@@ -3,7 +3,6 @@
 #include <memory>
 #include <string>
 #include <map>
-#include "Graphics\Model\FbxModelResource.h"
 
 #include "Components/ParticleSystemCom.h"
 
@@ -23,16 +22,16 @@ public:
     }
 
     //モデルリソース読み込み
-    std::shared_ptr<FbxModelResource> LoadModelResource(const char* filename);
+    std::shared_ptr<ModelResource> LoadModelResource(const char* filename);
 
     //モデルリソース登録
-    void RegisterModel(const char* filename, std::shared_ptr<FbxModelResource> resource);
+    void RegisterModel(const char* filename, std::shared_ptr<ModelResource> resource);
 
     //ファイル名で登録確認
     bool JudgeModelFilename(const char* filename);
 
 private:
-    using ModelMap = std::map<std::string, std::shared_ptr<FbxModelResource>>;
+    using ModelMap = std::map<std::string, std::shared_ptr<ModelResource>>;
 
     ModelMap models_;
     std::mutex mutex_;

@@ -63,9 +63,6 @@ public:
     void SetAnimationSpeed(float speed) { animationSpeed_ = speed; }
     const float GetAnimationSpeed()const { return animationSpeed_; }
 
-    //アニメーション追加
-    void ImportFbxAnimation(const char* filename);
-
     //アニメーションイベント取得(ポジションと再生中か)
     bool GetCurrentAnimationEvent(const char* eventName, DirectX::XMFLOAT3& position);
     //アニメーションイベント取得(エンドフレーム後なら)

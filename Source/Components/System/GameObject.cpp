@@ -7,10 +7,6 @@
 #include "../CameraCom.h"
 #include "../ColliderCom.h"
 #include "../ParticleSystemCom.h"
-#include "GameSource\ScriptComponents\Weapon\WeaponCom.h"
-#include "GameSource\ScriptComponents\Weapon\SwordTrailCom.h"
-#include "GameSource\ScriptComponents\Enemy\EnemyCom.h"
-#include "GameSource\ScriptComponents\Enemy\EnemyManager.h"
 #include "GameSource/Math/Collision.h"
 
 //ゲームオブジェクト
@@ -42,15 +38,11 @@ void GameObject::UpdateTransform()
 	if (!isEnabled_)return;
 
 	//親子の行列更新
-	//武器コンポーネントがないか
-	if (!this->GetComponent<WeaponCom>())
-	{
 		//親がいるか
-		if (parentObject_.lock())
-		{
-			DirectX::XMFLOAT4X4 parentTransform = parentObject_.lock()->transform_->GetWorldTransform();
-			transform_->SetParentTransform(parentTransform);
-		}
+	if (parentObject_.lock())
+	{
+		DirectX::XMFLOAT4X4 parentTransform = parentObject_.lock()->transform_->GetWorldTransform();
+		transform_->SetParentTransform(parentTransform);
 	}
 
 	transform_->UpdateTransform();
@@ -176,21 +168,6 @@ void GameObjectManager::AllRemove()
 		Remove(startObj);
 }
 
-bool GameObjectManager::EnemyObjFind(std::shared_ptr<GameObject> obj)
-{
-	if (obj->GetComponent<EnemyCom>())return true;
-
-	if (obj->GetParent())
-		return EnemyObjFind(obj->GetParent());
-
-	return false;
-}
-
-void GameObjectManager::ThreadEnemyUpdate(int id, float elapsedTime)
-{
-	enemyGameObject_[id].lock()->Update(elapsedTime);
-}
-
 
 // 更新
 void GameObjectManager::Update(float elapsedTime)
@@ -222,12 +199,6 @@ void GameObjectManager::Update(float elapsedTime)
 				renderSortObject_.emplace_back(rendererComponent);
 		}
 
-		//トレイルオブジェクトがあれば入れる
-		std::shared_ptr<SwordTrailCom> trailComponent = obj->GetComponent<SwordTrailCom>();
-		if (trailComponent)
-		{
-			swordTrailObject_.emplace_back(trailComponent);
-		}
 
 		//パーティクルオブジェクトがあれば入れる
 		std::shared_ptr<ParticleSystemCom> particleComponent = obj->GetComponent<ParticleSystemCom>();
@@ -271,23 +242,10 @@ void GameObjectManager::Update(float elapsedTime)
 		}
 	}
 
-	enemyGameObject_.clear();
 	//更新
 	for (std::shared_ptr<GameObject>& obj : updateGameObject_)
 	{
-		if (EnemyObjFind(obj))	//スレッド用
-			enemyGameObject_.emplace_back(obj);
-		else
-			obj->Update(elapsedTime);
-	}
-
-	int enemyCount = static_cast<int>(enemyGameObject_.size());
-	if (EnemyManager::Instance().GetIsUpdateFlag())	//更新フラグがOnの時
-	{
-		for (int enemyC = 0; enemyC < enemyCount; ++enemyC)
-		{
-			future.emplace_back(Graphics::Instance().GetThreadPool()->submit([&](auto id, auto elapsedTime) { return ThreadEnemyUpdate(id, elapsedTime); }, enemyC, elapsedTime));
-		}
+		obj->Update(elapsedTime);
 	}
 
 	for (auto& f : future)
@@ -345,15 +303,6 @@ void GameObjectManager::Update(float elapsedTime)
 				--ren;
 			}
 		}
-		//swordTrailObject解放
-		for (int tra = 0; tra < swordTrailObject_.size(); ++tra)
-		{
-			if (swordTrailObject_[tra].expired())
-			{
-				swordTrailObject_.erase(swordTrailObject_.begin() + tra);
-				--tra;
-			}
-		}
 
 		//particleObject解放
 		for (int per = 0; per < particleObject_.size(); ++per)
@@ -364,9 +313,6 @@ void GameObjectManager::Update(float elapsedTime)
 				--per;
 			}
 		}
-
-		//EnemyManagerの配列からEnemy解放
-		EnemyManager::Instance().EraseExpiredEnemy();
 	}
 
 }
@@ -391,9 +337,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
 
 	//パーティクル描画
 	ParticleRender();
-
-	//トレイル描画
-	SwordTrailRender();
 
 	//debug
 	if(Graphics::Instance().IsDebugGUI())
@@ -748,21 +691,6 @@ void GameObjectManager::RenderMask()
 	shader->End(dc);
 }
 
-//トレイル描画
-void GameObjectManager::SwordTrailRender()
-{
-	if (swordTrailObject_.size() <= 0)return;
-
-	for (std::weak_ptr<SwordTrailCom>& trailObj : swordTrailObject_)
-	{
-		if (!trailObj.lock()->GetGameObject()->GetEnabled())continue;
-		if (!trailObj.lock()->GetEnabled())continue;
-
-		trailObj.lock()->Render();
-
-	}
-
-}
 
 //パーティクル描画
 void GameObjectManager::ParticleRender()

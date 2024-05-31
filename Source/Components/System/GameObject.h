@@ -12,7 +12,6 @@ class Component;
 class TransformCom;
 class RendererCom;
 class ParticleSystemCom;
-class SwordTrailCom;
 class Collider;
 
 // ゲームオブジェクト
@@ -181,17 +180,12 @@ private:
 	//3D描画
 	void Render3D();
 
-	//トレイル描画
-	void SwordTrailRender();
-
 	//パーティクル描画
 	void ParticleRender();
 
 	//オブジェクト解放
 	void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
 
-	//スレッドで敵更新
-	void ThreadEnemyUpdate(int id, float elapsedTime);
 
 private:
 	std::vector<std::shared_ptr<GameObject>>		startGameObject_;
@@ -199,8 +193,6 @@ private:
 	std::set<std::shared_ptr<GameObject>>		selectionGameObject_;
 	std::set<std::shared_ptr<GameObject>>		removeGameObject_;
 
-	std::vector<std::weak_ptr<GameObject>>		enemyGameObject_;
-	bool EnemyObjFind(std::shared_ptr<GameObject> obj);
 
 
 
@@ -211,9 +203,6 @@ private:
 	bool isChangeShaderID_ = false;
 	//マスク用
 	std::vector<std::weak_ptr<RendererCom>>   renderMaskObject_;
-
-	//トレイル描画用
-	std::vector<std::weak_ptr<SwordTrailCom>>   swordTrailObject_;
 
 	//パーティクル描画用
 	std::vector<std::weak_ptr<ParticleSystemCom>>   particleObject_;

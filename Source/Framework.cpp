@@ -5,10 +5,7 @@
 #include "Graphics/Graphics.h"
 #include "Input/Input.h"
 #include "Framework.h"
-#include "GameSource\Render\Effect\EffectManager.h"
 #include "GameSource\Scene\SceneGame.h"
-#include "GameSource\Scene\SceneTitle.h"
-#include "GameSource\Scene\SceneResult.h"
 #include "GameSource\Scene\SceneManager.h"
 
 #include "imgui.h"
@@ -24,8 +21,6 @@ Framework::Framework(HWND hWnd)
 	, input_(hWnd)
 	, graphics_(hWnd)
 {
-	//エフェクトマネージャー初期化
-	EffectManager::Instance().Initialize();
 
 	//sceneGame.Initialize();
 	SceneManager::Instance().ChangeScene(new SceneGame);
@@ -39,9 +34,6 @@ Framework::~Framework()
 {
 	//sceneGame.Finalize();
 	SceneManager::Instance().Clear();
-
-	//エフェクトマネージャー終了化
-	EffectManager::Instance().Finalize();
 }
 
 #include "Logger.h"

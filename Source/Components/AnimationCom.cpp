@@ -73,7 +73,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 
 	//モデルからリソースを取得
 	Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
-	const FbxModelResource* resource = model->GetResource();
+	const ModelResource* resource = model->GetResource();
 	
 	//ブレンド率の計算
 	float blendRate = 1.0f;
@@ -241,7 +241,7 @@ void AnimationCom::PlayAnimation(int index, bool loop, float blendSeconds)
 	//アニメーションイベント保存
 	currentAnimationEvents_.clear();
 	Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
-	const FbxModelResource* resource = model->GetResource();
+	const ModelResource* resource = model->GetResource();
 	const ModelResource::Animation& animation = resource->GetAnimations().at(currentAnimationIndex_);
 	//アニメーションイベントから情報をコピー
 	for (auto& animEvent : animation.animationEvents)
@@ -284,23 +284,6 @@ bool AnimationCom::IsPlayAnimation()
 	if(animationEndFlag_)return false;
 
 	return true;
-}
-
-// アニメーション入力
-void AnimationCom::ImportFbxAnimation(const char* filename)
-{
-	//モデルからリソースを取得
-	std::shared_ptr<FbxModelResource> resource = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResourceShared();
-
-	if (resource != nullptr)
-	{
-		//fbx以外は弾く
-		const char* ext = strrchr(filename, '.');
-		if (::_stricmp(ext, ".fbx") == 0)
-		{
-			resource->AddAnimation(filename);
-		}
-	}
 }
 
 //アニメーションイベント取得

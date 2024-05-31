@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 #include <DirectXMath.h>
-#include "Graphics/Model/FbxModelResource.h"
 
+#include "ModelResource.h"
 #include <future>
 
 // モデル
@@ -37,8 +37,8 @@ public:
 	std::vector<Node>& GetNodes() { return nodes_; }
 
 	// リソース取得
-	const FbxModelResource* GetResource() const { return modelResource_.get(); }
-	std::shared_ptr<FbxModelResource> GetResourceShared() const { return modelResource_; }
+	const ModelResource* GetResource() const { return modelResource_.get(); }
+	std::shared_ptr<ModelResource> GetResourceShared() const { return modelResource_; }
 
 	//ノード検索
 	Node* FindNode(const char* name);
@@ -54,8 +54,7 @@ public:
 	const bool GetIsShadowDraw() const { return isShadowDraw_; }
 
 private:
-	//std::shared_ptr<ModelResource>	resource;
-	std::shared_ptr<FbxModelResource>	modelResource_;	//fbx用
+	std::shared_ptr<ModelResource>	modelResource_;	//fbx用
 	std::vector<Node>				nodes_;
 
 	DirectX::XMFLOAT4 materialColor_ = { 1,1,1,1 };

@@ -4,16 +4,15 @@
 
 
 //モデルリソース読み込み
-std::shared_ptr<FbxModelResource> ResourceManager::LoadModelResource(const char* filename)
+std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename)
 {
-    std::shared_ptr<FbxModelResource> model;
+    std::shared_ptr<ModelResource> model;
 
     //モデル検索
     for (auto& modelmap : models_){
         if (modelmap.first == filename){
             if (modelmap.second) {
-                model = std::make_shared<FbxModelResource>(*modelmap.second.get());
-                //model = static_cast<std::shared_ptr<FbxModelResource>>(modelmap.second);
+                model = std::make_shared<ModelResource>(*modelmap.second.get());
             }
         }
     }
@@ -21,18 +20,18 @@ std::shared_ptr<FbxModelResource> ResourceManager::LoadModelResource(const char*
     //モデルがない場合
     if (!model) {
         //新規モデルリソース作成＆読み込み
-        std::shared_ptr<FbxModelResource> resource = std::make_shared<FbxModelResource>();
+        std::shared_ptr<ModelResource> resource = std::make_shared<ModelResource>();
         resource->Load(Graphics::Instance().GetDevice(), filename);
 
         //マップに登録
         models_[filename] = resource;
-        model = static_cast<std::shared_ptr<FbxModelResource>>(models_[filename]);
+        model = static_cast<std::shared_ptr<ModelResource>>(models_[filename]);
     }
 
     return model;
 }
 
-void ResourceManager::RegisterModel(const char* filename, std::shared_ptr<FbxModelResource> resource)
+void ResourceManager::RegisterModel(const char* filename, std::shared_ptr<ModelResource> resource)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (models_.count(filename) == 0)

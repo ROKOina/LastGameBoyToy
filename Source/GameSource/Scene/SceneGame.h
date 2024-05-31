@@ -29,18 +29,4 @@ public:
 
 private:
 
-	float transitionOutTimer_;
-
-	bool gameEndFlag_ = false;
-	bool gameStartFlag_ = false;
-	float sceneTransitionTimer_;
-
-	std::unique_ptr<PostEffect> postEff_;
-
-	//ŠJŽn‰æ‘œ
-	std::unique_ptr<Sprite> startSprite_;
-	float startSpriteSize_;
-
-	//BGM
-	std::unique_ptr<AudioSource> BGM_ = Audio::Instance().LoadAudioSource("Data/Audio/gameBGM.wav");
 };

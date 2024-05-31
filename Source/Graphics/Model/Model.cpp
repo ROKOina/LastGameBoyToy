@@ -7,7 +7,6 @@
 void Model::ModelInitialize( const char* filename)
 {
 	ID3D11Device* device = Graphics::Instance().GetDevice();
-	modelResource_ = std::make_shared<FbxModelResource>();
 
 	//リソースマネージャーに登録されているか
 	if (!ResourceManager::Instance().JudgeModelFilename(filename))

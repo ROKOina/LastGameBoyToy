@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\Effekseer162a\include;.\External\FBX SDK\2019.0\include;.\External\imgui-docking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\imgui-docking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -69,7 +69,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Effekseer.lib;EffekseerRendererDX11.lib;libfbxsdk-mt.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
@@ -92,7 +92,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\Effekseer162a\include;.\External\FBX SDK\2019.0\include;.\External\imgui-docking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\imgui-docking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -102,7 +102,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Effekseer.lib;EffekseerRendererDX11.lib;libfbxsdk-mt.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
@@ -155,40 +155,12 @@
     <ClInclude Include="Source\Components\RendererCom.h" />
     <ClInclude Include="Source\Dialog.h" />
     <ClInclude Include="Source\GameSource\Math\easing.h" />
-    <ClInclude Include="Source\GameSource\Scene\SceneResult.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\CharacterStatusCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\EnemyAppleNearCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\EnemyFarCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\ActionBase.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\ActionDerived.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\BehaviorData.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\BehaviorTree.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\JudgmentBase.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\JudgmentDerived.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\NodeBase.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\EnemyCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\EnemyGrapeFarCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\EnemyManager.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\EnemyNearCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Enemy\TelegramEnemy.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Player\AttackPlayer.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Player\JustAvoidPlayer.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Player\MovePlayer.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Player\PlayerCameraCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Player\PlayerCom.h" />
     <ClInclude Include="Source\Components\System\Component.h" />
     <ClInclude Include="Source\Components\System\GameObject.h" />
     <ClInclude Include="Source\Components\TransformCom.h" />
     <ClInclude Include="Source\GameSource\Math\Collision.h" />
-    <ClInclude Include="Source\GameSource\Render\Effect\Effect.h" />
-    <ClInclude Include="Source\GameSource\Render\Effect\EffectManager.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Components\CameraCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Player\PlayerWeapon\CandyPushCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Score.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Weapon\SwordTrailCom.h" />
-    <ClInclude Include="Source\GameSource\ScriptComponents\Weapon\WeaponCom.h" />
-    <ClInclude Include="Source\GameSource\Stage\PathSearch.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\PhongShader.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\ShadowMapCasterShader.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\SilhoutteShader.h" />
@@ -196,7 +168,6 @@
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Dx11StateLib.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
-    <ClInclude Include="Source\Graphics\Model\FbxModelResource.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\LambertShader.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\LineRenderer.h" />
@@ -219,7 +190,6 @@
     <ClInclude Include="Source\GameSource\Scene\SceneGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneLoading.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneManager.h" />
-    <ClInclude Include="Source\GameSource\Scene\SceneTitle.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
     <ClInclude Include="Source\ThreadPool\ThreadPool.h" />
   </ItemGroup>
@@ -252,35 +222,11 @@
     <ClCompile Include="Source\Components\RendererCom.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
     <ClCompile Include="Source\GameSource\Math\easing.cpp" />
-    <ClCompile Include="Source\GameSource\Scene\SceneResult.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\CharacterStatusCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\ActionDerived.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\BehaviorData.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\BehaviorTree.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\JudgmentDerived.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\BehaviorTree\NodeBase.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\EnemyAppleNearCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\EnemyCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\EnemyFarCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\EnemyGrapeFarCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Enemy\EnemyNearCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Player\AttackPlayer.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Player\JustAvoidPlayer.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Player\MovePlayer.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Player\PlayerCameraCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Player\PlayerCom.cpp" />
     <ClCompile Include="Source\Components\System\GameObject.cpp" />
     <ClCompile Include="Source\Components\TransformCom.cpp" />
     <ClCompile Include="Source\GameSource\Math\Collision.cpp" />
-    <ClCompile Include="Source\GameSource\Render\Effect\Effect.cpp" />
-    <ClCompile Include="Source\GameSource\Render\Effect\EffectManager.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\Components\CameraCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Player\PlayerWeapon\CandyPushCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Weapon\SwordTrailCom.cpp" />
-    <ClCompile Include="Source\GameSource\ScriptComponents\Weapon\WeaponCom.cpp" />
-    <ClCompile Include="Source\GameSource\Stage\PathSearch.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\PhongShader.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\ShadowMapCasterShader.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\SilhoutteShader.cpp" />
@@ -288,7 +234,6 @@
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Dx11StateLib.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />
-    <ClCompile Include="Source\Graphics\Model\FbxModelResource.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\LambertShader.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\LineRenderer.cpp" />
@@ -307,7 +252,6 @@
     <ClCompile Include="Source\GameSource\Scene\SceneGame.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneLoading.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneManager.cpp" />
-    <ClCompile Include="Source\GameSource\Scene\SceneTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\2D\PostEffect\FullScreen.hlsli" />
