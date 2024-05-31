@@ -12,21 +12,6 @@ void SceneLoading::Initialize()
     //スレッド開始
     thread_ = new std::thread(LoadingThread,this);
 
-    //ポストエフェクト
-    {
-        Graphics& graphics = Graphics::Instance();
-        postEff_ = std::make_unique<PostEffect>(
-            static_cast<UINT>(graphics.GetScreenWidth()),
-            static_cast<UINT>(graphics.GetScreenHeight()));
-
-        //ブルーム
-        graphics.shaderParameter3D_.bloomLuminance.intensity = 5;
-        graphics.shaderParameter3D_.bloomLuminance.threshold = 1;
-
-        //太陽
-        postEff_->SetSunEnabled(false);
-    }
-
 }
 
 //終了化
@@ -79,23 +64,19 @@ void SceneLoading::Render(float elapsedTime)
         //バッファ避難
         Graphics::Instance().CacheRenderTargets();
 
-        //ポストエフェクト用切り替え
-        PostRenderTarget* ps = Graphics::Instance().GetPostEffectModelRenderTarget().get();
-        PostDepthStencil* ds = Graphics::Instance().GetPostEffectModelDepthStencilView().get();
-
         // 画面クリア＆レンダーターゲット設定
         rtv = {};
         dsv = {};
-        rtv = ps->renderTargetView.Get();
-        dsv = ds->depthStencilView.Get();
+        rtv = Graphics::Instance().GetRenderTargetView();
+        dsv = Graphics::Instance().GetDepthStencilView();
         dc->ClearRenderTargetView(rtv, color);
         dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
         dc->OMSetRenderTargets(1, &rtv, dsv);
 
         // ビューポートの設定
         D3D11_VIEWPORT	vp = {};
-        vp.Width = static_cast<float>(ps->width);
-        vp.Height = static_cast<float>(ps->height);
+        vp.Width = static_cast<float>(Graphics::Instance().GetScreenWidth());
+        vp.Height = static_cast<float>(Graphics::Instance().GetScreenHeight());
         vp.MinDepth = 0.0f;
         vp.MaxDepth = 1.0f;
         dc->RSSetViewports(1, &vp);
@@ -119,10 +100,6 @@ void SceneLoading::Render(float elapsedTime)
 
         //バッファ戻す
         graphics.RestoreRenderTargets();
-
-        postEff_->Render(mainCamera_);
-        if (graphics.IsDebugGUI())
-            postEff_->ImGuiRender();
     }
 }
 

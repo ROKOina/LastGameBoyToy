@@ -7,6 +7,7 @@
 
 #include "Dialog.h"
 #include "Logger.h"
+#include "Misc.h"
 #include <fstream>
 #include <filesystem>
 #include <shlwapi.h>
@@ -249,53 +250,53 @@ void ParticleSystemCom::Start()
 // 更新処理
 void ParticleSystemCom::Update(float elapsedTime)
 {
-	float worldElapsedTime = Graphics::Instance().GetWorldSpeed() * elapsedTime;
-	//世界のスピードに合わせない場合
-	if (!isWorldSpeed_)worldElapsedTime = elapsedTime;
+	//float worldElapsedTime = Graphics::Instance().GetWorldSpeed() * elapsedTime;
+	////世界のスピードに合わせない場合
+	//if (!isWorldSpeed_)worldElapsedTime = elapsedTime;
 
-	//リスタート
-	if (isRestart_)
-	{
-		isRestart_ = false;
-		lifeLimit_ = 0;
-		Restart();
-	}
+	////リスタート
+	//if (isRestart_)
+	//{
+	//	isRestart_ = false;
+	//	lifeLimit_ = 0;
+	//	Restart();
+	//}
 
-	//削除判定
-	if (!particleData_.particleData.isRoop && isAutoDeleteFlag_)
-	{
-		lifeLimit_ += worldElapsedTime;
-	}
-	else
-	{
-		lifeLimit_ = 0;
-	}
+	////削除判定
+	//if (!particleData_.particleData.isRoop && isAutoDeleteFlag_)
+	//{
+	//	lifeLimit_ += worldElapsedTime;
+	//}
+	//else
+	//{
+	//	lifeLimit_ = 0;
+	//}
 
-	std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
+	//std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
 
-	Graphics& graphics = Graphics::Instance();
-	ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+	//Graphics& graphics = Graphics::Instance();
+	//ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
 
-	dc->CSSetUnorderedAccessViews(0, 1, particleUAV_.GetAddressOf(), NULL);
+	//dc->CSSetUnorderedAccessViews(0, 1, particleUAV_.GetAddressOf(), NULL);
 
-	particleData_.particleData.time += worldElapsedTime;
-	particleData_.particleData.elapsedTime = worldElapsedTime;
-	dc->UpdateSubresource(constantBuffer_.Get(), 0, 0, &particleData_.particleData, 0, 0);
-	dc->CSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
+	//particleData_.particleData.time += worldElapsedTime;
+	//particleData_.particleData.elapsedTime = worldElapsedTime;
+	//dc->UpdateSubresource(constantBuffer_.Get(), 0, 0, &particleData_.particleData, 0, 0);
+	//dc->CSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
 
-	dc->UpdateSubresource(gameBuffer_.Get(), 0, 0, &gameData_, 0, 0);
-	dc->CSSetConstantBuffers(10, 1, gameBuffer_.GetAddressOf());
+	//dc->UpdateSubresource(gameBuffer_.Get(), 0, 0, &gameData_, 0, 0);
+	//dc->CSSetConstantBuffers(10, 1, gameBuffer_.GetAddressOf());
 
-	dc->CSSetConstantBuffers(1, 1, sceneBuffer_.GetAddressOf());
+	//dc->CSSetConstantBuffers(1, 1, sceneBuffer_.GetAddressOf());
 
-	dc->CSSetShader(particleCompute_.Get(), NULL, 0);
+	//dc->CSSetShader(particleCompute_.Get(), NULL, 0);
 
-	const UINT thread_group_count_x = align(static_cast<UINT>(maxParticleCount_), NUMTHREADS_X) / NUMTHREADS_X;
-	dc->Dispatch(thread_group_count_x, 1, 1);
+	//const UINT thread_group_count_x = align(static_cast<UINT>(maxParticleCount_), NUMTHREADS_X) / NUMTHREADS_X;
+	//dc->Dispatch(thread_group_count_x, 1, 1);
 
-	ID3D11UnorderedAccessView* null_unordered_access_view{};
-	dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
+	//ID3D11UnorderedAccessView* null_unordered_access_view{};
+	//dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
 }
 
 // GUI描画
@@ -830,90 +831,90 @@ void ParticleSystemCom::Initialize()
 
 void ParticleSystemCom::Render()
 {
-	Graphics& graphics = Graphics::Instance();
-	ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-	Dx11StateLib* dx11State = graphics.GetDx11State().get();
+	//Graphics& graphics = Graphics::Instance();
+	//ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+	//Dx11StateLib* dx11State = graphics.GetDx11State().get();
 
-	//背面カリングオフに
-	dc->RSSetState(dx11State->GetRasterizerState(Dx11StateLib::RASTERIZER_TYPE::FRONTCOUNTER_TRUE_CULLNONE).Get());
-
-
-	//シェーダーセット
-	dc->VSSetShader(particleVertex_.Get(), NULL, 0);
-	dc->PSSetShader(particlePixel_.Get(), NULL, 0);
-	dc->GSSetShader(particleGeometry_.Get(), NULL, 0);
-	dc->GSSetShaderResources(9, 1, particleSRV_.GetAddressOf());
-
-	//サンプラーステート
-	ID3D11SamplerState* samplerState = dx11State->GetSamplerState(Dx11StateLib::SAMPLER_TYPE::TEXTURE_ADDRESS_WRAP).Get();
-	dc->PSSetSamplers(0, 1, &samplerState);
-
-	//ブレンドステート
-	const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	dc->OMSetBlendState(
-		//dx11State->GetBlendState(Dx11StateLib::BLEND_STATE_TYPE::ADDITION).Get(),
-		dx11State->GetBlendState(Dx11StateLib::BLEND_STATE_TYPE::ALPHA_ATC).Get(),
-		blendFactor, 0xFFFFFFFF);
-
-	//画像
-	dc->PSSetShaderResources(0, 1, particleSprite_.GetAddressOf());
-	
-	//コンスタントバッファ
-	ParticleScene scene;
-
-	scene.cameraPos = graphics.shaderParameter3D_.viewPosition;
-
-	//モデル情報
-	DirectX::XMStoreFloat4x4(&scene.modelMat,
-		DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform()));
-
-	//ビュープロジェクション
-	DirectX::XMStoreFloat4x4(&scene.viweProj,
-		DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.view)
-		* DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.projection));
-
-	DirectX::XMStoreFloat4x4(&scene.inverseModelMat,
-		DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform())));
-
-	//逆ビュープロジェクション
-	DirectX::XMStoreFloat4x4(&scene.inverseViweProj,
-		DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.projection))
-		* DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.view)));
+	////背面カリングオフに
+	//dc->RSSetState(dx11State->GetRasterizerState(Dx11StateLib::RASTERIZER_TYPE::FRONTCOUNTER_TRUE_CULLNONE).Get());
 
 
-	DirectX::XMStoreFloat4x4(&scene.view, DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.view)));
-	DirectX::XMStoreFloat4x4(&scene.gProj,  DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.projection));
+	////シェーダーセット
+	//dc->VSSetShader(particleVertex_.Get(), NULL, 0);
+	//dc->PSSetShader(particlePixel_.Get(), NULL, 0);
+	//dc->GSSetShader(particleGeometry_.Get(), NULL, 0);
+	//dc->GSSetShaderResources(9, 1, particleSRV_.GetAddressOf());
 
-	scene.lightDir = graphics.shaderParameter3D_.lightDirection;
+	////サンプラーステート
+	//ID3D11SamplerState* samplerState = dx11State->GetSamplerState(Dx11StateLib::SAMPLER_TYPE::TEXTURE_ADDRESS_WRAP).Get();
+	//dc->PSSetSamplers(0, 1, &samplerState);
+
+	////ブレンドステート
+	//const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//dc->OMSetBlendState(
+	//	//dx11State->GetBlendState(Dx11StateLib::BLEND_STATE_TYPE::ADDITION).Get(),
+	//	dx11State->GetBlendState(Dx11StateLib::BLEND_STATE_TYPE::ALPHA_ATC).Get(),
+	//	blendFactor, 0xFFFFFFFF);
+
+	////画像
+	//dc->PSSetShaderResources(0, 1, particleSprite_.GetAddressOf());
+	//
+	////コンスタントバッファ
+	//ParticleScene scene;
+
+	//scene.cameraPos = graphics.shaderParameter3D_.viewPosition;
+
+	////モデル情報
+	//DirectX::XMStoreFloat4x4(&scene.modelMat,
+	//	DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform()));
+
+	////ビュープロジェクション
+	//DirectX::XMStoreFloat4x4(&scene.viweProj,
+	//	DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.view)
+	//	* DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.projection));
+
+	//DirectX::XMStoreFloat4x4(&scene.inverseModelMat,
+	//	DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform())));
+
+	////逆ビュープロジェクション
+	//DirectX::XMStoreFloat4x4(&scene.inverseViweProj,
+	//	DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.projection))
+	//	* DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.view)));
 
 
-	DirectX::XMFLOAT3 up = GetGameObject()->transform_->GetWorldPosition();
-	DirectX::XMFLOAT4 down = { up.x,up.y-1,up.z,1 };
+	//DirectX::XMStoreFloat4x4(&scene.view, DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.view)));
+	//DirectX::XMStoreFloat4x4(&scene.gProj,  DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.projection));
+
+	//scene.lightDir = graphics.shaderParameter3D_.lightDirection;
 
 
-	scene.downVec = down; 
+	//DirectX::XMFLOAT3 up = GetGameObject()->transform_->GetWorldPosition();
+	//DirectX::XMFLOAT4 down = { up.x,up.y-1,up.z,1 };
 
 
-	dc->UpdateSubresource(sceneBuffer_.Get(), 0, 0, &scene, 0, 0);
-	dc->GSSetConstantBuffers(1, 1, sceneBuffer_.GetAddressOf());
+	//scene.downVec = down; 
 
-	dc->UpdateSubresource(constantBuffer_.Get(), 0, 0, &particleData_.particleData, 0, 0);
-	dc->VSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
-	dc->PSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
-	dc->GSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
 
-	//解放
-	dc->IASetInputLayout(NULL);
-	dc->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
-	dc->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
-	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	dc->Draw(static_cast<UINT>(maxParticleCount_), 0);
+	//dc->UpdateSubresource(sceneBuffer_.Get(), 0, 0, &scene, 0, 0);
+	//dc->GSSetConstantBuffers(1, 1, sceneBuffer_.GetAddressOf());
 
-	ID3D11ShaderResourceView* null_shader_resource_view{};
-	dc->GSSetShaderResources(9, 1, &null_shader_resource_view);
-	dc->VSSetShader(NULL, NULL, 0);
-	dc->PSSetShader(NULL, NULL, 0);
-	dc->GSSetShader(NULL, NULL, 0);
+	//dc->UpdateSubresource(constantBuffer_.Get(), 0, 0, &particleData_.particleData, 0, 0);
+	//dc->VSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
+	//dc->PSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
+	//dc->GSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
+
+	////解放
+	//dc->IASetInputLayout(NULL);
+	//dc->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+	//dc->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
+	//dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	//dc->Draw(static_cast<UINT>(maxParticleCount_), 0);
+
+	//ID3D11ShaderResourceView* null_shader_resource_view{};
+	//dc->GSSetShaderResources(9, 1, &null_shader_resource_view);
+	//dc->VSSetShader(NULL, NULL, 0);
+	//dc->PSSetShader(NULL, NULL, 0);
+	//dc->GSSetShader(NULL, NULL, 0);
 }
 
 //ファイルネームでロード

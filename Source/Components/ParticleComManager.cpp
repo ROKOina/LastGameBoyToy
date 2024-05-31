@@ -9,44 +9,44 @@
 
 void ParticleComManager::Update(float elapsedTime)
 {
-    int index = 0;
-    for (; index < particles_.size(); )
-    {
-        if (particles_[index].particle.expired())    //データがないなら削除
-        {
-            particles_.erase(particles_.begin() + index);
-            continue;
-        }
+    //int index = 0;
+    //for (; index < particles_.size(); )
+    //{
+    //    if (particles_[index].particle.expired())    //データがないなら削除
+    //    {
+    //        particles_.erase(particles_.begin() + index);
+    //        continue;
+    //    }
 
-        //削除判定
-        std::shared_ptr<ParticleSystemCom> par = particles_[index].particle.lock()->GetComponent<ParticleSystemCom>();
-        if (par->DeleteFlag())
-            GameObjectManager::Instance().Remove(particles_[index].particle.lock());
+    //    //削除判定
+    //    std::shared_ptr<ParticleSystemCom> par = particles_[index].particle.lock()->GetComponent<ParticleSystemCom>();
+    //    if (par->DeleteFlag())
+    //        GameObjectManager::Instance().Remove(particles_[index].particle.lock());
 
-        //追従処理
-        if (particles_[index].posObj.lock())
-        {
-            if (particles_[index].boneName.empty()) //ボーンない場合
-            {
-                DirectX::XMFLOAT3 pos = particles_[index].posObj.lock()->transform_->GetWorldPosition();
-                pos.x += particles_[index].offsetPos.x;
-                pos.y += particles_[index].offsetPos.y;
-                pos.z += particles_[index].offsetPos.z;
-                particles_[index].particle.lock()->transform_->SetWorldPosition(pos);
-            }
-            else
-            {
-                DirectX::XMFLOAT4X4 boneTransform = particles_[index].posObj.lock()->GetComponent<RendererCom>()->GetModel()->FindNode(particles_[index].boneName.c_str())->worldTransform;
-                DirectX::XMFLOAT3 pos = { boneTransform._41,boneTransform._42,boneTransform._43 };
-                pos.x += particles_[index].offsetPos.x;
-                pos.y += particles_[index].offsetPos.y;
-                pos.z += particles_[index].offsetPos.z;
-                particles_[index].particle.lock()->transform_->SetWorldPosition(pos);
-            }
-        }
+    //    //追従処理
+    //    if (particles_[index].posObj.lock())
+    //    {
+    //        if (particles_[index].boneName.empty()) //ボーンない場合
+    //        {
+    //            DirectX::XMFLOAT3 pos = particles_[index].posObj.lock()->transform_->GetWorldPosition();
+    //            pos.x += particles_[index].offsetPos.x;
+    //            pos.y += particles_[index].offsetPos.y;
+    //            pos.z += particles_[index].offsetPos.z;
+    //            particles_[index].particle.lock()->transform_->SetWorldPosition(pos);
+    //        }
+    //        else
+    //        {
+    //            DirectX::XMFLOAT4X4 boneTransform = particles_[index].posObj.lock()->GetComponent<RendererCom>()->GetModel()->FindNode(particles_[index].boneName.c_str())->worldTransform;
+    //            DirectX::XMFLOAT3 pos = { boneTransform._41,boneTransform._42,boneTransform._43 };
+    //            pos.x += particles_[index].offsetPos.x;
+    //            pos.y += particles_[index].offsetPos.y;
+    //            pos.z += particles_[index].offsetPos.z;
+    //            particles_[index].particle.lock()->transform_->SetWorldPosition(pos);
+    //        }
+    //    }
 
-        index++;
-    }
+    //    index++;
+    //}
 }
 
 std::shared_ptr<GameObject> ParticleComManager::SetEffect(EFFECT_ID id, DirectX::XMFLOAT3 pos

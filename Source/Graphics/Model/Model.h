@@ -2,65 +2,74 @@
 
 #include <memory>
 #include <vector>
+#include <d3d11.h>
 #include <DirectXMath.h>
-
 #include "ModelResource.h"
-#include <future>
 
-// モデル
 class Model
 {
 public:
-	Model(const char* filename);
-	~Model() {}
+    Model(std::shared_ptr<ModelResource> resource);
+    ~Model() {}
 
-	void ModelInitialize(const char* filename);
+    struct Node
+    {
+        const char* name;
+        Node* parent;
+        DirectX::XMFLOAT3	scale;
+        DirectX::XMFLOAT4	rotate;
+        DirectX::XMFLOAT3	translate;
+        DirectX::XMFLOAT4X4	localTransform;
+        DirectX::XMFLOAT4X4	worldTransform;
+        int layer;
 
-	struct Node
-	{
-		const char*			name;
-		Node*				parent;
-		DirectX::XMFLOAT3	scale;
-		DirectX::XMFLOAT4	rotate;
-		DirectX::XMFLOAT3	translate;
-		DirectX::XMFLOAT4X4	localTransform;
-		DirectX::XMFLOAT4X4	worldTransform;
+        std::vector<Node*>	children;
+    };
 
-		std::vector<Node*>	children;
-	};
+    // アニメーション
+    bool IsPlayAnimation() const { return currentAnimation >= 0; }
+    void PlayAnimation(int animationIndex, bool loop = false);
+    void StopAnimation();
+    void UpdateAnimation(float elapsedTime);
+    void ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Node& node);
 
-	// 行列計算
-	void UpdateTransform(const DirectX::XMFLOAT4X4& transform);
+    // 速度設定
+    void SetSpeed(float speed) { this->speed = speed; }
 
-	// ノードリスト取得
-	const std::vector<Node>& GetNodes() const { return nodes_; }
-	std::vector<Node>& GetNodes() { return nodes_; }
+    // 行列計算
+    void UpdateTransform(const DirectX::XMMATRIX& Transform);
 
-	// リソース取得
-	const ModelResource* GetResource() const { return modelResource_.get(); }
-	std::shared_ptr<ModelResource> GetResourceShared() const { return modelResource_; }
+    const std::vector<Node>& GetNodes() const { return nodes; }
+    std::vector<Node>& GetNodes() { return nodes; }
+    const ModelResource* GetResource() const { return resource.get(); }
+    ModelResource* GetResource() { return resource.get(); }
 
-	//ノード検索
-	Node* FindNode(const char* name);
+    // アニメーション時間
+    float GetAnimationSeconds() const { return currentSeconds; }
+    void SetAnimationSeconds(float seconds) { currentSeconds = seconds; }
 
-	//カラー
-	const DirectX::XMFLOAT4 GetMaterialColor() const { return materialColor_; }
-	void SetMaterialColor(DirectX::XMFLOAT4 color) { materialColor_ = color; }
+    //シリアライズに適用させる為の処理
+    void CopyModel();
 
-	void JoinThred() { future.get(); }
-
-	//影を描画するか
-	void SetIsShadowDraw(bool flag) { isShadowDraw_ = flag; }
-	const bool GetIsShadowDraw() const { return isShadowDraw_; }
+    //オープンノードをした時に逆に情報を入れる
+    void CopyRefrectModel();
 
 private:
-	std::shared_ptr<ModelResource>	modelResource_;	//fbx用
-	std::vector<Node>				nodes_;
 
-	DirectX::XMFLOAT4 materialColor_ = { 1,1,1,1 };
+    enum Layer
+    {
+        ALLBODY,
+        UPPER,
+        LOWER,
+        LAYERMAX
+    };
 
-	bool isShadowDraw_ = false;
-
-	//モデル読み込みをスレッド化
-	std::future<void> future;
+private:
+    std::shared_ptr<ModelResource>	resource;
+    std::vector<Node>				nodes;
+    int								currentAnimation = -1;
+    float							currentSeconds = 0.0f;
+    bool							loopAnimation = false;
+    bool							endAnimation = false;
+    float							speed = 1.0f;
 };

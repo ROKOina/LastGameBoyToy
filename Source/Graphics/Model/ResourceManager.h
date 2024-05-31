@@ -5,6 +5,7 @@
 #include <map>
 
 #include "Components/ParticleSystemCom.h"
+#include "ModelResource.h"
 
 //リソースマネジャー
 class ResourceManager

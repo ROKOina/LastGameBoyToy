@@ -6,6 +6,7 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -15,18 +16,15 @@
 #include "ModelResource.h"
 
 // CEREALバージョン定義
-CEREAL_CLASS_VERSION(UnityChanToonStruct, 1)
-
 CEREAL_CLASS_VERSION(ModelResource::Node, 1)
 CEREAL_CLASS_VERSION(ModelResource::Material, 1)
 CEREAL_CLASS_VERSION(ModelResource::Subset, 1)
-CEREAL_CLASS_VERSION(ModelResource::ShapeData, 1)
 CEREAL_CLASS_VERSION(ModelResource::Vertex, 1)
 CEREAL_CLASS_VERSION(ModelResource::Mesh, 1)
 CEREAL_CLASS_VERSION(ModelResource::NodeKeyData, 1)
+CEREAL_CLASS_VERSION(ModelResource::RootPosition, 1)
 CEREAL_CLASS_VERSION(ModelResource::Keyframe, 1)
 CEREAL_CLASS_VERSION(ModelResource::AnimationEvent, 1)
-CEREAL_CLASS_VERSION(ModelResource::RootPosition, 1)
 CEREAL_CLASS_VERSION(ModelResource::Animation, 1)
 CEREAL_CLASS_VERSION(ModelResource, 1)
 
@@ -86,26 +84,7 @@ namespace DirectX
 	}
 }
 
-template<class Archive>
-void UnityChanToonStruct::serialize(Archive& archive, int version)
-{
-	archive(
-		CEREAL_NVP(_Is_LightColor_Base),
-		CEREAL_NVP(_Tweak_SystemShadowsLevel),
-		CEREAL_NVP(_BaseColor_Step),
-		CEREAL_NVP(_BaseShade_Feather),
-		CEREAL_NVP(_BaseColor),
-		CEREAL_NVP(_1st_ShadeColor),
-		CEREAL_NVP(_Set_HighColorMask),
-		CEREAL_NVP(_HighColor_Power),
-		CEREAL_NVP(dummy),
-		CEREAL_NVP(_RimLight_Power),
-		CEREAL_NVP(_RimLight),
-		CEREAL_NVP(_RimLightColor),
-		CEREAL_NVP(_Emissive_Color)
-	);
-}
-
+//ノード
 template<class Archive>
 void ModelResource::Node::serialize(Archive& archive, int version)
 {
@@ -116,22 +95,27 @@ void ModelResource::Node::serialize(Archive& archive, int version)
 		CEREAL_NVP(parentIndex),
 		CEREAL_NVP(scale),
 		CEREAL_NVP(rotate),
-		CEREAL_NVP(translate)
+		CEREAL_NVP(translate),
+		CEREAL_NVP(layer)
 	);
 }
 
+//マテリアル
 template<class Archive>
 void ModelResource::Material::serialize(Archive& archive, int version)
 {
 	archive(
 		CEREAL_NVP(name),
 		CEREAL_NVP(textureFilename),
-		CEREAL_NVP(normalFilename),
 		CEREAL_NVP(color),
-		CEREAL_NVP(toonStruct)
+		CEREAL_NVP(emissivecolor),
+		CEREAL_NVP(emissiveintensity),
+		CEREAL_NVP(Metalness),
+		CEREAL_NVP(Roughness)
 	);
 }
 
+//サブセット
 template<class Archive>
 void ModelResource::Subset::serialize(Archive& archive, int version)
 {
@@ -157,16 +141,6 @@ void ModelResource::Vertex::serialize(Archive& archive, int version)
 }
 
 template<class Archive>
-void ModelResource::ShapeData::serialize(Archive& archive, int version)
-{
-	archive(
-		CEREAL_NVP(name),
-		CEREAL_NVP(rate),
-		CEREAL_NVP(shapeVertex)
-	);
-}
-
-template<class Archive>
 void ModelResource::Mesh::serialize(Archive& archive, int version)
 {
 	archive(
@@ -177,8 +151,7 @@ void ModelResource::Mesh::serialize(Archive& archive, int version)
 		CEREAL_NVP(nodeIndices),
 		CEREAL_NVP(offsetTransforms),
 		CEREAL_NVP(boundsMin),
-		CEREAL_NVP(boundsMax),
-		CEREAL_NVP(shapeData)
+		CEREAL_NVP(boundsMax)
 	);
 }
 
@@ -202,22 +175,21 @@ void ModelResource::Keyframe::serialize(Archive& archive, int version)
 }
 
 template<class Archive>
-void ModelResource::AnimationEvent::serialize(Archive& archive, int version)
-{
-	archive(
-		CEREAL_NVP(name),
-		CEREAL_NVP(startFrame),
-		CEREAL_NVP(endFrame),
-		CEREAL_NVP(eventNode)
-	);
-}
-
-template<class Archive>
 void ModelResource::RootPosition::serialize(Archive& archive, int version)
 {
 	archive(
 		CEREAL_NVP(frame),
-		CEREAL_NVP(pos)
+		CEREAL_NVP(position)
+	);
+}
+
+template<class Archive>
+void ModelResource::AnimationEvent::serialize(Archive& archive, int version)
+{
+	archive(
+		CEREAL_NVP(name),
+		CEREAL_NVP(startframe),
+		CEREAL_NVP(endframe)
 	);
 }
 
@@ -227,19 +199,11 @@ void ModelResource::Animation::serialize(Archive& archive, int version)
 	archive(
 		CEREAL_NVP(name),
 		CEREAL_NVP(secondsLength),
+		CEREAL_NVP(animationspeed),
 		CEREAL_NVP(keyframes),
-		CEREAL_NVP(animationEvents),
-		CEREAL_NVP(rootPosition)
+		CEREAL_NVP(animationevents),
+		CEREAL_NVP(rootpositions)
 	);
-}
-
-//シェイプ0クリア
-void ModelResource::ShapeReset()
-{
-	for (auto& shape : meshes_[shapeIndex_].shapeData)
-	{
-		shape.rate = 0;
-	}
 }
 
 // 読み込み
@@ -264,19 +228,15 @@ void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
 	{
 		// 相対パスの解決
 		char filename[256];
-		::_makepath_s(filename, 256, nullptr, dirname, material.textureFilename.c_str(), nullptr);
+		for (int i = 0; i < 6; ++i)
+		{
+			::_makepath_s(filename, 256, nullptr, dirname, material.textureFilename[i].c_str(), nullptr);
 
-		// ディフューズマップテクスチャ読み込み
-		HRESULT hr = LoadTexture(device, filename, nullptr, true, material.diffuseMap.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-		::_makepath_s(filename, 256, nullptr, dirname, material.normalFilename.c_str(), nullptr);
-		// ノーマルテクスチャ読み込み
-		hr = LoadTexture(device, filename, nullptr, true, material.normalMap.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+			// テクスチャ読み込み
+			material.LoadTexture(device, filename, i);
+		}
 	}
 
-	int meshCount = 0;
 	for (Mesh& mesh : meshes_)
 	{
 		// サブセット
@@ -323,39 +283,88 @@ void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
 			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.indexBuffer.GetAddressOf());
 			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 		}
+	}
+}
 
-		//シェイプデータ
+// テクスチャ読み込み
+void ModelResource::Material::LoadTexture(ID3D11Device* device, const char* filename, int number)
+{
+	// マルチバイト文字からワイド文字へ変換
+	wchar_t wfilename[256];
+	::MultiByteToWideChar(CP_ACP, 0, filename, -1, wfilename, 256);
+
+	// テクスチャ読み込み
+	Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+	HRESULT hr = DirectX::CreateDDSTextureFromFile(device, wfilename, resource.GetAddressOf(), shaderResourceView[number].ReleaseAndGetAddressOf());
+	if (FAILED(hr))
+	{
+		// WICでサポートされていないフォーマットの場合（TGAなど）は
+		// STBで画像読み込みをしてテクスチャを生成する
+		int width, height, bpp;
+		unsigned char* pixels = stbi_load(filename, &width, &height, &bpp, STBI_rgb_alpha);
+		if (pixels != nullptr)
 		{
-			for (int i = 0; i < mesh.shapeData.size(); ++i)
-			{
-				shapeIndex_ = meshCount;
+			D3D11_TEXTURE2D_DESC desc = { 0 };
+			desc.Width = width;
+			desc.Height = height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+			D3D11_SUBRESOURCE_DATA data;
+			::memset(&data, 0, sizeof(data));
+			data.pSysMem = pixels;
+			data.SysMemPitch = width * 4;
 
-				D3D11_BUFFER_DESC buffer_desc{};
-				buffer_desc.ByteWidth = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * mesh.shapeData[i].shapeVertex.size());
-				buffer_desc.StructureByteStride = sizeof(DirectX::XMFLOAT3);
-				buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-				buffer_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-				buffer_desc.CPUAccessFlags = 0;
-				buffer_desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+			Microsoft::WRL::ComPtr<ID3D11Texture2D>	texture;
+			HRESULT hr = device->CreateTexture2D(&desc, &data, texture.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-				D3D11_SUBRESOURCE_DATA subresource_data{};
+			hr = device->CreateShaderResourceView(texture.Get(), nullptr, shaderResourceView[number].ReleaseAndGetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-				subresource_data.pSysMem = mesh.shapeData[i].shapeVertex.data();
-				subresource_data.SysMemPitch = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * mesh.vertices.size());		//配列のサイズ
-				subresource_data.SysMemSlicePitch = sizeof(DirectX::XMFLOAT3);	//１要素
-				HRESULT hr = device->CreateBuffer(&buffer_desc, &subresource_data, mesh.shapeData[i].sBuffer.GetAddressOf());
-				_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-				D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-				srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-				srvDesc.Buffer.FirstElement = 0;
-				srvDesc.Buffer.NumElements = static_cast<UINT>(mesh.shapeData[i].shapeVertex.size());
-				device->CreateShaderResourceView(mesh.shapeData[i].sBuffer.Get(), &srvDesc, mesh.shapeData[i].srvBuffer.GetAddressOf());
-			}
+			// 後始末
+			stbi_image_free(pixels);
 		}
+		else
+		{
+			// 読み込み失敗したらダミーテクスチャを作る
+			LOG("load failed : %s\n", filename);
 
-		meshCount++;
+			const int width = 8;
+			const int height = 8;
+			UINT pixels[width * height];
+			::memset(pixels, 0xFF, sizeof(pixels));
+
+			D3D11_TEXTURE2D_DESC desc = { 0 };
+			desc.Width = width;
+			desc.Height = height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+			D3D11_SUBRESOURCE_DATA data;
+			::memset(&data, 0, sizeof(data));
+			data.pSysMem = pixels;
+			data.SysMemPitch = width;
+
+			Microsoft::WRL::ComPtr<ID3D11Texture2D>	texture;
+			HRESULT hr = device->CreateTexture2D(&desc, &data, texture.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+			hr = device->CreateShaderResourceView(texture.Get(), nullptr, shaderResourceView[number].ReleaseAndGetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		}
 	}
 }
 

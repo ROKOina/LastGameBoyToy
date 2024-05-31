@@ -6,8 +6,6 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
-#include "../Shaders/3D/ShaderParameter3D.h"
-
 class ModelResource
 {
 public:
@@ -16,164 +14,155 @@ public:
 
 	using NodeId = UINT64;
 
-	struct Node
-	{
-		NodeId				id;
-		std::string			name;
-		std::string			path;
-		int					parentIndex;
-		DirectX::XMFLOAT3	scale;
-		DirectX::XMFLOAT4	rotate;
-		DirectX::XMFLOAT3	translate;
+    //ノード
+    struct Node
+    {
+        NodeId				id;
+        std::string			name;
+        std::string			path;
+        int					parentIndex;
+        DirectX::XMFLOAT3	scale;
+        DirectX::XMFLOAT4	rotate;
+        DirectX::XMFLOAT3	translate;
+        int                 layer = 0;
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	struct Material
-	{
-		std::string			name;
-		std::string			textureFilename;
-		std::string			normalFilename;
-		DirectX::XMFLOAT4	color = { 0.8f, 0.8f, 0.8f, 1.0f };
+    //マテリアル
+    struct Material
+    {
+        std::string			name;
+        std::string			textureFilename[6];
+        DirectX::XMFLOAT4	color = { 1.0f, 1.0f, 1.0f, 1.0f };
+        DirectX::XMFLOAT3   emissivecolor = { 1.0f,1.0f,1.0f };
+        float               emissiveintensity = 0;
+        float               Metalness = 1;
+        float               Roughness = 1;
 
-		//トゥーンシェーダー用の構造体
-		UnityChanToonStruct toonStruct;
+        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView[6];
 
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseMap;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normalMap;
+        void LoadTexture(ID3D11Device* device, const char* filename, int number);
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	struct Subset
-	{
-		UINT		startIndex = 0;
-		UINT		indexCount = 0;
-		int			materialIndex = 0;
+    //サブセット
+    struct Subset
+    {
+        UINT		startIndex = 0;
+        UINT		indexCount = 0;
+        int			materialIndex = 0;
 
-		Material* material = nullptr;
+        Material* material = nullptr;
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	struct Vertex
-	{
-		DirectX::XMFLOAT3	position = { 0, 0, 0 };
-		DirectX::XMFLOAT3	normal = { 0, 0, 0 };
-		DirectX::XMFLOAT3	tangent = { 0, 0, 0 };
-		DirectX::XMFLOAT2	texcoord = { 0, 0 };
-		DirectX::XMFLOAT4	color = { 1, 1, 1, 1 };
-		DirectX::XMFLOAT4	boneWeight = { 1, 0, 0, 0 };
-		DirectX::XMUINT4	boneIndex = { 0, 0, 0, 0 };
+    //頂点
+    struct Vertex
+    {
+        DirectX::XMFLOAT3	position = { 0, 0, 0 };
+        DirectX::XMFLOAT3	normal = { 0, 0, 0 };
+        DirectX::XMFLOAT3	tangent = { 0, 0, 0 };
+        DirectX::XMFLOAT2	texcoord = { 0, 0 };
+        DirectX::XMFLOAT4	color = { 1, 1, 1, 1 };
+        DirectX::XMFLOAT4	boneWeight = { 1, 0, 0, 0 };
+        DirectX::XMUINT4	boneIndex = { 0, 0, 0, 0 };
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	//シェイプデータ
-	struct ShapeData
-	{
-		std::string name;
-		float rate = 0;
-		std::vector<DirectX::XMFLOAT3> shapeVertex;
+    //メッシュ
+    struct Mesh
+    {
+        std::vector<Vertex>						vertices;
+        std::vector<UINT>						indices;
+        std::vector<Subset>						subsets;
 
-		Microsoft::WRL::ComPtr<ID3D11Buffer>			sBuffer;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>			srvBuffer;
+        int										nodeIndex;
+        std::vector<int>						nodeIndices;
+        std::vector<DirectX::XMFLOAT4X4>		offsetTransforms;
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        DirectX::XMFLOAT3						boundsMin;
+        DirectX::XMFLOAT3						boundsMax;
 
-	struct Mesh
-	{
-		std::vector<Vertex>						vertices;
-		std::vector<UINT>						indices;
-		std::vector<Subset>						subsets;
+        Microsoft::WRL::ComPtr<ID3D11Buffer>	vertexBuffer;
+        Microsoft::WRL::ComPtr<ID3D11Buffer>	indexBuffer;
 
-		int										nodeIndex;
-		std::vector<int>						nodeIndices;
-		std::vector<DirectX::XMFLOAT4X4>		offsetTransforms;
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-		DirectX::XMFLOAT3						boundsMin;
-		DirectX::XMFLOAT3						boundsMax;
+    //ノード情報
+    struct NodeKeyData
+    {
+        DirectX::XMFLOAT3	scale;
+        DirectX::XMFLOAT4	rotate;
+        DirectX::XMFLOAT3	translate;
 
-		Microsoft::WRL::ComPtr<ID3D11Buffer>	vertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>	indexBuffer;
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-		std::vector<ShapeData> shapeData;	//シェイプデータ
+    //キーふれーふ
+    struct Keyframe
+    {
+        float						seconds;
+        std::vector<NodeKeyData>	nodeKeys;
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	struct NodeKeyData
-	{
-		DirectX::XMFLOAT3	scale;
-		DirectX::XMFLOAT4	rotate;
-		DirectX::XMFLOAT3	translate;
+    //アニメーションイベント
+    struct AnimationEvent
+    {
+        std::string name;
+        float startframe;
+        float endframe;
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	struct Keyframe
-	{
-		float						seconds;
-		std::vector<NodeKeyData>	nodeKeys;
+    //ルート位置
+    struct RootPosition
+    {
+        float frame;
+        DirectX::XMFLOAT3 position;
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	struct AnimationEvent
-	{
-		std::string		name;
-		float			startFrame;
-		float			endFrame;
-		Node			eventNode;
+    //アニメーション
+    struct Animation
+    {
+        std::string					name;
+        float						secondsLength;
+        float                       animationspeed = 1.0f;
+        std::vector<Keyframe>		keyframes;
+        std::vector<AnimationEvent>	animationevents;
+        std::vector<RootPosition>   rootpositions;
 
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
 
-	struct RootPosition
-	{
-		float frame;
-		DirectX::XMFLOAT3 pos;
-
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
-
-	struct Animation
-	{
-		std::string					name;
-		float						secondsLength;
-		std::vector<Keyframe>		keyframes;
-		std::vector<AnimationEvent>	animationEvents;
-		std::vector<RootPosition>	rootPosition;
-
-		template<class Archive>
-		void serialize(Archive& archive, int version);
-	};
-
-	// 各種データ取得
+    // 各種データ取得
 	const std::vector<Mesh>& GetMeshes() const { return meshes_; }
-	const std::vector<Node>& GetNodes() const { return nodes_; }
+	std::vector<Node>& GetNodes() { return nodes_; }
 	const std::vector<Animation>& GetAnimations() const { return animations_; }
 	const std::vector<Material>& GetMaterials() const { return materials_; }
 	std::vector<Mesh>& GetMeshesEdit() { return meshes_; }
 	std::vector<Material>& GetMaterialsEdit()  { return materials_; }
 
-	const int& GetShapeIndex() const { return shapeIndex_; }
-
-	//シェイプ0クリア
-	void ShapeReset();
-
-	// 読み込み
+    // 読み込み
 	void Load(ID3D11Device* device, const char* filename);
 
 protected:
@@ -197,6 +186,4 @@ protected:
 	std::vector<Material>	materials_;
 	std::vector<Mesh>		meshes_;
 	std::vector<Animation>	animations_;
-
-	int shapeIndex_ = 0;
 };

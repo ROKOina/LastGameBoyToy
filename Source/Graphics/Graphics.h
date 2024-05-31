@@ -7,7 +7,7 @@
 #include "Graphics/DebugRenderer/DebugRenderer.h"
 #include "Graphics/DebugRenderer/LineRenderer.h"
 #include "Graphics\Dx11StateLib.h"
-#include "Shaders\3D\ShaderParameter3D.h"
+
 
 #include "ThreadPool/ThreadPool.h"
 
@@ -15,21 +15,69 @@
 
 #define DEBUG_GUI_ true
 
-class CameraCom;
-
-enum SHADER_ID
+//ブレンドステート
+enum class BLENDSTATE
 {
-	Default,
-	Phong,
-	Silhoutte,
-	UnityChanToon,
-	Shadow,
+	NONE,
+	ALPHA,
+	ADD,
+	SUBTRACT,
+	REPLACE,
+	MULTIPLY,
+	LIGHTEN,
+	DARKEN,
+	SCREEN,
 
-	MaskUnityChan,
-
-	MAX,	//最大数を保持する
+	MAX
 };
 
+// ラスタライザ
+enum class RASTERIZERSTATE
+{
+	SOLID_CULL_NONE,
+	SOLID_CULL_BACK,
+	SOLID_CULL_FRONT,
+	WIREFRAME,
+
+	MAX
+};
+
+// 深度ステート
+enum class DEPTHSTATE
+{
+	NONE, // 深度テストしない
+	ZT_ON_ZW_ON,    // テスト有、書き込み有
+	ZT_ON_ZW_OFF,   // テスト有、書き込み無
+	ZT_OFF_ZW_ON,   // テスト無、書き込み有
+	ZT_OFF_ZW_OFF,  // テスト無、書き込み無
+
+	// 以降ステンシルマスク用
+	MASK,
+	APPLY_MASK,
+	EXCLUSIVE,
+
+	MAX
+};
+
+// サンプラーステート
+enum SAMPLEMODE
+{
+	WRAP_POINT,
+	WRAP_LINEAR,
+	WRAP_ANISOTROPIC,
+
+	BORDER_POINT,
+	BORDER_LINEAR,
+	BORDER_ANISOTROPIC,
+
+	SHADOW,
+
+	MAX
+};
+
+
+class CameraCom;
+class ModelShader;
 
 // グラフィックス
 class Graphics
@@ -56,8 +104,8 @@ public:
 	// デプスステンシルビュー取得
 	ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView_.Get(); }
 
-	// シェーダー取得
-	Shader* GetShader(SHADER_ID shaderID) const { return shader_[shaderID].get(); }
+	//シェーダー取得
+	ModelShader* GetModelShader(int number)const { return modelshaders[number].get(); }
 
 	// スクリーン幅取得
 	float GetScreenWidth() const { return screenWidth_; }
@@ -80,12 +128,22 @@ public:
 	// 描画ターゲットを戻す
 	void RestoreRenderTargets();
 
+
+	// ブレンドステートの取得
+	ID3D11BlendState* GetBlendState(BLENDSTATE index) { return blendStates[static_cast<int>(index)].Get(); }
+
+	// ラスタライザの取得
+	ID3D11RasterizerState* GetRasterizerState(RASTERIZERSTATE index) { return rasterizerStates[static_cast<int>(index)].Get(); }
+
+	// 深度ステート の取得
+	ID3D11DepthStencilState* GetDepthStencilState(DEPTHSTATE index) { return depthStencilStates[static_cast<int>(index)].Get(); }
+
+	//サンプラーステートの設定
+	void SetSamplerState();
+
+
 	//ワールド座標からスクリーン座標にする
 	DirectX::XMFLOAT3 WorldToScreenPos(DirectX::XMFLOAT3 worldPos, std::shared_ptr<CameraCom> camera);
-
-	//ポストエフェクト
-	std::unique_ptr<PostRenderTarget>& GetPostEffectModelRenderTarget() { return postEffectModelRenderTarget; }
-	std::unique_ptr<PostDepthStencil>& GetPostEffectModelDepthStencilView() { return postEffectModelDepthStencil; }
 
 	//FPS(セットはフレームワークでしか使わない予定)
 	void SetFPSFramework(float fps) { this->fps_ = fps; }
@@ -103,8 +161,6 @@ public:
 	//ハンドルゲット
 	HWND GetHwnd() { return hWnd_; }
 
-public:
-	ShaderParameter3D shaderParameter3D_;
 
 private:
 	static Graphics* instance_;
@@ -116,7 +172,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D>			depthStencilBuffer_;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	depthStencilView_;
 
-	std::vector<std::unique_ptr<Shader>>			shader_;
 	std::unique_ptr<DebugRenderer>					debugRenderer_;
 	std::unique_ptr<LineRenderer>					lineRenderer_;
 
@@ -129,9 +184,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView>	cachedRenderTargetView_;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	cachedDepthStencilView_;
 
-	//ポストエフェクト用
-	std::unique_ptr<PostRenderTarget> postEffectModelRenderTarget;
-	std::unique_ptr<PostDepthStencil> postEffectModelDepthStencil;
+	Microsoft::WRL::ComPtr<ID3D11BlendState>		blendStates[static_cast<int>(BLENDSTATE::MAX)];
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState>	rasterizerStates[static_cast<int>(RASTERIZERSTATE::MAX)];
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depthStencilStates[static_cast<int>(DEPTHSTATE::MAX)];
+	Microsoft::WRL::ComPtr<ID3D11SamplerState>	    samplerStates[static_cast<int>(SAMPLEMODE::MAX)];
+
+	std::unique_ptr<ModelShader>                    modelshaders[2];
 
 
 private:

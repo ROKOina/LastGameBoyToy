@@ -8,6 +8,7 @@
 #include "../ColliderCom.h"
 #include "../ParticleSystemCom.h"
 #include "GameSource/Math/Collision.h"
+#include "Graphics/Shaders/3D/ModelShader.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -180,23 +181,7 @@ void GameObjectManager::Update(float elapsedTime)
 		std::shared_ptr<RendererCom> rendererComponent = obj->GetComponent<RendererCom>();
 		if (rendererComponent)
 		{
-			//モデルをスレッド読み込み
-			rendererComponent->GetModel()->JoinThred();
-
-			//シェーダーID順にソートして入れる
-			int insertShaderID = rendererComponent->GetShaderID();
-			int indexSize = static_cast<int>(renderSortObject_.size());	//最初のサイズを取得
-			for (int indexID = 0; indexID < renderSortObject_.size(); ++indexID)
-			{
-				if (renderSortObject_[indexID].lock()->GetShaderID() > insertShaderID)
-				{
-					renderSortObject_.insert(renderSortObject_.begin() + indexID, rendererComponent);
-					break;
-				}
-			}
-			//ソートに引っかからないなら後ろに入れる
-			if (indexSize == renderSortObject_.size())
-				renderSortObject_.emplace_back(rendererComponent);
+			renderSortObject_.emplace_back(rendererComponent);
 		}
 
 
@@ -329,9 +314,6 @@ void GameObjectManager::UpdateTransform()
 // 描画
 void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
-	//影描画
-	RenderShadowmap();
-
 	//3D描画
 	Render3D();
 
@@ -459,98 +441,6 @@ void GameObjectManager::DrawDetail()
 	ImGui::End();
 }
 
-//レンダーオブジェクトをシェーダーID順にソートする
-void GameObjectManager::SortRenderObject()
-{
-	//コムソート
-	size_t indexOffset = (renderSortObject_.size() * 10) / 13;
-	bool is_sorted = false;
-	while (!is_sorted) {
-		if (indexOffset == 1)is_sorted = true;
-		for (size_t index = 0; index < renderSortObject_.size() - indexOffset; ++index) {
-			if (renderSortObject_[index].lock()->GetShaderID() > renderSortObject_[index + indexOffset].lock()->GetShaderID()) {
-				std::iter_swap(renderSortObject_.begin() + index, renderSortObject_.begin() + (index + indexOffset));
-				if (is_sorted)is_sorted = false;
-			}
-		}
-		if (indexOffset > 1) indexOffset = (indexOffset * 10) / 13;
-		if (indexOffset == 0) indexOffset = 1;
-	}
-}
-
-//影描画
-void GameObjectManager::RenderShadowmap()
-{
-	Graphics& graphics = Graphics::Instance();
-	ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-	ID3D11RenderTargetView* rtv = nullptr;
-	ShaderParameter3D* sp = &graphics.shaderParameter3D_;
-	ShadowMapData* shadowData = &sp->shadowMapData;
-	ID3D11DepthStencilView* dsv = shadowData->shadowmapDepthStencil->depthStencilView.Get();
-
-	// 画面クリア
-	dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	// レンダーターゲット設定
-	dc->OMSetRenderTargets(0, &rtv, dsv);
-	// ビューポートの設定
-	D3D11_VIEWPORT	vp = {};
-	vp.Width = static_cast<float>(shadowData->shadowmapDepthStencil->width);
-	vp.Height = static_cast<float>(shadowData->shadowmapDepthStencil->height);
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	dc->RSSetViewports(1, &vp);
-
-	//カメラ用に用意
-	ShaderParameter3D spCamera;
-	//カメラ設定
-	{
-		// 平行光源からカメラ位置を作成し、そこから原点の位置を見るように視線行列を生成
-		DirectX::XMVECTOR LightPosition =
-			//DirectX::XMLoadFloat3(
-			//	&DirectX::XMFLOAT3(
-			//		sp->lightDirection.x,
-			//		sp->lightDirection.y,
-			//		sp->lightDirection.z));
-			{ 0.0f, -1.0f, 0.0f };
-
-		LightPosition = DirectX::XMVectorScale(LightPosition, -250.0f);
-		DirectX::XMMATRIX V = DirectX::XMMatrixLookAtLH(LightPosition,
-			//DirectX::XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f),
-			DirectX::XMLoadFloat4(&shadowData->shadowCameraPos),
-			DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-
-		// シャドウマップに描画したい範囲の射影行列を生成
-		DirectX::XMMATRIX P =
-			DirectX::XMMatrixOrthographicLH(
-				shadowData->shadowRect, shadowData->shadowRect, 0.1f, 1000.0f);
-		DirectX::XMStoreFloat4x4(&spCamera.view, V);
-		DirectX::XMStoreFloat4x4(&spCamera.projection, P);
-		DirectX::XMStoreFloat4x4(&shadowData->lightViewProjection, V * P);
-	}
-
-	//描画
-	{
-		Shader* shader = graphics.GetShader(SHADER_ID::Shadow);
-		shader->Begin(dc, graphics.shaderParameter3D_);
-
-		for (std::weak_ptr<RendererCom>& renderObj : renderSortObject_)
-		{
-			if (!renderObj.lock()->GetGameObject()->GetEnabled())continue;
-			if (!renderObj.lock()->GetEnabled())continue;
-
-			//影を落とすか
-			if (!renderObj.lock()->GetIsShadowFall())continue;
-
-			Model* model = renderObj.lock()->GetModel();
-			if (model != nullptr)
-			{
-				shader->Draw(dc, model);
-			}
-		}
-		shader->End(dc);
-	}
-}
-
 //3D描画
 void GameObjectManager::Render3D()
 {
@@ -559,12 +449,8 @@ void GameObjectManager::Render3D()
 	Graphics& graphics = Graphics::Instance();
 	ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
-	//ポストエフェクト用切り替え
-	PostRenderTarget* ps = Graphics::Instance().GetPostEffectModelRenderTarget().get();
-	PostDepthStencil* ds = Graphics::Instance().GetPostEffectModelDepthStencilView().get();
-
-	ID3D11RenderTargetView* rtv = ps->renderTargetView.Get();
-	ID3D11DepthStencilView* dsv = ds->depthStencilView.Get();
+	ID3D11RenderTargetView* rtv = Graphics::Instance().GetRenderTargetView();
+	ID3D11DepthStencilView* dsv = Graphics::Instance().GetDepthStencilView();
 
 	// 画面クリア＆レンダーターゲット設定
 	FLOAT color[] = { 0.0f, 0.0f, 0.5f, 1.0f };	// RGBA(0.0～1.0)
@@ -572,125 +458,27 @@ void GameObjectManager::Render3D()
 
 	// ビューポートの設定
 	D3D11_VIEWPORT	vp = {};
-	vp.Width = static_cast<float>(ps->width);
-	vp.Height = static_cast<float>(ps->height);
+	vp.Width = static_cast<float>(Graphics::Instance().GetScreenWidth());
+	vp.Height = static_cast<float>(Graphics::Instance().GetScreenHeight());
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	dc->RSSetViewports(1, &vp);
 
 
-	//シェーダーIDが変更された時に呼ぶ
-	if (isChangeShaderID_)
-	{
-		SortRenderObject();
-		isChangeShaderID_ = false;
-	}
-
-	//マスクオブジェ初期化
-	renderMaskObject_.clear();
-
-	// 描画
-	int oldShaderID = renderSortObject_[0].lock()->GetShaderID();	//違うシェーダーを使用するため、古いIDを保存
-	Shader* shader = graphics.GetShader(static_cast<SHADER_ID>(oldShaderID));
-	shader->Begin(dc, graphics.shaderParameter3D_);
-
-	//シルエット描画用
-	std::vector<std::weak_ptr<RendererCom>> silhouetteRender;
 
 	for (std::weak_ptr<RendererCom>& renderObj : renderSortObject_)
 	{
 		if (!renderObj.lock()->GetGameObject()->GetEnabled())continue;
 		if (!renderObj.lock()->GetEnabled())continue;
 
-		int newShaderID = renderObj.lock()->GetShaderID();
-
-		//マスクオブジェ
-		if (newShaderID == static_cast<int>(SHADER_ID::MaskUnityChan))
-		{
-			renderMaskObject_.emplace_back(renderObj.lock());
-			continue;
-		}
-
-		//シルエット描画は最後に行う
-		if (renderObj.lock()->GetSilhouetteFlag())
-		{
-			silhouetteRender.emplace_back(renderObj.lock());
-			continue;
-		}
-
-		//シェーダーIDが変化したら、シェーダーを変更
-		if (oldShaderID != newShaderID)
-		{
-			shader->End(dc);
-
-			shader = graphics.GetShader(static_cast<SHADER_ID>(newShaderID));
-			oldShaderID = newShaderID;
-
-			shader->Begin(dc, graphics.shaderParameter3D_);
-		}
 
 		Model* model = renderObj.lock()->GetModel();
 		if (model != nullptr)
 		{
-			shader->Draw(dc, model);
+			Graphics::Instance().GetModelShader(0)->Render(Graphics::Instance().GetDeviceContext(), model);
 		}
 	}
-
-	//シルエット描画
-	for (std::weak_ptr<RendererCom>& silhouette : silhouetteRender)
-	{
-		//シルエット描画
-		shader->End(dc);
-
-		shader = graphics.GetShader(SHADER_ID::Silhoutte);
-		oldShaderID = static_cast<int>(SHADER_ID::Silhoutte);
-
-		shader->Begin(dc, graphics.shaderParameter3D_);
-
-		Model* model = silhouette.lock()->GetModel();
-		if (model != nullptr)
-		{
-			shader->Draw(dc, model);
-		}
-
-		//モデル描画
-		shader->End(dc);
-
-		shader = graphics.GetShader(static_cast<SHADER_ID>(silhouette.lock()->GetShaderID()));
-
-		shader->Begin(dc, graphics.shaderParameter3D_);
-
-		if (model != nullptr)
-		{
-			shader->Draw(dc, model);
-		}
-
-	}
-
-	shader->End(dc);
 }
-
-void GameObjectManager::RenderMask()
-{
-	Graphics& graphics = Graphics::Instance();
-	ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-
-	Shader* shader = graphics.GetShader(SHADER_ID::UnityChanToon);
-
-	shader->Begin(dc, graphics.shaderParameter3D_);
-
-	for (std::weak_ptr<RendererCom>& renderMaskObj : renderMaskObject_)
-	{
-		Model* model = renderMaskObj.lock()->GetModel();
-		if (model != nullptr)
-		{
-			shader->Draw(dc, model);
-		}
-	}
-
-	shader->End(dc);
-}
-
 
 //パーティクル描画
 void GameObjectManager::ParticleRender()

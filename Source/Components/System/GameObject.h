@@ -153,16 +153,11 @@ public:
 	// 描画
 	void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
-	//マスクオブジェクト描画
-	void RenderMask();
 	//sprite描画
 	void Render2D(float elapsedTime);
 
 	//ゲームオブジェクトを探す
 	std::shared_ptr<GameObject> Find(const char* name);
-
-	//シェーダーIDを変えたら、ソートするために呼び出す
-	void ChangeShaderID() { isChangeShaderID_ = true; }
 
 	//シーンゲーム演出待ちフラグ
 	bool GetIsSceneGameStart() { return isSceneGameStart_; }
@@ -172,11 +167,7 @@ private:
 	void DrawLister();
 	void DrawDetail();
 
-	//レンダーオブジェクトをシェーダーID順にソートする
-	void SortRenderObject();
 
-	//影描画
-	void RenderShadowmap();
 	//3D描画
 	void Render3D();
 
@@ -200,9 +191,6 @@ private:
 
 	//描画順に格納する
 	std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;
-	bool isChangeShaderID_ = false;
-	//マスク用
-	std::vector<std::weak_ptr<RendererCom>>   renderMaskObject_;
 
 	//パーティクル描画用
 	std::vector<std::weak_ptr<ParticleSystemCom>>   particleObject_;

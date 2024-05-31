@@ -11,7 +11,6 @@
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
-#include "Components\AnimatorCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ParticleSystemCom.h"
