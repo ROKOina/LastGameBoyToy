@@ -30,5 +30,9 @@ void RendererCom::OnGUI()
 // ƒ‚ƒfƒ‹‚Ì“Ç‚İ‚İ
 void RendererCom::LoadModel(const char* filename)
 {
-	model_ = std::make_unique<Model>(filename);
+	ID3D11Device* device = Graphics::Instance().GetDevice();
+	std::shared_ptr<ModelResource> m = std::make_shared<ModelResource>();
+	m->Load(device, filename);
+
+	model_ = std::make_unique<Model>(m);
 }

@@ -9,7 +9,7 @@
 class Model
 {
 public:
-    Model(const char* filename);
+    Model(std::shared_ptr<ModelResource> resource);
     ~Model() {}
 
     struct Node

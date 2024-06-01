@@ -312,8 +312,10 @@ void GameObjectManager::UpdateTransform()
 }
 
 // 描画
-void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+void GameObjectManager::Render()
 {
+	Graphics::Instance().SetSamplerState();
+
 	//3D描画
 	Render3D();
 
@@ -453,7 +455,12 @@ void GameObjectManager::Render3D()
 	ID3D11DepthStencilView* dsv = Graphics::Instance().GetDepthStencilView();
 
 	// 画面クリア＆レンダーターゲット設定
-	FLOAT color[] = { 0.0f, 0.0f, 0.5f, 1.0f };	// RGBA(0.0～1.0)
+	FLOAT color[] = { 0.0f, 1.0f, 0.5f, 1.0f };	// RGBA(0.0～1.0)
+	dc->OMSetRenderTargets(1, &rtv, dsv);
+
+	// 画面クリア＆レンダーターゲット設定
+	dc->ClearRenderTargetView(rtv, color);
+	dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	dc->OMSetRenderTargets(1, &rtv, dsv);
 
 	// ビューポートの設定
@@ -478,6 +485,8 @@ void GameObjectManager::Render3D()
 			Graphics::Instance().GetModelShader(0)->Render(Graphics::Instance().GetDeviceContext(), model);
 		}
 	}
+
+
 }
 
 //パーティクル描画

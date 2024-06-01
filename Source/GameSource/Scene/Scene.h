@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Graphics/Shaders/constant_buffer.h"
+#include <DirectXMath.h>
 #include <memory>
 
 //前方宣言
@@ -30,9 +32,25 @@ public:
     //準備完了設定
     void SetReady() { isReady_ = true; }
 
+    //シーンのコンスタントバッファの更新
+    void ConstantBufferUpdate();
+
+    //シーンのコンスタントバッファの初期化
+    void ConstantBufferInitialize();
+
 protected:
-    //メインカメラ
-    std::shared_ptr<CameraCom> mainCamera_;
+    //シーンのコンスタントバッファの構造体
+    struct SceneConstants
+    {
+        DirectX::XMFLOAT4X4 view = {};
+        DirectX::XMFLOAT4X4 projection = {};
+        DirectX::XMFLOAT4X4 viewprojection = {};
+        DirectX::XMFLOAT4X4 inverseview = {};
+        DirectX::XMFLOAT4X4 inverseprojection = {};
+        DirectX::XMFLOAT3 cameraposition = {};
+        float dummy = {};
+    };
+    std::unique_ptr<constant_buffer<SceneConstants>>sc;
 
 private:
     bool isReady_ = false;

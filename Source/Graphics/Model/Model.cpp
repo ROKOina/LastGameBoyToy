@@ -4,11 +4,9 @@
 #include "Graphics/Graphics.h"
 
 //コンストラクタ
-Model::Model(const char* filename)
+Model::Model(std::shared_ptr<ModelResource> resource)
 {
-    ID3D11Device* device = Graphics::Instance().GetDevice();
-    resource = std::shared_ptr<ModelResource>();
-    resource->Load(device, filename);
+    this->resource = resource;
 
     // ノード
     const std::vector<ModelResource::Node>& resNodes = resource->GetNodes();
