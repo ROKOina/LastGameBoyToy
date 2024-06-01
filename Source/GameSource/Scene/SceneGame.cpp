@@ -20,6 +20,14 @@
 // ‰Šú‰»
 void SceneGame::Initialize()
 {
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    obj->SetName("test");
+    obj->transform_->SetWorldPosition({ 0, 0, 0 });
+    obj->transform_->SetScale({ 1.00f, 1.00f, 1.00f });
+
+    const char* filename = "Data/OneCoin/robot.mdl";
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>();
+    r->LoadModel(filename);
 
 }
 
@@ -31,7 +39,11 @@ void SceneGame::Finalize()
 // XVˆ—
 void SceneGame::Update(float elapsedTime)
 {
-    int a = 1;
+    GameObjectManager::Instance().Update(elapsedTime);
+
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("test");
+    std::shared_ptr<Component> r = obj->GetComponent<RendererCom>();
+    int i = 0;
 }
 
 // •`‰æˆ—

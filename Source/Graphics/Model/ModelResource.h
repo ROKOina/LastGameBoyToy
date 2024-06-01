@@ -178,7 +178,16 @@ protected:
 	// デシリアライズ
 	void Deserialize(const char* filename);
 
-	// ノードインデックスを取得する
+    //マテリアルデシリアライズ
+    void MaterialDeserialize(const char* filename);
+
+    //アニメーションデシリアライズ
+    void AnimationDeserialize(const char* filename);
+
+    //ノードデシリアライズ
+    void NodeDeserialize(const char* filename);
+    
+    // ノードインデックスを取得する
 	int FindNodeIndex(NodeId nodeId) const;
 
 protected:

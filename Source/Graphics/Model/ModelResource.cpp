@@ -7,6 +7,7 @@
 #include <cereal/types/vector.hpp>
 #include <WICTextureLoader.h>
 #include <DDSTextureLoader.h>
+#include <filesystem>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -216,6 +217,15 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
 
 	// デシリアライズ
 	Deserialize(filename);
+
+	//マテリアルデシリアライズ
+	MaterialDeserialize(filename);
+
+	//アニメーションデシリアライズ
+	AnimationDeserialize(filename);
+
+	//ノードデシリアライズ
+	NodeDeserialize(filename);
 
 	// モデル構築
 	BuildModel(device, dirname);
@@ -506,10 +516,7 @@ void ModelResource::Deserialize(const char* filename)
 		try
 		{
 			archive(
-				CEREAL_NVP(nodes_),
-				CEREAL_NVP(materials_),
-				CEREAL_NVP(meshes_),
-				CEREAL_NVP(animations_)
+				CEREAL_NVP(meshes_)
 			);
 		}
 		catch (...)
@@ -518,11 +525,86 @@ void ModelResource::Deserialize(const char* filename)
 			return;
 		}
 	}
-	else
+}
+
+//マテリアルデシリアライズ
+void ModelResource::MaterialDeserialize(const char* filename)
+{
+	std::string name = filename;
+	name.erase(name.find('.') + 1);
+	name += "Material";
+
+	std::ifstream istream(name, std::ios::binary);
+	if (istream.is_open())
 	{
-		char buffer[256];
-		sprintf_s(buffer, sizeof(buffer), "File not found > %s", filename);
-		_ASSERT_EXPR_A(false, buffer);
+		cereal::BinaryInputArchive archive(istream);
+
+		try
+		{
+			archive
+			(
+				CEREAL_NVP(materials_)
+			);
+		}
+		catch (...)
+		{
+			LOG("model deserialize materialfailed.\n%s\n", filename);
+			return;
+		}
+	}
+}
+
+//アニメーションデシリアライズ
+void ModelResource::AnimationDeserialize(const char* filename)
+{
+	std::string name = filename;
+	name.erase(name.find('.') + 1);
+	name += "Animation";
+
+	std::ifstream istream(name, std::ios::binary);
+	if (istream.is_open())
+	{
+		cereal::BinaryInputArchive archive(istream);
+
+		try
+		{
+			archive
+			(
+				CEREAL_NVP(animations_)
+			);
+		}
+		catch (...)
+		{
+			LOG("model deserialize animationfailed.\n%s\n", filename);
+			return;
+		}
+	}
+}
+
+//ノードデシリアライズ
+void ModelResource::NodeDeserialize(const char* filename)
+{
+	std::string name = filename;
+	name.erase(name.find('.') + 1);
+	name += "Node";
+
+	std::ifstream istream(name, std::ios::binary);
+	if (istream.is_open())
+	{
+		cereal::BinaryInputArchive archive(istream);
+
+		try
+		{
+			archive
+			(
+				CEREAL_NVP(nodes_)
+			);
+		}
+		catch (...)
+		{
+			LOG("model deserialize nodefailed.\n%s\n", filename);
+			return;
+		}
 	}
 }
 

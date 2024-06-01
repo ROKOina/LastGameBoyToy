@@ -1,11 +1,14 @@
 #include "Logger.h"
 #include "Misc.h"
 #include "Model.h"
+#include "Graphics/Graphics.h"
 
 //コンストラクタ
-Model::Model(std::shared_ptr<ModelResource> resource)
+Model::Model(const char* filename)
 {
-    this->resource = resource;
+    ID3D11Device* device = Graphics::Instance().GetDevice();
+    resource = std::shared_ptr<ModelResource>();
+    resource->Load(device, filename);
 
     // ノード
     const std::vector<ModelResource::Node>& resNodes = resource->GetNodes();

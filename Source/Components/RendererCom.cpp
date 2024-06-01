@@ -30,5 +30,5 @@ void RendererCom::OnGUI()
 // ƒ‚ƒfƒ‹‚Ì“Ç‚İ‚İ
 void RendererCom::LoadModel(const char* filename)
 {
-	//model_ = std::make_unique<Model>(filename);
+	model_ = std::make_unique<Model>(filename);
 }
