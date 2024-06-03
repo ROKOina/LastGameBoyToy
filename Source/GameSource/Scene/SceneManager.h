@@ -3,6 +3,7 @@
 #include "Scene.h"
 
 class GameObject;
+class CameraCom;
 
 //シーンマネージャー
 class SceneManager
@@ -31,6 +32,11 @@ public:
     //シーン切り替え
     void ChangeScene(Scene* scene);
 
+    //カメラ
+    void AddCameraActiveCount() { cameraActiveCount++; }
+    const bool& GetCameraChange() const { return isChangeCamera; }
+    void SetActiveCamera(std::shared_ptr<GameObject> camera) { activeCamera = camera; }
+    std::shared_ptr<GameObject> GetActiveCamera() { return activeCamera.lock(); }
 
     std::shared_ptr<GameObject> GetParticleObj()
     {
@@ -47,4 +53,9 @@ private:
     bool isParticleUpdate_ = true;
     std::shared_ptr<GameObject> changeParticle_;
     std::shared_ptr<GameObject> changeParticleCamera_;
+
+    //カメラアクティブ制御
+    std::weak_ptr<GameObject> activeCamera;
+    int cameraActiveCount = 0;
+    bool isChangeCamera = false;
 };

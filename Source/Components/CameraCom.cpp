@@ -3,13 +3,13 @@
 #include "TransformCom.h"
 #include "Graphics/Graphics.h"
 #include "GameSource/Math/Mathf.h"
+#include "GameSource/Scene/SceneManager.h"
 #include <imgui.h>
 #include <cmath>
 
 // 開始処理
 void CameraCom::Start()
 {
-
 }
 
 
@@ -65,6 +65,9 @@ void CameraCom::Update(float elapsedTime)
     }
 
     isLookAt_ = false;
+
+    //アクティブカメラ変更処理
+    ChangeActiveProcess();
 }
 
 // GUI描画
@@ -75,6 +78,14 @@ void CameraCom::OnGUI()
     ImGui::DragFloat3("shakePos_", &shakePos_.x);
     ImGui::DragFloat("shakeSec", &shakeSec_);
     ImGui::DragFloat("shakePower", &shakePower_);
+
+    bool active = isActiveCamera;
+    ImGui::Checkbox("isActive", &active);
+    if (ImGui::Button("Active"))
+    {
+        if (!isActiveCamera)
+            isNextCamera = true;
+    }
 }
 
 //指定方向を向く
@@ -140,4 +151,30 @@ void CameraCom::HitStop(float sec)
         saveWorldSpeed_ = Graphics::Instance().GetWorldSpeed();
     isHitStop_ = true;
     hitTimer_ = sec;
+}
+
+void CameraCom::SetActiveInitialize() 
+{
+    isActiveCamera = true;
+}
+
+//アクティブカメラ変更処理
+void CameraCom::ChangeActiveProcess()
+{
+    //変更処理
+    if (SceneManager::Instance().GetCameraChange() &&
+        (isActiveCamera || isNextCamera))
+    {
+        isActiveCamera = false;
+        if (isNextCamera)
+        {
+            isActiveCamera = true;
+            isNextCamera = false;
+        }
+    }
+
+    if (isActiveCamera)
+        SceneManager::Instance().SetActiveCamera(GetGameObject());
+
+    if (isActiveCamera || isNextCamera)SceneManager::Instance().AddCameraActiveCount();
 }

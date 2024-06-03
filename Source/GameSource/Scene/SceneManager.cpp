@@ -30,12 +30,19 @@ void SceneManager::Update(float elapsedTime)
 
         //シーン初期化処理
         if (!currentScene_->IsReady())currentScene_->Initialize();
-
     }
 
     if (currentScene_ != nullptr)
     {
         currentScene_->Update(elapsedTime);
+
+        //カメラチェンジ処理用
+        isChangeCamera = false;
+        if (cameraActiveCount >= 2)
+        {
+            isChangeCamera = true;
+        }
+        cameraActiveCount = 0;
     }
 }
 

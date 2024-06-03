@@ -15,22 +15,41 @@
 #include "Components\MovementCom.h"
 #include "Components\ParticleSystemCom.h"
 
+#include "GameSource/GameScript/FreeCameraCom.h"
+
 #include "Components/ParticleComManager.h"
 
 // èâä˙âª
 void SceneGame::Initialize()
 {
-    std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-    camera->SetName("camera");
-
     Graphics& graphics = Graphics::Instance();
+
+    std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
+    freeCamera->SetName("camera");
+
+    std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
+    f->SetPerspectiveFov(
+        DirectX::XMConvertToRadians(45),
+        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+        0.1f, 1000.0f
+    );
+    freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    f->SetActiveInitialize();
+
+    std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+    camera->SetName("camera1");
+
     std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
     c->SetPerspectiveFov(
         DirectX::XMConvertToRadians(45),
         graphics.GetScreenWidth() / graphics.GetScreenHeight(),
         0.1f, 1000.0f
     );
+
     camera->transform_->SetWorldPosition({ 0, 5, -10 });
+    
+   
+    //camera->AddComponent<FreeCameraCom>();
 
     ConstantBufferInitialize();
 
@@ -40,7 +59,7 @@ void SceneGame::Initialize()
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
     obj->SetName("test");
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
-    obj->transform_->SetScale({ 1.00f, 1.00f, 1.00f });
+    obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
 
     //const char* filename = "Data/picola/pi.mdl";
     const char* filename = "Data/OneCoin/robot.mdl";

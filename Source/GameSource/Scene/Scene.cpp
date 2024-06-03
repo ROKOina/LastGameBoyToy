@@ -3,6 +3,7 @@
 
 #include "Components/CameraCom.h"
 #include "Components/TransformCom.h"
+#include "GameSource/Scene/SceneManager.h"
 
 
 //シーンのコンスタントバッファの初期化
@@ -15,7 +16,7 @@ void Scene::ConstantBufferInitialize()
 void Scene::ConstantBufferUpdate()
 {
     //カメラの情報を持ってくる
-    std::shared_ptr<CameraCom> c = GameObjectManager::Instance().Find("camera")->GetComponent<CameraCom>();
+    std::shared_ptr<CameraCom> c = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>();
 
     Graphics& graphics = Graphics::Instance();
 

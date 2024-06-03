@@ -60,6 +60,17 @@ public:
     void HitStop(float sec);
     bool GetIsHitStop() { return isHitStop_; }
 
+    //アクティブカメラ最初のセット
+    void SetActiveInitialize();
+
+private:
+    //アクティブカメラ変更処理
+    void ChangeActiveProcess();
+
+protected:
+    //現在使うカメラ（カメラ複数あれば、一つしかONにならない）
+    bool isActiveCamera = false;
+    bool isNextCamera = false;
 
 private:
     //座標系
