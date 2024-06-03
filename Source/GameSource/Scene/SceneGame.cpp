@@ -1,4 +1,6 @@
 #include "Graphics/Graphics.h"
+#include "Graphics/Light/LightManager.h"
+#include "Graphics/Light/Light.h"
 #include "Input\Input.h"
 
 #include "SceneGame.h"
@@ -53,9 +55,6 @@ void SceneGame::Initialize()
 
     ConstantBufferInitialize();
 
-
-
-
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
     obj->SetName("test");
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
@@ -69,6 +68,14 @@ void SceneGame::Initialize()
 
     //std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
 
+    //ポストエフェクト追加
+    m_posteffect = std::make_unique<PostEffect>();
+
+    //平行光源を追加
+    Light* mainDirectionalLight = new Light(LightType::Directional);
+    mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
+    mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
+    LightManager::Instance().Register(mainDirectionalLight);
 }
 
 // 終了化
@@ -92,6 +99,34 @@ void SceneGame::Update(float elapsedTime)
 // 描画処理
 void SceneGame::Render(float elapsedTime)
 {
-    GameObjectManager::Instance().Render();
-}
+    // 画面クリア＆レンダーターゲット設定
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+    ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
+    ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
+    dc->OMSetRenderTargets(1, &rtv, dsv);
 
+    //サンプラーステートの設定
+    Graphics::Instance().SetSamplerState();
+
+    // ライトの定数バッファを更新
+    LightManager::Instance().UpdateConstatBuffer();
+
+    //デファードの設定
+    m_posteffect->DeferredFirstSet();
+
+    //オブジェクト描画
+    GameObjectManager::Instance().Render();
+
+    //デファードのリソース設定
+    m_posteffect->DeferredResourceSet();
+
+    //ポストエフェクト
+    m_posteffect->PostEffectRender();
+
+    //imgui描画
+    m_posteffect->PostEffectImGui();
+
+    //オブジェクト描画
+    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
+}

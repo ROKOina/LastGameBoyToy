@@ -1,5 +1,5 @@
 #include "Defalt.hlsli"
-#include "Common.hlsli"
+#include "../Common.hlsli"
 
 Texture2D DiffuseMap : register(t0); //カラーテクスチャ
 

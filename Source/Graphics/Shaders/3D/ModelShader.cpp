@@ -17,7 +17,7 @@ ModelShader::ModelShader(int shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DefaltPS.cso" };
         break;
-    case MODELSHADER::Unity:
+    case MODELSHADER::Deferred:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\PBR+IBL_Unity.cso" };
         break;
@@ -36,26 +36,26 @@ ModelShader::ModelShader(int shader)
         { "WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "BONES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
-    create_vs_from_cso(Graphics.GetDevice(), VSPath, VertexShader.GetAddressOf(), InputLayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
+    CreateVsFromCso(Graphics.GetDevice(), VSPath, VertexShader.GetAddressOf(), InputLayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
 
     // ピクセルシェーダー
-    create_ps_from_cso(Graphics.GetDevice(), PSPath, PixelShader.GetAddressOf());
+    CreatePsFromCso(Graphics.GetDevice(), PSPath, PixelShader.GetAddressOf());
 
     // 定数バッファ
     {
         // オブジェクト用のコンスタントバッファ,サブセット用
-        ObjectConstants = std::make_unique<constant_buffer<object_constants>>(Graphics.GetDevice());
-        SubsetConstants = std::make_unique<constant_buffer<subset_constants>>(Graphics.GetDevice());
+        ObjectConstants = std::make_unique<ConstantBuffer<object_constants>>(Graphics.GetDevice());
+        SubsetConstants = std::make_unique<ConstantBuffer<subset_constants>>(Graphics.GetDevice());
     }
 
-    ////IBL専用のテクスチャ読み込み
-    //{
-    //    D3D11_TEXTURE2D_DESC texture2d_desc{};
-    //    load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\snowy_hillside_4k.DDS", skybox.GetAddressOf(), &texture2d_desc);
-    //    load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\diffuse_iem.dds", diffuseiem.GetAddressOf(), &texture2d_desc);
-    //    load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\specular_pmrem.dds", specularpmrem.GetAddressOf(), &texture2d_desc);
-    //    load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\lut_ggx.DDS", lutggx.GetAddressOf(), &texture2d_desc);
-    //}
+    //IBL専用のテクスチャ読み込み
+    {
+        D3D11_TEXTURE2D_DESC texture2d_desc{};
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\snowy_hillside_4k.DDS", skybox.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\diffuse_iem.dds", diffuseiem.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\specular_pmrem.dds", specularpmrem.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\lut_ggx.DDS", lutggx.GetAddressOf(), &texture2d_desc);
+    }
 }
 
 //描画処理
@@ -65,8 +65,8 @@ void ModelShader::Render(ID3D11DeviceContext* dc, Model* model)
     const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     //レンダーステートの設定（ループの外で1回だけ設定）
-    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::ALPHA), blendFactor, 0xFFFFFFFF);
-    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 0);
+    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::MULTIPLERENDERTARGETS), blendFactor, 0xFFFFFFFF);
+    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_BACK));
 
     //シェーダーのセット
@@ -102,7 +102,7 @@ void ModelShader::Render(ID3D11DeviceContext* dc, Model* model)
             ObjectConstants->data.BoneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
         }
 
-        ObjectConstants->activate(dc, 1, true, true, false, false, false, false);
+        ObjectConstants->Activate(dc, 1, true, true, false, false, false, false);
 
         UINT stride = sizeof(ModelResource::Vertex);
         UINT offset = 0;
@@ -120,7 +120,7 @@ void ModelShader::Render(ID3D11DeviceContext* dc, Model* model)
             SubsetConstants->data.emissiveintensity = subset.material->emissiveintensity;
             SubsetConstants->data.Metalness = subset.material->Metalness;
             SubsetConstants->data.Roughness = subset.material->Roughness;
-            SubsetConstants->activate(dc, 2, true, true, false, false, false, false);
+            SubsetConstants->Activate(dc, 2, true, true, false, false, false, false);
 
             //シェーダーリソースビュー設定
             for (int i = 0; i < 6; ++i)

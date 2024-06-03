@@ -4,7 +4,7 @@
 #include <memory>
 
 //頂点シェーダー読み込み
-HRESULT create_vs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout, D3D11_INPUT_ELEMENT_DESC* input_element_desc, UINT num_elements)
+HRESULT CreateVsFromCso(ID3D11Device* device, const char* cso_name, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout, D3D11_INPUT_ELEMENT_DESC* input_element_desc, UINT num_elements)
 {
     FILE* fp{ nullptr };
     fopen_s(&fp, cso_name, "rb");
@@ -32,7 +32,7 @@ HRESULT create_vs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11Ver
 }
 
 //ピクセルシェーダー読み込み
-HRESULT create_ps_from_cso(ID3D11Device* device, const char* cso_name, ID3D11PixelShader** pixel_shader)
+HRESULT CreatePsFromCso(ID3D11Device* device, const char* cso_name, ID3D11PixelShader** pixel_shader)
 {
     FILE* fp{ nullptr };
     fopen_s(&fp, cso_name, "rb");
@@ -54,7 +54,7 @@ HRESULT create_ps_from_cso(ID3D11Device* device, const char* cso_name, ID3D11Pix
 }
 
 //ジオメトリシェーダー読み込み
-HRESULT create_gs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11GeometryShader** geometry_shader)
+HRESULT CreateGsFromCso(ID3D11Device* device, const char* cso_name, ID3D11GeometryShader** geometry_shader)
 {
     FILE* fp = nullptr;
     fopen_s(&fp, cso_name, "rb");
@@ -75,7 +75,7 @@ HRESULT create_gs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11Geo
 }
 
 //コンピュートシェーダー読み込み
-HRESULT create_cs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11ComputeShader** compute_shader)
+HRESULT CreateCsFromCso(ID3D11Device* device, const char* cso_name, ID3D11ComputeShader** compute_shader)
 {
     FILE* fp = nullptr;
     fopen_s(&fp, cso_name, "rb");
@@ -96,7 +96,7 @@ HRESULT create_cs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11Com
 }
 
 //ハルシェーダ読み込み
-HRESULT create_hs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11HullShader** hull_shader)
+HRESULT CreateHsFromCso(ID3D11Device* device, const char* cso_name, ID3D11HullShader** hull_shader)
 {
     FILE* fp = nullptr;
     fopen_s(&fp, cso_name, "rb");
@@ -117,7 +117,7 @@ HRESULT create_hs_from_cso(ID3D11Device* device, const char* cso_name, ID3D11Hul
 }
 
 //ドメインシェーダー読み込み
-HRESULT create_ds_from_cso(ID3D11Device* device, const char* cso_name, ID3D11DomainShader** domain_shader)
+HRESULT CreateDsFromCso(ID3D11Device* device, const char* cso_name, ID3D11DomainShader** domain_shader)
 {
     FILE* fp = nullptr;
     fopen_s(&fp, cso_name, "rb");
