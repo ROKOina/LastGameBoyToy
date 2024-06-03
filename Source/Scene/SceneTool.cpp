@@ -698,7 +698,7 @@ void SceneTool::DrawTimelineGUI()
             int animationCurrentFrame = static_cast<int>(animationCurrentSeconds * 60.0f);
             int frameLength = static_cast<int>(selectionAnimation->secondsLength * 60);
             ImGui::SetNextItemWidth(50);
-            if (ImGui::DragInt("", &animationCurrentFrame, 1.0f, 0, frameLength))
+            if (ImGui::DragInt(" ", &animationCurrentFrame, 1.0f, 0, frameLength))
             {
                 model->PlayAnimation(selectionAnimationIndex, animationLoop);
                 model->SetAnimationSeconds(animationCurrentFrame / 60.0f);
