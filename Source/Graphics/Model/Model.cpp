@@ -101,7 +101,7 @@ void Model::UpdateAnimation(float elapsedTime)
     }
 
     // ŽžŠÔŒo‰ß
-    currentSeconds += elapsedTime * animation.animationspeed * speed;
+    currentSeconds += elapsedTime * animation.animationspeed;
     if (currentSeconds >= animation.secondsLength)
     {
         if (loopAnimation)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics/Shaders/Shader.h"
-#include "Graphics/Shaders/constant_buffer.h"
+#include "Graphics/Shaders/ConstantBuffer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Model/Model.h"
 
@@ -10,7 +10,7 @@
 enum MODELSHADER
 {
     Defalt,
-    Unity,
+    Deferred,
     SHADERMAX
 };
 
@@ -29,7 +29,7 @@ public:
     {
         DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
     };
-    std::unique_ptr<constant_buffer<object_constants>> ObjectConstants;
+    std::unique_ptr<ConstantBuffer<object_constants>> ObjectConstants;
 
     struct subset_constants
     {
@@ -40,7 +40,7 @@ public:
         float               Roughness = 0;
         DirectX::XMFLOAT2 dummy = {};
     };
-    std::unique_ptr<constant_buffer<subset_constants>> SubsetConstants;
+    std::unique_ptr<ConstantBuffer<subset_constants>> SubsetConstants;
 
 private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader>    VertexShader;

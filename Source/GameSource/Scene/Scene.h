@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/Shaders/constant_buffer.h"
+#include "Graphics/Shaders/ConstantBuffer.h"
 #include <DirectXMath.h>
 #include <memory>
 
@@ -11,8 +11,8 @@ class CameraCom;
 class Scene
 {
 public:
-    Scene(){}
-    virtual ~Scene(){}
+    Scene() {}
+    virtual ~Scene() {}
 
     //èâä˙âª
     virtual void Initialize() = 0;
@@ -50,7 +50,7 @@ protected:
         DirectX::XMFLOAT3 cameraposition = {};
         float dummy = {};
     };
-    std::unique_ptr<constant_buffer<SceneConstants>>sc;
+    std::unique_ptr<ConstantBuffer<SceneConstants>>sc;
 
 private:
     bool isReady_ = false;

@@ -4,11 +4,10 @@
 #include "Components/CameraCom.h"
 #include "Components/TransformCom.h"
 
-
 //シーンのコンスタントバッファの初期化
 void Scene::ConstantBufferInitialize()
 {
-    sc = std::make_unique<constant_buffer<SceneConstants>>(Graphics::Instance().GetDevice());
+    sc = std::make_unique<ConstantBuffer<SceneConstants>>(Graphics::Instance().GetDevice());
 }
 
 //シーンのコンスタントバッファの更新
@@ -30,5 +29,5 @@ void Scene::ConstantBufferUpdate()
     sc->data.cameraposition = c->GetGameObject()->transform_->GetWorldPosition();
 
     //更新する
-    sc->activate(Graphics::Instance().GetDeviceContext(), 10, true, true, true, true, true, true);
+    sc->Activate(Graphics::Instance().GetDeviceContext(), 10, true, true, true, true, true, true);
 }

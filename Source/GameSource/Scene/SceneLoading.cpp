@@ -8,10 +8,9 @@ void SceneLoading::Initialize()
 {
     //スプライト初期化
     sprite_ = new Sprite("Data/Sprite/yellow.png");
-    
-    //スレッド開始
-    thread_ = new std::thread(LoadingThread,this);
 
+    //スレッド開始
+    thread_ = new std::thread(LoadingThread, this);
 }
 
 //終了化
@@ -43,7 +42,6 @@ void SceneLoading::Update(float elapsedTime)
     }
 }
 
-
 //描画処理
 void SceneLoading::Render(float elapsedTime)
 {
@@ -58,11 +56,10 @@ void SceneLoading::Render(float elapsedTime)
     dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     dc->OMSetRenderTargets(1, &rtv, dsv);
 
-
     //3D描画
     {
         //バッファ避難
-        Graphics::Instance().CacheRenderTargets();
+        //Graphics::Instance().CacheRenderTargets();
 
         // 画面クリア＆レンダーターゲット設定
         rtv = {};
@@ -99,10 +96,9 @@ void SceneLoading::Render(float elapsedTime)
         }
 
         //バッファ戻す
-        graphics.RestoreRenderTargets();
+        //graphics.RestoreRenderTargets();
     }
 }
-
 
 //ローディングスレッド
 void SceneLoading::LoadingThread(SceneLoading* scene)

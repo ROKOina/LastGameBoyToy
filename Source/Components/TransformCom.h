@@ -22,7 +22,6 @@ public:
     // GUI描画
     void OnGUI() override;
 
-
     //TransformComクラス
 public:
     //行列更新
@@ -30,7 +29,7 @@ public:
 
     // ローカルポジション
     void SetLocalPosition(const DirectX::XMFLOAT3& position) {
-        this->localPosition_ = position; 
+        this->localPosition_ = position;
         UpdateTransform();
     }
     const DirectX::XMFLOAT3& GetLocalPosition() const { return localPosition_; }
@@ -41,7 +40,7 @@ public:
         if (!GetGameObject()->GetParent()) {
             this->localPosition_ = worldPosition;
         }
-        else{
+        else {
             DirectX::XMMATRIX ParentTransformInverse = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GetGameObject()->GetParent()->transform_->GetWorldTransform()));
             DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&worldPosition), ParentTransformInverse);
             DirectX::XMStoreFloat3(&this->localPosition_, WorldPosition);
@@ -55,7 +54,7 @@ public:
     const DirectX::XMFLOAT4& GetRotation() { return rotation_.dxFloat4; }
 
     // オイラー回転(クォータニオン->オイラーはきついのでセットだけ)
-    void SetEulerRotation(const DirectX::XMFLOAT3& setEuler) { 
+    void SetEulerRotation(const DirectX::XMFLOAT3& setEuler) {
         DirectX::XMFLOAT3 euler;
         euler.x = DirectX::XMConvertToRadians(setEuler.x);
         euler.y = DirectX::XMConvertToRadians(setEuler.y);
@@ -84,17 +83,17 @@ public:
     void SetWorldTransform(const DirectX::XMFLOAT4X4& transform) { this->worldTransform_ = transform; }
     const DirectX::XMFLOAT4X4& GetWorldTransform() { return worldTransform_; }
     const DirectX::XMFLOAT3 GetWorldUp() const {
-        DirectX::XMFLOAT3 up = {worldTransform_._21, worldTransform_._22, worldTransform_._23};
+        DirectX::XMFLOAT3 up = { worldTransform_._21, worldTransform_._22, worldTransform_._23 };
         DirectX::XMStoreFloat3(&up, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&up)));
-        return up; 
+        return up;
     }
     const DirectX::XMFLOAT3 GetWorldFront() const {
-        DirectX::XMFLOAT3 front = {worldTransform_._31, worldTransform_._32, worldTransform_._33};
+        DirectX::XMFLOAT3 front = { worldTransform_._31, worldTransform_._32, worldTransform_._33 };
         DirectX::XMStoreFloat3(&front, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&front)));
         return front;
     }
     const DirectX::XMFLOAT3 GetWorldRight() const {
-        DirectX::XMFLOAT3 right = {worldTransform_._11, worldTransform_._12, worldTransform_._13};
+        DirectX::XMFLOAT3 right = { worldTransform_._11, worldTransform_._12, worldTransform_._13 };
         DirectX::XMStoreFloat3(&right, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&right)));
         return right;
     }
@@ -108,7 +107,7 @@ public:
 private:
     DirectX::XMFLOAT3	localPosition_ = DirectX::XMFLOAT3(0, 0, 0);
     DirectX::XMFLOAT3	worldPosition_ = DirectX::XMFLOAT3(0, 0, 0);
-    
+
     QuaternionStruct	rotation_ = DirectX::XMFLOAT4(0, 0, 0, 1);   //基準はクォータニオン
     DirectX::XMFLOAT3   eulerRotation_ = DirectX::XMFLOAT3(0, 0, 0);
     DirectX::XMFLOAT3	scale_ = DirectX::XMFLOAT3(1, 1, 1);
@@ -116,4 +115,3 @@ private:
     DirectX::XMFLOAT4X4	localTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     DirectX::XMFLOAT4X4 parentTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 };
-

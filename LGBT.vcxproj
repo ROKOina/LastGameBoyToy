@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\imgui-docking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -92,7 +92,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\imgui-docking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -129,20 +129,20 @@
     <ClInclude Include="External\DirectXTex\pch.h" />
     <ClInclude Include="External\DirectXTex\PlatformHelpers.h" />
     <ClInclude Include="External\DirectXTex\WICTextureLoader.h" />
-    <ClInclude Include="External\imgui-docking\backends\imgui_impl_dx11.h" />
-    <ClInclude Include="External\imgui-docking\backends\imgui_impl_win32.h" />
-    <ClInclude Include="External\imgui-docking\imconfig.h" />
-    <ClInclude Include="External\imgui-docking\imgui.h" />
-    <ClInclude Include="External\imgui-docking\imgui_internal.h" />
-    <ClInclude Include="External\imgui-docking\imstb_rectpack.h" />
-    <ClInclude Include="External\imgui-docking\imstb_textedit.h" />
-    <ClInclude Include="External\imgui-docking\imstb_truetype.h" />
-    <ClInclude Include="External\imgui\ImGuizmo\GraphEditor.h" />
-    <ClInclude Include="External\imgui\ImGuizmo\ImCurveEdit.h" />
-    <ClInclude Include="External\imgui\ImGuizmo\ImGradient.h" />
-    <ClInclude Include="External\imgui\ImGuizmo\ImGuizmo.h" />
-    <ClInclude Include="External\imgui\ImGuizmo\ImSequencer.h" />
-    <ClInclude Include="External\imgui\ImGuizmo\ImZoomSlider.h" />
+    <ClInclude Include="External\ImGuizmo\GraphEditor.h" />
+    <ClInclude Include="External\ImGuizmo\ImCurveEdit.h" />
+    <ClInclude Include="External\ImGuizmo\ImGradient.h" />
+    <ClInclude Include="External\ImGuizmo\ImGuizmo.h" />
+    <ClInclude Include="External\ImGuizmo\ImSequencer.h" />
+    <ClInclude Include="External\imgui\imconfig.h" />
+    <ClInclude Include="External\imgui\imgui.h" />
+    <ClInclude Include="External\imgui\ImGuiRender.h" />
+    <ClInclude Include="External\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="External\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="External\imgui\imgui_internal.h" />
+    <ClInclude Include="External\imgui\imstb_rectpack.h" />
+    <ClInclude Include="External\imgui\imstb_textedit.h" />
+    <ClInclude Include="External\imgui\imstb_truetype.h" />
     <ClInclude Include="Source\Audio\Audio.h" />
     <ClInclude Include="Source\Audio\AudioResource.h" />
     <ClInclude Include="Source\Audio\AudioSource.h" />
@@ -161,17 +161,23 @@
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Components\CameraCom.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
-    <ClInclude Include="Source\Graphics\Dx11StateLib.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\LineRenderer.h" />
+    <ClInclude Include="Source\Graphics\Light\Light.h" />
+    <ClInclude Include="Source\Graphics\Light\LightData.h" />
+    <ClInclude Include="Source\Graphics\Light\LightManager.h" />
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\ModelShader.h" />
-    <ClInclude Include="Source\Graphics\Shaders\constant_buffer.h" />
+    <ClInclude Include="Source\Graphics\Shaders\Bloom.h" />
+    <ClInclude Include="Source\Graphics\Shaders\ConstantBuffer.h" />
+    <ClInclude Include="Source\Graphics\Shaders\FrameBuffer.h" />
+    <ClInclude Include="Source\Graphics\Shaders\FullScreenQuad.h" />
+    <ClInclude Include="Source\Graphics\Shaders\MultiRenderTarget.h" />
+    <ClInclude Include="Source\Graphics\Shaders\PostEffect.h" />
     <ClInclude Include="Source\Graphics\Shaders\Shader.h" />
     <ClInclude Include="Source\Graphics\Shaders\Texture.h" />
-    <ClInclude Include="Source\Graphics\Shaders\TextureFormat.h" />
     <ClInclude Include="Source\Graphics\Sprite\Sprite.h" />
     <ClInclude Include="Source\HighResolutionTimer.h" />
     <ClInclude Include="Source\Input\GamePad.h" />
@@ -186,6 +192,7 @@
     <ClInclude Include="Source\GameSource\Scene\SceneLoading.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneManager.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
+    <ClInclude Include="Source\SystemStruct\TransformUtils.h" />
     <ClInclude Include="Source\ThreadPool\ThreadPool.h" />
   </ItemGroup>
   <ItemGroup>
@@ -193,18 +200,20 @@
     <ClCompile Include="External\DirectXTex\DirectXHelpers.cpp" />
     <ClCompile Include="External\DirectXTex\pch.cpp" />
     <ClCompile Include="External\DirectXTex\WICTextureLoader.cpp" />
-    <ClCompile Include="External\imgui-docking\backends\imgui_impl_dx11.cpp" />
-    <ClCompile Include="External\imgui-docking\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="External\imgui-docking\imgui.cpp" />
-    <ClCompile Include="External\imgui-docking\imgui_demo.cpp" />
-    <ClCompile Include="External\imgui-docking\imgui_draw.cpp" />
-    <ClCompile Include="External\imgui-docking\imgui_tables.cpp" />
-    <ClCompile Include="External\imgui-docking\imgui_widgets.cpp" />
-    <ClCompile Include="External\imgui\ImGuizmo\GraphEditor.cpp" />
-    <ClCompile Include="External\imgui\ImGuizmo\ImCurveEdit.cpp" />
-    <ClCompile Include="External\imgui\ImGuizmo\ImGradient.cpp" />
-    <ClCompile Include="External\imgui\ImGuizmo\ImGuizmo.cpp" />
-    <ClCompile Include="External\imgui\ImGuizmo\ImSequencer.cpp" />
+    <ClCompile Include="External\ImGuizmo\GraphEditor.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
+    <ClCompile Include="External\imgui\imgui.cpp" />
+    <ClCompile Include="External\imgui\ImguiRender.cpp" />
+    <ClCompile Include="External\imgui\imgui_demo.cpp" />
+    <ClCompile Include="External\imgui\imgui_draw.cpp" />
+    <ClCompile Include="External\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="External\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="External\imgui\imgui_ja_gryph_ranges.cpp" />
+    <ClCompile Include="External\imgui\imgui_tables.cpp" />
+    <ClCompile Include="External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Source\Audio\Audio.cpp" />
     <ClCompile Include="Source\Audio\AudioResource.cpp" />
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
@@ -223,16 +232,20 @@
     <ClCompile Include="Source\Components\CameraCom.cpp" />
     <ClCompile Include="Source\GameSource\Scene\Scene.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
-    <ClCompile Include="Source\Graphics\Dx11StateLib.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\LineRenderer.cpp" />
+    <ClCompile Include="Source\Graphics\Light\Light.cpp" />
+    <ClCompile Include="Source\Graphics\Light\LightManager.cpp" />
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\ModelShader.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\FrameBuffer.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\FullScreenQuad.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\PostEffect.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Shader.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Texture.cpp" />
-    <ClCompile Include="Source\Graphics\Shaders\TextureFormat.cpp" />
     <ClCompile Include="Source\Graphics\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Input\GamePad.cpp" />
     <ClCompile Include="Source\Input\Input.cpp" />
@@ -244,67 +257,62 @@
     <ClCompile Include="Source\GameSource\Scene\SceneGame.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneLoading.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HLSL\2D\PostEffect\FullScreen.hlsli" />
-    <None Include="HLSL\3D\Common.hlsli" />
-    <None Include="HLSL\3D\Constants.hlsli" />
+    <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
+    <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
+    <None Include="HLSL\Common.hlsli" />
     <None Include="HLSL\compute\Particle.hlsli" />
+    <None Include="HLSL\Constants.hlsli" />
     <None Include="HLSL\Debugs\Debug.hlsli" />
     <None Include="HLSL\Debugs\Line.hlsli" />
     <None Include="HLSL\2D\Sprite.hlsli" />
     <None Include="HLSL\noise.hlsli" />
     <None Include="HLSL\Rand.hlsli" />
+    <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="HLSL\2D\PostEffect\BloomExtract.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\FullScreenQuadPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\BloomKawase.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\colorGrading.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\FullScreenVS.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\FullScreenQuadVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\GaussianBlur.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\GaussianBlurDownsamplingPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\MaskPost.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\GaussianBlurHorizontalPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\PostEffect.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\GaussianBlurUpsamplingPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\RadialBlur.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\GaussianBlurVerticalPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\RenderPost.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\GlowExtractionPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\ShaderPostVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\Skymap.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\PostEffectPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\SunAtmosphere.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\SkyBoxPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\PostEffect\ToneMapPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>

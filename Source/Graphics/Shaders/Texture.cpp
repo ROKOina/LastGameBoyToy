@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <WICTextureLoader.h>
 #include <DDSTextureLoader.h>
-#include <stb_image.h>
 #include <map>
 
 #include "Texture.h"
@@ -12,7 +11,7 @@
 
 //DDSTextureì«Ç›çûÇ›
 static std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;
-HRESULT load_texture_from_file(ID3D11Device* device, const wchar_t* filename, ID3D11ShaderResourceView** shader_resource_view, D3D11_TEXTURE2D_DESC* texture2d_desc)
+HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename, ID3D11ShaderResourceView** shader_resource_view, D3D11_TEXTURE2D_DESC* texture2d_desc)
 {
     HRESULT hr{ S_OK };
     Microsoft::WRL::ComPtr<ID3D11Resource> resource;
@@ -26,7 +25,6 @@ HRESULT load_texture_from_file(ID3D11Device* device, const wchar_t* filename, ID
     }
     else
     {
-        // UNIT.31
         std::filesystem::path dds_filename(filename);
         dds_filename.replace_extension("dds");
         if (std::filesystem::exists(dds_filename.c_str()))
@@ -51,7 +49,7 @@ HRESULT load_texture_from_file(ID3D11Device* device, const wchar_t* filename, ID
 }
 
 //âï˙èàóù
-void release_all_textures()
+void ReleaseAllTextures()
 {
     resources.clear();
 }

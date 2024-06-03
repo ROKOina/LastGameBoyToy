@@ -33,9 +33,6 @@ public:
     void UpdateAnimation(float elapsedTime);
     void ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Node& node);
 
-    // ë¨ìxê›íË
-    void SetSpeed(float speed) { this->speed = speed; }
-
     // çsóÒåvéZ
     void UpdateTransform(const DirectX::XMMATRIX& Transform);
 
@@ -71,5 +68,4 @@ private:
     float							currentSeconds = 0.0f;
     bool							loopAnimation = false;
     bool							endAnimation = false;
-    float							speed = 1.0f;
 };

@@ -1,4 +1,4 @@
-#include "Common.hlsli"
+#include "../Common.hlsli"
 
 // —U“d—¦
 static const float Specular = 0.5f;

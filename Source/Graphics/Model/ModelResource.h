@@ -9,10 +9,10 @@
 class ModelResource
 {
 public:
-	ModelResource() {}
-	virtual ~ModelResource() {}
+    ModelResource() {}
+    virtual ~ModelResource() {}
 
-	using NodeId = UINT64;
+    using NodeId = UINT64;
 
     //ノード
     struct Node
@@ -155,28 +155,25 @@ public:
     };
 
     // 各種データ取得
-	const std::vector<Mesh>& GetMeshes() const { return meshes_; }
-	std::vector<Node>& GetNodes() { return nodes_; }
-	const std::vector<Animation>& GetAnimations() const { return animations_; }
-	const std::vector<Material>& GetMaterials() const { return materials_; }
-	std::vector<Mesh>& GetMeshesEdit() { return meshes_; }
-	std::vector<Material>& GetMaterialsEdit()  { return materials_; }
+    const std::vector<Mesh>& GetMeshes() const { return meshes_; }
+    std::vector<Node>& GetNodes() { return nodes_; }
+    const std::vector<Animation>& GetAnimations() const { return animations_; }
+    const std::vector<Material>& GetMaterials() const { return materials_; }
+    std::vector<Mesh>& GetMeshesEdit() { return meshes_; }
+    std::vector<Material>& GetMaterialsEdit() { return materials_; }
 
     // 読み込み
-	void Load(ID3D11Device* device, const char* filename);
+    void Load(ID3D11Device* device, const char* filename);
 
 protected:
-	// モデルセットアップ
-	void BuildModel(ID3D11Device* device, const char* dirname);
+    // モデルセットアップ
+    void BuildModel(ID3D11Device* device, const char* dirname);
 
-	// テクスチャ読み込み
-	HRESULT LoadTexture(ID3D11Device* device, const char* filename, const char* suffix, bool dummy, ID3D11ShaderResourceView** srv, UINT dummy_color = 0xFFFFFFFF);
+    // シリアライズ
+    void Serialize(const char* filename);
 
-	// シリアライズ
-	void Serialize(const char* filename);
-
-	// デシリアライズ
-	void Deserialize(const char* filename);
+    // デシリアライズ
+    void Deserialize(const char* filename);
 
     //マテリアルデシリアライズ
     void MaterialDeserialize(const char* filename);
@@ -186,13 +183,13 @@ protected:
 
     //ノードデシリアライズ
     void NodeDeserialize(const char* filename);
-    
+
     // ノードインデックスを取得する
-	int FindNodeIndex(NodeId nodeId) const;
+    int FindNodeIndex(NodeId nodeId) const;
 
 protected:
-	std::vector<Node>		nodes_;
-	std::vector<Material>	materials_;
-	std::vector<Mesh>		meshes_;
-	std::vector<Animation>	animations_;
+    std::vector<Node>		nodes_;
+    std::vector<Material>	materials_;
+    std::vector<Mesh>		meshes_;
+    std::vector<Animation>	animations_;
 };
