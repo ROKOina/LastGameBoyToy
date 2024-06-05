@@ -64,9 +64,9 @@ void SceneGame::Initialize()
     const char* filename = "Data/OneCoin/robot.mdl";
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>();
     r->LoadModel(filename);
-    r->GetModel()->PlayAnimation(0, true);
-
-    //std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+    
+    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+    a->PlayAnimation(1, true, 0.05f);
 
     //ポストエフェクト追加
     m_posteffect = std::make_unique<PostEffect>();
