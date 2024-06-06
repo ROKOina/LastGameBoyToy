@@ -73,11 +73,11 @@ void __fastcall NetServer::Initialize()
     // 第3引数,ローカルIPアドレスの指定
     // 第4引数,ローカルIPアドレスのサイズ
     setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_IF,
-        reinterpret_cast<char*>(&multicastAddr), sizeof(multicastAddr));
+        reinterpret_cast<char*>(&localAddress), sizeof(localAddress));
 
     // TTLのオプション設定(Time To Live 有効時間)
     int ttl = 10;
-    setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_IF,
+    setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_TTL,
         reinterpret_cast<char*>(&ttl), sizeof(ttl));
 
 

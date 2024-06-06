@@ -31,5 +31,6 @@ public:
 private:
     std::unique_ptr<PostEffect>m_posteffect;
 
-    NetClient netC;
+    NetServer netC;
+    //NetClient netC;
 };
