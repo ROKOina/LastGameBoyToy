@@ -22,16 +22,18 @@ void AnimationCom::OnGUI()
 {
     //if (!GetGameObject()->GetComponent<RendererCom>())return;
 
-    //const ModelResource* resource = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource();
-    //const std::vector<ModelResource::Animation>& animations = resource->GetAnimations();
+    const ModelResource* resource = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource();
+    const std::vector<ModelResource::Animation>& animations = resource->GetAnimations();
 
-    //ImGui::Checkbox("animationLoop", &isAnimLoop);
-    //ImGui::Separator();
-    //int index = 0;
-    //for (ModelResource::Animation anim : animations)
-    //{
-    //	index++;
-    //}
+    ImGui::Checkbox("animationLoop", &isAnimLoop);
+    ImGui::Checkbox("test", &test);
+    ImGui::Checkbox("test1", &test1);
+    ImGui::Separator();
+    int index = 0;
+    for (ModelResource::Animation anim : animations)
+    {
+    	index++;
+    }
 }
 
 //アニメーション更新
@@ -44,7 +46,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 
     //ブレンド率の計算
     float blendRate = 1.0f;
-    if (animationChangeTime)
+    if (animationChangeTime>0)
     {
         animationChangeRate += animationChangeTime;
         blendRate = animationChangeRate;
@@ -88,7 +90,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                  
                 if (blendRate < 1.0f)
                 {
-                    ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
+                    ComputeSwitchAnimation(key0, blendRate, model->GetNodes()[nodeIndex]);
                 }
                 else
                 {
@@ -135,8 +137,8 @@ void AnimationCom::PlayAnimation(int animeID, bool loop, float blendSeconds)
     loopAnimation = loop;
     endAnimation = false;
     currentSeconds = 0.0f;
-    animationChangeTime = 0.0f;
-    animationChangeRate = blendSeconds;
+    animationChangeTime = blendSeconds;
+    animationChangeRate = 0.0f;
 }
 
 //アニメーションストップ

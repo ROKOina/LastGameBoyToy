@@ -2,6 +2,7 @@
 #include "Graphics/Light/LightManager.h"
 #include "Graphics/Light/Light.h"
 #include "Input\Input.h"
+#include "Input\GamePad.h"
 
 #include "SceneGame.h"
 #include "SceneManager.h"
@@ -69,7 +70,7 @@ void SceneGame::Initialize()
     r->LoadModel(filename);
     
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    a->PlayAnimation(1, true, 0.05f);
+    a->PlayAnimation(0, true, 0.001f);
 
     //ポストエフェクト追加
     m_posteffect = std::make_unique<PostEffect>();
@@ -91,12 +92,21 @@ void SceneGame::Update(float elapsedTime)
 {
     netC.Update();
 
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
     //コンポーネントゲット
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("test");
     std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
+    std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
+    if(a->Get()&&!a->Get1())
+    {
+        a->PlayAnimation(1, true, 0.001f);
+        a->Set(true);
+    }
+   
 
     ConstantBufferUpdate();
 }

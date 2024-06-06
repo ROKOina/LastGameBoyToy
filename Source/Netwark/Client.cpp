@@ -71,10 +71,10 @@ void __fastcall NetClient::Initialize()
     addr.sin_family = AF_INET;
     addr.sin_port = htons(7000);
 
-    addr.sin_addr.S_un.S_un_b.s_b1 = 127;
-    addr.sin_addr.S_un.S_un_b.s_b2 = 0;
-    addr.sin_addr.S_un.S_un_b.s_b3 = 0;
-    addr.sin_addr.S_un.S_un_b.s_b4 = 1;
+    addr.sin_addr.S_un.S_un_b.s_b1 = 192;
+    addr.sin_addr.S_un.S_un_b.s_b2 = 168;
+    addr.sin_addr.S_un.S_un_b.s_b3 = 1;
+    addr.sin_addr.S_un.S_un_b.s_b4 = 7;
 
     // マルチキャストソケット作成(サーバから受信用)
     multicastSock = socket(AF_INET, SOCK_DGRAM, 0);
