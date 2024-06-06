@@ -76,5 +76,7 @@ private:
     bool                            test = false;
     bool                            test1 = false;
 
+    bool                            test2 = false;
+
 
 };

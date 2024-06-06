@@ -90,7 +90,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                  
                 if (blendRate < 1.0f)
                 {
-                    ComputeSwitchAnimation(key0, blendRate, model->GetNodes()[nodeIndex]);
+                    ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
                 }
                 else
                 {
@@ -109,6 +109,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         currentAnimation = -1;
         return;
     }
+
 
     // ŽžŠÔŒo‰ß
     currentSeconds += elapsedTime * animation.animationspeed;
@@ -177,9 +178,9 @@ void AnimationCom::ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1
     DirectX::XMVECTOR MT1 = DirectX::XMLoadFloat3(&node.translate);
 
 
-    DirectX::XMVECTOR S = DirectX::XMVectorLerp(S1,MS1, blendRate);
-    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(R1,MR1, blendRate);
-    DirectX::XMVECTOR T = DirectX::XMVectorLerp(T1,MT1, blendRate);
+    DirectX::XMVECTOR S = DirectX::XMVectorLerp(MS1,S1, blendRate);
+    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(MR1,R1, blendRate);
+    DirectX::XMVECTOR T = DirectX::XMVectorLerp(MT1,T1, blendRate);
 
     DirectX::XMStoreFloat3(&node.scale, S);
     DirectX::XMStoreFloat4(&node.rotate, R);
