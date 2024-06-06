@@ -41,6 +41,16 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     const ModelResource* resource = model->GetResource();
 
+
+    //ブレンド率の計算
+    float blendRate = 1.0f;
+    if (animationChangeTime)
+    {
+        animationChangeRate += animationChangeTime;
+        blendRate = animationChangeRate;
+        if (blendRate > 1.0f)blendRate = 1.0f;
+    }
+
     if (currentAnimation < 0)
     {
         return;
@@ -60,6 +70,9 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         // 現在の時間がどのキーフレームの間にいるか判定する
         const ModelResource::Keyframe& keyframe0 = keyframes.at(keyIndex);
         const ModelResource::Keyframe& keyframe1 = keyframes.at(keyIndex + 1);
+
+
+        
         if (currentSeconds >= keyframe0.seconds && currentSeconds <= keyframe1.seconds)
         {
             float rate = (currentSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
@@ -117,6 +130,8 @@ void AnimationCom::PlayAnimation(int animeID, bool loop, float blendSeconds)
     loopAnimation = loop;
     endAnimation = false;
     currentSeconds = 0.0f;
+    animationChangeTime = 0.0f;
+    animationChangeRate = blendSeconds;
 }
 
 //アニメーションストップ

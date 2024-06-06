@@ -57,6 +57,10 @@ private:
     int								currentAnimation = -1;
     //アニメーションの現在の時間
     float							currentSeconds = 0.0f;
+    //アニメーションを変更した時の変数
+    float                           animationChangeRate = 0.0f;
+    //アニメーションを変更時の現在の時間
+    float                           animationChangeTime = 0.0f;
     //アニメーションをループさせるか？
     bool							loopAnimation = false;
     //アニメーションを終了させるか？
