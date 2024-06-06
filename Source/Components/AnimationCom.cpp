@@ -86,10 +86,15 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
 
                  
-
-                //アニメーション計算
-                ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
-                
+                if (blendRate < 1.0f)
+                {
+                    ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
+                }
+                else
+                {
+                    //アニメーション計算
+                    ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                }
             }
             break;
         }
@@ -153,6 +158,26 @@ void AnimationCom::ComputeAnimation(const ModelResource::NodeKeyData& key0, cons
     DirectX::XMVECTOR S = DirectX::XMVectorLerp(S0, S1, rate);
     DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(R0, R1, rate);
     DirectX::XMVECTOR T = DirectX::XMVectorLerp(T0, T1, rate);
+
+    DirectX::XMStoreFloat3(&node.scale, S);
+    DirectX::XMStoreFloat4(&node.rotate, R);
+    DirectX::XMStoreFloat3(&node.translate, T);
+}
+
+//アニメーション切り替え時の計算
+void AnimationCom::ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node)
+{
+    DirectX::XMVECTOR S1 = DirectX::XMLoadFloat3(&key1.scale);
+    DirectX::XMVECTOR R1 = DirectX::XMLoadFloat4(&key1.rotate);
+    DirectX::XMVECTOR T1 = DirectX::XMLoadFloat3(&key1.translate);
+    DirectX::XMVECTOR MS1 = DirectX::XMLoadFloat3(&node.scale);
+    DirectX::XMVECTOR MR1 = DirectX::XMLoadFloat4(&node.rotate);
+    DirectX::XMVECTOR MT1 = DirectX::XMLoadFloat3(&node.translate);
+
+
+    DirectX::XMVECTOR S = DirectX::XMVectorLerp(S1,MS1, blendRate);
+    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(R1,MR1, blendRate);
+    DirectX::XMVECTOR T = DirectX::XMVectorLerp(T1,MT1, blendRate);
 
     DirectX::XMStoreFloat3(&node.scale, S);
     DirectX::XMStoreFloat4(&node.rotate, R);

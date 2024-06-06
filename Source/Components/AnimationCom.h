@@ -49,6 +49,9 @@ private:
 
     //アニメーション計算
     void ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node&node);
+    //アニメーション切り替え時の計算
+    void ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node);
+
 
 private:
     //変数
