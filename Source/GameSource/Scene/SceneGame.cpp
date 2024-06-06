@@ -21,9 +21,12 @@
 
 #include "Components/ParticleComManager.h"
 
+
 // 初期化
 void SceneGame::Initialize()
 {
+    netC.Initialize();
+
     Graphics& graphics = Graphics::Instance();
 
     std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -86,6 +89,8 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+    netC.Update();
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
@@ -126,6 +131,8 @@ void SceneGame::Render(float elapsedTime)
 
     //imgui描画
     m_posteffect->PostEffectImGui();
+
+    netC.ImGui();
 
     //オブジェクト描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
