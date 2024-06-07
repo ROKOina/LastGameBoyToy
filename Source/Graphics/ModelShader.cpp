@@ -51,7 +51,7 @@ ModelShader::ModelShader(int shader)
     //IBL専用のテクスチャ読み込み
     {
         D3D11_TEXTURE2D_DESC texture2d_desc{};
-        load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\snowy_hillside_4k.DDS", skybox.GetAddressOf(), &texture2d_desc);
+       // load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\snowy_hillside_4k.DDS", skybox.GetAddressOf(), &texture2d_desc);
         load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\diffuse_iem.dds", diffuseiem.GetAddressOf(), &texture2d_desc);
         load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\specular_pmrem.dds", specularpmrem.GetAddressOf(), &texture2d_desc);
         load_texture_from_file(Graphics.GetDevice(), L".\\Data\\Texture\\lut_ggx.DDS", lutggx.GetAddressOf(), &texture2d_desc);

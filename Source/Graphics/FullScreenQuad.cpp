@@ -22,7 +22,7 @@ FullScreenQuad::FullScreenQuad(ID3D11Device* device)
 
     //SKYMAP用テクスチャを読み込み
     D3D11_TEXTURE2D_DESC texture2d_desc{};
-    load_texture_from_file(device, L".\\Data\\Texture\\snowy_hillside_4k.DDS", skymap.GetAddressOf(), &texture2d_desc);
+   // load_texture_from_file(device, L".\\Data\\Texture\\snowy_hillside_4k.DDS", skymap.GetAddressOf(), &texture2d_desc);
 }
 
 //インスタンス取得
