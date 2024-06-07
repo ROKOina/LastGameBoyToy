@@ -90,6 +90,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                  
                 if (blendRate < 1.0f)
                 {
+                    //アニメーション切り替え時の計算
                     ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
                 }
                 else
