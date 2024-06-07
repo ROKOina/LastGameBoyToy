@@ -3,6 +3,7 @@
 //#include <winsock2.h>
 #include <thread>
 //#include <memory>
+#include <string>
 
 
 class NetClient
