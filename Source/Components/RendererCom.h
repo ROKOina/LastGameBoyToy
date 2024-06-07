@@ -7,7 +7,7 @@
 class RendererCom : public Component
 {
     //コンポーネントオーバーライド
-public: 
+public:
     RendererCom() {}
     ~RendererCom() {}
 
@@ -22,7 +22,6 @@ public:
 
     // GUI描画
     void OnGUI() override;
-
 
     //Rendererクラス
 public:

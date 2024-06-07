@@ -53,8 +53,7 @@ void SceneGame::Initialize()
     );
 
     camera->transform_->SetWorldPosition({ 0, 5, -10 });
-    
-   
+
     //camera->AddComponent<FreeCameraCom>();
 
     ConstantBufferInitialize();
@@ -71,6 +70,11 @@ void SceneGame::Initialize()
     
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     a->PlayAnimation(0, true, 0.001f);
+
+    obj = GameObjectManager::Instance().Create();
+    obj->SetName("testP");
+
+    obj->AddComponent<ParticleSystemCom>(100, false);
 
     //ポストエフェクト追加
     m_posteffect = std::make_unique<PostEffect>();
