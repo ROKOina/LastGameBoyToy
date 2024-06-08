@@ -1,9 +1,8 @@
 #pragma once
 
 //#include <winsock2.h>
-#include <thread>
 //#include <memory>
-
+#include <string>
 
 class NetClient
 {
@@ -22,9 +21,6 @@ private:
 
     unsigned __int64 sock;
     unsigned __int64 multicastSock;
-    std::unique_ptr<std::thread> thread;
 
-    std::string sendData;
-    bool isSend = false;
     std::string recvData="ABC";
 };

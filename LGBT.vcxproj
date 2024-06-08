@@ -193,6 +193,7 @@
     <ClInclude Include="Source\GameSource\Scene\SceneLoading.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneManager.h" />
     <ClInclude Include="Source\Netwark\Client.h" />
+    <ClInclude Include="Source\Netwark\NetData.h" />
     <ClInclude Include="Source\Netwark\Server.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
     <ClInclude Include="Source\SystemStruct\TransformUtils.h" />
