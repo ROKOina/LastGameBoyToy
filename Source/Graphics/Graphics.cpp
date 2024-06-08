@@ -631,8 +631,8 @@ Graphics::Graphics(HWND hWnd)
 
     // シェーダー
     {
-        modelshaders[0] = std::make_unique<ModelShader>(static_cast<int>(Defalt));
-        modelshaders[1] = std::make_unique<ModelShader>(static_cast<int>(Deferred));
+        m_modelshaders[static_cast<int>(SHADERMODE::DEFALT)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFALT);
+        m_modelshaders[static_cast<int>(SHADERMODE::DEFERRED)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFERRED);
     }
 
     // レンダラ

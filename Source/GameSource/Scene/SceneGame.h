@@ -4,7 +4,6 @@
 #include "Graphics\Sprite\Sprite.h"
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
-#include "Graphics/Shaders/PostEffect.h"
 
 #include "Netwark/Client.h"
 #include "Netwark/Server.h"
@@ -29,7 +28,5 @@ public:
     void Render(float elapsedTime)override;
 
 private:
-    std::unique_ptr<PostEffect>m_posteffect;
-
     NetClient netC;
 };

@@ -129,8 +129,6 @@ void PostEffect::PostEffectImGui()
         ImGui::Image(m_multirendertarget->m_rendertargetshaderresourceviews[3], { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
         ImGui::Text("Emission");
         ImGui::Image(m_multirendertarget->m_rendertargetshaderresourceviews[4], { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
-        ImGui::Text("Effect");
-        ImGui::Image(m_multirendertarget->m_rendertargetshaderresourceviews[5], { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
         ImGui::Text("Depth");
         ImGui::Image(m_multirendertarget->m_depthstencilshaderresourceview, { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
         ImGui::Text("FinalPass");

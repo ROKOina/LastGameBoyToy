@@ -22,7 +22,6 @@
 
 #include "Components/ParticleComManager.h"
 
-
 // 初期化
 void SceneGame::Initialize()
 {
@@ -65,9 +64,9 @@ void SceneGame::Initialize()
 
     //const char* filename = "Data/picola/pi.mdl";
     const char* filename = "Data/OneCoin/robot.mdl";
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>();
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
     r->LoadModel(filename);
-    
+
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     a->PlayAnimation(0, true, 0.001f);
 
@@ -75,9 +74,6 @@ void SceneGame::Initialize()
     obj->SetName("testP");
 
     obj->AddComponent<ParticleSystemCom>(100, false);
-
-    //ポストエフェクト追加
-    m_posteffect = std::make_unique<PostEffect>();
 
     //平行光源を追加
     Light* mainDirectionalLight = new Light(LightType::Directional);
@@ -105,14 +101,11 @@ void SceneGame::Update(float elapsedTime)
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("test");
     std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
     std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-    if(a->Get()&&!a->Get1())
+    if (a->Get() && !a->Get1())
     {
         a->PlayAnimation(1, true, 0.001f);
         a->Set(true);
     }
-   
-
-    ConstantBufferUpdate();
 }
 
 // 描画処理
@@ -125,29 +118,20 @@ void SceneGame::Render(float elapsedTime)
     ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
     dc->OMSetRenderTargets(1, &rtv, dsv);
 
+    //コンスタントバッファの更新
+    ConstantBufferUpdate();
+
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
     // ライトの定数バッファを更新
     LightManager::Instance().UpdateConstatBuffer();
 
-    //デファードの設定
-    m_posteffect->DeferredFirstSet();
-
     //オブジェクト描画
     GameObjectManager::Instance().Render();
 
-    //デファードのリソース設定
-    m_posteffect->DeferredResourceSet();
-
-    //ポストエフェクト
-    m_posteffect->PostEffectRender();
-
-    //imgui描画
-    m_posteffect->PostEffectImGui();
-
     netC.ImGui();
 
-    //オブジェクト描画
+    //imguiguizmo描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 }
