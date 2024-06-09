@@ -26,8 +26,6 @@ void AnimationCom::OnGUI()
     const std::vector<ModelResource::Animation>& animations = resource->GetAnimations();
 
     ImGui::Checkbox("animationLoop", &isAnimLoop);
-    ImGui::Checkbox("test", &test);
-    ImGui::Checkbox("test1", &test1);
     ImGui::Separator();
     int index = 0;
     for (ModelResource::Animation anim : animations)
@@ -186,4 +184,87 @@ void AnimationCom::ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1
     DirectX::XMStoreFloat3(&node.scale, S);
     DirectX::XMStoreFloat4(&node.rotate, R);
     DirectX::XMStoreFloat3(&node.translate, T);
+}
+
+
+
+
+//ルートモーションの値を取るノードを検索
+void AnimationCom::SetupRootMotion(const char* rootMotionNodeIndex)
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    this->rootMotionNodeIndex = model->FindNodeIndex(rootMotionNodeIndex);
+}
+
+//ルートモーションの腰を取るノードを検索
+void AnimationCom::SetupRootMotionHip(const char* rootMotionNodeName)
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    this->rootMotionHipNodeIndex = model->FindNodeIndex(rootMotionNodeName);
+}
+
+//ルートモーションの移動値を計算
+void AnimationCom::ComputeRootMotion()
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+
+
+    if (!rootMotionFlag)
+    {
+        //ルートフラグが無かったらしない
+        return;
+    }
+    if (rootMotionNodeIndex < 0)
+    {
+        //ルートインデックスが無かったらしない
+        return;
+    }
+
+    //前のフレームと今回のフレームの移動量データの差分量を求める
+    rootMotionTranslation.x = model->GetNodes()[rootMotionHipNodeIndex].translate.x - cahcheRootMotionTranslation.x;
+    rootMotionTranslation.z = model->GetNodes()[rootMotionHipNodeIndex].translate.z - cahcheRootMotionTranslation.z;
+
+
+    //次回に差分量を求めるために今回の移動値をキャッシュする
+    cahcheRootMotionTranslation = model->GetNodes()[rootMotionHipNodeIndex].translate;
+
+    //アニメーション内で移動してほしくないのでルートモーション移動値をリセット
+    model->GetNodes()[rootMotionHipNodeIndex].translate.x = 0;
+    model->GetNodes()[rootMotionHipNodeIndex].translate.z = 0;
+
+    //ルートモーションフラグをオフにする
+    rootMotionFlag = false;
+}
+
+//ルートモーション更新
+void AnimationCom::updateRootMotion(DirectX::XMFLOAT3& translation)
+{
+
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    if (rootMotionNodeIndex < 0)
+    {
+        return;
+    }
+
+    DirectX::XMMATRIX transform;
+
+    DirectX::XMVECTOR tranlation = DirectX::XMLoadFloat3(&rootMotionTranslation);
+
+    if (rootMotionNodeIndex == 0)
+    {
+        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].worldTransform);
+    }
+    else
+    {
+        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].parent->worldTransform);
+
+        DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(tranlation, transform);
+        DirectX::XMStoreFloat3(&translation, position);
+        //GetGameObject().lock()->SetPosition(translation);
+        GetGameObject()->transform_->SetWorldPosition(translation);
+
+        rootMotionTranslation = { 0,0,0 };
+    }
 }

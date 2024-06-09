@@ -40,9 +40,7 @@ public:
     //アニメーションストップ
     void StopAnimation();
 
-    bool Get() { return test; }
-    bool Get1() { return test1; }
-    void Set(bool set) { test1=set; }
+   
 
 public:
     // アニメーション時間
@@ -56,6 +54,18 @@ private:
     //アニメーション切り替え時の計算
     void ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node);
    
+private:
+
+    //ルートモーション関連
+    
+    //ルートモーションの値を取るノードを検索
+    void SetupRootMotion(const char* rootMotionNodeName);
+    //ルートモーションの腰を取るノードを検索
+    void SetupRootMotionHip(const char* rootMotionNodeName);
+    //ルートモーション更新
+    void updateRootMotion(DirectX::XMFLOAT3& translation);
+    //ルートモーションの移動値を計算
+    void ComputeRootMotion();
 
 private:
     //変数
@@ -73,10 +83,22 @@ private:
     //アニメーションを終了させるか？
     bool							endAnimation = false;
 
-    bool                            test = false;
-    bool                            test1 = false;
+    //ルートモーション
 
-    bool                            test2 = false;
+    //動かすノードのインデックス
+    int rootMotionNodeIndex = -1;
+    //ポジションを入れるノードのインデックス
+    int rootMotionHipNodeIndex = -1;
+    //ルートモーションするかどうか
+    bool rootFlag = false;
+    //ルートモーション　アニメーション更新処理判定
+    bool rootMotionFlag = false;
+    //ルートモーションで使う値を保存しておく変数
+    DirectX::XMFLOAT3 cahcheRootMotionTranslation = { 0,0,0 };
+    //フレーム間の差分用変数
+    DirectX::XMFLOAT3 rootMotionTranslation = { 0,0,0 };
+
+
 
 
 };

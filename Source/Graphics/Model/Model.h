@@ -44,6 +44,14 @@ public:
     //オープンノードをした時に逆に情報を入れる
     void CopyRefrectModel();
 
+public:
+    //ノード検索　上半身分別
+    Node* FindNode(const char* name);
+
+    //特定のノードの番号検索
+    int FindNodeIndex(const char* name);
+
+
 private:
 
     enum Layer

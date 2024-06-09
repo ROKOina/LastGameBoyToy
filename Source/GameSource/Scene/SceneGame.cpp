@@ -101,11 +101,7 @@ void SceneGame::Update(float elapsedTime)
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("test");
     std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
     std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-    if(a->Get()&&!a->Get1())
-    {
-        a->PlayAnimation(1, true, 0.001f);
-        a->Set(true);
-    }
+    
    
 
     ConstantBufferUpdate();
