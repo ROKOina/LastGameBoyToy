@@ -21,6 +21,10 @@ ModelShader::ModelShader(int shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\PBR+IBL_Unity.cso" };
         break;
+    case MODELSHADER::BLACK:
+        VSPath = { "Shader\\DefaltVS.cso" };
+        PSPath = { "Shader\\BlackPS.cso" };
+        break;
     }
 
     // 頂点シェーダー

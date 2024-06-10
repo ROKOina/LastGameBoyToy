@@ -633,6 +633,7 @@ Graphics::Graphics(HWND hWnd)
     {
         m_modelshaders[static_cast<int>(SHADERMODE::DEFALT)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFALT);
         m_modelshaders[static_cast<int>(SHADERMODE::DEFERRED)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFERRED);
+        m_modelshaders[static_cast<int>(SHADERMODE::BLACK)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::BLACK);
     }
 
     // ƒŒƒ“ƒ_ƒ‰

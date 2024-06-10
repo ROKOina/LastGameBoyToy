@@ -6,5 +6,7 @@ cbuffer SceneConstants : register(b10)
     row_major float4x4 inverseview;
     row_major float4x4 inverseprojection;
     float3 cameraposition;
-    float dummy;
+    float time;
+    float deltatime;
+    float3 SCdummy;
 }

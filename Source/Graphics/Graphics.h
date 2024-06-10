@@ -83,6 +83,7 @@ enum class SHADERMODE
 {
     DEFALT,
     DEFERRED,
+    BLACK,
     MAX
 };
 

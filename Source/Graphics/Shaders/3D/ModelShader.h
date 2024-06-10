@@ -52,6 +52,7 @@ public:
     {
         DEFALT,
         DEFERRED,
+        BLACK,
         MAX
     };
 

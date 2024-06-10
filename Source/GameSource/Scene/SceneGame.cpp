@@ -29,51 +29,86 @@ void SceneGame::Initialize()
 
     Graphics& graphics = Graphics::Instance();
 
-    std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
-    freeCamera->SetName("camera");
+    //フリーカメラ
+    {
+        std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
+        freeCamera->SetName("freecamera");
+        std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
+        f->SetPerspectiveFov
+        (
+            DirectX::XMConvertToRadians(45),
+            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+            0.1f, 1000.0f
+        );
+        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        f->SetActiveInitialize();
+    }
 
-    std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
-    f->SetPerspectiveFov(
-        DirectX::XMConvertToRadians(45),
-        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-        0.1f, 1000.0f
-    );
-    freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-    f->SetActiveInitialize();
+    //普通のカメラ
+    {
+        std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+        camera->SetName("normalcamera");
 
-    std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-    camera->SetName("camera1");
+        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+        c->SetPerspectiveFov
+        (
+            DirectX::XMConvertToRadians(45),
+            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+            0.1f, 1000.0f
+        );
 
-    std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-    c->SetPerspectiveFov(
-        DirectX::XMConvertToRadians(45),
-        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-        0.1f, 1000.0f
-    );
+        camera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
 
-    camera->transform_->SetWorldPosition({ 0, 5, -10 });
-
-    //camera->AddComponent<FreeCameraCom>();
-
+    //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-    obj->SetName("test");
-    obj->transform_->SetWorldPosition({ 0, 0, 0 });
-    obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
+    //プレイヤー
+    {
+        obj->SetName("player");
+        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
+        r->LoadModel("Data/OneCoin/robot.mdl");
+        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        a->PlayAnimation(0, true, 0.001f);
+    }
 
-    //const char* filename = "Data/picola/pi.mdl";
-    const char* filename = "Data/OneCoin/robot.mdl";
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
-    r->LoadModel(filename);
+    //ステージ
+    {
+        obj = GameObjectManager::Instance().Create();
+        obj->SetName("stage");
+        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
+        obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
+        r->LoadModel("Data/Stage/Stage.mdl");
+    }
 
-    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    a->PlayAnimation(0, true, 0.001f);
+    //バリア
+    {
+        obj = GameObjectManager::Instance().Create();
+        obj->SetName("barrier");
+        obj->transform_->SetWorldPosition({ -2.0f,1.4f,0.0f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFALT), static_cast<int>(BLENDSTATE::ADD));
+        r->LoadModel("Data/Ball/b.mdl");
+    }
 
-    obj = GameObjectManager::Instance().Create();
-    obj->SetName("testP");
+    //黒い何か
+    {
+        obj = GameObjectManager::Instance().Create();
+        obj->SetName("blackball");
+        obj->transform_->SetWorldPosition({ 2.0f,1.4f,0.0f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::BLACK), static_cast<int>(BLENDSTATE::ALPHA));
+        r->LoadModel("Data/Ball/t.mdl");
+    }
 
-    obj->AddComponent<ParticleSystemCom>(100, false);
+    //パーティクル
+    {
+        obj = GameObjectManager::Instance().Create();
+        obj->SetName("testP");
+        obj->AddComponent<ParticleSystemCom>(100, false);
+    }
 
     //平行光源を追加
     Light* mainDirectionalLight = new Light(LightType::Directional);
@@ -98,7 +133,7 @@ void SceneGame::Update(float elapsedTime)
     GameObjectManager::Instance().Update(elapsedTime);
 
     //コンポーネントゲット
-    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("test");
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
     std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
     std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
     if (a->Get() && !a->Get1())
@@ -119,7 +154,7 @@ void SceneGame::Render(float elapsedTime)
     dc->OMSetRenderTargets(1, &rtv, dsv);
 
     //コンスタントバッファの更新
-    ConstantBufferUpdate();
+    ConstantBufferUpdate(elapsedTime);
 
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();

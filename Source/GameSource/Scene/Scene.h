@@ -33,7 +33,7 @@ public:
     void SetReady() { isReady_ = true; }
 
     //シーンのコンスタントバッファの更新
-    void ConstantBufferUpdate();
+    void ConstantBufferUpdate(float elapsedTime);
 
     //シーンのコンスタントバッファの初期化
     void ConstantBufferInitialize();
@@ -48,7 +48,9 @@ protected:
         DirectX::XMFLOAT4X4 inverseview = {};
         DirectX::XMFLOAT4X4 inverseprojection = {};
         DirectX::XMFLOAT3 cameraposition = {};
-        float dummy = {};
+        float time = {};
+        float deltatime = {};
+        DirectX::XMFLOAT3 SCdummy = {};
     };
     std::unique_ptr<ConstantBuffer<SceneConstants>>sc;
 

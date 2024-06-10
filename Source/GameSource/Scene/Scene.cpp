@@ -12,12 +12,16 @@ void Scene::ConstantBufferInitialize()
 }
 
 //シーンのコンスタントバッファの更新
-void Scene::ConstantBufferUpdate()
+void Scene::ConstantBufferUpdate(float elapsedTime)
 {
     //カメラの情報を持ってくる
     std::shared_ptr<CameraCom> c = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>();
 
     Graphics& graphics = Graphics::Instance();
+
+    //コンスタントバッファに入れる時間の更新
+    sc->data.time += elapsedTime;
+    sc->data.deltatime = elapsedTime;
 
     //カメラの情報を入れてあげる
     sc->data.view = c->GetView();
