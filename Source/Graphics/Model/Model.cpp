@@ -96,3 +96,34 @@ void Model::CopyRefrectModel()
         nodes.at(nodeIndex).layer = resNodes.at(nodeIndex).layer;
     }
 }
+
+//ノード検索　上半身分別
+Model::Node* Model::FindNode(const char* name)
+{
+    //全てのノードを総当たりで名前比較する
+    for (Model::Node& node : nodes)
+    {
+        if (strcmp(node.name, name) == 0)
+        {
+            return &node;
+        }
+    }
+
+    //見つからなかった
+    return nullptr;
+}
+
+//特定のノードの番号検索
+int Model::FindNodeIndex(const char* name)
+{
+    int nodeCount = static_cast<int>(nodes.size());
+    for (int i = 0; i < nodeCount; ++i)
+    {
+        if (strcmp(nodes[i].name, name) == 0)
+        {
+            //return nodes[i].id;
+        }
+    }
+
+    return -1;
+}
