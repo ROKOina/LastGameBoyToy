@@ -193,6 +193,8 @@
     <ClInclude Include="Source\GameSource\Scene\SceneLoading.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneManager.h" />
     <ClInclude Include="Source\Netwark\Client.h" />
+    <ClInclude Include="Source\Netwark\NetData.h" />
+    <ClInclude Include="Source\Netwark\NetwarkPost.h" />
     <ClInclude Include="Source\Netwark\Server.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
     <ClInclude Include="Source\SystemStruct\TransformUtils.h" />
@@ -262,6 +264,7 @@
     <ClCompile Include="Source\GameSource\Scene\SceneLoading.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Netwark\Client.cpp" />
+    <ClCompile Include="Source\Netwark\NetwarkPost.cpp" />
     <ClCompile Include="Source\Netwark\Server.cpp" />
     <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
   </ItemGroup>

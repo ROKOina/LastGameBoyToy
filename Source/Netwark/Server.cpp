@@ -4,8 +4,7 @@
 #include <ws2tcpip.h>
 #pragma comment(lib,"ws2_32.lib")
 
-#include <sstream>
-#include <vector>
+#include "NetData.h"
 
 __fastcall NetServer::~NetServer()
 {
@@ -73,11 +72,11 @@ void __fastcall NetServer::Initialize()
     // 第3引数,ローカルIPアドレスの指定
     // 第4引数,ローカルIPアドレスのサイズ
     setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_IF,
-        reinterpret_cast<char*>(&multicastAddr), sizeof(multicastAddr));
+        reinterpret_cast<char*>(&localAddress), sizeof(localAddress));
 
     // TTLのオプション設定(Time To Live 有効時間)
     int ttl = 10;
-    setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_IF,
+    setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_TTL,
         reinterpret_cast<char*>(&ttl), sizeof(ttl));
 
 
@@ -85,12 +84,13 @@ void __fastcall NetServer::Initialize()
 
 void __fastcall NetServer::Update()
 {
-    char buffer[256];
+    //データ受信
+    char buffer[256] = {};
     struct sockaddr_in fromAddr;
     int addrSize = sizeof(struct sockaddr_in);
-    int n = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&fromAddr, &addrSize);
+    int isRecv = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&fromAddr, &addrSize);
 
-    if (n > 0)
+    if (isRecv > 0)
     {
         std::cout << "msg : " << buffer << std::endl;
         recvData = buffer;
@@ -101,22 +101,15 @@ void __fastcall NetServer::Update()
     }
     std::cout << "message send:" << buffer << std::endl;
 
-    //test:vector int読み取り
-    std::vector<int> vec;
-    std::stringstream ss(buffer);
-
-    int a;
-    while (ss >> a)
+    // マルチキャストアドレスを宛先に指定してメッセージを送信、パケットロス回避のため３フレーム毎
+    static int cou = 0;
+    cou++;
+    if (cou > 3)
     {
-        vec.emplace_back(a);
+        sendto(multicastSock, buffer, static_cast<int>(strlen(buffer) + 1), 0,
+            reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
+        cou = 0;
     }
-
-
-    // TODO 1_8
-    // マルチキャストアドレスを宛先に指定してメッセージを送信
-    sendto(multicastSock, buffer, static_cast<int>(strlen(buffer) + 1), 0,
-        reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
-
 }
 
 #include <imgui.h>

@@ -22,11 +22,13 @@
 
 #include "Components/ParticleComManager.h"
 
+#include "Netwark/Client.h"
+#include "Netwark/Server.h"
+
+
 // 初期化
 void SceneGame::Initialize()
 {
-    netC.Initialize();
-
     Graphics& graphics = Graphics::Instance();
 
     //フリーカメラ
@@ -72,7 +74,7 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        a->PlayAnimation(0, true, 0.001f);
+        a->PlayAnimation(0, true,false, 0.001f);
     }
 
     //ステージ
@@ -125,7 +127,8 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-    netC.Update();
+    if (n)
+        n->Update();
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -136,11 +139,10 @@ void SceneGame::Update(float elapsedTime)
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
     std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
     std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-    if (a->Get() && !a->Get1())
-    {
-        a->PlayAnimation(1, true, 0.001f);
-        a->Set(true);
-    }
+    
+   
+
+   // ConstantBufferUpdate();
 }
 
 // 描画処理
@@ -165,8 +167,44 @@ void SceneGame::Render(float elapsedTime)
     //オブジェクト描画
     GameObjectManager::Instance().Render();
 
-    netC.ImGui();
-
-    //imguiguizmo描画
+    //オブジェクト描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
+
+
+
+    if (n)
+        n->ImGui();
+    else
+    {
+        //ネットワーク決定仮ボタン
+        ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+        ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
+
+        static std::string ip;
+        char ipAdd[256];
+        ::strncpy_s(ipAdd, sizeof(ipAdd), ip.c_str(), sizeof(ipAdd));
+        if (ImGui::InputText("ipv4Adress", ipAdd, sizeof(ipAdd), ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            ip = ipAdd;
+        }
+        if (ImGui::Button("Client"))
+        {
+            if (ip.size() > 0)
+            {
+                n = std::make_unique<NetClient>(ip);
+                n->Initialize();
+            }
+        }
+
+        if (ImGui::Button("Server"))
+        {
+            n = std::make_unique<NetServer>();
+            n->Initialize();
+        }
+
+        ImGui::End();
+    }
+
 }

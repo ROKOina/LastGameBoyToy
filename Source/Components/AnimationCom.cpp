@@ -26,8 +26,6 @@ void AnimationCom::OnGUI()
     const std::vector<ModelResource::Animation>& animations = resource->GetAnimations();
 
     ImGui::Checkbox("animationLoop", &isAnimLoop);
-    ImGui::Checkbox("test", &test);
-    ImGui::Checkbox("test1", &test1);
     ImGui::Separator();
     int index = 0;
     for (ModelResource::Animation anim : animations)
@@ -90,6 +88,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                  
                 if (blendRate < 1.0f)
                 {
+                    //アニメーション切り替え時の計算
                     ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
                 }
                 else
@@ -117,7 +116,21 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
     {
         if (loopAnimation)
         {
+            //再生時間を巻き戻す
             currentSeconds -= animation.secondsLength;
+            //ルートモーション用の計算
+            if (rootMotionNodeIndex >=0)
+            {
+                //零クリアするとHips分の値がずれるのでアニメーションの最初のフレームのHipsの値を入れて初期化
+                cahcheRootMotionTranslation.x = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.x;
+                cahcheRootMotionTranslation.z = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.z;
+
+                //キャッシュルートモーションでクリア
+                model->GetNodes()[rootMotionHipNodeIndex].translate.x = cahcheRootMotionTranslation.x;
+                model->GetNodes()[rootMotionHipNodeIndex].translate.z = cahcheRootMotionTranslation.z;
+
+            }
+
         }
         else
         {
@@ -126,17 +139,25 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         }
     }
 
-    
+    rootMotionFlag = true;
+    if (rootFlag)
+    {
+        //ルートモーション計算
+        ComputeRootMotion();
+    }
+
+
 }
 
 
 
 //普通のアニメーション再生関数
-void AnimationCom::PlayAnimation(int animeID, bool loop, float blendSeconds)
+void AnimationCom::PlayAnimation(int animeID, bool loop,bool rootFlag, float blendSeconds)
 {
     currentAnimation = animeID;
     loopAnimation = loop;
     endAnimation = false;
+    this->rootFlag = rootFlag;
     currentSeconds = 0.0f;
     animationChangeTime = blendSeconds;
     animationChangeRate = 0.0f;
@@ -185,4 +206,85 @@ void AnimationCom::ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1
     DirectX::XMStoreFloat3(&node.scale, S);
     DirectX::XMStoreFloat4(&node.rotate, R);
     DirectX::XMStoreFloat3(&node.translate, T);
+}
+
+
+
+
+//ルートモーションの値を取るノードを検索
+void AnimationCom::SetupRootMotion(const char* rootMotionNodeIndex)
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    this->rootMotionNodeIndex = model->FindNodeIndex(rootMotionNodeIndex);
+}
+
+//ルートモーションの腰を取るノードを検索
+void AnimationCom::SetupRootMotionHip(const char* rootMotionNodeName)
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    this->rootMotionHipNodeIndex = model->FindNodeIndex(rootMotionNodeName);
+}
+
+//ルートモーションの移動値を計算
+void AnimationCom::ComputeRootMotion()
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    if (!rootMotionFlag)
+    {
+        return;
+    }
+    if (rootMotionNodeIndex < 0)
+    {
+        return;
+    }
+
+    //前のフレームと今回のフレームの移動量データの差分量を求める
+    rootMotionTranslation.x = model->GetNodes()[rootMotionHipNodeIndex].translate.x - cahcheRootMotionTranslation.x;
+    //RootMotionTranslation.y = objectModel->GetNodes()[RootMotionNodeIndex].translate.y - CacheRootMotionTranslation.y;
+    rootMotionTranslation.z = model->GetNodes()[rootMotionHipNodeIndex].translate.z - cahcheRootMotionTranslation.z;
+
+    //次回に差分量を求めるために今回の移動値をキャッシュする
+    cahcheRootMotionTranslation = model->GetNodes()[rootMotionHipNodeIndex].translate;
+
+
+    //アニメーション内で移動してほしくないのでルートモーション移動値をリセット
+    model->GetNodes()[rootMotionHipNodeIndex].translate.x = 0.0f;
+    model->GetNodes()[rootMotionHipNodeIndex].translate.z = 0.0f;
+
+
+    //ルートモーションフラグをオフにする
+    rootMotionFlag = false;
+}
+
+//ルートモーション更新
+void AnimationCom::updateRootMotion(DirectX::XMFLOAT3& translation)
+{
+
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    if (rootMotionNodeIndex <0)
+    {
+        return;
+    }
+
+    DirectX::XMMATRIX transform;
+
+    DirectX::XMVECTOR tranlation = DirectX::XMLoadFloat3(&rootMotionTranslation);
+
+    if (rootMotionNodeIndex == 0)
+    {
+        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].worldTransform);
+    }
+    else
+    {
+        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].worldTransform);
+
+        DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(tranlation, transform);
+        DirectX::XMStoreFloat3(&translation, position);
+       
+        GetGameObject()->transform_->SetWorldPosition(translation);
+
+        rootMotionTranslation = { 0,0,0 };
+    }
 }

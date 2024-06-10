@@ -1,30 +1,20 @@
 #pragma once
 
-//#include <winsock2.h>
-#include <thread>
-//#include <memory>
-#include <string>
+#include "NetwarkPost.h"
 
-class NetClient
+
+class NetClient : public NetwarkPost
 {
 public:
-    NetClient(){}
+    NetClient(std::string ipv4Adress) :ipv4Adress(ipv4Adress) {}
     ~NetClient();
 
-    void __fastcall Initialize();
+    void __fastcall Initialize() override;
 
-    void __fastcall Update();
+    void __fastcall Update() override;
 
-    void ImGui();
+    void ImGui() override;
 
 private:
-    void __fastcall RecvThread();
-
-    unsigned __int64 sock;
-    unsigned __int64 multicastSock;
-    std::unique_ptr<std::thread> thread;
-
-    std::string sendData;
-    bool isSend = false;
-    std::string recvData="ABC";
+    std::string ipv4Adress;
 };

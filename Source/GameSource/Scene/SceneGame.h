@@ -5,8 +5,7 @@
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
 
-#include "Netwark/Client.h"
-#include "Netwark/Server.h"
+#include "Netwark/NetwarkPost.h"
 
 // ÉQÅ[ÉÄÉVÅ[Éì
 class SceneGame :public Scene
@@ -28,5 +27,5 @@ public:
     void Render(float elapsedTime)override;
 
 private:
-    NetClient netC;
+    std::unique_ptr<NetwarkPost> n;
 };
