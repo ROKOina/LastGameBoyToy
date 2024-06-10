@@ -1,21 +1,31 @@
 #include "CharacterCom.h"
 #include "MovementCom.h"
 #include "CameraCom.h"
+#include "TransformCom.h"
+
 #include "GameSource\Scene\SceneManager.h"
 #include "Input\Input.h"
+#include "../GameSource/Math/Mathf.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
     GamePad gamePad = Input::Instance().GetGamePad();
     MovementCom* moveCom = GetGameObject()->GetComponent<MovementCom>().get();
+    TransformCom* transCom = GetGameObject()->GetComponent<TransformCom>().get();
 
     //入力値取得
     DirectX::XMFLOAT3 moveVec = CalcMoveVec();
 
-    //移動ベクトルを設定
-    //DirectX::XMFLOAT3 v = moveVec * moveCom->GetMoveAcceleration();
-    //moveCom->SetVelocityX(v.x);
-    //moveCom->SetVelocityZ(v.z);
+    //歩く
+    DirectX::XMFLOAT3 v = moveVec * moveCom->GetMoveAcceleration();
+    moveCom->AddForce(v);
+
+    //ジャンプ
+    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    {
+        moveCom->AddForce({ 0,10.5f,0 });
+    }
+    
 }
 
 DirectX::XMFLOAT3 CharacterCom::CalcMoveVec() const

@@ -3,6 +3,7 @@
 
 class CharacterCom : public Component
 {
+public:
     CharacterCom() {};
     ~CharacterCom() override {};
 
@@ -21,4 +22,19 @@ class CharacterCom : public Component
     // コントローラーから進行方向取得
     DirectX::XMFLOAT3 CalcMoveVec() const;
 
+    
+};
+
+class StateMachine
+{
+
+};
+class State
+{
+
+};
+
+class Chara1Statemachine : public StateMachine
+{
+    State jamp
 };
