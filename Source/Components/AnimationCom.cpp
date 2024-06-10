@@ -152,11 +152,12 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 
 
 //普通のアニメーション再生関数
-void AnimationCom::PlayAnimation(int animeID, bool loop, float blendSeconds)
+void AnimationCom::PlayAnimation(int animeID, bool loop,bool rootFlag, float blendSeconds)
 {
     currentAnimation = animeID;
     loopAnimation = loop;
     endAnimation = false;
+    this->rootFlag = rootFlag;
     currentSeconds = 0.0f;
     animationChangeTime = blendSeconds;
     animationChangeRate = 0.0f;

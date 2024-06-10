@@ -65,12 +65,16 @@ void SceneGame::Initialize()
     obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
 
     //const char* filename = "Data/picola/pi.mdl";
-    const char* filename = "Data/OneCoin/robot.mdl";
+    const char* filename = "Data/zombie/ZOMBIE_M.mdl";
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>();
     r->LoadModel(filename);
     
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    a->PlayAnimation(0, true, 0.001f);
+
+    a->SetupRootMotion("Zombie1");
+
+    a->SetupRootMotionHip("Base_HumanPelvis");
+    a->PlayAnimation(0, true,true, 0.001f);
 
     //ポストエフェクト追加
     m_posteffect = std::make_unique<PostEffect>();

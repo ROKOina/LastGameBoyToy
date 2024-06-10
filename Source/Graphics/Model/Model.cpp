@@ -122,7 +122,7 @@ int Model::FindNodeIndex(const char* name)
     {
         if (strcmp(nodes[i].name, name) == 0)
         {
-            //return nodes[i].id;
+            return nodes[i].nodeIndex;
         }
     }
 

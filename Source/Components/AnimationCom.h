@@ -34,7 +34,7 @@ public:
     //アニメーション再生関数
 
     //普通のアニメーション再生関数
-    void PlayAnimation(int animeID,bool loop,float blendSeconds);
+    void PlayAnimation(int animeID,bool loop,bool rootFlag,float blendSeconds);
     //再生中か
     bool IsPlayAnimation() const { return currentAnimation >= 0; }
     //アニメーションストップ
@@ -47,6 +47,10 @@ public:
     float GetAnimationSeconds() const { return currentSeconds; }
     void SetAnimationSeconds(float seconds) { currentSeconds = seconds; }
 
+    //ルートモーションの値を取るノードを検索
+    void SetupRootMotion(const char* rootMotionNodeName);
+    //ルートモーションの腰を取るノードを検索
+    void SetupRootMotionHip(const char* rootMotionNodeName);
 private:
 
     //アニメーション計算
@@ -58,10 +62,6 @@ private:
 
     //ルートモーション関連
     
-    //ルートモーションの値を取るノードを検索
-    void SetupRootMotion(const char* rootMotionNodeName);
-    //ルートモーションの腰を取るノードを検索
-    void SetupRootMotionHip(const char* rootMotionNodeName);
     //ルートモーション更新
     void updateRootMotion(DirectX::XMFLOAT3& translation);
     //ルートモーションの移動値を計算
