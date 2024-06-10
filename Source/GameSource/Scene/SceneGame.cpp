@@ -22,11 +22,13 @@
 
 #include "Components/ParticleComManager.h"
 
+#include "Netwark/Client.h"
+#include "Netwark/Server.h"
+
+
 // 初期化
 void SceneGame::Initialize()
 {
-    netC.Initialize();
-
     Graphics& graphics = Graphics::Instance();
 
     //フリーカメラ
@@ -125,7 +127,8 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-    netC.Update();
+    if (n)
+        n->Update();
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -165,8 +168,44 @@ void SceneGame::Render(float elapsedTime)
     //オブジェクト描画
     GameObjectManager::Instance().Render();
 
-    netC.ImGui();
-
-    //imguiguizmo描画
+    //オブジェクト描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
+
+
+
+    if (n)
+        n->ImGui();
+    else
+    {
+        //ネットワーク決定仮ボタン
+        ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+        ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
+
+        static std::string ip;
+        char ipAdd[256];
+        ::strncpy_s(ipAdd, sizeof(ipAdd), ip.c_str(), sizeof(ipAdd));
+        if (ImGui::InputText("ipv4Adress", ipAdd, sizeof(ipAdd), ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            ip = ipAdd;
+        }
+        if (ImGui::Button("Client"))
+        {
+            if (ip.size() > 0)
+            {
+                n = std::make_unique<NetClient>(ip);
+                n->Initialize();
+            }
+        }
+
+        if (ImGui::Button("Server"))
+        {
+            n = std::make_unique<NetServer>();
+            n->Initialize();
+        }
+
+        ImGui::End();
+    }
+
 }

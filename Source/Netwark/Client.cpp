@@ -5,16 +5,12 @@
 #include <ws2tcpip.h>
 #pragma comment(lib,"ws2_32.lib")
 
-#include <sstream>
-#include <vector>
-
-static bool endThread = false;
+#include "NetData.h"
+#include "Components/System/GameObject.h"
+#include "Components/TransformCom.h"
 
 NetClient::~NetClient()
 {
-    endThread = true;
-    thread->join();
-
     // ソケット終了
     if (closesocket(multicastSock) != 0)
     {
@@ -32,30 +28,6 @@ NetClient::~NetClient()
 //winsock2.h　インクルードエラーでこれだけグローバルに
 struct sockaddr_in addr;
 
-//受信スレッド用
-void NetClient::RecvThread()
-{
-    char buffer[256];
-    struct sockaddr_in fromAddr;
-    int addrSize = sizeof(struct sockaddr_in);
-    do
-    {
-        //マルチキャストアドレスからデータ受信
-        int n = recvfrom(multicastSock, buffer,
-            sizeof(buffer), 0,
-            reinterpret_cast<struct sockaddr*>(&fromAddr),
-            &addrSize);
-        if (n > 0)
-        {
-            recvData = buffer;
-            std::cout << "multicast msg recieve: " << buffer << std::endl;
-        }
-        else
-        {
-            std::cout << WSAGetLastError() << std::endl;
-        }
-    } while (strcmp(buffer, "exit") != 0);
-}
 
 void __fastcall NetClient::Initialize()
 {
@@ -71,10 +43,44 @@ void __fastcall NetClient::Initialize()
     addr.sin_family = AF_INET;
     addr.sin_port = htons(7000);
 
-    addr.sin_addr.S_un.S_un_b.s_b1 = 192;
-    addr.sin_addr.S_un.S_un_b.s_b2 = 168;
-    addr.sin_addr.S_un.S_un_b.s_b3 = 1;
-    addr.sin_addr.S_un.S_un_b.s_b4 = 7;
+    //文字列区切り
+    auto StringSplit = [](std::string& st, const char del)
+        {
+            char* sc = (char*)malloc(sizeof(char) * 10);
+            
+            int count = 0;
+            while (1)
+            {
+                //文字区切り終了
+                if (st[0] == del || st[0] == '\0')
+                {
+                    if(st[0])
+                        st = st.substr(1);
+                    sc[count] = '\0';
+                    break;
+                }
+
+                //文字追加
+                sc[count] = st[0];
+                count++;
+                st = st.substr(1);
+            }
+            return sc;
+        };
+    
+    //ip登録
+    std::string s = StringSplit(ipv4Adress, '.');
+    int ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b1 = ip;
+    s = StringSplit(ipv4Adress, '.');
+    ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b2 = ip;
+    s = StringSplit(ipv4Adress, '.');
+    ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b3 = ip;
+    s = StringSplit(ipv4Adress, '.');
+    ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b4 = ip;
 
     // マルチキャストソケット作成(サーバから受信用)
     multicastSock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -87,6 +93,10 @@ void __fastcall NetClient::Initialize()
     {
         std::cout << "error_code:" << WSAGetLastError();
     }
+
+    // 接続受付のソケットをブロッキング(ノンブロッキング)に設定
+    u_long val = 1;
+    ioctlsocket(multicastSock, FIONBIO, &val);
 
     // マルチキャストグループへ登録処理( join )
     // マルチキャストグループ用構造体ip_mreqを使用する
@@ -102,9 +112,6 @@ void __fastcall NetClient::Initialize()
     
     setsockopt(multicastSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         reinterpret_cast<const char*>(&mr), sizeof(mr));
-
-    // レシーブ用マルチスレッド起動
-    thread = std::make_unique<std::thread>(&NetClient::RecvThread, this);
 }
 
 void __fastcall NetClient::Update()
@@ -113,22 +120,50 @@ void __fastcall NetClient::Update()
 
     //test:vector int送り
 
-    std::vector<int> vec{ 6, 3, 8, -9, 1, -2, 8 };
-    std::stringstream ss;
-    for (auto it = vec.begin(); it != vec.end(); it++) {
-        if (it != vec.begin()) {
-            ss << " ";
-        }
-        ss << *it;
-    }
-    //sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
+    //仮でポジションを送る
+    std::vector<NetData> netData;
+    NetData n;
+    n.id = 0;
+    n.radi = 1.1f;
+    DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+    n.pos = p;
+    netData.emplace_back(n);
 
-    //imguiで送る
-    if (isSend)
+    //送信型に変換
+    std::stringstream ss;
+    for (auto& data : netData)
     {
-        sendto(sock, sendData.c_str(), static_cast<int>(strlen(sendData.c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
-        isSend = false;
+        ss << " ";
+        ss << data;
     }
+
+    //パケットロス回避のため、3フレーム毎に送る
+    static int cou = 0;
+    cou++;
+    if (cou > 3) {
+        sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
+        cou = 0;
+    }
+
+    //マルチキャストアドレスからデータ受信
+    char buffer[256] = {};
+    struct sockaddr_in fromAddr;
+    int addrSize = sizeof(struct sockaddr_in);
+    int isRecv = recvfrom(multicastSock, buffer,
+        sizeof(buffer), 0,
+        reinterpret_cast<struct sockaddr*>(&fromAddr),
+        &addrSize);
+
+    if (isRecv > 0)
+    {
+        recvData = buffer;
+        std::cout << "multicast msg recieve: " << buffer << std::endl;
+    }
+    else
+    {
+        std::cout << WSAGetLastError() << std::endl;
+    }
+
 }
 
 #include <imgui.h>
@@ -139,18 +174,19 @@ void NetClient::ImGui()
 
     ImGui::Begin("NetClient", nullptr, ImGuiWindowFlags_None);
 
-    char data[256];
-    ::strncpy_s(data, sizeof(data), sendData.c_str(), sizeof(data));
-    if (ImGui::InputText("data", data, sizeof(data), ImGuiInputTextFlags_EnterReturnsTrue))
-    {
-        sendData = data;
-    }
 
-    if (ImGui::Button("sendData"))
-    {
-        isSend = true;
-    }
     ImGui::Text(recvData.c_str());
+
+    NetData n;
+    std::vector<NetData> nd;
+    std::stringstream ss(recvData);
+    while (ss >> n)
+    {
+        nd.emplace_back(n);
+    }
+    if (nd.size() > 0)
+        ImGui::InputFloat3("pos", &nd[0].pos.x);
+
 
     ImGui::End();
 }
