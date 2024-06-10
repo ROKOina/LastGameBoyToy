@@ -74,7 +74,7 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        a->PlayAnimation(0, true, 0.001f);
+        a->PlayAnimation(0, true,false, 0.001f);
     }
 
     //ステージ
@@ -139,11 +139,10 @@ void SceneGame::Update(float elapsedTime)
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
     std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
     std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-    if (a->Get() && !a->Get1())
-    {
-        a->PlayAnimation(1, true, 0.001f);
-        a->Set(true);
-    }
+    
+   
+
+   // ConstantBufferUpdate();
 }
 
 // 描画処理
