@@ -85,7 +85,7 @@ void __fastcall NetServer::Initialize()
 void __fastcall NetServer::Update()
 {
     //データ受信
-    char buffer[256];
+    char buffer[256] = {};
     struct sockaddr_in fromAddr;
     int addrSize = sizeof(struct sockaddr_in);
     int isRecv = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&fromAddr, &addrSize);

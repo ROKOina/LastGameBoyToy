@@ -1,23 +1,16 @@
 #pragma once
 
-//#include <winsock2.h>
-#include <string>
+#include "NetwarkPost.h"
 
-class NetServer
+class NetServer : public NetwarkPost
 {
 public:
     __fastcall NetServer() {}
     __fastcall ~NetServer();
 
-    void __fastcall Initialize();
+    void __fastcall Initialize() override;
 
-    void __fastcall Update();
+    void __fastcall Update() override;
 
-    void ImGui();
-
-private:
-    unsigned __int64 sock;
-    unsigned __int64 multicastSock;
-
-    std::string recvData="ABC";
+    void ImGui() override;
 };

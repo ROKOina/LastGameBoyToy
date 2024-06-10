@@ -28,6 +28,7 @@ NetClient::~NetClient()
 //winsock2.h　インクルードエラーでこれだけグローバルに
 struct sockaddr_in addr;
 
+
 void __fastcall NetClient::Initialize()
 {
     //WSA初期化
@@ -42,15 +43,44 @@ void __fastcall NetClient::Initialize()
     addr.sin_family = AF_INET;
     addr.sin_port = htons(7000);
 
-    addr.sin_addr.S_un.S_un_b.s_b1 = 192;
-    addr.sin_addr.S_un.S_un_b.s_b2 = 168;
-    addr.sin_addr.S_un.S_un_b.s_b3 = 1;
-    addr.sin_addr.S_un.S_un_b.s_b4 = 6;
+    //文字列区切り
+    auto StringSplit = [](std::string& st, const char del)
+        {
+            char* sc = (char*)malloc(sizeof(char) * 10);
+            
+            int count = 0;
+            while (1)
+            {
+                //文字区切り終了
+                if (st[0] == del || st[0] == '\0')
+                {
+                    if(st[0])
+                        st = st.substr(1);
+                    sc[count] = '\0';
+                    break;
+                }
 
-    //addr.sin_addr.S_un.S_un_b.s_b1 = 127;
-    //addr.sin_addr.S_un.S_un_b.s_b2 = 0;
-    //addr.sin_addr.S_un.S_un_b.s_b3 = 0;
-    //addr.sin_addr.S_un.S_un_b.s_b4 = 1;
+                //文字追加
+                sc[count] = st[0];
+                count++;
+                st = st.substr(1);
+            }
+            return sc;
+        };
+    
+    //ip登録
+    std::string s = StringSplit(ipv4Adress, '.');
+    int ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b1 = ip;
+    s = StringSplit(ipv4Adress, '.');
+    ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b2 = ip;
+    s = StringSplit(ipv4Adress, '.');
+    ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b3 = ip;
+    s = StringSplit(ipv4Adress, '.');
+    ip = std::stoi(s);
+    addr.sin_addr.S_un.S_un_b.s_b4 = ip;
 
     // マルチキャストソケット作成(サーバから受信用)
     multicastSock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -116,7 +146,7 @@ void __fastcall NetClient::Update()
     }
 
     //マルチキャストアドレスからデータ受信
-    char buffer[256];
+    char buffer[256] = {};
     struct sockaddr_in fromAddr;
     int addrSize = sizeof(struct sockaddr_in);
     int isRecv = recvfrom(multicastSock, buffer,

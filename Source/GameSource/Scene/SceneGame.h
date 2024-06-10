@@ -6,8 +6,7 @@
 #include "Audio\Audio.h"
 #include "Graphics/Shaders/PostEffect.h"
 
-#include "Netwark/Client.h"
-#include "Netwark/Server.h"
+#include "Netwark/NetwarkPost.h"
 
 // ƒQ[ƒ€ƒV[ƒ“
 class SceneGame :public Scene
@@ -31,6 +30,7 @@ public:
 private:
     std::unique_ptr<PostEffect>m_posteffect;
 
-    NetServer netC;
+    std::unique_ptr<NetwarkPost> n;
+    //NetServer netC;
     //NetClient netC;
 };
