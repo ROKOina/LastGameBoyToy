@@ -17,6 +17,7 @@ Model::Model(std::shared_ptr<ModelResource> resource)
         auto&& src = resNodes.at(nodeIndex);
         auto&& dst = nodes.at(nodeIndex);
 
+        dst.nodeIndex = nodeIndex;
         dst.name = src.name.c_str();
         dst.parent = src.parentIndex >= 0 ? &nodes.at(src.parentIndex) : nullptr;
         dst.scale = src.scale;

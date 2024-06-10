@@ -86,9 +86,9 @@ private:
     //ルートモーション
 
     //動かすノードのインデックス
-    int rootMotionNodeIndex = -1;
+    int rootMotionNodeIndex=-1;
     //ポジションを入れるノードのインデックス
-    int rootMotionHipNodeIndex = -1;
+    int rootMotionHipNodeIndex=-1;
     //ルートモーションするかどうか
     bool rootFlag = false;
     //ルートモーション　アニメーション更新処理判定

@@ -116,7 +116,21 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
     {
         if (loopAnimation)
         {
+            //再生時間を巻き戻す
             currentSeconds -= animation.secondsLength;
+            //ルートモーション用の計算
+            if (rootMotionNodeIndex >=0)
+            {
+                //零クリアするとHips分の値がずれるのでアニメーションの最初のフレームのHipsの値を入れて初期化
+                cahcheRootMotionTranslation.x = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.x;
+                cahcheRootMotionTranslation.z = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.z;
+
+                //キャッシュルートモーションでクリア
+                model->GetNodes()[rootMotionHipNodeIndex].translate.x = cahcheRootMotionTranslation.x;
+                model->GetNodes()[rootMotionHipNodeIndex].translate.z = cahcheRootMotionTranslation.z;
+
+            }
+
         }
         else
         {
@@ -125,7 +139,14 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         }
     }
 
-    
+    rootMotionFlag = true;
+    if (rootFlag)
+    {
+        //ルートモーション計算
+        ComputeRootMotion();
+    }
+
+
 }
 
 
@@ -208,30 +229,28 @@ void AnimationCom::ComputeRootMotion()
 {
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
-
-
     if (!rootMotionFlag)
     {
-        //ルートフラグが無かったらしない
         return;
     }
     if (rootMotionNodeIndex < 0)
     {
-        //ルートインデックスが無かったらしない
         return;
     }
 
     //前のフレームと今回のフレームの移動量データの差分量を求める
     rootMotionTranslation.x = model->GetNodes()[rootMotionHipNodeIndex].translate.x - cahcheRootMotionTranslation.x;
+    //RootMotionTranslation.y = objectModel->GetNodes()[RootMotionNodeIndex].translate.y - CacheRootMotionTranslation.y;
     rootMotionTranslation.z = model->GetNodes()[rootMotionHipNodeIndex].translate.z - cahcheRootMotionTranslation.z;
-
 
     //次回に差分量を求めるために今回の移動値をキャッシュする
     cahcheRootMotionTranslation = model->GetNodes()[rootMotionHipNodeIndex].translate;
 
+
     //アニメーション内で移動してほしくないのでルートモーション移動値をリセット
-    model->GetNodes()[rootMotionHipNodeIndex].translate.x = 0;
-    model->GetNodes()[rootMotionHipNodeIndex].translate.z = 0;
+    model->GetNodes()[rootMotionHipNodeIndex].translate.x = 0.0f;
+    model->GetNodes()[rootMotionHipNodeIndex].translate.z = 0.0f;
+
 
     //ルートモーションフラグをオフにする
     rootMotionFlag = false;
@@ -243,7 +262,7 @@ void AnimationCom::updateRootMotion(DirectX::XMFLOAT3& translation)
 
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
-    if (rootMotionNodeIndex < 0)
+    if (rootMotionNodeIndex <0)
     {
         return;
     }
@@ -258,11 +277,11 @@ void AnimationCom::updateRootMotion(DirectX::XMFLOAT3& translation)
     }
     else
     {
-        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].parent->worldTransform);
+        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].worldTransform);
 
         DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(tranlation, transform);
         DirectX::XMStoreFloat3(&translation, position);
-        //GetGameObject().lock()->SetPosition(translation);
+       
         GetGameObject()->transform_->SetWorldPosition(translation);
 
         rootMotionTranslation = { 0,0,0 };

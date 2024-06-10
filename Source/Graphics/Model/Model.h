@@ -14,6 +14,7 @@ public:
 
     struct Node
     {
+        int                 nodeIndex;
         const char* name;
         Node* parent;
         DirectX::XMFLOAT3	scale;
