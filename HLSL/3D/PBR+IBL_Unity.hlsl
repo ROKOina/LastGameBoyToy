@@ -81,8 +81,8 @@ PS_OUT main(VS_OUT pin)
     //MRTèoóÕ
     PS_OUT ret;
     ret.diffuse = color;
-    ret.normal = mul(float4(N, 0.0f), view);
-    ret.position = mul(pin.world_position, view);
+    ret.normal = float4(N, 1.0f);
+    ret.position = float4(pin.world_position, 1.0f);
     ret.MRO = float4(metallic, roughness, ao, 1.0f);
     ret.emission = float4(emission.rgb, 1.0f);
     return ret;

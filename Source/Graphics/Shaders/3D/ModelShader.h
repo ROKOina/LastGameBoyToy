@@ -7,31 +7,35 @@
 
 #define MAX_BONES 256
 
-enum MODELSHADER
-{
-    Defalt,
-    Deferred,
-    SHADERMAX
-};
-
 class ModelShader
 {
 public:
     ModelShader(int shader);
     ~ModelShader() {};
 
+    //描画初期設定
+    void Begin(ID3D11DeviceContext* dc, int blendmode);
+
     //描画処理
-    void Render(ID3D11DeviceContext* dc, Model* model);
+    void SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh);
+
+    //サブセット毎の描画
+    void SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset);
+
+    //描画終了処理
+    void End(ID3D11DeviceContext* dc);
 
 public:
 
-    struct object_constants
+    //オブジェクトのコンスタントバッファ
+    struct objectconstants
     {
         DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
     };
-    std::unique_ptr<ConstantBuffer<object_constants>> ObjectConstants;
+    std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
 
-    struct subset_constants
+    //サブセットのコンスタントバッファ
+    struct subsetconstants
     {
         DirectX::XMFLOAT4	color = { 1.0f, 1.0f, 1.0f, 1.0f };
         DirectX::XMFLOAT3   emissivecolor = { 1.0f,1.0f,1.0f };
@@ -40,14 +44,24 @@ public:
         float               Roughness = 0;
         DirectX::XMFLOAT2 dummy = {};
     };
-    std::unique_ptr<ConstantBuffer<subset_constants>> SubsetConstants;
+    std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
+
+public:
+
+    enum MODELSHADER
+    {
+        DEFALT,
+        DEFERRED,
+        BLACK,
+        MAX
+    };
 
 private:
-    Microsoft::WRL::ComPtr<ID3D11VertexShader>    VertexShader;
-    Microsoft::WRL::ComPtr<ID3D11PixelShader>     PixelShader;
-    Microsoft::WRL::ComPtr<ID3D11InputLayout>     InputLayout;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> skybox;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseiem;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> specularpmrem;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> lutggx;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_skybox;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_diffuseiem;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_specularpmrem;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_lutggx;
 };

@@ -3,6 +3,7 @@
 #include "TransformCom.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Model/ResourceManager.h"
+#include "Graphics/Shaders/Texture.h"
 #include <imgui.h>
 
 #include "Dialog.h"
@@ -248,32 +249,32 @@ void ParticleSystemCom::Start()
 // 更新処理
 void ParticleSystemCom::Update(float elapsedTime)
 {
-    //float worldElapsedTime = Graphics::Instance().GetWorldSpeed() * elapsedTime;
-    ////世界のスピードに合わせない場合
-    //if (!isWorldSpeed_)worldElapsedTime = elapsedTime;
+    float worldElapsedTime = Graphics::Instance().GetWorldSpeed() * elapsedTime;
+    //世界のスピードに合わせない場合
+    if (!isWorldSpeed_)worldElapsedTime = elapsedTime;
 
-    ////リスタート
-    //if (isRestart_)
-    //{
-    //	isRestart_ = false;
-    //	lifeLimit_ = 0;
-    //	Restart();
-    //}
+    //リスタート
+    if (isRestart_)
+    {
+        isRestart_ = false;
+        lifeLimit_ = 0;
+        Restart();
+    }
 
-    ////削除判定
-    //if (!particleData_.particleData.isRoop && isAutoDeleteFlag_)
-    //{
-    //	lifeLimit_ += worldElapsedTime;
-    //}
-    //else
-    //{
-    //	lifeLimit_ = 0;
-    //}
+    //削除判定
+    if (!particleData_.particleData.isRoop && isAutoDeleteFlag_)
+    {
+        lifeLimit_ += worldElapsedTime;
+    }
+    else
+    {
+        lifeLimit_ = 0;
+    }
 
-    //std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
+    std::lock_guard<std::mutex> lock(Graphics::Instance().GetMutex());
 
-    //Graphics& graphics = Graphics::Instance();
-    //ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
     //dc->CSSetUnorderedAccessViews(0, 1, particleUAV_.GetAddressOf(), NULL);
 
@@ -339,7 +340,7 @@ void ParticleSystemCom::OnGUI()
                 D3D11_TEXTURE2D_DESC texture2d_desc{};
                 if (particleSprite_)
                     particleSprite_.Get()->Release();	//解放
-                //dx11State->load_texture_from_file(device, particleData_.particleTexture.c_str(), particleSprite_.GetAddressOf(), &texture2d_desc);
+                //LoadTextureFromFile(device, particleData_.particleTexture.c_str(), particleSprite_.GetAddressOf(), &texture2d_desc);
             }
         }
         ImGui::SameLine();
@@ -355,7 +356,7 @@ void ParticleSystemCom::OnGUI()
             D3D11_TEXTURE2D_DESC texture2d_desc{};
             if (particleSprite_)
                 particleSprite_.Get()->Release();	//解放
-            //dx11State->load_texture_from_file(device, particleData_.particleTexture.c_str(), particleSprite_.GetAddressOf(), &texture2d_desc);
+            //LoadTextureFromFile(device, particleData_.particleTexture.c_str(), particleSprite_.GetAddressOf(), &texture2d_desc);
         }
 
         ImGui::TreePop();
@@ -797,43 +798,42 @@ void ParticleSystemCom::Initialize()
     //dx11State->createConstantBuffer(device, sizeof(ParticleScene), sceneBuffer_.GetAddressOf());
 
     //シェーダー初期化
-    //dx11State->createVsFromCso(device, "Shader\\ParticleVS.cso", particleVertex_.ReleaseAndGetAddressOf(), NULL, NULL, 0);
-    //dx11State->createPsFromCso(device, "Shader\\ParticlePS.cso", particlePixel_.ReleaseAndGetAddressOf());
-    //dx11State->createGsFromCso(device, "Shader\\ParticleGS.cso", particleGeometry_.ReleaseAndGetAddressOf());
-    //dx11State->createCsFromCso(device, "Shader\\ParticleCS.cso", particleCompute_.ReleaseAndGetAddressOf());
-    //dx11State->createCsFromCso(device, "Shader\\ParticleInitializeCS.cso", particleInitializerCompute_.ReleaseAndGetAddressOf());
+    CreateVsFromCso(device, "Shader\\ParticleVS.cso", particleVertex_.ReleaseAndGetAddressOf(), NULL, NULL, 0);
+    CreatePsFromCso(device, "Shader\\ParticlePS.cso", particlePixel_.ReleaseAndGetAddressOf());
+    CreateGsFromCso(device, "Shader\\ParticleGS.cso", particleGeometry_.ReleaseAndGetAddressOf());
+    CreateCsFromCso(device, "Shader\\ParticleCS.cso", particleCompute_.ReleaseAndGetAddressOf());
+    CreateCsFromCso(device, "Shader\\ParticleInitializeCS.cso", particleInitializerCompute_.ReleaseAndGetAddressOf());
 
-    dc->CSSetUnorderedAccessViews(0, 1, particleUAV_.GetAddressOf(), NULL);
+    //dc->CSSetUnorderedAccessViews(0, 1, particleUAV_.GetAddressOf(), NULL);
 
-    dc->UpdateSubresource(constantBuffer_.Get(), 0, 0, &particleData_.particleData, 0, 0);
-    dc->CSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
+    //dc->UpdateSubresource(constantBuffer_.Get(), 0, 0, &particleData_.particleData, 0, 0);
+    //dc->CSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
 
-    dc->UpdateSubresource(gameBuffer_.Get(), 0, 0, &gameData_, 0, 0);
-    dc->CSSetConstantBuffers(10, 1, gameBuffer_.GetAddressOf());
+    //dc->UpdateSubresource(gameBuffer_.Get(), 0, 0, &gameData_, 0, 0);
+    //dc->CSSetConstantBuffers(10, 1, gameBuffer_.GetAddressOf());
 
-    dc->CSSetShader(particleInitializerCompute_.Get(), NULL, 0);
+    //dc->CSSetShader(particleInitializerCompute_.Get(), NULL, 0);
 
-    const UINT thread_group_count_x = align(static_cast<UINT>(maxParticleCount_), NUMTHREADS_X) / NUMTHREADS_X;
-    dc->Dispatch(thread_group_count_x, 1, 1);
+    //const UINT thread_group_count_x = align(static_cast<UINT>(maxParticleCount_), NUMTHREADS_X) / NUMTHREADS_X;
+    //dc->Dispatch(thread_group_count_x, 1, 1);
 
-    ID3D11UnorderedAccessView* null_unordered_access_view{};
-    dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
+    //ID3D11UnorderedAccessView* null_unordered_access_view{};
+    //dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
 }
 
 void ParticleSystemCom::Render()
 {
-    //Graphics& graphics = Graphics::Instance();
-    //ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-    //Dx11StateLib* dx11State = graphics.GetDx11State().get();
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
     ////背面カリングオフに
     //dc->RSSetState(dx11State->GetRasterizerState(Dx11StateLib::RASTERIZER_TYPE::FRONTCOUNTER_TRUE_CULLNONE).Get());
 
-    ////シェーダーセット
-    //dc->VSSetShader(particleVertex_.Get(), NULL, 0);
-    //dc->PSSetShader(particlePixel_.Get(), NULL, 0);
-    //dc->GSSetShader(particleGeometry_.Get(), NULL, 0);
-    //dc->GSSetShaderResources(9, 1, particleSRV_.GetAddressOf());
+    //シェーダーセット
+    dc->VSSetShader(particleVertex_.Get(), NULL, 0);
+    dc->PSSetShader(particlePixel_.Get(), NULL, 0);
+    dc->GSSetShader(particleGeometry_.Get(), NULL, 0);
+    dc->GSSetShaderResources(9, 1, particleSRV_.GetAddressOf());
 
     ////サンプラーステート
     //ID3D11SamplerState* samplerState = dx11State->GetSamplerState(Dx11StateLib::SAMPLER_TYPE::TEXTURE_ADDRESS_WRAP).Get();
@@ -866,7 +866,7 @@ void ParticleSystemCom::Render()
     //DirectX::XMStoreFloat4x4(&scene.inverseModelMat,
     //	DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform())));
 
-    ////逆ビュープロジェクション
+    //逆ビュープロジェクション
     //DirectX::XMStoreFloat4x4(&scene.inverseViweProj,
     //	DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.projection))
     //	* DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&graphics.shaderParameter3D_.view)));
@@ -890,17 +890,17 @@ void ParticleSystemCom::Render()
     //dc->GSSetConstantBuffers(9, 1, constantBuffer_.GetAddressOf());
 
     ////解放
-    //dc->IASetInputLayout(NULL);
-    //dc->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
-    //dc->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
-    //dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-    //dc->Draw(static_cast<UINT>(maxParticleCount_), 0);
+    dc->IASetInputLayout(NULL);
+    dc->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+    dc->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
+    dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+    dc->Draw(static_cast<UINT>(maxParticleCount_), 0);
 
-    //ID3D11ShaderResourceView* null_shader_resource_view{};
-    //dc->GSSetShaderResources(9, 1, &null_shader_resource_view);
-    //dc->VSSetShader(NULL, NULL, 0);
-    //dc->PSSetShader(NULL, NULL, 0);
-    //dc->GSSetShader(NULL, NULL, 0);
+    ID3D11ShaderResourceView* null_shader_resource_view{};
+    dc->GSSetShaderResources(9, 1, &null_shader_resource_view);
+    dc->VSSetShader(NULL, NULL, 0);
+    dc->PSSetShader(NULL, NULL, 0);
+    dc->GSSetShader(NULL, NULL, 0);
 }
 
 //ファイルネームでロード

@@ -5,7 +5,6 @@
 //#include <memory>
 #include <string>
 
-
 class NetClient
 {
 public:

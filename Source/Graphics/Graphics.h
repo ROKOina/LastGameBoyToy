@@ -78,6 +78,15 @@ enum SAMPLEMODE
     MAX
 };
 
+//シェーダー設定
+enum class SHADERMODE
+{
+    DEFALT,
+    DEFERRED,
+    BLACK,
+    MAX
+};
+
 class CameraCom;
 class ModelShader;
 
@@ -107,7 +116,7 @@ public:
     ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView_.Get(); }
 
     //シェーダー取得
-    ModelShader* GetModelShader(int number)const { return modelshaders[number].get(); }
+    ModelShader* GetModelShader(int number)const { return m_modelshaders[number].get(); }
 
     // スクリーン幅取得
     float GetScreenWidth() const { return screenWidth_; }
@@ -170,7 +179,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depthStencilStates[static_cast<int>(DEPTHSTATE::MAX)];
     Microsoft::WRL::ComPtr<ID3D11SamplerState>	    samplerStates[static_cast<int>(SAMPLEMODE::MAX)];
 
-    std::unique_ptr<ModelShader>                    modelshaders[2];
+    std::unique_ptr<ModelShader>                    m_modelshaders[static_cast<int>(SHADERMODE::MAX)];
 
 private:
     float	screenWidth_;

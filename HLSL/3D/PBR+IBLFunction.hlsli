@@ -70,11 +70,8 @@ float3 ApproximateSpecularIBL(Texture2D lutGGX, TextureCube specularPmrem, Sampl
     float NdotV = saturate(dot(N, V));
     float3 R = normalize(reflect(-V, N));
     float2 samplePoint = saturate(float2(NdotV, perceptualRoughness));
-    // プレフィルタリングされた入射光（スペキュラIBLテクスチャ）
     float3 PrefilteredColor = sampleSpecularPmrem(specularPmrem, sampleState, R, perceptualRoughness).rgb;
-    // Environment BRDF 2D LUT
     float2 EnvBRDF = sampleLutGGX(lutGGX, sampleState, samplePoint).xy;
-    // F0 = SpecularColor
     return PrefilteredColor * (F0 * EnvBRDF.x + EnvBRDF.y);
 }
 
@@ -93,7 +90,6 @@ float3 IBL(Texture2D lutGGX, TextureCube diffuseIem, TextureCube specularPmrem, 
 {
     float3 diffuse = RadianceLambertian(lutGGX, diffuseIem, sampleState, N, V, perceptualRoughness, DiffuseColor, F0);
     float3 specular = ApproximateSpecularIBL(lutGGX, specularPmrem, sampleState, F0, perceptualRoughness, N, V);
-    // スペキュラ反射の強さを調整
     float LuminanceRatio = MaxLuminance / RGB2Luminance(specular);
     LuminanceRatio = clamp(LuminanceRatio, 0.0, 1.0);
     return diffuse + specular * LuminanceRatio;
@@ -131,7 +127,6 @@ float4 BRDF(float4 albedo, float metallic, float perceptualRoughness, float3 nor
     float3 specular = V * D * F * ndotl * lightColor;
     specular *= PI;
     specular = max(0, specular);
-    //Indirect Specular
     float surfaceReduction = 1.0 / (alpha * alpha + 1.0);
     float f90 = saturate((1 - perceptualRoughness) + reflectivity);
     specular += surfaceReduction * indirectSpecular * lerp(f0, f90, pow(1 - ndotv, 5));

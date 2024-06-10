@@ -8,6 +8,7 @@
 #include <future>
 #include <imgui.h>
 #include <ImGuizmo.h>
+#include "Graphics/Shaders/PostEffect.h"
 
 // 前方宣言
 class Component;
@@ -125,7 +126,7 @@ private:
 class GameObjectManager
 {
 private:
-    GameObjectManager() {}
+    GameObjectManager() { m_posteffect = std::make_unique<PostEffect>(); }
     ~GameObjectManager() {}
 
 public:
@@ -196,6 +197,9 @@ private:
 
     //パーティクル描画用
     std::vector<std::weak_ptr<ParticleSystemCom>>   particleObject_;
+
+    //ポストエフェクト
+    std::unique_ptr<PostEffect>m_posteffect;
 
     bool					isHiddenLister_ = false;
     bool					isHiddenDetail_ = false;

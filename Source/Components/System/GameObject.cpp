@@ -305,11 +305,20 @@ void GameObjectManager::UpdateTransform()
 // 描画
 void GameObjectManager::Render()
 {
+    //デファードレンダリングの初期設定
+    m_posteffect->DeferredFirstSet();
+
     //3D描画
     Render3D();
 
     //パーティクル描画
     ParticleRender();
+
+    //デファードレンダリング終了
+    m_posteffect->DeferredResourceSet();
+
+    //ポストエフェクト
+    m_posteffect->PostEffectRender();
 
     //debug
     if (Graphics::Instance().IsDebugGUI())
@@ -327,6 +336,9 @@ void GameObjectManager::Render()
 
         // 詳細描画
         DrawDetail();
+
+        //ポストエフェクトimgui
+        m_posteffect->PostEffectImGui();
     }
 }
 
@@ -478,7 +490,7 @@ void GameObjectManager::Render3D()
         Model* model = renderObj.lock()->GetModel();
         if (model != nullptr)
         {
-            Graphics::Instance().GetModelShader(1)->Render(Graphics::Instance().GetDeviceContext(), model);
+            renderObj.lock()->Render();
         }
     }
 }

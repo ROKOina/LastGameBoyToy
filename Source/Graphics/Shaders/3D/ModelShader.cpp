@@ -13,13 +13,17 @@ ModelShader::ModelShader(int shader)
     //選択されたのが指定される
     switch (shader)
     {
-    case MODELSHADER::Defalt:
+    case MODELSHADER::DEFALT:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DefaltPS.cso" };
         break;
-    case MODELSHADER::Deferred:
+    case MODELSHADER::DEFERRED:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\PBR+IBL_Unity.cso" };
+        break;
+    case MODELSHADER::BLACK:
+        VSPath = { "Shader\\DefaltVS.cso" };
+        PSPath = { "Shader\\BlackPS.cso" };
         break;
     }
 
@@ -36,101 +40,102 @@ ModelShader::ModelShader(int shader)
         { "WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "BONES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
-    CreateVsFromCso(Graphics.GetDevice(), VSPath, VertexShader.GetAddressOf(), InputLayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
+    CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshader.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
 
     // ピクセルシェーダー
-    CreatePsFromCso(Graphics.GetDevice(), PSPath, PixelShader.GetAddressOf());
+    CreatePsFromCso(Graphics.GetDevice(), PSPath, m_pixelshader.GetAddressOf());
 
     // 定数バッファ
     {
         // オブジェクト用のコンスタントバッファ,サブセット用
-        ObjectConstants = std::make_unique<ConstantBuffer<object_constants>>(Graphics.GetDevice());
-        SubsetConstants = std::make_unique<ConstantBuffer<subset_constants>>(Graphics.GetDevice());
+        m_objectconstants = std::make_unique<ConstantBuffer<objectconstants>>(Graphics.GetDevice());
+        m_subsetconstants = std::make_unique<ConstantBuffer<subsetconstants>>(Graphics.GetDevice());
     }
 
     //IBL専用のテクスチャ読み込み
     {
         D3D11_TEXTURE2D_DESC texture2d_desc{};
-        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\snowy_hillside_4k.DDS", skybox.GetAddressOf(), &texture2d_desc);
-        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\diffuse_iem.dds", diffuseiem.GetAddressOf(), &texture2d_desc);
-        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\specular_pmrem.dds", specularpmrem.GetAddressOf(), &texture2d_desc);
-        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\lut_ggx.DDS", lutggx.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\snowy_hillside_4k.DDS", m_skybox.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\diffuse_iem.dds", m_diffuseiem.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\specular_pmrem.dds", m_specularpmrem.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics.GetDevice(), L".\\Data\\Texture\\lut_ggx.DDS", m_lutggx.GetAddressOf(), &texture2d_desc);
     }
 }
 
-//描画処理
-void ModelShader::Render(ID3D11DeviceContext* dc, Model* model)
+//描画設定
+void ModelShader::Begin(ID3D11DeviceContext* dc, int blendmode)
 {
+    //シェーダーのセット
+    dc->VSSetShader(m_vertexshader.Get(), nullptr, 0);
+    dc->PSSetShader(m_pixelshader.Get(), nullptr, 0);
+    dc->IASetInputLayout(m_inputlayout.Get());
+
     Graphics& Graphics = Graphics::Instance();
     const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     //レンダーステートの設定（ループの外で1回だけ設定）
-    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::MULTIPLERENDERTARGETS), blendFactor, 0xFFFFFFFF);
+    dc->OMSetBlendState(Graphics.GetBlendState(static_cast<BLENDSTATE>(blendmode)), blendFactor, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_BACK));
 
-    //シェーダーのセット
-    dc->VSSetShader(VertexShader.Get(), nullptr, 0);
-    dc->PSSetShader(PixelShader.Get(), nullptr, 0);
-    dc->IASetInputLayout(InputLayout.Get());
-
     //IBL専用のテクスチャセット
-    dc->PSSetShaderResources(6, 1, skybox.GetAddressOf());
-    dc->PSSetShaderResources(7, 1, diffuseiem.GetAddressOf());
-    dc->PSSetShaderResources(8, 1, specularpmrem.GetAddressOf());
-    dc->PSSetShaderResources(9, 1, lutggx.GetAddressOf());
+    dc->PSSetShaderResources(6, 1, m_skybox.GetAddressOf());
+    dc->PSSetShaderResources(7, 1, m_diffuseiem.GetAddressOf());
+    dc->PSSetShaderResources(8, 1, m_specularpmrem.GetAddressOf());
+    dc->PSSetShaderResources(9, 1, m_lutggx.GetAddressOf());
+}
 
-    //モデル情報
-    const ModelResource* resource = model->GetResource();
-    const std::vector<Model::Node>& nodes = model->GetNodes();
-
-    for (const ModelResource::Mesh& mesh : resource->GetMeshes())
+//バッファー描画
+void ModelShader::SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh)
+{
+    if (mesh.nodeIndices.size() > 0)
     {
-        // メッシュ用定数バッファ更新
-        if (mesh.nodeIndices.size() > 0)
+        for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
         {
-            for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
-            {
-                DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
-                DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-                DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-                DirectX::XMStoreFloat4x4(&ObjectConstants->data.BoneTransforms[i], boneTransform);
-            }
-        }
-        else
-        {
-            ObjectConstants->data.BoneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
-        }
-
-        ObjectConstants->Activate(dc, 1, true, true, false, false, false, false);
-
-        UINT stride = sizeof(ModelResource::Vertex);
-        UINT offset = 0;
-        dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-        dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-        dc->IASetInputLayout(InputLayout.Get());
-        dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        //サブセット毎の更新
-        for (const ModelResource::Subset& subset : mesh.subsets)
-        {
-            //コンスタントバッファの情報
-            SubsetConstants->data.color = subset.material->color;
-            SubsetConstants->data.emissivecolor = subset.material->emissivecolor;
-            SubsetConstants->data.emissiveintensity = subset.material->emissiveintensity;
-            SubsetConstants->data.Metalness = subset.material->Metalness;
-            SubsetConstants->data.Roughness = subset.material->Roughness;
-            SubsetConstants->Activate(dc, 2, true, true, false, false, false, false);
-
-            //シェーダーリソースビュー設定
-            for (int i = 0; i < 6; ++i)
-            {
-                dc->PSSetShaderResources(i, 1, subset.material->shaderResourceView[i].GetAddressOf());
-            }
-
-            dc->DrawIndexed(subset.indexCount, subset.startIndex, 0);
+            DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+            DirectX::XMMATRIX boneTransform = offsetTransform * DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+            DirectX::XMStoreFloat4x4(&m_objectconstants->data.BoneTransforms[i], boneTransform);
         }
     }
+    else
+    {
+        DirectX::XMStoreFloat4x4(&m_objectconstants->data.BoneTransforms[0], DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndex).worldTransform));
+    }
+
+    //コンスタントバッファの更新
+    m_objectconstants->Activate(dc, 1, true, true, false, false, false, false);
+
+    UINT stride = sizeof(ModelResource::Vertex);
+    UINT offset = 0;
+    dc->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+    dc->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+//サブセット毎の描画
+void ModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset)
+{
+    //コンスタントバッファの情報
+    m_subsetconstants->data.color = subset.material->color;
+    m_subsetconstants->data.emissivecolor = subset.material->emissivecolor;
+    m_subsetconstants->data.emissiveintensity = subset.material->emissiveintensity;
+    m_subsetconstants->data.Metalness = subset.material->Metalness;
+    m_subsetconstants->data.Roughness = subset.material->Roughness;
+    m_subsetconstants->Activate(dc, 2, true, true, false, false, false, false);
+
+    //シェーダーリソースビュー設定
+    for (int i = 0; i < 6; ++i)
+    {
+        dc->PSSetShaderResources(i, 1, subset.material->shaderResourceView[i].GetAddressOf());
+    }
+
+    dc->DrawIndexed(subset.indexCount, subset.startIndex, 0);
+}
+
+//描画終了処理
+void ModelShader::End(ID3D11DeviceContext* dc)
+{
+    dc->IASetInputLayout(nullptr);
 
     //解放してあげる
     dc->VSSetShader(NULL, NULL, 0);
