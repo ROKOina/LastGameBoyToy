@@ -28,12 +28,10 @@ public:
     void Update(float elapsedTime) override;
 
     // GUI•`‰æ
-    void OnGUI() override {};
+    void OnGUI() override;
 
     StateMachine<CharacterCom, CHARACTER_ACTIONS>& GetStateMachine() { return stateMachine; }
 
 protected:
     StateMachine<CharacterCom, CHARACTER_ACTIONS> stateMachine;
-
-    bool jumpFlag = false;
 };

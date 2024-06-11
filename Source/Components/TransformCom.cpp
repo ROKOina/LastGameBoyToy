@@ -107,31 +107,16 @@ void TransformCom::SetUpTransform(const DirectX::XMFLOAT3& up)
 	UpdateTransform();
 }
 
-void TransformCom::Turn(const float& elapsedTime, DirectX::XMFLOAT3 directionXZ, float turnSpeed)
+void TransformCom::Turn(DirectX::XMFLOAT3& moveVec, float turnSpeed)
 {
-	// 1フレームあたりの旋回速度
-	float speed = turnSpeed * elapsedTime;
+	//旋回処理
+	DirectX::XMVECTOR currentRot = DirectX::XMLoadFloat4(&rotation_.dxFloat4);
+	DirectX::XMVECTOR goalRot = DirectX::XMLoadFloat4(&rotation_.LookRotation(moveVec).dxFloat4);
 
-	DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&directionXZ);
-	Direction = DirectX::XMVector3Normalize(Direction);
+	DirectX::XMFLOAT4 rot = {};
+	DirectX::XMStoreFloat4(&rot, DirectX::XMQuaternionNormalize(DirectX::XMQuaternionSlerp(currentRot, goalRot, 0.1f)));
 
-	DirectX::XMVECTOR Forward = DirectX::XMLoadFloat3(&this->forward_);
-
-	// 回転する任意軸を作成
-	DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(Forward, Direction);
-	if (DirectX::XMVector3Equal(Axis, DirectX::XMVectorZero()))
-	{
-		return;
-	}
-
-	// ベクトル同士の角度の差を求める
-	float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Forward, Direction));
-	// スピードを調整 ( 向きが近くなるほど遅くなる )
-	speed = min(1.0f - dot, speed);
-
-	//if(speed )
-
-	// 回転処理
-	DirectX::XMVECTOR Turn = DirectX::XMQuaternionRotationAxis(Axis, speed);
-	DirectX::XMStoreFloat4(&rotation_.dxFloat4, DirectX::XMQuaternionMultiply(DirectX::XMLoadFloat4(&rotation_.dxFloat4), Turn));
+	rotation_ = rot;
 }
+
+

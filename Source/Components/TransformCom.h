@@ -103,10 +103,9 @@ public:
 
     //w’è‚ÌUp‚É‡‚í‚¹‚é
     void SetUpTransform(const DirectX::XMFLOAT3& up);
-    
-    //ù‰ñ
-    void Turn(const float& elapsedTime, DirectX::XMFLOAT3 directionXZ, float turnSpeed);
 
+    //ù‰ñ
+    void Turn(DirectX::XMFLOAT3& moveVec, float turnSpeed);
 
 private:
     DirectX::XMFLOAT3	localPosition_ = DirectX::XMFLOAT3(0, 0, 0);

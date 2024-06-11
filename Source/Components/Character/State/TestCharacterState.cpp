@@ -7,6 +7,7 @@
 
 TestCharacter_BaseState::TestCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
+    //初期設定
     testCharaCom = GetComp(TestCharacterCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
@@ -28,16 +29,12 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     //歩く
     DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
     moveCom.lock()->AddForce(v);
-    QuaternionStruct q = transCom.lock()->GetRotation(); //transCom.lock()->Turn(elapsedTime, moveVec,10.0f);
-    
-    DirectX::XMVECTOR currentRot = DirectX::XMLoadFloat4(&q.dxFloat4);
-    DirectX::XMVECTOR goalRot = DirectX::XMLoadFloat4(&q.LookRotation(moveVec).dxFloat4);
+    QuaternionStruct q = transCom.lock()->GetRotation();
 
-    DirectX::XMFLOAT4 rot = {};
-    DirectX::XMStoreFloat4(&rot, DirectX::XMQuaternionNormalize(DirectX::XMQuaternionSlerp(currentRot, goalRot, 0.1f)));
+    //旋回処理
+    transCom.lock()->Turn(moveVec, 0.1f);
 
-    transCom.lock()->SetRotation(rot);
-
+    //ジャンプ
     if (GamePad::BTN_A & gamePad.GetButtonDown())
     {
         ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
@@ -47,7 +44,7 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
 void TestCharacter_JumpState::Enter()
 {
     //ジャンプ
-    moveCom.lock()->AddForce({0,10.5f,0});
+    moveCom.lock()->AddForce(jumpPower);
 }
 
 void TestCharacter_JumpState::Execute(const float& elapsedTime)
@@ -60,6 +57,7 @@ void TestCharacter_JumpState::Execute(const float& elapsedTime)
     //空中制御
     DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
     moveCom.lock()->AddForce(v);
+    transCom.lock()->Turn(moveVec, 0.1f);
 
     if (moveCom.lock()->OnGround())
     {
