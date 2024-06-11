@@ -9,3 +9,8 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename, ID3D1
 
 //‰ğ•úˆ—
 void ReleaseAllTextures();
+
+#ifdef _DEBUG
+HRESULT LoadTexture(const char* filename, ID3D11Device* device, ID3D11ShaderResourceView** srv, D3D11_TEXTURE2D_DESC* textureDesc);
+
+#endif // _DEBUG

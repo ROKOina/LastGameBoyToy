@@ -109,7 +109,7 @@ public:
         void serialize(Archive& archive, int version);
     };
 
-    //キーふれーふ
+    //キーフレーム
     struct Keyframe
     {
         float						seconds;
@@ -164,6 +164,14 @@ public:
 
     // 読み込み
     void Load(ID3D11Device* device, const char* filename);
+    // マテリアル情報のみ読み込む
+    void LoadMaterial(ID3D11Device* device, const char* filename);
+
+#ifdef _DEBUG
+    //マテリアルシリアライズ
+    void ModelResource::MaterialSerialize(const char* filename);
+
+#endif // _DEBUG
 
 protected:
     // モデルセットアップ
