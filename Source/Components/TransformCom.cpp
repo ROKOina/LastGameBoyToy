@@ -53,10 +53,14 @@ void TransformCom::UpdateTransform()
 
 	DirectX::XMStoreFloat4x4(&worldTransform_, W);
 
+	right = { worldTransform_._11,worldTransform_._12,worldTransform_._13 };
+	up = { worldTransform_._21,worldTransform_._22,worldTransform_._23 };
+	forward_ = { worldTransform_._31,worldTransform_._32,worldTransform_._33 };
+
 	worldPosition_ = { worldTransform_._41,worldTransform_._42,worldTransform_._43 };
 }
 
-//指定方向を向く
+//指定地点を向く
 void TransformCom::LookAtTransform(const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up)
 {
 	//位置、注視点、上方向からビュー行列を作成
@@ -101,4 +105,33 @@ void TransformCom::SetUpTransform(const DirectX::XMFLOAT3& up)
 	DirectX::XMStoreFloat4(&rotation_.dxFloat4, DirectX::XMQuaternionRotationMatrix(M));
 
 	UpdateTransform();
+}
+
+void TransformCom::Turn(const float& elapsedTime, DirectX::XMFLOAT3 directionXZ, float turnSpeed)
+{
+	// 1フレームあたりの旋回速度
+	float speed = turnSpeed * elapsedTime;
+
+	DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&directionXZ);
+	Direction = DirectX::XMVector3Normalize(Direction);
+
+	DirectX::XMVECTOR Forward = DirectX::XMLoadFloat3(&this->forward_);
+
+	// 回転する任意軸を作成
+	DirectX::XMVECTOR Axis = DirectX::XMVector3Cross(Forward, Direction);
+	if (DirectX::XMVector3Equal(Axis, DirectX::XMVectorZero()))
+	{
+		return;
+	}
+
+	// ベクトル同士の角度の差を求める
+	float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Forward, Direction));
+	// スピードを調整 ( 向きが近くなるほど遅くなる )
+	speed = min(1.0f - dot, speed);
+
+	//if(speed )
+
+	// 回転処理
+	DirectX::XMVECTOR Turn = DirectX::XMQuaternionRotationAxis(Axis, speed);
+	DirectX::XMStoreFloat4(&rotation_.dxFloat4, DirectX::XMQuaternionMultiply(DirectX::XMLoadFloat4(&rotation_.dxFloat4), Turn));
 }

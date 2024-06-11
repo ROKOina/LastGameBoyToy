@@ -98,11 +98,15 @@ public:
         return right;
     }
 
-    //指定方向を向く
+    //指定地点を向く
     void LookAtTransform(const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up = { 0,1,0 });
 
     //指定のUpに合わせる
     void SetUpTransform(const DirectX::XMFLOAT3& up);
+    
+    //旋回
+    void Turn(const float& elapsedTime, DirectX::XMFLOAT3 directionXZ, float turnSpeed);
+
 
 private:
     DirectX::XMFLOAT3	localPosition_ = DirectX::XMFLOAT3(0, 0, 0);
@@ -114,4 +118,8 @@ private:
     DirectX::XMFLOAT4X4	worldTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     DirectX::XMFLOAT4X4	localTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     DirectX::XMFLOAT4X4 parentTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+    DirectX::XMFLOAT3 right = {};
+    DirectX::XMFLOAT3 up = {};
+    DirectX::XMFLOAT3 forward_ = {};
 };

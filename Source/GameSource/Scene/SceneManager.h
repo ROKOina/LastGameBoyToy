@@ -38,6 +38,9 @@ public:
     void SetActiveCamera(std::shared_ptr<GameObject> camera) { activeCamera = camera; }
     std::shared_ptr<GameObject> GetActiveCamera() { return activeCamera.lock(); }
 
+    // カメラからコントローラーの進行方向取得
+    DirectX::XMFLOAT3 InputVec() const;
+
     std::shared_ptr<GameObject> GetParticleObj()
     {
         return changeParticle_;
