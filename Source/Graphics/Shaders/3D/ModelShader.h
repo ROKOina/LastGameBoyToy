@@ -26,7 +26,6 @@ public:
     void End(ID3D11DeviceContext* dc);
 
 public:
-
     //オブジェクトのコンスタントバッファ
     struct objectconstants
     {
@@ -46,13 +45,24 @@ public:
     };
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
 
-public:
+    //エフェクトのコンスタントバッファ
+    struct effectconstants
+    {
+      float simulateTime1 = 0.0f;
+      float simulateTime2 = 0.0f;
+      float simulateTime3 = 0.0f;
 
+      float waveEffectRange = 3.0f;
+    };
+    std::unique_ptr<ConstantBuffer<effectconstants>> m_effectconstants;
+
+public:
     enum MODELSHADER
     {
         DEFALT,
         DEFERRED,
         BLACK,
+        AREA_EFFECT_CIRCLE,
         MAX
     };
 

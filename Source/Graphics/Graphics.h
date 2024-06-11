@@ -84,6 +84,8 @@ enum class SHADERMODE
     DEFALT,
     DEFERRED,
     BLACK,
+    AREA_EFFECT_CIRCLE,
+
     MAX
 };
 

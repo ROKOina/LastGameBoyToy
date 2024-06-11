@@ -7,36 +7,57 @@
 
 class RendererCom : public Component
 {
-    //コンポーネントオーバーライド
+  //コンポーネントオーバーライド
 public:
-    RendererCom(int shaderslot, int blendmode);
-    ~RendererCom() {}
+  RendererCom(int shaderslot, int blendmode);
+  ~RendererCom() {}
 
-    // 名前取得
-    const char* GetName() const override { return "Renderer"; }
+  // 名前取得
+  const char* GetName() const override { return "Renderer"; }
 
-    // 開始処理
-    void Start() override;
+  // 開始処理
+  void Start() override;
 
-    //描画
-    void Render();
+  //描画
+  void Render();
 
-    // 更新処理
-    void Update(float elapsedTime) override;
+  // 更新処理
+  void Update(float elapsedTime) override;
 
-    // GUI描画
-    void OnGUI() override;
+  // GUI描画
+  void OnGUI() override;
 
-    //Rendererクラス
-public:
-    // モデルの読み込み
-    void LoadModel(const char* filename);
+  // モデルの読み込み
+  void LoadModel(const char* filename);
 
-    // モデルの取得
-    Model* GetModel() const { return model_.get(); }
+  // マテリアルのみ読み込む
+  void LoadMaterial(const char* filename);
+
+  // モデルの取得
+  Model* GetModel() const { return model_.get(); }
 
 private:
-    std::unique_ptr<Model>	model_;
-    std::unique_ptr<ModelShader>m_modelshader;
-    int m_blend = 9;
+#ifdef _DEBUG
+  // マテリアルを選択するImGui
+  void MaterialSelector();
+
+  ModelResource::Material* GetSelectionMaterial();
+
+  // 編集したマテリアルファイルを書き出す
+  void ExportMaterialFile();
+
+#endif
+
+private:
+  std::unique_ptr<Model>	model_;
+  std::unique_ptr<ModelShader>m_modelshader;
+  int m_blend = 9;
+
+#ifdef _DEBUG
+  int									selectionMaterialIndex = -1;
+  bool								hiddenProperty = false;
+  std::string					modelFilePath;
+
+#endif // _DEBUG
+
 };
