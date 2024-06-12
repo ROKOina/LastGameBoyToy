@@ -151,6 +151,17 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 
 
 
+//上半身別アニメーション更新
+void AnimationCom::AnimationSortingUpdate(float elapsedTime)
+{
+    //再生中できないなら処理しない
+    if (!IsPlayAnimation())return;
+
+    //ブレンド率の計算
+    float blendRate
+}
+
+
 //普通のアニメーション再生関数
 void AnimationCom::PlayAnimation(int animeID, bool loop,bool rootFlag, float blendSeconds)
 {
