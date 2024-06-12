@@ -10,6 +10,7 @@
 #include "GameSource/Math/Collision.h"
 #include "Graphics/Shaders/3D/ModelShader.h"
 #include "SystemStruct/TransformUtils.h"
+#include "Components/CPUParticle.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -182,6 +183,13 @@ void GameObjectManager::Update(float elapsedTime)
             renderSortObject_.emplace_back(rendererComponent);
         }
 
+        //CPUパーティクルオブジェクトがあれば入れる
+        std::shared_ptr<CPUParticle> cpuparticlecomp = obj->GetComponent<CPUParticle>();
+        if (cpuparticlecomp)
+        {
+            cpuparticleobject.emplace_back(cpuparticlecomp);
+        }
+
         //パーティクルオブジェクトがあれば入れる
         std::shared_ptr<ParticleSystemCom> particleComponent = obj->GetComponent<ParticleSystemCom>();
         if (particleComponent)
@@ -281,6 +289,16 @@ void GameObjectManager::Update(float elapsedTime)
             }
         }
 
+        //cpuparticleObject解放
+        for (int per = 0; per < cpuparticleobject.size(); ++per)
+        {
+            if (cpuparticleobject[per].expired())
+            {
+                cpuparticleobject.erase(cpuparticleobject.begin() + per);
+                --per;
+            }
+        }
+
         //particleObject解放
         for (int per = 0; per < particleObject_.size(); ++per)
         {
@@ -310,6 +328,9 @@ void GameObjectManager::Render()
 
     //3D描画
     Render3D();
+
+    //CPUパーティクル描画
+    CPUParticleRender();
 
     //パーティクル描画
     ParticleRender();
@@ -492,6 +513,20 @@ void GameObjectManager::Render3D()
         {
             renderObj.lock()->Render();
         }
+    }
+}
+
+//CPUパーティクル描画
+void GameObjectManager::CPUParticleRender()
+{
+    if (cpuparticleobject.size() <= 0)return;
+
+    for (std::weak_ptr<CPUParticle>& po : cpuparticleobject)
+    {
+        if (!po.lock()->GetGameObject()->GetEnabled())continue;
+        if (!po.lock()->GetEnabled())continue;
+
+        po.lock()->Render();
     }
 }
 

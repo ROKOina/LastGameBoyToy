@@ -15,6 +15,7 @@ class Component;
 class TransformCom;
 class RendererCom;
 class ParticleSystemCom;
+class CPUParticle;
 class Collider;
 
 // ゲームオブジェクト
@@ -174,6 +175,9 @@ private:
     //3D描画
     void Render3D();
 
+    //CPUパーティクル描画
+    void CPUParticleRender();
+
     //パーティクル描画
     void ParticleRender();
 
@@ -194,6 +198,9 @@ private:
 
     //描画順に格納する
     std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;
+
+    //CPUパーティクル描画用
+    std::vector<std::weak_ptr<CPUParticle>> cpuparticleobject;
 
     //パーティクル描画用
     std::vector<std::weak_ptr<ParticleSystemCom>>   particleObject_;

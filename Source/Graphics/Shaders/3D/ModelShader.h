@@ -48,11 +48,11 @@ public:
     //エフェクトのコンスタントバッファ
     struct effectconstants
     {
-      float simulateTime1 = 0.0f;
-      float simulateTime2 = 0.0f;
-      float simulateTime3 = 0.0f;
+        float simulateTime1 = 0.0f;
+        float simulateTime2 = 0.0f;
+        float simulateTime3 = 0.0f;
 
-      float waveEffectRange = 3.0f;
+        float waveEffectRange = 3.0f;
     };
     std::unique_ptr<ConstantBuffer<effectconstants>> m_effectconstants;
 
