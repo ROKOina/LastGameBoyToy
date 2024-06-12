@@ -8,7 +8,7 @@
 TestCharacter_BaseState::TestCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //‰Šúİ’è
-    testCharaCom = GetComp(TestCharacterCom);
+    testCharaCom = GetComp(CharacterCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
 }

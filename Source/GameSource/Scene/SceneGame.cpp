@@ -22,6 +22,7 @@
 #include "Components\MovementCom.h"
 #include "Components\ParticleSystemCom.h"
 #include "Components\Character\TestCharacterCom.h"
+#include "Components\Character\InazawaCharacterCom.h"
 #include "Components/CPUParticle.h"
 
 #include "GameSource/GameScript/FreeCameraCom.h"
@@ -79,7 +80,7 @@ void SceneGame::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         a->PlayAnimation(0, true, false, 0.001f);
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     }
 
     //ƒeƒXƒg

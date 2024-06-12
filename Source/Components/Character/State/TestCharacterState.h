@@ -10,7 +10,7 @@ public:
     TestCharacter_BaseState(CharacterCom* owner);
 
 protected:
-    std::weak_ptr<TestCharacterCom> testCharaCom;
+    std::weak_ptr<CharacterCom> testCharaCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
 };
