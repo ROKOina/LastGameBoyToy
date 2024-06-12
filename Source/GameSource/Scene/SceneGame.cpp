@@ -1,3 +1,7 @@
+//一番上でインクルード（ネットワーク）
+#include "Netwark/Client.h"
+#include "Netwark/Server.h"
+
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
 #include "Graphics/Light/Light.h"
@@ -24,8 +28,6 @@
 
 #include "Components/ParticleComManager.h"
 
-#include "Netwark/Client.h"
-#include "Netwark/Server.h"
 
 // 初期化
 void SceneGame::Initialize()
@@ -199,8 +201,12 @@ void SceneGame::Render(float elapsedTime)
 
         ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
 
+
+        static int ClientID = 0;
         static std::string ip;
         char ipAdd[256];
+
+        ImGui::InputInt("id", &ClientID);
         ::strncpy_s(ipAdd, sizeof(ipAdd), ip.c_str(), sizeof(ipAdd));
         if (ImGui::InputText("ipv4Adress", ipAdd, sizeof(ipAdd), ImGuiInputTextFlags_EnterReturnsTrue))
         {
@@ -210,10 +216,11 @@ void SceneGame::Render(float elapsedTime)
         {
             if (ip.size() > 0)
             {
-                n = std::make_unique<NetClient>(ip);
+                n = std::make_unique<NetClient>(ip, ClientID);
                 n->Initialize();
             }
         }
+
 
         if (ImGui::Button("Server"))
         {

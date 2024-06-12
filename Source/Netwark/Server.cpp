@@ -1,10 +1,10 @@
 #include "Server.h"
 
 #include <iostream>
-#include <ws2tcpip.h>
 #pragma comment(lib,"ws2_32.lib")
 
-#include "NetData.h"
+#include "Components/System/GameObject.h"
+#include "Components/TransformCom.h"
 
 __fastcall NetServer::~NetServer()
 {
@@ -21,9 +21,6 @@ __fastcall NetServer::~NetServer()
     // WSA終了
     WSACleanup();
 }
-
-//winsock2.h　インクルードエラーでこれだけグローバルに
-struct sockaddr_in multicastAddr;
 
 void __fastcall NetServer::Initialize()
 {
@@ -72,7 +69,7 @@ void __fastcall NetServer::Initialize()
     // 第3引数,ローカルIPアドレスの指定
     // 第4引数,ローカルIPアドレスのサイズ
     setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_IF,
-        reinterpret_cast<char*>(&localAddress), sizeof(localAddress));
+        reinterpret_cast<char*>(&multicastAddr), sizeof(multicastAddr));
 
     // TTLのオプション設定(Time To Live 有効時間)
     int ttl = 10;
@@ -85,28 +82,56 @@ void __fastcall NetServer::Initialize()
 void __fastcall NetServer::Update()
 {
     //データ受信
-    char buffer[256] = {};
+    char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
     int addrSize = sizeof(struct sockaddr_in);
-    int isRecv = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&fromAddr, &addrSize);
+    //クライアントの数だけ回すようにする
+    for (int i = 0; i < clientDatas.size() + 1; ++i)
+    {
+        int isRecv = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&fromAddr, &addrSize);
 
-    if (isRecv > 0)
-    {
-        std::cout << "msg : " << buffer << std::endl;
-        recvData = buffer;
+        if (isRecv > 0)
+        {
+            std::cout << "msg : " << buffer << std::endl;
+            recvData = buffer;
+
+            //仮
+            std::vector<NetData> clientND = NetDataRecvCast(recvData);
+
+            //登録済みなら上書き
+            for (auto& nData : clientND)
+            {
+                bool isRegisterClient = false;
+                for (auto& client : clientDatas)
+                {
+                    if (nData.id == client.id)
+                    {
+                        isRegisterClient = true;
+                        client = nData;
+                        break;
+                    }
+                }
+                //登録されていないなら登録
+                if (!isRegisterClient)
+                    clientDatas.emplace_back(nData);
+            }
+        }
+        else
+        {
+            std::cout << WSAGetLastError << std::endl;
+        }
+        std::cout << "message send:" << buffer << std::endl;
     }
-    else
-    {
-        std::cout << WSAGetLastError << std::endl;
-    }
-    std::cout << "message send:" << buffer << std::endl;
 
     // マルチキャストアドレスを宛先に指定してメッセージを送信、パケットロス回避のため３フレーム毎
     static int cou = 0;
     cou++;
     if (cou > 3)
     {
-        sendto(multicastSock, buffer, static_cast<int>(strlen(buffer) + 1), 0,
+        //送信型に変換してデータを全て送る
+        std::stringstream ss = NetDataSendCast(clientDatas);
+
+        sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
             reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
         cou = 0;
     }
@@ -121,6 +146,22 @@ void NetServer::ImGui()
     ImGui::Begin("NetServer", nullptr, ImGuiWindowFlags_None);
 
     ImGui::Text(recvData.c_str());
+
+    static int cID = 0;
+
+    ImGui::InputInt("drawID", &cID);
+    if (clientDatas.size() > 0)
+    {
+        if (cID < 0)cID = 0;
+        if (clientDatas.size() >= cID + 1)
+        {
+            GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition(clientDatas[cID].pos);
+        }
+        else
+        {
+            cID = 0;
+        }
+    }
 
     ImGui::End();
 }
