@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "NetData.h"
 
 class NetwarkPost
 {
@@ -14,9 +15,12 @@ public:
 
     virtual void ImGui() = 0;
 
+    virtual void RenderUpdate();
+
 protected:
     unsigned __int64 sock;
     unsigned __int64 multicastSock;
 
     std::string recvData = "ABC";
+    std::vector<NetData> clientDatas;
 };

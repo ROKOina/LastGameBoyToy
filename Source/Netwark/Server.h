@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ws2tcpip.h>
 #include "NetwarkPost.h"
 
 class NetServer : public NetwarkPost
@@ -13,4 +14,7 @@ public:
     void __fastcall Update() override;
 
     void ImGui() override;
+
+private:
+    struct sockaddr_in multicastAddr;
 };

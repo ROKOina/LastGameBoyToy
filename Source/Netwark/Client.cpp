@@ -2,10 +2,9 @@
 
 #include <iostream>
 //#include <winsock2.h>
-#include <ws2tcpip.h>
+//#include <ws2tcpip.h>
 #pragma comment(lib,"ws2_32.lib")
 
-#include "NetData.h"
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 
@@ -24,9 +23,6 @@ NetClient::~NetClient()
     // WSA終了
     WSACleanup();
 }
-
-//winsock2.h　インクルードエラーでこれだけグローバルに
-struct sockaddr_in addr;
 
 
 void __fastcall NetClient::Initialize()
@@ -118,35 +114,29 @@ void __fastcall NetClient::Update()
 {
     // 通常のソケットでサーバにメッセージを送信
 
-    //test:vector int送り
-
-    //仮でポジションを送る
-    std::vector<NetData> netData;
-    NetData n;
-    n.id = 0;
-    n.radi = 1.1f;
-    DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-    n.pos = p;
-    netData.emplace_back(n);
-
-    //送信型に変換
-    std::stringstream ss;
-    for (auto& data : netData)
-    {
-        ss << " ";
-        ss << data;
-    }
-
     //パケットロス回避のため、3フレーム毎に送る
     static int cou = 0;
     cou++;
     if (cou > 3) {
+        //仮でポジションを送る
+        std::vector<NetData> netData;
+        NetData n;
+        n.id = id;
+        n.radi = 1.1f;
+        DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+        n.pos = p;
+        netData.emplace_back(n);
+
+        //送信型に変換
+        std::stringstream ss = NetDataSendCast(netData);
+
+
         sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
         cou = 0;
     }
 
     //マルチキャストアドレスからデータ受信
-    char buffer[256] = {};
+    char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
     int addrSize = sizeof(struct sockaddr_in);
     int isRecv = recvfrom(multicastSock, buffer,
@@ -158,12 +148,15 @@ void __fastcall NetClient::Update()
     {
         recvData = buffer;
         std::cout << "multicast msg recieve: " << buffer << std::endl;
+
+        clientDatas = NetDataRecvCast(recvData);
     }
     else
     {
         std::cout << WSAGetLastError() << std::endl;
     }
 
+    RenderUpdate();
 }
 
 #include <imgui.h>
@@ -174,19 +167,8 @@ void NetClient::ImGui()
 
     ImGui::Begin("NetClient", nullptr, ImGuiWindowFlags_None);
 
-
-    ImGui::Text(recvData.c_str());
-
-    NetData n;
-    std::vector<NetData> nd;
-    std::stringstream ss(recvData);
-    while (ss >> n)
-    {
-        nd.emplace_back(n);
-    }
-    if (nd.size() > 0)
-        ImGui::InputFloat3("pos", &nd[0].pos.x);
-
+    int ID = id;
+    ImGui::InputInt("id", &ID);
 
     ImGui::End();
 }
