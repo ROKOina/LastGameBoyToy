@@ -5,10 +5,15 @@
 #include <string>
 
 //コンストラクタ
-RendererCom::RendererCom(int shaderslot, int blendmode)
+RendererCom::RendererCom(SHADERMODE mode, BLENDSTATE blendmode)
 {
-  m_blend = blendmode;
-  m_modelshader = std::make_unique<ModelShader>(shaderslot);
+  m_blend = static_cast<int>(blendmode);
+  m_modelshader = std::make_unique<ModelShader>(static_cast<int>(mode));
+
+#ifdef _DEBUG
+  shaderMode = mode;
+
+#endif // _DEBUG
 }
 
 // 開始処理
@@ -75,10 +80,10 @@ void RendererCom::OnGUI()
   //ブレンドモード設定
   ImGui::Combo("BlendMode", &m_blend, BlendName, static_cast<int>(BLENDSTATE::MAX), 10);
 
+#ifdef _DEBUG
   MaterialSelector();
 
-
-
+#endif // _DEBUG
 }
 
 // モデルの読み込み
@@ -179,7 +184,6 @@ void RendererCom::MaterialSelector()
       if (ImGui::Button("Save")) {
         ExportMaterialFile();
       }
-
     }
   }
 }
@@ -202,9 +206,6 @@ void RendererCom::ExportMaterialFile()
   static const char* filter = "Material Files(*.Material)\0*.Material;\0All Files(*.*)\0*.*;\0\0";
 
   char filename[256] = { 0 };
-  //char drive[32], dir[256], name[256];
-  //::_splitpath_s(modelFilePath.c_str(), drive, sizeof(drive), dir, sizeof(dir), name, sizeof(name), nullptr, 0);
-  //::_makepath_s(filename, sizeof(filename), drive, dir, name, nullptr);
   DialogResult result = Dialog::SaveFileName(filename, sizeof(filename), filter, nullptr, "mdl", Framework::GetInstance()->GetHWND());
   if (result == DialogResult::OK)
   {

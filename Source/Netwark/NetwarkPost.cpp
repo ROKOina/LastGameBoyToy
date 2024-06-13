@@ -38,7 +38,7 @@ void NetwarkPost::RenderUpdate()
             clientObj = GameObjectManager::Instance().Create();
             clientObj->SetName(name.c_str());
             clientObj->transform_->SetScale(DirectX::XMFLOAT3(0.3f, 0.3f, 0.3f));
-            std::shared_ptr<RendererCom> r = clientObj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::BLACK), static_cast<int>(BLENDSTATE::ALPHA));
+            std::shared_ptr<RendererCom> r = clientObj->AddComponent<RendererCom>(SHADERMODE::BLACK, BLENDSTATE::ALPHA);
             r->LoadModel("Data/Ball/t.mdl");
         }
 
