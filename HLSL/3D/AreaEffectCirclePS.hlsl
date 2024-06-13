@@ -9,8 +9,10 @@ cbuffer EffectCircleConstants : register(b3)
     float simulateTime3;
     float waveEffectRange;
     
-    float3 waveEffectColor;
+    float4 waveEffectColor;
+    
     float waveEffectIntensity;
+    float3 dummy;
 }
 
 Texture2D OuterCircle : register(t0); //外側のサークル
@@ -42,14 +44,16 @@ float4 main(VS_OUT pin) : SV_TARGET
     half2 centerUV = RotateUV(simulateTime2, pin.texcoord);
     color += CenterCircle.Sample(sampler_states[LINEAR], centerUV);
     
+    // エミッシブを反映
+    color.rgb *= emissivecolor * emissiveintensity;
+    
     // 周期的に現れるオーラ
     half centerDist = length(pin.texcoord * 2.0 - 1.0);
     float wave = EffectRamp.Sample(sampler_states[LINEAR], float2(abs(centerDist) - simulateTime3, 0));
-    color += wave * step(centerDist, 1.0) * step(color.a, 0);
+    color += wave * waveEffectColor * waveEffectIntensity * step(centerDist, waveEffectRange) * step(color.a, 0);
     
     // 限りなく透明に近いピクセルは破棄する
     clip(color.a - 0.0001f);
-    color.rgb *= emissivecolor * emissiveintensity;
     
     return color;
 }

@@ -10,6 +10,16 @@
 class ModelShader
 {
 public:
+  enum MODELSHADER
+  {
+    DEFALT,
+    DEFERRED,
+    BLACK,
+    AREA_EFFECT_CIRCLE,
+    MAX
+  };
+
+public:
   ModelShader(int shader);
   ~ModelShader() {};
 
@@ -31,44 +41,22 @@ public:
   {
     DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
   };
-  std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
 
   //サブセットのコンスタントバッファ
   struct subsetconstants
   {
     DirectX::XMFLOAT4	color = { 1.0f, 1.0f, 1.0f, 1.0f };
-    DirectX::XMFLOAT3   emissivecolor = { 1.0f,1.0f,1.0f };
-    float               emissiveintensity = 0;
-    float               Metalness = 0;
-    float               Roughness = 0;
+    DirectX::XMFLOAT3 emissivecolor = { 1.0f,1.0f,1.0f };
+    float             emissiveintensity = 0;
+    float             Metalness = 0;
+    float             Roughness = 0;
     DirectX::XMFLOAT2 dummy = {};
-  };
-  std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
-
-  //エフェクトのコンスタントバッファ
-  struct effectconstants
-  {
-    float simulateTime1 = 0.0f;
-    float simulateTime2 = 0.0f;
-    float simulateTime3 = 0.0f;
-    float waveEffectRange = 3.0f;
-
-    DirectX::XMFLOAT3 waveEffectColor = { 1.0f,1.0f,1.0f };
-    float waveEffectIntensity = 0.7f;
-  };
-  std::unique_ptr<ConstantBuffer<effectconstants>> m_effectconstants;
-
-public:
-  enum MODELSHADER
-  {
-    DEFALT,
-    DEFERRED,
-    BLACK,
-    AREA_EFFECT_CIRCLE,
-    MAX
   };
 
 private:
+  std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
+  std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
+
   Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
   Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
   Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;

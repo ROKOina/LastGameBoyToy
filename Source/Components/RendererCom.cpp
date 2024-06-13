@@ -27,6 +27,11 @@ void RendererCom::Render()
   Graphics& Graphics = Graphics::Instance();
   ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
 
+  // 定数バッファをGPUに設定
+  if (variousConstant.get() != nullptr) {
+    variousConstant->UpdateConstantBuffer(dc);
+  }
+
   //セット
   m_modelshader->Begin(dc, m_blend);
 
@@ -55,6 +60,11 @@ void RendererCom::Update(float elapsedTime)
   {
     DirectX::XMFLOAT4X4 transform = GetGameObject()->GetComponent<TransformCom>()->GetWorldTransform();
     model_->UpdateTransform(DirectX::XMLoadFloat4x4(&transform));
+
+    // 定数バッファの更新
+    if (variousConstant.get() != nullptr) {
+      variousConstant->Update(elapsedTime);
+    }
   }
 }
 
@@ -84,6 +94,13 @@ void RendererCom::OnGUI()
   MaterialSelector();
 
 #endif // _DEBUG
+
+  if (variousConstant.get() != nullptr) {
+    ImGui::Separator();
+    ImGui::Text("ConstantBuffer");
+
+    variousConstant->DrawGui();
+  }
 }
 
 // モデルの読み込み

@@ -4,10 +4,11 @@
 #include "Graphics\Model\Model.h"
 #include "Graphics\Graphics.h"
 #include "Graphics/Shaders/3D/ModelShader.h"
+#include "Graphics/Shaders/3D/VariousShaderConstants.h"
 
 class RendererCom : public Component
 {
-  //コンポーネントオーバーライド
+  // コンポーネントオーバーライド
 public:
   RendererCom(SHADERMODE mode, BLENDSTATE blendmode);
   ~RendererCom() {}
@@ -18,7 +19,7 @@ public:
   // 開始処理
   void Start() override;
 
-  //描画
+  // 描画
   void Render();
 
   // 更新処理
@@ -36,6 +37,20 @@ public:
   // モデルの取得
   Model* GetModel() const { return model_.get(); }
 
+  template<class T>
+  std::shared_ptr<T> SetVariousConstant() { 
+    std::shared_ptr<T> p = std::make_shared<T>();
+    variousConstant = p;
+    return p;
+  }
+
+  template<class T>
+  std::shared_ptr<T> GetVariousConstant() {
+    std::shared_ptr<T> p = std::dynamic_pointer_cast<T>(variousConstant);
+    if (p == nullptr) return nullptr;
+    return p;
+  }
+
 private:
 #ifdef _DEBUG
   // マテリアルを選択するImGui
@@ -52,6 +67,8 @@ private:
   std::unique_ptr<Model>	model_;
   std::unique_ptr<ModelShader> m_modelshader;
   int m_blend = 9;
+
+  std::shared_ptr<BaseConstants> variousConstant = nullptr;
 
 #ifdef _DEBUG
   SHADERMODE          shaderMode;

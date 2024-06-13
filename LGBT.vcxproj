@@ -178,6 +178,7 @@
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\ModelShader.h" />
+    <ClInclude Include="Source\Graphics\Shaders\3D\VariousShaderConstants.h" />
     <ClInclude Include="Source\Graphics\Shaders\Bloom.h" />
     <ClInclude Include="Source\Graphics\Shaders\ConstantBuffer.h" />
     <ClInclude Include="Source\Graphics\Shaders\FrameBuffer.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\ModelShader.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\3D\VariousShaderConstants.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FrameBuffer.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FullScreenQuad.cpp" />
