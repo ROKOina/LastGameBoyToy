@@ -9,7 +9,7 @@ class RendererCom : public Component
 {
   //コンポーネントオーバーライド
 public:
-  RendererCom(int shaderslot, int blendmode);
+  RendererCom(SHADERMODE mode, BLENDSTATE blendmode);
   ~RendererCom() {}
 
   // 名前取得
@@ -46,14 +46,18 @@ private:
   // 編集したマテリアルファイルを書き出す
   void ExportMaterialFile();
 
+  // 割り当てられているシェーダーの定数バッファを編集
+  void EditConstantBuffer();
+
 #endif
 
 private:
   std::unique_ptr<Model>	model_;
-  std::unique_ptr<ModelShader>m_modelshader;
+  std::unique_ptr<ModelShader> m_modelshader;
   int m_blend = 9;
 
 #ifdef _DEBUG
+  SHADERMODE          shaderMode;
   int									selectionMaterialIndex = -1;
   bool								hiddenProperty = false;
   std::string					modelFilePath;

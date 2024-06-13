@@ -255,6 +255,8 @@ void ModelResource::LoadMaterial(ID3D11Device* device, const char* filename)
   }
 }
 
+#ifdef _DEBUG
+
 //マテリアルシリアライズ
 void ModelResource::MaterialSerialize(const char* filename)
 {
@@ -282,6 +284,7 @@ void ModelResource::MaterialSerialize(const char* filename)
   }
 }
 
+#endif // _DEBUG
 
 // モデル構築
 void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)

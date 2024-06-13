@@ -376,3 +376,54 @@ Data/Model/stages/Piza/Textures/Pizza_Albedo.tga
 Data/Model/stages/Piza/Textures/Pizza_Albedo_suisai.tga
 Data/Model/stages/Piza/Textures/Pizza_Ao.tga
 Data/Model/stages/Piza/Textures/Pizza_Normals.tga
+External/FBX SDK/2019.0/include/fbxsdk/fileio/fbxcallbacks.h
+External/FBX SDK/2019.0/include/fbxsdk/scene/shading/fbxsurfacematerialutils.h
+External/FBX SDK/2019.0/include/libxml2/libxml/c14n.h
+External/FBX SDK/2019.0/include/libxml2/libxml/catalog.h
+External/FBX SDK/2019.0/include/libxml2/libxml/chvalid.h
+External/FBX SDK/2019.0/include/libxml2/libxml/debugXML.h
+External/FBX SDK/2019.0/include/libxml2/libxml/dict.h
+External/FBX SDK/2019.0/include/libxml2/libxml/DOCBparser.h
+External/FBX SDK/2019.0/include/libxml2/libxml/encoding.h
+External/FBX SDK/2019.0/include/libxml2/libxml/entities.h
+External/FBX SDK/2019.0/include/libxml2/libxml/globals.h
+External/FBX SDK/2019.0/include/libxml2/libxml/hash.h
+External/FBX SDK/2019.0/include/libxml2/libxml/HTMLparser.h
+External/FBX SDK/2019.0/include/libxml2/libxml/HTMLtree.h
+External/FBX SDK/2019.0/include/libxml2/libxml/list.h
+External/FBX SDK/2019.0/include/libxml2/libxml/nanoftp.h
+External/FBX SDK/2019.0/include/libxml2/libxml/nanohttp.h
+External/FBX SDK/2019.0/include/libxml2/libxml/parser.h
+External/FBX SDK/2019.0/include/libxml2/libxml/parserInternals.h
+External/FBX SDK/2019.0/include/libxml2/libxml/pattern.h
+External/FBX SDK/2019.0/include/libxml2/libxml/relaxng.h
+External/FBX SDK/2019.0/include/libxml2/libxml/SAX.h
+External/FBX SDK/2019.0/include/libxml2/libxml/SAX2.h
+External/FBX SDK/2019.0/include/libxml2/libxml/schemasInternals.h
+External/FBX SDK/2019.0/include/libxml2/libxml/schematron.h
+External/FBX SDK/2019.0/include/libxml2/libxml/threads.h
+External/FBX SDK/2019.0/include/libxml2/libxml/tree.h
+External/FBX SDK/2019.0/include/libxml2/libxml/uri.h
+External/FBX SDK/2019.0/include/libxml2/libxml/valid.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xinclude.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xlink.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlautomata.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlerror.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlexports.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlIO.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlmemory.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlmodule.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlreader.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlregexp.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlsave.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlschemas.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlschemastypes.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlstring.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlunicode.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlversion.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlwin32version.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xmlwriter.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xpath.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xpathInternals.h
+External/FBX SDK/2019.0/include/libxml2/libxml/xpointer.h
+imgui.ini

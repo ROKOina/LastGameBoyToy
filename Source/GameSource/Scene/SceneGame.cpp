@@ -73,23 +73,12 @@ void SceneGame::Initialize()
     obj->SetName("player");
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
     r->LoadModel("Data/OneCoin/robot.mdl");
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     a->PlayAnimation(0, true, false, 0.001f);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-  }
-
-  //テスト
-  {
-    auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("plane");
-    obj->transform_->SetWorldPosition({ 0, 1, 0 });
-    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::AREA_EFFECT_CIRCLE), static_cast<int>(BLENDSTATE::ALPHA));
-    r->LoadModel("Data/UtilityModels/plane.mdl");
-    r->LoadMaterial("Data/UtilityModels/SkillEffect_Circle.Material");
   }
 
   //ステージ
@@ -98,8 +87,19 @@ void SceneGame::Initialize()
     obj->SetName("stage");
     obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
     obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFERRED), static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS));
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
     r->LoadModel("Data/Stage/Stage.mdl");
+  }
+
+  //テスト
+  {
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("plane");
+    obj->transform_->SetWorldPosition({ 0, 1, 0 });
+    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::AREA_EFFECT_CIRCLE, BLENDSTATE::ALPHA);
+    r->LoadModel("Data/UtilityModels/plane.mdl");
+    r->LoadMaterial("Data/UtilityModels/SkillEffect_Circle.Material");
   }
 
   //バリア
@@ -107,7 +107,7 @@ void SceneGame::Initialize()
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("barrier");
     obj->transform_->SetWorldPosition({ -2.0f,1.4f,0.0f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::DEFALT), static_cast<int>(BLENDSTATE::ADD));
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
     r->LoadModel("Data/Ball/b.mdl");
   }
 
@@ -116,7 +116,7 @@ void SceneGame::Initialize()
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("blackball");
     obj->transform_->SetWorldPosition({ 2.0f,1.4f,0.0f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(static_cast<int>(SHADERMODE::BLACK), static_cast<int>(BLENDSTATE::ALPHA));
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::BLACK, BLENDSTATE::ALPHA);
     r->LoadModel("Data/Ball/t.mdl");
   }
 
@@ -154,8 +154,6 @@ void SceneGame::Update(float elapsedTime)
   std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
   std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
   std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-
-
 
   // ConstantBufferUpdate();
 }

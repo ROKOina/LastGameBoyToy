@@ -54,7 +54,10 @@ ModelShader::ModelShader(int shader)
     // オブジェクト用のコンスタントバッファ,サブセット用
     m_objectconstants = std::make_unique<ConstantBuffer<objectconstants>>(Graphics.GetDevice());
     m_subsetconstants = std::make_unique<ConstantBuffer<subsetconstants>>(Graphics.GetDevice());
-    m_effectconstants = std::make_unique<ConstantBuffer<effectconstants>>(Graphics.GetDevice());
+
+    // 特定のシェーダー専用の定数バッファ
+    // AreaEffect_Circle用
+    m_EffectConstants = std::make_unique<ConstantBuffer<EffectConstants>>(Graphics.GetDevice());
   }
 
   //IBL専用のテクスチャ読み込み
@@ -110,10 +113,10 @@ void ModelShader::SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::No
   //コンスタントバッファの更新
   m_objectconstants->Activate(dc, 1, true, true, false, false, false, false);
 
-  m_effectconstants->data.simulateTime1 += 0.016;
-  m_effectconstants->data.simulateTime2 += 0.016 * 1.15f;
-  m_effectconstants->data.simulateTime3 += 0.016 * 1.5f;
-  m_effectconstants->Activate(dc, 3, false, true, false, false, false, false);
+  m_EffectConstants->data.simulateTime1 += 0.016f * 1.25f;
+  m_EffectConstants->data.simulateTime2 += 0.016f * 3.25f;
+  m_EffectConstants->data.simulateTime3 += 0.016f * 1.1f;
+  m_EffectConstants->Activate(dc, 3, false, true, false, false, false, false);
 
   UINT stride = sizeof(ModelResource::Vertex);
   UINT offset = 0;
