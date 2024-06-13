@@ -7,7 +7,7 @@ class NetwarkPost
 {
 public:
     __fastcall NetwarkPost() {}
-    __fastcall ~NetwarkPost();
+    virtual __fastcall ~NetwarkPost();
 
     virtual void __fastcall Initialize() = 0;
 

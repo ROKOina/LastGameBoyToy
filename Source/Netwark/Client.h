@@ -7,8 +7,8 @@
 class NetClient : public NetwarkPost
 {
 public:
-    NetClient(std::string ipv4Adress, int id) :ipv4Adress(ipv4Adress), id(id) {}
-    ~NetClient();
+    __fastcall NetClient(std::string ipv4Adress, int id) :ipv4Adress(ipv4Adress), id(id) {}
+    __fastcall ~NetClient() override;
 
     void __fastcall Initialize() override;
 
@@ -18,6 +18,6 @@ public:
 
 private:
     std::string ipv4Adress;
-    struct sockaddr_in addr;
+    struct sockaddr_in addr = {0};
     int id = 0;
 };

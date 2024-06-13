@@ -8,18 +8,7 @@
 
 __fastcall NetServer::~NetServer()
 {
-    // ソケット終了
-    if (closesocket(multicastSock) != 0)
-    {
-        std::cout << "error_code:" << WSAGetLastError();
-    }
-    if (closesocket(sock) != 0)
-    {
-        std::cout << "error_code:" << WSAGetLastError();
-    }
-
-    // WSA終了
-    WSACleanup();
+    NetwarkPost::~NetwarkPost();
 }
 
 void __fastcall NetServer::Initialize()
