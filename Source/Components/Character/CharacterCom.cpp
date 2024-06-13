@@ -14,9 +14,9 @@ void CharacterCom::Update(float elapsedTime)
 void CharacterCom::OnGUI()
 {
     std::string stateNames[(int)CHARACTER_ACTIONS::MAX] = {
-        "Santora",
-        "Is",
-        "Baka"
+        "IDLE",
+        "MOVE",
+        "JUMP"
     };
     ImGui::Text(std::string("CurrentState:" + stateNames[(int)stateMachine.GetCurrentState()]).c_str());
 

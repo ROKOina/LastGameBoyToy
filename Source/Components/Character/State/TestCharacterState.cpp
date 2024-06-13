@@ -11,12 +11,30 @@ TestCharacter_BaseState::TestCharacter_BaseState(CharacterCom* owner) : State(ow
     testCharaCom = GetComp(TestCharacterCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
+    animationCom = GetComp(AnimationCom);
 }
 
+void TestCharacter_IdleState::Enter()
+{
+    //歩きアニメーション再生開始
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+}
+
+void TestCharacter_IdleState::Execute(const float& elapsedTime)
+{
+    //入力値取得
+    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
+
+    if (moveVec != 0)
+    {
+
+    }
+}
 
 void TestCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
 }
 
 void TestCharacter_MoveState::Execute(const float& elapsedTime)
@@ -64,3 +82,5 @@ void TestCharacter_JumpState::Execute(const float& elapsedTime)
         ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
     }
 }
+
+

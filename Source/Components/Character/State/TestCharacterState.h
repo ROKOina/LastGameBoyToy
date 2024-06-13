@@ -4,6 +4,7 @@
 #include "../TestCharacterCom.h"
 #include "../../MovementCom.h"
 #include "../../TransformCom.h"
+#include "../../AnimationCom.h"
 
 class TestCharacter_BaseState : public State<CharacterCom> {
 public:
@@ -13,8 +14,17 @@ protected:
     std::weak_ptr<TestCharacterCom> testCharaCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
+    std::weak_ptr<AnimationCom> animationCom;
 };
 
+class TestCharacter_IdleState : public TestCharacter_BaseState
+{
+public:
+    TestCharacter_IdleState(CharacterCom* owner) :TestCharacter_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+};
 
 class TestCharacter_MoveState : public TestCharacter_BaseState
 {
