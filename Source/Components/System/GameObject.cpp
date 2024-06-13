@@ -435,11 +435,15 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
     std::shared_ptr<GameObject> selectedObject = *selectionGameObject_.begin();
 
     // ワールド行列の更新
+    auto& parent = selectedObject->GetParent();
     DirectX::XMFLOAT4X4 world = {};
-    DirectX::XMMATRIX S = DirectX::XMMatrixScaling(selectedObject->transform_->GetScale().x, selectedObject->transform_->GetScale().y, selectedObject->transform_->GetScale().z);
-    DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&selectedObject->transform_->GetRotation()));
-    DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(selectedObject->transform_->GetLocalPosition().x, selectedObject->transform_->GetLocalPosition().y, selectedObject->transform_->GetLocalPosition().z);
-    DirectX::XMStoreFloat4x4(&world, S * R * T);
+
+    if (parent) {
+        parent->transform_->UpdateTransform();
+        selectedObject->transform_->SetParentTransform(parent->transform_->GetWorldTransform());
+    }
+    selectedObject->transform_->UpdateTransform();
+    world = selectedObject->transform_->GetWorldTransform();
 
     ImGuizmo::Manipulate(
         &view._11, &projection._11,           // ビュー＆プロジェクション行列
@@ -454,9 +458,26 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
     DirectX::XMFLOAT4 rotate = selectedObject->transform_->GetRotation();
     DirectX::XMFLOAT3 position = selectedObject->transform_->GetWorldPosition();
     TransformUtils::MatrixToTransformation(world, &scale, &rotate, &position);
-    selectedObject->transform_->SetScale(scale);
-    selectedObject->transform_->SetRotation(rotate);
-    selectedObject->transform_->SetWorldPosition(position);
+
+    if (parent) {
+        // 親のワールド逆行列と自身のワールド行列を乗算することで自身のローカル行列を算出できる
+        DirectX::XMMATRIX ParentWorldTransform = DirectX::XMLoadFloat4x4(&parent->transform_->GetWorldTransform());
+        DirectX::XMMATRIX ParentInverseTransform = DirectX::XMMatrixInverse(nullptr, ParentWorldTransform);
+        DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&world);
+        DirectX::XMMATRIX LocalTransform = DirectX::XMMatrixMultiply(WorldTransform, ParentInverseTransform);
+        DirectX::XMStoreFloat4x4(&world, LocalTransform);
+
+        TransformUtils::MatrixToTransformation(world, &scale, &rotate, &position);
+        selectedObject->transform_->SetScale(scale);
+        selectedObject->transform_->SetRotation(rotate);
+        selectedObject->transform_->SetLocalPosition(position);
+    }
+    else {
+        selectedObject->transform_->SetScale(scale);
+        selectedObject->transform_->SetRotation(rotate);
+        selectedObject->transform_->SetWorldPosition(position);
+    }
+
 }
 
 // リスター描画
