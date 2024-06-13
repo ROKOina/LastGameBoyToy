@@ -10,18 +10,7 @@
 
 NetClient::~NetClient()
 {
-    // ソケット終了
-    if (closesocket(multicastSock) != 0)
-    {
-        std::cout << "error_code:" << WSAGetLastError();
-    }
-    if (closesocket(sock) != 0)
-    {
-        std::cout << "error_code:" << WSAGetLastError();
-    }
-
-    // WSA終了
-    WSACleanup();
+    NetwarkPost::~NetwarkPost();
 }
 
 
@@ -61,7 +50,11 @@ void __fastcall NetClient::Initialize()
                 count++;
                 st = st.substr(1);
             }
-            return sc;
+
+            std::string s = sc;
+            delete sc;
+
+            return s;
         };
     
     //ip登録

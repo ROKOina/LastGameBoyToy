@@ -7,7 +7,7 @@ class NetServer : public NetwarkPost
 {
 public:
     __fastcall NetServer() {}
-    __fastcall ~NetServer();
+    __fastcall ~NetServer() override;
 
     void __fastcall Initialize() override;
 
