@@ -13,7 +13,24 @@ void AnimationCom::Start()
 // 更新処理
 void AnimationCom::Update(float elapsedTime)
 {
-    AnimationUpdata(elapsedTime);
+
+    switch (animaType)
+    {
+        //普通のアニメーション更新
+    case AnimationType::NormalAnimation:
+        //更新処理
+        AnimationUpdata(elapsedTime);
+        break;
+        //上半身別アニメーション更新
+    case AnimationType::UpperLowerAnimation:
+        AnimationUpdata(elapsedTime);
+        AnimationSortingUpdate(elapsedTime);
+        break;
+        //上半身別上半身アニメーションブレンド更新
+    case AnimationType::UpperBlendLowerAnimation:
+        break;
+    }
+
 }
 
 // GUI描画
@@ -24,6 +41,8 @@ void AnimationCom::OnGUI()
 
     const ModelResource* resource = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource();
     const std::vector<ModelResource::Animation>& animations = resource->GetAnimations();
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
     ImGui::Checkbox("animationLoop", &isAnimLoop);
     ImGui::Separator();
@@ -32,7 +51,57 @@ void AnimationCom::OnGUI()
     {
     	index++;
     }
+
+
+    int animationIndex = 0;
+    ModelResource::Animation* selectionAnimation = GetSelectionAnimation();
+    std::vector<ModelResource::Animation>& animations1 = const_cast<std::vector<ModelResource::Animation>&>(model->GetResource()->GetAnimations());
+    std::vector<ModelResource::Animation>::iterator it = animations1.begin();
+    while (it != animations1.end())
+    {
+        ModelResource::Animation& animation = (*it);
+
+        ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
+        if (selectionAnimation == &animation)
+        {
+            nodeFlags |= ImGuiTreeNodeFlags_Selected;
+        }
+
+        ImGui::SetNextItemWidth(58);
+        ImGui::DragFloat(animation.name.c_str(), &animation.animationspeed);
+
+        ImGui::TreeNodeEx(&animation, nodeFlags, animation.name.c_str());
+
+        // クリックすると選択
+        if (ImGui::IsItemClicked())
+        {
+            currentAnimation = animationIndex;
+            PlayAnimation(currentAnimation, false, false,0.2f);
+        }
+
+        ImGui::TreePop();
+        ++animationIndex;
+        ++it;
+    }
+
 }
+
+
+
+//Debug用選択アニメーションを取得
+ModelResource::Animation* AnimationCom::GetSelectionAnimation()
+{
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    const std::vector<ModelResource::Animation>& animations = model->GetResource()->GetAnimations();
+    if (currentAnimation >= 0 && currentAnimation < static_cast<int>(animations.size()))
+    {
+        return const_cast<ModelResource::Animation*>(&animations.at(currentAnimation));
+    }
+    return nullptr;
+}
+
 
 //アニメーション更新
 void AnimationCom::AnimationUpdata(float elapsedTime)
@@ -49,6 +118,13 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         animationChangeRate += animationChangeTime;
         blendRate = animationChangeRate;
         if (blendRate > 1.0f)blendRate = 1.0f;
+    }
+
+    //上半身補完の計算
+    if (upperComplementFlag)
+    {
+        upperRate += animationChangeTime;
+        if (upperRate > 1.0f)upperComplementFlag = true;
     }
 
     if (currentAnimation < 0)
@@ -93,8 +169,22 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 }
                 else
                 {
-                    //アニメーション計算
-                    ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+
+                    //上半身アニメーションが入っているか否か
+                    if (upperIsPlayAnimation)
+                    {
+                        //上半身アニメーションを飛ばす
+                        if (model->GetNodes()[nodeIndex].layer != 0)
+                        {
+                            //アニメーション計算
+                            ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                        }
+                    }
+                    else
+                    {
+                        //アニメーション計算
+                        ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                    }
                 }
             }
             break;
@@ -154,13 +244,106 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 //上半身別アニメーション更新
 void AnimationCom::AnimationSortingUpdate(float elapsedTime)
 {
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
     //再生中できないなら処理しない
-    if (!IsPlayAnimation())return;
+    if (!IsPlayUpperAnimation())return;
 
     //ブレンド率の計算
-    float blendRate
+    float blendRate = 1.0f;
+    if (upperAnimationChangeTime > 0)
+    {
+        upperAnimationChangeRate += upperAnimationChangeTime;
+        blendRate = upperAnimationChangeRate;
+        if (blendRate > 1.0f)blendRate = 1.0f;
+    }
+
+    //指定のアニメーションデータを取得
+    const std::vector<ModelResource::Animation>& animations = model->GetResource()->GetAnimations();
+    const ModelResource::Animation& animation = animations.at(currentUpperAnimation);
+
+    //アニメーションデータからキーフレームデータリストを取得
+    const std::vector<ModelResource::Keyframe>& Keyframes = animation.keyframes;
+    int keyCount = static_cast<int>(Keyframes.size());
+    for (int keyIndex = 0; keyIndex < keyCount - 1; ++keyIndex)
+    {
+        //現在の時間がどのキーフレームの間にいるか判定する
+        const ModelResource::Keyframe& keyframe0 = Keyframes.at(keyIndex);
+        const ModelResource::Keyframe& keyframe1 = Keyframes.at(keyIndex + 1);
+        if (upperCurrentAnimationSeconds >= keyframe0.seconds && upperCurrentAnimationSeconds < keyframe1.seconds)
+        {
+            //再生時間とキーフレームの時間から補完率を算出する
+            float rate = (upperCurrentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+
+            int nodeCount = static_cast<int>(model->GetNodes().size());
+            for (int nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+            {
+                //2つのキーフレーム間の補完計算
+                const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
+                const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
+
+
+
+                if (blendRate < 1.0f)
+                {
+                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    {
+                        //現在の姿勢と次のキーフレームとの姿勢の補完
+                        ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
+                    }
+                }
+                //通常の計算
+                else
+                {
+                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    {
+                        ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                    }
+                }
+
+            }
+            break;
+        }
+    }
+
+    //時間経過
+    upperCurrentAnimationSeconds+=elapsedTime* animation.animationspeed;
+
+    //最終フレーム
+    if (animationUpperEndFlag)
+    {
+        animationUpperEndFlag = false;
+        currentUpperAnimation = -1;
+        upperIsPlayAnimation = false;
+        return;
+    }
+
+    //再生時間が終端時間を超えたら
+    if (upperCurrentAnimationSeconds >= animation.secondsLength && animationUpperLoopFlag == false)
+    {
+        animationUpperEndFlag = true;
+        upperComplementFlag = true;
+    }
+    
+    //再生時間が終端時間を超えたら
+    if (upperCurrentAnimationSeconds >= animation.secondsLength)
+    {
+        //再生時間を巻き戻す
+        upperCurrentAnimationSeconds -= animation.secondsLength;
+    }
 }
 
+
+//上半身アニメーション再生中か？
+bool AnimationCom::IsPlayUpperAnimation()
+{
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    if (currentUpperAnimation < 0)return false;
+    if (currentUpperAnimation >= model->GetResource()->GetAnimations().size())return false;
+    return true;
+}
 
 //普通のアニメーション再生関数
 void AnimationCom::PlayAnimation(int animeID, bool loop,bool rootFlag, float blendSeconds)
@@ -174,10 +357,29 @@ void AnimationCom::PlayAnimation(int animeID, bool loop,bool rootFlag, float ble
     animationChangeRate = 0.0f;
 }
 
+//上半身のみアニメーション再生関数
+void AnimationCom::PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds)
+{
+    currentUpperAnimation = upperAnimaId;
+    upperCurrentAnimationSeconds = 0.0f;
+    animationUpperLoopFlag = false;
+    animationUpperEndFlag = false;
+    upperAnimationChangeTime = blendSeconds;
+    upperIsPlayAnimation = false;
+    beforeOneFream = false;
+    upperAnimationChangeRate = 0.0f;
+}
+
 //アニメーションストップ
 void AnimationCom::StopAnimation()
 {
     currentAnimation = -1;
+}
+
+//アニメーション更新切り替え
+void AnimationCom::SetUpAnimationUpdate(int updateId)
+{
+    animaType = updateId;
 }
 
 //アニメーション計算

@@ -5,6 +5,7 @@
 #include "System\Component.h"
 #include "Graphics/Model/Model.h"
 #include "Graphics\Model\Model.h"
+#include "Graphics/Model/ModelResource.h"
 
 //アニメーション
 class AnimationCom : public Component
@@ -38,8 +39,13 @@ public:
 
     //普通のアニメーション再生関数
     void PlayAnimation(int animeID,bool loop,bool rootFlag,float blendSeconds);
+    //上半身だけアニメーション再生
+    void PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds);
     //再生中か
     bool IsPlayAnimation() const { return currentAnimation >= 0; }
+    //上半身アニメーション再生中か？
+    bool IsPlayUpperAnimation();
+
     //アニメーションストップ
     void StopAnimation();
 
@@ -56,6 +62,9 @@ public:
     void SetupRootMotion(const char* rootMotionNodeName);
     //ルートモーションの腰を取るノードを検索
     void SetupRootMotionHip(const char* rootMotionNodeName);
+
+    //アニメーション更新切り替え
+    void SetUpAnimationUpdate(int updateId);
 private:
 
     //アニメーション計算
@@ -71,6 +80,12 @@ private:
     void updateRootMotion(DirectX::XMFLOAT3& translation);
     //ルートモーションの移動値を計算
     void ComputeRootMotion();
+
+private:
+
+    //Debug用選択アニメーションを取得
+    ModelResource::Animation* GetSelectionAnimation();
+
 
 private:
     //変数
@@ -109,7 +124,7 @@ private:
     //上半身関連
 
     //現在の再生している上半身アニメーション番号
-    int                             currentUpperAnimationIndex = -1;
+    int                             currentUpperAnimation = -1;
     //上半身のアニメーション番号
     int                             upperAnimationIndex = 0;
     //上半身アニメーションを変更した時の変数
@@ -120,7 +135,10 @@ private:
     float                           upperAnimationSecondsLength = 0.0f;
     //上半身アニメーションの現在の時間
     float                           upperCurrentAnimationSeconds = 0.0f;
-
+    //上半身アニメーションブレンドのブレンドレート
+    float                           upperBlendRate = 0.0f;
+    //上半身アニメーションのブレンドレート
+    float                           upperRate = 0.0f;
 
 
 
@@ -141,11 +159,14 @@ private:
     bool                            upperComplementFlag = false;
 
     //アニメーション更新タイプ
-    enum class AnimationType
+    enum  AnimationType
     {
         NormalAnimation,
         UpperLowerAnimation,
         UpperBlendLowerAnimation,
     };
+
+    //アニメーション更新変数
+    int animaType = 0;
 
 };
