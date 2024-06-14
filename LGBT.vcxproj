@@ -148,6 +148,7 @@
     <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\TestCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\TestCharacterState.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
@@ -229,6 +230,7 @@
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\TestCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\TestCharacterState.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />

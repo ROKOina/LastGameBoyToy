@@ -8,7 +8,25 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     stateMachine.Update(elapsedTime);
+
+
+    if (GamePad::BTN_LEFT_TRIGGER & gamePad.GetButtonDown())
+    {
+        MainAttack();
+    }
+
+    if (GamePad::BTN_B & gamePad.GetButtonDown())
+    {
+        MainSkill();
+        MainAttack();
+    }
+    if (GamePad::BTN_X & gamePad.GetButtonDown())
+    {
+        SubSkill();
+    }
 }
 
 void CharacterCom::OnGUI()
@@ -22,4 +40,5 @@ void CharacterCom::OnGUI()
 
     int index = (int)stateMachine.GetCurrentState();
     ImGui::InputInt("State", &index);
+    ImGui::InputFloat("JumpState", &jumpPower);
 }

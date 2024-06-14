@@ -1,26 +1,44 @@
-#include "TestCharacterState.h"
+#include "BaseCharacterState.h"
 #include "Input\Input.h"
+#include "BaseCharacterState.h"
 
 // マクロ
 #define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
-#define ChangeState(State) testCharaCom.lock()->GetStateMachine().ChangeState(State);
+#define ChangeState(State) charaCom.lock()->GetStateMachine().ChangeState(State);
 
-TestCharacter_BaseState::TestCharacter_BaseState(CharacterCom* owner) : State(owner)
+BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
-    testCharaCom = GetComp(TestCharacterCom);
+    charaCom = GetComp(CharacterCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
     animationCom = GetComp(AnimationCom);
 }
 
-void TestCharacter_MoveState::Enter()
+void BaseCharacter_IdleState::Enter()
+{
+    //歩きアニメーション再生開始
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true, false, 0.1f);
+}
+
+void BaseCharacter_IdleState::Execute(const float& elapsedTime)
+{
+    //入力値取得
+    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
+
+    if (moveVec != 0)
+    {
+        ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
+    }
+}
+
+void BaseCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
 }
 
-void TestCharacter_MoveState::Execute(const float& elapsedTime)
+void BaseCharacter_MoveState::Execute(const float& elapsedTime)
 {
     GamePad gamePad = Input::Instance().GetGamePad();
 
@@ -35,12 +53,6 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     //旋回処理
     transCom.lock()->Turn(moveVec, 0.1f);
 
-    //待機
-    if (moveVec == 0)
-    {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
-    }
-
     //ジャンプ
     if (GamePad::BTN_A & gamePad.GetButtonDown())
     {
@@ -48,13 +60,13 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     }
 }
 
-void TestCharacter_JumpState::Enter()
+void BaseCharacter_JumpState::Enter()
 {
     //ジャンプ
-    moveCom.lock()->AddForce(jumpPower);
+    moveCom.lock()->AddForce({ 0,charaCom.lock()->GetJumpPower(),0 });
 }
 
-void TestCharacter_JumpState::Execute(const float& elapsedTime)
+void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 {
     GamePad gamePad = Input::Instance().GetGamePad();
 
@@ -68,8 +80,7 @@ void TestCharacter_JumpState::Execute(const float& elapsedTime)
 
     if (moveCom.lock()->OnGround())
     {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
+        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
     }
 }
-
 

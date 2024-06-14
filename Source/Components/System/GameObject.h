@@ -121,6 +121,8 @@ private:
     //オブジェクトスピード（スローにできる）
     float objSpeed_ = 1;
 };
+using GameObj = std::shared_ptr<GameObject>;
+
 
 // ゲームオブジェクトマネージャー
 class GameObjectManager

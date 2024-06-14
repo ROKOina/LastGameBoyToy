@@ -30,8 +30,19 @@ public:
     // GUI•`‰æ
     void OnGUI() override;
 
+    virtual void MainAttack() {};
+    virtual void SubAttack() {};
+
+    virtual void MainSkill() {};
+    virtual void SubSkill() {};
+    virtual void DashSkill() {};
+    virtual void UltSkill() {};
+
     StateMachine<CharacterCom, CHARACTER_ACTIONS>& GetStateMachine() { return stateMachine; }
+    float GetJumpPower() { return jumpPower; }
 
 protected:
     StateMachine<CharacterCom, CHARACTER_ACTIONS> stateMachine;
+
+    float jumpPower = 5.0f;
 };

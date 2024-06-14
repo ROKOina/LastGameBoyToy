@@ -17,15 +17,6 @@ protected:
     std::weak_ptr<AnimationCom> animationCom;
 };
 
-class TestCharacter_IdleState : public TestCharacter_BaseState
-{
-public:
-    TestCharacter_IdleState(CharacterCom* owner) :TestCharacter_BaseState(owner) {}
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-};
-
 class TestCharacter_MoveState : public TestCharacter_BaseState
 {
 public:
