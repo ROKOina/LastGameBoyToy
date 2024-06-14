@@ -27,19 +27,6 @@ public:
 
 };
 
-class TestCharacter_JumpState : public TestCharacter_BaseState
-{
-public:
-    TestCharacter_JumpState(CharacterCom* owner) :TestCharacter_BaseState(owner) {}
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-
-private:
-    DirectX::XMFLOAT3 jumpPower = { 0, 30.0f, 0 };
-    bool jumpFlag = false;
-};
-
 class TestCharacter_AttackState : public TestCharacter_BaseState
 {
 public:

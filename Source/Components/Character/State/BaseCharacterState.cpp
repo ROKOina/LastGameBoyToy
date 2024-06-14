@@ -23,12 +23,20 @@ void BaseCharacter_IdleState::Enter()
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     //入力値取得
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
+    //移動
     if (moveVec != 0)
     {
         ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
+    }
+    //ジャンプ
+    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    {
+        ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
     }
 }
 
@@ -53,6 +61,11 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     //旋回処理
     transCom.lock()->Turn(moveVec, 0.1f);
 
+    //待機
+    if (moveVec == 0)
+    {
+        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+    }
     //ジャンプ
     if (GamePad::BTN_A & gamePad.GetButtonDown())
     {
@@ -63,7 +76,8 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
 void BaseCharacter_JumpState::Enter()
 {
     //ジャンプ
-    moveCom.lock()->AddForce({ 0,charaCom.lock()->GetJumpPower(),0 });
+    moveCom.lock()->AddForce(jumpPower);
+    moveCom.lock()->SetOnGround(false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)

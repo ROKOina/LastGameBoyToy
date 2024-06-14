@@ -75,6 +75,7 @@ public:
 
     //Ú’n”»’è
     const bool OnGround() { return onGround_; }
+    void SetOnGround(bool flag) { onGround_ = flag; }
 
     //–€C
     const float& GetFriction()const {

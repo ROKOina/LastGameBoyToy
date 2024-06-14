@@ -43,4 +43,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+
+private:
+    DirectX::XMFLOAT3 jumpPower = { 0, 15.0f, 0 };
 };

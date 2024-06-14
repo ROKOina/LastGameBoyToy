@@ -51,30 +51,6 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     }
 }
 
-void TestCharacter_JumpState::Enter()
-{
-    //ƒWƒƒƒ“ƒv
-    moveCom.lock()->AddForce(jumpPower);
-}
-
-void TestCharacter_JumpState::Execute(const float& elapsedTime)
-{
-    GamePad gamePad = Input::Instance().GetGamePad();
-
-    //“ü—Í’lŽæ“¾
-    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
-
-    //‹ó’†§Œä
-    DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
-    moveCom.lock()->AddForce(v);
-    transCom.lock()->Turn(moveVec, 0.1f);
-
-    if (moveCom.lock()->OnGround())
-    {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
-    }
-}
-
 void TestCharacter_AttackState::Execute(const float& elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
