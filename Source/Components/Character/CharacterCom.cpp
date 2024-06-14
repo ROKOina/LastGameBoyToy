@@ -8,18 +8,36 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     stateMachine.Update(elapsedTime);
+
+
+    if (CharacterInput::MainAttackButton & gamePad.GetButtonDown())
+    {
+        MainAttack();
+    }
+
+    if (CharacterInput::MainSkillButton & gamePad.GetButtonDown())
+    {
+        MainSkill();
+    }
+    if (CharacterInput::SubSkillButton & gamePad.GetButtonDown())
+    {
+        SubSkill();
+    }
 }
 
 void CharacterCom::OnGUI()
 {
     std::string stateNames[(int)CHARACTER_ACTIONS::MAX] = {
-        "Santora",
-        "Is",
-        "Baka"
+        "IDLE",
+        "MOVE",
+        "JUMP"
     };
     ImGui::Text(std::string("CurrentState:" + stateNames[(int)stateMachine.GetCurrentState()]).c_str());
 
     int index = (int)stateMachine.GetCurrentState();
     ImGui::InputInt("State", &index);
+    ImGui::InputFloat("JumpState", &jumpPower);
 }

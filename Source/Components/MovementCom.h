@@ -75,6 +75,7 @@ public:
 
     //Ú’n”»’è
     const bool OnGround() { return onGround_; }
+    void SetOnGround(bool flag) { onGround_ = flag; }
 
     //–€C
     const float& GetFriction()const {
@@ -109,7 +110,6 @@ private:
     float gravity_ = GRAVITY_NORMAL;  //d—Í
     bool onGround_ = false;      //’n–Ê‚É‚Â‚¢‚Ä‚¢‚é‚©
     float friction_ = 15;  //–€C
-    //float friction_ = 0.1f;  //–€C
 
     float moveMaxSpeed_ = 10.0f;
     float moveAcceleration_ = 1.0f;

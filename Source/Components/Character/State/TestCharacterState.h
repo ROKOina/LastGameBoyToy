@@ -4,6 +4,7 @@
 #include "../TestCharacterCom.h"
 #include "../../MovementCom.h"
 #include "../../TransformCom.h"
+#include "../../AnimationCom.h"
 
 class TestCharacter_BaseState : public State<CharacterCom> {
 public:
@@ -13,8 +14,8 @@ protected:
     std::weak_ptr<CharacterCom> testCharaCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
+    std::weak_ptr<AnimationCom> animationCom;
 };
-
 
 class TestCharacter_MoveState : public TestCharacter_BaseState
 {
@@ -26,15 +27,31 @@ public:
 
 };
 
-class TestCharacter_JumpState : public TestCharacter_BaseState
+class TestCharacter_AttackState : public TestCharacter_BaseState
 {
 public:
-    TestCharacter_JumpState(CharacterCom* owner) :TestCharacter_BaseState(owner) {}
+    TestCharacter_AttackState(CharacterCom* owner) : TestCharacter_BaseState(owner) {}
+
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+
+private:
+    void Fire();
+
+    float fireTimer = 0.0f;
+    float fireTime = 0.3f;
+};
+
+class TestCharacter_DashState : public TestCharacter_BaseState
+{
+public:
+    TestCharacter_DashState(CharacterCom* owner) : TestCharacter_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit() override;
 
 private:
-    DirectX::XMFLOAT3 jumpPower = { 0, 30.0f, 0 };
-    bool jumpFlag = false;
+    float dashAcceleration = 3.0f;
+    float maxDashAcceleration = 20.0f;
 };

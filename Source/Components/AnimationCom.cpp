@@ -376,6 +376,24 @@ void AnimationCom::StopAnimation()
     currentAnimation = -1;
 }
 
+int AnimationCom::FindAnimation(const char* animeName)
+{
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    const ModelResource* resource = model->GetResource();
+
+    for (int i = 0; i < resource->GetAnimations().size(); i++) {
+        if (animeName == resource->GetAnimations().at(i).name) {
+
+            return i;
+        }
+    }
+
+    assert(!"引数の名前のアニメーションは、「なにも無かった!!」");
+
+    return -1;
+}
+
 //アニメーション更新切り替え
 void AnimationCom::SetUpAnimationUpdate(int updateId)
 {

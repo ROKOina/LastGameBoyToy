@@ -130,12 +130,9 @@ void MovementCom::VelocityAppPosition(float elapsedTime)
 
 
     //Ç∆ÇËÇ†Ç¶Ç∏0à»â∫ï‚ê≥
-    if (position.y <= 0)
+    if (velocity.y < 0.0f && position.y <= 0)
     {
         velocity_.y = 0;
-        position.y = 0;
-        GetGameObject()->transform_->SetWorldPosition(position);
-
         nonMaxSpeedVelocity_.y = 0;
         position.y = 0;
         GetGameObject()->transform_->SetWorldPosition(position);

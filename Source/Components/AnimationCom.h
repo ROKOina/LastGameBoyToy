@@ -38,7 +38,7 @@ public:
     //アニメーション再生関数
 
     //普通のアニメーション再生関数
-    void PlayAnimation(int animeID,bool loop,bool rootFlag,float blendSeconds);
+    void PlayAnimation(int animeID,bool loop,bool rootFlag = false,float blendSeconds = 0.25f);
     //上半身だけアニメーション再生
     void PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds);
     //再生中か
@@ -49,7 +49,8 @@ public:
     //アニメーションストップ
     void StopAnimation();
 
-   
+    //アニメIDを返す
+    int FindAnimation(const char* animeName);
 
 public:
     //ゲッターセッター
@@ -68,14 +69,14 @@ public:
 private:
 
     //アニメーション計算
-    void ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node&node);
+    void ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node& node);
     //アニメーション切り替え時の計算
     void ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node);
-   
+
 private:
 
     //ルートモーション関連
-    
+
     //ルートモーション更新
     void updateRootMotion(DirectX::XMFLOAT3& translation);
     //ルートモーションの移動値を計算
@@ -108,9 +109,9 @@ private:
     //ルートモーション
 
     //動かすノードのインデックス
-    int                             rootMotionNodeIndex=-1;
+    int rootMotionNodeIndex = -1;
     //ポジションを入れるノードのインデックス
-    int                             rootMotionHipNodeIndex=-1;
+    int rootMotionHipNodeIndex = -1;
     //ルートモーションするかどうか
     bool                            rootFlag = false;
     //ルートモーション　アニメーション更新処理判定

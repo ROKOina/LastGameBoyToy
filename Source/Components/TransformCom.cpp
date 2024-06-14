@@ -53,10 +53,6 @@ void TransformCom::UpdateTransform()
 
 	DirectX::XMStoreFloat4x4(&worldTransform_, W);
 
-	right = { worldTransform_._11,worldTransform_._12,worldTransform_._13 };
-	up = { worldTransform_._21,worldTransform_._22,worldTransform_._23 };
-	forward_ = { worldTransform_._31,worldTransform_._32,worldTransform_._33 };
-
 	worldPosition_ = { worldTransform_._41,worldTransform_._42,worldTransform_._43 };
 }
 
