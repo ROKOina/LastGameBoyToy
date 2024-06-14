@@ -37,8 +37,11 @@ public:
     const ModelResource* GetResource() const { return resource.get(); }
     ModelResource* GetResource() { return resource.get(); }
 
-   
+#ifdef _DEBUG
 
+
+#endif // _DEBUG
+   
     //シリアライズに適用させる為の処理
     void CopyModel();
 

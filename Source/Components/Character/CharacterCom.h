@@ -3,6 +3,19 @@
 #include "../System\StateMachine.h"
 #include "GameSource\Scene\SceneManager.h"
 #include "GameSource\Math\Mathf.h"
+#include "Input\Input.h"
+
+//プレイヤー用キー入力補助クラス
+class CharacterInput
+{
+public:
+    static constexpr GamePadButton JumpButton = GamePad::BTN_A;
+    static constexpr GamePadButton MainSkillButton = GamePad::BTN_LEFT_SHOULDER;
+    static constexpr GamePadButton SubSkillButton = GamePad::BTN_RIGHT_SHOULDER;
+    static constexpr GamePadButton UltimetButton = GamePad::BTN_Y;
+    static constexpr GamePadButton MainAttackButton = GamePad::BTN_RIGHT_TRIGGER;
+    static constexpr GamePadButton SubAttackButton = GamePad::BTN_LEFT_TRIGGER;
+};
 
 class CharacterCom : public Component
 {
@@ -10,7 +23,9 @@ public:
     enum class CHARACTER_ACTIONS {
         IDLE,
         MOVE,
+        DASH,
         JUMP,
+        ATTACK,
         MAX,
     };
 
@@ -35,7 +50,6 @@ public:
 
     virtual void MainSkill() {};
     virtual void SubSkill() {};
-    virtual void DashSkill() {};
     virtual void UltSkill() {};
 
     StateMachine<CharacterCom, CHARACTER_ACTIONS>& GetStateMachine() { return stateMachine; }

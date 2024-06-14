@@ -24,6 +24,17 @@ public:
     int Run();
     LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+#ifdef _DEBUG
+    const HWND& GetHWND() {
+      return hWnd_;
+    }
+
+    static Framework* GetInstance() {
+      return instance;
+    }
+
+#endif // _DEBUG
+
 private:
     const HWND				hWnd_;
     HighResolutionTimer		timer_;
@@ -35,4 +46,9 @@ private:
 
     Microsoft::WRL::ComPtr<IDXGIDebug>				debugGI_;
     Microsoft::WRL::ComPtr<ID3D11Debug>				debugID_;
+
+#ifdef _DEBUG
+    static Framework* instance;
+
+#endif // _DEBUG
 };

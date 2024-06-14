@@ -149,9 +149,11 @@
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\TestCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\TestCharacterState.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
+    <ClInclude Include="Source\Components\CPUParticle.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\ParticleComManager.h" />
     <ClInclude Include="Source\Components\ParticleSystemCom.h" />
@@ -177,6 +179,7 @@
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\ModelShader.h" />
+    <ClInclude Include="Source\Graphics\Shaders\3D\VariousShaderConstants.h" />
     <ClInclude Include="Source\Graphics\Shaders\Bloom.h" />
     <ClInclude Include="Source\Graphics\Shaders\ConstantBuffer.h" />
     <ClInclude Include="Source\Graphics\Shaders\FrameBuffer.h" />
@@ -231,9 +234,11 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\TestCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\TestCharacterState.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
+    <ClCompile Include="Source\Components\CPUParticle.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
     <ClCompile Include="Source\Components\ParticleComManager.cpp" />
     <ClCompile Include="Source\Components\ParticleSystemCom.cpp" />
@@ -256,6 +261,7 @@
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\ModelShader.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\3D\VariousShaderConstants.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FrameBuffer.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FullScreenQuad.cpp" />
@@ -290,6 +296,7 @@
     <None Include="HLSL\Debugs\Debug.hlsli" />
     <None Include="HLSL\Debugs\Line.hlsli" />
     <None Include="HLSL\2D\Sprite.hlsli" />
+    <None Include="HLSL\Effect\CPUParticle.hlsli" />
     <None Include="HLSL\noise.hlsli" />
     <None Include="HLSL\Rand.hlsli" />
     <None Include="Shader\BloomExtract.cod" />
@@ -332,6 +339,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\ToneMapPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\AreaEffectCirclePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
@@ -430,6 +441,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\2D\SpriteVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\Effect\CPUParticleGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\Effect\CPUParticlePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\Effect\CPUParticleVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

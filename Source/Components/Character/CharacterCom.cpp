@@ -13,17 +13,16 @@ void CharacterCom::Update(float elapsedTime)
     stateMachine.Update(elapsedTime);
 
 
-    if (GamePad::BTN_LEFT_TRIGGER & gamePad.GetButtonDown())
+    if (CharacterInput::MainAttackButton & gamePad.GetButtonDown())
     {
         MainAttack();
     }
 
-    if (GamePad::BTN_B & gamePad.GetButtonDown())
+    if (CharacterInput::MainSkillButton & gamePad.GetButtonDown())
     {
         MainSkill();
-        MainAttack();
     }
-    if (GamePad::BTN_X & gamePad.GetButtonDown())
+    if (CharacterInput::SubSkillButton & gamePad.GetButtonDown())
     {
         SubSkill();
     }

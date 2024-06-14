@@ -18,7 +18,7 @@ FullScreenQuad::FullScreenQuad(ID3D11Device* device)
 
     //SKYMAP用テクスチャを読み込み
     D3D11_TEXTURE2D_DESC texture2d_desc{};
-    LoadTextureFromFile(device, L".\\Data\\Texture\\snowy_hillside_4k.DDS", m_skymap.GetAddressOf(), &texture2d_desc);
+    LoadTextureFromFile(device, "Data\\Texture\\snowy_hillside_4k.DDS", m_skymap.GetAddressOf(), &texture2d_desc);
 }
 
 //元々のピクセルシェーダを参照してキャッシュする関数(フルスクリーンの四角形を描画して、指定されたピクセルシェーダやリソースビューを設定し描画をした後もとに戻している)

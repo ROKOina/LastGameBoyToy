@@ -11,12 +11,14 @@
 
 //DDSTexture読み込み
 static std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;
-HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename, ID3D11ShaderResourceView** shader_resource_view, D3D11_TEXTURE2D_DESC* texture2d_desc)
+HRESULT LoadTextureFromFile(ID3D11Device* device, const char* filename, ID3D11ShaderResourceView** shader_resource_view, D3D11_TEXTURE2D_DESC* texture2d_desc)
 {
     HRESULT hr{ S_OK };
     Microsoft::WRL::ComPtr<ID3D11Resource> resource;
 
-    auto it = resources.find(filename);
+    std::wstring wideFilename(filename, filename + strlen(filename));
+
+    auto it = resources.find(wideFilename);
     if (it != resources.end())
     {
         *shader_resource_view = it->second.Get();
@@ -25,7 +27,7 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename, ID3D1
     }
     else
     {
-        std::filesystem::path dds_filename(filename);
+        std::filesystem::path dds_filename(wideFilename);
         dds_filename.replace_extension("dds");
         if (std::filesystem::exists(dds_filename.c_str()))
         {
@@ -34,10 +36,10 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename, ID3D1
         }
         else
         {
-            hr = DirectX::CreateWICTextureFromFile(device, filename, resource.GetAddressOf(), shader_resource_view);
+            hr = DirectX::CreateWICTextureFromFile(device, wideFilename.c_str(), resource.GetAddressOf(), shader_resource_view);
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
-        resources.insert(std::make_pair(filename, *shader_resource_view));
+        resources.insert(make_pair(wideFilename, *shader_resource_view));
     }
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
@@ -52,4 +54,34 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename, ID3D1
 void ReleaseAllTextures()
 {
     resources.clear();
+}
+
+HRESULT LoadTexture(const char* filename, ID3D11Device* device, ID3D11ShaderResourceView** srv, D3D11_TEXTURE2D_DESC* textureDesc)
+{
+    // マルチバイト文字からワイド文字へ変換
+    std::filesystem::path filepath(filename);
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    HRESULT hr;
+
+    // DDSの読み込み
+    if (filepath.extension().string() == ".DDS" ||
+        filepath.extension().string() == ".dds")
+    {
+        hr = DirectX::CreateDDSTextureFromFile(device, filepath.c_str(), resource.GetAddressOf(), srv);
+    }
+    // DDS以外のテクスチャ読み込み
+    else
+    {
+        hr = DirectX::CreateWICTextureFromFile(device, filepath.c_str(), resource.GetAddressOf(), srv);
+    }
+    // D3D11_TEXTURE2D_DESCの作成
+    if (textureDesc && SUCCEEDED(hr))
+    {
+        Microsoft::WRL::ComPtr<ID3D11Texture2D>	texture2d;
+        HRESULT hr = resource.Get()->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        texture2d->GetDesc(textureDesc);
+    }
+
+    return hr;
 }

@@ -84,6 +84,8 @@ enum class SHADERMODE
     DEFALT,
     DEFERRED,
     BLACK,
+    AREA_EFFECT_CIRCLE,
+
     MAX
 };
 
@@ -116,7 +118,7 @@ public:
     ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView_.Get(); }
 
     //シェーダー取得
-    ModelShader* GetModelShader(int number)const { return m_modelshaders[number].get(); }
+    ModelShader* GetModelShader(SHADERMODE mode)const { return m_modelshaders[static_cast<int>(mode)].get(); }
 
     // スクリーン幅取得
     float GetScreenWidth() const { return screenWidth_; }

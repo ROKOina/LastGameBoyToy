@@ -29,6 +29,9 @@ public:
     // アニメーション更新
     void AnimationUpdata(float elapsedTime);
 
+    //上半身別アニメーション更新
+    void AnimationSortingUpdate(float elapsedTime);
+
     //Animationクラス
 public:
     //アニメーション再生関数
@@ -44,6 +47,8 @@ public:
     int FindAnimation(const char* animeName);
 
 public:
+    //ゲッターセッター
+
     // アニメーション時間
     float GetAnimationSeconds() const { return currentSeconds; }
     void SetAnimationSeconds(float seconds) { currentSeconds = seconds; }
@@ -71,6 +76,8 @@ private:
 private:
     //変数
 
+    //ノーマルアニメーション
+
     //現在のアニメーションID
     int								currentAnimation = -1;
     //アニメーションの現在の時間
@@ -91,15 +98,55 @@ private:
     //ポジションを入れるノードのインデックス
     int rootMotionHipNodeIndex = -1;
     //ルートモーションするかどうか
-    bool rootFlag = false;
+    bool                            rootFlag = false;
     //ルートモーション　アニメーション更新処理判定
-    bool rootMotionFlag = false;
+    bool                            rootMotionFlag = false;
     //ルートモーションで使う値を保存しておく変数
-    DirectX::XMFLOAT3 cahcheRootMotionTranslation = { 0,0,0 };
+    DirectX::XMFLOAT3               cahcheRootMotionTranslation = { 0,0,0 };
     //フレーム間の差分用変数
-    DirectX::XMFLOAT3 rootMotionTranslation = { 0,0,0 };
+    DirectX::XMFLOAT3               rootMotionTranslation = { 0,0,0 };
+
+
+    //上半身関連
+
+    //現在の再生している上半身アニメーション番号
+    int                             currentUpperAnimationIndex = -1;
+    //上半身のアニメーション番号
+    int                             upperAnimationIndex = 0;
+    //上半身アニメーションを変更した時の変数
+    float                           upperAnimationChangeRate = 0.0f;
+    //上半身アニメーションを変更時の現在の時間
+    float                           upperAnimationChangeTime = 0.0f;
+    //上半身のアニメーションの長さ
+    float                           upperAnimationSecondsLength = 0.0f;
+    //上半身アニメーションの現在の時間
+    float                           upperCurrentAnimationSeconds = 0.0f;
 
 
 
+
+
+    //上半身のアニメーション再生中か？
+    bool                            upperAnimaPlay = false;
+    //上半身のアニメーション再生中か 再生中=true 再生していない=false
+    bool                            upperIsPlayAnimation = false;
+    //上半身アニメーションが終了しているか
+    bool                            animationUpperEndFlag = false;
+    //上半身アニメーションがループしているか
+    bool                            animationUpperLoopFlag = false;
+    //アニメーションの終わる1フレーム前に立つフラグ
+    bool                            beforeOneFream = false;
+    //上半身終わったらのフラグ 終了＝true 
+    bool                            upperAnimationEndFlag = false;
+    //上半身補完フラグ
+    bool                            upperComplementFlag = false;
+
+    //アニメーション更新タイプ
+    enum class AnimationType
+    {
+        NormalAnimation,
+        UpperLowerAnimation,
+        UpperBlendLowerAnimation,
+    };
 
 };
