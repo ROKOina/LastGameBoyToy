@@ -191,6 +191,9 @@ void RendererCom::MaterialSelector()
       }
       ImGui::PopID();
 
+      // テクスチャ編集
+      TextureGui(material);
+
       ImGui::ColorEdit4("Color", &material->color.x, ImGuiColorEditFlags_None);
       ImGui::DragFloat("Roughness", &material->Roughness, 0.01f, 0.0f, 1.0f);
       ImGui::DragFloat("Metallic", &material->Metalness, 0.01f, 0.0f, 1.0f);
@@ -216,6 +219,74 @@ ModelResource::Material* RendererCom::GetSelectionMaterial()
     }
   }
   return nullptr;
+}
+
+void RendererCom::TextureGui(ModelResource::Material* material)
+{
+  ImGui::Separator();
+  ImGui::Text("TextureEdit");
+
+  char id[12] = "ModelFile";
+  ImGui::PushID(id);
+  ImGui::Text("Model");
+  ImGui::SameLine();
+  if (ImGui::Button("...")) {
+    char modelFile[256];    
+    ::strncpy_s(modelFile, sizeof(modelFile), material->textureFilename[0].c_str(), sizeof(modelFile));
+
+    const char* filter = "Texture Files(*.mdl)\0*.mdl;\0All Files(*.*)\0*.*;\0\0";
+    DialogResult result = Dialog::OpenFileName(modelFile, sizeof(modelFile), filter, nullptr, Framework::GetInstance()->GetHWND());
+    if (result == DialogResult::OK)
+    {
+      filePathDriveToModel = modelFile;
+    }
+  }
+  ImGui::PopID();
+
+  if (filePathDriveToModel.empty())return;
+
+  // 適用するテクスチャを選択                
+  char textureFile[256];
+  const char* fileKinds[6] = { "Diffuse","Normal","Metallic","Roughness","Ao","Emissive" };
+  for (int i = 0; i < 6; ++i)
+  {
+    ::strncpy_s(textureFile, sizeof(textureFile), material->textureFilename[i].c_str(), sizeof(textureFile));
+
+    ImGui::PushID(&material->textureFilename[i]);
+    if (ImGui::Button("..."))
+    {
+      const char* filter = "Texture Files(*.DDS;*.png;*.tga;*.jpg;*.tif)\0*.DDS;*.png;*.tga;*.jpg;*.tif;\0All Files(*.*)\0*.*;\0\0";
+      DialogResult result = Dialog::OpenFileName(textureFile, sizeof(textureFile), filter, nullptr, Framework::GetInstance()->GetHWND());
+      if (result == DialogResult::OK)
+      {
+        char drive[32], dir[256], dirname[256];
+        ::_splitpath_s(filePathDriveToModel.c_str(), drive, sizeof(drive), dir, sizeof(dir), nullptr, 0, nullptr, 0);
+        ::_makepath_s(dirname, sizeof(dirname), drive, dir, nullptr, nullptr);
+        dirname[strlen(dirname) - 1] = '\0';
+        char relativeTextureFile[MAX_PATH];
+        PathRelativePathToA(relativeTextureFile, dirname, FILE_ATTRIBUTE_DIRECTORY, textureFile, FILE_ATTRIBUTE_ARCHIVE);
+
+        // 読み込み
+        material->textureFilename[i] = relativeTextureFile;
+        material->LoadTexture(Graphics::Instance().GetDevice(), textureFile, i);
+      }
+    }
+    ImGui::SameLine();
+
+    ::strncpy_s(textureFile, sizeof(textureFile), material->textureFilename[i].c_str(), sizeof(textureFile));
+    if (ImGui::InputText(fileKinds[i], textureFile, sizeof(textureFile), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+      material->textureFilename[i] = textureFile;
+
+      char drive[32], dir[256], fullPath[256];
+      ::_splitpath_s(filePathDriveToModel.c_str(), drive, sizeof(drive), dir, sizeof(dir), nullptr, 0, nullptr, 0);
+      ::_makepath_s(fullPath, sizeof(fullPath), drive, dir, textureFile, nullptr);
+      material->LoadTexture(Graphics::Instance().GetDevice(), fullPath, i);
+    }
+    ImGui::Text("TextureResource");
+    ImGui::Image(material->shaderResourceView[i].Get(), { 156, 156 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+    ImGui::PopID();
+  }
 }
 
 void RendererCom::ExportMaterialFile()

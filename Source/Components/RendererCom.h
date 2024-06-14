@@ -38,7 +38,7 @@ public:
   Model* GetModel() const { return model_.get(); }
 
   template<class T>
-  std::shared_ptr<T> SetVariousConstant() { 
+  std::shared_ptr<T> SetVariousConstant() {
     std::shared_ptr<T> p = std::make_shared<T>();
     variousConstant = p;
     return p;
@@ -58,6 +58,8 @@ private:
 
   ModelResource::Material* GetSelectionMaterial();
 
+  void TextureGui(ModelResource::Material*);
+
   // 編集したマテリアルファイルを書き出す
   void ExportMaterialFile();
 
@@ -75,6 +77,7 @@ private:
   int									selectionMaterialIndex = -1;
   bool								hiddenProperty = false;
   std::string					modelFilePath;
+  std::string					filePathDriveToModel = "";
 
 #endif // _DEBUG
 
