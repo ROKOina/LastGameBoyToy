@@ -76,7 +76,7 @@ void AnimationCom::OnGUI()
         if (ImGui::IsItemClicked())
         {
             currentAnimation = animationIndex;
-            PlayAnimation(currentAnimation, false, false,0.2f);
+            PlayAnimation(currentAnimation, isAnimLoop, false,0.2f);
         }
 
         ImGui::TreePop();

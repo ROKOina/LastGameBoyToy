@@ -40,6 +40,7 @@ private:
 
     float fireTimer = 0.0f;
     float fireTime = 0.3f;
+
 };
 
 class TestCharacter_DashState : public TestCharacter_BaseState

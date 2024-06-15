@@ -147,6 +147,7 @@
     <ClInclude Include="Source\Audio\AudioResource.h" />
     <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\Components\AnimationCom.h" />
+    <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Source\GameSource\Math\Collision.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Components\CameraCom.h" />
+    <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
@@ -232,6 +234,7 @@
     <ClCompile Include="Source\Audio\AudioResource.cpp" />
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
+    <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
@@ -252,6 +255,7 @@
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\Components\CameraCom.cpp" />
     <ClCompile Include="Source\GameSource\Scene\Scene.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\SceneIKTest.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />

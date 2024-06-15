@@ -96,6 +96,16 @@ void SceneGame::Initialize()
         ro1->LoadModel("Data/Ball/b.mdl");
 
     }
+    //IKテスト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("IKTest");
+        obj->transform_->SetWorldPosition({ -5, 0, 0 });
+        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/IKTestModel/IKTest.mdl");
+        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+    }
 
   //ステージ
   {

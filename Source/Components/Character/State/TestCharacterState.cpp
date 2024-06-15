@@ -3,6 +3,7 @@
 
 #include "Components\RendererCom.h"
 #include "Components\CameraCom.h"
+#include "Components\Character\BulletCom.h"
 
 // ƒ}ƒNƒ
 #define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
@@ -78,6 +79,7 @@ void TestCharacter_AttackState::Execute(const float& elapsedTime)
         fireTimer += elapsedTime;
     }
 
+
     if (CharacterInput::MainAttackButton & gamePad.GetButtonUp())
     {
         ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
@@ -112,7 +114,11 @@ void TestCharacter_AttackState::Fire()
     moveCom->SetFriction(0.0f);
     moveCom->AddNonMaxSpeedForce(owner->GetGameObject()->transform_->GetWorldFront() * 30.0f);
 
+    //’e
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>();
+    bulletCom->SetAliveTime(2.0f);
 }
+
 
 void TestCharacter_DashState::Enter()
 {
