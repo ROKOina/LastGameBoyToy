@@ -128,6 +128,10 @@ private:
     int                             currentUpperAnimation = -1;
     //上半身のアニメーション番号
     int                             upperAnimationIndex = 0;
+    //上半身のノードの番号
+    int                             upperID = 2;
+    //下半身ノードの番号
+    int                             lowerID = 1;
     //上半身アニメーションを変更した時の変数
     float                           upperAnimationChangeRate = 0.0f;
     //上半身アニメーションを変更時の現在の時間

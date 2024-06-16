@@ -107,6 +107,22 @@ void SceneGame::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     }
 
+    //test
+    /*{
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("zombie");
+        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
+        obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/zombie/Zombie.mdl");
+       
+        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        a->PlayAnimation(1, true, false, 0.05);
+        a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
+        a->SetUpAnimationUpdate(1);
+    }*/
+
+
   //ステージ
   {
     auto& obj = GameObjectManager::Instance().Create();

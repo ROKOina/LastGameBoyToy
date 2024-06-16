@@ -174,7 +174,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                     if (upperIsPlayAnimation)
                     {
                         //上半身アニメーションを飛ばす
-                        if (model->GetNodes()[nodeIndex].layer != 0)
+                        if (model->GetNodes()[nodeIndex].layer !=2 )
                         {
                             //アニメーション計算
                             ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
@@ -287,7 +287,7 @@ void AnimationCom::AnimationSortingUpdate(float elapsedTime)
 
                 if (blendRate < 1.0f)
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
                     {
                         //現在の姿勢と次のキーフレームとの姿勢の補完
                         ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
@@ -296,7 +296,7 @@ void AnimationCom::AnimationSortingUpdate(float elapsedTime)
                 //通常の計算
                 else
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
                     {
                         ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                     }
@@ -362,10 +362,10 @@ void AnimationCom::PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float
 {
     currentUpperAnimation = upperAnimaId;
     upperCurrentAnimationSeconds = 0.0f;
-    animationUpperLoopFlag = false;
+    animationUpperLoopFlag = loop;
     animationUpperEndFlag = false;
     upperAnimationChangeTime = blendSeconds;
-    upperIsPlayAnimation = false;
+    upperIsPlayAnimation = true;
     beforeOneFream = false;
     upperAnimationChangeRate = 0.0f;
 }
