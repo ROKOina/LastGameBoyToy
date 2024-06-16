@@ -24,7 +24,7 @@ void AnimationCom::Update(float elapsedTime)
         //上半身別アニメーション更新
     case AnimationType::UpperLowerAnimation:
         AnimationUpdata(elapsedTime);
-        AnimationSortingUpdate(elapsedTime);
+        //AnimationSortingUpdate(elapsedTime);
         break;
         //上半身別上半身アニメーションブレンド更新
     case AnimationType::UpperBlendLowerAnimation:
@@ -171,10 +171,10 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 {
 
                     //上半身アニメーションが入っているか否か
-                    if (upperIsPlayAnimation)
+                    if (true)
                     {
                         //上半身アニメーションを飛ばす
-                        if (model->GetNodes()[nodeIndex].layer != 0)
+                        if (model->GetNodes()[nodeIndex].layer !=2 )
                         {
                             //アニメーション計算
                             ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
@@ -287,7 +287,7 @@ void AnimationCom::AnimationSortingUpdate(float elapsedTime)
 
                 if (blendRate < 1.0f)
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
                     {
                         //現在の姿勢と次のキーフレームとの姿勢の補完
                         ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
@@ -296,7 +296,7 @@ void AnimationCom::AnimationSortingUpdate(float elapsedTime)
                 //通常の計算
                 else
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
                     {
                         ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                     }
@@ -365,7 +365,7 @@ void AnimationCom::PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float
     animationUpperLoopFlag = false;
     animationUpperEndFlag = false;
     upperAnimationChangeTime = blendSeconds;
-    upperIsPlayAnimation = false;
+    upperIsPlayAnimation = true;
     beforeOneFream = false;
     upperAnimationChangeRate = 0.0f;
 }
