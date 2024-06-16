@@ -70,7 +70,7 @@ void SceneGame::Initialize()
   ConstantBufferInitialize();
 
     //プレイヤー
-    /*{
+    {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
@@ -96,10 +96,10 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
         ro1->LoadModel("Data/Ball/b.mdl");
 
-    }*/
+    }
 
     //test
-    {
+    /*{
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("zombie");
         obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
@@ -108,10 +108,10 @@ void SceneGame::Initialize()
         r->LoadModel("Data/zombie/Zombie.mdl");
        
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        a->PlayAnimation(0, true, false, 0.05);
-        a->PlayUpperBodyOnlyAnimation(1, true, 0.05f);
+        a->PlayAnimation(1, true, false, 0.05);
+        a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
         a->SetUpAnimationUpdate(1);
-    }
+    }*/
 
 
   //ステージ
@@ -213,10 +213,10 @@ void SceneGame::Update(float elapsedTime)
   GameObjectManager::Instance().UpdateTransform();
   GameObjectManager::Instance().Update(elapsedTime);
 
-  ////コンポーネントゲット
-  //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-  //std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
-  //std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
+  //コンポーネントゲット
+  std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
+  std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
+  std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
 
 }
 

@@ -24,7 +24,7 @@ void AnimationCom::Update(float elapsedTime)
         //上半身別アニメーション更新
     case AnimationType::UpperLowerAnimation:
         AnimationUpdata(elapsedTime);
-        //AnimationSortingUpdate(elapsedTime);
+        AnimationSortingUpdate(elapsedTime);
         break;
         //上半身別上半身アニメーションブレンド更新
     case AnimationType::UpperBlendLowerAnimation:
@@ -171,7 +171,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 {
 
                     //上半身アニメーションが入っているか否か
-                    if (true)
+                    if (upperIsPlayAnimation)
                     {
                         //上半身アニメーションを飛ばす
                         if (model->GetNodes()[nodeIndex].layer !=2 )
@@ -362,7 +362,7 @@ void AnimationCom::PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float
 {
     currentUpperAnimation = upperAnimaId;
     upperCurrentAnimationSeconds = 0.0f;
-    animationUpperLoopFlag = false;
+    animationUpperLoopFlag = loop;
     animationUpperEndFlag = false;
     upperAnimationChangeTime = blendSeconds;
     upperIsPlayAnimation = true;
