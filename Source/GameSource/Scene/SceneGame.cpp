@@ -50,22 +50,6 @@ void SceneGame::Initialize()
     f->SetActiveInitialize();
   }
 
-  //普通のカメラ
-  {
-    std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-    camera->SetName("normalcamera");
-
-    std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-    c->SetPerspectiveFov
-    (
-      DirectX::XMConvertToRadians(45),
-      graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-      0.1f, 1000.0f
-    );
-
-    camera->transform_->SetWorldPosition({ 0, 5, -10 });
-  }
-
   //コンスタントバッファの初期化
   ConstantBufferInitialize();
 
@@ -121,6 +105,31 @@ void SceneGame::Initialize()
         a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
         a->SetUpAnimationUpdate(1);
     }*/
+
+
+    //普通のカメラ(プレイヤーの子にする)
+    {
+        //カメラを動かす支柱
+        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("player")->AddChildObject();
+        std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
+        cameraPost->SetName("cameraPostPlayer");
+
+        //カメラ本体
+        //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+        std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
+        camera->SetName("normalcamera");
+
+        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+        c->SetPerspectiveFov
+        (
+            DirectX::XMConvertToRadians(45),
+            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+            0.1f, 1000.0f
+        );
+
+        camera->transform_->SetWorldPosition({ 0, 1, -7 });
+    }
+
 
 
   //ステージ

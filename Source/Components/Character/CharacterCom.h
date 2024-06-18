@@ -55,6 +55,10 @@ public:
     StateMachine<CharacterCom, CHARACTER_ACTIONS>& GetStateMachine() { return stateMachine; }
     float GetJumpPower() { return jumpPower; }
 
+private:
+    //ƒJƒƒ‰‘€ì
+    void CameraControl();
+
 protected:
     StateMachine<CharacterCom, CHARACTER_ACTIONS> stateMachine;
 
