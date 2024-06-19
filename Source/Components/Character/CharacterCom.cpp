@@ -8,6 +8,13 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
+    //ƒJƒƒ‰‚ªŒü‚¢‚Ä‚¢‚é•ûŒü‚Öù‰ñ
+    DirectX::XMFLOAT3 cameraForward = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront();
+    GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
+    GetGameObject()->transform_->UpdateTransform();
+    GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
+
+
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     stateMachine.Update(elapsedTime);
@@ -27,6 +34,11 @@ void CharacterCom::Update(float elapsedTime)
         SubSkill();
     }
 
+    if (CharacterInput::JumpButton_SPACE & gamePad.GetButtonDown())
+    {
+        SpaceSkill();
+    }
+
     //ƒJƒƒ‰§Œä
     CameraControl();
 }
@@ -36,13 +48,32 @@ void CharacterCom::OnGUI()
     std::string stateNames[(int)CHARACTER_ACTIONS::MAX] = {
         "IDLE",
         "MOVE",
-        "JUMP"
+        "DASH",
+        "JUMP",
+        "ATTACK"
     };
     ImGui::Text(std::string("CurrentState:" + stateNames[(int)stateMachine.GetCurrentState()]).c_str());
 
     int index = (int)stateMachine.GetCurrentState();
     ImGui::InputInt("State", &index);
     ImGui::InputFloat("JumpState", &jumpPower);
+
+    //ImGui•\Ž¦
+    ImGui::Separator();
+
+    static int drawState = 0;
+    ImGui::Text(std::string("DebugDrawState:" + stateNames[drawState]).c_str());
+    if (ImGui::InputInt("drawState", &drawState))
+    {
+        if (drawState >= (int)CHARACTER_ACTIONS::MAX)
+            drawState = (int)CHARACTER_ACTIONS::MAX - 1;
+        if (drawState < 0)drawState = 0;
+    }
+
+    if (!stateMachine.CurrentStateImGui((CHARACTER_ACTIONS)drawState))
+    {
+        ImGui::Text("not found");
+    }
 }
 
 void CharacterCom::CameraControl()

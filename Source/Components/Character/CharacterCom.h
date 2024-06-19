@@ -52,6 +52,8 @@ public:
     virtual void SubSkill() {};
     virtual void UltSkill() {};
 
+    virtual void SpaceSkill() {}
+
     StateMachine<CharacterCom, CHARACTER_ACTIONS>& GetStateMachine() { return stateMachine; }
     float GetJumpPower() { return jumpPower; }
 
