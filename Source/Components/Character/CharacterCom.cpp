@@ -18,11 +18,11 @@ void CharacterCom::Update(float elapsedTime)
         MainAttack();
     }
 
-    if (CharacterInput::MainSkillButton & gamePad.GetButtonDown())
+    if (CharacterInput::MainSkillButton_Q & gamePad.GetButtonDown())
     {
         MainSkill();
     }
-    if (CharacterInput::SubSkillButton & gamePad.GetButtonDown())
+    if (CharacterInput::SubSkillButton_E & gamePad.GetButtonDown())
     {
         SubSkill();
     }

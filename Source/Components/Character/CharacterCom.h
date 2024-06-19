@@ -9,12 +9,12 @@
 class CharacterInput
 {
 public:
-    static constexpr GamePadButton JumpButton = GamePad::BTN_A;
-    static constexpr GamePadButton MainSkillButton = GamePad::BTN_LEFT_SHOULDER;
-    static constexpr GamePadButton SubSkillButton = GamePad::BTN_RIGHT_SHOULDER;
-    static constexpr GamePadButton UltimetButton = GamePad::BTN_Y;
-    static constexpr GamePadButton MainAttackButton = GamePad::BTN_RIGHT_TRIGGER;
-    static constexpr GamePadButton SubAttackButton = GamePad::BTN_LEFT_TRIGGER;
+    static constexpr GamePadButton JumpButton_SPACE = GamePad::BTN_A;
+    static constexpr GamePadButton MainSkillButton_Q = GamePad::BTN_LEFT_SHOULDER;
+    static constexpr GamePadButton SubSkillButton_E = GamePad::BTN_RIGHT_SHOULDER;
+    static constexpr GamePadButton UltimetButton_R = GamePad::BTN_Y;
+    static constexpr GamePadButton MainAttackButton = GamePad::BTN_RIGHT_TRIGGER;   //マウス左
+    static constexpr GamePadButton SubAttackButton = GamePad::BTN_LEFT_TRIGGER;     //マウス右
 };
 
 class CharacterCom : public Component
