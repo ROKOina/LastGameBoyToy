@@ -69,33 +69,33 @@ void SceneGame::Initialize()
   //コンスタントバッファの初期化
   ConstantBufferInitialize();
 
-    //プレイヤー
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("player");
-        obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/OneCoin/robot.mdl");
-        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+    ////プレイヤー
+    //{
+    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    //    obj->SetName("player");
+    //    obj->transform_->SetWorldPosition({ 0, 0, 0 });
+    //    obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    //    r->LoadModel("Data/OneCoin/robot.mdl");
+    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+    //    std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+    //    std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
 
-        auto& oo=obj->AddChildObject();
-        oo->SetName("barrier1");
-        oo->transform_->SetScale({ 500,500,500 });
-        oo->transform_->SetLocalPosition({ 1000,0,0 });
-        std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
-        ro->LoadModel("Data/Ball/b.mdl");
+    //    auto& oo=obj->AddChildObject();
+    //    oo->SetName("barrier1");
+    //    oo->transform_->SetScale({ 500,500,500 });
+    //    oo->transform_->SetLocalPosition({ 1000,0,0 });
+    //    std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+    //    ro->LoadModel("Data/Ball/b.mdl");
 
-        auto& oo1=oo->AddChildObject();
-        oo1->SetName("barrier2");
-        oo1->transform_->SetScale({ 1,1,1 });
-        oo1->transform_->SetLocalPosition({ 3,0,0 });
-        std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
-        ro1->LoadModel("Data/Ball/b.mdl");
+    //    auto& oo1=oo->AddChildObject();
+    //    oo1->SetName("barrier2");
+    //    oo1->transform_->SetScale({ 1,1,1 });
+    //    oo1->transform_->SetLocalPosition({ 3,0,0 });
+    //    std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+    //    ro1->LoadModel("Data/Ball/b.mdl");
 
-    }
+    //}
     //IKテスト
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -108,7 +108,7 @@ void SceneGame::Initialize()
     }
 
     //test
-    /*{
+    {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("zombie");
         obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
@@ -117,10 +117,14 @@ void SceneGame::Initialize()
         r->LoadModel("Data/zombie/Zombie.mdl");
        
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        a->PlayAnimation(1, true, false, 0.05);
+        a->SetupRootMotion("Zombie1");
+        a->SetupRootMotionHip("Base_HumanPelvis");
+        //a->PlayAnimation(2, true, true, 0.05);
+        
         a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
+        a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
         a->SetUpAnimationUpdate(1);
-    }*/
+    }
 
 
   //ステージ
@@ -222,10 +226,17 @@ void SceneGame::Update(float elapsedTime)
   GameObjectManager::Instance().UpdateTransform();
   GameObjectManager::Instance().Update(elapsedTime);
 
-  //コンポーネントゲット
-  std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-  std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
+  ////コンポーネントゲット
+  std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("zombie");
+  //std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
   std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
+  DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+  a->updateRootMotion(pos);
+
+  ////コンポーネントゲット
+  //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
+  //std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
+  //std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
 
 }
 
