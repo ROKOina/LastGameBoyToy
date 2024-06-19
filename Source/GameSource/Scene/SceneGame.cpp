@@ -50,22 +50,6 @@ void SceneGame::Initialize()
     f->SetActiveInitialize();
   }
 
-  //普通のカメラ
-  {
-    std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-    camera->SetName("normalcamera");
-
-    std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-    c->SetPerspectiveFov
-    (
-      DirectX::XMConvertToRadians(45),
-      graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-      0.1f, 1000.0f
-    );
-
-    camera->transform_->SetWorldPosition({ 0, 5, -10 });
-  }
-
   //コンスタントバッファの初期化
   ConstantBufferInitialize();
 
@@ -79,7 +63,8 @@ void SceneGame::Initialize()
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
+        //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
 
         auto& oo=obj->AddChildObject();
         oo->SetName("barrier1");
@@ -125,6 +110,31 @@ void SceneGame::Initialize()
     //    a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
     //    a->SetUpAnimationUpdate(1);
     //}
+
+
+    //普通のカメラ(プレイヤーの子にする)
+    {
+        //カメラを動かす支柱
+        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("player")->AddChildObject();
+        std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
+        cameraPost->SetName("cameraPostPlayer");
+
+        //カメラ本体
+        //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+        std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
+        camera->SetName("normalcamera");
+
+        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+        c->SetPerspectiveFov
+        (
+            DirectX::XMConvertToRadians(45),
+            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+            0.1f, 1000.0f
+        );
+
+        camera->transform_->SetWorldPosition({ 0, 1, -7 });
+    }
+
 
 
   //ステージ

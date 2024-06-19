@@ -8,6 +8,13 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
+    //カメラが向いている方向へ旋回
+    DirectX::XMFLOAT3 cameraForward = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront();
+    GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
+    GetGameObject()->transform_->UpdateTransform();
+    GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
+
+
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     stateMachine.Update(elapsedTime);
@@ -18,14 +25,22 @@ void CharacterCom::Update(float elapsedTime)
         MainAttack();
     }
 
-    if (CharacterInput::MainSkillButton & gamePad.GetButtonDown())
+    if (CharacterInput::MainSkillButton_Q & gamePad.GetButtonDown())
     {
         MainSkill();
     }
-    if (CharacterInput::SubSkillButton & gamePad.GetButtonDown())
+    if (CharacterInput::SubSkillButton_E & gamePad.GetButtonDown())
     {
         SubSkill();
     }
+
+    if (CharacterInput::JumpButton_SPACE & gamePad.GetButtonDown())
+    {
+        SpaceSkill();
+    }
+
+    //カメラ制御
+    CameraControl();
 }
 
 void CharacterCom::OnGUI()
@@ -33,11 +48,74 @@ void CharacterCom::OnGUI()
     std::string stateNames[(int)CHARACTER_ACTIONS::MAX] = {
         "IDLE",
         "MOVE",
-        "JUMP"
+        "DASH",
+        "JUMP",
+        "ATTACK"
     };
     ImGui::Text(std::string("CurrentState:" + stateNames[(int)stateMachine.GetCurrentState()]).c_str());
 
     int index = (int)stateMachine.GetCurrentState();
     ImGui::InputInt("State", &index);
     ImGui::InputFloat("JumpState", &jumpPower);
+
+    //ImGui表示
+    ImGui::Separator();
+
+    static int drawState = 0;
+    ImGui::Text(std::string("DebugDrawState:" + stateNames[drawState]).c_str());
+    if (ImGui::InputInt("drawState", &drawState))
+    {
+        if (drawState >= (int)CHARACTER_ACTIONS::MAX)
+            drawState = (int)CHARACTER_ACTIONS::MAX - 1;
+        if (drawState < 0)drawState = 0;
+    }
+
+    if (!stateMachine.CurrentStateImGui((CHARACTER_ACTIONS)drawState))
+    {
+        ImGui::Text("not found");
+    }
+}
+
+void CharacterCom::CameraControl()
+{
+    std::shared_ptr<GameObject> cameraObj = SceneManager::Instance().GetActiveCamera();
+
+    //ゲームカメラの場合
+    if (std::strcmp(cameraObj->GetName(), "normalcamera") == 0)
+    {
+        //フリーに切り替え
+        if (::GetAsyncKeyState(VK_CONTROL) & 0x8000)
+        {
+            std::shared_ptr<GameObject> g = GameObjectManager::Instance().Find("freecamera");
+            g->GetComponent<CameraCom>()->SetActiveInitialize();
+            return;
+        }
+
+        std::shared_ptr<CameraCom> camera = cameraObj->GetComponent<CameraCom>();
+
+        POINT cursor;
+        ::GetCursorPos(&cursor);
+
+        DirectX::XMFLOAT2 newCursor = DirectX::XMFLOAT2(static_cast<float>(cursor.x), static_cast<float>(cursor.y));
+
+        ::SetCursorPos(500, 500);
+
+        float moveX = (newCursor.x - 500) * 0.02f;
+        float moveY = (newCursor.y - 500) * 0.02f;
+
+        std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("cameraPostPlayer");
+
+        //回転
+        DirectX::XMFLOAT3 euler = cameraPost->transform_->GetEulerRotation();
+        euler.y += moveX * 8.0f;
+        euler.x += moveY * 5.0f;
+        cameraPost->transform_->SetEulerRotation(euler);
+
+        //位置
+        cameraPost->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+        
+        cameraPost->transform_->UpdateTransform();
+
+
+    }
 }

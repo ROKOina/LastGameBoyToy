@@ -15,6 +15,8 @@ public:
     // このステートから他のステートに遷移するときに一度だけ呼ばれる
     virtual void Exit() {};
 
+    virtual void ImGui() {}
+
 protected:
     T* owner = nullptr;
 };

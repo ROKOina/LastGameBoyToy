@@ -1,7 +1,6 @@
 #pragma once
 #include "../../System/State.h"
 #include "../CharacterCom.h"
-#include "../TestCharacterCom.h"
 #include "../../MovementCom.h"
 #include "../../TransformCom.h"
 #include "../../AnimationCom.h"
