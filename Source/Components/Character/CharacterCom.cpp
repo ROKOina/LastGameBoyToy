@@ -39,5 +39,8 @@ void CharacterCom::OnGUI()
 
     int index = (int)stateMachine.GetCurrentState();
     ImGui::InputInt("State", &index);
-    ImGui::InputFloat("JumpState", &jumpPower);
+
+    DirectX::XMFLOAT2 inputVec = { Input::Instance().GetGamePad().GetAxisLX(),Input::Instance().GetGamePad().GetAxisLY() };
+    ImGui::InputFloat2("InputVec", &inputVec.x);
+    ImGui::InputFloat("JumpPower", &jumpPower);
 }

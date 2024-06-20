@@ -25,8 +25,11 @@ void TestCharacterCom::MainAttack()
 
 void TestCharacterCom::SubSkill()
 {
-    dashFlag = !dashFlag;
-    dashFlag ? stateMachine.ChangeState(CHARACTER_ACTIONS::DASH) : stateMachine.ChangeState(CHARACTER_ACTIONS::IDLE);
+    if (Input::Instance().GetGamePad().GetAxisLY() > 0.0f)
+    {
+        dashFlag = !dashFlag;
+        dashFlag ? stateMachine.ChangeState(CHARACTER_ACTIONS::DASH) : stateMachine.ChangeState(CHARACTER_ACTIONS::IDLE);
+    }
 }
 
 

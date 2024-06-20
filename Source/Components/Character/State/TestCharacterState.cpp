@@ -136,6 +136,7 @@ void TestCharacter_DashState::Enter()
 void TestCharacter_DashState::Execute(const float& elapsedTime)
 {
     //入力値取得
+    GamePad& gamePad = Input::Instance().GetGamePad();
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //移動
@@ -144,6 +145,16 @@ void TestCharacter_DashState::Execute(const float& elapsedTime)
 
     //旋回処理
     transCom.lock()->Turn(moveVec, 0.1f);
+
+    //ダッシュやめ
+    if (gamePad.GetAxisLY() <= 0.0f)
+    {
+        ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
+    }
+    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    {
+        ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
+    }
 }
 
 void TestCharacter_DashState::Exit()
@@ -155,4 +166,6 @@ void TestCharacter_DashState::Exit()
     dashAccele -= dashAcceleration;
     moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
     moveCom.lock()->SetMoveAcceleration(dashAccele);
+
+    
 }
