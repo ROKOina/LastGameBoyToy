@@ -6,11 +6,11 @@
 #include "../TransformCom.h"
 #include "../CameraCom.h"
 #include "../ColliderCom.h"
-#include "../ParticleSystemCom.h"
 #include "GameSource/Math/Collision.h"
 #include "Graphics/Shaders/3D/ModelShader.h"
 #include "SystemStruct/TransformUtils.h"
 #include "Components/CPUParticle.h"
+#include "Components/GPUParticle.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -190,11 +190,11 @@ void GameObjectManager::Update(float elapsedTime)
             cpuparticleobject.emplace_back(cpuparticlecomp);
         }
 
-        //パーティクルオブジェクトがあれば入れる
-        std::shared_ptr<ParticleSystemCom> particleComponent = obj->GetComponent<ParticleSystemCom>();
-        if (particleComponent)
+        //GPUパーティクルオブジェクトがあれば入る
+        std::shared_ptr<GPUParticle>gpuparticlecomp = obj->GetComponent<GPUParticle>();
+        if (gpuparticlecomp)
         {
-            particleObject_.emplace_back(particleComponent);
+            gpuparticleobject.emplace_back(gpuparticlecomp);
         }
 
         obj->Start();
@@ -299,12 +299,12 @@ void GameObjectManager::Update(float elapsedTime)
             }
         }
 
-        //particleObject解放
-        for (int per = 0; per < particleObject_.size(); ++per)
+        //gpuparticleobject解放
+        for (int per = 0; per < gpuparticleobject.size(); ++per)
         {
-            if (particleObject_[per].expired())
+            if (gpuparticleobject[per].expired())
             {
-                particleObject_.erase(particleObject_.begin() + per);
+                gpuparticleobject.erase(gpuparticleobject.begin() + per);
                 --per;
             }
         }
@@ -332,8 +332,8 @@ void GameObjectManager::Render()
     //CPUパーティクル描画
     CPUParticleRender();
 
-    //パーティクル描画
-    ParticleRender();
+    //GPUパーティクル描画
+    GPUParticleRender();
 
     //デファードレンダリング終了
     m_posteffect->DeferredResourceSet();
@@ -477,7 +477,6 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
         selectedObject->transform_->SetRotation(rotate);
         selectedObject->transform_->SetWorldPosition(position);
     }
-
 }
 
 // リスター描画
@@ -551,17 +550,17 @@ void GameObjectManager::CPUParticleRender()
     }
 }
 
-//パーティクル描画
-void GameObjectManager::ParticleRender()
+//GPUパーティクル描画
+void GameObjectManager::GPUParticleRender()
 {
-    if (particleObject_.size() <= 0)return;
+    if (gpuparticleobject.size() <= 0)return;
 
-    for (std::weak_ptr<ParticleSystemCom>& particleObj : particleObject_)
+    for (std::weak_ptr<GPUParticle>& po : gpuparticleobject)
     {
-        if (!particleObj.lock()->GetGameObject()->GetEnabled())continue;
-        if (!particleObj.lock()->GetEnabled())continue;
+        if (!po.lock()->GetGameObject()->GetEnabled())continue;
+        if (!po.lock()->GetEnabled())continue;
 
-        particleObj.lock()->Render();
+        po.lock()->Render();
     }
 }
 

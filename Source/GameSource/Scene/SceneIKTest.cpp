@@ -16,14 +16,11 @@
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
-#include "Components\ParticleSystemCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components/CPUParticle.h"
 
 #include "GameSource/GameScript/FreeCameraCom.h"
-
-#include "Components/ParticleComManager.h"
 
 // 初期化
 void SceneIKTest::Initialize()
@@ -89,7 +86,6 @@ void SceneIKTest::Initialize()
         oo1->transform_->SetLocalPosition({ 3,0,0 });
         std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
         ro1->LoadModel("Data/Ball/b.mdl");
-
     }
 
     //ステージ
@@ -101,7 +97,7 @@ void SceneIKTest::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/Stage/Stage.mdl");
     }
-    
+
     //平行光源を追加
     Light* mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
@@ -112,13 +108,8 @@ void SceneIKTest::Initialize()
 //更新処理
 void SceneIKTest::Update(float elapsedTime)
 {
-    
 }
 
 void SceneIKTest::Render(float elapsedTime)
 {
-
 }
-
-
-
