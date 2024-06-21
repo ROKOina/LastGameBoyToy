@@ -110,6 +110,18 @@ void CharacterCom::CameraControl()
         euler.y += moveX * 8.0f;
         euler.x += moveY * 5.0f;
         cameraPost->transform_->SetEulerRotation(euler);
+        //cŽ²§Œä
+        euler = cameraPost->transform_->GetEulerRotation();
+        if (euler.x > 70)
+        {
+            euler.x = 70;
+            cameraPost->transform_->SetEulerRotation(euler);
+        }
+        if (euler.x < -70)
+        {
+            euler.x = -70;
+            cameraPost->transform_->SetEulerRotation(euler);
+        }
 
         //ˆÊ’u
         cameraPost->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());

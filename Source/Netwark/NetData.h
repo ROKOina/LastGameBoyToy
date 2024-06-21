@@ -46,17 +46,20 @@ struct NetData
     int id;
     float radi;
     DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT4 rotato;
 };
 static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
 {
     out << h.id << " " << h.radi << " ";
-    out << h.pos;
+    out << h.pos << " ";
+    out << h.rotato << " ";
     return out;
 }
 static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
     in >> h.id >> h.radi;
     in >> h.pos;
+    in >> h.rotato;
     return in;
 }
 

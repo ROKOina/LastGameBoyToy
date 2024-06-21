@@ -118,6 +118,7 @@ void __fastcall NetClient::Update()
         n.radi = 1.1f;
         DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
         n.pos = p;
+        n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
         netData.emplace_back(n);
 
         //‘—MŒ^‚É•ÏŠ·

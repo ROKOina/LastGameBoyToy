@@ -86,8 +86,8 @@ void InazawaCharacterCom::SpaceSkill()
         DirectX::XMFLOAT3 v = moveVec * 50.0f;
         moveCom->AddNonMaxSpeedForce(v);
 
-        //ù‰ñˆ—
-        GetGameObject()->transform_->Turn(moveVec, 1);
+        ////ù‰ñˆ—
+        //GetGameObject()->transform_->Turn(moveVec, 1);
 
         moveCom->ZeroVelocity();
         JumpInput(GetGameObject());
