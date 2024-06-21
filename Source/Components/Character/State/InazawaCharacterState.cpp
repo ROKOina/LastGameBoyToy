@@ -70,8 +70,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     }
 
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    if (CharacterInput::MainAttackButton & gamePad.GetButtonUp())
+    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
         //UŒ‚ˆ—
         Fire(owner->GetGameObject(), arrowSpeed, attackPower);
@@ -115,8 +114,7 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
 
     intervalTimer += elapsedTime;
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    if (CharacterInput::MainAttackButton & gamePad.GetButton() && intervalTimer >= interval)
+    if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
     {
         //UŒ‚ˆ—
         Fire(owner->GetGameObject(), arrowSpeed);

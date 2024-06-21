@@ -14,36 +14,32 @@ void CharacterCom::Update(float elapsedTime)
     GetGameObject()->transform_->UpdateTransform();
     GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
 
-
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
     stateMachine.Update(elapsedTime);
 
 #ifdef _DEBUG
-    if (CharacterInput::MainAttackButton & gamePad.GetButtonDown()
-    && GamePad::BTN_LEFT_SHOULDER & gamePad.GetButton())
+    if (CharacterInput::MainAttackButton & GetButtonDown()
+    && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
         MainAttack();
     }
 
 #else
-    if (CharacterInput::MainAttackButton & gamePad.GetButtonDown())
+    if (CharacterInput::MainAttackButton & GetButtonDown())
     {
         MainAttack();
     }
 
 #endif // _DEBUG
 
-    if (CharacterInput::MainSkillButton_Q & gamePad.GetButtonDown())
+    if (CharacterInput::MainSkillButton_Q & GetButtonDown())
     {
         MainSkill();
     }
-    if (CharacterInput::SubSkillButton_E & gamePad.GetButtonDown())
+    if (CharacterInput::SubSkillButton_E & GetButtonDown())
     {
         SubSkill();
     }
-
-    if (CharacterInput::JumpButton_SPACE & gamePad.GetButtonDown())
+    if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         SpaceSkill();
     }
