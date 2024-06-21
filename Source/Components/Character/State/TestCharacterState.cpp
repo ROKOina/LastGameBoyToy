@@ -46,7 +46,7 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     }
 
     //ƒWƒƒƒ“ƒv
-    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    if (CharacterInput::JumpButton_SPACE & gamePad.GetButtonDown())
     {
         ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
     }

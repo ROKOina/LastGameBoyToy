@@ -50,22 +50,6 @@ void SceneGame::Initialize()
     f->SetActiveInitialize();
   }
 
-  //普通のカメラ
-  {
-    std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-    camera->SetName("normalcamera");
-
-    std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-    c->SetPerspectiveFov
-    (
-      DirectX::XMConvertToRadians(45),
-      graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-      0.1f, 1000.0f
-    );
-
-    camera->transform_->SetWorldPosition({ 0, 5, -10 });
-  }
-
   //コンスタントバッファの初期化
   ConstantBufferInitialize();
 
@@ -79,6 +63,7 @@ void SceneGame::Initialize()
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+        //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
         std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
 
         auto& oo=obj->AddChildObject();
@@ -108,19 +93,48 @@ void SceneGame::Initialize()
     }
 
     //test
-    /*{
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("zombie");
-        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-        obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/zombie/Zombie.mdl");
-       
-        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        a->PlayAnimation(1, true, false, 0.05);
-        a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
-        a->SetUpAnimationUpdate(1);
-    }*/
+    //{
+    //    auto& obj = GameObjectManager::Instance().Create();
+    //    obj->SetName("zombie");
+    //    obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
+    //    obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    //    r->LoadModel("Data/zombie/Zombie.mdl");
+    //   
+    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+    //    a->SetupRootMotion("Zombie1");
+    //    a->SetupRootMotionHip("Base_HumanPelvis");
+    //    //a->PlayAnimation(2, true, true, 0.05);
+    //    
+    //    a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
+    //    a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
+    //    a->SetUpAnimationUpdate(1);
+    //}
+
+
+    //普通のカメラ(プレイヤーの子にする)
+    {
+        //カメラを動かす支柱
+        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("player")->AddChildObject();
+        std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
+        cameraPost->SetName("cameraPostPlayer");
+
+        //カメラ本体
+        //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+        std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
+        camera->SetName("normalcamera");
+
+        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+        c->SetPerspectiveFov
+        (
+            DirectX::XMConvertToRadians(45),
+            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+            0.1f, 1000.0f
+        );
+
+        camera->transform_->SetWorldPosition({ 0, 1, -7 });
+    }
+
 
 
   //ステージ
@@ -221,6 +235,13 @@ void SceneGame::Update(float elapsedTime)
 
   GameObjectManager::Instance().UpdateTransform();
   GameObjectManager::Instance().Update(elapsedTime);
+
+  ////コンポーネントゲット
+  //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("zombie");
+  //std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
+  //std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
+  //DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+  //a->updateRootMotion(pos);
 
   //コンポーネントゲット
   std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");

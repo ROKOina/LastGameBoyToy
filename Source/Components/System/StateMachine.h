@@ -53,6 +53,16 @@ public:
         currentState->Enter();
     }
 
+    bool CurrentStateImGui(Enum index)
+    {
+        if (stateList.count(index) != 0)
+        {
+            stateList[index]->ImGui();
+            return true;
+        }
+        return false;
+    }
+
     Enum GetCurrentState() { return currentIndex; }
     Enum GetNextState() { return nextIndex; }
     Enum GetOldState() { return oldIndex; }
