@@ -20,15 +20,12 @@
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
-#include "Components\ParticleSystemCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components/CPUParticle.h"
-
 #include "GameSource/GameScript/FreeCameraCom.h"
-
-#include "Components/ParticleComManager.h"
-
+#include "Components/CPUParticle.h"
+#include "Components/GPUParticle.h"
 
 // 初期化
 void SceneGame::Initialize()
@@ -92,50 +89,47 @@ void SceneGame::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     }
 
-    //test
-    //{
-    //    auto& obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("zombie");
-    //    obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-    //    obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/zombie/Zombie.mdl");
-    //   
-    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    //    a->SetupRootMotion("Zombie1");
-    //    a->SetupRootMotionHip("Base_HumanPelvis");
-    //    //a->PlayAnimation(2, true, true, 0.05);
-    //    
-    //    a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
-    //    a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
-    //    a->SetUpAnimationUpdate(1);
-    //}
+  //test
+  //{
+  //    auto& obj = GameObjectManager::Instance().Create();
+  //    obj->SetName("zombie");
+  //    obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
+  //    obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+  //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+  //    r->LoadModel("Data/zombie/Zombie.mdl");
+  //
+  //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+  //    a->SetupRootMotion("Zombie1");
+  //    a->SetupRootMotionHip("Base_HumanPelvis");
+  //    //a->PlayAnimation(2, true, true, 0.05);
+  //
+  //    a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
+  //    a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
+  //    a->SetUpAnimationUpdate(1);
+  //}
 
+  //普通のカメラ(プレイヤーの子にする)
+  {
+    //カメラを動かす支柱
+    //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("player")->AddChildObject();
+    std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
+    cameraPost->SetName("cameraPostPlayer");
 
-    //普通のカメラ(プレイヤーの子にする)
-    {
-        //カメラを動かす支柱
-        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("player")->AddChildObject();
-        std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
-        cameraPost->SetName("cameraPostPlayer");
+    //カメラ本体
+    //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+    std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
+    camera->SetName("normalcamera");
 
-        //カメラ本体
-        //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-        std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
-        camera->SetName("normalcamera");
+    std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+    c->SetPerspectiveFov
+    (
+      DirectX::XMConvertToRadians(45),
+      graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+      0.1f, 1000.0f
+    );
 
-        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-        c->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
-
-        camera->transform_->SetWorldPosition({ 0, 1, -7 });
-    }
-
-
+    camera->transform_->SetWorldPosition({ 0, 1, -7 });
+  }
 
   //ステージ
   {
@@ -164,21 +158,14 @@ void SceneGame::Initialize()
     cb->waveEffectIntensity = 5.0f;
   }
 
-  //テスト
+  //ステージ
   {
     auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("plane");
-    obj->transform_->SetWorldPosition({ 0, 0.1f, 0 });
-    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::AREA_EFFECT_CIRCLE, BLENDSTATE::ALPHA);
-    r->LoadModel("Data/UtilityModels/plane.mdl");
-    r->LoadMaterial("Data/UtilityModels/SkillEffect_Circle.Material");
-    auto& cb = r->SetVariousConstant<EffectConstants>();
-    cb->simulateSpeed1 = 1.6f;
-    cb->simulateSpeed2 = -2.4f;
-    cb->waveEffectRange = 0.97f;
-    cb->waveEffectColor = { 1.0f,0.3f,0.0f,0.1f };
-    cb->waveEffectIntensity = 5.0f;
+    obj->SetName("stage");
+    obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
+    obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    r->LoadModel("Data/Stage/Stage.mdl");
   }
 
   //バリア
@@ -199,18 +186,46 @@ void SceneGame::Initialize()
     r->LoadModel("Data/Ball/t.mdl");
   }
 
-  //パーティクル
+  //テスト
   {
     auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("testP");
-    obj->AddComponent<ParticleSystemCom>(100, false);
+    obj->SetName("plane");
+    obj->transform_->SetWorldPosition({ 0, 0.1f, 0 });
+    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::AREA_EFFECT_CIRCLE, BLENDSTATE::ALPHA);
+    r->LoadModel("Data/UtilityModels/plane.mdl");
+    r->LoadMaterial("Data/UtilityModels/SkillEffect_Circle.Material");
+    auto& cb = r->SetVariousConstant<EffectConstants>();
+    cb->simulateSpeed1 = 1.6f;
+    cb->simulateSpeed2 = -2.4f;
+    cb->waveEffectRange = 0.97f;
+    cb->waveEffectColor = { 1.0f,0.3f,0.0f,0.1f };
+    cb->waveEffectIntensity = 5.0f;
   }
 
-  //cpuパーティクル設定
+  //IKテスト
+  {
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    obj->SetName("IKTest");
+    obj->transform_->SetWorldPosition({ -5, 0, 0 });
+    obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    r->LoadModel("Data/IKTestModel/IKTest.mdl");
+    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+  }
+
+  //cpuparticletest
   {
     auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("testparticle");
-    obj->AddComponent<CPUParticle>(100);
+    obj->SetName("cpuparticle");
+    obj->AddComponent<CPUParticle>("Data\\Effect\\test.cpuparticle", 1000);
+  }
+
+  //gpuparticletest
+  {
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("gpuparticle");
+    obj->AddComponent<GPUParticle>("Data\\Effect\\test.gpuparticle", 4000);
   }
 
   //平行光源を追加
@@ -231,10 +246,12 @@ void SceneGame::Update(float elapsedTime)
   if (n)
     n->Update();
 
-  GamePad& gamePad = Input::Instance().GetGamePad();
+  // キーの入力情報を各キャラクターに割り当てる
+  SetUserInputs();
 
-  GameObjectManager::Instance().UpdateTransform();
+  // ゲームオブジェクトの更新
   GameObjectManager::Instance().Update(elapsedTime);
+  GameObjectManager::Instance().UpdateTransform();
 
   ////コンポーネントゲット
   //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("zombie");
@@ -242,12 +259,6 @@ void SceneGame::Update(float elapsedTime)
   //std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
   //DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
   //a->updateRootMotion(pos);
-
-  //コンポーネントゲット
-  std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-  std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
-  std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-
 }
 
 // 描画処理
@@ -285,7 +296,6 @@ void SceneGame::Render(float elapsedTime)
 
     ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
 
-
     static int ClientID = 0;
     static std::string ip;
     char ipAdd[256];
@@ -305,7 +315,6 @@ void SceneGame::Render(float elapsedTime)
       }
     }
 
-
     if (ImGui::Button("Server"))
     {
       n = std::make_unique<NetServer>();
@@ -314,4 +323,36 @@ void SceneGame::Render(float elapsedTime)
 
     ImGui::End();
   }
+}
+
+void SceneGame::SetUserInputs()
+{
+  // プレイヤーの入力情報
+  SetPlayerInput();
+
+  // 他のプレイヤーの入力情報
+  SetOnlineInput();
+}
+
+void SceneGame::SetPlayerInput()
+{
+  GamePad& gamePad = Input::Instance().GetGamePad();
+
+  std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
+  if (obj.use_count() == 0)return;
+
+  std::shared_ptr<CharacterCom> chara = obj->GetComponent<CharacterCom>();
+  if (chara.use_count() == 0) return;
+
+  // 入力情報をプレイヤーキャラクターに送信
+  chara->SetUserInput(gamePad.GetButton());
+  chara->SetUserInputDown(gamePad.GetButtonDown());
+  chara->SetUserInputUp(gamePad.GetButtonUp());
+
+  chara->SetLeftStick(gamePad.GetAxisL());
+  chara->SetRightStick(gamePad.GetAxisR());
+}
+
+void SceneGame::SetOnlineInput()
+{
 }

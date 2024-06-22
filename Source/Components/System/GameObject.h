@@ -14,8 +14,8 @@
 class Component;
 class TransformCom;
 class RendererCom;
-class ParticleSystemCom;
 class CPUParticle;
+class GPUParticle;
 class Collider;
 
 // ゲームオブジェクト
@@ -124,7 +124,6 @@ private:
 };
 using GameObj = std::shared_ptr<GameObject>;
 
-
 // ゲームオブジェクトマネージャー
 class GameObjectManager
 {
@@ -180,8 +179,8 @@ private:
     //CPUパーティクル描画
     void CPUParticleRender();
 
-    //パーティクル描画
-    void ParticleRender();
+    //GPUパーティクル描画
+    void GPUParticleRender();
 
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
@@ -204,8 +203,8 @@ private:
     //CPUパーティクル描画用
     std::vector<std::weak_ptr<CPUParticle>> cpuparticleobject;
 
-    //パーティクル描画用
-    std::vector<std::weak_ptr<ParticleSystemCom>>   particleObject_;
+    //GPUparticle描画
+    std::vector<std::weak_ptr<GPUParticle>>gpuparticleobject;
 
     //ポストエフェクト
     std::unique_ptr<PostEffect>m_posteffect;

@@ -1,4 +1,4 @@
-#include "Particle.hlsli"
+#include "GPUParticle.hlsli"
 
 VS_OUT main(uint vertexId : SV_VERTEXID)
 {
