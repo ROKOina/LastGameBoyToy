@@ -33,6 +33,8 @@ void NetwarkPost::RenderUpdate()
 {
     for (auto& client : clientDatas)
     {
+        if (client.id == id)continue;
+
         std::string name = "Net" + std::to_string(client.id);
         std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
 
@@ -46,8 +48,8 @@ void NetwarkPost::RenderUpdate()
             std::shared_ptr<RendererCom> r = clientObj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
             r->LoadModel("Data/OneCoin/robot.mdl");
             std::shared_ptr<AnimationCom> a = clientObj->AddComponent<AnimationCom>();
-            //std::shared_ptr<MovementCom> m = clientObj->AddComponent<MovementCom>();
-            //std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
+            std::shared_ptr<MovementCom> m = clientObj->AddComponent<MovementCom>();
+            std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
         }
 
         //à íuçXêV

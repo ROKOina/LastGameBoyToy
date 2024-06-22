@@ -355,4 +355,24 @@ void SceneGame::SetPlayerInput()
 
 void SceneGame::SetOnlineInput()
 {
+    if (!n)return;
+
+    for (auto& client : n->GetNetDatas())
+    {
+        std::string name = "Net" + std::to_string(client.id);
+        std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
+
+        if (clientObj)
+        {
+            std::shared_ptr<CharacterCom> chara = clientObj->GetComponent<CharacterCom>();
+
+            // 入力情報をプレイヤーキャラクターに送信
+            chara->SetUserInput(client.input);
+            chara->SetUserInputDown(client.inputDown);
+            chara->SetUserInputUp(client.inputUp);
+
+            //chara->SetLeftStick(gamePad.GetAxisL());
+            //chara->SetRightStick(gamePad.GetAxisR());
+        }
+    }
 }

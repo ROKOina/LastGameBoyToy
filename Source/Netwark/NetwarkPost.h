@@ -17,10 +17,14 @@ public:
 
     virtual void RenderUpdate();
 
+public:
+    const std::vector<NetData>& GetNetDatas() { return clientDatas; }
+
 protected:
     unsigned __int64 sock;
     unsigned __int64 multicastSock;
 
     std::string recvData = "ABC";
     std::vector<NetData> clientDatas;
+    int id;
 };

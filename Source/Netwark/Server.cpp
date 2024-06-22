@@ -65,7 +65,10 @@ void __fastcall NetServer::Initialize()
     setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_TTL,
         reinterpret_cast<char*>(&ttl), sizeof(ttl));
 
-
+    //サーバーのキャラ情報
+    NetData serverData;
+    serverData.id = id;
+    clientDatas.emplace_back(serverData);
 }
 
 void __fastcall NetServer::Update()
@@ -117,6 +120,15 @@ void __fastcall NetServer::Update()
     cou++;
     if (cou > 3)
     {
+        //自分自身(server)のキャラ情報を送る
+        for (auto& client : clientDatas)
+        {
+            if (client.id != id)continue;
+
+            client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+            client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+            break;
+        }
         //送信型に変換してデータを全て送る
         std::stringstream ss = NetDataSendCast(clientDatas);
 
@@ -124,6 +136,8 @@ void __fastcall NetServer::Update()
             reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
         cou = 0;
     }
+
+    RenderUpdate();
 }
 
 #include <imgui.h>
@@ -135,22 +149,6 @@ void NetServer::ImGui()
     ImGui::Begin("NetServer", nullptr, ImGuiWindowFlags_None);
 
     ImGui::Text(recvData.c_str());
-
-    static int cID = 0;
-
-    ImGui::InputInt("drawID", &cID);
-    if (clientDatas.size() > 0)
-    {
-        if (cID < 0)cID = 0;
-        if (clientDatas.size() >= cID + 1)
-        {
-            GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition(clientDatas[cID].pos);
-        }
-        else
-        {
-            cID = 0;
-        }
-    }
 
     ImGui::End();
 }
