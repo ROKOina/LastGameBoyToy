@@ -2,7 +2,7 @@
 #include "../Constants.hlsli"
 #include "../Common.hlsli"
 
-cbuffer EffectCircleConstants : register(b3)
+cbuffer EffectCircleConstants : register(b0)
 {
     float simulateTime1;
     float simulateTime2;
