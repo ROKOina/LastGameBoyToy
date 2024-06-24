@@ -18,7 +18,8 @@ public:
     virtual void RenderUpdate();
 
 public:
-    const std::vector<NetData>& GetNetDatas() { return clientDatas; }
+     std::vector<NetData>& GetNetDatas() { return clientDatas; }
+    const int GetNetId() { return id; }
 
 protected:
     unsigned __int64 sock;

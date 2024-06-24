@@ -359,6 +359,16 @@ void SceneGame::SetOnlineInput()
 
     for (auto& client : n->GetNetDatas())
     {
+        //Ž©•ªŽ©g‚Ìê‡‚Í“ü—Íî•ñ‚ðXV
+        if (client.id == n->GetNetId())
+        {
+            GamePad& gamePad = Input::Instance().GetGamePad();
+
+            client.input = gamePad.GetButton();
+            client.inputDown = gamePad.GetButtonDown();
+            client.inputUp = gamePad.GetButtonUp();
+        }
+
         std::string name = "Net" + std::to_string(client.id);
         std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
 
