@@ -61,7 +61,7 @@ void PostEffect::PostEffectRender()
     const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     //コンスタントバッファのアクティブ
-    m_posteffect->Activate(dc, 3, true, true, false, false, false, false);
+    m_posteffect->Activate(dc, (int)CB_INDEX::POST_EFFECT, true, true, false, false, false, false);
 
     //ポストエフェクト
     m_framebuffers[static_cast<size_t>(offscreen::posteffect)]->Clear(dc);
