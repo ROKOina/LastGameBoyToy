@@ -48,6 +48,6 @@ public:
   float waveEffectIntensity = 1.0f;
 
 private:
-  std::unique_ptr<ConstantBuffer<Buffer>> m_effectconstants;
+  inline static std::unique_ptr<ConstantBuffer<Buffer>> m_effectconstants;
 
 };

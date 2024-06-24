@@ -166,7 +166,7 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
 
     //コンスタントバッファの定義と更新
     m_gpu = std::make_unique<ConstantBuffer<GPUParticleConstants>>(device);
-    m_gpu->Activate(dc, 6, false, false, true, true, false, false);
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
 
     //コンスタントバッファのバッファ作成、更新
     buffer_desc.ByteWidth = sizeof(GPUparticleSaveConstants);
@@ -178,8 +178,8 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     hr = device->CreateBuffer(&buffer_desc, nullptr, m_constantbuffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-    dc->CSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
-    dc->GSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
+    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
 
     //初期化のピクセルシェーダーをセット
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
@@ -207,10 +207,10 @@ void GPUParticle::Update(float elapsedTime)
     //コンスタントバッファの更新
     m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
-    m_gpu->Activate(dc, 6, false, false, true, true, false, false);
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
     dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-    dc->CSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
-    dc->GSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
+    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
 
     //更新するコンピュートシェーダーをセットする
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);

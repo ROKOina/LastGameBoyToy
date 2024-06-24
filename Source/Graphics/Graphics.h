@@ -13,6 +13,23 @@
 
 #define DEBUG_GUI_ true
 
+// 定数バッファの割り当て番号
+enum class CB_INDEX
+{
+  VARIOUS             = 0,
+
+  OBJECT              = 1,
+  SUBSET              = 2,
+  POST_EFFECT         = 3,
+
+  CPU_PARTICLE        = 5,
+  GPU_PARTICLE        = 6,
+  GPU_PARTICLE_SAVE   = 7,
+  LIGHT_DATA          = 8,
+
+  SCENE               = 10
+};
+
 //ブレンドステート
 enum class BLENDSTATE
 {

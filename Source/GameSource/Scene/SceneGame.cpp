@@ -126,23 +126,6 @@ void SceneGame::Initialize()
     r->LoadModel("Data/Stage/Stage.mdl");
   }
 
-  //テスト
-  {
-    auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("plane");
-    obj->transform_->SetWorldPosition({ 0, 0.1f, 3 });
-    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::AREA_EFFECT_CIRCLE, BLENDSTATE::ALPHA);
-    r->LoadModel("Data/UtilityModels/plane.mdl");
-    r->LoadMaterial("Data/UtilityModels/Kaho.Material");
-    auto& cb = r->SetVariousConstant<EffectConstants>();
-    cb->simulateSpeed1 = 1.6f;
-    cb->simulateSpeed2 = -2.4f;
-    cb->waveEffectRange = 0.97f;
-    cb->waveEffectColor = { 1.0f,0.3f,0.0f,0.1f };
-    cb->waveEffectIntensity = 5.0f;
-  }
-
   //ステージ
   {
     auto& obj = GameObjectManager::Instance().Create();
