@@ -62,6 +62,8 @@ public:
 
     //アクティブカメラ最初のセット
     void SetActiveInitialize();
+    void ActiveCameraChange();
+    bool GetIsActive() { return isActiveCamera; }
 
 private:
     //アクティブカメラ変更処理

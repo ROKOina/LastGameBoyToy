@@ -27,6 +27,9 @@
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 
+std::shared_ptr<CameraCom> freeC;
+std::shared_ptr<CameraCom> follow;
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -37,6 +40,7 @@ void SceneGame::Initialize()
     std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
     freeCamera->SetName("freecamera");
     std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
+    freeC = f;
     f->SetPerspectiveFov
     (
       DirectX::XMConvertToRadians(45),
@@ -87,9 +91,11 @@ void SceneGame::Initialize()
   //普通のカメラ(プレイヤーの子にする)
   {
     //カメラを動かす支柱
-    //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("player")->AddChildObject();
-    std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
+      std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
+    std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+    //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
     cameraPost->SetName("cameraPostPlayer");
+
 
     //カメラ本体
     //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
@@ -97,6 +103,7 @@ void SceneGame::Initialize()
     camera->SetName("normalcamera");
 
     std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+    follow = c;
     c->SetPerspectiveFov
     (
       DirectX::XMConvertToRadians(45),
@@ -104,7 +111,9 @@ void SceneGame::Initialize()
       0.1f, 1000.0f
     );
 
-    camera->transform_->SetWorldPosition({ 0, 1, -7 });
+    camera->transform_->SetWorldPosition({ 0, 950, 300 });
+
+    playerObj->GetComponent<CharacterCom>()->SetCameraObj(camera.get());
   }
 
   //ステージ

@@ -55,6 +55,8 @@ public:
   virtual void SpaceSkill() {}
 
   StateMachine<CharacterCom, CHARACTER_ACTIONS>& GetStateMachine() { return stateMachine; }
+  GameObject* GetCameraObj() { return cameraObj; }
+  void SetCameraObj(GameObject* obj) { cameraObj = obj; }
   float GetJumpPower() { return jumpPower; }
 
   // ‘€ì“ü—Íî•ñ
@@ -76,6 +78,7 @@ private:
 
 protected:
   StateMachine<CharacterCom, CHARACTER_ACTIONS> stateMachine;
+  GameObject* cameraObj = nullptr;
 
   float jumpPower = 5.0f;
 
