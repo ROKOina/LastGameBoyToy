@@ -219,6 +219,12 @@ void GPUParticle::Update(float elapsedTime)
     dc->Dispatch(thread_group_count_x, 1, 1);
     ID3D11UnorderedAccessView* null_unordered_access_view{};
     dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
+
+    //パラメータ初期化
+    if (m_gpu->data.loop == 0)
+    {
+        //Reset();
+    }
 }
 
 //描画
@@ -383,7 +389,7 @@ void GPUParticle::OnGUI()
     ImGui::SameLine();
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"弾け飛ぶ係数"), &m_GSC.radial, 0.1f, 0.0f, 10.0f);
-    ImGui::DragFloat(J(u8"スピード"), &m_GSC.speed, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat(J(u8"スピード"), &m_GSC.speed, 0.1f, 0.0f, 100.0f);
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"最初のスピード"), &m_GSC.startspeed, 0.1f, 0.01f, 100.0f);
     ImGui::SameLine();

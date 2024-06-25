@@ -22,6 +22,7 @@
 #include "Components\MovementCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
+#include "Components\Character\UenoCharacterCom.h"
 #include "Components/CPUParticle.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
 #include "Components/CPUParticle.h"
@@ -66,7 +67,8 @@ void SceneGame::Initialize()
         a->PlayAnimation(0, true, false, 0.001f);
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
     }
 
     //test
@@ -149,15 +151,15 @@ void SceneGame::Initialize()
         obj->SetName("plane");
         obj->transform_->SetWorldPosition({ 0, 0.1f, 0 });
         obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::CRACK_EFFECT, BLENDSTATE::ALPHA);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::AREA_EFFECT_CIRCLE, BLENDSTATE::ALPHA);
         r->LoadModel("Data/UtilityModels/plane.mdl");
-        r->LoadMaterial("Data/UtilityModels/crack.Material");
-        //auto& cb = r->SetVariousConstant<EffectConstants>();
-        //cb->simulateSpeed1 = 1.6f;
-        //cb->simulateSpeed2 = -2.4f;
-        //cb->waveEffectRange = 0.97f;
-        //cb->waveEffectColor = { 1.0f,0.3f,0.0f,0.1f };
-        //cb->waveEffectIntensity = 5.0f;
+        r->LoadMaterial("Data/UtilityModels/SkillEffect_Circle.Material");
+        auto& cb = r->SetVariousConstant<EffectConstants>();
+        cb->simulateSpeed1 = 1.6f;
+        cb->simulateSpeed2 = -2.4f;
+        cb->waveEffectRange = 0.97f;
+        cb->waveEffectColor = { 1.0f,0.3f,0.0f,0.1f };
+        cb->waveEffectIntensity = 5.0f;
     }
 
     //IKƒeƒXƒg

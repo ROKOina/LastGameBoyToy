@@ -28,10 +28,10 @@ public:
     //名前設定
     const char* GetName()const override { return "GPUParticle"; }
 
-private:
-
     //リセット関数
     void Reset();
+
+private:
 
     //シリアライズ
     void Serialize();
@@ -55,6 +55,7 @@ public:
         DirectX::XMFLOAT4 rotation = { 0,0,0,1 };
         DirectX::XMFLOAT3 velocity = { 0,0,0 };
         DirectX::XMFLOAT3 strechvelocity = { 0,0,0 };
+        DirectX::XMFLOAT3 direction = { 0,0,0 };
         DirectX::XMFLOAT4 color = { 1,1,1,1 };
         float lifetime = 0.0f;
         float age = 0.0f;
@@ -68,9 +69,10 @@ public:
         DirectX::XMFLOAT4 rotation = { 0,0,0,1 };
         DirectX::XMFLOAT3 position = { 0,0,0 };
         int isalive = { true };
+        DirectX::XMFLOAT3 direction = { 1,1,1 };
         int loop = { true };
         int startflag = { true };
-        DirectX::XMFLOAT2 Gdummy = {};
+        DirectX::XMFLOAT3 Gdummy = {};
     };
     std::unique_ptr<ConstantBuffer<GPUParticleConstants>>m_gpu;
 

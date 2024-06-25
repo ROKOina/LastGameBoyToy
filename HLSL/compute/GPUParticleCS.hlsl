@@ -48,18 +48,26 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         //浮力
         p.velocity += buoyancy * deltatime;
 
-        //速力更新
-        p.velocity.x += ((random(p.position.x * time + id) * 2) - 1) * velorandscale;
-        p.velocity.y += ((random(p.position.y * time + id) * 2) - 1) * velorandscale;
-        p.velocity.z += ((random(p.position.z * time + id) * 2) - 1) * velorandscale;
-        //p.velocity = normalize(p.velocity);
+        //方向の正規化
+        float3 normDir = normalize(direction);
+        p.direction = direction;
+
+        //ランダム成分を計算
+        float3 randomVel = float3(
+            ((random(p.position.x * time + id) * 2) - 1) * velorandscale,
+            ((random(p.position.y * time + id) * 2) - 1) * velorandscale,
+            ((random(p.position.z * time + id) * 2) - 1) * velorandscale
+        );
+
+        //トータルの速力
+        float3 totalVelocity = velocity + p.direction * speed + randomVel + orbVelo + radialVec;
 
         //重力適量
         p.position.yz -= lerp(startgravity, endgravity, lerprate) * deltatime;
- 
+
         //速力更新
-        p.position += (p.velocity + orbVelo + radialVec) * speed * lerp(startspeed, endspeed, lerprate) * deltatime;
-        p.strechvelocity = (p.velocity + orbVelo + radialVec) * speed * lerp(startspeed, endspeed, lerprate) * deltatime;
+        p.position += totalVelocity * lerp(startspeed, endspeed, lerprate) * deltatime;
+        p.strechvelocity = totalVelocity * lerp(startspeed, endspeed, lerprate) * deltatime;
     }
 
     //パーティクルの動き更新処理

@@ -19,6 +19,7 @@ struct MainParticle
     float4 rotation;
     float3 velocity;
     float3 strechvelocity;
+    float3 direction;
     float4 color;
     float lifetime;
     float age;
@@ -32,9 +33,10 @@ cbuffer GPUParticleConstants : register(b6)
     float4 rotation;
     float3 position;
     int isalive;
+    float3 direction;
     int loop;
     int startflag;
-    float2 Gdummy;
+    float3 Gdummy;
 }
 
 //•Û‘¶‚·‚é‚à‚Ì‚ð“ü‚ê‚Ä‚¨‚­

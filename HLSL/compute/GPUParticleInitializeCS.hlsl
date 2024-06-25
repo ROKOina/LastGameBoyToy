@@ -24,6 +24,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         p.rotation = rotation;
         p.velocity = velocity * f2;
         p.strechvelocity = 0;
+        p.direction = direction;
         p.isalive = isalive;
         p.isstart = startflag;
         p.lifetime = lifetime;
@@ -37,6 +38,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         p.rotation = rotation;
         p.velocity = velocity * f2;
         p.strechvelocity = 0;
+        p.direction = direction;
         p.isalive = isalive;
         p.isstart = startflag;
         p.lifetime = lifetime;
