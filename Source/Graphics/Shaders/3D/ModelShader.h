@@ -16,6 +16,7 @@ public:
         DEFERRED,
         BLACK,
         AREA_EFFECT_CIRCLE,
+        CRACK_EFFECT,
         MAX
     };
 

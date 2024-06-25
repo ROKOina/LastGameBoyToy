@@ -102,6 +102,7 @@ enum class SHADERMODE
     DEFERRED,
     BLACK,
     AREA_EFFECT_CIRCLE,
+    CRACK_EFFECT,
 
     MAX
 };

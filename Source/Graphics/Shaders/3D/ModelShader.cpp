@@ -29,6 +29,10 @@ ModelShader::ModelShader(int shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\AreaEffectCirclePS.cso" };
         break;
+    case MODELSHADER::CRACK_EFFECT:
+        VSPath = { "Shader\\FakeDepthVS.cso" };
+        PSPath = { "Shader\\FakeDepthPS.cso" };
+        break;
 
     default:
       assert(!"ˆø”‚ÌShader‚É‘z’è‚³‚ê‚Ä‚¢‚È‚¢’l‚ª“ü‚ê‚ç‚ê‚Ä‚¢‚é");
