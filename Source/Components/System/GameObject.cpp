@@ -321,7 +321,7 @@ void GameObjectManager::UpdateTransform()
 }
 
 // 描画
-void GameObjectManager::Render()
+void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     //デファードレンダリングの初期設定
     m_posteffect->DeferredFirstSet();
@@ -334,6 +334,9 @@ void GameObjectManager::Render()
 
     //GPUパーティクル描画
     GPUParticleRender();
+
+    //デバッグレンダー
+    Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
 
     //デファードレンダリング終了
     m_posteffect->DeferredResourceSet();

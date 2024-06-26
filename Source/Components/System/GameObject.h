@@ -154,7 +154,7 @@ public:
     void UpdateTransform();
 
     // •`‰æ
-    void Render();
+    void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     //sprite•`‰æ
     void Render2D(float elapsedTime);
