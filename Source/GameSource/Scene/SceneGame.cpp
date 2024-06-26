@@ -20,6 +20,7 @@
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
+#include "Components\ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\UenoCharacterCom.h"
@@ -171,6 +172,10 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/IKTestModel/IKTest.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        std::shared_ptr<CapsuleColliderCom> c = obj->AddComponent<CapsuleColliderCom>();
+        c->SetPosition1({ 0,10,0 });
+        c->SetMyTag(COLLIDER_TAG::Enemy);
+        c->SetJudgeTag(COLLIDER_TAG::PlayerAttack);
     }
 
     ////cpuparticletest
@@ -210,6 +215,7 @@ void SceneGame::Update(float elapsedTime)
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().Update(elapsedTime);
+    
     GameObjectManager::Instance().UpdateTransform();
 
     ////コンポーネントゲット

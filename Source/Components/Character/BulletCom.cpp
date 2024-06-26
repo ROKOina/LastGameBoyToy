@@ -1,7 +1,14 @@
 #include "BulletCom.h"
+#include "Components\ColliderCom.h"
 #include "Components\System\GameObject.h"
+
 void BulletCom::Update(float elapsedTime)
 {
+    Collider* collider = GetGameObject()->GetComponent<Collider>().get();
+    if(collider->OnHitGameObject().size()) 
+    {
+        GameObjectManager::Instance().Remove(this->GetGameObject());
+    }
     //íeè¡ãé
     EraseBullet(elapsedTime);
 }

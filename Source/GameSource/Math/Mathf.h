@@ -43,6 +43,11 @@ public:
   static int GetSign(const float& value);
   static int GetSign(const int& value);
 
+  // s—ñ‚©‚çw’è‚Ì—ñ‚ğ”²‚«o‚·
+  static DirectX::XMFLOAT3 TransformSamplePosition(const DirectX::XMFLOAT4X4& trans);
+  static DirectX::XMFLOAT3 TransformSampleRight(const DirectX::XMFLOAT4X4& trans);
+  static DirectX::XMFLOAT3 TransformSampleUp(const DirectX::XMFLOAT4X4& trans);
+  static DirectX::XMFLOAT3 TransformSampleFront(const DirectX::XMFLOAT4X4& trans);
 };
 
 

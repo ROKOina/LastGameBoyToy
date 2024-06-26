@@ -149,3 +149,23 @@ int Mathf::GetSign(const int& value)
 {
   return (value > 0) - (value < 0);
 }
+
+DirectX::XMFLOAT3 Mathf::TransformSamplePosition(const DirectX::XMFLOAT4X4& trans)
+{
+    return DirectX::XMFLOAT3(trans._41, trans._42, trans._43);
+}
+
+DirectX::XMFLOAT3 Mathf::TransformSampleRight(const DirectX::XMFLOAT4X4& trans)
+{
+    return DirectX::XMFLOAT3(trans._11,trans._12,trans._13);
+}
+
+DirectX::XMFLOAT3 Mathf::TransformSampleUp(const DirectX::XMFLOAT4X4& trans)
+{
+    return DirectX::XMFLOAT3(trans._21,trans._22,trans._23);
+}
+
+DirectX::XMFLOAT3 Mathf::TransformSampleFront(const DirectX::XMFLOAT4X4& trans)
+{
+    return DirectX::XMFLOAT3(trans._31, trans._32, trans._33);
+}
