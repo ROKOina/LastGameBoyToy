@@ -155,6 +155,7 @@
     <ClInclude Include="Source\Components\Character\State\TestCharacterState.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
+    <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\ParticleComManager.h" />
     <ClInclude Include="Source\Components\ParticleSystemCom.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="Source\Components\Character\State\TestCharacterState.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
     <ClCompile Include="Source\Components\ParticleComManager.cpp" />
     <ClCompile Include="Source\Components\ParticleSystemCom.cpp" />

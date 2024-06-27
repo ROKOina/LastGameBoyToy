@@ -16,6 +16,7 @@
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
+#include "Components\FootIKcom.h"
 #include "Components\ParticleSystemCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
@@ -69,26 +70,13 @@ void SceneIKTest::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/OneCoin/robot.mdl");
+        r->LoadModel("Data/IKTestModel/IKTest.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-
-        auto& oo = obj->AddChildObject();
-        oo->SetName("barrier1");
-        oo->transform_->SetScale({ 500,500,500 });
-        oo->transform_->SetLocalPosition({ 1000,0,0 });
-        std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
-        ro->LoadModel("Data/Ball/b.mdl");
-
-        auto& oo1 = oo->AddChildObject();
-        oo1->SetName("barrier2");
-        oo1->transform_->SetScale({ 1,1,1 });
-        oo1->transform_->SetLocalPosition({ 3,0,0 });
-        std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
-        ro1->LoadModel("Data/Ball/b.mdl");
+        std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
 
     }
 
@@ -96,10 +84,10 @@ void SceneIKTest::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-        obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+        obj->transform_->SetWorldPosition({ 0, 0.0f, 0 });
+        obj->transform_->SetScale({ 0.6f, 0.6f, 0.6f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/Stage/Stage.mdl");
+        r->LoadModel("Data/IKTestStage/ExampleStage.mdl");
     }
     
     //平行光源を追加
@@ -112,11 +100,41 @@ void SceneIKTest::Initialize()
 //更新処理
 void SceneIKTest::Update(float elapsedTime)
 {
-    
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    GameObjectManager::Instance().UpdateTransform();
+    GameObjectManager::Instance().Update(elapsedTime);
+
+    //コンポーネントゲット
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
+    std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
+    std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
+
 }
 
 void SceneIKTest::Render(float elapsedTime)
 {
+    // 画面クリア＆レンダーターゲット設定
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+    ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
+    ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
+    dc->OMSetRenderTargets(1, &rtv, dsv);
+
+    //コンスタントバッファの更新
+    ConstantBufferUpdate(elapsedTime);
+
+    //サンプラーステートの設定
+    Graphics::Instance().SetSamplerState();
+
+    // ライトの定数バッファを更新
+    LightManager::Instance().UpdateConstatBuffer();
+
+    //オブジェクト描画
+    GameObjectManager::Instance().Render();
+
+    //オブジェクト描画
+    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 
 }
 
