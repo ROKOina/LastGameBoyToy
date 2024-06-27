@@ -3,6 +3,9 @@
 #include <iostream>
 #pragma comment(lib,"ws2_32.lib")
 
+#include "Input\Input.h"
+#include "Input\GamePad.h"
+
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 
@@ -131,23 +134,35 @@ void __fastcall NetServer::Update()
     }
 
     // マルチキャストアドレスを宛先に指定してメッセージを送信、パケットロス回避のため３フレーム毎
+
+    //入力情報更新
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    input |= gamePad.GetButton();
+    inputDown |= gamePad.GetButtonDown();
+    inputUp |= gamePad.GetButtonUp();
+
+
     static int cou = 0;
     cou++;
     if (cou > 3)
     {
         for (auto& client : clientDatas)
         {
-            //入力をリセット
-            client.input = 0;
-            client.inputUp = 0;
-            client.inputDown = 0;
-
             //自分自身(server)のキャラ情報を送る
             if (client.id != id)continue;
 
             client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
             client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
-            //break;
+
+            client.input = input;
+            client.inputDown = inputDown;
+            client.inputUp = inputUp;
+            input = 0;
+            inputDown = 0;
+            inputUp = 0;
+
+            break;
         }
         //送信型に変換してデータを全て送る
         std::stringstream ss = NetDataSendCast(clientDatas);

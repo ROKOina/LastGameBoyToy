@@ -5,6 +5,9 @@
 //#include <ws2tcpip.h>
 #pragma comment(lib,"ws2_32.lib")
 
+#include "Input\Input.h"
+#include "Input\GamePad.h"
+
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 
@@ -107,6 +110,13 @@ void __fastcall NetClient::Update()
 {
     // 通常のソケットでサーバにメッセージを送信
 
+    //入力情報更新
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    input |= gamePad.GetButton();
+    inputDown |= gamePad.GetButtonDown();
+    inputUp |= gamePad.GetButtonUp();
+
     //パケットロス回避のため、3フレーム毎に送る
     static int cou = 0;
     cou++;
@@ -119,6 +129,13 @@ void __fastcall NetClient::Update()
         DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
         n.pos = p;
         n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+
+        n.input = input;
+        n.inputDown = inputDown;
+        n.inputUp = inputUp;
+        input = 0;
+        inputDown = 0;
+        inputUp = 0;
 
         netData.emplace_back(n);
 

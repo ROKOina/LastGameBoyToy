@@ -28,4 +28,9 @@ protected:
     std::string recvData = "ABC";
     std::vector<NetData> clientDatas;
     int id;
+
+
+    unsigned int input;
+    unsigned int inputUp;
+    unsigned int inputDown;
 };

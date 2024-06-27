@@ -359,15 +359,15 @@ void SceneGame::SetOnlineInput()
 
     for (auto& client : n->GetNetDatas())
     {
-        //自分自身の場合は入力情報を更新
-        if (client.id == n->GetNetId())
-        {
-            GamePad& gamePad = Input::Instance().GetGamePad();
+        ////自分自身の場合は入力情報を更新
+        //if (client.id == n->GetNetId())
+        //{
+        //    GamePad& gamePad = Input::Instance().GetGamePad();
 
-            client.input = gamePad.GetButton();
-            client.inputDown = gamePad.GetButtonDown();
-            client.inputUp = gamePad.GetButtonUp();
-        }
+        //    client.input |= gamePad.GetButton();
+        //    client.inputDown |= gamePad.GetButtonDown();
+        //    client.inputUp |= gamePad.GetButtonUp();
+        //}
 
         std::string name = "Net" + std::to_string(client.id);
         std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());

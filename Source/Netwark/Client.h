@@ -19,4 +19,5 @@ public:
 private:
     std::string ipv4Adress;
     struct sockaddr_in addr = {0};
+
 };
