@@ -70,9 +70,12 @@ void __fastcall NetServer::Initialize()
     serverData.id = id;
     clientDatas.emplace_back(serverData);
 }
-
+static std::vector<int> kari;
+static int kk = 0;
 void __fastcall NetServer::Update()
 {
+    kk++;
+
     //データ受信
     char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
@@ -96,6 +99,18 @@ void __fastcall NetServer::Update()
                 bool isRegisterClient = false;
                 for (auto& client : clientDatas)
                 {
+
+
+                    if (client.id == 1)
+                    {
+                        kari.emplace_back(kk);
+                        kk = 0;
+                        if (client.input == 0)
+                            int i = 0;
+                    }
+
+
+
                     if (nData.id == client.id)
                     {
                         isRegisterClient = true;
@@ -120,14 +135,19 @@ void __fastcall NetServer::Update()
     cou++;
     if (cou > 3)
     {
-        //自分自身(server)のキャラ情報を送る
         for (auto& client : clientDatas)
         {
+            //入力をリセット
+            client.input = 0;
+            client.inputUp = 0;
+            client.inputDown = 0;
+
+            //自分自身(server)のキャラ情報を送る
             if (client.id != id)continue;
 
             client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
             client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
-            break;
+            //break;
         }
         //送信型に変換してデータを全て送る
         std::stringstream ss = NetDataSendCast(clientDatas);

@@ -40,6 +40,21 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
         return in;
     }
 
+////フレームと入力
+//struct InputFrame
+//{
+//    int progressFrame;  //経過フレーム
+//    unsigned int input; //入力
+//};
+
+//struct InputData
+//{
+//    std::vector<unsigned int> input;
+//    std::vector<unsigned int> inputDown;
+//    std::vector<unsigned int> inputUp;
+//};
+//
+
 
 struct NetData
 {
@@ -47,9 +62,11 @@ struct NetData
     float radi;
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT4 rotato;
-    unsigned int input;
     unsigned int inputDown;
+    unsigned int input;
     unsigned int inputUp;
+    //int pSize;
+    //std::vector<int> p;
 };
 static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
 {
@@ -57,6 +74,10 @@ static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
     out << h.pos << " ";
     out << h.rotato << " ";
     out << h.input << " "<< h.inputDown << " "<< h.inputUp << " ";
+    //for (auto& i : h.p)
+    //{
+
+    //}
     return out;
 }
 static std::stringstream& operator>>(std::stringstream& in, NetData& h)

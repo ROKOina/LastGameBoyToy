@@ -119,11 +119,11 @@ void __fastcall NetClient::Update()
         DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
         n.pos = p;
         n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+
         netData.emplace_back(n);
 
         //‘—MŒ^‚É•ÏŠ·
         std::stringstream ss = NetDataSendCast(netData);
-
 
         sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
         cou = 0;
