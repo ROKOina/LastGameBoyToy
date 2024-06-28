@@ -170,6 +170,12 @@ public:
     void DrawGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
 private:
+    void StartUpObjects();
+
+    void CollideGameObjects();
+
+    void RemoveGameObjects();
+
     void DrawLister();
     void DrawDetail();
 
@@ -214,9 +220,6 @@ private:
 
     //演出待ちフラグ（シーンゲーム）
     bool isSceneGameStart_ = false;
-
-    //スレッド用
-    std::vector<std::future<void>> future;
 
     std::mutex mutex_;
 };
