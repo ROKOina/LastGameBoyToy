@@ -158,6 +158,11 @@ void CameraCom::SetActiveInitialize()
     isActiveCamera = true;
 }
 
+void CameraCom::ActiveCameraChange()
+{
+    isNextCamera = true;
+}
+
 //アクティブカメラ変更処理
 void CameraCom::ChangeActiveProcess()
 {

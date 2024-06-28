@@ -635,6 +635,7 @@ Graphics::Graphics(HWND hWnd)
         m_modelshaders[static_cast<int>(SHADERMODE::DEFERRED)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFERRED);
         m_modelshaders[static_cast<int>(SHADERMODE::BLACK)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::BLACK);
         m_modelshaders[static_cast<int>(SHADERMODE::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::AREA_EFFECT_CIRCLE);
+        m_modelshaders[static_cast<int>(SHADERMODE::CRACK_EFFECT)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::CRACK_EFFECT);
     }
 
     // ƒŒƒ“ƒ_ƒ‰

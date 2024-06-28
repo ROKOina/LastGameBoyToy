@@ -233,7 +233,7 @@ void CPUParticle::Render()
     //コンスタントバッファの更新
     m_cc->data.particlecolor = m_scp.m_particlecolor;
     m_cc->data.intensity = m_scp.m_intensity;
-    m_cc->Activate(dc, 5, false, true, false, false, false, false);
+    m_cc->Activate(dc, (int)CB_INDEX::CPU_PARTICLE, false, true, false, false, false, false);
 
     //パーティクル発生数
     int n = 0;

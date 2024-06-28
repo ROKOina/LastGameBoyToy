@@ -34,5 +34,5 @@ void Scene::ConstantBufferUpdate(float elapsedTime)
     sc->data.cameraposition = c->GetGameObject()->transform_->GetWorldPosition();
 
     //XV‚·‚é
-    sc->Activate(Graphics::Instance().GetDeviceContext(), 10, true, true, true, true, true, true);
+    sc->Activate(Graphics::Instance().GetDeviceContext(), (int)CB_INDEX::SCENE, true, true, true, true, true, true);
 }

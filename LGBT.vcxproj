@@ -149,11 +149,15 @@
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\InazawaCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\State\NomuraCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\State\UenoCharacterState.h" />
     <ClInclude Include="Source\Components\Character\TestCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\TestCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
@@ -236,11 +240,15 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\NomuraCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\InazawaCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\State\NomuraCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\State\UenoCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\TestCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\TestCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
@@ -291,6 +299,7 @@
   <ItemGroup>
     <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
+    <None Include="HLSL\3D\FakeDepth.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
@@ -353,6 +362,14 @@
     <FxCompile Include="HLSL\3D\BlackPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\FakeDepthPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\FakeDepthVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\DefaltPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

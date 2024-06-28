@@ -29,6 +29,13 @@ ModelShader::ModelShader(int shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\AreaEffectCirclePS.cso" };
         break;
+    case MODELSHADER::CRACK_EFFECT:
+        VSPath = { "Shader\\FakeDepthVS.cso" };
+        PSPath = { "Shader\\FakeDepthPS.cso" };
+        break;
+
+    default:
+      assert(!"引数のShaderに想定されていない値が入れられている");
     }
 
     // 頂点シェーダー
@@ -107,7 +114,7 @@ void ModelShader::SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::No
     }
 
     //コンスタントバッファの更新
-    m_objectconstants->Activate(dc, 1, true, true, false, false, false, false);
+    m_objectconstants->Activate(dc, (int)CB_INDEX::OBJECT, true, true, false, false, false, false);
 
     UINT stride = sizeof(ModelResource::Vertex);
     UINT offset = 0;
@@ -125,7 +132,7 @@ void ModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset
     m_subsetconstants->data.emissiveintensity = subset.material->emissiveintensity;
     m_subsetconstants->data.Metalness = subset.material->Metalness;
     m_subsetconstants->data.Roughness = subset.material->Roughness;
-    m_subsetconstants->Activate(dc, 2, true, true, false, false, false, false);
+    m_subsetconstants->Activate(dc, (int)CB_INDEX::SUBSET, true, true, false, false, false, false);
 
     //シェーダーリソースビュー設定
     dc->PSSetShaderResources(0, std::size(subset.material->shaderResourceView), subset.material->shaderResourceView[0].GetAddressOf());

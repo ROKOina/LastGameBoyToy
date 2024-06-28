@@ -1,5 +1,6 @@
 #include "GPUparticle.hlsli"
 #include "../Constants.hlsli"
+#include "..\\3D\\Light.hlsli"
 
 StructuredBuffer<MainParticle> particlebuffer : register(t0);
 
@@ -35,15 +36,25 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
 	    float2(1.0f, 1.0f), // 右下
     };
 
+    //簡易的なライティング計算
+    float3 n = float3(0, 0, 1); // パーティクルの面法線
+    float3 N = normalize(n);
+    float3 L = normalize(-directionalLight.direction.xyz);
+    float d = dot(L, N);
+    float power = max(0, d) * 0.5f + 0.5f;
+
     //実体を作る
     MainParticle p = particlebuffer[input[0].vertex_id];
 
     //座標変換(速力と位置)
-    float4 viewpos = mul(float4(p.position, 1.0), view);
+    float4 viewpos = mul(float4(p.position.xyz, 1.0), view);
     float4 viewvelo = mul(float4(p.strechvelocity, 0.0), view);
 
     //回転
     p.rotation = rotation;
+
+    //方向を代入
+    p.direction = direction;
 
     //生存フラグがfalseなら生成しない
     p.isalive = isalive;
@@ -69,7 +80,8 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         }
         cornerPos = QuaternionRotate(cornerPos, p.rotation);
         element.position = mul(float4(viewpos.xyz + cornerPos, 1.0f), projection);
-        element.color = p.color * color;
+        element.color.rgb = p.color.rgb * power * color.rgb;
+        element.color.a = p.color.a * color.a;
         element.color.rgb *= luminance;
         element.texcoord = TEXCOORD[i];
         output.Append(element);

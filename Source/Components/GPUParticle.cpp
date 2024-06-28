@@ -166,7 +166,7 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
 
     //コンスタントバッファの定義と更新
     m_gpu = std::make_unique<ConstantBuffer<GPUParticleConstants>>(device);
-    m_gpu->Activate(dc, 6, false, false, true, true, false, false);
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
 
     //コンスタントバッファのバッファ作成、更新
     buffer_desc.ByteWidth = sizeof(GPUparticleSaveConstants);
@@ -178,8 +178,8 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     hr = device->CreateBuffer(&buffer_desc, nullptr, m_constantbuffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-    dc->CSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
-    dc->GSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
+    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
 
     //初期化のピクセルシェーダーをセット
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
@@ -207,10 +207,10 @@ void GPUParticle::Update(float elapsedTime)
     //コンスタントバッファの更新
     m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
-    m_gpu->Activate(dc, 6, false, false, true, true, false, false);
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
     dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-    dc->CSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
-    dc->GSSetConstantBuffers(7, 1, m_constantbuffer.GetAddressOf());
+    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
 
     //更新するコンピュートシェーダーをセットする
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
@@ -219,6 +219,12 @@ void GPUParticle::Update(float elapsedTime)
     dc->Dispatch(thread_group_count_x, 1, 1);
     ID3D11UnorderedAccessView* null_unordered_access_view{};
     dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
+
+    //パラメータ初期化
+    if (m_gpu->data.loop == 0)
+    {
+        //Reset();
+    }
 }
 
 //描画
@@ -383,7 +389,7 @@ void GPUParticle::OnGUI()
     ImGui::SameLine();
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"弾け飛ぶ係数"), &m_GSC.radial, 0.1f, 0.0f, 10.0f);
-    ImGui::DragFloat(J(u8"スピード"), &m_GSC.speed, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat(J(u8"スピード"), &m_GSC.speed, 0.1f, 0.0f, 100.0f);
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"最初のスピード"), &m_GSC.startspeed, 0.1f, 0.01f, 100.0f);
     ImGui::SameLine();

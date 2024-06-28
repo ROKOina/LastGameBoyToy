@@ -6,7 +6,9 @@ EffectConstants::EffectConstants()
 {
   Graphics& graphics = Graphics::Instance();
 
-  m_effectconstants = std::make_unique<ConstantBuffer<Buffer>>(graphics.GetDevice());
+  if (m_effectconstants == nullptr) {
+    m_effectconstants = std::make_unique<ConstantBuffer<Buffer>>(graphics.GetDevice());
+  }
 }
 
 void EffectConstants::DrawGui()
@@ -36,5 +38,5 @@ void EffectConstants::Update(const float& elapsedTime)
 
 void EffectConstants::UpdateConstantBuffer(ID3D11DeviceContext* dc)
 {
-  m_effectconstants->Activate(dc, 3, false, true, false, false, false, false);
+  m_effectconstants->Activate(dc, (int)CB_INDEX::VARIOUS, false, true, false, false, false, false);
 }

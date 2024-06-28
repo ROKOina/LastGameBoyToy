@@ -17,6 +17,8 @@ void CharacterCom::Update(float elapsedTime)
     stateMachine.Update(elapsedTime);
 
 #ifdef _DEBUG
+
+    //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()
     && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
@@ -83,16 +85,16 @@ void CharacterCom::OnGUI()
 
 void CharacterCom::CameraControl()
 {
-    std::shared_ptr<GameObject> cameraObj = SceneManager::Instance().GetActiveCamera();
+    GamePad& gamePad = Input::Instance().GetGamePad();
 
     //ゲームカメラの場合
-    if (std::strcmp(cameraObj->GetName(), "normalcamera") == 0)
+    if (cameraObj->GetComponent<CameraCom>()->GetIsActive())
     {
         //フリーに切り替え
-        if (::GetAsyncKeyState(VK_CONTROL) & 0x8000)
+        if (GamePad::BTN_LCONTROL & gamePad.GetButtonDown())
         {
             std::shared_ptr<GameObject> g = GameObjectManager::Instance().Find("freecamera");
-            g->GetComponent<CameraCom>()->SetActiveInitialize();
+            g->GetComponent<CameraCom>()->ActiveCameraChange();
             return;
         }
 
@@ -108,31 +110,34 @@ void CharacterCom::CameraControl()
         float moveX = (newCursor.x - 500) * 0.02f;
         float moveY = (newCursor.y - 500) * 0.02f;
 
-        std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("cameraPostPlayer");
+        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("cameraPostPlayer");
 
         //回転
-        DirectX::XMFLOAT3 euler = cameraPost->transform_->GetEulerRotation();
+        DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
         euler.y += moveX * 8.0f;
         euler.x += moveY * 5.0f;
-        cameraPost->transform_->SetEulerRotation(euler);
-        //縦軸制御
-        euler = cameraPost->transform_->GetEulerRotation();
+
+        //回転制御
         if (euler.x > 70)
         {
             euler.x = 70;
-            cameraPost->transform_->SetEulerRotation(euler);
+            GetGameObject()->transform_->SetEulerRotation(euler);
         }
         if (euler.x < -70)
         {
             euler.x = -70;
-            cameraPost->transform_->SetEulerRotation(euler);
+            GetGameObject()->transform_->SetEulerRotation(euler);
         }
 
-        //位置
-        cameraPost->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
-
-        cameraPost->transform_->UpdateTransform();
-
-
+        GetGameObject()->transform_->SetEulerRotation(euler);
+    }
+    else
+    {
+        //キャラカメラに切り替え
+        if (GamePad::BTN_LCONTROL & gamePad.GetButtonDown())
+        {
+            cameraObj->GetComponent<CameraCom>()->ActiveCameraChange();
+            return;
+        }
     }
 }

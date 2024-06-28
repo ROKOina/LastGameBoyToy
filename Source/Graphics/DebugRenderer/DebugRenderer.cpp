@@ -3,6 +3,7 @@
 #include "Misc.h"
 #include "DebugRenderer.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/Shaders/Shader.h"
 
 DebugRenderer::DebugRenderer(ID3D11Device* device)
 {
@@ -13,19 +14,17 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
         {
             { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         };
-
-        //dx11State->createVsFromCso(device, "Shader\\DebugVS.cso", vertexShader_.GetAddressOf(),
-        //	inputLayout_.GetAddressOf(), inputElementDesc, ARRAYSIZE(inputElementDesc));
+        CreateVsFromCso(device, "Shader\\DebugVS.cso", vertexShader_.GetAddressOf(), inputLayout_.GetAddressOf(), inputElementDesc, ARRAYSIZE(inputElementDesc));
     }
 
     // ピクセルシェーダー
     {
-        //dx11State->createPsFromCso(device, "Shader\\DebugPS.cso", pixelShader_.GetAddressOf());
+        CreatePsFromCso(device, "Shader\\DebugPS.cso", pixelShader_.GetAddressOf());
     }
 
     // 定数バッファ
     {
-        //dx11State->createConstantBuffer(device, sizeof(CbMesh), constantBuffer_.GetAddressOf());
+        cbmesh = std::make_unique<ConstantBuffer<CbMesh>>(device);
     }
 
     // 球メッシュ作成
@@ -47,16 +46,12 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     context->IASetInputLayout(inputLayout_.Get());
 
     // 定数バッファ設定
-    context->VSSetConstantBuffers(0, 1, constantBuffer_.GetAddressOf());
-    //context->PSSetConstantBuffers(0, 1, constantBuffer_.GetAddressOf());
+    cbmesh->Activate(context, 0, true, false, false, false, false, false);
 
     // レンダーステート設定
-    //const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    //context->OMSetBlendState(dx11State->GetBlendState(Dx11StateLib::BLEND_STATE_TYPE::ALPHA).Get()
-    //	, blendFactor, 0xFFFFFFFF);
-    //context->OMSetDepthStencilState(dx11State->GetDepthStencilState(Dx11StateLib::DEPTHSTENCIL_STATE_TYPE::DEPTH_ON_3D).Get()
-    //	, 0);
-    //context->RSSetState(dx11State->GetRasterizerState(Dx11StateLib::RASTERIZER_TYPE::FRONTCOUNTER_FALSE_CULLNONE_WIREFRAME).Get());
+    context->OMSetBlendState(Graphics::Instance().GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
+    context->OMSetDepthStencilState(Graphics::Instance().GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
+    context->RSSetState(Graphics::Instance().GetRasterizerState(RASTERIZERSTATE::WIREFRAME));
 
     // ビュープロジェクション行列作成
     DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
@@ -79,11 +74,9 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         DirectX::XMMATRIX WVP = W * VP;
 
         // 定数バッファ更新
-        CbMesh cbMesh;
-        cbMesh.color = sphere.color;
-        DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
+        cbmesh->data.color = sphere.color;
+        DirectX::XMStoreFloat4x4(&cbmesh->data.wvp, WVP);
 
-        context->UpdateSubresource(constantBuffer_.Get(), 0, 0, &cbMesh, 0, 0);
         context->Draw(sphereVertexCount_, 0);
     }
     spheres_.clear();
@@ -102,11 +95,9 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         DirectX::XMMATRIX WVP = W * VP;
 
         // 定数バッファ更新
-        CbMesh cbMesh;
-        cbMesh.color = box.color;
-        DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
+        cbmesh->data.color = box.color;
+        DirectX::XMStoreFloat4x4(&cbmesh->data.wvp, WVP);
 
-        context->UpdateSubresource(constantBuffer_.Get(), 0, 0, &cbMesh, 0, 0);
         D3D11_BUFFER_DESC buffer_desc{};
         boxIndexBuffer_->GetDesc(&buffer_desc);
         context->DrawIndexed(buffer_desc.ByteWidth / sizeof(uint32_t), 0, 0);
@@ -147,11 +138,9 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         DirectX::XMMATRIX WVP = W * VP;
 
         // 定数バッファ更新
-        CbMesh cbMesh;
-        cbMesh.color = cylinder.color;
-        DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
+        cbmesh->data.color = cylinder.color;
+        DirectX::XMStoreFloat4x4(&cbmesh->data.wvp, WVP);
 
-        context->UpdateSubresource(constantBuffer_.Get(), 0, 0, &cbMesh, 0, 0);
         context->Draw(cylinderVertexCount_, 0);
     }
     cylinders_.clear();
