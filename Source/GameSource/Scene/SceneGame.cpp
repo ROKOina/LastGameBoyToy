@@ -338,6 +338,8 @@ void SceneGame::SetOnlineInput()
         {
             std::shared_ptr<CharacterCom> chara = clientObj->GetComponent<CharacterCom>();
 
+            if (!chara)continue;
+
             // 入力情報をプレイヤーキャラクターに送信
             chara->SetUserInput(client.input);
             chara->SetUserInputDown(client.inputDown);

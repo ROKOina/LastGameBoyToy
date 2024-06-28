@@ -49,7 +49,7 @@ void NetwarkPost::RenderUpdate()
             r->LoadModel("Data/OneCoin/robot.mdl");
             std::shared_ptr<AnimationCom> a = clientObj->AddComponent<AnimationCom>();
             std::shared_ptr<MovementCom> m = clientObj->AddComponent<MovementCom>();
-            std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
+            //std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
         }
 
         //ˆÊ’uXV
