@@ -55,6 +55,8 @@ void NetwarkPost::RenderUpdate()
         //ˆÊ’uXV
         clientObj->transform_->SetWorldPosition(client.pos);
         clientObj->transform_->SetRotation(client.rotato);
+        clientObj->GetComponent<MovementCom>()->SetVelocity(client.velocity);
+        clientObj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(client.nonVelocity);
     }
 }
 

@@ -8,6 +8,7 @@
 
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
+#include "Components/MovementCom.h"
 
 __fastcall NetServer::~NetServer()
 {
@@ -125,6 +126,8 @@ void __fastcall NetServer::Update()
                 if (!isRegisterClient)
                     clientDatas.emplace_back(nData);
             }
+
+            RenderUpdate();
         }
         else
         {
@@ -153,6 +156,8 @@ void __fastcall NetServer::Update()
             if (client.id != id)continue;
 
             client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+            client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+            client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
             client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
 
             client.input = input;
@@ -172,7 +177,7 @@ void __fastcall NetServer::Update()
         cou = 0;
     }
 
-    RenderUpdate();
+    //RenderUpdate();
 }
 
 #include <imgui.h>

@@ -50,7 +50,10 @@ public:
     }
     const DirectX::XMFLOAT3& GetVelocity()const {
         return velocity_;
-   }
+    }
+    void SetVelocity(DirectX::XMFLOAT3 velo){
+        velocity_ = velo;
+    }
 
     //nonMaxSpeedVelocity
     void AddNonMaxSpeedForce(const DirectX::XMFLOAT3& force) {
@@ -63,7 +66,10 @@ public:
     }
     const DirectX::XMFLOAT3& GetNonMaxSpeedVelocity()const {
         return nonMaxSpeedVelocity_;
-   }
+    }
+    void SetNonMaxSpeedVelocity(DirectX::XMFLOAT3 velo) {
+        nonMaxSpeedVelocity_ = velo;
+    }
 
     //èdóÕ
     const float& GetGravity()const {

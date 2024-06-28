@@ -10,6 +10,7 @@
 
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
+#include "Components/MovementCom.h"
 
 NetClient::~NetClient()
 {
@@ -128,6 +129,8 @@ void __fastcall NetClient::Update()
         n.radi = 1.1f;
         DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
         n.pos = p;
+        n.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+        n.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
         n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
 
         n.input = input;
@@ -161,13 +164,15 @@ void __fastcall NetClient::Update()
         std::cout << "multicast msg recieve: " << buffer << std::endl;
 
         clientDatas = NetDataRecvCast(recvData);
+
+        RenderUpdate();
     }
     else
     {
         std::cout << WSAGetLastError() << std::endl;
     }
 
-    RenderUpdate();
+    //RenderUpdate();
 }
 
 #include <imgui.h>

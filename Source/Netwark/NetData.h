@@ -61,6 +61,8 @@ struct NetData
     int id;
     float radi;
     DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT3 velocity;
+    DirectX::XMFLOAT3 nonVelocity;
     DirectX::XMFLOAT4 rotato;
     unsigned int inputDown;
     unsigned int input;
@@ -72,6 +74,8 @@ static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
 {
     out << h.id << " " << h.radi << " ";
     out << h.pos << " ";
+    out << h.velocity << " ";
+    out << h.nonVelocity << " ";
     out << h.rotato << " ";
     out << h.input << " "<< h.inputDown << " "<< h.inputUp << " ";
     //for (auto& i : h.p)
@@ -84,6 +88,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
     in >> h.id >> h.radi;
     in >> h.pos;
+    in >> h.velocity;
+    in >> h.nonVelocity;
     in >> h.rotato;
     in >> h.input>> h.inputDown >> h.inputUp;
     return in;
