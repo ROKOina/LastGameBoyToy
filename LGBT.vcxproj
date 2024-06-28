@@ -149,9 +149,11 @@
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\InazawaCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\State\NomuraCharacterState.h" />
     <ClInclude Include="Source\Components\Character\State\UenoCharacterState.h" />
     <ClInclude Include="Source\Components\Character\TestCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\TestCharacterState.h" />
@@ -238,9 +240,11 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\NomuraCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\InazawaCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\State\NomuraCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\State\UenoCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\TestCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\TestCharacterState.cpp" />
