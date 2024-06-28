@@ -4,7 +4,7 @@
 
 void BulletCom::Update(float elapsedTime)
 {
-    Collider* collider = GetGameObject()->GetComponent<Collider>().get();
+    std::shared_ptr<SphereColliderCom> collider = GetGameObject()->GetComponent<SphereColliderCom>();
     if(collider->OnHitGameObject().size()) 
     {
         GameObjectManager::Instance().Remove(this->GetGameObject());

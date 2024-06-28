@@ -18,6 +18,8 @@ void CharacterCom::Update(float elapsedTime)
 
 #ifdef _DEBUG
 
+    int inputNum = GetButtonDown();
+
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()
     && GamePad::BTN_LEFT_SHOULDER & GetButton())
