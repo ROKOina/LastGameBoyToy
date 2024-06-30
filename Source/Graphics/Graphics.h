@@ -96,7 +96,7 @@ enum SAMPLEMODE
 };
 
 //シェーダー設定
-enum class SHADERMODE
+enum class SHADER_ID_MODEL
 {
     // デファードレンダーターゲットに描画
     DEFERRED,
@@ -139,7 +139,7 @@ public:
     ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView_.Get(); }
 
     //シェーダー取得
-    ModelShader* GetModelShader(SHADERMODE mode)const { return m_modelshaders[static_cast<int>(mode)].get(); }
+    ModelShader* GetModelShader(SHADER_ID_MODEL mode)const { return m_modelshaders[static_cast<int>(mode)].get(); }
 
     // スクリーン幅取得
     float GetScreenWidth() const { return screenWidth_; }
@@ -202,7 +202,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depthStencilStates[static_cast<int>(DEPTHSTATE::MAX)];
     Microsoft::WRL::ComPtr<ID3D11SamplerState>	    samplerStates[static_cast<int>(SAMPLEMODE::MAX)];
 
-    std::unique_ptr<ModelShader>                    m_modelshaders[static_cast<int>(SHADERMODE::MAX)];
+    std::unique_ptr<ModelShader>                    m_modelshaders[static_cast<int>(SHADER_ID_MODEL::MAX)];
 
 private:
     float	screenWidth_;

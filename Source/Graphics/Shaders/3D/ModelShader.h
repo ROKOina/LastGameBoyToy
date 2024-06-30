@@ -10,20 +10,7 @@
 class ModelShader
 {
 public:
-    enum MODELSHADER
-    {
-        DEFERRED,
-
-        BLACK,
-        DEFAULT,
-        CRACK_EFFECT,
-        AREA_EFFECT_CIRCLE,
-
-        MAX
-    };
-
-public:
-    ModelShader(int shader);
+    ModelShader(SHADER_ID_MODEL shader);
     ~ModelShader() {};
 
     //ï`âÊèâä˙ê›íË

@@ -2,7 +2,7 @@
 #include "Graphics/Shaders/Texture.h"
 
 //èâä˙âª
-ModelShader::ModelShader(int shader)
+ModelShader::ModelShader(SHADER_ID_MODEL shader)
 {
     Graphics& Graphics = Graphics::Instance();
 
@@ -13,23 +13,23 @@ ModelShader::ModelShader(int shader)
     //ëIëÇ≥ÇÍÇΩÇÃÇ™éwíËÇ≥ÇÍÇÈ
     switch (shader)
     {
-    case MODELSHADER::DEFAULT:
+    case SHADER_ID_MODEL::DEFAULT:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DefaltPS.cso" };
         break;
-    case MODELSHADER::DEFERRED:
+    case SHADER_ID_MODEL::DEFERRED:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DeferredSetupPS.cso" };
         break;
-    case MODELSHADER::BLACK:
+    case SHADER_ID_MODEL::BLACK:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\BlackPS.cso" };
         break;
-    case MODELSHADER::AREA_EFFECT_CIRCLE:
+    case SHADER_ID_MODEL::AREA_EFFECT_CIRCLE:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\AreaEffectCirclePS.cso" };
         break;
-    case MODELSHADER::CRACK_EFFECT:
+    case SHADER_ID_MODEL::CRACK_EFFECT:
         VSPath = { "Shader\\FakeDepthVS.cso" };
         PSPath = { "Shader\\FakeDepthPS.cso" };
         break;

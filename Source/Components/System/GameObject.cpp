@@ -555,7 +555,7 @@ void GameObjectManager::SortRenderObject()
 
   deferredCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
     [&](std::weak_ptr<RendererCom>& ren) {
-      return ren.lock()->GetShaderMode() == SHADERMODE::DEFERRED;
+      return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::DEFERRED;
     });
 }
 
