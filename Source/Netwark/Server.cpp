@@ -3,8 +3,12 @@
 #include <iostream>
 #pragma comment(lib,"ws2_32.lib")
 
+#include "Input\Input.h"
+#include "Input\GamePad.h"
+
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
+#include "Components/MovementCom.h"
 
 __fastcall NetServer::~NetServer()
 {
@@ -65,11 +69,17 @@ void __fastcall NetServer::Initialize()
     setsockopt(multicastSock, IPPROTO_IP, IP_MULTICAST_TTL,
         reinterpret_cast<char*>(&ttl), sizeof(ttl));
 
-
+    //サーバーのキャラ情報
+    NetData serverData;
+    serverData.id = id;
+    clientDatas.emplace_back(serverData);
 }
-
+static std::vector<int> kari;
+static int kk = 0;
 void __fastcall NetServer::Update()
 {
+    kk++;
+
     //データ受信
     char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
@@ -93,6 +103,18 @@ void __fastcall NetServer::Update()
                 bool isRegisterClient = false;
                 for (auto& client : clientDatas)
                 {
+
+
+                    if (client.id == 1)
+                    {
+                        kari.emplace_back(kk);
+                        kk = 0;
+                        if (client.input == 0)
+                            int i = 0;
+                    }
+
+
+
                     if (nData.id == client.id)
                     {
                         isRegisterClient = true;
@@ -104,6 +126,8 @@ void __fastcall NetServer::Update()
                 if (!isRegisterClient)
                     clientDatas.emplace_back(nData);
             }
+
+            RenderUpdate();
         }
         else
         {
@@ -113,10 +137,38 @@ void __fastcall NetServer::Update()
     }
 
     // マルチキャストアドレスを宛先に指定してメッセージを送信、パケットロス回避のため３フレーム毎
+
+    //入力情報更新
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    input |= gamePad.GetButton();
+    inputDown |= gamePad.GetButtonDown();
+    inputUp |= gamePad.GetButtonUp();
+
+
     static int cou = 0;
     cou++;
     if (cou > 3)
     {
+        for (auto& client : clientDatas)
+        {
+            //自分自身(server)のキャラ情報を送る
+            if (client.id != id)continue;
+
+            client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+            client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+            client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+            client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+
+            client.input = input;
+            client.inputDown = inputDown;
+            client.inputUp = inputUp;
+            input = 0;
+            inputDown = 0;
+            inputUp = 0;
+
+            break;
+        }
         //送信型に変換してデータを全て送る
         std::stringstream ss = NetDataSendCast(clientDatas);
 
@@ -124,6 +176,8 @@ void __fastcall NetServer::Update()
             reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
         cou = 0;
     }
+
+    //RenderUpdate();
 }
 
 #include <imgui.h>
@@ -135,22 +189,6 @@ void NetServer::ImGui()
     ImGui::Begin("NetServer", nullptr, ImGuiWindowFlags_None);
 
     ImGui::Text(recvData.c_str());
-
-    static int cID = 0;
-
-    ImGui::InputInt("drawID", &cID);
-    if (clientDatas.size() > 0)
-    {
-        if (cID < 0)cID = 0;
-        if (clientDatas.size() >= cID + 1)
-        {
-            GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition(clientDatas[cID].pos);
-        }
-        else
-        {
-            cID = 0;
-        }
-    }
 
     ImGui::End();
 }
