@@ -5,6 +5,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
 #include "Graphics/Light/Light.h"
+#include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
@@ -36,6 +37,8 @@ std::shared_ptr<CameraCom> follow;
 void SceneGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
+
+#pragma region ゲームオブジェクトの設定
 
     //フリーカメラ
     {
@@ -135,7 +138,7 @@ void SceneGame::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("barrier");
         obj->transform_->SetWorldPosition({ -2.0f,1.4f,0.0f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFAULT, BLENDSTATE::ADD);
         r->LoadModel("Data/Ball/b.mdl");
     }
 
@@ -190,11 +193,25 @@ void SceneGame::Initialize()
         obj->AddComponent<GPUParticle>("Data\\Effect\\test.gpuparticle", 4000);
     }
 
+#pragma endregion
+
+#pragma region グラフィック系の設定
     //平行光源を追加
     Light* mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
+
+    // スカイボックスの設定
+    std::array<const char*, 4> filepath = {
+      "Data\\Texture\\snowy_hillside_4k.DDS",
+      "Data\\Texture\\diffuse_iem.dds",
+      "Data\\Texture\\specular_pmrem.dds",
+      "Data\\Texture\\lut_ggx.DDS"
+    };
+    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
+
+#pragma endregion
 }
 
 // 終了化

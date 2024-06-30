@@ -98,11 +98,14 @@ enum SAMPLEMODE
 //シェーダー設定
 enum class SHADERMODE
 {
-    DEFALT,
+    // デファードレンダーターゲットに描画
     DEFERRED,
+
+    // フォワードレンダーターゲットに描画 ( 以降 )
     BLACK,
-    AREA_EFFECT_CIRCLE,
+    DEFAULT,
     CRACK_EFFECT,
+    AREA_EFFECT_CIRCLE,
 
     MAX
 };

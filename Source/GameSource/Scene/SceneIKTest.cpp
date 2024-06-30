@@ -77,14 +77,14 @@ void SceneIKTest::Initialize()
         oo->SetName("barrier1");
         oo->transform_->SetScale({ 500,500,500 });
         oo->transform_->SetLocalPosition({ 1000,0,0 });
-        std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+        std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADERMODE::DEFAULT, BLENDSTATE::ADD);
         ro->LoadModel("Data/Ball/b.mdl");
 
         auto& oo1 = oo->AddChildObject();
         oo1->SetName("barrier2");
         oo1->transform_->SetScale({ 1,1,1 });
         oo1->transform_->SetLocalPosition({ 3,0,0 });
-        std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+        std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFAULT, BLENDSTATE::ADD);
         ro1->LoadModel("Data/Ball/b.mdl");
     }
 

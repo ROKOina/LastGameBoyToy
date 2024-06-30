@@ -51,6 +51,8 @@ public:
     return p;
   }
 
+  SHADERMODE GetShaderMode() { return shaderMode; }
+
 private:
 #ifdef _DEBUG
   // マテリアルを選択するImGui

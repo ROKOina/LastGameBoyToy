@@ -4,7 +4,7 @@
 #include <vector>
 
 //コンストラクタ
-Bloom::Bloom(ID3D11Device* device, uint32_t width, uint32_t height) : FullScreenQuad(device)
+Bloom::Bloom(ID3D11Device* device, uint32_t width, uint32_t height)
 {
     m_glowextraction = std::make_unique<FrameBuffer>(device, width, height, DXGI_FORMAT_R32G32B32A32_FLOAT, true);
     for (size_t downsampled_index = 0; downsampled_index < m_downsampledcount; ++downsampled_index)
@@ -25,11 +25,12 @@ Bloom::Bloom(ID3D11Device* device, uint32_t width, uint32_t height) : FullScreen
 void Bloom::Make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView* color_map)
 {
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> null_shader_resource_view;
+    FullScreenQuad& screenQuad = FullScreenQuad::Instance();
 
     //Extracting bright color
     m_glowextraction->Clear(immediate_context);
     m_glowextraction->Activate(immediate_context);
-    FullScreenQuad::Blit(immediate_context, &color_map, 0, 1, m_glowextractionps.Get());
+    screenQuad.Blit(immediate_context, &color_map, 0, 1, m_glowextractionps.Get());
     m_glowextraction->Deactivate(immediate_context);
 
     //Gaussian blur
@@ -38,18 +39,18 @@ void Bloom::Make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceVie
     // downsampling
     m_gaussianblur[0][0]->Clear(immediate_context);
     m_gaussianblur[0][0]->Activate(immediate_context);
-    FullScreenQuad::Blit(immediate_context, m_glowextraction->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurdownsamplingps.Get());
+    screenQuad.Blit(immediate_context, m_glowextraction->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurdownsamplingps.Get());
     m_gaussianblur[0][0]->Deactivate(immediate_context);
 
     // ping-pong gaussian blur
     m_gaussianblur[0][1]->Clear(immediate_context);
     m_gaussianblur[0][1]->Activate(immediate_context);
-    FullScreenQuad::Blit(immediate_context, m_gaussianblur[0][0]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurhorizontalps.Get());
+    screenQuad.Blit(immediate_context, m_gaussianblur[0][0]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurhorizontalps.Get());
     m_gaussianblur[0][1]->Deactivate(immediate_context);
 
     m_gaussianblur[0][0]->Clear(immediate_context);
     m_gaussianblur[0][0]->Activate(immediate_context);
-    FullScreenQuad::Blit(immediate_context, m_gaussianblur[0][1]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurverticalps.Get());
+    screenQuad.Blit(immediate_context, m_gaussianblur[0][1]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurverticalps.Get());
     m_gaussianblur[0][0]->Deactivate(immediate_context);
 
     for (size_t downsampled_index = 1; downsampled_index < m_downsampledcount; ++downsampled_index)
@@ -57,18 +58,18 @@ void Bloom::Make(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceVie
         // downsampling
         m_gaussianblur[downsampled_index][0]->Clear(immediate_context);
         m_gaussianblur[downsampled_index][0]->Activate(immediate_context);
-        FullScreenQuad::Blit(immediate_context, m_gaussianblur[downsampled_index - 1][0]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurdownsamplingps.Get());
+        screenQuad.Blit(immediate_context, m_gaussianblur[downsampled_index - 1][0]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurdownsamplingps.Get());
         m_gaussianblur[downsampled_index][0]->Deactivate(immediate_context);
 
         // ping-pong gaussian blur
         m_gaussianblur[downsampled_index][1]->Clear(immediate_context);
         m_gaussianblur[downsampled_index][1]->Activate(immediate_context);
-        FullScreenQuad::Blit(immediate_context, m_gaussianblur[downsampled_index][0]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurhorizontalps.Get());
+        screenQuad.Blit(immediate_context, m_gaussianblur[downsampled_index][0]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurhorizontalps.Get());
         m_gaussianblur[downsampled_index][1]->Deactivate(immediate_context);
 
         m_gaussianblur[downsampled_index][0]->Clear(immediate_context);
         m_gaussianblur[downsampled_index][0]->Activate(immediate_context);
-        FullScreenQuad::Blit(immediate_context, m_gaussianblur[downsampled_index][1]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurverticalps.Get());
+        screenQuad.Blit(immediate_context, m_gaussianblur[downsampled_index][1]->m_shaderresourceviews[0].GetAddressOf(), 0, 1, m_gaussianblurverticalps.Get());
         m_gaussianblur[downsampled_index][0]->Deactivate(immediate_context);
     }
 }
@@ -81,5 +82,5 @@ void Bloom::Blit(ID3D11DeviceContext* immediate_context)
     {
         shader_resource_views.push_back(m_gaussianblur[downsampled_index][0]->m_shaderresourceviews[0].Get());
     }
-    FullScreenQuad::Blit(immediate_context, shader_resource_views.data(), 0, m_downsampledcount, m_gaussianblurupsamplingps.Get());
+    FullScreenQuad::Instance().Blit(immediate_context, shader_resource_views.data(), 0, m_downsampledcount, m_gaussianblurupsamplingps.Get());
 }

@@ -1,3 +1,6 @@
+#ifndef	__COMMON_HLSLI__
+#define	__COMMON_HLSLI__
+
 #define POINT 0
 #define LINEAR 1
 #define ANISOTROPIC 2
@@ -15,3 +18,5 @@ static const float PI = 3.141592653589;
 static const float GAMMA = 2.2;
 // ŒÀ‚è‚È‚­0‚É‹ß‚¢’l
 static const float EPSILON = 0.000001;
+
+#endif // #endif __COMMON_HLSLI__
