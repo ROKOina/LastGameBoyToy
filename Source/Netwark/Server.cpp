@@ -80,7 +80,7 @@ void __fastcall NetServer::Update()
 {
     kk++;
 
-    //データ受信
+    ///******       データ受信        ******///
     char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
     int addrSize = sizeof(struct sockaddr_in);
@@ -127,6 +127,7 @@ void __fastcall NetServer::Update()
                     clientDatas.emplace_back(nData);
             }
 
+            //クライアント情報更新
             RenderUpdate();
         }
         else
@@ -136,6 +137,9 @@ void __fastcall NetServer::Update()
         std::cout << "message send:" << buffer << std::endl;
     }
 
+
+
+    ///******       データ送信        ******///
     // マルチキャストアドレスを宛先に指定してメッセージを送信、パケットロス回避のため３フレーム毎
 
     //入力情報更新
@@ -176,8 +180,6 @@ void __fastcall NetServer::Update()
             reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
         cou = 0;
     }
-
-    //RenderUpdate();
 }
 
 #include <imgui.h>

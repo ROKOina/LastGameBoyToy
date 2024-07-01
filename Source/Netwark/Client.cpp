@@ -109,8 +109,7 @@ void __fastcall NetClient::Initialize()
 
 void __fastcall NetClient::Update()
 {
-    // 通常のソケットでサーバにメッセージを送信
-
+    ///******       データ送信        ******///
     //入力情報更新
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -149,6 +148,8 @@ void __fastcall NetClient::Update()
         cou = 0;
     }
 
+
+    ///******       データ受信        ******///
     //マルチキャストアドレスからデータ受信
     char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
@@ -171,8 +172,6 @@ void __fastcall NetClient::Update()
     {
         std::cout << WSAGetLastError() << std::endl;
     }
-
-    //RenderUpdate();
 }
 
 #include <imgui.h>
