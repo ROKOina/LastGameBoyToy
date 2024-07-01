@@ -23,8 +23,8 @@ void AnimationCom::Update(float elapsedTime)
         break;
         //上半身別アニメーション更新
     case AnimationType::UpperLowerAnimation:
-        AnimationUpdata(elapsedTime);
-        AnimationSortingUpdate(elapsedTime);
+        AnimationUpperUpdate(elapsedTime);
+        AnimationLowerUpdate(elapsedTime);
         break;
         //上半身別上半身アニメーションブレンド更新
     case AnimationType::UpperBlendLowerAnimation:
@@ -113,18 +113,11 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 
     //ブレンド率の計算
     float blendRate = 1.0f;
-    if (animationChangeTime>0)
+    if (animationChangeTime > 0)
     {
         animationChangeRate += animationChangeTime;
         blendRate = animationChangeRate;
         if (blendRate > 1.0f)blendRate = 1.0f;
-    }
-
-    //上半身補完の計算
-    if (upperComplementFlag)
-    {
-        upperRate += animationChangeTime;
-        if (upperRate > 1.0f)upperComplementFlag = true;
     }
 
     if (currentAnimation < 0)
@@ -148,7 +141,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         const ModelResource::Keyframe& keyframe1 = keyframes.at(keyIndex + 1);
 
 
-        
+
         if (currentSeconds >= keyframe0.seconds && currentSeconds <= keyframe1.seconds)
         {
             float rate = (currentSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
@@ -161,7 +154,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
                 const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
 
-                 
+
                 if (blendRate < 1.0f)
                 {
                     //アニメーション切り替え時の計算
@@ -169,22 +162,9 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 }
                 else
                 {
+                    //アニメーション計算
+                    ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
 
-                    //上半身アニメーションが入っているか否か
-                    if (upperIsPlayAnimation)
-                    {
-                        //上半身アニメーションを飛ばす
-                        if (model->GetNodes()[nodeIndex].layer != 0)
-                        {
-                            //アニメーション計算
-                            ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
-                        }
-                    }
-                    else
-                    {
-                        //アニメーション計算
-                        ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
-                    }
                 }
             }
             break;
@@ -209,7 +189,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
             //再生時間を巻き戻す
             currentSeconds -= animation.secondsLength;
             //ルートモーション用の計算
-            if (rootMotionNodeIndex >=0)
+            if (rootMotionNodeIndex >= 0)
             {
                 //零クリアするとHips分の値がずれるのでアニメーションの最初のフレームのHipsの値を入れて初期化
                 cahcheRootMotionTranslation.x = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.x;
@@ -242,7 +222,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 
 
 //上半身別アニメーション更新
-void AnimationCom::AnimationSortingUpdate(float elapsedTime)
+void AnimationCom::AnimationUpperUpdate(float elapsedTime)
 {
     //モデルからリソースを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
@@ -287,7 +267,7 @@ void AnimationCom::AnimationSortingUpdate(float elapsedTime)
 
                 if (blendRate < 1.0f)
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
                     {
                         //現在の姿勢と次のキーフレームとの姿勢の補完
                         ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
@@ -296,7 +276,7 @@ void AnimationCom::AnimationSortingUpdate(float elapsedTime)
                 //通常の計算
                 else
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 0 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
                     {
                         ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                     }
@@ -335,6 +315,124 @@ void AnimationCom::AnimationSortingUpdate(float elapsedTime)
 }
 
 
+//上半身別アニメーション更新
+void AnimationCom::AnimationLowerUpdate(float elapsedTime)
+{
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    //再生中できないなら処理しない
+    if (!IsPlayLowerAnimation())return;
+
+    //ブレンド率の計算
+    float blendRate = 1.0f;
+    if (lowerAnimationChangeTime > 0)
+    {
+        lowerAnimationChangeRate += lowerAnimationChangeTime;
+        blendRate = lowerAnimationChangeRate;
+        if (blendRate > 1.0f)blendRate = 1.0f;
+    }
+
+    //指定のアニメーションデータを取得
+    const std::vector<ModelResource::Animation>& animations = model->GetResource()->GetAnimations();
+    const ModelResource::Animation& animation = animations.at(currentLowerAnimation);
+
+    //アニメーションデータからキーフレームデータリストを取得
+    const std::vector<ModelResource::Keyframe>& Keyframes = animation.keyframes;
+    int keyCount = static_cast<int>(Keyframes.size());
+    for (int keyIndex = 0; keyIndex < keyCount - 1; ++keyIndex)
+    {
+        //現在の時間がどのキーフレームの間にいるか判定する
+        const ModelResource::Keyframe& keyframe0 = Keyframes.at(keyIndex);
+        const ModelResource::Keyframe& keyframe1 = Keyframes.at(keyIndex + 1);
+        if (lowerCurrentAnimationSeconds >= keyframe0.seconds && lowerCurrentAnimationSeconds < keyframe1.seconds)
+        {
+            //再生時間とキーフレームの時間から補完率を算出する
+            float rate = (lowerCurrentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+
+            int nodeCount = static_cast<int>(model->GetNodes().size());
+            for (int nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+            {
+                //2つのキーフレーム間の補完計算
+                const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
+                const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
+
+
+
+                if (blendRate < 1.0f)
+                {
+                    if (model->GetNodes()[nodeIndex].layer == 1 && lowerIsPlayAnimation)
+                    {
+                        //現在の姿勢と次のキーフレームとの姿勢の補完
+                        ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
+                    }
+                }
+                //通常の計算
+                else
+                {
+                    if (model->GetNodes()[nodeIndex].layer == 1 && lowerIsPlayAnimation)
+                    {
+                        ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                    }
+                }
+
+            }
+            break;
+        }
+    }
+   
+
+
+    //時間経過
+    lowerCurrentAnimationSeconds += elapsedTime * animation.animationspeed;
+
+    //最終フレーム
+    if (animationLowerEndFlag)
+    {
+        animationLowerEndFlag = false;
+        currentLowerAnimation = -1;
+        lowerIsPlayAnimation = false;
+        return;
+    }
+
+    //再生時間が終端時間を超えたら
+    if (lowerCurrentAnimationSeconds >= animation.secondsLength)
+    {
+        if (animationLowerLoopFlag)
+        {
+            //再生時間を巻き戻す
+            lowerCurrentAnimationSeconds -= animation.secondsLength;
+            //ルートモーション用の計算
+            if (rootMotionNodeIndex >= 0)
+            {
+                //零クリアするとHips分の値がずれるのでアニメーションの最初のフレームのHipsの値を入れて初期化
+                cahcheRootMotionTranslation.x = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.x;
+                cahcheRootMotionTranslation.z = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.z;
+
+                //キャッシュルートモーションでクリア
+                model->GetNodes()[rootMotionHipNodeIndex].translate.x = cahcheRootMotionTranslation.x;
+                model->GetNodes()[rootMotionHipNodeIndex].translate.z = cahcheRootMotionTranslation.z;
+            }
+
+        }
+        else
+        {
+            animationLowerEndFlag = true;
+            lowerComplementFlag = true;
+        }
+    }
+    
+
+
+    rootMotionFlag = true;
+    if (rootFlag)
+    {
+        //ルートモーション計算
+        ComputeRootMotion();
+    }
+}
+
+
 //上半身アニメーション再生中か？
 bool AnimationCom::IsPlayUpperAnimation()
 {
@@ -342,6 +440,16 @@ bool AnimationCom::IsPlayUpperAnimation()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     if (currentUpperAnimation < 0)return false;
     if (currentUpperAnimation >= model->GetResource()->GetAnimations().size())return false;
+    return true;
+}
+
+//下半身アニメーション再生中か？
+bool AnimationCom::IsPlayLowerAnimation()
+{
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    if (currentLowerAnimation < 0)return false;
+    if (currentLowerAnimation >= model->GetResource()->GetAnimations().size())return false;
     return true;
 }
 
@@ -362,12 +470,26 @@ void AnimationCom::PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float
 {
     currentUpperAnimation = upperAnimaId;
     upperCurrentAnimationSeconds = 0.0f;
-    animationUpperLoopFlag = false;
+    animationUpperLoopFlag = loop;
     animationUpperEndFlag = false;
     upperAnimationChangeTime = blendSeconds;
-    upperIsPlayAnimation = false;
+    upperIsPlayAnimation = true;
     beforeOneFream = false;
     upperAnimationChangeRate = 0.0f;
+}
+
+//下半身のみアニメーション再生関数
+void AnimationCom::PlayLowerBodyOnlyAnimation(int lowerAnimaId, bool loop, bool rootFlga, float blendSeconds)
+{
+    currentLowerAnimation = lowerAnimaId;
+    lowerCurrentAnimationSeconds = 0.0f;
+    animationLowerLoopFlag = loop;
+    animationLowerEndFlag = false;
+    lowerAnimationChangeTime = blendSeconds;
+    lowerIsPlayAnimation = true;
+    beforeOneFream = false;
+    lowerAnimationChangeRate = 0.0f;
+    this->rootFlag = rootFlga;
 }
 
 //アニメーションストップ

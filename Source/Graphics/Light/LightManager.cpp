@@ -24,12 +24,12 @@ LightManager::LightManager()
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
     // 定数バッファ設定
-    dc->VSSetConstantBuffers(8, 1, m_lightCb.GetAddressOf());
-    dc->PSSetConstantBuffers(8, 1, m_lightCb.GetAddressOf());
-    dc->CSSetConstantBuffers(8, 1, m_lightCb.GetAddressOf());
-    dc->GSSetConstantBuffers(8, 1, m_lightCb.GetAddressOf());
-    dc->HSSetConstantBuffers(8, 1, m_lightCb.GetAddressOf());
-    dc->DSSetConstantBuffers(8, 1, m_lightCb.GetAddressOf());
+    dc->VSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->PSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->CSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->HSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->DSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
 }
 
 //デストラクタ

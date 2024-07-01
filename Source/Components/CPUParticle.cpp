@@ -88,6 +88,9 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
         CEREAL_NVP(m_scalerandom),
         CEREAL_NVP(m_randomrotation),
         CEREAL_NVP(m_speed),
+        CEREAL_NVP(m_string),
+        CEREAL_NVP(m_scalar),
+        CEREAL_NVP(m_stringlate),
         CEREAL_NVP(m_filename),
         CEREAL_NVP(m_orbitalvelocity),
         CEREAL_NVP(m_randombuoyancy),
@@ -95,6 +98,7 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
         CEREAL_NVP(m_buoyancy),
         CEREAL_NVP(m_velocity),
         CEREAL_NVP(m_scale),
+        CEREAL_NVP(m_latesize),
         CEREAL_NVP(m_particlecolor),
         CEREAL_NVP(m_intensity)
     );
@@ -104,7 +108,7 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
 #define J(x) reinterpret_cast<const char*>(x)
 
 //コンストラクタ
-CPUParticle::CPUParticle(int num)
+CPUParticle::CPUParticle(const char* filename, int num)
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -149,6 +153,14 @@ CPUParticle::CPUParticle(int num)
 
     //コンスタントバッファ設定
     m_cc = std::make_unique<ConstantBuffer<CPUParticleConstant>>(graphics.GetDevice());
+
+    //ファイル読み込み処理
+    if (filename)
+    {
+        Desirialize(filename);
+        D3D11_TEXTURE2D_DESC texture2d_desc{};
+        LoadTextureFromFile(Graphics::Instance().GetDevice(), m_scp.m_filename.c_str(), m_shaderresourceview.GetAddressOf(), &texture2d_desc);
+    }
 }
 
 //更新処理
@@ -161,13 +173,16 @@ void CPUParticle::Update(float elapsedTime)
         {
             if (m_data[i].type < 0) continue;
 
+            //寿命時間の割合を求める
+            float lifelate = 1 - (m_data[i].timer / m_scp.m_lifetime);
+
             m_data[i].vx += m_data[i].ax * elapsedTime;
             m_data[i].vy += m_data[i].ay * elapsedTime;
             m_data[i].vz += m_data[i].az * elapsedTime;
 
-            m_data[i].x += m_data[i].vx * elapsedTime;
-            m_data[i].y += m_data[i].vy * elapsedTime;
-            m_data[i].z += m_data[i].vz * elapsedTime;
+            m_data[i].x += m_data[i].vx * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
+            m_data[i].y += m_data[i].vy * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
+            m_data[i].z += m_data[i].vz * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
 
             m_data[i].timer -= elapsedTime;
             m_data[i].alpha = sqrtf(m_data[i].timer);
@@ -183,7 +198,7 @@ void CPUParticle::Update(float elapsedTime)
         }
 
         //パーティクルの動き
-        ParticleMove();
+        ParticleMove(elapsedTime);
     }
 }
 
@@ -218,7 +233,7 @@ void CPUParticle::Render()
     //コンスタントバッファの更新
     m_cc->data.particlecolor = m_scp.m_particlecolor;
     m_cc->data.intensity = m_scp.m_intensity;
-    m_cc->Activate(dc, 5, false, true, false, false, false, false);
+    m_cc->Activate(dc, (int)CB_INDEX::CPU_PARTICLE, false, true, false, false, false, false);
 
     //パーティクル発生数
     int n = 0;
@@ -294,7 +309,7 @@ void CPUParticle::Set(int type, float time, DirectX::XMFLOAT3 p, DirectX::XMFLOA
 }
 
 //パーティクルの動き
-void CPUParticle::ParticleMove()
+void CPUParticle::ParticleMove(float elapsedTime)
 {
     if (m_active)
     {
@@ -303,39 +318,29 @@ void CPUParticle::ParticleMove()
             //位置
             DirectX::XMFLOAT3 position = { GetGameObject()->transform_->GetWorldPosition() };
 
-            //スケール
-            m_scp.m_scale = { GetGameObject()->transform_->GetScale().x ,GetGameObject()->transform_->GetScale().y };
-
             //回転
             DirectX::XMFLOAT4 rotation = GetGameObject()->transform_->GetRotation();
-
-            //親子付け
-            //if (transform.GetParentObject().expired() == false)
-            //{
-            //    DirectX::XMVECTOR Quaternion = DirectX::XMQuaternionMultiply(DirectX::XMLoadFloat4(&rotation), DirectX::XMQuaternionRotationMatrix(*transform.GetParentTransform()));
-            //    DirectX::XMStoreFloat4(&rotation, Quaternion);
-
-            //    DirectX::XMVECTOR Position = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&position), *transform.GetParentTransform());
-            //    DirectX::XMStoreFloat3(&position, Position);
-            //}
 
             //広がるやつ
             float angle = (rand() % m_scp.m_arc);
             position.x += cos(DirectX::XMConvertToRadians(angle)) * m_scp.m_radius;
             position.z += sin(DirectX::XMConvertToRadians(angle)) * m_scp.m_radius;
 
-            //回転のやつ
             for (int j = 0; j < m_numparticle; j++)
             {
+                //寿命時間の割合を求める
+                float lifelate = 1 - (m_data[j].timer / m_scp.m_lifetime);
+
+                //回転のやつ
                 DirectX::XMFLOAT3 vec = Mathf::Normalize(position - DirectX::XMFLOAT3(m_data[j].x, m_data[j].y, m_data[j].z));
                 DirectX::XMFLOAT3 X = Mathf::Cross(vec, DirectX::XMFLOAT3(1, 0, 0));
                 DirectX::XMFLOAT3 Y = Mathf::Cross(vec, DirectX::XMFLOAT3(0, 1, 0));
                 DirectX::XMFLOAT3 Z = Mathf::Cross(vec, DirectX::XMFLOAT3(0, 0, 1));
                 DirectX::XMFLOAT3 orbVelo = { X * m_scp.m_orbitalvelocity.x + Y * m_scp.m_orbitalvelocity.y + Z * m_scp.m_orbitalvelocity.z };
                 DirectX::XMFLOAT3 radialvector = -vec * m_scp.m_scaleradius;
-                m_data[j].x += (m_scp.m_velocity + orbVelo + radialvector).x;
-                m_data[j].y += (m_scp.m_velocity + orbVelo + radialvector).y;
-                m_data[j].z += (m_scp.m_velocity + orbVelo + radialvector).z;
+                m_data[j].x += (m_scp.m_velocity.x + orbVelo.x + radialvector.x) * m_scp.m_scalar;
+                m_data[j].y += (m_scp.m_velocity.y + orbVelo.y + radialvector.y) * m_scp.m_scalar;
+                m_data[j].z += (m_scp.m_velocity.z + orbVelo.z + radialvector.z) * m_scp.m_scalar;
 
                 //重力ランダム
                 m_data[j].vx += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.x);
@@ -356,14 +361,19 @@ void CPUParticle::ParticleMove()
                 m_data[j].ay += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.y);
                 m_data[j].az += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.z);
 
+                //大きさをラープで制御
+                m_data[j].w = Mathf::Lerp(m_scp.m_latesize.x, m_scp.m_latesize.y, lifelate);
+                m_data[j].h = Mathf::Lerp(m_scp.m_latesize.x, m_scp.m_latesize.y, lifelate);
+
+                //スケールランダム
+                DirectX::XMFLOAT2 latescale = { m_data[j].w, m_data[j].h };
+                latescale += Mathf::RandomRange(0.0f, m_scp.m_scalerandom);
+                m_data[j].w = Mathf::Lerp(m_scp.m_scale.x, latescale.x, lifelate);
+                m_data[j].h = Mathf::Lerp(m_scp.m_scale.y, latescale.y, lifelate);
+
                 //回転ランダム
                 m_data[j].rz += Mathf::RandomRange(0.0f, m_scp.m_randomrotation);
             }
-
-            //スケールランダム
-            DirectX::XMFLOAT2 latescale = { m_scp.m_scale };
-            latescale += Mathf::RandomRange(0.0f, m_scp.m_scalerandom);
-            m_scp.m_scale = Mathf::Lerp(m_scp.m_scale, latescale, 0.01f);
 
             //セットする
             Set(m_scp.m_type, m_scp.m_lifetime, position, rotation, m_scp.m_velocity, m_scp.m_buoyancy, m_scp.m_scale);
@@ -464,8 +474,14 @@ void CPUParticle::OnGUI()
     ImGui::SameLine();
     ImGui::SetNextItemWidth(92);
     ImGui::DragFloat(J(u8"アニメーションスピード"), &m_scp.m_animationspeed, 0.1f, 0.0f, 60.0f);
+    ImGui::DragFloat2(J(u8"スケール"), &m_scp.m_scale.x, 0.01f, 0);
+    if (ImGui::DragFloat(J(u8"全部のスケール"), &m_scp.m_scale.x, 0.01f, 0))
+    {
+        m_scp.m_scale.y = m_scp.m_scale.x;
+    }
+    ImGui::Spacing();
     ImGui::ColorEdit4(J(u8"色"), &m_scp.m_particlecolor.x);
-    ImGui::DragFloat3(J(u8"輝度"), &m_scp.m_intensity.x, 0.1f);
+    ImGui::DragFloat3(J(u8"輝度"), &m_scp.m_intensity.x, 0.1f, 0.0f, 300.0f);
     ImGui::DragFloat(J(u8"生存時間"), &m_scp.m_lifetime, 0.1f);
     ImGui::DragFloat3(J(u8"重力方向"), &m_scp.m_velocity.x, 0.1f);
     ImGui::DragFloat3(J(u8"重力ランダム"), &m_scp.m_randomvelocity.x, 0.1f, 0.0f);
@@ -477,14 +493,29 @@ void CPUParticle::OnGUI()
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"半径"), &m_scp.m_radius, 0.1f);
     ImGui::DragFloat3(J(u8"回転係数"), &m_scp.m_orbitalvelocity.x, 0.1f);
+    ImGui::SetNextItemWidth(90);
+    ImGui::DragFloat(J(u8"広がる早さ"), &m_scp.m_scalar, 0.1f, 0.1f, 100.0f);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"広がる大きさ"), &m_scp.m_scaleradius, 0.1f);
     ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"スケールランダム"), &m_scp.m_scalerandom, 0.1f, 0.0f);
+    ImGui::DragFloat(J(u8"スケールランダム"), &m_scp.m_scalerandom, 0.1f, 0.0f, 200.0f);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"Z軸回転ランダム"), &m_scp.m_randomrotation, 0.01f, -0.1f, 0.1f);
+    ImGui::SetNextItemWidth(90);
+    ImGui::DragFloat(J(u8"生成時の大きさ"), &m_scp.m_latesize.x, 0.01f, 0.0f, 1.0f);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(90);
+    ImGui::DragFloat(J(u8"消滅時の大きさ"), &m_scp.m_latesize.y, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat3(J(u8"方向ベクトル"), &m_direction.x, 0.1f);
     ImGui::DragFloat(J(u8"ベクトルに加算するスピード"), &m_scp.m_speed, 0.1f);
+    ImGui::DragFloat(J(u8"パーティクルの速さ"), &m_scp.m_string, 0.01f, 1.0f, 10.0f);
+    ImGui::SetNextItemWidth(90);
+    ImGui::DragFloat(J(u8"パーティクルの最初の速さ"), &m_scp.m_stringlate.x, 0.01f, 1.0f, 10.0f);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(90);
+    ImGui::DragFloat(J(u8"パーティクルの最後の速さ"), &m_scp.m_stringlate.y, 0.01f, 1.0f, 10.0f);
 }
 
 //シリアライズ
@@ -566,12 +597,16 @@ void CPUParticle::Reset()
     m_scp.m_scalerandom = 0;
     m_scp.m_randomrotation = 0.0f;
     m_scp.m_speed = 0.0f;
+    m_scp.m_string = 1.0f;
+    m_scp.m_scalar = 1.0f;
+    m_scp.m_stringlate = { 1.0f,1.0f };
     m_scp.m_orbitalvelocity = { 0,0,0 };
     m_scp.m_randombuoyancy = { 0,0,0 };
     m_scp.m_randomvelocity = { 0,0,0 };
     m_scp.m_buoyancy = { 0,0,0 };
     m_scp.m_velocity = { 0,0,0 };
     m_scp.m_scale = { 1,1 };
+    m_scp.m_latesize = { 1,1 };
     m_scp.m_particlecolor = { 1,1,1,1 };
     m_scp.m_intensity = { 1,1,1 };
 }

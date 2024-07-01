@@ -631,10 +631,11 @@ Graphics::Graphics(HWND hWnd)
 
     // シェーダー
     {
-        m_modelshaders[static_cast<int>(SHADERMODE::DEFALT)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFALT);
-        m_modelshaders[static_cast<int>(SHADERMODE::DEFERRED)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFERRED);
-        m_modelshaders[static_cast<int>(SHADERMODE::BLACK)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::BLACK);
-        m_modelshaders[static_cast<int>(SHADERMODE::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::AREA_EFFECT_CIRCLE);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::DEFAULT)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::DEFAULT);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::DEFERRED)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::DEFERRED);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::BLACK)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::BLACK);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::CRACK_EFFECT)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::CRACK_EFFECT);
     }
 
     // レンダラ

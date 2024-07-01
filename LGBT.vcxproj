@@ -149,16 +149,20 @@
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\State\InazawaCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\State\NomuraCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\State\UenoCharacterState.h" />
     <ClInclude Include="Source\Components\Character\TestCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\TestCharacterState.h" />
+    <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
     <ClInclude Include="Source\Components\FootIKcom.h" />
+    <ClInclude Include="Source\Components\GPUParticle.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
-    <ClInclude Include="Source\Components\ParticleComManager.h" />
-    <ClInclude Include="Source\Components\ParticleSystemCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
@@ -190,6 +194,7 @@
     <ClInclude Include="Source\Graphics\Shaders\MultiRenderTarget.h" />
     <ClInclude Include="Source\Graphics\Shaders\PostEffect.h" />
     <ClInclude Include="Source\Graphics\Shaders\Shader.h" />
+    <ClInclude Include="Source\Graphics\SkyBoxManager\SkyBoxManager.h" />
     <ClInclude Include="Source\Graphics\Shaders\Texture.h" />
     <ClInclude Include="Source\Graphics\Sprite\Sprite.h" />
     <ClInclude Include="Source\HighResolutionTimer.h" />
@@ -237,16 +242,20 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\NomuraCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\State\InazawaCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\State\NomuraCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\State\UenoCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\TestCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\TestCharacterState.cpp" />
+    <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
-    <ClCompile Include="Source\Components\ParticleComManager.cpp" />
-    <ClCompile Include="Source\Components\ParticleSystemCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FreeCameraCom.cpp" />
@@ -271,8 +280,10 @@
     <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FrameBuffer.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FullScreenQuad.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\MultiRenderTarget.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\PostEffect.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Shader.cpp" />
+    <ClCompile Include="Source\Graphics\SkyBoxManager\SkyBoxManager.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Texture.cpp" />
     <ClCompile Include="Source\Graphics\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Input\GamePad.cpp" />
@@ -291,13 +302,15 @@
     <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="HLSL\2D\PostEffect\FilterFunctions.hlsli" />
     <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
+    <None Include="HLSL\3D\FakeDepth.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
     <None Include="HLSL\Common.hlsli" />
-    <None Include="HLSL\compute\Particle.hlsli" />
+    <None Include="HLSL\compute\GPUParticle.hlsli" />
     <None Include="HLSL\Constants.hlsli" />
     <None Include="HLSL\Debugs\Debug.hlsli" />
     <None Include="HLSL\Debugs\Line.hlsli" />
@@ -308,6 +321,10 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\2D\PostEffect\DeferredPBR_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\FullScreenQuadPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -336,7 +353,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\PostEffectPS.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\ColorGradingPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
@@ -356,6 +373,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\3D\DeferredSetupPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\FakeDepthPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\FakeDepthVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\3D\DefaltPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -368,29 +397,23 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\compute\ParticleCS.hlsl">
+    <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="HLSL\compute\ParticleGS.hlsl">
+    <FxCompile Include="HLSL\compute\GPUParticleGS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="HLSL\compute\ParticleInitializeCS.hlsl">
+    <FxCompile Include="HLSL\compute\GPUParticleInitializeCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="HLSL\compute\ParticlePS.hlsl">
+    <FxCompile Include="HLSL\compute\GPUParticlePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\compute\ParticleVS.hlsl">
+    <FxCompile Include="HLSL\compute\GPUParticleVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

@@ -6,6 +6,7 @@
 #define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
 #define ChangeState(State) charaCom.lock()->GetStateMachine().ChangeState(State);
 
+
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
@@ -23,8 +24,6 @@ void BaseCharacter_IdleState::Enter()
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 {
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
     //入力値取得
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
@@ -34,7 +33,7 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
         ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    if (GamePad::BTN_A & owner->GetButtonDown())
     {
         ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
     }
@@ -48,18 +47,10 @@ void BaseCharacter_MoveState::Enter()
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
 {
-    GamePad gamePad = Input::Instance().GetGamePad();
+    MoveInputVec(owner->GetGameObject());
 
     //入力値取得
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
-
-    //歩く
-    DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
-    moveCom.lock()->AddForce(v);
-    QuaternionStruct q = transCom.lock()->GetRotation();
-
-    //旋回処理
-    transCom.lock()->Turn(moveVec, 0.1f);
 
     //待機
     if (moveVec == 0)
@@ -67,7 +58,7 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
         ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    if (GamePad::BTN_A & owner->GetButtonDown())
     {
         ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
     }
@@ -76,21 +67,19 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
 void BaseCharacter_JumpState::Enter()
 {
     //ジャンプ
-    moveCom.lock()->AddForce(jumpPower);
+    if (!moveCom.lock()->OnGround())
+        return;
+
+    JumpInput(owner->GetGameObject());
     moveCom.lock()->SetOnGround(false);
+
+    //moveCom.lock()->AddForce(jumpPower);
+    //moveCom.lock()->SetOnGround(false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 {
-    GamePad gamePad = Input::Instance().GetGamePad();
-
-    //入力値取得
-    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
-
-    //空中制御
-    DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
-    moveCom.lock()->AddForce(v);
-    transCom.lock()->Turn(moveVec, 0.1f);
+    MoveInputVec(owner->GetGameObject());
 
     if (moveCom.lock()->OnGround())
     {

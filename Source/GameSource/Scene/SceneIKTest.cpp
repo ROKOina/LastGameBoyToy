@@ -16,15 +16,11 @@
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
-#include "Components\FootIKcom.h"
-#include "Components\ParticleSystemCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components/CPUParticle.h"
 
 #include "GameSource/GameScript/FreeCameraCom.h"
-
-#include "Components/ParticleComManager.h"
 
 // èâä˙âª
 void SceneIKTest::Initialize()
@@ -89,7 +85,7 @@ void SceneIKTest::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/IKTestStage/ExampleStage.mdl");
     }
-    
+
     //ïΩçsåıåπÇí«â¡
     Light* mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });

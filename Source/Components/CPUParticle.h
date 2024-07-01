@@ -9,7 +9,7 @@ class CPUParticle :public Component
 {
 public:
 
-    CPUParticle(int num);
+    CPUParticle(const char* filename, int num);
     ~CPUParticle() { delete[] m_data; delete[] m_v; }
 
     //初期設定
@@ -33,7 +33,7 @@ private:
     void Set(int type, float time, DirectX::XMFLOAT3 p, DirectX::XMFLOAT4 r, DirectX::XMFLOAT3 v, DirectX::XMFLOAT3 f, DirectX::XMFLOAT2 size);
 
     //パーティクルの動き
-    void ParticleMove();
+    void ParticleMove(float elapsedTime);
 
     //シリアライズ
     void Serialize();
@@ -103,6 +103,9 @@ public:
         float m_scalerandom = 0;
         float m_randomrotation = 0.0f;
         float m_speed = 0.0f;
+        float m_string = 1.0f;
+        float m_scalar = 1.0f;
+        DirectX::XMFLOAT2 m_stringlate = { 1.0f,1.0f };
         std::string	m_filename;
         DirectX::XMFLOAT3 m_orbitalvelocity = { 0,0,0 };
         DirectX::XMFLOAT3 m_randombuoyancy = { 0,0,0 };
@@ -110,6 +113,7 @@ public:
         DirectX::XMFLOAT3 m_buoyancy = { 0,0,0 };
         DirectX::XMFLOAT3 m_velocity = { 0,0,0 };
         DirectX::XMFLOAT2 m_scale = { 1,1 };
+        DirectX::XMFLOAT2 m_latesize = { 1,1 };
         DirectX::XMFLOAT4 m_particlecolor = { 1,1,1,1 };
         DirectX::XMFLOAT3 m_intensity = { 1,1,1 };
 

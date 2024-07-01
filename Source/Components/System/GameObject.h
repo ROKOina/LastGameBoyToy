@@ -14,8 +14,8 @@
 class Component;
 class TransformCom;
 class RendererCom;
-class ParticleSystemCom;
 class CPUParticle;
+class GPUParticle;
 class Collider;
 
 // ゲームオブジェクト
@@ -124,7 +124,6 @@ private:
 };
 using GameObj = std::shared_ptr<GameObject>;
 
-
 // ゲームオブジェクトマネージャー
 class GameObjectManager
 {
@@ -155,7 +154,7 @@ public:
     void UpdateTransform();
 
     // 描画
-    void Render();
+    void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     //sprite描画
     void Render2D(float elapsedTime);
@@ -171,17 +170,26 @@ public:
     void DrawGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
 private:
+    void StartUpObjects();
+
+    void CollideGameObjects();
+
+    void RemoveGameObjects();
+
     void DrawLister();
     void DrawDetail();
 
+    void SortRenderObject();
+
     //3D描画
-    void Render3D();
+    void RenderDeferred();
+    void RenderForward();
 
     //CPUパーティクル描画
     void CPUParticleRender();
 
-    //パーティクル描画
-    void ParticleRender();
+    //GPUパーティクル描画
+    void GPUParticleRender();
 
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
@@ -200,12 +208,14 @@ private:
 
     //描画順に格納する
     std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;
+    // デファード描画オブジェクトの数
+    int deferredCount = -1;
 
     //CPUパーティクル描画用
     std::vector<std::weak_ptr<CPUParticle>> cpuparticleobject;
 
-    //パーティクル描画用
-    std::vector<std::weak_ptr<ParticleSystemCom>>   particleObject_;
+    //GPUparticle描画
+    std::vector<std::weak_ptr<GPUParticle>>gpuparticleobject;
 
     //ポストエフェクト
     std::unique_ptr<PostEffect>m_posteffect;
@@ -215,9 +225,6 @@ private:
 
     //演出待ちフラグ（シーンゲーム）
     bool isSceneGameStart_ = false;
-
-    //スレッド用
-    std::vector<std::future<void>> future;
 
     std::mutex mutex_;
 };

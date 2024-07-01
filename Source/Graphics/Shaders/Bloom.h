@@ -5,7 +5,7 @@
 #include <memory>
 
 //ƒuƒ‹[ƒ€
-class Bloom :FullScreenQuad
+class Bloom
 {
 public:
     Bloom(ID3D11Device* device, uint32_t width, uint32_t height);

@@ -2,7 +2,7 @@
 #include "../Constants.hlsli"
 #include "../Common.hlsli"
 
-cbuffer EffectCircleConstants : register(b3)
+cbuffer EffectCircleConstants : register(b0)
 {
     float simulateTime1;
     float simulateTime2;
@@ -53,7 +53,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     color += wave * waveEffectColor * waveEffectIntensity * step(centerDist, waveEffectRange) * step(color.a, 0);
     
     // ŒÀ‚è‚È‚­“§–¾‚É‹ß‚¢ƒsƒNƒZƒ‹‚Í”jŠü‚·‚é
-    clip(color.a - 0.0001f);
+    clip(color.a - EPSILON);
     
     return color;
 }

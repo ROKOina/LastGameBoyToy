@@ -1,7 +1,6 @@
 #include "SceneManager.h"
 
 #include "Components/System/GameObject.h"
-#include "Components\ParticleSystemCom.h"
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Graphics/Graphics.h"
@@ -9,13 +8,11 @@
 
 SceneManager::SceneManager()
 {
-
 }
 
 SceneManager::~SceneManager()
 {
 }
-
 
 //XVˆ—
 void SceneManager::Update(float elapsedTime)
@@ -122,4 +119,3 @@ DirectX::XMFLOAT3 SceneManager::InputVec() const
 
     return vec;
 }
-
