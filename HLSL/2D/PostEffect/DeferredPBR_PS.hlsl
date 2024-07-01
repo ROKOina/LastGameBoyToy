@@ -55,9 +55,6 @@ float4 main(VS_OUT pin) : SV_TARGET
     //AOマップ適用
     color.rgb *= MRAO.z;
 
-    //トーンマップ
-    color.rgb = saturate(color.rgb); //クランプ
-
     //エミッション適用
     color.rgb += emissiveMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).rgb;
 

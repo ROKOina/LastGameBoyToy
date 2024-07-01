@@ -12,10 +12,6 @@ Texture2D MetallicMap : register(t2); //メタリックマップ
 Texture2D RoughnessMap : register(t3); //ラフネスマップ
 Texture2D AOMap : register(t4); //AOマップ
 Texture2D EmissionMap : register(t5); //エミッションマップ
-Texture2D SkyBox : register(t6); //skybox
-TextureCube diffuseIem : register(t7); // プレフィルタリング済スカイボックス(Diffuse)
-TextureCube specularPmrem : register(t8); // プレフィルタリング済スカイボックス(Specular)
-Texture2D lutGGX : register(t9); // スカイボックスの色対応表
 
 //MRT対応
 struct PS_OUT
