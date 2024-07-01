@@ -563,9 +563,15 @@ void GameObjectManager::SortRenderObject()
 void GameObjectManager::RenderDeferred()
 {
   if (renderSortObject_.size() <= 0)return;
+  if (deferredCount == 0)return;
 
+  int drawCount = 0;
   for (std::weak_ptr<RendererCom>& renderObj : renderSortObject_)
   {
+    // デファードレンダリングのモデルのみ描画する
+    if (drawCount == deferredCount)return;
+    drawCount++;
+
     if (!renderObj.lock()->GetGameObject()->GetEnabled())continue;
     if (!renderObj.lock()->GetEnabled())continue;
 

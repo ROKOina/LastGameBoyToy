@@ -23,7 +23,7 @@ PostEffect::PostEffect()
   CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
 
   //MultiRenderTarget作成
-  m_multirendertarget = std::make_unique<decltype(m_multirendertarget)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 5);
+  m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 5);
 
   //コンスタントバッファ
   m_posteffect = std::make_unique<ConstantBuffer<POSTEFFECT>>(Graphics.GetDevice());
@@ -39,8 +39,8 @@ void PostEffect::SetDeferredTarget()
   SkyBoxManager::Instance().DrawSkyBox(dc);
 
   //MultiRenderTargetの描画段階
-  m_multirendertarget->clear(dc);
-  m_multirendertarget->activate(dc);
+  m_gBuffer->clear(dc);
+  m_gBuffer->activate(dc);
 }
 
 //デファードの終了
@@ -50,7 +50,7 @@ void PostEffect::EndDeferred()
   ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
 
   // Gバッファ用のレンダーターゲットをGPUから解放
-  m_multirendertarget->LiberationRenderTarget(dc);
+  m_gBuffer->LiberationRenderTarget(dc);
 
   // スカイボックスのリソースをバインド
   SkyBoxManager::Instance().BindTextures(dc, 10);
@@ -59,8 +59,8 @@ void PostEffect::EndDeferred()
   dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
 
   // Gバッファを元に描画 ( PBR + IBL )
-  FullScreenQuad::Instance().Blit(dc, m_multirendertarget->GetShaderResources(), 0,
-    m_multirendertarget->BufferCount(), m_pixelshaders[static_cast<int>(pixelshader::deferred)].Get());
+  FullScreenQuad::Instance().Blit(dc, m_gBuffer->GetShaderResources(), 0,
+    m_gBuffer->BufferCount(), m_pixelshaders[static_cast<int>(pixelshader::deferred)].Get());
 
   // 深度ステンシルを戻す
   dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
@@ -73,9 +73,10 @@ void PostEffect::PostEffectRender()
   ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
   const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+  // GバッファのDSVをGPUから解放
+  m_gBuffer->LiberationDepthStencil(dc);
+  m_gBuffer->ReleaseCache(dc);
   // オフスクリーンへの描画を止める
-  m_multirendertarget->LiberationDepthStencil(dc);
-  m_multirendertarget->ReleaseCache(dc);
   m_offScreenBuffer[static_cast<int>(offscreen::offscreen)]->Deactivate(dc);
 
   //コンスタントバッファのアクティブ
@@ -134,7 +135,10 @@ void PostEffect::PostEffectImGui()
   //ライトのimgui
   LightManager::Instance().DrawDebugGUI();
 
-  m_multirendertarget->DrawImGui();
+  m_gBuffer->DrawImGui();
+
+  ImGui::Text("OffScreen");
+  ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
   ImGui::Text("FinalPass");
   ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::posteffect)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
