@@ -200,11 +200,20 @@ void GameObjectManager::UpdateTransform()
 // 描画
 void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
-  //デファードレンダリングの初期設定
-  m_posteffect->DeferredFirstSet();
+  // オフスクリーンに描画開始
+  m_posteffect->StartOffScreenRendering();
+
+  //デファードレンダリングの初期設定 ( レンダーターゲットをデファード用の物に変更 )
+  m_posteffect->SetDeferredTarget();
 
   //3D描画
-  Render3D();
+  RenderDeferred();
+
+  //デファードレンダリング終了 ( レンダーターゲットをバックバッファに変更 )
+  m_posteffect->EndDeferred();
+
+  // フォワードレンダリング
+  RenderForward();
 
   //CPUパーティクル描画
   CPUParticleRender();
@@ -212,18 +221,11 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   //GPUパーティクル描画
   GPUParticleRender();
 
-  //デバッグレンダー
-  Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
-
-  //デファードレンダリング終了
-  m_posteffect->DeferredResourceSet();
-
-
-
-
-
   //ポストエフェクト
   m_posteffect->PostEffectRender();
+
+  //デバッグレンダー
+  Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
 
   //debug
   if (Graphics::Instance().IsDebugGUI())
@@ -365,6 +367,8 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
 
 void GameObjectManager::StartUpObjects()
 {
+  if (startGameObject_.empty())return;
+
   for (std::shared_ptr<GameObject>& obj : startGameObject_)
   {
     if (!obj)continue;
@@ -403,6 +407,9 @@ void GameObjectManager::StartUpObjects()
     obj->UpdateTransform();
   }
   startGameObject_.clear();
+
+  // 描画オブジェクトのソート
+  SortRenderObject();
 }
 
 void GameObjectManager::CollideGameObjects()
@@ -496,6 +503,8 @@ void GameObjectManager::RemoveGameObjects()
       --per;
     }
   }
+
+  SortRenderObject();
 }
 
 // リスター描画
@@ -537,8 +546,21 @@ void GameObjectManager::DrawDetail()
   ImGui::End();
 }
 
+void GameObjectManager::SortRenderObject()
+{
+  std::sort(renderSortObject_.begin(), renderSortObject_.end(),
+    [&](std::weak_ptr<RendererCom>& left, std::weak_ptr<RendererCom>& right) {
+      return left.lock()->GetShaderMode() < right.lock()->GetShaderMode();
+    });
+
+  deferredCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
+    [&](std::weak_ptr<RendererCom>& ren) {
+      return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::DEFERRED;
+    });
+}
+
 //3D描画
-void GameObjectManager::Render3D()
+void GameObjectManager::RenderDeferred()
 {
   if (renderSortObject_.size() <= 0)return;
 
@@ -551,6 +573,29 @@ void GameObjectManager::Render3D()
     if (model != nullptr)
     {
       renderObj.lock()->Render();
+    }
+  }
+}
+
+void GameObjectManager::RenderForward()
+{
+  if (renderSortObject_.size() <= 0)return;
+
+  // フォワードレンダリングするオブジェクトの数
+  int drawVolume = renderSortObject_.size() - deferredCount;
+  if (drawVolume <= 0)return;
+
+  for (int i = 0; i < drawVolume; ++i)
+  {
+    int index = deferredCount + i;
+
+    if (!renderSortObject_[index].lock()->GetGameObject()->GetEnabled())continue;
+    if (!renderSortObject_[index].lock()->GetEnabled())continue;
+
+    Model* model = renderSortObject_[index].lock()->GetModel();
+    if (model != nullptr)
+    {
+      renderSortObject_[index].lock()->Render();
     }
   }
 }

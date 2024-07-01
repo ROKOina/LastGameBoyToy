@@ -45,11 +45,11 @@ void NetwarkPost::RenderUpdate()
             clientObj->SetName(name.c_str());
             clientObj->transform_->SetWorldPosition({ 0, 0, 0 });
             clientObj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-            std::shared_ptr<RendererCom> r = clientObj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+            std::shared_ptr<RendererCom> r = clientObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
             r->LoadModel("Data/OneCoin/robot.mdl");
             std::shared_ptr<AnimationCom> a = clientObj->AddComponent<AnimationCom>();
             std::shared_ptr<MovementCom> m = clientObj->AddComponent<MovementCom>();
-            std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
+            //std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
         }
 
         //à íuçXêV

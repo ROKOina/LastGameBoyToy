@@ -85,6 +85,7 @@ void CharacterCom::OnGUI()
 
 void CharacterCom::CameraControl()
 {
+    if (!cameraObj)return;
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     //ƒQ[ƒ€ƒJƒƒ‰‚Ìê‡

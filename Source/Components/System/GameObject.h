@@ -179,8 +179,11 @@ private:
     void DrawLister();
     void DrawDetail();
 
+    void SortRenderObject();
+
     //3D描画
-    void Render3D();
+    void RenderDeferred();
+    void RenderForward();
 
     //CPUパーティクル描画
     void CPUParticleRender();
@@ -205,6 +208,8 @@ private:
 
     //描画順に格納する
     std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;
+    // デファード描画オブジェクトの数
+    int deferredCount = -1;
 
     //CPUパーティクル描画用
     std::vector<std::weak_ptr<CPUParticle>> cpuparticleobject;

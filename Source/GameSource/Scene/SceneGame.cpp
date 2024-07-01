@@ -5,6 +5,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
 #include "Graphics/Light/Light.h"
+#include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
@@ -37,6 +38,8 @@ void SceneGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
 
+#pragma region ゲームオブジェクトの設定
+
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -62,7 +65,7 @@ void SceneGame::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
         obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         a->PlayAnimation(0, true, false, 0.001f);
@@ -126,7 +129,7 @@ void SceneGame::Initialize()
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
         obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/Stage/Stage.mdl");
     }
 
@@ -135,7 +138,7 @@ void SceneGame::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("barrier");
         obj->transform_->SetWorldPosition({ -2.0f,1.4f,0.0f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD);
         r->LoadModel("Data/Ball/b.mdl");
     }
 
@@ -144,7 +147,7 @@ void SceneGame::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("blackball");
         obj->transform_->SetWorldPosition({ 2.0f,1.4f,0.0f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::BLACK, BLENDSTATE::ALPHA);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::BLACK, BLENDSTATE::ALPHA);
         r->LoadModel("Data/Ball/t.mdl");
     }
 
@@ -154,7 +157,7 @@ void SceneGame::Initialize()
         obj->SetName("plane");
         obj->transform_->SetWorldPosition({ 0, 0.1f, 0 });
         obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::CRACK_EFFECT, BLENDSTATE::ALPHA);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::CRACK_EFFECT, BLENDSTATE::ALPHA);
         r->LoadModel("Data/UtilityModels/plane.mdl");
         r->LoadMaterial("Data/UtilityModels/crack.Material");
         auto& cb = r->SetVariousConstant<EffectConstants>();
@@ -171,7 +174,7 @@ void SceneGame::Initialize()
         obj->SetName("IKTest");
         obj->transform_->SetWorldPosition({ -5, 0, 0 });
         obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/IKTestModel/IKTest.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     }
@@ -190,11 +193,25 @@ void SceneGame::Initialize()
         obj->AddComponent<GPUParticle>("Data\\Effect\\test.gpuparticle", 4000);
     }
 
+#pragma endregion
+
+#pragma region グラフィック系の設定
     //平行光源を追加
     Light* mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
+
+    // スカイボックスの設定
+    std::array<const char*, 4> filepath = {
+      "Data\\Texture\\snowy_hillside_4k.DDS",
+      "Data\\Texture\\diffuse_iem.dds",
+      "Data\\Texture\\specular_pmrem.dds",
+      "Data\\Texture\\lut_ggx.DDS"
+    };
+    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
+
+#pragma endregion
 }
 
 // 終了化
@@ -337,6 +354,8 @@ void SceneGame::SetOnlineInput()
         if (clientObj)
         {
             std::shared_ptr<CharacterCom> chara = clientObj->GetComponent<CharacterCom>();
+
+            if (!chara)continue;
 
             // 入力情報をプレイヤーキャラクターに送信
             chara->SetUserInput(client.input);

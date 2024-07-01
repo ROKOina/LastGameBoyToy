@@ -67,7 +67,7 @@ void SceneIKTest::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
         obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
@@ -77,14 +77,14 @@ void SceneIKTest::Initialize()
         oo->SetName("barrier1");
         oo->transform_->SetScale({ 500,500,500 });
         oo->transform_->SetLocalPosition({ 1000,0,0 });
-        std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+        std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD);
         ro->LoadModel("Data/Ball/b.mdl");
 
         auto& oo1 = oo->AddChildObject();
         oo1->SetName("barrier2");
         oo1->transform_->SetScale({ 1,1,1 });
         oo1->transform_->SetLocalPosition({ 3,0,0 });
-        std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
+        std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD);
         ro1->LoadModel("Data/Ball/b.mdl");
     }
 
@@ -94,7 +94,7 @@ void SceneIKTest::Initialize()
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
         obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/Stage/Stage.mdl");
     }
 

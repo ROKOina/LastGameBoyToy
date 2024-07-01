@@ -5,13 +5,13 @@
 #include <string>
 
 //コンストラクタ
-RendererCom::RendererCom(SHADERMODE mode, BLENDSTATE blendmode)
+RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode)
 {
   m_blend = static_cast<int>(blendmode);
-  m_modelshader = std::make_unique<ModelShader>(static_cast<int>(mode));
+  m_modelshader = std::make_unique<ModelShader>(id);
 
 #ifdef _DEBUG
-  shaderMode = mode;
+  shaderID = id;
 
 #endif // _DEBUG
 }
