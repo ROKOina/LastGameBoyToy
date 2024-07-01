@@ -52,5 +52,5 @@ private:
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];
     std::unique_ptr<Bloom> m_bloomeffect;
-    std::unique_ptr<MultiRenderTarget>m_multirendertarget;
+    std::unique_ptr<MultiRenderTarget>m_gBuffer;
 };
