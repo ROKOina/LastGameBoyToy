@@ -62,13 +62,26 @@ void NomuraCharacterCom::SubSkill()
 
     DirectX::XMVECTOR MoveVec = DirectX::XMLoadFloat3(&moveVec);
 
-    MoveVec = DirectX::XMVectorScale(MoveVec, 50.0f);
+    if (moveVec != 0)
+    {
+        MoveVec = DirectX::XMVectorScale(MoveVec, 50.0f);
 
-    DirectX::XMStoreFloat3(&moveVec, MoveVec);
+        DirectX::XMStoreFloat3(&moveVec, MoveVec);
 
-    moveCom->AddNonMaxSpeedForce(moveVec);
+        moveCom->AddNonMaxSpeedForce(moveVec);
+    }
+    else
+    {
+        MoveVec = DirectX::XMLoadFloat3(&GetGameObject()->transform_->GetWorldFront());
 
-    //moveCom->AddForce(moveVec);
+        MoveVec = DirectX::XMVectorScale(MoveVec, 50.0f);
+
+        DirectX::XMStoreFloat3(&moveVec, MoveVec);
+
+        moveCom->AddNonMaxSpeedForce(moveVec);
+    }
+
+    Reload();
 }
 
 //void NomuraCharacterCom::SpaceSkill()
