@@ -209,17 +209,17 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   //3D描画
   RenderDeferred();
 
-  //デファードレンダリング終了 ( レンダーターゲットをバックバッファに変更 )
+  //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
   m_posteffect->EndDeferred();
-
-  // フォワードレンダリング
-  RenderForward();
 
   //CPUパーティクル描画
   CPUParticleRender();
 
   //GPUパーティクル描画
   GPUParticleRender();
+
+  // フォワードレンダリング
+  RenderForward();
 
   //ポストエフェクト
   m_posteffect->PostEffectRender();

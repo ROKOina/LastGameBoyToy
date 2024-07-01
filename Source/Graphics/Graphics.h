@@ -98,13 +98,15 @@ enum SAMPLEMODE
 //シェーダー設定
 enum class SHADER_ID_MODEL
 {
-    // デファードレンダーターゲットに描画
+    // デファード描画
     DEFERRED,
 
-    // フォワードレンダーターゲットに描画 ( 以降 )
+    // 以降、フォワード描画
     BLACK,
-    DEFAULT,
-    CRACK_EFFECT,
+    FAKE_DEPTH,
+    
+    // 以降、半透明オブジェクト
+    DEFAULT, 
     AREA_EFFECT_CIRCLE,
 
     MAX

@@ -29,7 +29,7 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\AreaEffectCirclePS.cso" };
         break;
-    case SHADER_ID_MODEL::CRACK_EFFECT:
+    case SHADER_ID_MODEL::FAKE_DEPTH:
         VSPath = { "Shader\\FakeDepthVS.cso" };
         PSPath = { "Shader\\FakeDepthPS.cso" };
         break;

@@ -157,7 +157,7 @@ void SceneGame::Initialize()
         obj->SetName("plane");
         obj->transform_->SetWorldPosition({ 0, 0.1f, 0 });
         obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::CRACK_EFFECT, BLENDSTATE::ALPHA);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::FAKE_DEPTH, BLENDSTATE::ALPHA);
         r->LoadModel("Data/UtilityModels/plane.mdl");
         r->LoadMaterial("Data/UtilityModels/crack.Material");
         auto& cb = r->SetVariousConstant<EffectConstants>();
