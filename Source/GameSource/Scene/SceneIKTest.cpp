@@ -1,4 +1,5 @@
 #include "Graphics/Graphics.h"
+
 #include "Graphics/Light/LightManager.h"
 #include "Graphics/Light/Light.h"
 #include "Input\Input.h"
@@ -18,6 +19,7 @@
 #include "Components\MovementCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
+#include "Components\FootIKcom.h"
 #include "Components/CPUParticle.h"
 
 #include "GameSource/GameScript/FreeCameraCom.h"
@@ -67,7 +69,7 @@ void SceneIKTest::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
         obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/IKTestModel/IKTest.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
@@ -82,7 +84,7 @@ void SceneIKTest::Initialize()
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, 0.0f, 0 });
         obj->transform_->SetScale({ 0.6f, 0.6f, 0.6f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/IKTestStage/ExampleStage.mdl");
     }
 
@@ -127,7 +129,7 @@ void SceneIKTest::Render(float elapsedTime)
     LightManager::Instance().UpdateConstatBuffer();
 
     //オブジェクト描画
-    GameObjectManager::Instance().Render();
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection);
 
     //オブジェクト描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
