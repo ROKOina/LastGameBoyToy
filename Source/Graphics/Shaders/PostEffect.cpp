@@ -14,8 +14,11 @@ PostEffect::PostEffect()
   m_bloomeffect = std::make_unique<Bloom>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight());
 
   //フレームバッファ生成
-  m_offScreenBuffer[static_cast<int>(offscreen::offscreen)] = std::make_unique<FrameBuffer>(Graphics.GetDevice(), static_cast<uint32_t>(Graphics.GetScreenWidth()), static_cast<uint32_t>(Graphics.GetScreenHeight()), DXGI_FORMAT_R32G32B32A32_FLOAT, false);
-  m_offScreenBuffer[static_cast<int>(offscreen::posteffect)] = std::make_unique<FrameBuffer>(Graphics.GetDevice(), static_cast<uint32_t>(Graphics.GetScreenWidth()), static_cast<uint32_t>(Graphics.GetScreenHeight()), DXGI_FORMAT_R32G32B32A32_FLOAT, false);
+  for (int i = 0; i < static_cast<int>(offscreen::max); ++i) {
+    m_offScreenBuffer[i] = std::make_unique<FrameBuffer>(Graphics.GetDevice(),
+      static_cast<uint32_t>(Graphics.GetScreenWidth()), static_cast<uint32_t>(Graphics.GetScreenHeight()),
+      DXGI_FORMAT_R32G32B32A32_FLOAT, false);
+  }
 
   //ピクセルシェーダー
   CreatePsFromCso(Graphics.GetDevice(), "Shader\\DeferredPBR_PS.cso", m_pixelshaders[static_cast<int>(pixelshader::deferred)].GetAddressOf());
@@ -152,4 +155,19 @@ void PostEffect::StartOffScreenRendering()
 
   m_offScreenBuffer[static_cast<int>(offscreen::offscreen)]->Clear(dc);
   m_offScreenBuffer[static_cast<int>(offscreen::offscreen)]->Activate(dc);
+}
+
+void PostEffect::DepthCopyAndBind(int registerIndex)
+{
+  ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+  m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->Clear(dc);
+  m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->Activate(dc);
+
+  FullScreenQuad::Instance().Blit(dc, m_gBuffer->GetDepthStencilSRV(), 0, 1);
+
+  m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->Deactivate(dc);
+
+  dc->PSSetShaderResources(registerIndex, 1, 
+    m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->m_shaderresourceviews[0].GetAddressOf());
 }

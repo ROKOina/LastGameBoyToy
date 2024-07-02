@@ -33,7 +33,7 @@ public:
     float waveEffectRange = 3.0f;
 
     DirectX::XMFLOAT4 waveEffectColor = { 1.0f,1.0f,1.0f,1.0f };
-    
+
     float waveEffectIntensity = 1.0f;
     DirectX::XMFLOAT3 dummy;
   };
@@ -49,5 +49,55 @@ public:
 
 private:
   inline static std::unique_ptr<ConstantBuffer<Buffer>> m_effectconstants;
+
+};
+
+class SciFiGateConstants :public BaseConstants
+{
+public:
+  SciFiGateConstants();
+
+  void DrawGui()override;
+
+  void Update(const float& elapsedTime)override;
+
+  void UpdateConstantBuffer(ID3D11DeviceContext* dc)override;
+
+public:
+  struct Buffer {
+    DirectX::XMFLOAT2 uvScrollDir1 = {};
+    DirectX::XMFLOAT2 uvScrollDir2 = {};
+
+    float uvScale1 = 0.0f;
+    float uvScale2 = 0.0f;
+    float simulateTime1 = 0.0f;
+    float simulateTime2 = 0.0f;
+
+    DirectX::XMFLOAT4 effectColor1 = {};
+    DirectX::XMFLOAT4 effectColor2 = {};
+
+    float intensity1 = 0.0f;
+    float intensity2 = 0.0f;
+    DirectX::XMFLOAT2 dummy;
+  };
+
+public:
+  DirectX::XMFLOAT2 uvScrollDir1 = {};
+  DirectX::XMFLOAT2 uvScrollDir2 = {};
+
+  float simulateSpeed1 = 1.0f;
+  float simulateSpeed2 = 1.0f;
+
+  float uvScale1 = 1.0f;
+  float uvScale2 = 1.0f;
+
+  DirectX::XMFLOAT4 effectColor1 = { 1,1,1,1 };
+  DirectX::XMFLOAT4 effectColor2 = { 1,1,1,1 };
+
+  float intensity1 = 1.0f;
+  float intensity2 = 1.0f;
+
+private:
+  inline static std::unique_ptr<ConstantBuffer<Buffer>> m_constants;
 
 };

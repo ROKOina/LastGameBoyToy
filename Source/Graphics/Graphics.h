@@ -109,6 +109,10 @@ enum class SHADER_ID_MODEL
     DEFAULT, 
     AREA_EFFECT_CIRCLE,
 
+    // 以降、深度マップを使用するシェーダー
+    USE_DEPTH_MAP,
+    SCI_FI_GATE = USE_DEPTH_MAP,
+
     MAX
 };
 

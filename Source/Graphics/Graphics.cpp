@@ -636,6 +636,7 @@ Graphics::Graphics(HWND hWnd)
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::BLACK)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::BLACK);
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE);
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::FAKE_DEPTH)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::FAKE_DEPTH);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SCI_FI_GATE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SCI_FI_GATE);
     }
 
     // ƒŒƒ“ƒ_ƒ‰

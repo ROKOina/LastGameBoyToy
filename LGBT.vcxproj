@@ -161,9 +161,7 @@
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
     <ClInclude Include="Source\Components\FootIKcom.h" />
-
     <ClInclude Include="Source\Components\GPUParticle.h" />
-
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
     <ClInclude Include="Source\Components\System\State.h" />
@@ -396,6 +394,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\PBR+IBL_Unity.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\SciFiGatePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>

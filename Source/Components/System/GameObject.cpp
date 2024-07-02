@@ -212,6 +212,9 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
   m_posteffect->EndDeferred();
 
+  // 深度マップをコピーしてGPUに設定
+  m_posteffect->DepthCopyAndBind(8);
+
   //CPUパーティクル描画
   CPUParticleRender();
 
@@ -221,15 +224,21 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   // フォワードレンダリング
   RenderForward();
 
+  // 深度マップをコピーしてGPUに設定
+  m_posteffect->DepthCopyAndBind(8);
+
+  // 深度マップを使用するシェーダー
+  RenderUseDepth();
+
   //ポストエフェクト
   m_posteffect->PostEffectRender();
-
-  //デバッグレンダー
-  Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
 
   //debug
   if (Graphics::Instance().IsDebugGUI())
   {
+    //デバッグレンダー
+    Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+
     //当たり判定用デバッグ描画
     for (auto& col : colliderObject_)
     {
@@ -557,6 +566,11 @@ void GameObjectManager::SortRenderObject()
     [&](std::weak_ptr<RendererCom>& ren) {
       return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::DEFERRED;
     });
+
+  useDepthCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
+    [&](std::weak_ptr<RendererCom>& ren) {
+      return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::USE_DEPTH_MAP;
+    });
 }
 
 //3D描画
@@ -588,12 +602,35 @@ void GameObjectManager::RenderForward()
   if (renderSortObject_.size() <= 0)return;
 
   // フォワードレンダリングするオブジェクトの数
-  int drawVolume = renderSortObject_.size() - deferredCount;
+  int drawVolume = renderSortObject_.size() - deferredCount - useDepthCount;
   if (drawVolume <= 0)return;
 
   for (int i = 0; i < drawVolume; ++i)
   {
     int index = deferredCount + i;
+
+    if (!renderSortObject_[index].lock()->GetGameObject()->GetEnabled())continue;
+    if (!renderSortObject_[index].lock()->GetEnabled())continue;
+
+    Model* model = renderSortObject_[index].lock()->GetModel();
+    if (model != nullptr)
+    {
+      renderSortObject_[index].lock()->Render();
+    }
+  }
+}
+
+void GameObjectManager::RenderUseDepth()
+{
+  if (renderSortObject_.size() <= 0) return;
+
+  // フォワードレンダリングするオブジェクトの数
+  int drawVolume = useDepthCount;
+  if (drawVolume <= 0) return;
+
+  for (int i = 0; i < drawVolume; ++i)
+  {
+    int index = i + renderSortObject_.size() - useDepthCount;
 
     if (!renderSortObject_[index].lock()->GetGameObject()->GetEnabled())continue;
     if (!renderSortObject_[index].lock()->GetEnabled())continue;

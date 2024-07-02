@@ -5,7 +5,7 @@
 #include <string>
 
 //コンストラクタ
-RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode)
+RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, RASTERIZERSTATE rs) :m_rasterizerState(rs)
 {
   m_blend = static_cast<int>(blendmode);
   m_modelshader = std::make_unique<ModelShader>(id);
@@ -33,7 +33,7 @@ void RendererCom::Render()
   }
 
   //セット
-  m_modelshader->Begin(dc, m_blend);
+  m_modelshader->Begin(dc, m_blend, m_rasterizerState);
 
   //モデルを描画
   for (auto& mesh : model_->GetResource()->GetMeshes())
@@ -231,7 +231,7 @@ void RendererCom::TextureGui(ModelResource::Material* material)
   ImGui::Text("Model");
   ImGui::SameLine();
   if (ImGui::Button("...")) {
-    char modelFile[256];    
+    char modelFile[256];
     ::strncpy_s(modelFile, sizeof(modelFile), material->textureFilename[0].c_str(), sizeof(modelFile));
 
     const char* filter = "Texture Files(*.mdl)\0*.mdl;\0All Files(*.*)\0*.*;\0\0";

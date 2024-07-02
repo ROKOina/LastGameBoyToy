@@ -10,7 +10,7 @@ class RendererCom : public Component
 {
   // コンポーネントオーバーライド
 public:
-  RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode);
+  RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, RASTERIZERSTATE rs = RASTERIZERSTATE::SOLID_CULL_BACK);
   ~RendererCom() {}
 
   // 名前取得
@@ -71,6 +71,7 @@ private:
   std::unique_ptr<Model>	model_;
   std::unique_ptr<ModelShader> m_modelshader;
   int m_blend = 9;
+  RASTERIZERSTATE m_rasterizerState = RASTERIZERSTATE::SOLID_CULL_BACK;
 
   std::shared_ptr<BaseConstants> variousConstant = nullptr;
 

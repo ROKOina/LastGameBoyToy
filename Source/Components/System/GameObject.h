@@ -184,6 +184,7 @@ private:
     //3D描画
     void RenderDeferred();
     void RenderForward();
+    void RenderUseDepth();
 
     //CPUパーティクル描画
     void CPUParticleRender();
@@ -210,6 +211,8 @@ private:
     std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;
     // デファード描画オブジェクトの数
     int deferredCount = -1;
+    // 深度マップを使用する描画オブジェクトの数
+    int useDepthCount = -1;
 
     //CPUパーティクル描画用
     std::vector<std::weak_ptr<CPUParticle>> cpuparticleobject;
