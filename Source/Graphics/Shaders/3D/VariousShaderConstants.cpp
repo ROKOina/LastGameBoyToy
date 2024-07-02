@@ -58,8 +58,8 @@ void SciFiGateConstants::DrawGui()
   ImGui::DragFloat2("uvScrollDir1", &uvScrollDir1.x, 0.01f, 0.0f, 1.0f);
   ImGui::DragFloat2("uvScrollDir2", &uvScrollDir2.x, 0.01f, 0.0f, 1.0f);
 
-  ImGui::DragFloat("uvScale1", &uvScale1, 0.001f, 0.0f);
-  ImGui::DragFloat("uvScale2", &uvScale2, 0.001f, 0.0f);
+  ImGui::DragFloat2("uvScale1", &uvScale1.x, 0.001f, 0.0f);
+  ImGui::DragFloat2("uvScale2", &uvScale2.x, 0.001f, 0.0f);
 
   ImGui::ColorEdit4("effectColor1", &effectColor1.x);
   ImGui::ColorEdit4("effectColor2", &effectColor2.x);

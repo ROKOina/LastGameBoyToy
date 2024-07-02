@@ -155,9 +155,9 @@ void SceneGame::Initialize()
   {
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("plane");
-    obj->transform_->SetWorldPosition({ 0, 1.0f, 0 });
-    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    obj->transform_->SetWorldPosition({ 0, 1.5f, 5 });
     obj->transform_->SetEulerRotation({ 90.0f,0.0f,0.0f });
+    obj->transform_->SetScale({ 0.05f,1.0f,0.015f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
     r->LoadModel("Data/UtilityModels/plane.mdl");
     r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
@@ -167,6 +167,7 @@ void SceneGame::Initialize()
     cb->simulateSpeed2 = -0.3f;
     cb->uvScrollDir1 = { 1.0f,1.0f };
     cb->uvScrollDir2 = { 0.0f,1.0f };
+    cb->uvScale1 = { 2.0f,1.0f };
     cb->intensity1 = 0.8f;
     cb->intensity2 = 1.6f;
     cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };

@@ -68,17 +68,16 @@ public:
     DirectX::XMFLOAT2 uvScrollDir1 = {};
     DirectX::XMFLOAT2 uvScrollDir2 = {};
 
-    float uvScale1 = 0.0f;
-    float uvScale2 = 0.0f;
+    DirectX::XMFLOAT2 uvScale1 = {};
+    DirectX::XMFLOAT2 uvScale2 = {};
     float simulateTime1 = 0.0f;
     float simulateTime2 = 0.0f;
+    float intensity1 = 0.0f;
+    float intensity2 = 0.0f;
 
     DirectX::XMFLOAT4 effectColor1 = {};
     DirectX::XMFLOAT4 effectColor2 = {};
 
-    float intensity1 = 0.0f;
-    float intensity2 = 0.0f;
-    DirectX::XMFLOAT2 dummy;
   };
 
 public:
@@ -88,8 +87,8 @@ public:
   float simulateSpeed1 = 1.0f;
   float simulateSpeed2 = 1.0f;
 
-  float uvScale1 = 1.0f;
-  float uvScale2 = 1.0f;
+  DirectX::XMFLOAT2 uvScale1 = { 1.0f,1.0f };
+  DirectX::XMFLOAT2 uvScale2 = { 1.0f,1.0f };
 
   DirectX::XMFLOAT4 effectColor1 = { 1,1,1,1 };
   DirectX::XMFLOAT4 effectColor2 = { 1,1,1,1 };

@@ -14,17 +14,15 @@ cbuffer EffectCircleConstants : register(b0)
     float2 uvScrollDir1;
     float2 uvScrollDir2;
     
-    float uvScale1;
-    float uvScale2;
+    float2 uvScale1;
+    float2 uvScale2;
     float simulateTime1;
     float simulateTime2;
+    float intensity1;
+    float intensity2;
     
     float4 effectColor1;
     float4 effectColor2;
-    
-    float intensity1;
-    float intensity2;
-    float2 dummy;
 }
 
 float4 main(VS_OUT pin) : SV_TARGET
