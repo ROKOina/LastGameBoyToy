@@ -212,9 +212,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
   m_posteffect->EndDeferred();
 
-  // 深度マップをコピーしてGPUに設定
-  m_posteffect->DepthCopyAndBind(8);
-
   //CPUパーティクル描画
   CPUParticleRender();
 

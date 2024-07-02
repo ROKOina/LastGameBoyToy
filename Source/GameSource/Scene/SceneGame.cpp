@@ -154,12 +154,11 @@ void SceneGame::Initialize()
   //ƒeƒXƒg
   {
     auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("plane");
-    obj->transform_->SetWorldPosition({ 0, 1.5f, 5 });
-    obj->transform_->SetEulerRotation({ 90.0f,0.0f,0.0f });
-    obj->transform_->SetScale({ 0.05f,1.0f,0.015f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
-    r->LoadModel("Data/UtilityModels/plane.mdl");
+    obj->SetName("SciFiGate");
+    obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
+    obj->transform_->SetScale({ 0.06f,0.02f,0.0001f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD);
+    r->LoadModel("Data/UtilityModels/cube.mdl");
     r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
 
     auto& cb = r->SetVariousConstant<SciFiGateConstants>();

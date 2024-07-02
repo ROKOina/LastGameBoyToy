@@ -315,6 +315,7 @@
     <None Include="HLSL\Debugs\Debug.hlsli" />
     <None Include="HLSL\Debugs\Line.hlsli" />
     <None Include="HLSL\2D\Sprite.hlsli" />
+    <None Include="HLSL\DepthFunctions.hlsli" />
     <None Include="HLSL\Effect\CPUParticle.hlsli" />
     <None Include="HLSL\noise.hlsli" />
     <None Include="HLSL\Rand.hlsli" />

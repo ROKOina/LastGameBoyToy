@@ -47,10 +47,13 @@ protected:
         DirectX::XMFLOAT4X4 viewprojection = {};
         DirectX::XMFLOAT4X4 inverseview = {};
         DirectX::XMFLOAT4X4 inverseprojection = {};
+
         DirectX::XMFLOAT3 cameraposition = {};
         float time = {};
+
         float deltatime = {};
-        DirectX::XMFLOAT3 SCdummy = {};
+        DirectX::XMFLOAT2 cameraScope = {};
+        float SCdummy = {};
     };
     std::unique_ptr<ConstantBuffer<SceneConstants>>sc;
 

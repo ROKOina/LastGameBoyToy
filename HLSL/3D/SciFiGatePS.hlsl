@@ -1,6 +1,7 @@
 #include "Defalt.hlsli"
 #include "../Constants.hlsli"
 #include "../Common.hlsli"
+#include "../DepthFunctions.hlsli"
 
 Texture2D BaseTexture : register(t0);
 Texture2D BaseNoise : register(t1);
@@ -42,6 +43,11 @@ float4 main(VS_OUT pin) : SV_TARGET
     // エリア
     float area = GateArea.Sample(sampler_states[LINEAR], pin.texcoord).r;
     color *= area;
+    
+    // 深度値による輪郭
+    // 深度マップの読み込み ( なぜか左右反転しているので、UVを左右反転している )
+    float depth = DepthMap.Sample(sampler_states[WHITE_BORDER_ANISOTROPIC], pin.position.xy / (float2(1920, 1080) * 0.8)).r;
+    color += effectColor1 * (1 - saturate(500 * (depth - pin.position.z))) * step(pin.position.z, depth) * 2;
     
     return color;
 }

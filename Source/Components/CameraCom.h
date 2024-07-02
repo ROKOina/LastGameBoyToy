@@ -38,6 +38,9 @@ public:
     //プロジェクション行列取得
     const DirectX::XMFLOAT4X4& GetProjection() const { return projection_; }
 
+    //描画範囲取得
+    const DirectX::XMFLOAT2& GetScope()const { return scope_; }
+
     //注視点取得
     const DirectX::XMFLOAT3& GetFocus()const { return focus_; }
 
@@ -78,6 +81,7 @@ private:
     //座標系
     DirectX::XMFLOAT4X4 view_ = {};
     DirectX::XMFLOAT4X4 projection_ = {};
+    DirectX::XMFLOAT2 scope_ = { 0,0 };
 
     DirectX::XMFLOAT3 focus_ = {0,0,0};
 
