@@ -73,9 +73,9 @@ private:
   int m_blend = 9;
 
   std::shared_ptr<BaseConstants> variousConstant = nullptr;
+  SHADER_ID_MODEL     shaderID;
 
 #ifdef _DEBUG
-  SHADER_ID_MODEL     shaderID;
   int									selectionMaterialIndex = -1;
   bool								hiddenProperty = false;
   std::string					modelFilePath;

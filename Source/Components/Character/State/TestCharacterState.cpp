@@ -107,7 +107,7 @@ void TestCharacter_AttackState::Fire()
   //firePos.y = 1.0f;
   bullet->transform_->SetWorldPosition(firePos);
 
-  std::shared_ptr<RendererCom> bullet_renderCom = bullet->AddComponent<RendererCom>((SHADERMODE::BLACK), (BLENDSTATE::ALPHA));
+  std::shared_ptr<RendererCom> bullet_renderCom = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
   bullet_renderCom->LoadModel("Data/Ball/t.mdl");
 
   std::shared_ptr<SphereColliderCom> sphereCollider = bullet->AddComponent<SphereColliderCom>();
