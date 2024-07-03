@@ -54,6 +54,10 @@ protected:
         float deltatime = {};
         DirectX::XMFLOAT2 cameraScope = {};
         float SCdummy = {};
+
+        DirectX::XMFLOAT2 screenResolution = {};
+        DirectX::XMFLOAT2 dummy = {};
+
     };
     std::unique_ptr<ConstantBuffer<SceneConstants>>sc;
 

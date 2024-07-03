@@ -15,6 +15,9 @@ cbuffer SceneConstants : register(b10)
     float deltatime;
     float2 cameraScope;
     float SCdummy;
+    
+    float2 screenResolution;
+    float2 SCdummy2;
 }
 
 #endif

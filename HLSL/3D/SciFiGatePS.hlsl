@@ -10,13 +10,14 @@ Texture2D GateArea : register(t3);
 
 Texture2D DepthMap : register(t8);
 
-cbuffer EffectCircleConstants : register(b0)
+cbuffer SciFiGateConstants : register(b0)
 {
     float2 uvScrollDir1;
     float2 uvScrollDir2;
     
     float2 uvScale1;
     float2 uvScale2;
+    
     float simulateTime1;
     float simulateTime2;
     float intensity1;
@@ -24,6 +25,10 @@ cbuffer EffectCircleConstants : register(b0)
     
     float4 effectColor1;
     float4 effectColor2;
+    
+    float contourIntensity;
+    float contourSensitive;
+    float2 SFDummy;
 }
 
 float4 main(VS_OUT pin) : SV_TARGET
@@ -45,9 +50,16 @@ float4 main(VS_OUT pin) : SV_TARGET
     color *= area;
     
     // 深度値による輪郭
-    // 深度マップの読み込み ( なぜか左右反転しているので、UVを左右反転している )
-    float depth = DepthMap.Sample(sampler_states[WHITE_BORDER_ANISOTROPIC], pin.position.xy / (float2(1920, 1080) * 0.8)).r;
-    color += effectColor1 * (1 - saturate(500 * (depth - pin.position.z))) * step(pin.position.z, depth) * 2;
+    {
+        // 深度マップの読み込み 
+        float2 screenUV = pin.position.xy / screenResolution;
+        float depth = DepthMap.Sample(sampler_states[WHITE_BORDER_ANISOTROPIC], screenUV).r;
+        
+        float4 contour = effectColor1 * contourIntensity;
+        float contourPower = (1 - saturate(contourSensitive * (depth - pin.position.z))) * step(pin.position.z, depth);
+
+        color += contour * contourPower;
+    }
     
     return color;
 }

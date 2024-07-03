@@ -66,6 +66,9 @@ void SciFiGateConstants::DrawGui()
 
   ImGui::DragFloat("Intensity1", &intensity1, 0.01f, 0.0f, 80.0f);
   ImGui::DragFloat("Intensity2", &intensity2, 0.01f, 0.0f, 80.0f);
+
+  ImGui::DragFloat("contourIntensity", &contourIntensity, 0.01f, 0.0f, 80.0f);
+  ImGui::DragFloat("contourSensitive", &contourSensitive, 0.1f, 0.0f, 1000.0f);
 }
 
 void SciFiGateConstants::Update(const float& elapsedTime)
@@ -86,6 +89,9 @@ void SciFiGateConstants::Update(const float& elapsedTime)
 
   data.intensity1 = intensity1;
   data.intensity2 = intensity2;
+
+  data.contourIntensity = contourIntensity;
+  data.contourSensitive = contourSensitive;
 }
 
 void SciFiGateConstants::UpdateConstantBuffer(ID3D11DeviceContext* dc)

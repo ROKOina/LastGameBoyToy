@@ -156,9 +156,10 @@ void SceneGame::Initialize()
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("SciFiGate");
     obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
-    obj->transform_->SetScale({ 0.06f,0.02f,0.0001f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD);
-    r->LoadModel("Data/UtilityModels/cube.mdl");
+    obj->transform_->SetScale({ 0.06f,0.0001f,0.02f });
+    obj->transform_->SetEulerRotation({90,0,0});
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD,RASTERIZERSTATE::SOLID_CULL_NONE);
+    r->LoadModel("Data/UtilityModels/plane.mdl");
     r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
 
     auto& cb = r->SetVariousConstant<SciFiGateConstants>();
@@ -171,6 +172,7 @@ void SceneGame::Initialize()
     cb->intensity2 = 1.6f;
     cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
     cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
+    cb->contourIntensity = 1.5f;
   }
 
   //IKƒeƒXƒg

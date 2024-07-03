@@ -78,6 +78,9 @@ public:
     DirectX::XMFLOAT4 effectColor1 = {};
     DirectX::XMFLOAT4 effectColor2 = {};
 
+    float contourIntensity = 0;
+    float contourSensitive = 0;
+    DirectX::XMFLOAT2 dummy;
   };
 
 public:
@@ -95,6 +98,9 @@ public:
 
   float intensity1 = 1.0f;
   float intensity2 = 1.0f;
+
+  float contourIntensity = 1.0;
+  float contourSensitive = 500.0;
 
 private:
   inline static std::unique_ptr<ConstantBuffer<Buffer>> m_constants;
