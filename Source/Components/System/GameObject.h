@@ -154,7 +154,7 @@ public:
     void UpdateTransform();
 
     // ï`âÊ
-    void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+    void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& lightdirection);
 
     //spriteï`âÊ
     void Render2D(float elapsedTime);
@@ -184,6 +184,7 @@ private:
     //3Dï`âÊ
     void RenderDeferred();
     void RenderForward();
+    void RenderShadow();
     void RenderUseDepth();
 
     //CPUÉpÅ[ÉeÉBÉNÉãï`âÊ

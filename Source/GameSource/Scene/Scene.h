@@ -47,6 +47,7 @@ protected:
         DirectX::XMFLOAT4X4 viewprojection = {};
         DirectX::XMFLOAT4X4 inverseview = {};
         DirectX::XMFLOAT4X4 inverseprojection = {};
+        DirectX::XMFLOAT4X4 inverseviewprojection = {};
 
         DirectX::XMFLOAT3 cameraposition = {};
         float time = {};

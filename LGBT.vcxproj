@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Graphics\Light\LightManager.h" />
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
+    <ClInclude Include="Source\Graphics\Shaders\3D\CascadedShadowMap.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\ModelShader.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\VariousShaderConstants.h" />
     <ClInclude Include="Source\Graphics\Shaders\Bloom.h" />
@@ -275,6 +276,7 @@
     <ClCompile Include="Source\Graphics\Light\LightManager.cpp" />
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\3D\CascadedShadowMap.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\ModelShader.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\VariousShaderConstants.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
@@ -309,6 +311,7 @@
     <None Include="HLSL\3D\Defalt.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
+    <None Include="HLSL\3D\Shadow.hlsli" />
     <None Include="HLSL\Common.hlsli" />
     <None Include="HLSL\compute\GPUParticle.hlsli" />
     <None Include="HLSL\Constants.hlsli" />
@@ -401,6 +404,16 @@
     <FxCompile Include="HLSL\3D\SciFiGatePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\ShadowGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\ShadowVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

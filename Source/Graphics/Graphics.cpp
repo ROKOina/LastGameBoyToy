@@ -637,6 +637,7 @@ Graphics::Graphics(HWND hWnd)
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE);
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::FAKE_DEPTH)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::FAKE_DEPTH);
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SCI_FI_GATE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SCI_FI_GATE);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SHADOW)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SHADOW);
     }
 
     // ƒŒƒ“ƒ_ƒ‰
@@ -697,4 +698,5 @@ void Graphics::SetSamplerState()
     immediateContext_->PSSetSamplers(6, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_POINT].GetAddressOf());
     immediateContext_->PSSetSamplers(7, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_LINEAR].GetAddressOf());
     immediateContext_->PSSetSamplers(8, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_ANISOTROPIC].GetAddressOf());
+    immediateContext_->PSSetSamplers(9, 1, samplerStates[SAMPLEMODE::SHADOW].GetAddressOf());
 }
