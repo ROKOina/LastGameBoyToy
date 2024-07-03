@@ -10,7 +10,7 @@ class RendererCom : public Component
 {
   // コンポーネントオーバーライド
 public:
-  RendererCom(SHADERMODE mode, BLENDSTATE blendmode);
+  RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode);
   ~RendererCom() {}
 
   // 名前取得
@@ -51,6 +51,8 @@ public:
     return p;
   }
 
+  SHADER_ID_MODEL GetShaderMode() { return shaderID; }
+
 private:
 #ifdef _DEBUG
   // マテリアルを選択するImGui
@@ -73,7 +75,7 @@ private:
   std::shared_ptr<BaseConstants> variousConstant = nullptr;
 
 #ifdef _DEBUG
-  SHADERMODE          shaderMode;
+  SHADER_ID_MODEL     shaderID;
   int									selectionMaterialIndex = -1;
   bool								hiddenProperty = false;
   std::string					modelFilePath;

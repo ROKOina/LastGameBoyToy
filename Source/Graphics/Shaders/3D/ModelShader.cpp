@@ -2,7 +2,7 @@
 #include "Graphics/Shaders/Texture.h"
 
 //初期化
-ModelShader::ModelShader(int shader)
+ModelShader::ModelShader(SHADER_ID_MODEL shader)
 {
     Graphics& Graphics = Graphics::Instance();
 
@@ -13,23 +13,23 @@ ModelShader::ModelShader(int shader)
     //選択されたのが指定される
     switch (shader)
     {
-    case MODELSHADER::DEFALT:
+    case SHADER_ID_MODEL::DEFAULT:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DefaltPS.cso" };
         break;
-    case MODELSHADER::DEFERRED:
+    case SHADER_ID_MODEL::DEFERRED:
         VSPath = { "Shader\\DefaltVS.cso" };
-        PSPath = { "Shader\\PBR+IBL_Unity.cso" };
+        PSPath = { "Shader\\DeferredSetupPS.cso" };
         break;
-    case MODELSHADER::BLACK:
+    case SHADER_ID_MODEL::BLACK:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\BlackPS.cso" };
         break;
-    case MODELSHADER::AREA_EFFECT_CIRCLE:
+    case SHADER_ID_MODEL::AREA_EFFECT_CIRCLE:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\AreaEffectCirclePS.cso" };
         break;
-    case MODELSHADER::CRACK_EFFECT:
+    case SHADER_ID_MODEL::FAKE_DEPTH:
         VSPath = { "Shader\\FakeDepthVS.cso" };
         PSPath = { "Shader\\FakeDepthPS.cso" };
         break;
@@ -62,15 +62,6 @@ ModelShader::ModelShader(int shader)
         m_objectconstants = std::make_unique<ConstantBuffer<objectconstants>>(Graphics.GetDevice());
         m_subsetconstants = std::make_unique<ConstantBuffer<subsetconstants>>(Graphics.GetDevice());
     }
-
-    //IBL専用のテクスチャ読み込み
-    {
-        D3D11_TEXTURE2D_DESC texture2d_desc{};
-        LoadTextureFromFile(Graphics.GetDevice(), "Data\\Texture\\snowy_hillside_4k.DDS", m_skybox.GetAddressOf(), &texture2d_desc);
-        LoadTextureFromFile(Graphics.GetDevice(), "Data\\Texture\\diffuse_iem.dds", m_diffuseiem.GetAddressOf(), &texture2d_desc);
-        LoadTextureFromFile(Graphics.GetDevice(), "Data\\Texture\\specular_pmrem.dds", m_specularpmrem.GetAddressOf(), &texture2d_desc);
-        LoadTextureFromFile(Graphics.GetDevice(), "Data\\Texture\\lut_ggx.DDS", m_lutggx.GetAddressOf(), &texture2d_desc);
-    }
 }
 
 //描画設定
@@ -88,12 +79,6 @@ void ModelShader::Begin(ID3D11DeviceContext* dc, int blendmode)
     dc->OMSetBlendState(Graphics.GetBlendState(static_cast<BLENDSTATE>(blendmode)), blendFactor, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_BACK));
-
-    //IBL専用のテクスチャセット
-    dc->PSSetShaderResources(6, 1, m_skybox.GetAddressOf());
-    dc->PSSetShaderResources(7, 1, m_diffuseiem.GetAddressOf());
-    dc->PSSetShaderResources(8, 1, m_specularpmrem.GetAddressOf());
-    dc->PSSetShaderResources(9, 1, m_lutggx.GetAddressOf());
 }
 
 //バッファー描画

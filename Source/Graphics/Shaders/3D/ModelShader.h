@@ -10,18 +10,7 @@
 class ModelShader
 {
 public:
-    enum MODELSHADER
-    {
-        DEFALT,
-        DEFERRED,
-        BLACK,
-        AREA_EFFECT_CIRCLE,
-        CRACK_EFFECT,
-        MAX
-    };
-
-public:
-    ModelShader(int shader);
+    ModelShader(SHADER_ID_MODEL shader);
     ~ModelShader() {};
 
     //ï`âÊèâä˙ê›íË
@@ -61,8 +50,4 @@ private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_skybox;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_diffuseiem;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_specularpmrem;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_lutggx;
 };

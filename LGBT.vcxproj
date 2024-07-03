@@ -160,7 +160,10 @@
     <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
+    <ClInclude Include="Source\Components\FootIKcom.h" />
+
     <ClInclude Include="Source\Components\GPUParticle.h" />
+
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
     <ClInclude Include="Source\Components\System\State.h" />
@@ -193,6 +196,7 @@
     <ClInclude Include="Source\Graphics\Shaders\MultiRenderTarget.h" />
     <ClInclude Include="Source\Graphics\Shaders\PostEffect.h" />
     <ClInclude Include="Source\Graphics\Shaders\Shader.h" />
+    <ClInclude Include="Source\Graphics\SkyBoxManager\SkyBoxManager.h" />
     <ClInclude Include="Source\Graphics\Shaders\Texture.h" />
     <ClInclude Include="Source\Graphics\Sprite\Sprite.h" />
     <ClInclude Include="Source\HighResolutionTimer.h" />
@@ -251,6 +255,7 @@
     <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
@@ -277,8 +282,10 @@
     <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FrameBuffer.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\FullScreenQuad.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\MultiRenderTarget.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\PostEffect.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Shader.cpp" />
+    <ClCompile Include="Source\Graphics\SkyBoxManager\SkyBoxManager.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Texture.cpp" />
     <ClCompile Include="Source\Graphics\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Input\GamePad.cpp" />
@@ -297,6 +304,7 @@
     <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="HLSL\2D\PostEffect\FilterFunctions.hlsli" />
     <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
     <None Include="HLSL\3D\FakeDepth.hlsli" />
@@ -315,6 +323,10 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\2D\PostEffect\DeferredPBR_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\FullScreenQuadPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -343,7 +355,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\PostEffectPS.hlsl">
+    <FxCompile Include="HLSL\2D\PostEffect\ColorGradingPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
@@ -360,6 +372,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\BlackPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\DeferredSetupPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>

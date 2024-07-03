@@ -22,7 +22,7 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
     firePos.y += 1.0f;
     obj->transform_->SetWorldPosition(firePos);
 
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADERMODE::BLACK), (BLENDSTATE::ALPHA));
+    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
     renderCom->LoadModel("Data/Ball/t.mdl");
 
     ///////////////////////////////

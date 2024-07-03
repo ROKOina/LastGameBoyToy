@@ -87,6 +87,7 @@ void CharacterCom::OnGUI()
 
 void CharacterCom::CameraControl()
 {
+    if (!cameraObj)return;
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     //ƒQ[ƒ€ƒJƒƒ‰‚Ìê‡
@@ -118,6 +119,19 @@ void CharacterCom::CameraControl()
         DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
         euler.y += moveX * 8.0f;
         euler.x += moveY * 5.0f;
+
+        //‰ñ“]§Œä
+        if (euler.x > 70)
+        {
+            euler.x = 70;
+            GetGameObject()->transform_->SetEulerRotation(euler);
+        }
+        if (euler.x < -70)
+        {
+            euler.x = -70;
+            GetGameObject()->transform_->SetEulerRotation(euler);
+        }
+
         GetGameObject()->transform_->SetEulerRotation(euler);
     }
     else
