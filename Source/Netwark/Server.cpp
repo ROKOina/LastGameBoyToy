@@ -150,10 +150,10 @@ void __fastcall NetServer::Update()
     inputUp |= gamePad.GetButtonUp();
 
 
-    static int cou = 0;
-    cou++;
-    if (cou > 3)
-    {
+    //static int cou = 0;
+    //cou++;
+    //if (cou > 3)
+    //{
         for (auto& client : clientDatas)
         {
             //©•ª©g(server)‚ÌƒLƒƒƒ‰î•ñ‚ğ‘—‚é
@@ -178,8 +178,8 @@ void __fastcall NetServer::Update()
 
         sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
             reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
-        cou = 0;
-    }
+    //    cou = 0;
+    //}
 }
 
 #include <imgui.h>

@@ -118,9 +118,9 @@ void __fastcall NetClient::Update()
     inputUp |= gamePad.GetButtonUp();
 
     //パケットロス回避のため、3フレーム毎に送る
-    static int cou = 0;
-    cou++;
-    if (cou > 3) {
+    //static int cou = 0;
+    //cou++;
+    //if (cou > 3) {
         //仮でポジションを送る
         std::vector<NetData> netData;
         NetData n;
@@ -145,8 +145,8 @@ void __fastcall NetClient::Update()
         std::stringstream ss = NetDataSendCast(netData);
 
         sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
-        cou = 0;
-    }
+    //    cou = 0;
+    //}
 
 
     ///******       データ受信        ******///
