@@ -54,8 +54,17 @@ bool RayCastManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 
   // î•ñ‚ð‘ã“ü
   if (positionPtr)*positionPtr = nearHit.position;
-  if (resultPtr)*resultPtr = nearHit;
   if (objectPtr)*objectPtr = nearHit.hitObject;
+  if (resultPtr) {
+    *resultPtr = nearHit;
+
+    // ŒXŽÎ—¦‚ÌŒvŽZ
+    nearHit.normal.y = 0;
+    float horizon = sqrtf(Mathf::Dot(nearHit.normal));
+
+    // ’l‚ª‚P‚É‹ß‚¢‚Ù‚Ç•Ç‚É‚È‚é
+    resultPtr->slopeRate = 1 - (resultPtr->normal.y / (resultPtr->normal.y + horizon));
+  }
 
   return isHit;
 }

@@ -22,6 +22,7 @@ public:
     DirectX::XMFLOAT3 normal = { 0,0,0 };   // 衝突したポリゴンの法線ベクトル
     float distance = 0.0f;                  // レイの始点から交点までの距離
     int materialIndex = -1;                 // 衝突したポリゴンのマテリアル番号
+    float slopeRate = 0.0f;                 // 交点の傾斜率
     std::weak_ptr<GameObject> hitObject;    // 当たったオブジェクト
   };
 
