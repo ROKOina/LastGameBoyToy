@@ -124,6 +124,6 @@ private:
 
   inline static float maxGravity = -0.7f; // 最大落下速度
   inline static float stepOffset = 0.5f; // レイキャスト用のオフセット
-  inline static float slopeThreshold = 0.4f; // 滑り落ちる傾斜率の境界
-  inline static float slipPower = 20.0f; // 滑り落ちる速度
+  inline static float slopeThreshold = 0.8f; // 滑り落ちる傾斜率の境界
+  inline static float slipPower = 8.0f; // 滑り落ちる速度
 };

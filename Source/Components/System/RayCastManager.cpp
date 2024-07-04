@@ -2,12 +2,16 @@
 #include "GameSource/Math/Mathf.h"
 #include "Components/RayCollisionCom.h"
 #include "Components/TransformCom.h"
+#include "Graphics/Graphics.h"
 #include <queue>
 #include <assert.h>
 
+// レイキャストの判定するポリゴンを表示するフラグ ( コメントアウト = 無効化 )
+#define DRAW_POLYGON_GROUP
+
 void RayCastManager::Remove(std::shared_ptr<RayCollisionCom> removeCollision)
 {
-  auto& removeItr = std::remove_if(collisionModels.begin(), collisionModels.end(), 
+  auto& removeItr = std::remove_if(collisionModels.begin(), collisionModels.end(),
     [&](std::weak_ptr<RayCollisionCom>& collision) {return collision.lock() == removeCollision; }
   );
   assert(removeItr != collisionModels.end());
@@ -71,6 +75,15 @@ bool RayCastManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFL
 
 bool RayCastManager::Collide(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, std::weak_ptr<RayCollisionCom> collision, Result* hitResult)
 {
+#ifdef DRAW_POLYGON_GROUP
+  const auto& line = Graphics::Instance().GetLineRenderer();
+
+  std::vector<DirectX::XMFLOAT3> lineVertexs;
+  std::vector<DirectX::XMFLOAT4> lineColors;
+  DirectX::XMFLOAT3 lineOffset = { 0.0f,0.01f,0.0f };
+  DirectX::XMFLOAT3 lineHitOffset = { 0.0f,0.05f,0.0f };
+#endif
+
   const RayCollisionCom::Collision& collisionData = collision.lock()->GetCollision();
   const std::vector<RayCollisionCom::Collision::PolygonGroupe>& groups = collisionData.polygonGroupes;
   const std::vector<std::vector<RayCollisionCom::CollisionVertex>>& vertices = collisionData.vertices;
@@ -128,6 +141,22 @@ bool RayCastManager::Collide(const DirectX::XMFLOAT3& start, const DirectX::XMFL
     for (auto& vertexData : groups[groupIndex].vertexDatas) {
       // ポリゴンとレイの当たり判定
       {
+#ifdef DRAW_POLYGON_GROUP
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA].position + lineOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 1].position + lineOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 1].position + lineOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 2].position + lineOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 2].position + lineOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA].position + lineOffset);
+
+        lineColors.emplace_back(DirectX::XMFLOAT4(1, 0, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(1, 0, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(1, 0, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(1, 0, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(1, 0, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(1, 0, 0, 1));
+#endif
+
         // ポリゴンを構成する3頂点
         DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&vertices[vertexData.keyID][vertexData.vertexA].position);
         DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&vertices[vertexData.keyID][vertexData.vertexA + 1].position);
@@ -192,12 +221,19 @@ bool RayCastManager::Collide(const DirectX::XMFLOAT3& start, const DirectX::XMFL
         isHit = true;
 
 #ifdef DRAW_POLYGON_GROUP
-        line->AddVertex(vertices[vertexData.keyID][vertexData.vertexA].position, { 0,1,0,1 });
-        line->AddVertex(vertices[vertexData.keyID][vertexData.vertexA + 1].position, { 0,1,0,1 });
-        line->AddVertex(vertices[vertexData.keyID][vertexData.vertexA + 1].position, { 0,1,0,1 });
-        line->AddVertex(vertices[vertexData.keyID][vertexData.vertexA + 2].position, { 0,1,0,1 });
-        line->AddVertex(vertices[vertexData.keyID][vertexData.vertexA + 2].position, { 0,1,0,1 });
-        line->AddVertex(vertices[vertexData.keyID][vertexData.vertexA].position, { 0,1,0,1 });
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA].position + lineOffset + lineHitOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 1].position + lineOffset + lineHitOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 1].position + lineOffset + lineHitOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 2].position + lineOffset + lineHitOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA + 2].position + lineOffset + lineHitOffset);
+        lineVertexs.emplace_back(vertices[vertexData.keyID][vertexData.vertexA].position + lineOffset + lineHitOffset);
+
+        lineColors.emplace_back(DirectX::XMFLOAT4(0, 4, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(0, 4, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(0, 4, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(0, 4, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(0, 4, 0, 1));
+        lineColors.emplace_back(DirectX::XMFLOAT4(0, 4, 0, 1));
 #endif
       }
     }
@@ -217,10 +253,20 @@ bool RayCastManager::Collide(const DirectX::XMFLOAT3& start, const DirectX::XMFL
     hitResult->distance = sqrtf(Mathf::Dot(hitResult->position - start));
   }
 
+#ifdef DRAW_POLYGON_GROUP
+  auto& wt = collision.lock()->GetGameObject()->transform_->GetWorldTransform();
+  DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&wt);
+
+  for (int i = 0; i < lineVertexs.size(); ++i) {
+    DirectX::XMVECTOR wPosV = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&lineVertexs[i]), world);
+    DirectX::XMFLOAT3 wPos;
+    DirectX::XMStoreFloat3(&wPos, wPosV);
+    line->AddVertex(wPos, lineColors[i]);
+  }
+
+#endif
+
   return isHit;
-
-
-  return false;
 }
 
 bool RayCastManager::RayVsBox(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT3& positive, const DirectX::XMFLOAT3& negative)

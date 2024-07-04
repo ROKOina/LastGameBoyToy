@@ -236,6 +236,10 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   // フォワードレンダリング
   RenderForward();
 
+  //デバッグレンダー
+  Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+  Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+
   // 深度マップをコピーしてGPUに設定
   m_posteffect->DepthCopyAndBind(8);
 
@@ -248,9 +252,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   //debug
   if (Graphics::Instance().IsDebugGUI())
   {
-    //デバッグレンダー
-    Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
-
     //当たり判定用デバッグ描画
     for (auto& col : colliderObject_)
     {
