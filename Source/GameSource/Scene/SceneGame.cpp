@@ -15,6 +15,7 @@
 
 #include "Components\System\GameObject.h"
 #include "Components\RendererCom.h"
+#include "Components\RayCollisionCom.h"
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
@@ -129,6 +130,7 @@ void SceneGame::Initialize()
         obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/canyon/stage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
 
     //ƒoƒŠƒA

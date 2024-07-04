@@ -108,7 +108,6 @@ public:
     }
 
 private:
-
     //速力
     DirectX::XMFLOAT3 velocity_ = { 0,0,0 };
     DirectX::XMFLOAT3 nonMaxSpeedVelocity_ = { 0,0,0 }; //最大スピードを無視した速力
@@ -119,4 +118,6 @@ private:
 
     float moveMaxSpeed_ = 10.0f;
     float moveAcceleration_ = 1.0f;
+
+    inline static float slopeThreshold = 0.7f; // 滑り落ちる傾斜率の境界
 };

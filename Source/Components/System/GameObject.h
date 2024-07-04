@@ -31,6 +31,9 @@ public:
     // 更新処理
     virtual void Update(float elapsedTime);
 
+    // ゲームオブジェクトの破棄の際に呼ばれる
+    void OnDestroy();
+
     // 行列の更新
     virtual void UpdateTransform();
 
