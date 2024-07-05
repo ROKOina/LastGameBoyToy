@@ -43,7 +43,7 @@ void __fastcall NetServer::Initialize()
     multicastAddr.sin_port = htons(7002);    // ポート(マルチキャスト用ポート、通常のポートと番号を変える必要がある)
 
     // inet_pton…標準テキスト表示形式のインターネットネットワークアドレスを数値バイナリ形式に変換
-    if (inet_pton(AF_INET, "224.10.1.1", &multicastAddr.sin_addr) == 0)
+    if (inet_pton(AF_INET, "224.10.1.15", &multicastAddr.sin_addr) == 0)
     {
         std::cout << "error_code:" << WSAGetLastError();
     }

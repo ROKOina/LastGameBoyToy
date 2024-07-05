@@ -95,7 +95,7 @@ void __fastcall NetClient::Initialize()
     // マルチキャストグループ用構造体ip_mreqを使用する
     // マルチキャストアドレスは「224.10.1.1」を使用
     struct ip_mreq mr;
-    if (inet_pton(AF_INET, "224.10.1.1", &mr.imr_multiaddr.s_addr) == 0)
+    if (inet_pton(AF_INET, "224.10.1.15", &mr.imr_multiaddr.s_addr) == 0)
     {
         std::cout << "error_code:" << WSAGetLastError();
     }
