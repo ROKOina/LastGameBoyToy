@@ -5,6 +5,7 @@
 #include "ConstantBuffer.h"
 #include "Bloom.h"
 #include "MultiRenderTarget.h"
+#include "Graphics/Shaders/3D/CascadedShadowMap.h"
 #include <DirectXMath.h>
 
 //ポストエフェクト
@@ -29,8 +30,18 @@ public:
     // オフスクリーンバッファに描画していく
     void StartOffScreenRendering();
 
-private:
+    MultiRenderTarget* GetGeometryBuffer() { return m_gBuffer.get(); }
 
+    // 深度マップをSRVにコピーして、GPUにバインドする
+    void DepthCopyAndBind(int registerIndex);
+
+public:
+
+    //取得
+    CascadedShadowMap* GetCascadedShadow() const { return m_cascadedshadowmap.get(); }
+    float m_criticaldepthvalue = 300.0f;
+
+private:
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
     {
@@ -46,11 +57,23 @@ private:
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
+    //影のパラメータのコンスタントバッファ
+    struct SHADOWPARAMETER
+    {
+        float shadowdepthbias = 0.00008475f;
+        float shadowcolor = 0.419f;
+        float shadowfilterradius = 14.222f;
+        int shadowsamplecount = 32;
+    };
+    std::unique_ptr<ConstantBuffer<SHADOWPARAMETER>>m_shadowparameter;
+
 private:
-    enum class offscreen { offscreen,posteffect, max };
-    enum class pixelshader { deferred,colorGrading, tonemap, max };
+    enum class offscreen { offscreen, posteffect, depthCopy, max };
+    enum class pixelshader { deferred, colorGrading, tonemap, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];
+
     std::unique_ptr<Bloom> m_bloomeffect;
     std::unique_ptr<MultiRenderTarget>m_gBuffer;
+    std::unique_ptr<CascadedShadowMap> m_cascadedshadowmap;
 };

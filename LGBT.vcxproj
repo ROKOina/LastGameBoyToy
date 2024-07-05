@@ -161,11 +161,11 @@
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
     <ClInclude Include="Source\Components\FootIKcom.h" />
-
     <ClInclude Include="Source\Components\GPUParticle.h" />
-
     <ClInclude Include="Source\Components\MovementCom.h" />
+    <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
+    <ClInclude Include="Source\Components\System\RayCastManager.h" />
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
     <ClInclude Include="Source\Dialog.h" />
@@ -187,6 +187,7 @@
     <ClInclude Include="Source\Graphics\Light\LightManager.h" />
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
+    <ClInclude Include="Source\Graphics\Shaders\3D\CascadedShadowMap.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\ModelShader.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\VariousShaderConstants.h" />
     <ClInclude Include="Source\Graphics\Shaders\Bloom.h" />
@@ -258,7 +259,9 @@
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
+    <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
+    <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FreeCameraCom.cpp" />
     <ClCompile Include="Source\GameSource\Math\easing.cpp" />
@@ -277,6 +280,7 @@
     <ClCompile Include="Source\Graphics\Light\LightManager.cpp" />
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\3D\CascadedShadowMap.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\ModelShader.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\VariousShaderConstants.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
@@ -311,12 +315,14 @@
     <None Include="HLSL\3D\Defalt.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
+    <None Include="HLSL\3D\Shadow.hlsli" />
     <None Include="HLSL\Common.hlsli" />
     <None Include="HLSL\compute\GPUParticle.hlsli" />
     <None Include="HLSL\Constants.hlsli" />
     <None Include="HLSL\Debugs\Debug.hlsli" />
     <None Include="HLSL\Debugs\Line.hlsli" />
     <None Include="HLSL\2D\Sprite.hlsli" />
+    <None Include="HLSL\DepthFunctions.hlsli" />
     <None Include="HLSL\Effect\CPUParticle.hlsli" />
     <None Include="HLSL\noise.hlsli" />
     <None Include="HLSL\Rand.hlsli" />
@@ -398,6 +404,20 @@
     <FxCompile Include="HLSL\3D\PBR+IBL_Unity.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\SciFiGatePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\ShadowGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\ShadowVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

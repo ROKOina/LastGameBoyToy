@@ -35,6 +35,15 @@ void GameObject::Update(float elapsedTime)
   }
 }
 
+void GameObject::OnDestroy()
+{
+  for (std::shared_ptr<Component>& component : components_)
+  {
+    if (!component->GetEnabled())continue;
+    component->OnDestroy();
+  }
+}
+
 // 行列の更新
 void GameObject::UpdateTransform()
 {
@@ -198,8 +207,14 @@ void GameObjectManager::UpdateTransform()
 }
 
 // 描画
-void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& lightdirection)
 {
+  //影描画
+  m_posteffect->GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, m_posteffect->m_criticaldepthvalue, [&]()
+    {
+      RenderShadow();
+    });
+
   // オフスクリーンに描画開始
   m_posteffect->StartOffScreenRendering();
 
@@ -221,11 +236,18 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
   // フォワードレンダリング
   RenderForward();
 
-  //ポストエフェクト
-  m_posteffect->PostEffectRender();
-
   //デバッグレンダー
   Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+  Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+
+  // 深度マップをコピーしてGPUに設定
+  m_posteffect->DepthCopyAndBind(8);
+
+  // 深度マップを使用するシェーダー
+  RenderUseDepth();
+
+  //ポストエフェクト
+  m_posteffect->PostEffectRender();
 
   //debug
   if (Graphics::Instance().IsDebugGUI())
@@ -442,6 +464,7 @@ void GameObjectManager::RemoveGameObjects()
     std::vector<std::weak_ptr<GameObject>> parentObj;
     for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
     {
+      obj->OnDestroy();
       EraseObject(startGameObject_, obj);
       EraseObject(updateGameObject_, obj);
 
@@ -459,8 +482,9 @@ void GameObjectManager::RemoveGameObjects()
     //child解放
     for (std::weak_ptr<GameObject> parent : parentObj)
     {
-      if (!parent.expired())
+      if (!parent.expired()) {
         parent.lock()->EraseExpiredChild();
+      }
     }
   }
 
@@ -557,6 +581,11 @@ void GameObjectManager::SortRenderObject()
     [&](std::weak_ptr<RendererCom>& ren) {
       return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::DEFERRED;
     });
+
+  useDepthCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
+    [&](std::weak_ptr<RendererCom>& ren) {
+      return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::USE_DEPTH_MAP;
+    });
 }
 
 //3D描画
@@ -588,12 +617,54 @@ void GameObjectManager::RenderForward()
   if (renderSortObject_.size() <= 0)return;
 
   // フォワードレンダリングするオブジェクトの数
-  int drawVolume = renderSortObject_.size() - deferredCount;
+  int drawVolume = renderSortObject_.size() - deferredCount - useDepthCount;
   if (drawVolume <= 0)return;
 
   for (int i = 0; i < drawVolume; ++i)
   {
     int index = deferredCount + i;
+
+    if (!renderSortObject_[index].lock()->GetGameObject()->GetEnabled())continue;
+    if (!renderSortObject_[index].lock()->GetEnabled())continue;
+
+    Model* model = renderSortObject_[index].lock()->GetModel();
+    if (model != nullptr)
+    {
+      renderSortObject_[index].lock()->Render();
+    }
+  }
+}
+
+//影描画
+void GameObjectManager::RenderShadow()
+{
+  if (renderSortObject_.size() <= 0)return;
+
+  //影描画
+  for (std::weak_ptr<RendererCom>& modelrender : renderSortObject_)
+  {
+    if (!modelrender.lock()->GetGameObject()->GetEnabled())continue;
+    if (!modelrender.lock()->GetEnabled())continue;
+
+    Model* model = modelrender.lock()->GetModel();
+    if (model != nullptr)
+    {
+      modelrender.lock()->ShadowRender();
+    }
+  }
+}
+
+void GameObjectManager::RenderUseDepth()
+{
+  if (renderSortObject_.size() <= 0) return;
+
+  // フォワードレンダリングするオブジェクトの数
+  int drawVolume = useDepthCount;
+  if (drawVolume <= 0) return;
+
+  for (int i = 0; i < drawVolume; ++i)
+  {
+    int index = i + renderSortObject_.size() - useDepthCount;
 
     if (!renderSortObject_[index].lock()->GetGameObject()->GetEnabled())continue;
     if (!renderSortObject_[index].lock()->GetEnabled())continue;

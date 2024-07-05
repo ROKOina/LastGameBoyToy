@@ -14,13 +14,15 @@ public:
     ~ModelShader() {};
 
     //描画初期設定
-    void Begin(ID3D11DeviceContext* dc, int blendmode);
+    void Begin(ID3D11DeviceContext* dc, int blendmode, RASTERIZERSTATE rasterizerState = RASTERIZERSTATE::SOLID_CULL_BACK);
+    void ShadowBegin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode);
 
     //描画処理
     void SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh);
 
     //サブセット毎の描画
     void SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset);
+    void ShadowSetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset);
 
     //描画終了処理
     void End(ID3D11DeviceContext* dc);
@@ -49,5 +51,6 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
 };

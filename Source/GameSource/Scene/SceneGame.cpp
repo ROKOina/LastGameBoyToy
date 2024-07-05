@@ -4,7 +4,6 @@
 
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
-#include "Graphics/Light/Light.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
@@ -16,6 +15,7 @@
 
 #include "Components\System\GameObject.h"
 #include "Components\RendererCom.h"
+#include "Components\RayCollisionCom.h"
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
@@ -75,7 +75,6 @@ void SceneGame::Initialize()
         //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
         std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
-
     }
 
     //test
@@ -129,9 +128,10 @@ void SceneGame::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-        obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/Stage/Stage.mdl");
+        r->LoadModel("Data/canyon/stage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
 
     //バリア
@@ -152,22 +152,29 @@ void SceneGame::Initialize()
         r->LoadModel("Data/Ball/t.mdl");
     }
 
-    //テスト
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("plane");
-        obj->transform_->SetWorldPosition({ 0, 0.1f, 0 });
-        obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::FAKE_DEPTH, BLENDSTATE::ALPHA);
-        r->LoadModel("Data/UtilityModels/plane.mdl");
-        r->LoadMaterial("Data/UtilityModels/crack.Material");
-        auto& cb = r->SetVariousConstant<EffectConstants>();
-        cb->simulateSpeed1 = 1.6f;
-        cb->simulateSpeed2 = -2.4f;
-        cb->waveEffectRange = 0.97f;
-        cb->waveEffectColor = { 1.0f,0.3f,0.0f,0.1f };
-        cb->waveEffectIntensity = 5.0f;
-    }
+  //テスト
+  {
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("SciFiGate");
+    obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
+    obj->transform_->SetScale({ 0.06f,0.0001f,0.02f });
+    obj->transform_->SetEulerRotation({90,0,0});
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD,RASTERIZERSTATE::SOLID_CULL_NONE);
+    r->LoadModel("Data/UtilityModels/plane.mdl");
+    r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
+
+    auto& cb = r->SetVariousConstant<SciFiGateConstants>();
+    cb->simulateSpeed1 = 1.1f;
+    cb->simulateSpeed2 = -0.3f;
+    cb->uvScrollDir1 = { 1.0f,1.0f };
+    cb->uvScrollDir2 = { 0.0f,1.0f };
+    cb->uvScale1 = { 2.0f,1.0f };
+    cb->intensity1 = 0.8f;
+    cb->intensity2 = 1.6f;
+    cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
+    cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
+    cb->contourIntensity = 1.5f;
+  }
 
     //IKテスト
     {
@@ -202,7 +209,7 @@ void SceneGame::Initialize()
 
 #pragma region グラフィック系の設定
     //平行光源を追加
-    Light* mainDirectionalLight = new Light(LightType::Directional);
+    mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
@@ -266,7 +273,7 @@ void SceneGame::Render(float elapsedTime)
     LightManager::Instance().UpdateConstatBuffer();
 
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection);
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
 
     //オブジェクト描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);

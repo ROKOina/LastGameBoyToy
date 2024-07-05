@@ -6,6 +6,7 @@
 #include "Audio\Audio.h"
 
 #include "Netwark/NetwarkPost.h"
+#include "Graphics/Light/Light.h"
 
 // ÉQÅ[ÉÄÉVÅ[Éì
 class SceneIKTest :public Scene
@@ -27,5 +28,5 @@ public:
     void Render(float elapsedTime)override;
 
 private:
- 
+    Light* mainDirectionalLight = nullptr;
 };

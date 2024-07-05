@@ -31,7 +31,11 @@ void Scene::ConstantBufferUpdate(float elapsedTime)
     DirectX::XMStoreFloat4x4(&sc->data.viewprojection, V * P);
     DirectX::XMStoreFloat4x4(&sc->data.inverseview, DirectX::XMMatrixInverse(nullptr, V));
     DirectX::XMStoreFloat4x4(&sc->data.inverseprojection, DirectX::XMMatrixInverse(nullptr, P));
+    DirectX::XMStoreFloat4x4(&sc->data.inverseviewprojection, XMMatrixInverse(nullptr, V * P));
     sc->data.cameraposition = c->GetGameObject()->transform_->GetWorldPosition();
+    sc->data.cameraScope = c->GetScope();
+    sc->data.screenResolution.x = Graphics::Instance().GetScreenWidth();
+    sc->data.screenResolution.y = Graphics::Instance().GetScreenHeight();
 
     //XV‚·‚é
     sc->Activate(Graphics::Instance().GetDeviceContext(), (int)CB_INDEX::SCENE, true, true, true, true, true, true);

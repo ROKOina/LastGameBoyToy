@@ -10,6 +10,8 @@ void CharacterCom::Update(float elapsedTime)
 {
     //ƒJƒƒ‰‚ªŒü‚¢‚Ä‚¢‚é•ûŒü‚Öù‰ñ
     DirectX::XMFLOAT3 cameraForward = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront();
+    cameraForward.y = 0;
+    
     GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
     GetGameObject()->transform_->UpdateTransform();
     GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
