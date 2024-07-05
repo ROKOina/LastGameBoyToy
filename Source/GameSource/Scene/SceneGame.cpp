@@ -223,7 +223,14 @@ void SceneGame::Finalize()
 void SceneGame::Update(float elapsedTime)
 {
     if (n)
+    {
         n->Update();
+
+        if (!n->IsNextFrame())
+        {
+            return;
+        }
+    }
 
     // キーの入力情報を各キャラクターに割り当てる
     SetUserInputs();

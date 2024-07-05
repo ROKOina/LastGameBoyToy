@@ -211,6 +211,7 @@
     <ClInclude Include="Source\Netwark\Client.h" />
     <ClInclude Include="Source\Netwark\NetData.h" />
     <ClInclude Include="Source\Netwark\NetwarkPost.h" />
+    <ClInclude Include="Source\Netwark\RingBuffer.h" />
     <ClInclude Include="Source\Netwark\Server.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
     <ClInclude Include="Source\SystemStruct\TransformUtils.h" />

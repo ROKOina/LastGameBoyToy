@@ -76,8 +76,13 @@ void __fastcall NetServer::Initialize()
 }
 static std::vector<int> kari;
 static int kk = 0;
+#include "RingBuffer.h"
+RingBuffer<int>* bufRing = new RingBuffer<int>(8);
 void __fastcall NetServer::Update()
 {
+
+    isNextFrame = false;
+
     kk++;
 
     ///******       データ受信        ******///
@@ -105,13 +110,13 @@ void __fastcall NetServer::Update()
                 {
 
 
-                    if (client.id == 1)
-                    {
-                        kari.emplace_back(kk);
-                        kk = 0;
-                        if (client.input == 0)
-                            int i = 0;
-                    }
+                    //if (client.id == 1)
+                    //{
+                    //    kari.emplace_back(kk);
+                    //    kk = 0;
+                    //    if (client.input == 0)
+                    //        int i = 0;
+                    //}
 
 
 
@@ -137,7 +142,13 @@ void __fastcall NetServer::Update()
         std::cout << "message send:" << buffer << std::endl;
     }
 
-
+    //入退室終了なら
+    if (isEndJoin)
+        //登録クライアントの情報が揃った場合に進む
+        if (clientDatas.size() < clientNum)
+        {
+            return;
+        }
 
     ///******       データ送信        ******///
     // マルチキャストアドレスを宛先に指定してメッセージを送信、パケットロス回避のため３フレーム毎
@@ -154,32 +165,47 @@ void __fastcall NetServer::Update()
     //cou++;
     //if (cou > 3)
     //{
-        for (auto& client : clientDatas)
-        {
-            //自分自身(server)のキャラ情報を送る
-            if (client.id != id)continue;
+    for (auto& client : clientDatas)
+    {
+        //自分自身(server)のキャラ情報を送る
+        if (client.id != id)continue;
 
-            client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-            client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-            client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-            client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+        client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+        client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+        client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+        client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
 
-            client.input = input;
-            client.inputDown = inputDown;
-            client.inputUp = inputUp;
-            input = 0;
-            inputDown = 0;
-            inputUp = 0;
+        client.input = input;
+        client.inputDown = inputDown;
+        client.inputUp = inputUp;
+        input = 0;
+        inputDown = 0;
+        inputUp = 0;
 
-            break;
-        }
-        //送信型に変換してデータを全て送る
-        std::stringstream ss = NetDataSendCast(clientDatas);
+        break;
+    }
+    //送信型に変換してデータを全て送る
+    std::stringstream ss = NetDataSendCast(clientDatas);
 
-        sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
-            reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
+    sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
+        reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
     //    cou = 0;
     //}
+
+    //次のフレームに行くことを許可する
+    isNextFrame = true;
+
+    //入退室後処理
+    if (isEndJoin)
+    {
+        //送信後はクライアントデータ削除
+        clientDatas.clear();
+
+        //サーバー情報だけ追加
+        NetData serverData;
+        serverData.id = id;
+        clientDatas.emplace_back(serverData);
+    }
 }
 
 #include <imgui.h>
@@ -191,6 +217,30 @@ void NetServer::ImGui()
     ImGui::Begin("NetServer", nullptr, ImGuiWindowFlags_None);
 
     ImGui::Text(recvData.c_str());
+
+    //エンドフラグ（一回onにしたら戻せない）
+    bool endJoin = isEndJoin;
+    if (ImGui::Checkbox("end", &endJoin))
+    {
+        //最初だけクライアント数保存
+        if (!isEndJoin)
+        {
+            clientNum = clientDatas.size();
+        }
+        isEndJoin |= endJoin;
+    }
+
+    bool aaa=false;
+    if (ImGui::Checkbox("Enqueue", &aaa)) {
+        static int bb = 0;
+        bufRing->Enqueue(bb);
+        bb++;
+    }
+    if (ImGui::Checkbox("Dele", &aaa)) {
+        bufRing->Dequeue();
+    }
+
+
 
     ImGui::End();
 }

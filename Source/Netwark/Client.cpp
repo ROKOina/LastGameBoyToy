@@ -87,9 +87,9 @@ void __fastcall NetClient::Initialize()
         std::cout << "error_code:" << WSAGetLastError();
     }
 
-    // 接続受付のソケットをブロッキング(ノンブロッキング)に設定
-    u_long val = 1;
-    ioctlsocket(multicastSock, FIONBIO, &val);
+    //// 接続受付のソケットをブロッキング(ノンブロッキング)に設定
+    //u_long val = 1;
+    //ioctlsocket(multicastSock, FIONBIO, &val);
 
     // マルチキャストグループへ登録処理( join )
     // マルチキャストグループ用構造体ip_mreqを使用する
@@ -105,6 +105,8 @@ void __fastcall NetClient::Initialize()
     
     setsockopt(multicastSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         reinterpret_cast<const char*>(&mr), sizeof(mr));
+
+    isNextFrame = true;
 }
 
 void __fastcall NetClient::Update()
