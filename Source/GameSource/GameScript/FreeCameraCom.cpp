@@ -2,21 +2,30 @@
 
 #include "Components/TransformCom.h"
 #include "SystemStruct/QuaternionStruct.h"
-
+#include "Graphics/Graphics.h"
 #include <windows.h>
+
+//コンストラクタ
+FreeCameraCom::FreeCameraCom() : CameraCom::CameraCom(45, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.1f, 1000.0f)
+{
+    focuslapelate = 1.0f;
+    eyelaperate = 0.0f;
+}
 
 // 開始処理
 void FreeCameraCom::Start()
 {
-  DirectX::XMFLOAT3 front = GetGameObject()->transform_->GetWorldFront();
-  DirectX::XMFLOAT3 eye;
-  eye.x = focusPos.x - front.x * distance;
-  eye.y = focusPos.y - front.y * distance;
-  eye.z = focusPos.z - front.z * distance;
-  GetGameObject()->transform_->SetWorldPosition(eye);
+    DirectX::XMFLOAT3 front = GetGameObject()->transform_->GetWorldFront();
+    DirectX::XMFLOAT3 eye;
+    eye.x = focusPos.x - front.x * distance;
+    eye.y = focusPos.y - front.y * distance;
+    eye.z = focusPos.z - front.z * distance;
+    GetGameObject()->transform_->SetWorldPosition(eye);
 
-  //基底クラスのカメラを呼ぶ
-  CameraCom::Start();
+    //基底クラスのカメラを呼ぶ
+    CameraCom::Start();
+
+    isActiveCamera = true;
 }
 
 // 更新処理
@@ -90,7 +99,6 @@ void FreeCameraCom::Update(float elapsedTime)
 // GUI描画
 void FreeCameraCom::OnGUI()
 {
-  //基底クラスのカメラを呼ぶ
-  CameraCom::OnGUI();
+    //基底クラスのカメラを呼ぶ
+    CameraCom::OnGUI();
 }
-

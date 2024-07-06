@@ -87,15 +87,15 @@ void __fastcall NetClient::Initialize()
         std::cout << "error_code:" << WSAGetLastError();
     }
 
-    //// 接続受付のソケットをブロッキング(ノンブロッキング)に設定
-    //u_long val = 1;
-    //ioctlsocket(multicastSock, FIONBIO, &val);
+    // 接続受付のソケットをブロッキング(ノンブロッキング)に設定
+    u_long val = 1;
+    ioctlsocket(multicastSock, FIONBIO, &val);
 
     // マルチキャストグループへ登録処理( join )
     // マルチキャストグループ用構造体ip_mreqを使用する
     // マルチキャストアドレスは「224.10.1.1」を使用
     struct ip_mreq mr;
-    if (inet_pton(AF_INET, "224.10.1.15", &mr.imr_multiaddr.s_addr) == 0)
+    if (inet_pton(AF_INET, "224.10.1.1", &mr.imr_multiaddr.s_addr) == 0)
     {
         std::cout << "error_code:" << WSAGetLastError();
     }
@@ -105,13 +105,12 @@ void __fastcall NetClient::Initialize()
     
     setsockopt(multicastSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         reinterpret_cast<const char*>(&mr), sizeof(mr));
-
-    isNextFrame = true;
 }
 
 void __fastcall NetClient::Update()
 {
-    ///******       データ送信        ******///
+    // 通常のソケットでサーバにメッセージを送信
+
     //入力情報更新
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -120,9 +119,9 @@ void __fastcall NetClient::Update()
     inputUp |= gamePad.GetButtonUp();
 
     //パケットロス回避のため、3フレーム毎に送る
-    //static int cou = 0;
-    //cou++;
-    //if (cou > 3) {
+    static int cou = 0;
+    cou++;
+    if (cou > 3) {
         //仮でポジションを送る
         std::vector<NetData> netData;
         NetData n;
@@ -147,11 +146,9 @@ void __fastcall NetClient::Update()
         std::stringstream ss = NetDataSendCast(netData);
 
         sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
-    //    cou = 0;
-    //}
+        cou = 0;
+    }
 
-
-    ///******       データ受信        ******///
     //マルチキャストアドレスからデータ受信
     char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
@@ -174,6 +171,8 @@ void __fastcall NetClient::Update()
     {
         std::cout << WSAGetLastError() << std::endl;
     }
+
+    //RenderUpdate();
 }
 
 #include <imgui.h>

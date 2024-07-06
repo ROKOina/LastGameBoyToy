@@ -21,8 +21,6 @@ public:
      std::vector<NetData>& GetNetDatas() { return clientDatas; }
     const int GetNetId() { return id; }
 
-    const bool IsNextFrame() { return isNextFrame; }
-
 protected:
     unsigned __int64 sock;
     unsigned __int64 multicastSock;
@@ -35,9 +33,4 @@ protected:
     unsigned int input;
     unsigned int inputUp;
     unsigned int inputDown;
-
-    //完全同期用
-    bool isEndJoin = false; //入室終了フラグ
-    bool isNextFrame = false;   //次のフレームに行けるか
-    int clientNum;
 };

@@ -244,7 +244,7 @@ void GPUParticle::Render()
     dc->PSSetShaderResources(20, 1, m_colormap.GetAddressOf());
 
     //デプスステンシルステート設定
-    dc->OMSetDepthStencilState(graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_OFF), 0);
+    dc->OMSetDepthStencilState(graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 0);
 
     //プリミティブトポロジー設定
     dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);

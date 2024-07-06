@@ -9,6 +9,7 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
     //ファイル名
     const char* VSPath = nullptr;
     const char* PSPath = nullptr;
+    const char* GSPath = nullptr;
 
     //選択されたのが指定される
     switch (shader)
@@ -29,13 +30,21 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\AreaEffectCirclePS.cso" };
         break;
-    case SHADER_ID_MODEL::CRACK_EFFECT:
+    case SHADER_ID_MODEL::FAKE_DEPTH:
         VSPath = { "Shader\\FakeDepthVS.cso" };
         PSPath = { "Shader\\FakeDepthPS.cso" };
         break;
+    case SHADER_ID_MODEL::SCI_FI_GATE:
+        VSPath = { "Shader\\DefaltVS.cso" };
+        PSPath = { "Shader\\SciFiGatePS.cso" };
+        break;
+    case SHADER_ID_MODEL::SHADOW:
+        VSPath = { "Shader\\ShadowVS.cso" };
+        GSPath = { "Shader\\ShadowGS.cso" };
+        break;
 
     default:
-      assert(!"引数のShaderに想定されていない値が入れられている");
+        assert(!"引数のShaderに想定されていない値が入れられている");
     }
 
     // 頂点シェーダー
@@ -53,8 +62,15 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
     };
     CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshader.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
 
-    // ピクセルシェーダー
-    CreatePsFromCso(Graphics.GetDevice(), PSPath, m_pixelshader.GetAddressOf());
+    // ピクセルシェーダーとジオメトリシェーダー
+    if (shader != SHADER_ID_MODEL::SHADOW)
+    {
+        CreatePsFromCso(Graphics.GetDevice(), PSPath, m_pixelshader.GetAddressOf());
+    }
+    else if (shader == SHADER_ID_MODEL::SHADOW)
+    {
+        CreateGsFromCso(Graphics.GetDevice(), GSPath, m_geometryshader.GetAddressOf());
+    }
 
     // 定数バッファ
     {
@@ -65,7 +81,7 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
 }
 
 //描画設定
-void ModelShader::Begin(ID3D11DeviceContext* dc, int blendmode)
+void ModelShader::Begin(ID3D11DeviceContext* dc, int blendmode, RASTERIZERSTATE rasterizerState)
 {
     //シェーダーのセット
     dc->VSSetShader(m_vertexshader.Get(), nullptr, 0);
@@ -78,7 +94,24 @@ void ModelShader::Begin(ID3D11DeviceContext* dc, int blendmode)
     //レンダーステートの設定（ループの外で1回だけ設定）
     dc->OMSetBlendState(Graphics.GetBlendState(static_cast<BLENDSTATE>(blendmode)), blendFactor, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
-    dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_BACK));
+    dc->RSSetState(Graphics.GetRasterizerState(rasterizerState));
+}
+
+void ModelShader::ShadowBegin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode)
+{
+    //シェーダーのセット
+    dc->VSSetShader(m_vertexshader.Get(), nullptr, 0);
+    dc->GSSetShader(m_geometryshader.Get(), nullptr, 0);
+    dc->PSSetShader(NULL, NULL, 0);
+    dc->IASetInputLayout(m_inputlayout.Get());
+
+    Graphics& Graphics = Graphics::Instance();
+    const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    //レンダーステートの設定（ループの外で1回だけ設定）
+    dc->OMSetBlendState(Graphics.GetBlendState(blendmode), blendFactor, 0xFFFFFFFF);
+    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(depthmode), 1);
+    dc->RSSetState(Graphics.GetRasterizerState(rasterizermode));
 }
 
 //バッファー描画
@@ -125,6 +158,12 @@ void ModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset
     dc->DrawIndexed(subset.indexCount, subset.startIndex, 0);
 }
 
+//影のサブセット毎の描画
+void ModelShader::ShadowSetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset)
+{
+    dc->DrawIndexedInstanced(subset.indexCount, 4, subset.startIndex, 0, 0);
+}
+
 //描画終了処理
 void ModelShader::End(ID3D11DeviceContext* dc)
 {
@@ -133,4 +172,5 @@ void ModelShader::End(ID3D11DeviceContext* dc)
     //解放してあげる
     dc->VSSetShader(NULL, NULL, 0);
     dc->PSSetShader(NULL, NULL, 0);
+    dc->GSSetShader(NULL, NULL, 0);
 }

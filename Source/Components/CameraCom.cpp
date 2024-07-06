@@ -7,11 +7,17 @@
 #include <imgui.h>
 #include <cmath>
 
+//コンストラクタで値を代入
+CameraCom::CameraCom(float fovY, float aspect, float nearZ, float farZ)
+{
+    //パースペクティブ設定
+    SetPerspectiveFov(DirectX::XMConvertToRadians(fovY), aspect, nearZ, farZ);
+}
+
 // 開始処理
 void CameraCom::Start()
 {
 }
-
 
 // 更新処理
 void CameraCom::Update(float elapsedTime)
@@ -36,32 +42,23 @@ void CameraCom::Update(float elapsedTime)
         shakePos_ = { 0,0,0 };
     }
 
-    //ヒットストップ
-    if (isHitStop_)
-    {
-        if (hitTimer_ > 0)
-        {
-            hitTimer_ -= elapsedTime;
-            Graphics::Instance().SetWorldSpeed(0);
-        }
-        else
-        {
-            isHitStop_ = false;
-            Graphics::Instance().SetWorldSpeed(saveWorldSpeed_);
-        }
-    }
-
     //LookAt関数使っていないなら更新する
-    if (!isLookAt_) {
+    if (!isLookAt_)
+    {
         //カメラのフォワードをフォーカスする
-        DirectX::XMFLOAT3 forwardPoint;
         DirectX::XMFLOAT3 wPos = GetGameObject()->transform_->GetWorldPosition();
-        DirectX::XMFLOAT3 forwardNormalVec = GetGameObject()->transform_->GetWorldFront();
-        forwardPoint = { forwardNormalVec.x * 2 + wPos.x + shakePos_.x,
-            forwardNormalVec.y * 2 + wPos.y + shakePos_.y,
-            forwardNormalVec.z * 2 + wPos.z + shakePos_.z };
 
-        SetLookAt(forwardPoint, GetGameObject()->transform_->GetWorldUp());
+        //前方向のベクトルを取得
+        DirectX::XMFLOAT3 forwardNormalVec = GetGameObject()->transform_->GetWorldFront();
+
+        //eyeを線形補完して滑らかに制御する
+        DirectX::XMStoreFloat3(&wPos, DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&eye_), DirectX::XMLoadFloat3(&wPos), 1.0f - eyelaperate));
+
+        //focusを線形補完して滑らかに制御する
+        DirectX::XMFLOAT3 forwardPoint = { forwardNormalVec * 2 + wPos + shakePos_ };
+        DirectX::XMStoreFloat3(&focus_, DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&forwardPoint), DirectX::XMLoadFloat3(&focus_), 1.0f - focuslapelate));
+
+        SetLookAt(focus_, GetGameObject()->transform_->GetWorldUp());
     }
 
     isLookAt_ = false;
@@ -74,6 +71,9 @@ void CameraCom::Update(float elapsedTime)
 void CameraCom::OnGUI()
 {
     ImGui::DragFloat3("Focus", &focus_.x);
+    ImGui::DragFloat3("Eye", &eye_.x);
+    ImGui::DragFloat("focuslapelate", &focuslapelate, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("eyelaperate", &eyelaperate, 0.01f, 0.0f, 1.0f);
 
     ImGui::DragFloat3("shakePos_", &shakePos_.x);
     ImGui::DragFloat("shakeSec", &shakeSec_);
@@ -115,23 +115,23 @@ void CameraCom::SetLookAt(const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT
     if (!std::isfinite(world._11))return;
 
     //カメラの方向を取り出す
-    this->right_.x   = world._11;
-    this->right_.y   = world._12;
-    this->right_.z   = world._13;
+    this->right_.x = world._11;
+    this->right_.y = world._12;
+    this->right_.z = world._13;
 
-    this->up_.x      = world._21;
-    this->up_.y      = world._22;
-    this->up_.z      = world._23;
+    this->up_.x = world._21;
+    this->up_.y = world._22;
+    this->up_.z = world._23;
 
-    this->front_.x   = world._31;
-    this->front_.y   = world._32;
-    this->front_.z   = world._33;
+    this->front_.x = world._31;
+    this->front_.y = world._32;
+    this->front_.z = world._33;
 
     GetGameObject()->transform_->SetWorldTransform(world);
 
-
     //視点、注視点を保存
     this->focus_ = focus;
+    this->eye_ = cameraPos;
 
     isLookAt_ = true;
 }
@@ -142,18 +142,10 @@ void CameraCom::SetPerspectiveFov(float fovY, float aspect, float nearZ, float f
     //画角、画面比率、クリップ距離からプロジェクション行列を作成
     DirectX::XMMATRIX Projection = DirectX::XMMatrixPerspectiveFovLH(fovY, aspect, nearZ, farZ);	//プロジェクション行列作成
     DirectX::XMStoreFloat4x4(&projection_, Projection);	//rcに渡す
+    scope_ = DirectX::XMFLOAT2(nearZ, farZ);
 }
 
-//ヒットストップ
-void CameraCom::HitStop(float sec)
-{
-    if (!isHitStop_)
-        saveWorldSpeed_ = Graphics::Instance().GetWorldSpeed();
-    isHitStop_ = true;
-    hitTimer_ = sec;
-}
-
-void CameraCom::SetActiveInitialize() 
+void CameraCom::SetActiveInitialize()
 {
     isActiveCamera = true;
 }

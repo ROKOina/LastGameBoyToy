@@ -27,7 +27,7 @@ void TransformCom::OnGUI()
 	}
 
 	//クォータニオン
-	ImGui::DragFloat4("Rotation", &rotation_.x, 0.1f);
+	ImGui::Text("Rotation : %.2f, %.2f, %.2f, %.2f", &rotation_.x, &rotation_.y, &rotation_.z, &rotation_.w);
 
 	//オイラー角
 	DirectX::XMFLOAT3 euler = eulerRotation_;
@@ -35,7 +35,7 @@ void TransformCom::OnGUI()
 		SetEulerRotation(euler);
 	}
 
-	ImGui::DragFloat3("Scale", &scale_.x, 0.1f);
+	ImGui::DragFloat3("Scale", &scale_.x, 0.001f);
 }
 
 //行列更新

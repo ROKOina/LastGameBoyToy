@@ -6,6 +6,7 @@
 #include "Audio\Audio.h"
 
 #include "Netwark/NetwarkPost.h"
+#include "Graphics/Light/Light.h"
 
 // ゲームシーン
 class SceneIKTest :public Scene
@@ -18,7 +19,7 @@ public:
     void Initialize()override;
 
     // 終了化
-    void Finalize()override;
+    void Finalize()override {};
 
     // 更新処理
     void Update(float elapsedTime)override;
@@ -27,5 +28,5 @@ public:
     void Render(float elapsedTime)override;
 
 private:
- 
+    Light* mainDirectionalLight = nullptr;
 };

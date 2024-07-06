@@ -7,6 +7,7 @@
 #include "Framework.h"
 #include "GameSource\Scene\SceneGame.h"
 #include "GameSource\Scene\SceneManager.h"
+#include "GameSource\Scene\SceneIKTest.h"
 #include "ImGuiRender.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -29,6 +30,7 @@ Framework::Framework(HWND hWnd)
   SceneManager::Instance().ChangeScene(new SceneGame);
   //SceneManager::Instance().ChangeScene(new SceneTitle);
   //SceneManager::Instance().ChangeScene(new SceneResult);
+  //SceneManager::Instance().ChangeScene(new SceneIKTest);
 
   //IMGUIèâä˙âª
   IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());

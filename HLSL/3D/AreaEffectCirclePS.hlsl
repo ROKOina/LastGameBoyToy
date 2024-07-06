@@ -12,7 +12,7 @@ cbuffer EffectCircleConstants : register(b0)
     float4 waveEffectColor;
     
     float waveEffectIntensity;
-    float3 dummy;
+    float3 ECdummy;
 }
 
 Texture2D OuterCircle : register(t0); //外側のサークル

@@ -16,18 +16,18 @@
 // 定数バッファの割り当て番号
 enum class CB_INDEX
 {
-  VARIOUS             = 0,
+    VARIOUS = 0,
 
-  OBJECT              = 1,
-  SUBSET              = 2,
-  POST_EFFECT         = 3,
-
-  CPU_PARTICLE        = 5,
-  GPU_PARTICLE        = 6,
-  GPU_PARTICLE_SAVE   = 7,
-  LIGHT_DATA          = 8,
-
-  SCENE               = 10
+    OBJECT = 1,
+    SUBSET = 2,
+    POST_EFFECT = 3,
+    SHADOW = 4,
+    CPU_PARTICLE = 5,
+    GPU_PARTICLE = 6,
+    GPU_PARTICLE_SAVE = 7,
+    LIGHT_DATA = 8,
+    SHADOW_PAR = 9,
+    SCENE = 10
 };
 
 //ブレンドステート
@@ -98,14 +98,23 @@ enum SAMPLEMODE
 //シェーダー設定
 enum class SHADER_ID_MODEL
 {
-    // デファードレンダーターゲットに描画
+    // デファード描画
     DEFERRED,
 
-    // フォワードレンダーターゲットに描画 ( 以降 )
+    // 以降、フォワード描画
     BLACK,
+    FAKE_DEPTH,
+
+    // 以降、半透明オブジェクト
     DEFAULT,
-    CRACK_EFFECT,
     AREA_EFFECT_CIRCLE,
+
+    // 以降、深度マップを使用するシェーダー
+    USE_DEPTH_MAP,
+    SCI_FI_GATE = USE_DEPTH_MAP,
+
+    //影
+    SHADOW,
 
     MAX
 };
