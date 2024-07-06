@@ -73,25 +73,6 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
-    //test
-    //{
-    //    auto& obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("zombie");
-    //    obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-    //    obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/zombie/Zombie.mdl");
-    //
-    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    //    a->SetupRootMotion("Zombie1");
-    //    a->SetupRootMotionHip("Base_HumanPelvis");
-    //    //a->PlayAnimation(2, true, true, 0.05);
-    //
-    //    a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
-    //    a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
-    //    a->SetUpAnimationUpdate(1);
-    //}
-
     //ステージ
     {
         auto& obj = GameObjectManager::Instance().Create();
@@ -101,24 +82,6 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-    }
-
-    //バリア
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("barrier");
-        obj->transform_->SetWorldPosition({ -2.0f,1.4f,0.0f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD);
-        r->LoadModel("Data/Ball/b.mdl");
-    }
-
-    //黒い何か
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("blackball");
-        obj->transform_->SetWorldPosition({ 2.0f,1.4f,0.0f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::BLACK, BLENDSTATE::ALPHA);
-        r->LoadModel("Data/Ball/t.mdl");
     }
 
     //テスト
@@ -143,31 +106,6 @@ void SceneGame::Initialize()
         cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
         cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
         cb->contourIntensity = 1.5f;
-    }
-
-    //IKテスト
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("IKTest");
-        obj->transform_->SetWorldPosition({ -5, 0, 0 });
-        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/IKTestModel/IKTest.mdl");
-        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    }
-
-    ////cpuparticletest
-    //{
-    //  auto& obj = GameObjectManager::Instance().Create();
-    //  obj->SetName("cpuparticle");
-    //  obj->AddComponent<CPUParticle>("Data\\Effect\\test.cpuparticle", 1000);
-    //}
-
-    //gpuparticletest
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("gpuparticle");
-        obj->AddComponent<GPUParticle>("Data\\Effect\\test.gpuparticle", 4000);
     }
 
 #pragma endregion
