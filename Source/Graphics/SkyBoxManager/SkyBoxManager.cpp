@@ -16,7 +16,7 @@ void SkyBoxManager::LoadSkyBoxTextures(std::array<const char*, 4> filepath)
   // テクスチャ読み込み
   D3D11_TEXTURE2D_DESC texture2d_desc{};
   for (int i = 0; i < 4; ++i) {
-    LoadTextureFromFile(device, filepath[i], skyBoxTextures[i].GetAddressOf(), &texture2d_desc);
+    LoadTextureFromFile(device, filepath[i], skyBoxTextures[i].ReleaseAndGetAddressOf(), &texture2d_desc);
   }
 }
 
