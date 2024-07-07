@@ -7,7 +7,7 @@
 #include <assert.h>
 
 // レイキャストの判定するポリゴンを表示するフラグ ( コメントアウト = 無効化 )
-#define DRAW_POLYGON_GROUP
+//#define DRAW_POLYGON_GROUP
 
 void RayCastManager::Remove(std::shared_ptr<RayCollisionCom> removeCollision)
 {

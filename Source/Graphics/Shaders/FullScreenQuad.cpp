@@ -38,6 +38,8 @@ void FullScreenQuad::Blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderRe
   //ピクセルシェーダーのリソースビューを再度設定
   immediate_context->PSSetShaderResources(start_slot, num_views, shader_resource_views);
 
+  immediate_context->RSSetState(Graphics::Instance().GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
+
   //4つの頂点からなる三角形ストリップ
   immediate_context->Draw(4, 0);
 

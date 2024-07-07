@@ -77,7 +77,7 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
+        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
         obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/canyon/stage.mdl");
@@ -106,6 +106,13 @@ void SceneGame::Initialize()
         cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
         cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
         cb->contourIntensity = 1.5f;
+    }
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("test");
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
+        r->LoadModel("Data/Ball/b.mdl");
+
     }
 
 #pragma endregion
