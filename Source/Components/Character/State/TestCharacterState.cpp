@@ -23,6 +23,14 @@ void TestCharacter_MoveState::Enter()
 {
   //歩きアニメーション再生開始
   animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
+
+  //ダッシュ用の速度設定
+  float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
+  maxDashAccele = 20.0f;
+  float dashAccele = moveCom.lock()->GetMoveAcceleration();
+  dashAccele = 3.0f;
+  moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
+  moveCom.lock()->SetMoveAcceleration(dashAccele);
 }
 
 void TestCharacter_MoveState::Execute(const float& elapsedTime)
