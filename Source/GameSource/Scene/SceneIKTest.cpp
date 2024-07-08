@@ -1,6 +1,6 @@
 #include "Graphics/Graphics.h"
+
 #include "Graphics/Light/LightManager.h"
-#include "Graphics/Light/Light.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
@@ -18,6 +18,7 @@
 #include "Components\MovementCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
+#include "Components\FootIKcom.h"
 #include "Components/CPUParticle.h"
 
 #include "GameSource/GameScript/FreeCameraCom.h"
@@ -31,31 +32,8 @@ void SceneIKTest::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
-        f->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
+        freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-        f->SetActiveInitialize();
-    }
-
-    //普通のカメラ
-    {
-        std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-        camera->SetName("normalcamera");
-
-        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-        c->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
-
-        camera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
     //コンスタントバッファの初期化
@@ -66,40 +44,27 @@ void SceneIKTest::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/OneCoin/robot.mdl");
+        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/IKTestModel/IKTest.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-
-        auto& oo = obj->AddChildObject();
-        oo->SetName("barrier1");
-        oo->transform_->SetScale({ 500,500,500 });
-        oo->transform_->SetLocalPosition({ 1000,0,0 });
-        std::shared_ptr<RendererCom> ro = oo->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
-        ro->LoadModel("Data/Ball/b.mdl");
-
-        auto& oo1 = oo->AddChildObject();
-        oo1->SetName("barrier2");
-        oo1->transform_->SetScale({ 1,1,1 });
-        oo1->transform_->SetLocalPosition({ 3,0,0 });
-        std::shared_ptr<RendererCom> ro1 = oo1->AddComponent<RendererCom>(SHADERMODE::DEFALT, BLENDSTATE::ADD);
-        ro1->LoadModel("Data/Ball/b.mdl");
+        std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
     }
 
     //ステージ
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-        obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/Stage/Stage.mdl");
+        obj->transform_->SetWorldPosition({ 0, 0.0f, 0 });
+        obj->transform_->SetScale({ 0.6f, 0.6f, 0.6f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/IKTestStage/ExampleStage.mdl");
     }
 
     //平行光源を追加
-    Light* mainDirectionalLight = new Light(LightType::Directional);
+    mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
@@ -108,8 +73,38 @@ void SceneIKTest::Initialize()
 //更新処理
 void SceneIKTest::Update(float elapsedTime)
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    GameObjectManager::Instance().UpdateTransform();
+    GameObjectManager::Instance().Update(elapsedTime);
+
+    //コンポーネントゲット
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
+    std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
+    std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
 }
 
 void SceneIKTest::Render(float elapsedTime)
 {
+    // 画面クリア＆レンダーターゲット設定
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+    ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
+    ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
+    dc->OMSetRenderTargets(1, &rtv, dsv);
+
+    //コンスタントバッファの更新
+    ConstantBufferUpdate(elapsedTime);
+
+    //サンプラーステートの設定
+    Graphics::Instance().SetSamplerState();
+
+    // ライトの定数バッファを更新
+    LightManager::Instance().UpdateConstatBuffer();
+
+    //オブジェクト描画
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+
+    //オブジェクト描画
+    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 }

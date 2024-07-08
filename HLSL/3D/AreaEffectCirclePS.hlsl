@@ -12,7 +12,7 @@ cbuffer EffectCircleConstants : register(b0)
     float4 waveEffectColor;
     
     float waveEffectIntensity;
-    float3 dummy;
+    float3 ECdummy;
 }
 
 Texture2D OuterCircle : register(t0); //外側のサークル
@@ -53,7 +53,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     color += wave * waveEffectColor * waveEffectIntensity * step(centerDist, waveEffectRange) * step(color.a, 0);
     
     // 限りなく透明に近いピクセルは破棄する
-    clip(color.a - 0.0001f);
+    clip(color.a - EPSILON);
     
     return color;
 }

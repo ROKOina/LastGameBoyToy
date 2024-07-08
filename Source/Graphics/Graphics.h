@@ -16,18 +16,18 @@
 // 定数バッファの割り当て番号
 enum class CB_INDEX
 {
-  VARIOUS             = 0,
+    VARIOUS = 0,
 
-  OBJECT              = 1,
-  SUBSET              = 2,
-  POST_EFFECT         = 3,
-
-  CPU_PARTICLE        = 5,
-  GPU_PARTICLE        = 6,
-  GPU_PARTICLE_SAVE   = 7,
-  LIGHT_DATA          = 8,
-
-  SCENE               = 10
+    OBJECT = 1,
+    SUBSET = 2,
+    POST_EFFECT = 3,
+    SHADOW = 4,
+    CPU_PARTICLE = 5,
+    GPU_PARTICLE = 6,
+    GPU_PARTICLE_SAVE = 7,
+    LIGHT_DATA = 8,
+    SHADOW_PAR = 9,
+    SCENE = 10
 };
 
 //ブレンドステート
@@ -96,13 +96,25 @@ enum SAMPLEMODE
 };
 
 //シェーダー設定
-enum class SHADERMODE
+enum class SHADER_ID_MODEL
 {
-    DEFALT,
+    // デファード描画
     DEFERRED,
+
+    // 以降、フォワード描画
     BLACK,
+    FAKE_DEPTH,
+
+    // 以降、半透明オブジェクト
+    DEFAULT,
     AREA_EFFECT_CIRCLE,
-    CRACK_EFFECT,
+
+    // 以降、深度マップを使用するシェーダー
+    USE_DEPTH_MAP,
+    SCI_FI_GATE = USE_DEPTH_MAP,
+
+    //影
+    SHADOW,
 
     MAX
 };
@@ -136,7 +148,7 @@ public:
     ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView_.Get(); }
 
     //シェーダー取得
-    ModelShader* GetModelShader(SHADERMODE mode)const { return m_modelshaders[static_cast<int>(mode)].get(); }
+    ModelShader* GetModelShader(SHADER_ID_MODEL mode)const { return m_modelshaders[static_cast<int>(mode)].get(); }
 
     // スクリーン幅取得
     float GetScreenWidth() const { return screenWidth_; }
@@ -199,7 +211,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depthStencilStates[static_cast<int>(DEPTHSTATE::MAX)];
     Microsoft::WRL::ComPtr<ID3D11SamplerState>	    samplerStates[static_cast<int>(SAMPLEMODE::MAX)];
 
-    std::unique_ptr<ModelShader>                    m_modelshaders[static_cast<int>(SHADERMODE::MAX)];
+    std::unique_ptr<ModelShader>                    m_modelshaders[static_cast<int>(SHADER_ID_MODEL::MAX)];
 
 private:
     float	screenWidth_;

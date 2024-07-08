@@ -631,11 +631,13 @@ Graphics::Graphics(HWND hWnd)
 
     // シェーダー
     {
-        m_modelshaders[static_cast<int>(SHADERMODE::DEFALT)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFALT);
-        m_modelshaders[static_cast<int>(SHADERMODE::DEFERRED)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::DEFERRED);
-        m_modelshaders[static_cast<int>(SHADERMODE::BLACK)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::BLACK);
-        m_modelshaders[static_cast<int>(SHADERMODE::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::AREA_EFFECT_CIRCLE);
-        m_modelshaders[static_cast<int>(SHADERMODE::CRACK_EFFECT)] = std::make_unique<ModelShader>(ModelShader::MODELSHADER::CRACK_EFFECT);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::DEFAULT)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::DEFAULT);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::DEFERRED)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::DEFERRED);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::BLACK)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::BLACK);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::FAKE_DEPTH)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::FAKE_DEPTH);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SCI_FI_GATE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SCI_FI_GATE);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SHADOW)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SHADOW);
     }
 
     // レンダラ
@@ -696,4 +698,5 @@ void Graphics::SetSamplerState()
     immediateContext_->PSSetSamplers(6, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_POINT].GetAddressOf());
     immediateContext_->PSSetSamplers(7, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_LINEAR].GetAddressOf());
     immediateContext_->PSSetSamplers(8, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_ANISOTROPIC].GetAddressOf());
+    immediateContext_->PSSetSamplers(9, 1, samplerStates[SAMPLEMODE::SHADOW].GetAddressOf());
 }

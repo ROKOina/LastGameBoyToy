@@ -35,6 +35,15 @@ void GameObject::Update(float elapsedTime)
     }
 }
 
+void GameObject::OnDestroy()
+{
+  for (std::shared_ptr<Component>& component : components_)
+  {
+    if (!component->GetEnabled())continue;
+    component->OnDestroy();
+  }
+}
+
 // 行列の更新
 void GameObject::UpdateTransform()
 {
@@ -172,64 +181,11 @@ void GameObjectManager::AllRemove()
 // 更新
 void GameObjectManager::Update(float elapsedTime)
 {
-    for (std::shared_ptr<GameObject>& obj : startGameObject_)
-    {
-        if (!obj)continue;
-
-        //レンダラーコンポーネントがあればレンダーオブジェに入れる
-        std::shared_ptr<RendererCom> rendererComponent = obj->GetComponent<RendererCom>();
-        if (rendererComponent)
-        {
-            renderSortObject_.emplace_back(rendererComponent);
-        }
-
-        //CPUパーティクルオブジェクトがあれば入れる
-        std::shared_ptr<CPUParticle> cpuparticlecomp = obj->GetComponent<CPUParticle>();
-        if (cpuparticlecomp)
-        {
-            cpuparticleobject.emplace_back(cpuparticlecomp);
-        }
-
-        //GPUパーティクルオブジェクトがあれば入る
-        std::shared_ptr<GPUParticle>gpuparticlecomp = obj->GetComponent<GPUParticle>();
-        if (gpuparticlecomp)
-        {
-            gpuparticleobject.emplace_back(gpuparticlecomp);
-        }
-
-        obj->Start();
-        updateGameObject_.emplace_back(obj);
-
-        //当たり判定コンポーネント追加
-        std::shared_ptr<Collider> colliderComponent = obj->GetComponent<Collider>();
-        if (colliderComponent)
-        {
-            colliderObject_.emplace_back(colliderComponent);
-        }
-
-        obj->UpdateTransform();
-    }
-    startGameObject_.clear();
+    // 新しく生成されたゲームオブジェクトの初期設定
+    StartUpObjects();
 
     //当たり判定
-    {
-        //判定前のクリア
-        for (auto& col : colliderObject_)
-        {
-            col.lock()->ColliderStartClear();
-        }
-
-        //判定
-        for (int col1 = 0; col1 < colliderObject_.size(); ++col1)
-        {
-            if (!colliderObject_[col1].lock()->GetGameObject()->GetEnabled())continue;
-            for (int col2 = col1 + 1; col2 < colliderObject_.size(); ++col2)
-            {
-                if (!colliderObject_[col2].lock()->GetGameObject()->GetEnabled())continue;
-                colliderObject_[col1].lock()->ColliderVSOther(colliderObject_[col2].lock());
-            }
-        }
-    }
+    CollideGameObjects();
 
     //更新
     for (std::shared_ptr<GameObject>& obj : updateGameObject_)
@@ -237,78 +193,8 @@ void GameObjectManager::Update(float elapsedTime)
         obj->Update(elapsedTime);
     }
 
-    for (auto& f : future)
-    {
-        f.get();
-    }
-    future.clear();
-
     //削除
-    std::vector<std::weak_ptr<GameObject>> parentObj;
-    for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
-    {
-        EraseObject(startGameObject_, obj);
-        EraseObject(updateGameObject_, obj);
-
-        std::set<std::shared_ptr<GameObject>>::iterator itSelection = selectionGameObject_.find(obj);
-        if (itSelection != selectionGameObject_.end())
-        {
-            selectionGameObject_.erase(itSelection);
-        }
-
-        if (obj->GetParent())
-            parentObj.emplace_back(obj->GetParent());
-    }
-    removeGameObject_.clear();
-
-    //各オブジェクト解放(削除)
-    {
-        //child解放
-        for (std::weak_ptr<GameObject> parent : parentObj)
-        {
-            if (!parent.expired())
-                parent.lock()->EraseExpiredChild();
-        }
-
-        //collider解放
-        for (int col = 0; col < colliderObject_.size(); ++col)
-        {
-            if (colliderObject_[col].expired())
-            {
-                colliderObject_.erase(colliderObject_.begin() + col);
-                --col;
-            }
-        }
-        //renderObject解放
-        for (int ren = 0; ren < renderSortObject_.size(); ++ren)
-        {
-            if (renderSortObject_[ren].expired())
-            {
-                renderSortObject_.erase(renderSortObject_.begin() + ren);
-                --ren;
-            }
-        }
-
-        //cpuparticleObject解放
-        for (int per = 0; per < cpuparticleobject.size(); ++per)
-        {
-            if (cpuparticleobject[per].expired())
-            {
-                cpuparticleobject.erase(cpuparticleobject.begin() + per);
-                --per;
-            }
-        }
-
-        //gpuparticleobject解放
-        for (int per = 0; per < gpuparticleobject.size(); ++per)
-        {
-            if (gpuparticleobject[per].expired())
-            {
-                gpuparticleobject.erase(gpuparticleobject.begin() + per);
-                --per;
-            }
-        }
-    }
+    RemoveGameObjects();
 }
 
 // 行列更新
@@ -321,13 +207,25 @@ void GameObjectManager::UpdateTransform()
 }
 
 // 描画
-void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& lightdirection)
 {
-    //デファードレンダリングの初期設定
-    m_posteffect->DeferredFirstSet();
+    //影描画
+    m_posteffect->GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, m_posteffect->m_criticaldepthvalue, [&]()
+        {
+            RenderShadow();
+        });
+
+    // オフスクリーンに描画開始
+    m_posteffect->StartOffScreenRendering();
+
+    //デファードレンダリングの初期設定 ( レンダーターゲットをデファード用の物に変更 )
+    m_posteffect->SetDeferredTarget();
 
     //3D描画
-    Render3D();
+    RenderDeferred();
+
+    //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
+    m_posteffect->EndDeferred();
 
     //CPUパーティクル描画
     CPUParticleRender();
@@ -335,25 +233,32 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //GPUパーティクル描画
     GPUParticleRender();
 
-    //デバッグレンダー
-    Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+    // フォワードレンダリング
+    RenderForward();
 
-    //デファードレンダリング終了
-    m_posteffect->DeferredResourceSet();
+  //デバッグレンダー
+  Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+  Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+
+  // 深度マップをコピーしてGPUに設定
+  m_posteffect->DepthCopyAndBind(8);
+
+    // 深度マップを使用するシェーダー
+    RenderUseDepth();
 
     //ポストエフェクト
     m_posteffect->PostEffectRender();
 
-    //debug
-    if (Graphics::Instance().IsDebugGUI())
+  //debug
+  if (Graphics::Instance().IsDebugGUI())
+  {
+    //当たり判定用デバッグ描画
+    for (auto& col : colliderObject_)
     {
-        //当たり判定用デバッグ描画
-        for (auto& col : colliderObject_)
-        {
-            if (!col.lock()->GetEnabled())continue;
-            if (!col.lock()->GetGameObject()->GetEnabled())continue;
-            col.lock()->DebugRender();
-        }
+      if (!col.lock()->GetEnabled())continue;
+      if (!col.lock()->GetGameObject()->GetEnabled())continue;
+      col.lock()->DebugRender();
+    }
 
         // リスター描画
         DrawLister();
@@ -482,6 +387,150 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
     }
 }
 
+void GameObjectManager::StartUpObjects()
+{
+    if (startGameObject_.empty())return;
+
+    for (std::shared_ptr<GameObject>& obj : startGameObject_)
+    {
+        if (!obj)continue;
+
+        //レンダラーコンポーネントがあればレンダーオブジェに入れる
+        std::shared_ptr<RendererCom> rendererComponent = obj->GetComponent<RendererCom>();
+        if (rendererComponent)
+        {
+            renderSortObject_.emplace_back(rendererComponent);
+        }
+
+        //CPUパーティクルオブジェクトがあれば入れる
+        std::shared_ptr<CPUParticle> cpuparticlecomp = obj->GetComponent<CPUParticle>();
+        if (cpuparticlecomp)
+        {
+            cpuparticleobject.emplace_back(cpuparticlecomp);
+        }
+
+        //GPUパーティクルオブジェクトがあれば入る
+        std::shared_ptr<GPUParticle>gpuparticlecomp = obj->GetComponent<GPUParticle>();
+        if (gpuparticlecomp)
+        {
+            gpuparticleobject.emplace_back(gpuparticlecomp);
+        }
+
+        obj->Start();
+        updateGameObject_.emplace_back(obj);
+
+        //当たり判定コンポーネント追加
+        std::shared_ptr<Collider> colliderComponent = obj->GetComponent<Collider>();
+        if (colliderComponent)
+        {
+            colliderObject_.emplace_back(colliderComponent);
+        }
+
+        obj->UpdateTransform();
+    }
+    startGameObject_.clear();
+
+    // 描画オブジェクトのソート
+    SortRenderObject();
+}
+
+void GameObjectManager::CollideGameObjects()
+{
+    // 判定前のクリア
+    for (auto& col : colliderObject_)
+    {
+        col.lock()->ColliderStartClear();
+    }
+
+    // 判定
+    for (int col1 = 0; col1 < colliderObject_.size(); ++col1)
+    {
+        if (!colliderObject_[col1].lock()->GetGameObject()->GetEnabled())continue;
+        for (int col2 = col1 + 1; col2 < colliderObject_.size(); ++col2)
+        {
+            if (!colliderObject_[col2].lock()->GetGameObject()->GetEnabled())continue;
+            colliderObject_[col1].lock()->ColliderVSOther(colliderObject_[col2].lock());
+        }
+    }
+}
+
+void GameObjectManager::RemoveGameObjects()
+{
+    // 削除リストに何もなかったら、何もしない
+    if (removeGameObject_.empty())return;
+
+  // 削除リストのオブジェクトを削除
+  {
+    std::vector<std::weak_ptr<GameObject>> parentObj;
+    for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
+    {
+      obj->OnDestroy();
+      EraseObject(startGameObject_, obj);
+      EraseObject(updateGameObject_, obj);
+
+            std::set<std::shared_ptr<GameObject>>::iterator itSelection = selectionGameObject_.find(obj);
+            if (itSelection != selectionGameObject_.end())
+            {
+                selectionGameObject_.erase(itSelection);
+            }
+
+            if (obj->GetParent())
+                parentObj.emplace_back(obj->GetParent());
+        }
+        removeGameObject_.clear();
+
+    //child解放
+    for (std::weak_ptr<GameObject> parent : parentObj)
+    {
+      if (!parent.expired()) {
+        parent.lock()->EraseExpiredChild();
+      }
+    }
+  }
+
+    //各オブジェクト解放(削除)
+      //collider解放
+    for (int col = 0; col < colliderObject_.size(); ++col)
+    {
+        if (colliderObject_[col].expired())
+        {
+            colliderObject_.erase(colliderObject_.begin() + col);
+            --col;
+        }
+    }
+    //renderObject解放
+    for (int ren = 0; ren < renderSortObject_.size(); ++ren)
+    {
+        if (renderSortObject_[ren].expired())
+        {
+            renderSortObject_.erase(renderSortObject_.begin() + ren);
+            --ren;
+        }
+    }
+
+    //cpuparticleObject解放
+    for (int per = 0; per < cpuparticleobject.size(); ++per)
+    {
+        if (cpuparticleobject[per].expired())
+        {
+            cpuparticleobject.erase(cpuparticleobject.begin() + per);
+            --per;
+        }
+    }
+
+    //gpuparticleobject解放
+    for (int per = 0; per < gpuparticleobject.size(); ++per)
+    {
+        if (gpuparticleobject[per].expired())
+        {
+            gpuparticleobject.erase(gpuparticleobject.begin() + per);
+            --per;
+        }
+    }
+
+    SortRenderObject();
+}
+
 // リスター描画
 void GameObjectManager::DrawLister()
 {
@@ -521,13 +570,37 @@ void GameObjectManager::DrawDetail()
     ImGui::End();
 }
 
+void GameObjectManager::SortRenderObject()
+{
+    std::sort(renderSortObject_.begin(), renderSortObject_.end(),
+        [&](std::weak_ptr<RendererCom>& left, std::weak_ptr<RendererCom>& right) {
+            return left.lock()->GetShaderMode() < right.lock()->GetShaderMode();
+        });
+
+    deferredCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
+        [&](std::weak_ptr<RendererCom>& ren) {
+            return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::DEFERRED;
+        });
+
+    useDepthCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
+        [&](std::weak_ptr<RendererCom>& ren) {
+            return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::USE_DEPTH_MAP;
+        });
+}
+
 //3D描画
-void GameObjectManager::Render3D()
+void GameObjectManager::RenderDeferred()
 {
     if (renderSortObject_.size() <= 0)return;
+    if (deferredCount == 0)return;
 
+    int drawCount = 0;
     for (std::weak_ptr<RendererCom>& renderObj : renderSortObject_)
     {
+        // デファードレンダリングのモデルのみ描画する
+        if (drawCount == deferredCount)return;
+        drawCount++;
+
         if (!renderObj.lock()->GetGameObject()->GetEnabled())continue;
         if (!renderObj.lock()->GetEnabled())continue;
 
@@ -535,6 +608,71 @@ void GameObjectManager::Render3D()
         if (model != nullptr)
         {
             renderObj.lock()->Render();
+        }
+    }
+}
+
+void GameObjectManager::RenderForward()
+{
+    if (renderSortObject_.size() <= 0)return;
+
+    // フォワードレンダリングするオブジェクトの数
+    int drawVolume = renderSortObject_.size() - deferredCount - useDepthCount;
+    if (drawVolume <= 0)return;
+
+    for (int i = 0; i < drawVolume; ++i)
+    {
+        int index = deferredCount + i;
+
+        if (!renderSortObject_[index].lock()->GetGameObject()->GetEnabled())continue;
+        if (!renderSortObject_[index].lock()->GetEnabled())continue;
+
+        Model* model = renderSortObject_[index].lock()->GetModel();
+        if (model != nullptr)
+        {
+            renderSortObject_[index].lock()->Render();
+        }
+    }
+}
+
+//影描画
+void GameObjectManager::RenderShadow()
+{
+    if (renderSortObject_.size() <= 0)return;
+
+    //影描画
+    for (std::weak_ptr<RendererCom>& modelrender : renderSortObject_)
+    {
+        if (!modelrender.lock()->GetGameObject()->GetEnabled())continue;
+        if (!modelrender.lock()->GetEnabled())continue;
+
+        Model* model = modelrender.lock()->GetModel();
+        if (model != nullptr)
+        {
+            modelrender.lock()->ShadowRender();
+        }
+    }
+}
+
+void GameObjectManager::RenderUseDepth()
+{
+    if (renderSortObject_.size() <= 0) return;
+
+    // フォワードレンダリングするオブジェクトの数
+    int drawVolume = useDepthCount;
+    if (drawVolume <= 0) return;
+
+    for (int i = 0; i < drawVolume; ++i)
+    {
+        int index = i + renderSortObject_.size() - useDepthCount;
+
+        if (!renderSortObject_[index].lock()->GetGameObject()->GetEnabled())continue;
+        if (!renderSortObject_[index].lock()->GetEnabled())continue;
+
+        Model* model = renderSortObject_[index].lock()->GetModel();
+        if (model != nullptr)
+        {
+            renderSortObject_[index].lock()->Render();
         }
     }
 }

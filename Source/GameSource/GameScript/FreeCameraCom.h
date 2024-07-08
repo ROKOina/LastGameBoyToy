@@ -11,7 +11,7 @@ class FreeCameraCom : public CameraCom
 {
     // コンポーネントオーバーライド
 public:
-    FreeCameraCom() {}
+    FreeCameraCom();
     ~FreeCameraCom() {}
 
     // 名前取得
@@ -29,11 +29,10 @@ public:
     //FreeCameraクラス
 public:
 
-
 private:
     DirectX::XMFLOAT3 focusPos = { 0,0,0 };
     float distance = 10;
 
-    DirectX::XMFLOAT2	oldCursor;
-    DirectX::XMFLOAT2	newCursor;
+    DirectX::XMFLOAT2	oldCursor = {};
+    DirectX::XMFLOAT2	newCursor = {};
 };

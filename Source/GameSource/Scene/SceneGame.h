@@ -6,6 +6,7 @@
 #include "Audio\Audio.h"
 
 #include "Netwark/NetwarkPost.h"
+#include "Graphics/Light/Light.h"
 
 // ゲームシーン
 class SceneGame :public Scene
@@ -27,15 +28,16 @@ public:
     void Render(float elapsedTime)override;
 
 private:
-  // 各プレイヤーの入力情報を、それぞれのキャラクターに送る
-  void SetUserInputs();
+    // 各プレイヤーの入力情報を、それぞれのキャラクターに送る
+    void SetUserInputs();
 
-  // プレイヤー( PCの持ち主 )の入力情報
-  void SetPlayerInput();
+    // プレイヤー( PCの持ち主 )の入力情報
+    void SetPlayerInput();
 
-  // 他のプレイヤー( オンライン )の入力情報
-  void SetOnlineInput();
+    // 他のプレイヤー( オンライン )の入力情報
+    void SetOnlineInput();
 
 private:
     std::unique_ptr<NetwarkPost> n;
+    Light* mainDirectionalLight = nullptr;
 };
