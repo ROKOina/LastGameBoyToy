@@ -24,7 +24,7 @@ void TestCharacter_MoveState::Enter()
   //歩きアニメーション再生開始
   animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
   animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.2f);
-  animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
+  //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
   //ダッシュ用の速度設定
   float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();

@@ -267,7 +267,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
 
                 if (blendRate < 1.0f)
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 1 && upperIsPlayAnimation)
                     {
                         //Œ»Ý‚ÌŽp¨‚ÆŽŸ‚ÌƒL[ƒtƒŒ[ƒ€‚Æ‚ÌŽp¨‚Ì•âŠ®
                         ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
@@ -276,7 +276,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                 //’Êí‚ÌŒvŽZ
                 else
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 2 && upperIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 1 && upperIsPlayAnimation)
                     {
                         ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                     }
@@ -361,7 +361,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
 
                 if (blendRate < 1.0f)
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 1 && lowerIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && lowerIsPlayAnimation)
                     {
                         //Œ»Ý‚ÌŽp¨‚ÆŽŸ‚ÌƒL[ƒtƒŒ[ƒ€‚Æ‚ÌŽp¨‚Ì•âŠ®
                         ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
@@ -370,7 +370,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                 //’Êí‚ÌŒvŽZ
                 else
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 1 && lowerIsPlayAnimation)
+                    if (model->GetNodes()[nodeIndex].layer == 2 && lowerIsPlayAnimation)
                     {
                         ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                     }
