@@ -6,7 +6,9 @@
 #include "Components\Character\BulletCom.h"
 #include "Components\ColliderCom.h"
 
+#include "GameSource/Scene/SceneManager.h"
 #include "BaseCharacterState.h"
+
 
 // マクロ
 #define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
@@ -46,10 +48,7 @@ void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, floa
     bulletCom->SetAliveTime(2.0f);
 }
 
-void Reloed()
-{
 
-}
 
 NomuraCharacter_BaseState::NomuraCharacter_BaseState(CharacterCom* owner) :State(owner)
 {
@@ -69,6 +68,8 @@ void NomuraCharacter_AttackState::Enter()
 
 void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
 {
+    
+
     MoveInputVec(owner->GetGameObject(), 0.5f);
 
     if (moveCom.lock()->OnGround())
@@ -79,7 +80,7 @@ void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
     if (attackPower > maxAttackPower) {
         attackPower = maxAttackPower;
     }
-
+    
     //攻撃終了処理＆攻撃処理
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
@@ -93,7 +94,7 @@ void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
 
 void NomuraCharacter_AttackState::ImGui()
 {
-    //ImGui::DragFloat()
+  
 }
 
 #pragma endregion
@@ -107,28 +108,11 @@ void NomuraCharacter_ESkillState::Enter()
 
 void NomuraCharacter_ESkillState::Execute(const float& elapsedTime)
 {
-    //タイマー
-    skillTimer -= elapsedTime;
-    ////時間か矢数で終了
-    //if (skillTimer < 0 || arrowCount <= 0)
-    //{
-    //    ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
-    //}
+    
 
-    MoveInputVec(owner->GetGameObject());
 
-    if (moveCom.lock()->OnGround())
-        JumpInput(owner->GetGameObject());
 
-    //intervalTimer += elapsedTime;
-    //攻撃終了処理＆攻撃処理
-    //if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
-    //{
-    //    //攻撃処理
-    //   /* Fire(owner->GetGameObject(), arrowSpeed);
-    //    arrowCount--;
-    //    intervalTimer = 0;*/
-    //}
+
 }
 
 void NomuraCharacter_ESkillState::ImGui()
