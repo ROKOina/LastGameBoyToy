@@ -8,7 +8,7 @@
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
-#include "SceneGame.h"
+#include "SceneDebugGame.h"
 #include "SceneManager.h"
 #include "SceneLoading.h"
 #include "imgui.h"
@@ -17,7 +17,7 @@
 #include "Components\RendererCom.h"
 #include "Components\RayCollisionCom.h"
 #include "Components\TransformCom.h"
-#include "Components\CameraCom.h"
+//#include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
@@ -28,12 +28,14 @@
 #include "Components\Character\NomuraCharacterCom.h"
 #include "Components/CPUParticle.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
-#include "GameSource/GameScript/FPSCameraCom.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 
+std::shared_ptr<CameraCom> freeC;
+std::shared_ptr<CameraCom> follow;
+
 // 初期化
-void SceneGame::Initialize()
+void SceneDebugGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -43,9 +45,20 @@ void SceneGame::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        freeCamera->AddComponent<FreeCameraCom>();
+        std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
+        freeC = f;
+        f->SetPerspectiveFov
+        (
+            DirectX::XMConvertToRadians(45),
+            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+            0.1f, 1000.0f
+        );
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        f->SetActiveInitialize();
     }
+
+    //コンスタントバッファの初期化
+    ConstantBufferInitialize();
 
     //プレイヤー
     {
@@ -64,25 +77,60 @@ void SceneGame::Initialize()
         //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
     }
 
-    //カメラをプレイヤーの子どもにして制御する
+    //普通のカメラ(プレイヤーの子にする)
     {
-        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
-        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
-        cameraPost->SetName("cameraPostPlayer");
-        std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-        cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
-        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+        ////カメラを動かす支柱
+        //std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
+        //std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+        ////std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
+        //cameraPost->SetName("cameraPostPlayer");
+
+        ////カメラ本体
+        ////std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+        //std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
+        //camera->SetName("normalcamera");
+
+        //std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+        //follow = c;
+        //c->SetPerspectiveFov
+        //(
+        //    DirectX::XMConvertToRadians(45),
+        //    graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+        //    0.1f, 1000.0f
+        //);
+
+        //camera->transform_->SetWorldPosition({ 0, 950, 300 });
+
+        //playerObj->GetComponent<CharacterCom>()->SetCameraObj(camera.get());
     }
 
     //ステージ
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
         obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        r->LoadModel("Data/Stage/Stage.mdl");
+        //obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+    }
+
+    //バリア
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("barrier");
+        obj->transform_->SetWorldPosition({ -2.0f,1.4f,0.0f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD);
+        r->LoadModel("Data/Ball/b.mdl");
+    }
+
+    //黒い何か
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("blackball");
+        obj->transform_->SetWorldPosition({ 2.0f,1.4f,0.0f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::BLACK, BLENDSTATE::ALPHA);
+        r->LoadModel("Data/Ball/t.mdl");
     }
 
     //テスト
@@ -108,12 +156,34 @@ void SceneGame::Initialize()
         cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
         cb->contourIntensity = 1.5f;
     }
+
+    //IKテスト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("IKTest");
+        obj->transform_->SetWorldPosition({ -5, 0, 0 });
+        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/IKTestModel/IKTest.mdl");
+        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        std::shared_ptr<CapsuleColliderCom> c = obj->AddComponent<CapsuleColliderCom>();
+        c->SetPosition1({ 0,10,0 });
+        c->SetMyTag(COLLIDER_TAG::Enemy);
+        c->SetJudgeTag(COLLIDER_TAG::PlayerAttack);
+    }
+
+    ////cpuparticletest
+    //{
+    //  auto& obj = GameObjectManager::Instance().Create();
+    //  obj->SetName("cpuparticle");
+    //  obj->AddComponent<CPUParticle>("Data\\Effect\\test.cpuparticle", 1000);
+    //}
+
+    //gpuparticletest
     {
         auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("test");
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
-        r->LoadModel("Data/Ball/b.mdl");
-
+        obj->SetName("gpuparticle");
+        obj->AddComponent<GPUParticle>("Data\\Effect\\test.gpuparticle", 4000);
     }
 
 #pragma endregion
@@ -134,19 +204,16 @@ void SceneGame::Initialize()
     };
     SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
 
-    //コンスタントバッファの初期化
-    ConstantBufferInitialize();
-
 #pragma endregion
 }
 
 // 終了化
-void SceneGame::Finalize()
+void SceneDebugGame::Finalize()
 {
 }
 
 // 更新処理
-void SceneGame::Update(float elapsedTime)
+void SceneDebugGame::Update(float elapsedTime)
 {
     if (n)
         n->Update();
@@ -156,7 +223,7 @@ void SceneGame::Update(float elapsedTime)
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().Update(elapsedTime);
-    
+
     GameObjectManager::Instance().UpdateTransform();
 
     ////コンポーネントゲット
@@ -168,7 +235,7 @@ void SceneGame::Update(float elapsedTime)
 }
 
 // 描画処理
-void SceneGame::Render(float elapsedTime)
+void SceneDebugGame::Render(float elapsedTime)
 {
     // 画面クリア＆レンダーターゲット設定
     Graphics& graphics = Graphics::Instance();
@@ -231,7 +298,7 @@ void SceneGame::Render(float elapsedTime)
     }
 }
 
-void SceneGame::SetUserInputs()
+void SceneDebugGame::SetUserInputs()
 {
     // プレイヤーの入力情報
     SetPlayerInput();
@@ -240,7 +307,7 @@ void SceneGame::SetUserInputs()
     SetOnlineInput();
 }
 
-void SceneGame::SetPlayerInput()
+void SceneDebugGame::SetPlayerInput()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -259,7 +326,7 @@ void SceneGame::SetPlayerInput()
     chara->SetRightStick(gamePad.GetAxisR());
 }
 
-void SceneGame::SetOnlineInput()
+void SceneDebugGame::SetOnlineInput()
 {
     if (!n)return;
 

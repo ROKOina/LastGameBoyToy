@@ -35,6 +35,16 @@ public:
     //下半身別アニメーション更新
     void AnimationLowerUpdate(float elapsedTime);
     //Animationクラス
+
+public:
+    //アニメーション更新タイプ
+    enum  AnimationType
+    {
+        NormalAnimation,
+        UpperLowerAnimation,
+        UpperBlendLowerAnimation,
+    };
+
 public:
     //アニメーション再生関数
 
@@ -179,14 +189,6 @@ private:
     //上半身下半身補完フラグ
     bool                            upperComplementFlag = false;
     bool                            lowerComplementFlag = false;
-
-    //アニメーション更新タイプ
-    enum  AnimationType
-    {
-        NormalAnimation,
-        UpperLowerAnimation,
-        UpperBlendLowerAnimation,
-    };
 
     //アニメーション更新変数
     int animaType = 0;

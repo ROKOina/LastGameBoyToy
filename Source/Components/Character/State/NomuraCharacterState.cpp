@@ -4,6 +4,7 @@
 #include "Components\RendererCom.h"
 #include "Components\CameraCom.h"
 #include "Components\Character\BulletCom.h"
+#include "Components\ColliderCom.h"
 
 #include "BaseCharacterState.h"
 
@@ -24,6 +25,11 @@ void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, floa
 
     std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
     renderCom->LoadModel("Data/Ball/t.mdl");
+
+    std::shared_ptr<SphereColliderCom> sphereCollider = obj->AddComponent<SphereColliderCom>();
+    sphereCollider->SetPushBack(false);
+    sphereCollider->SetMyTag(COLLIDER_TAG::PlayerAttack);
+    sphereCollider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyAttack);
 
     ///////////////////////////////
 

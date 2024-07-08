@@ -178,6 +178,7 @@
     <ClInclude Include="Source\GameSource\Math\Collision.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Components\CameraCom.h" />
+    <ClInclude Include="Source\GameSource\Scene\SceneDebugGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\Components\CameraCom.cpp" />
     <ClCompile Include="Source\GameSource\Scene\Scene.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\SceneDebugGame.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneIKTest.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />

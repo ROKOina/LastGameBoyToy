@@ -10,6 +10,8 @@ void CharacterCom::Update(float elapsedTime)
 {
     //カメラが向いている方向へ旋回
     DirectX::XMFLOAT3 cameraForward = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront();
+    cameraForward.y = 0;
+    
     GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
     GetGameObject()->transform_->UpdateTransform();
     GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
@@ -17,6 +19,8 @@ void CharacterCom::Update(float elapsedTime)
     stateMachine.Update(elapsedTime);
 
 #ifdef _DEBUG
+
+    int inputNum = GetButtonDown();
 
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()

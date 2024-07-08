@@ -15,7 +15,7 @@ void TestCharacterCom::Start()
     stateMachine.AddState(CHARACTER_ACTIONS::ATTACK, std::make_shared<TestCharacter_AttackState>(this));
     stateMachine.AddState(CHARACTER_ACTIONS::DASH, std::make_shared<TestCharacter_DashState>(this));
 
-    stateMachine.ChangeState(CHARACTER_ACTIONS::MOVE);
+    stateMachine.ChangeState(CHARACTER_ACTIONS::IDLE);
 }
 
 void TestCharacterCom::MainAttack()
