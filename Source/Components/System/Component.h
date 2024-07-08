@@ -18,6 +18,9 @@ public:
 	// XVˆ—
 	virtual void Update(float elapsedTime) {}
 
+	// ”jŠüˆ—
+	virtual void OnDestroy() {}
+
 	// GUI•`‰æ
 	virtual void OnGUI() {}
 

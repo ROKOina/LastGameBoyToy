@@ -1,4 +1,5 @@
 #pragma once
+
 #include "CharacterCom.h"
 
 class TestCharacterCom : public CharacterCom
@@ -10,5 +11,6 @@ class TestCharacterCom : public CharacterCom
 
 private:
     bool dashFlag = false;
+    bool attackFlag = false;
 };
 

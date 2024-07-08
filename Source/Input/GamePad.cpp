@@ -148,15 +148,10 @@ void GamePad::Update()
     if (GetAsyncKeyState('E') & 0x8000) newButtonState |= BTN_X;
     if (GetAsyncKeyState('R') & 0x8000) newButtonState |= BTN_Y;
     if (GetAsyncKeyState(VK_SHIFT) & 0x8000)newButtonState |= BTN_LEFT_SHOULDER;
-    if (GetAsyncKeyState('E') & 0x8000)newButtonState |= BTN_RIGHT_SHOULDER;
+    if (GetAsyncKeyState('C') & 0x8000)newButtonState |= BTN_RIGHT_SHOULDER;
     if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)newButtonState |= BTN_LEFT_TRIGGER;
     if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)newButtonState |= BTN_RIGHT_TRIGGER;
     if (GetAsyncKeyState(VK_LCONTROL) & 0x8000)newButtonState |= BTN_LCONTROL;
-
-
-    //ゲームパッドととキーボードを同じキーにする
-    if (GetAsyncKeyState(' ') & 0x8000) newButtonState |= BTN_B;
-    if (GetAsyncKeyState(' ') & 0x8000)	newButtonState |= BTN_RIGHT_TRIGGER;
 
     //if (GetAsyncKeyState(VK_UP) & 0x8000)		newButtonState |= BTN_UP;
     //if (GetAsyncKeyState(VK_RIGHT) & 0x8000)	newButtonState |= BTN_RIGHT;

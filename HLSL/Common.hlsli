@@ -11,6 +11,7 @@
 #define WHITE_BORDER_LINEAR 7
 #define WHITE_BORDER_ANISOTROPIC 8
 SamplerState sampler_states[9] : register(s0);
+SamplerComparisonState comparison_sampler_state : register(s9);
 
 // ‰~Žü—¦
 static const float PI = 3.141592653589;

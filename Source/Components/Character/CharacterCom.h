@@ -80,7 +80,7 @@ protected:
   StateMachine<CharacterCom, CHARACTER_ACTIONS> stateMachine;
   GameObject* cameraObj = nullptr;
 
-  float jumpPower = 5.0f;
+  float jumpPower = 10.0f;
 
 private:
   // キャラクターの操作入力情報

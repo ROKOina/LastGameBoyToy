@@ -1,7 +1,6 @@
 #include "Graphics/Graphics.h"
 
 #include "Graphics/Light/LightManager.h"
-#include "Graphics/Light/Light.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
@@ -33,31 +32,8 @@ void SceneIKTest::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
-        f->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
+        freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-        f->SetActiveInitialize();
-    }
-
-    //普通のカメラ
-    {
-        std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-        camera->SetName("normalcamera");
-
-        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-        c->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
-
-        camera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
     //コンスタントバッファの初期化
@@ -75,7 +51,6 @@ void SceneIKTest::Initialize()
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
-
     }
 
     //ステージ
@@ -89,7 +64,7 @@ void SceneIKTest::Initialize()
     }
 
     //平行光源を追加
-    Light* mainDirectionalLight = new Light(LightType::Directional);
+    mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
@@ -107,7 +82,6 @@ void SceneIKTest::Update(float elapsedTime)
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
     std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
     std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-
 }
 
 void SceneIKTest::Render(float elapsedTime)
@@ -129,12 +103,8 @@ void SceneIKTest::Render(float elapsedTime)
     LightManager::Instance().UpdateConstatBuffer();
 
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection);
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
 
     //オブジェクト描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
-
 }
-
-
-

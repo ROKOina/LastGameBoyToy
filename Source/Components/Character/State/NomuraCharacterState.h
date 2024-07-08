@@ -21,6 +21,8 @@ protected:
 
 };
 
+
+//e”­Ë
 class NomuraCharacter_AttackState :public NomuraCharacter_BaseState
 {
 public:
@@ -31,14 +33,15 @@ public:
     void ImGui()override;
 
 
-    int   nowMagazine = 0;
-    int   maxBullets = 6;
+ 
     float attackPower = 0;
     float maxAttackPower = 1;
     float bulletSpeed = 50;
+  
     
 };
 
+//ˆê’Uƒ[ƒŠƒ“ƒO
 class NomuraCharacter_ESkillState :public NomuraCharacter_BaseState
 {
 public:
@@ -48,9 +51,6 @@ public:
     void Execute(const float& elapsedTime)override;
     void ImGui()override;
 
-    float moveDebuff = 0.12f;
-    float explosionDamage = 45.0f;
-    float skillTimer = 12.0f;
-    bool  obstructionSkill = false;
+  
     
 };

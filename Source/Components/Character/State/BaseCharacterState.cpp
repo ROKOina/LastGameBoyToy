@@ -19,6 +19,7 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
 void BaseCharacter_IdleState::Enter()
 {
     //歩きアニメーション再生開始
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true, false, 0.1f);
 }
 
@@ -71,19 +72,37 @@ void BaseCharacter_JumpState::Enter()
         return;
 
     JumpInput(owner->GetGameObject());
+    moveVec = SceneManager::Instance().InputVec();
     moveCom.lock()->SetOnGround(false);
-
-    //moveCom.lock()->AddForce(jumpPower);
-    //moveCom.lock()->SetOnGround(false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 {
-    MoveInputVec(owner->GetGameObject());
+    //空中制御
+    DirectX::XMFLOAT3 inputVec = SceneManager::Instance().InputVec();
+    moveVec = Mathf::Lerp(moveVec, inputVec, 0.1f);
+
+    if (moveCom.lock()->GetVelocity().y < 0.05f && HoveringTimer < HoveringTime)
+    {
+        DirectX::XMFLOAT3 verocity = moveCom.lock()->GetVelocity();
+        verocity.y = -GRAVITY_NORMAL * elapsedTime;
+        moveCom.lock()->SetVelocity(verocity);
+
+        HoveringTimer += elapsedTime;
+    }
+
+    DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
+    moveCom.lock()->AddForce(v);
+
 
     if (moveCom.lock()->OnGround())
     {
         ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
     }
+}
+
+void BaseCharacter_JumpState::Exit()
+{
+    HoveringTimer = 0.0f;
 }
 

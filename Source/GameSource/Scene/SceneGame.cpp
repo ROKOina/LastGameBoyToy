@@ -4,7 +4,6 @@
 
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
-#include "Graphics/Light/Light.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
@@ -16,22 +15,22 @@
 
 #include "Components\System\GameObject.h"
 #include "Components\RendererCom.h"
+#include "Components\RayCollisionCom.h"
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
+#include "Components\ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\UenoCharacterCom.h"
 #include "Components\Character\NomuraCharacterCom.h"
 #include "Components/CPUParticle.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
+#include "GameSource/GameScript/FPSCameraCom.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
-
-std::shared_ptr<CameraCom> freeC;
-std::shared_ptr<CameraCom> follow;
 
 // 初期化
 void SceneGame::Initialize()
@@ -44,20 +43,9 @@ void SceneGame::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
-        freeC = f;
-        f->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
+        freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-        f->SetActiveInitialize();
     }
-
-    //コンスタントバッファの初期化
-    ConstantBufferInitialize();
 
     //プレイヤー
     {
@@ -71,133 +59,68 @@ void SceneGame::Initialize()
         a->PlayAnimation(0, true, false, 0.001f);
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
-        std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
-
+        //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
     }
 
-    //test
-    //{
-    //    auto& obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("zombie");
-    //    obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-    //    obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/zombie/Zombie.mdl");
-    //
-    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    //    a->SetupRootMotion("Zombie1");
-    //    a->SetupRootMotionHip("Base_HumanPelvis");
-    //    //a->PlayAnimation(2, true, true, 0.05);
-    //
-    //    a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
-    //    a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
-    //    a->SetUpAnimationUpdate(1);
-    //}
-
-    //普通のカメラ(プレイヤーの子にする)
+    //カメラをプレイヤーの子どもにして制御する
     {
-        //カメラを動かす支柱
         std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
         std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
-        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
         cameraPost->SetName("cameraPostPlayer");
-
-        //カメラ本体
-        //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-        std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
-        camera->SetName("normalcamera");
-
-        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-        follow = c;
-        c->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
-
-        camera->transform_->SetWorldPosition({ 0, 950, 300 });
-
-        playerObj->GetComponent<CharacterCom>()->SetCameraObj(camera.get());
+        std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
+        cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
+        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
     //ステージ
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-        obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/Stage/Stage.mdl");
-    }
-
-    //バリア
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("barrier");
-        obj->transform_->SetWorldPosition({ -2.0f,1.4f,0.0f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD);
-        r->LoadModel("Data/Ball/b.mdl");
-    }
-
-    //黒い何か
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("blackball");
-        obj->transform_->SetWorldPosition({ 2.0f,1.4f,0.0f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::BLACK, BLENDSTATE::ALPHA);
-        r->LoadModel("Data/Ball/t.mdl");
+        r->LoadModel("Data/canyon/stage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
 
     //テスト
     {
         auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("plane");
-        obj->transform_->SetWorldPosition({ 0, 0.1f, 0 });
-        obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::CRACK_EFFECT, BLENDSTATE::ALPHA);
+        obj->SetName("SciFiGate");
+        obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
+        obj->transform_->SetScale({ 0.06f,0.0001f,0.02f });
+        obj->transform_->SetEulerRotation({ 90,0,0 });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
         r->LoadModel("Data/UtilityModels/plane.mdl");
-        r->LoadMaterial("Data/UtilityModels/crack.Material");
-        auto& cb = r->SetVariousConstant<EffectConstants>();
-        cb->simulateSpeed1 = 1.6f;
-        cb->simulateSpeed2 = -2.4f;
-        cb->waveEffectRange = 0.97f;
-        cb->waveEffectColor = { 1.0f,0.3f,0.0f,0.1f };
-        cb->waveEffectIntensity = 5.0f;
+        r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
+
+        auto& cb = r->SetVariousConstant<SciFiGateConstants>();
+        cb->simulateSpeed1 = 1.1f;
+        cb->simulateSpeed2 = -0.3f;
+        cb->uvScrollDir1 = { 1.0f,1.0f };
+        cb->uvScrollDir2 = { 0.0f,1.0f };
+        cb->uvScale1 = { 2.0f,1.0f };
+        cb->intensity1 = 0.8f;
+        cb->intensity2 = 1.6f;
+        cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
+        cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
+        cb->contourIntensity = 1.5f;
     }
-
-    //IKテスト
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("IKTest");
-        obj->transform_->SetWorldPosition({ -5, 0, 0 });
-        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/IKTestModel/IKTest.mdl");
-        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    }
-
-    ////cpuparticletest
-    //{
-    //  auto& obj = GameObjectManager::Instance().Create();
-    //  obj->SetName("cpuparticle");
-    //  obj->AddComponent<CPUParticle>("Data\\Effect\\test.cpuparticle", 1000);
-    //}
-
-    //gpuparticletest
     {
         auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("gpuparticle");
-        obj->AddComponent<GPUParticle>("Data\\Effect\\test.gpuparticle", 4000);
+        obj->SetName("test");
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
+        r->LoadModel("Data/Ball/b.mdl");
+
     }
 
 #pragma endregion
 
 #pragma region グラフィック系の設定
     //平行光源を追加
-    Light* mainDirectionalLight = new Light(LightType::Directional);
+    mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
@@ -210,6 +133,9 @@ void SceneGame::Initialize()
       "Data\\Texture\\lut_ggx.DDS"
     };
     SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
+
+    //コンスタントバッファの初期化
+    ConstantBufferInitialize();
 
 #pragma endregion
 }
@@ -230,6 +156,7 @@ void SceneGame::Update(float elapsedTime)
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().Update(elapsedTime);
+    
     GameObjectManager::Instance().UpdateTransform();
 
     ////コンポーネントゲット
@@ -260,7 +187,7 @@ void SceneGame::Render(float elapsedTime)
     LightManager::Instance().UpdateConstatBuffer();
 
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection);
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
 
     //オブジェクト描画
     GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);

@@ -31,6 +31,9 @@ public:
     // 更新処理
     virtual void Update(float elapsedTime);
 
+    // ゲームオブジェクトの破棄の際に呼ばれる
+    void OnDestroy();
+
     // 行列の更新
     virtual void UpdateTransform();
 
@@ -154,7 +157,7 @@ public:
     void UpdateTransform();
 
     // 描画
-    void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+    void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& lightdirection);
 
     //sprite描画
     void Render2D(float elapsedTime);
@@ -184,6 +187,8 @@ private:
     //3D描画
     void RenderDeferred();
     void RenderForward();
+    void RenderShadow();
+    void RenderUseDepth();
 
     //CPUパーティクル描画
     void CPUParticleRender();
@@ -210,6 +215,8 @@ private:
     std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;
     // デファード描画オブジェクトの数
     int deferredCount = -1;
+    // 深度マップを使用する描画オブジェクトの数
+    int useDepthCount = -1;
 
     //CPUパーティクル描画用
     std::vector<std::weak_ptr<CPUParticle>> cpuparticleobject;

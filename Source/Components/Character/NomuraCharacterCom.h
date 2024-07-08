@@ -18,10 +18,29 @@ public:
     void SubSkill()override;
 
     //void SpaceSkill()override;
-
-
 private:
 
+    void FireInterval(float elapsedTime);
+
+    void Reload();
+
+    void BulletManagement();
+private:
+
+
+    int   nowMagazine = 6;
+    int   maxBullets = 6;
+    float attackPower = 0;
+    float maxAttackPower = 1;
+    float bulletSpeed = 50;
+    float firingInterval = 0.3f;
+    float firingIntervalTimer = 0.3f;
+
+    bool  launchPermission = true;
+
+    bool  remainingBullets = true;
+
+   
     //ƒ_ƒbƒVƒ…
     bool dashFlag = false;
 

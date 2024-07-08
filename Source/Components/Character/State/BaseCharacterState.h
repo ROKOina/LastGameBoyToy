@@ -31,7 +31,7 @@ static void JumpInput(std::shared_ptr<GameObject> obj, float speed = 1)
     GamePad gamePad = Input::Instance().GetGamePad();
     if (CharacterInput::JumpButton_SPACE & gamePad.GetButtonDown())
     {
-        DirectX::XMFLOAT3 power = { 0,15.0f * speed,0 };
+        DirectX::XMFLOAT3 power = { 0,obj->GetComponent<CharacterCom>()->GetJumpPower() * speed,0 };
         moveCom->AddForce(power);
     }
 }
@@ -65,6 +65,7 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
 
+
 };
 
 class BaseCharacter_JumpState : public BaseCharacter_BaseState
@@ -74,7 +75,12 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit() override;
 
 private:
-    DirectX::XMFLOAT3 jumpPower = { 0, 15.0f, 0 };
+
+    DirectX::XMFLOAT3 moveVec = {};
+    DirectX::XMFLOAT3 jumpPower = { 0, 12.0f, 0 };
+    float HoveringTimer = 0.0f;
+    float HoveringTime = 0.05f;
 };

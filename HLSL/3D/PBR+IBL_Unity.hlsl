@@ -71,10 +71,7 @@ PS_OUT main(VS_OUT pin)
 
     //AOマップ適用
     color.rgb *= ao;
-
-    //トーンマップ
-    color.rgb = saturate(color.rgb); //クランプ
-
+    
     //エミッション適用
     color.rgb += emission;
 
