@@ -44,6 +44,9 @@ public:
     DirectX::XMFLOAT3 GetTargetPosition(Legs leg);
     //セッター
     void SetLegNodes() {};
+
+    //ボーンの計算
+    void MoveBone();
 private:
     //足ノードを保持
     Model::Node* legNodes[(int)LegNodes::Max] = {};

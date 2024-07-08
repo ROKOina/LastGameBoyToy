@@ -2,6 +2,7 @@
 #include "GameSource\Math\Collision.h"
 #include "Components\RendererCom.h"
 #include "Components\TransformCom.h"
+#include "Graphics\Graphics.h"
 
 void FootIKCom::Start()
 {
@@ -76,9 +77,16 @@ DirectX::XMFLOAT3 FootIKCom::GetTargetPosition(Legs leg)
         stageModel,
         hitresult
     );
+   
+
 
     //レイキャストの結果を返す
     return hitresult.position;
+}
+
+void FootIKCom::MoveBone()
+{
+    
 }
 
 void FootIKCom::OnGUI()
