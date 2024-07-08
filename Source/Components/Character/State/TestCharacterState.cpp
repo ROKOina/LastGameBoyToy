@@ -22,13 +22,15 @@ TestCharacter_BaseState::TestCharacter_BaseState(CharacterCom* owner) : State(ow
 void TestCharacter_MoveState::Enter()
 {
   //歩きアニメーション再生開始
-  animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
+  animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+  animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.2f);
+  animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
   //ダッシュ用の速度設定
   float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
-  maxDashAccele = 20.0f;
+  maxDashAccele = 10.0f;
   float dashAccele = moveCom.lock()->GetMoveAcceleration();
-  dashAccele = 3.0f;
+  dashAccele = 1.0f;
   moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
   moveCom.lock()->SetMoveAcceleration(dashAccele);
 }

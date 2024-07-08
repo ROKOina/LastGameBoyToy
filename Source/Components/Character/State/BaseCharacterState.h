@@ -65,6 +65,7 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
 
+
 };
 
 class BaseCharacter_JumpState : public BaseCharacter_BaseState
@@ -74,7 +75,12 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit() override;
 
 private:
-    DirectX::XMFLOAT3 jumpPower = { 0, 15.0f, 0 };
+
+    DirectX::XMFLOAT3 moveVec = {};
+    DirectX::XMFLOAT3 jumpPower = { 0, 12.0f, 0 };
+    float HoveringTimer = 0.0f;
+    float HoveringTime = 0.05f;
 };

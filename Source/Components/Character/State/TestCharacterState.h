@@ -41,7 +41,7 @@ private:
     void Fire();
 
     float fireTimer = 0.0f;
-    float fireTime = 0.3f;
+    float fireTime = 0.05f;
 
 };
 

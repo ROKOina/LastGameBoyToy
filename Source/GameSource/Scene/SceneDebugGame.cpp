@@ -8,7 +8,7 @@
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
-#include "SceneGame.h"
+#include "SceneDebugGame.h"
 #include "SceneManager.h"
 #include "SceneLoading.h"
 #include "imgui.h"
@@ -17,7 +17,7 @@
 #include "Components\RendererCom.h"
 #include "Components\RayCollisionCom.h"
 #include "Components\TransformCom.h"
-#include "Components\CameraCom.h"
+//#include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
@@ -31,8 +31,11 @@
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 
+std::shared_ptr<CameraCom> freeC;
+std::shared_ptr<CameraCom> follow;
+
 // 初期化
-void SceneGame::Initialize()
+void SceneDebugGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -43,6 +46,7 @@ void SceneGame::Initialize()
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
         std::shared_ptr<FreeCameraCom> f = freeCamera->AddComponent<FreeCameraCom>();
+        freeC = f;
         f->SetPerspectiveFov
         (
             DirectX::XMConvertToRadians(45),
@@ -73,49 +77,31 @@ void SceneGame::Initialize()
         //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
     }
 
-    //test
-    //{
-    //    auto& obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("zombie");
-    //    obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
-    //    obj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADERMODE::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/zombie/Zombie.mdl");
-    //
-    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    //    a->SetupRootMotion("Zombie1");
-    //    a->SetupRootMotionHip("Base_HumanPelvis");
-    //    //a->PlayAnimation(2, true, true, 0.05);
-    //
-    //    a->PlayUpperBodyOnlyAnimation(0, true, 0.05f);
-    //    a->PlayLowerBodyOnlyAnimation(2, true, true, 0.05f);
-    //    a->SetUpAnimationUpdate(1);
-    //}
-
     //普通のカメラ(プレイヤーの子にする)
     {
-        //カメラを動かす支柱
-        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
-        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
-        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
-        cameraPost->SetName("cameraPostPlayer");
+        ////カメラを動かす支柱
+        //std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
+        //std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+        ////std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Create();
+        //cameraPost->SetName("cameraPostPlayer");
 
-        //カメラ本体
-        //std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
-        std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
-        camera->SetName("normalcamera");
+        ////カメラ本体
+        ////std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Create();
+        //std::shared_ptr<GameObject> camera = cameraPost->AddChildObject();
+        //camera->SetName("normalcamera");
 
-        std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
-        c->SetPerspectiveFov
-        (
-            DirectX::XMConvertToRadians(45),
-            graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-            0.1f, 1000.0f
-        );
+        //std::shared_ptr<CameraCom> c = camera->AddComponent<CameraCom>();
+        //follow = c;
+        //c->SetPerspectiveFov
+        //(
+        //    DirectX::XMConvertToRadians(45),
+        //    graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+        //    0.1f, 1000.0f
+        //);
 
-        camera->transform_->SetWorldPosition({ 0, 950, 300 });
+        //camera->transform_->SetWorldPosition({ 0, 950, 300 });
 
-        playerObj->GetComponent<CharacterCom>()->SetCameraObj(camera.get());
+        //playerObj->GetComponent<CharacterCom>()->SetCameraObj(camera.get());
     }
 
     //ステージ
@@ -125,8 +111,8 @@ void SceneGame::Initialize()
         obj->transform_->SetWorldPosition({ 0, -0.4f, 0 });
         obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        r->LoadModel("Data/Stage/Stage.mdl");
+        //obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
 
     //バリア
@@ -147,29 +133,29 @@ void SceneGame::Initialize()
         r->LoadModel("Data/Ball/t.mdl");
     }
 
-  //テスト
-  {
-    auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("SciFiGate");
-    obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
-    obj->transform_->SetScale({ 0.06f,0.0001f,0.02f });
-    obj->transform_->SetEulerRotation({90,0,0});
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD,RASTERIZERSTATE::SOLID_CULL_NONE);
-    r->LoadModel("Data/UtilityModels/plane.mdl");
-    r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
+    //テスト
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("SciFiGate");
+        obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
+        obj->transform_->SetScale({ 0.06f,0.0001f,0.02f });
+        obj->transform_->SetEulerRotation({ 90,0,0 });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
+        r->LoadModel("Data/UtilityModels/plane.mdl");
+        r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
 
-    auto& cb = r->SetVariousConstant<SciFiGateConstants>();
-    cb->simulateSpeed1 = 1.1f;
-    cb->simulateSpeed2 = -0.3f;
-    cb->uvScrollDir1 = { 1.0f,1.0f };
-    cb->uvScrollDir2 = { 0.0f,1.0f };
-    cb->uvScale1 = { 2.0f,1.0f };
-    cb->intensity1 = 0.8f;
-    cb->intensity2 = 1.6f;
-    cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
-    cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
-    cb->contourIntensity = 1.5f;
-  }
+        auto& cb = r->SetVariousConstant<SciFiGateConstants>();
+        cb->simulateSpeed1 = 1.1f;
+        cb->simulateSpeed2 = -0.3f;
+        cb->uvScrollDir1 = { 1.0f,1.0f };
+        cb->uvScrollDir2 = { 0.0f,1.0f };
+        cb->uvScale1 = { 2.0f,1.0f };
+        cb->intensity1 = 0.8f;
+        cb->intensity2 = 1.6f;
+        cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
+        cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
+        cb->contourIntensity = 1.5f;
+    }
 
     //IKテスト
     {
@@ -222,12 +208,12 @@ void SceneGame::Initialize()
 }
 
 // 終了化
-void SceneGame::Finalize()
+void SceneDebugGame::Finalize()
 {
 }
 
 // 更新処理
-void SceneGame::Update(float elapsedTime)
+void SceneDebugGame::Update(float elapsedTime)
 {
     if (n)
         n->Update();
@@ -237,7 +223,7 @@ void SceneGame::Update(float elapsedTime)
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().Update(elapsedTime);
-    
+
     GameObjectManager::Instance().UpdateTransform();
 
     ////コンポーネントゲット
@@ -249,7 +235,7 @@ void SceneGame::Update(float elapsedTime)
 }
 
 // 描画処理
-void SceneGame::Render(float elapsedTime)
+void SceneDebugGame::Render(float elapsedTime)
 {
     // 画面クリア＆レンダーターゲット設定
     Graphics& graphics = Graphics::Instance();
@@ -312,7 +298,7 @@ void SceneGame::Render(float elapsedTime)
     }
 }
 
-void SceneGame::SetUserInputs()
+void SceneDebugGame::SetUserInputs()
 {
     // プレイヤーの入力情報
     SetPlayerInput();
@@ -321,7 +307,7 @@ void SceneGame::SetUserInputs()
     SetOnlineInput();
 }
 
-void SceneGame::SetPlayerInput()
+void SceneDebugGame::SetPlayerInput()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -340,7 +326,7 @@ void SceneGame::SetPlayerInput()
     chara->SetRightStick(gamePad.GetAxisR());
 }
 
-void SceneGame::SetOnlineInput()
+void SceneDebugGame::SetOnlineInput()
 {
     if (!n)return;
 
