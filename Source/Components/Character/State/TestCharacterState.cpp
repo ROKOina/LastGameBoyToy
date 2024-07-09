@@ -59,7 +59,7 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
 void TestCharacter_AttackState::Enter()
 {
     //ショットアニメーション再生
-    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Shot_Enter"), true, 0.8f);
+    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Shot_Enter"), false, 0.8f);
 }
 
 void TestCharacter_AttackState::Execute(const float& elapsedTime)

@@ -300,18 +300,20 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
     }
 
     //再生時間が終端時間を超えたら
-    if (upperCurrentAnimationSeconds >= animation.secondsLength && animationUpperLoopFlag == false)
-    {
-        animationUpperEndFlag = true;
-        upperComplementFlag = true;
-    }
-    
-    //再生時間が終端時間を超えたら
     if (upperCurrentAnimationSeconds >= animation.secondsLength)
     {
-        //再生時間を巻き戻す
-        upperCurrentAnimationSeconds -= animation.secondsLength;
+        if (animationUpperLoopFlag)
+        {
+            //再生時間を巻き戻す
+            upperCurrentAnimationSeconds -= animation.secondsLength;
+        }
+        else
+        {
+            animationUpperEndFlag = true;
+            upperComplementFlag = true;
+        }
     }
+   
 }
 
 
