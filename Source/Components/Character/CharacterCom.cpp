@@ -16,7 +16,8 @@ void CharacterCom::Update(float elapsedTime)
     GetGameObject()->transform_->UpdateTransform();
     GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
 
-    stateMachine.Update(elapsedTime);
+    attackStateMachine.Update(elapsedTime);
+    if(useMoveFlag)moveStateMachine.Update(elapsedTime);
 
 #ifdef _DEBUG
 
@@ -56,35 +57,35 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
-    std::string stateNames[(int)CHARACTER_ACTIONS::MAX] = {
-        "IDLE",
-        "MOVE",
-        "DASH",
-        "JUMP",
-        "ATTACK"
-    };
-    ImGui::Text(std::string("CurrentState:" + stateNames[(int)stateMachine.GetCurrentState()]).c_str());
+    //std::string stateNames[(int)CHARACTER_ACTIONS::MAX] = {
+    //    "IDLE",
+    //    "MOVE",
+    //    "DASH",
+    //    "JUMP",
+    //    "ATTACK"
+    //};
+    //ImGui::Text(std::string("CurrentState:" + stateNames[(int)stateMachine.GetCurrentState()]).c_str());
 
-    int index = (int)stateMachine.GetCurrentState();
-    ImGui::InputInt("State", &index);
-    ImGui::InputFloat("JumpState", &jumpPower);
+    //int index = (int)stateMachine.GetCurrentState();
+    //ImGui::InputInt("State", &index);
+    //ImGui::InputFloat("JumpState", &jumpPower);
 
-    //ImGui•\Ž¦
-    ImGui::Separator();
+    ////ImGui•\Ž¦
+    //ImGui::Separator();
 
-    static int drawState = 0;
-    ImGui::Text(std::string("DebugDrawState:" + stateNames[drawState]).c_str());
-    if (ImGui::InputInt("drawState", &drawState))
-    {
-        if (drawState >= (int)CHARACTER_ACTIONS::MAX)
-            drawState = (int)CHARACTER_ACTIONS::MAX - 1;
-        if (drawState < 0)drawState = 0;
-    }
+    //static int drawState = 0;
+    //ImGui::Text(std::string("DebugDrawState:" + stateNames[drawState]).c_str());
+    //if (ImGui::InputInt("drawState", &drawState))
+    //{
+    //    if (drawState >= (int)CHARACTER_ACTIONS::MAX)
+    //        drawState = (int)CHARACTER_ACTIONS::MAX - 1;
+    //    if (drawState < 0)drawState = 0;
+    //}
 
-    if (!stateMachine.CurrentStateImGui((CHARACTER_ACTIONS)drawState))
-    {
-        ImGui::Text("not found");
-    }
+    //if (!stateMachine.CurrentStateImGui((CHARACTER_ACTIONS)drawState))
+    //{
+    //    ImGui::Text("not found");
+    //}
 }
 
 void CharacterCom::CameraControl()

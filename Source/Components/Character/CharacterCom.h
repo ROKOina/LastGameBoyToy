@@ -17,16 +17,32 @@ public:
   static constexpr GamePadButton SubAttackButton = GamePad::BTN_LEFT_TRIGGER;     //マウス右
 };
 
+#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
+#define ChangeMoveState(State) charaCom.lock()->GetMoveStateMachine().ChangeState(State);
+#define ChangeAttackState(State) charaCom.lock()->GetAttackStateMachine().ChangeState(State);
+
 class CharacterCom : public Component
 {
 public:
-  enum class CHARACTER_ACTIONS {
+  enum class CHARACTER_MOVE_ACTIONS {
     IDLE,
     MOVE,
     DASH,
     JUMP,
-    ATTACK,
+    NONE,
     MAX,
+  };
+
+  //攻撃やスキルを使った時の挙動
+  enum class CHARACTER_ATTACK_ACTIONS {
+      PANTCH,
+      RELOAD,
+      MAIN_ATTACK,
+      SUB_ATTACK,
+      MAIN_SKILL,
+      SUB_SKILL,
+      NONE,
+      MAX,
   };
 
 public:
@@ -54,7 +70,8 @@ public:
 
   virtual void SpaceSkill() {}
 
-  StateMachine<CharacterCom, CHARACTER_ACTIONS>& GetStateMachine() { return stateMachine; }
+  StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS>& GetAttackStateMachine() { return attackStateMachine; }
+  StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>& GetMoveStateMachine() { return moveStateMachine; }
   GameObject* GetCameraObj() { return cameraObj; }
   void SetCameraObj(GameObject* obj) { cameraObj = obj; }
   float GetJumpPower() { return jumpPower; }
@@ -77,9 +94,11 @@ private:
   void CameraControl();
 
 protected:
-  StateMachine<CharacterCom, CHARACTER_ACTIONS> stateMachine;
+  StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
+  StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
   GameObject* cameraObj = nullptr;
 
+  bool useMoveFlag = true;//falseにするとmoveStateを使わない
   float jumpPower = 10.0f;
 
 private:
@@ -89,5 +108,4 @@ private:
   unsigned int userInputUp = 0x00;
   DirectX::XMFLOAT2 leftStick = {};
   DirectX::XMFLOAT2 rightStick = {};
-
 };

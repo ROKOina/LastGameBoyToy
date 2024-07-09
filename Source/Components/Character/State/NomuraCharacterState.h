@@ -14,7 +14,7 @@ public:
     NomuraCharacter_BaseState(CharacterCom* owner);
 
 protected:
-    std::weak_ptr<NomuraCharacterCom> testCharaCom;
+    std::weak_ptr<NomuraCharacterCom> charaCom;
     std::weak_ptr<MovementCom>        moveCom;
     std::weak_ptr<TransformCom>       transCom;
     std::weak_ptr<AnimationCom>       animationCom;

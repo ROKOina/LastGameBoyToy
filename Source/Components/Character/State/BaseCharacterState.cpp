@@ -2,11 +2,6 @@
 #include "Input\Input.h"
 #include "BaseCharacterState.h"
 
-// マクロ
-#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
-#define ChangeState(State) charaCom.lock()->GetStateMachine().ChangeState(State);
-
-
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
@@ -19,8 +14,8 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
 void BaseCharacter_IdleState::Enter()
 {
     //歩きアニメーション再生開始
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true, false, 0.1f);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, false, 0.1f);
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -31,12 +26,12 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     //移動
     if (moveVec != 0)
     {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
     //ジャンプ
     if (GamePad::BTN_A & owner->GetButtonDown())
     {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 }
 
@@ -56,12 +51,12 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     //待機
     if (moveVec == 0)
     {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
     //ジャンプ
     if (GamePad::BTN_A & owner->GetButtonDown())
     {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 }
 
@@ -97,7 +92,7 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 
     if (moveCom.lock()->OnGround())
     {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
 }
 
@@ -106,3 +101,9 @@ void BaseCharacter_JumpState::Exit()
     HoveringTimer = 0.0f;
 }
 
+void BaseCharacter_NoneAttack::Enter()
+{
+    //歩きアニメーション再生開始
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
+}

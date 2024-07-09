@@ -5,14 +5,10 @@
 #include "Components\ColliderCom.h"
 #include "Components\Character\BulletCom.h"
 
-// マクロ
-#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
-#define ChangeState(State) testCharaCom.lock()->GetStateMachine().ChangeState(State);
-
 TestCharacter_BaseState::TestCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
   //初期設定
-  testCharaCom = GetComp(CharacterCom);
+  charaCom = GetComp(TestCharacterCom);
   moveCom = GetComp(MovementCom);
   transCom = GetComp(TransformCom);
   animationCom = GetComp(AnimationCom);
@@ -23,8 +19,7 @@ void TestCharacter_MoveState::Enter()
 {
   //歩きアニメーション再生開始
   animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-  animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.2f);
-  //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
+  animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
   //ダッシュ用の速度設定
   float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
@@ -51,36 +46,24 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
   //待機
   if (moveVec == 0)
   {
-    ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+    ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
   }
 
   //ジャンプ
   if (CharacterInput::JumpButton_SPACE & owner->GetButtonDown())
   {
-    ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
+    ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
   }
 }
 
 void TestCharacter_AttackState::Enter()
 {
     //ショットアニメーション再生
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Shot_Enter"), false, false, 0.8f);
+    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Shot_Enter"), true, 0.8f);
 }
 
 void TestCharacter_AttackState::Execute(const float& elapsedTime)
 {
-  //入力値取得
-  DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
-
-  //歩く
-  DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
-  moveCom.lock()->AddForce(v);
-  QuaternionStruct q = transCom.lock()->GetRotation();
-
-  //カメラが向いている方向へ旋回
-  DirectX::XMFLOAT3 cameraForward = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront();
-  transCom.lock()->Turn(cameraForward, 0.1f);
-
   //弾発射
   if (fireTimer >= fireTime)
   {
@@ -95,7 +78,7 @@ void TestCharacter_AttackState::Execute(const float& elapsedTime)
 
   if (CharacterInput::MainAttackButton & owner->GetButtonUp())
   {
-    ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
   }
 }
 
@@ -143,6 +126,7 @@ void TestCharacter_AttackState::Fire()
 
 void TestCharacter_DashState::Enter()
 {
+  animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
   animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Dash_Forward"), true);
 
   //ダッシュ用の速度設定
@@ -169,11 +153,13 @@ void TestCharacter_DashState::Execute(const float& elapsedTime)
   //ダッシュやめ
   if (owner->GetLeftStick().y <= 0.0f)
   {
-    ChangeState(CharacterCom::CHARACTER_ACTIONS::MOVE);
+    ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
   }
   if (GamePad::BTN_A & owner->GetButtonDown())
   {
-    ChangeState(CharacterCom::CHARACTER_ACTIONS::JUMP);
+    ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
   }
 }
 
@@ -186,6 +172,4 @@ void TestCharacter_DashState::Exit()
   dashAccele -= dashAcceleration;
   moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
   moveCom.lock()->SetMoveAcceleration(dashAccele);
-
-
 }

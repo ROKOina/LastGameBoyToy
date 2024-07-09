@@ -14,7 +14,7 @@ public:
     UenoCharacterState_BaseState(CharacterCom* owner);
 
 protected:
-    std::weak_ptr<UenoCharacterCom> testCharaCom;
+    std::weak_ptr<UenoCharacterCom> charaCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;

@@ -84,3 +84,11 @@ private:
     float HoveringTimer = 0.0f;
     float HoveringTime = 0.05f;
 };
+
+class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
+{
+public:
+    BaseCharacter_NoneAttack(CharacterCom* owner) : BaseCharacter_BaseState(owner){}
+
+    void Enter() override;
+};

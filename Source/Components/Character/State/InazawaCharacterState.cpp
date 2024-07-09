@@ -7,10 +7,6 @@
 
 #include "BaseCharacterState.h"
 
-// マクロ
-#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
-#define ChangeState(State) testCharaCom.lock()->GetStateMachine().ChangeState(State);
-
 void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float power = 1)
 {
     //弾丸オブジェクトを生成///////
@@ -43,7 +39,7 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
 InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
-    testCharaCom = GetComp(InazawaCharacterCom);
+    charaCom = GetComp(InazawaCharacterCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
     animationCom = GetComp(AnimationCom);
@@ -75,7 +71,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         //攻撃処理
         Fire(owner->GetGameObject(), arrowSpeed, attackPower);
 
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
 }
 
@@ -104,7 +100,7 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
     //時間か矢数で終了
     if (skillTimer < 0 || arrowCount <= 0)
     {
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 
     MoveInputVec(owner->GetGameObject());
