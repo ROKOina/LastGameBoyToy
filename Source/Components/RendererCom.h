@@ -82,8 +82,8 @@ private:
 
     SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFAULT;
 #ifdef _DEBUG
-    int									selectionMaterialIndex = -1;
-    bool								hiddenProperty = false;
+    int							selectionMaterialIndex = -1;
+    bool						hiddenProperty = false;
     std::string					modelFilePath;
     std::string					filePathDriveToModel = "";
 

@@ -49,11 +49,11 @@ public:
     //アニメーション再生関数
 
     //普通のアニメーション再生関数
-    void PlayAnimation(int animeID,bool loop,bool rootFlag = false,float blendSeconds = 0.25f);
+    void PlayAnimation(int animeID, bool loop, bool rootFlag = false, float blendSeconds = 0.25f);
     //上半身だけアニメーション再生
     void PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds);
     //下半身だけアニメーション再生
-    void PlayLowerBodyOnlyAnimation(int lowerAnimaId, bool loop,bool rootFlag, float blendSeconds);
+    void PlayLowerBodyOnlyAnimation(int lowerAnimaId, bool loop, bool rootFlag, float blendSeconds);
     //再生中か
     bool IsPlayAnimation() const { return currentAnimation >= 0; }
     //上半身アニメーション再生中か？
@@ -89,11 +89,16 @@ private:
     //アニメーション切り替え時の計算
     void ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node);
 
+    //AimIK関数
+    void AimIK();
+
+    //ノードを探す
+    void SearchAimNode();
+
 private:
 
     //ルートモーション関連
 
-    
     //ルートモーションの移動値を計算
     void ComputeRootMotion();
 
@@ -101,7 +106,6 @@ private:
 
     //Debug用選択アニメーションを取得
     ModelResource::Animation* GetSelectionAnimation();
-
 
 private:
     //変数
@@ -136,7 +140,6 @@ private:
     //フレーム間の差分用変数
     DirectX::XMFLOAT3               rootMotionTranslation = { 0,0,0 };
 
-
     //上半身下半身関連
 
     //現在の再生している上半身下半身アニメーション番号
@@ -168,7 +171,6 @@ private:
     float                           upperRate = 0.0f;
     float                           lowerRate = 0.0f;
 
-
     //上半身下半身のアニメーション再生中か？
     bool                            upperAnimaPlay = false;
     bool                            lowerAnimaPlay = false;
@@ -183,7 +185,7 @@ private:
     bool                            animationLowerLoopFlag = false;
     //アニメーションの終わる1フレーム前に立つフラグ
     bool                            beforeOneFream = false;
-    //上半身下半身終わったらのフラグ 終了＝true 
+    //上半身下半身終わったらのフラグ 終了＝true
     bool                            upperAnimationEndFlag = false;
     bool                            lowerAnimationEndFlag = false;
     //上半身下半身補完フラグ
@@ -193,4 +195,6 @@ private:
     //アニメーション更新変数
     int animaType = 0;
 
+    //AimIK用変数
+    std::vector<int>AimBone;
 };

@@ -2,18 +2,21 @@
 
 #include "RendererCom.h"
 #include "TransformCom.h"
+#include "CameraCom.h"
+#include "../GameSource/Math/Mathf.h"
 #include <imgui.h>
 #include <cassert>
 
 // 開始処理
 void AnimationCom::Start()
 {
+    //ノード検索
+    SearchAimNode();
 }
 
 // 更新処理
 void AnimationCom::Update(float elapsedTime)
 {
-
     switch (animaType)
     {
         //普通のアニメーション更新
@@ -30,7 +33,6 @@ void AnimationCom::Update(float elapsedTime)
     case AnimationType::UpperBlendLowerAnimation:
         break;
     }
-
 }
 
 // GUI描画
@@ -49,9 +51,8 @@ void AnimationCom::OnGUI()
     int index = 0;
     for (ModelResource::Animation anim : animations)
     {
-    	index++;
+        index++;
     }
-
 
     int animationIndex = 0;
     ModelResource::Animation* selectionAnimation = GetSelectionAnimation();
@@ -76,17 +77,14 @@ void AnimationCom::OnGUI()
         if (ImGui::IsItemClicked())
         {
             currentAnimation = animationIndex;
-            PlayAnimation(currentAnimation, isAnimLoop, false,0.2f);
+            PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
         }
 
         ImGui::TreePop();
         ++animationIndex;
         ++it;
     }
-
 }
-
-
 
 //Debug用選択アニメーションを取得
 ModelResource::Animation* AnimationCom::GetSelectionAnimation()
@@ -102,14 +100,12 @@ ModelResource::Animation* AnimationCom::GetSelectionAnimation()
     return nullptr;
 }
 
-
 //アニメーション更新
 void AnimationCom::AnimationUpdata(float elapsedTime)
 {
     //モデルからリソースを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     const ModelResource* resource = model->GetResource();
-
 
     //ブレンド率の計算
     float blendRate = 1.0f;
@@ -140,8 +136,6 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         const ModelResource::Keyframe& keyframe0 = keyframes.at(keyIndex);
         const ModelResource::Keyframe& keyframe1 = keyframes.at(keyIndex + 1);
 
-
-
         if (currentSeconds >= keyframe0.seconds && currentSeconds <= keyframe1.seconds)
         {
             float rate = (currentSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
@@ -154,7 +148,6 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
                 const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
 
-
                 if (blendRate < 1.0f)
                 {
                     //アニメーション切り替え時の計算
@@ -164,9 +157,12 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 {
                     //アニメーション計算
                     ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
-
                 }
             }
+
+            //AimIK計算
+            AimIK();
+
             break;
         }
     }
@@ -178,7 +174,6 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         currentAnimation = -1;
         return;
     }
-
 
     // 時間経過
     currentSeconds += elapsedTime * animation.animationspeed;
@@ -198,9 +193,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 //キャッシュルートモーションでクリア
                 model->GetNodes()[rootMotionHipNodeIndex].translate.x = cahcheRootMotionTranslation.x;
                 model->GetNodes()[rootMotionHipNodeIndex].translate.z = cahcheRootMotionTranslation.z;
-
             }
-
         }
         else
         {
@@ -215,11 +208,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
         //ルートモーション計算
         ComputeRootMotion();
     }
-
-
 }
-
-
 
 //上半身別アニメーション更新
 void AnimationCom::AnimationUpperUpdate(float elapsedTime)
@@ -263,8 +252,6 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                 const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
                 const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
 
-
-
                 if (blendRate < 1.0f)
                 {
                     if (model->GetNodes()[nodeIndex].layer == 1 && upperIsPlayAnimation)
@@ -281,14 +268,13 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                         ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                     }
                 }
-
             }
             break;
         }
     }
 
     //時間経過
-    upperCurrentAnimationSeconds+=elapsedTime* animation.animationspeed;
+    upperCurrentAnimationSeconds += elapsedTime * animation.animationspeed;
 
     //最終フレーム
     if (animationUpperEndFlag)
@@ -305,7 +291,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
         animationUpperEndFlag = true;
         upperComplementFlag = true;
     }
-    
+
     //再生時間が終端時間を超えたら
     if (upperCurrentAnimationSeconds >= animation.secondsLength)
     {
@@ -313,7 +299,6 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
         upperCurrentAnimationSeconds -= animation.secondsLength;
     }
 }
-
 
 //上半身別アニメーション更新
 void AnimationCom::AnimationLowerUpdate(float elapsedTime)
@@ -357,8 +342,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                 const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
                 const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
 
-
-
                 if (blendRate < 1.0f)
                 {
                     if (model->GetNodes()[nodeIndex].layer == 2 && lowerIsPlayAnimation)
@@ -375,13 +358,10 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                     }
                 }
-
             }
             break;
         }
     }
-   
-
 
     //時間経過
     lowerCurrentAnimationSeconds += elapsedTime * animation.animationspeed;
@@ -413,7 +393,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                 model->GetNodes()[rootMotionHipNodeIndex].translate.x = cahcheRootMotionTranslation.x;
                 model->GetNodes()[rootMotionHipNodeIndex].translate.z = cahcheRootMotionTranslation.z;
             }
-
         }
         else
         {
@@ -421,8 +400,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
             lowerComplementFlag = true;
         }
     }
-    
-
 
     rootMotionFlag = true;
     if (rootFlag)
@@ -431,7 +408,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
         ComputeRootMotion();
     }
 }
-
 
 //上半身アニメーション再生中か？
 bool AnimationCom::IsPlayUpperAnimation()
@@ -454,7 +430,7 @@ bool AnimationCom::IsPlayLowerAnimation()
 }
 
 //普通のアニメーション再生関数
-void AnimationCom::PlayAnimation(int animeID, bool loop,bool rootFlag, float blendSeconds)
+void AnimationCom::PlayAnimation(int animeID, bool loop, bool rootFlag, float blendSeconds)
 {
     currentAnimation = animeID;
     loopAnimation = loop;
@@ -506,7 +482,6 @@ int AnimationCom::FindAnimation(const char* animeName)
 
     for (int i = 0; i < resource->GetAnimations().size(); i++) {
         if (animeName == resource->GetAnimations().at(i).name) {
-
             return i;
         }
     }
@@ -551,18 +526,97 @@ void AnimationCom::ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1
     DirectX::XMVECTOR MR1 = DirectX::XMLoadFloat4(&node.rotate);
     DirectX::XMVECTOR MT1 = DirectX::XMLoadFloat3(&node.translate);
 
-
-    DirectX::XMVECTOR S = DirectX::XMVectorLerp(MS1,S1, blendRate);
-    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(MR1,R1, blendRate);
-    DirectX::XMVECTOR T = DirectX::XMVectorLerp(MT1,T1, blendRate);
+    DirectX::XMVECTOR S = DirectX::XMVectorLerp(MS1, S1, blendRate);
+    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(MR1, R1, blendRate);
+    DirectX::XMVECTOR T = DirectX::XMVectorLerp(MT1, T1, blendRate);
 
     DirectX::XMStoreFloat3(&node.scale, S);
     DirectX::XMStoreFloat4(&node.rotate, R);
     DirectX::XMStoreFloat3(&node.translate, T);
 }
 
+//AimIK関数
+void AnimationCom::AimIK()
+{
+    // ゲームオブジェクトのレンダラーコンポーネントからモデルを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
+    for (size_t neckBoneIndex : AimBone)
+    {
+        // モデルからエイムボーンノードを取得
+        Model::Node& aimbone = model->GetNodes()[neckBoneIndex];
 
+        // フリーカメラの前方方向のワールド空間でのターゲット位置を取得
+        DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
+
+        // エイムボーンのワールド空間での位置を取得
+        DirectX::XMFLOAT3 aimPosition = { aimbone.worldTransform._41, aimbone.worldTransform._42, aimbone.worldTransform._43 };
+
+        // 正規化されたターゲット方向とエイムボーンからターゲットへの方向の内積を計算
+        DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
+        DirectX::XMVECTOR aimPositionVec = DirectX::XMLoadFloat3(&aimPosition);
+        DirectX::XMVECTOR targetDir = DirectX::XMVector3Normalize(targetVec);
+        DirectX::XMVECTOR aimToTargetDir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(targetVec, aimPositionVec));
+        float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(targetDir, aimToTargetDir));
+
+        // 内積がしきい値を超える場合、処理をスキップ
+        if (abs(dot) > 1.0f)
+        {
+            return;
+        }
+
+        // ローカル空間でのアップベクトルを定義
+        DirectX::XMFLOAT3 up = { 0, 0, 1 };
+
+        // ターゲット位置をプレイヤーのローカル空間に変換
+        DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("player")->transform_->GetWorldTransform()));
+        DirectX::XMStoreFloat3(&target, DirectX::XMVector4Transform(targetVec, playerTransformInv));
+
+        // エイムボーンからターゲットへのローカル空間でのベクトルを計算
+        DirectX::XMFLOAT3 toTarget = { target.x - aimPosition.x, target.y - aimPosition.y, target.z - aimPosition.z };
+
+        // エイムボーンのグローバルトランスフォームの逆行列を取得
+        DirectX::XMMATRIX inverseGlobalTransform = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&aimbone.worldTransform));
+
+        // toTargetとupベクトルをエイムボーンのローカル空間に変換
+        DirectX::XMVECTOR toTargetVec = DirectX::XMLoadFloat3(&toTarget);
+        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&up);
+        DirectX::XMStoreFloat3(&toTarget, DirectX::XMVector3TransformNormal(toTargetVec, inverseGlobalTransform));
+        DirectX::XMStoreFloat3(&up, DirectX::XMVector3TransformNormal(upVec, inverseGlobalTransform));
+
+        // 回転軸をupベクトルとtoTargetベクトルの外積として計算
+        DirectX::XMVECTOR axis = DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&up), DirectX::XMLoadFloat3(&toTarget));
+
+        // upベクトルとtoTargetベクトルの間の回転角を計算
+        float angle = DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenVectors(DirectX::XMLoadFloat3(&up), DirectX::XMLoadFloat3(&toTarget)));
+
+        // 計算した軸と角度で回転行列を作成
+        DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationAxis(DirectX::XMVector3Normalize(axis), angle);
+
+        // 回転行列をクォータニオンとして保存
+        DirectX::XMFLOAT4 rotationQuaternion;
+        DirectX::XMStoreFloat4(&rotationQuaternion, DirectX::XMQuaternionRotationMatrix(rotation));
+
+        // 計算した回転をエイムボーンに適用
+        aimbone.rotate = rotationQuaternion;
+    }
+}
+
+//ボーンを探す
+void AnimationCom::SearchAimNode()
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    for (size_t nodeIndex = 0; nodeIndex < model->GetNodes().size(); ++nodeIndex)
+    {
+        const Model::Node& node = model->GetNodes().at(nodeIndex);
+
+        if (strstr(node.name, "Spine") == node.name)
+        {
+            AimBone.push_back(static_cast<int>(nodeIndex));
+        }
+    }
+}
 
 //ルートモーションの値を取るノードを検索
 void AnimationCom::SetupRootMotion(const char* rootMotionNodeIndex)
@@ -600,11 +654,9 @@ void AnimationCom::ComputeRootMotion()
     //次回に差分量を求めるために今回の移動値をキャッシュする
     cahcheRootMotionTranslation = model->GetNodes()[rootMotionHipNodeIndex].translate;
 
-
     //アニメーション内で移動してほしくないのでルートモーション移動値をリセット
     model->GetNodes()[rootMotionHipNodeIndex].translate.x = 0.0f;
     model->GetNodes()[rootMotionHipNodeIndex].translate.z = 0.0f;
-
 
     //ルートモーションフラグをオフにする
     rootMotionFlag = false;
@@ -613,10 +665,9 @@ void AnimationCom::ComputeRootMotion()
 //ルートモーション更新
 void AnimationCom::updateRootMotion(DirectX::XMFLOAT3& translation)
 {
-
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
-    if (rootMotionNodeIndex <0)
+    if (rootMotionNodeIndex < 0)
     {
         return;
     }
@@ -635,7 +686,7 @@ void AnimationCom::updateRootMotion(DirectX::XMFLOAT3& translation)
 
         DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(tranlation, transform);
         DirectX::XMStoreFloat3(&translation, position);
-       
+
         GetGameObject()->transform_->SetWorldPosition(translation);
 
         rootMotionTranslation = { 0,0,0 };
