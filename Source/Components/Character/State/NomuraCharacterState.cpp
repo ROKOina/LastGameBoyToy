@@ -116,3 +116,27 @@ void NomuraCharacter_ESkillState::ImGui()
 }
 
 #pragma endregion
+
+
+#pragma region Reload
+
+void NomuraCharacter_ReloadState::Enter()
+{
+
+}
+
+void NomuraCharacter_ReloadState::Execute(const float& elapsedTime)
+{
+
+
+
+
+
+}
+
+void NomuraCharacter_ReloadState::ImGui()
+{
+
+}
+
+#pragma endregion
