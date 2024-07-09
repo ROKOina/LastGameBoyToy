@@ -12,10 +12,7 @@ RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, RASTERIZERSTA
     m_shadow = std::make_unique<ModelShader>(SHADER_ID_MODEL::SHADOW);
     m_shadowrender = shadowrender;
 
-#ifdef _DEBUG
     shaderID = id;
-
-#endif // _DEBUG
 }
 
 // äJénèàóù
