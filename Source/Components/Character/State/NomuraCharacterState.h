@@ -50,7 +50,15 @@ public:
     void Enter()override;
     void Execute(const float& elapsedTime)override;
     void ImGui()override;
-
-  
     
+};
+
+class NomuraCharacter_ReloadState : public NomuraCharacter_BaseState
+{
+public:
+    NomuraCharacter_ReloadState(CharacterCom*owner):NomuraCharacter_BaseState(owner){}
+
+    void Enter()override;
+    void Execute(const float& elapsedTime)override;
+    void ImGui()override;
 };
