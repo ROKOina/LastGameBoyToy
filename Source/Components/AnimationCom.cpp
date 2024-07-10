@@ -269,6 +269,9 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                     }
                 }
             }
+
+            AimIK();
+
             break;
         }
     }
@@ -547,7 +550,7 @@ void AnimationCom::AimIK()
         Model::Node& aimbone = model->GetNodes()[neckBoneIndex];
 
         // フリーカメラの前方方向のワールド空間でのターゲット位置を取得
-        DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
+        DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
 
         // エイムボーンのワールド空間での位置を取得
         DirectX::XMFLOAT3 aimPosition = { aimbone.worldTransform._41, aimbone.worldTransform._42, aimbone.worldTransform._43 };
