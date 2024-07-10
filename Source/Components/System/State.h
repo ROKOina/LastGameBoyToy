@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 template <class T>
 class State
 {
@@ -17,6 +19,9 @@ public:
 
     virtual void ImGui() {}
 
+    std::string GetName() { return name; }
+
 protected:
+    std::string name = "";
     T* owner = nullptr;
 };

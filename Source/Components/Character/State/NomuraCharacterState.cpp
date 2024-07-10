@@ -9,11 +9,6 @@
 #include "GameSource/Scene/SceneManager.h"
 #include "BaseCharacterState.h"
 
-
-// マクロ
-#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
-#define ChangeState(State) testCharaCom.lock()->GetStateMachine().ChangeState(State);
-
 void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float power = 1)
 {
     //弾丸オブジェクトを生成///////
@@ -53,7 +48,7 @@ void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, floa
 NomuraCharacter_BaseState::NomuraCharacter_BaseState(CharacterCom* owner) :State(owner)
 {
     //初期設定
-    testCharaCom = GetComp(NomuraCharacterCom);
+    charaCom = GetComp(NomuraCharacterCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
     animationCom = GetComp(AnimationCom);
@@ -87,7 +82,7 @@ void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
         //攻撃処理
         BuletFire(owner->GetGameObject(), 30.0f, attackPower);
 
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 
     }
 }
@@ -116,6 +111,30 @@ void NomuraCharacter_ESkillState::Execute(const float& elapsedTime)
 }
 
 void NomuraCharacter_ESkillState::ImGui()
+{
+
+}
+
+#pragma endregion
+
+
+#pragma region Reload
+
+void NomuraCharacter_ReloadState::Enter()
+{
+
+}
+
+void NomuraCharacter_ReloadState::Execute(const float& elapsedTime)
+{
+
+
+
+
+
+}
+
+void NomuraCharacter_ReloadState::ImGui()
 {
 
 }

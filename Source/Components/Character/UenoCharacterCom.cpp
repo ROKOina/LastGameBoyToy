@@ -26,12 +26,15 @@ UenoCharacterCom::UenoCharacterCom()
 void UenoCharacterCom::Start()
 {
     //ステート登録
-    stateMachine.AddState(CHARACTER_ACTIONS::IDLE, std::make_shared<BaseCharacter_IdleState>(this));
-    stateMachine.AddState(CHARACTER_ACTIONS::MOVE, std::make_shared<BaseCharacter_MoveState>(this));
-    stateMachine.AddState(CHARACTER_ACTIONS::JUMP, std::make_shared<BaseCharacter_JumpState>(this));
-    stateMachine.AddState(CHARACTER_ACTIONS::ATTACK, std::make_shared<UenoCharacterState_AttackState>(this));
+    moveStateMachine.AddState(CHARACTER_MOVE_ACTIONS::IDLE, std::make_shared<BaseCharacter_IdleState>(this));
+    moveStateMachine.AddState(CHARACTER_MOVE_ACTIONS::MOVE, std::make_shared<BaseCharacter_MoveState>(this));
+    moveStateMachine.AddState(CHARACTER_MOVE_ACTIONS::JUMP, std::make_shared<BaseCharacter_JumpState>(this));
+    
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<UenoCharacterState_AttackState>(this));
 
-    stateMachine.ChangeState(CHARACTER_ACTIONS::MOVE);
+    moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::MOVE);
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
 //更新処理
@@ -50,7 +53,7 @@ void UenoCharacterCom::OnGUI()
 //メインアタック
 void UenoCharacterCom::MainAttack()
 {
-    stateMachine.ChangeState(CHARACTER_ACTIONS::ATTACK);
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
 }
 
 //パーティクル更新

@@ -11,6 +11,6 @@ class TestCharacterCom : public CharacterCom
 
 private:
     bool dashFlag = false;
-    bool attackFlag = false;
+    bool useWeponFlag = false;
 };
 

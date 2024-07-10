@@ -1,6 +1,6 @@
 #pragma once
 #include "../../System/State.h"
-#include "../CharacterCom.h"
+#include "../TestCharacterCom.h"
 #include "../../MovementCom.h"
 #include "../../TransformCom.h"
 #include "../../AnimationCom.h"
@@ -11,7 +11,7 @@ public:
     TestCharacter_BaseState(CharacterCom* owner);
 
 protected:
-    std::weak_ptr<CharacterCom> testCharaCom;
+    std::weak_ptr<TestCharacterCom> charaCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
@@ -31,18 +31,19 @@ public:
 class TestCharacter_AttackState : public TestCharacter_BaseState
 {
 public:
-    TestCharacter_AttackState(CharacterCom* owner) : TestCharacter_BaseState(owner) {}
+    TestCharacter_AttackState(CharacterCom* owner) : TestCharacter_BaseState(owner) { name = "AttackState"; }
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
+
+    void ImGui() override;
 
 private:
     void Fire();
 
     float fireTimer = 0.0f;
     float fireTime = 0.05f;
-
 };
 
 class TestCharacter_DashState : public TestCharacter_BaseState

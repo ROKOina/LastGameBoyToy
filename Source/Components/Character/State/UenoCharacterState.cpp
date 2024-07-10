@@ -5,14 +5,10 @@
 #include "Components\Character\BulletCom.h"
 #include "BaseCharacterState.h"
 
-// ƒ}ƒNƒ
-#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
-#define ChangeState(State) testCharaCom.lock()->GetStateMachine().ChangeState(State);
-
 UenoCharacterState_BaseState::UenoCharacterState_BaseState(CharacterCom* owner) : State(owner)
 {
     //‰ŠúÝ’è
-    testCharaCom = GetComp(UenoCharacterCom);
+    charaCom = GetComp(UenoCharacterCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
     animationCom = GetComp(AnimationCom);
@@ -33,18 +29,18 @@ void UenoCharacterState_AttackState::Execute(const float& elapsedTime)
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        testCharaCom.lock()->SetLazerFlag(false);
-        ChangeState(CharacterCom::CHARACTER_ACTIONS::IDLE);
+        charaCom.lock()->SetLazerFlag(false);
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
         t = true;
     }
     else
     {
         if (t)
         {
-            testCharaCom.lock()->gpulazerparticle->Reset();
+            charaCom.lock()->gpulazerparticle->Reset();
             t = false;
         }
-        testCharaCom.lock()->SetLazerFlag(true);
+        charaCom.lock()->SetLazerFlag(true);
     }
 }
 

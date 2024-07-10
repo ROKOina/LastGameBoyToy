@@ -14,7 +14,7 @@ public:
     InazawaCharacter_BaseState(CharacterCom* owner);
 
 protected:
-    std::weak_ptr<InazawaCharacterCom> testCharaCom;
+    std::weak_ptr<InazawaCharacterCom> charaCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;

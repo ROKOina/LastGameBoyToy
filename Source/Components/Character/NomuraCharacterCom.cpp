@@ -5,14 +5,16 @@
 
 void NomuraCharacterCom::Start()
 {
-    stateMachine.AddState(CHARACTER_ACTIONS::IDLE, std::make_shared<BaseCharacter_IdleState>(this));
-    stateMachine.AddState(CHARACTER_ACTIONS::MOVE, std::make_shared<BaseCharacter_MoveState>(this));
-    stateMachine.AddState(CHARACTER_ACTIONS::JUMP, std::make_shared<BaseCharacter_JumpState>(this));
-    stateMachine.AddState(CHARACTER_ACTIONS::ATTACK, std::make_shared<NomuraCharacter_AttackState>(this));
-    stateMachine.AddState(CHARACTER_ACTIONS::DASH, std::make_shared<NomuraCharacter_ESkillState>(this));
+    moveStateMachine.AddState(CHARACTER_MOVE_ACTIONS::IDLE, std::make_shared<BaseCharacter_IdleState>(this));
+    moveStateMachine.AddState(CHARACTER_MOVE_ACTIONS::MOVE, std::make_shared<BaseCharacter_MoveState>(this));
+    moveStateMachine.AddState(CHARACTER_MOVE_ACTIONS::JUMP, std::make_shared<BaseCharacter_JumpState>(this));
     
-    stateMachine.ChangeState(CHARACTER_ACTIONS::MOVE);
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<NomuraCharacter_AttackState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<NomuraCharacter_ESkillState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
+    moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::MOVE);
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
 void NomuraCharacterCom::Update(float elapsedTime)
@@ -44,9 +46,9 @@ void NomuraCharacterCom::OnGUI()
 
 void NomuraCharacterCom::MainAttack()
 {
-    if (stateMachine.GetCurrentState() != CHARACTER_ACTIONS::DASH&& launchPermission&& remainingBullets)
+    if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL && launchPermission&& remainingBullets)
     {
-        stateMachine.ChangeState(CHARACTER_ACTIONS::ATTACK);
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
         launchPermission = false;
         nowMagazine -= 1;
 

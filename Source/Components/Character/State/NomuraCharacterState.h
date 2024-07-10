@@ -14,7 +14,7 @@ public:
     NomuraCharacter_BaseState(CharacterCom* owner);
 
 protected:
-    std::weak_ptr<NomuraCharacterCom> testCharaCom;
+    std::weak_ptr<NomuraCharacterCom> charaCom;
     std::weak_ptr<MovementCom>        moveCom;
     std::weak_ptr<TransformCom>       transCom;
     std::weak_ptr<AnimationCom>       animationCom;
@@ -50,7 +50,15 @@ public:
     void Enter()override;
     void Execute(const float& elapsedTime)override;
     void ImGui()override;
-
-  
     
+};
+
+class NomuraCharacter_ReloadState : public NomuraCharacter_BaseState
+{
+public:
+    NomuraCharacter_ReloadState(CharacterCom*owner):NomuraCharacter_BaseState(owner){}
+
+    void Enter()override;
+    void Execute(const float& elapsedTime)override;
+    void ImGui()override;
 };

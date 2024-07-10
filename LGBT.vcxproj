@@ -163,6 +163,7 @@
     <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
+    <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
@@ -217,6 +218,7 @@
     <ClInclude Include="Source\Netwark\Client.h" />
     <ClInclude Include="Source\Netwark\NetData.h" />
     <ClInclude Include="Source\Netwark\NetwarkPost.h" />
+    <ClInclude Include="Source\Netwark\RingBuffer.h" />
     <ClInclude Include="Source\Netwark\Server.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
     <ClInclude Include="Source\SystemStruct\TransformUtils.h" />
@@ -261,6 +263,7 @@
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
+    <ClCompile Include="Source\Components\ProjectileCom.cpp" />
     <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
