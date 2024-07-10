@@ -94,7 +94,7 @@ void CharacterCom::CameraControl()
         //‰ñ“]
         DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
         euler.y += moveX * 8.0f;
-        euler.x += moveY * 5.0f;
+        //euler.x += moveY * 5.0f;
 
         //‰ñ“]§Œä
         if (euler.x > 70)
