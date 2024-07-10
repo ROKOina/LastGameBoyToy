@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <imgui.h>
 
 template <class Owner, typename Enum>
 class StateMachine
@@ -17,6 +18,25 @@ public:
 
     ~StateMachine() {
         stateList.clear();
+    }
+
+    void ImGui()
+    {
+        // コンポーネント
+        for (auto& state : stateList)
+        {
+            if (state.second->GetName().empty())continue;
+
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+            if (ImGui::TreeNodeEx(state.second->GetName().c_str(), nodeFlags))
+            {
+                state.second->ImGui();
+                ImGui::TreePop();
+            }
+        }
     }
 
     void AddState(Enum index, StatePtr state) {
@@ -75,3 +95,5 @@ private:
 
     std::map<Enum, StatePtr> stateList;
 };
+
+
