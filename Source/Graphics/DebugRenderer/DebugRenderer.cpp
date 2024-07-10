@@ -46,7 +46,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     context->IASetInputLayout(inputLayout_.Get());
 
     // 定数バッファ設定
-    cbmesh->Activate(context, 0, true, false, false, false, false, false);
+    //cbmesh->Activate(context, 0, true, false, false, false, false, false);
 
     // レンダーステート設定
     context->OMSetBlendState(Graphics::Instance().GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
@@ -76,6 +76,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         // 定数バッファ更新
         cbmesh->data.color = sphere.color;
         DirectX::XMStoreFloat4x4(&cbmesh->data.wvp, WVP);
+        cbmesh->Activate(context, 0, true, false, false, false, false, false);
 
         context->Draw(sphereVertexCount_, 0);
     }
@@ -97,7 +98,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         // 定数バッファ更新
         cbmesh->data.color = box.color;
         DirectX::XMStoreFloat4x4(&cbmesh->data.wvp, WVP);
-
+        cbmesh->Activate(context, 0, true, false, false, false, false, false);
         D3D11_BUFFER_DESC buffer_desc{};
         boxIndexBuffer_->GetDesc(&buffer_desc);
         context->DrawIndexed(buffer_desc.ByteWidth / sizeof(uint32_t), 0, 0);
@@ -140,6 +141,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         // 定数バッファ更新
         cbmesh->data.color = cylinder.color;
         DirectX::XMStoreFloat4x4(&cbmesh->data.wvp, WVP);
+        cbmesh->Activate(context, 0, true, false, false, false, false, false);
 
         context->Draw(cylinderVertexCount_, 0);
     }

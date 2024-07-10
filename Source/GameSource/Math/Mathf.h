@@ -36,6 +36,15 @@ public:
   static DirectX::XMFLOAT3 Normalize(const DirectX::XMFLOAT3& value, float& length);
   static DirectX::XMFLOAT4 Normalize(const DirectX::XMFLOAT4& value, float& length);
 
+  //長さ
+  static float Length(const DirectX::XMFLOAT2 Vec);
+  static float Length(const DirectX::XMFLOAT3 Vec);
+
+  //二つの値が等しいか判別する
+  static bool  Equal(const float value1, const float value2);
+  static bool  Equal(const DirectX::XMFLOAT2 value1, const DirectX::XMFLOAT2 value2);
+  static bool  Equal(const DirectX::XMFLOAT3 value1, const DirectX::XMFLOAT3 value2);
+
   // 指定範囲のランダム値を計算
   static float RandomRange(const float& min, const float& max);
 

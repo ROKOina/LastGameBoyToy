@@ -134,6 +134,40 @@ DirectX::XMFLOAT4 Mathf::Normalize(const DirectX::XMFLOAT4& value, float& length
   return value / length;
 }
 
+float Mathf::Length(const DirectX::XMFLOAT2 Vec)
+{
+    float length = sqrt(Dot(Vec, Vec));
+    return  length;
+}
+
+float Mathf::Length(const DirectX::XMFLOAT3 Vec)
+{
+    float length = sqrt(Dot(Vec,Vec));
+    return  length;
+}
+
+bool Mathf::Equal(const float value1, const float value2)
+{
+    return (value1 == value2);
+}
+
+bool Mathf::Equal(const DirectX::XMFLOAT2 value1, const DirectX::XMFLOAT2 value2)
+{
+    return (
+        value1.x == value2.x &&
+        value1.y == value2.y
+        );
+}
+
+bool Mathf::Equal(const DirectX::XMFLOAT3 value1, const DirectX::XMFLOAT3 value2)
+{
+    return (
+        value1.x == value2.x &&
+        value1.y == value2.y &&
+        value1.z == value2.z 
+        );
+}
+
 float Mathf::RandomRange(const float& min, const float& max)
 {
   float range = max - min;

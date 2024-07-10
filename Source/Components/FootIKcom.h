@@ -5,9 +5,9 @@ class FootIKCom : public Component
 {
 public:
     enum class LegNodes{
-        RIGHT_WAIST,   //腰 ノードのレイヤーを参照するので3から
-        RIGHT_KNEES,       //膝
-        RIGHT_ANKLE,       //足首
+        RIGHT_WAIST,   //腰 
+        RIGHT_KNEES,   //膝
+        RIGHT_ANKLE,   //足首
         LEFT_WAIST,         
         LEFT_KNEES,
         LEFT_ANKLE,
@@ -46,7 +46,7 @@ public:
     void SetLegNodes() {};
 
     //ボーンの計算
-    void MoveBone();
+    void MoveBone(Legs leg);
 private:
     //足ノードを保持
     Model::Node* legNodes[(int)LegNodes::Max] = {};

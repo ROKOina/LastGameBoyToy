@@ -129,8 +129,6 @@ void TestCharacter_AttackState::Fire()
   std::shared_ptr<BulletCom> bullet_bulletCom = bullet->AddComponent<BulletCom>();
 
   ///////////////////////////////
-
-
   //’e”­ŽË
   bullet_moveCom->SetGravity(0.0f);
   bullet_moveCom->SetFriction(0.0f);

@@ -30,7 +30,7 @@ Framework::Framework(HWND hWnd)
   //SceneManager::Instance().ChangeScene(new SceneGame);
   //SceneManager::Instance().ChangeScene(new SceneTitle);
   //SceneManager::Instance().ChangeScene(new SceneResult);
-   SceneManager::Instance().ChangeScene(new SceneIKTest);
+  SceneManager::Instance().ChangeScene(new SceneIKTest);
 
   //IMGUIèâä˙âª
   IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());

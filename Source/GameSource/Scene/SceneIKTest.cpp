@@ -20,6 +20,7 @@
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\FootIKcom.h"
 #include "Components/CPUParticle.h"
+#include "Components\RayCollisionCom.h"
 
 #include "GameSource/GameScript/FreeCameraCom.h"
 
@@ -61,6 +62,7 @@ void SceneIKTest::Initialize()
         obj->transform_->SetScale({ 0.6f, 0.6f, 0.6f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/IKTestStage/ExampleStage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/IKTestStage/ExampleStage.collision");
     }
 
     //•½sŒõŒ¹‚ğ’Ç‰Á
