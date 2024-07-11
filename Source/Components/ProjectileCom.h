@@ -16,14 +16,13 @@ struct ProjectileContext
 
   bool isApplyGravity   = true;     // 重力の影響を受けるか
   bool isCollideTerrain = true;     // 地形との当たり判定をするか
-  bool isHitOnce        = false;    // 一度当たった時点で移動を止めるか ( 地形との当たり判定 )
 };
 
 // 弾・グレネードなど投射物用の挙動制御コンポーネント
 class ProjectileCom :public Component
 {
 public:
-  ProjectileCom(const ProjectileContext& context) :context(context) {}
+  ProjectileCom(const ProjectileContext& context);
 
   // 名前取得
   const char* GetName() const override { return "ProjectileCom"; }
@@ -31,37 +30,38 @@ public:
   // 更新処理
   void Update(float elapsedTime)override;
 
-  // TRUE = 地形と当たった
-  bool OnHitTerrain() { return onHitTerrain; }
+  // TRUE = 地形と当たったか
+  bool HitTerrain() { return hitTerrain; }
   bool OnGround() { return onGround; }
 
 private:
   // 地形に当たった時にバウンドする
-  void Rebound(const DirectX::XMFLOAT3& normal);
+  void Rebound(const DirectX::XMFLOAT3& normal,const DirectX::XMFLOAT3& vec);
 
   // 地面との当たり判定
-  void CheckHitGround();
+  void CheckHitGround(const float& simulateSpeed);
 
   // 摩擦力の更新
-  void UpdateFriction(float elapsedTime);
+  void UpdateFriction(const float& simulateSpeed);
 
   // 重力の更新
-  void UpdateGravity(float elapsedTime);
+  void UpdateGravity(const float& simulateSpeed);
 
   // 横方向移動更新
-  void HorizonUpdate(float elapsedTime);
+  void VelocityAcceleration(const float& simulateSpeed);
 
   // 速力を反映
-  void ApplyVelocity(float elapsedTime);
+  void ApplyVelocity(const float& simulateSpeed);
 
 private:
   const float MASS = 1.0f;          // 質量
   const float MAX_GRAVITY = 10.0f;  // 最大重力加速度
   const float STEP_OFFSET = 0.5f;   // レイキャスト用のオフセット値
 
-  float gravitySimulate = 0.0f;
   ProjectileContext context;
+  float gravitySimulate = 0.0f;
 
-  bool onGround   = false;      // 接地しているか
-  bool onHitTerrain = false;    // 地形に当たった瞬間
+  bool isSimulateEnd  = false;    // 移動量が0になったか
+  bool onGround       = false;    // 接地しているか
+  bool hitTerrain   = false;    // 地形に当たったか
 };

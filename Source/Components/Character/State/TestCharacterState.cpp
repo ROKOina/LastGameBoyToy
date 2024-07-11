@@ -90,8 +90,11 @@ void TestCharacter_AttackState::Exit()
 void TestCharacter_AttackState::ImGui()
 {
     ImGui::DragFloat(u8"”­ŽËŠÔŠu", &fireTime, 0.001f, 0.0f, 100.0f);
+    ImGui::DragFloat("friction1", &friction1, 0.01f, 0.0f, 100.0f);
+    ImGui::DragFloat("friction2", &friction2, 0.01f, 0.0f, 100.0f);
 }
 
+#include "Components/ProjectileCom.h"
 void TestCharacter_AttackState::Fire()
 {
     //’eŠÛƒIƒuƒWƒFƒNƒg‚ð¶¬///////
@@ -113,19 +116,20 @@ void TestCharacter_AttackState::Fire()
     sphereCollider->SetMyTag(COLLIDER_TAG::PlayerAttack);
     sphereCollider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyAttack);
 
-    std::shared_ptr<MovementCom> bullet_moveCom = bullet->AddComponent<MovementCom>();
+    bullet->transform_->SetScale({ 0.1f,0.1f,0.1f });
+
+    ProjectileContext context;
+    context.velocity = owner->GetGameObject()->transform_->GetWorldFront() * 30.0f;
+    context.frictionAir = friction1;
+    context.frictionGround = friction2;
+
+    std::shared_ptr<ProjectileCom> bullet_moveCom = bullet->AddComponent<ProjectileCom>(context);
     std::shared_ptr<BulletCom> bullet_bulletCom = bullet->AddComponent<BulletCom>();
 
     ///////////////////////////////
 
-
-    //’e”­ŽË
-    bullet_moveCom->SetGravity(0.0f);
-    bullet_moveCom->SetFriction(0.0f);
-    bullet_moveCom->AddNonMaxSpeedForce(owner->GetGameObject()->transform_->GetWorldFront() * 30.0f);
-
     //’e
-    bullet_bulletCom->SetAliveTime(2.0f);
+    bullet_bulletCom->SetAliveTime(20.0f);
 }
 
 

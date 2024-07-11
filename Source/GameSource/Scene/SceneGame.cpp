@@ -87,6 +87,7 @@ void SceneGame::Initialize()
 
     //ƒeƒXƒg
     {
+      //Graphics::Instance().SetWorldSpeed(0.1f);
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("SciFiGate");
         obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
