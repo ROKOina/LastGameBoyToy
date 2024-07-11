@@ -42,8 +42,13 @@ public:
 private:
     void Fire();
 
+private:
+  float friction1 = 1.0f;
+  float friction2 = 1.0f;
+
     float fireTimer = 0.0f;
     float fireTime = 0.05f;
+
 };
 
 class TestCharacter_DashState : public TestCharacter_BaseState

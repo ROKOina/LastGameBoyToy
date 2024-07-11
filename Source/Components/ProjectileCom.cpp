@@ -4,17 +4,34 @@
 #include "Components/TransformCom.h"
 #include "Components/System/RayCastManager.h"
 
-#define GRAVITY 9.8f
+#include "Graphics/DebugRenderer/LineRenderer.h"
+
+#define GRAVITY 0.98f
+
+ProjectileCom::ProjectileCom(const ProjectileContext& context) :context(context)
+{
+}
 
 void ProjectileCom::Update(float elapsedTime)
 {
-  HorizonUpdate(elapsedTime);
-  UpdateGravity(elapsedTime);
+  if (isSimulateEnd == true)return;
 
-  CheckHitGround();
-  UpdateFriction(elapsedTime);
+  hitTerrain = false;
 
-  ApplyVelocity(elapsedTime);
+  // 世界のスピード
+  float worldSpeed = Graphics::Instance().GetWorldSpeed();
+  // オブジェクトのスピード
+  float objSpeed = GetGameObject()->GetObjSpeed();
+
+  float simulateSpeed = elapsedTime * worldSpeed * objSpeed;
+
+  VelocityAcceleration(simulateSpeed);
+  UpdateGravity(simulateSpeed);
+
+  CheckHitGround(simulateSpeed);
+  UpdateFriction(simulateSpeed);
+
+  ApplyVelocity(simulateSpeed);
 }
 
 void ProjectileCom::Rebound(const DirectX::XMFLOAT3& normal)
@@ -26,10 +43,10 @@ void ProjectileCom::Rebound(const DirectX::XMFLOAT3& normal)
   context.velocity = normal * vn + context.velocity;
 }
 
-void ProjectileCom::CheckHitGround()
+void ProjectileCom::CheckHitGround(const float& simulateSpeed)
 {
   DirectX::XMFLOAT3 position = GetGameObject()->transform_->GetWorldPosition();
-  float vectorY = context.velocity.y + gravitySimulate;
+  float vectorY = context.velocity.y * simulateSpeed - gravitySimulate;
 
   // 地面との着地判定
   {
@@ -45,77 +62,114 @@ void ProjectileCom::CheckHitGround()
     end.y += vectorY;
 
     // 判定
-    onGround = RayCastManager::Instance().RayCast(start, end);
+    RayCastManager::Result hit;
+    if (RayCastManager::Instance().RayCast(start, end, hit)) {
+      DirectX::XMFLOAT3 position = GetGameObject()->transform_->GetWorldPosition();
+      position.y = hit.position.y;
+      GetGameObject()->transform_->SetWorldPosition(position);
+
+      hitTerrain = true;
+      onGround = true;
+      gravitySimulate = 0.0f;
+    }
+    else {
+      onGround = false;
+    }
   }
 }
 
-void ProjectileCom::UpdateFriction(float elapsedTime)
+void ProjectileCom::UpdateFriction(const float& simulateSpeed)
 {
   // 摩擦力
   float friction;
   {
-    // 世界のスピード
-    float worldSpeed = Graphics::Instance().GetWorldSpeed();
-    // オブジェクトのスピード
-    float objSpeed = GetGameObject()->GetObjSpeed();
-
     friction = (onGround) ? context.frictionGround : context.frictionAir;
-    friction *= (elapsedTime * worldSpeed * objSpeed);
+    friction *= simulateSpeed;
   }
 
-  DirectX::XMFLOAT3 horizonVelocity = { context.velocity.x, 0, context.velocity.z };
-
   // 摩擦力
-  if (Mathf::Dot(horizonVelocity, horizonVelocity) > 0.0f)
+  if (Mathf::Dot(context.velocity, context.velocity) > 0.001f)
   {
-    DirectX::XMFLOAT3 friVelocity = horizonVelocity * -friction;
+    DirectX::XMFLOAT3 friVelocity = context.velocity * -friction;
     context.velocity += friVelocity;
   }
   else
   {
-    context.velocity.x = 0;
-    context.velocity.z = 0;
+    context.velocity = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+    isSimulateEnd = true;
   }
 }
 
-void ProjectileCom::UpdateGravity(float elapsedTime)
+void ProjectileCom::UpdateGravity(const float& simulateSpeed)
 {
-  // 世界のスピード
-  float worldSpeed = Graphics::Instance().GetWorldSpeed();
-  // オブジェクトのスピード
-  float objSpeed = GetGameObject()->GetObjSpeed();
-  float gravity = GRAVITY * (elapsedTime * worldSpeed * objSpeed);
+  if (context.isApplyGravity == false)return;
+
+  float gravity = GRAVITY * simulateSpeed;
 
   gravitySimulate += gravity;
   gravitySimulate = min(gravitySimulate, MAX_GRAVITY);
 }
 
-void ProjectileCom::HorizonUpdate(float elapsedTime)
+void ProjectileCom::VelocityAcceleration(const float& simulateSpeed)
 {
-  DirectX::XMFLOAT3 horizonVelocity = { context.velocity.x, 0, context.velocity.z };
-  float horiLengthSq = Mathf::Dot(horizonVelocity, horizonVelocity);
+  if (context.acceleration == 0.0f)return;
+
+  float lengthSq = Mathf::Dot(context.velocity, context.velocity);
 
   // 最大速度を超えている場合は制限する
-  if (horiLengthSq > context.maxSpeed * context.maxSpeed)
+  if (lengthSq > context.maxSpeed * context.maxSpeed)
   {
-    DirectX::XMFLOAT3 newMaxVelocity = Mathf::Normalize(horizonVelocity) * context.maxSpeed;
-    context.velocity.x = newMaxVelocity.x;
-    context.velocity.z = newMaxVelocity.z;
+    DirectX::XMFLOAT3 newMaxVelocity = Mathf::Normalize(context.velocity) * context.maxSpeed;
+    context.velocity = newMaxVelocity;
+  }
+  else
+  {
+    context.velocity += context.acceleration * simulateSpeed;
   }
 }
 
-void ProjectileCom::ApplyVelocity(float elapsedTime)
+void ProjectileCom::ApplyVelocity(const float& simulateSpeed)
 {
+  DirectX::XMFLOAT3 velocity = context.velocity * simulateSpeed + DirectX::XMFLOAT3(0, -gravitySimulate, 0);
   DirectX::XMFLOAT3 oldPosition = GetGameObject()->transform_->GetWorldPosition();
-  DirectX::XMFLOAT3 newPosition = oldPosition + context.velocity + DirectX::XMFLOAT3(0, gravitySimulate, 0);
+  DirectX::XMFLOAT3 newPosition = oldPosition + context.velocity * simulateSpeed + DirectX::XMFLOAT3(0, -gravitySimulate, 0);
+  DirectX::XMFLOAT3 vec = newPosition - oldPosition;
 
   if (context.isCollideTerrain) {
+#ifdef _DEBUG
+    Graphics::Instance().GetLineRenderer()->AddVertex(oldPosition, { 1,1,0,1 });
+    Graphics::Instance().GetLineRenderer()->AddVertex(newPosition, { 1,1,0,1 });
+
+#endif // _DEBUG
+
     RayCastManager::Result hit;
     if (RayCastManager::Instance().RayCast(oldPosition, newPosition, hit)) {
-      newPosition = hit.position;
+      // 壁の法線
+      DirectX::XMFLOAT3 normal = hit.normal;
 
-      if (context.isHitOnce == false) 
-        Rebound(hit.normal);
+      // 入射ベクトルを法線ベクトルに射影
+      float projectionLength = Mathf::Dot(vec, hit.normal);
+
+      // 補正位置の計算
+      DirectX::XMFLOAT3 correction = hit.normal * projectionLength + newPosition;
+
+      DirectX::XMFLOAT3 start = hit.position;
+      DirectX::XMFLOAT3 end = correction;
+
+      // 補正後の位置が壁にめり込んでいたら
+      RayCastManager::Result hit2;
+      if (RayCastManager::Instance().RayCast(start, end, hit2))
+      {
+        newPosition = hit2.position;
+        normal = hit2.normal;
+      }
+      else
+      {
+        newPosition = correction;
+      }
+
+      hitTerrain = true;
+      Rebound(normal);
     }
   }
 

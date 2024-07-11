@@ -195,7 +195,7 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
     moveVec.x,
     moveVec.z
   };
-  float velocityLengthXZ = DirectX::XMVectorGetX(DirectX::XMVector2LengthSq(XMLoadFloat2(&Speed)));
+  float velocityLengthXZ = Mathf::Dot(Speed, Speed);
 
   if (velocityLengthXZ > 0.0f)
   {
