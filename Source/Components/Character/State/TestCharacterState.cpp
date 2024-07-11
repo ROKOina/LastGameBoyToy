@@ -90,8 +90,9 @@ void TestCharacter_AttackState::Exit()
 void TestCharacter_AttackState::ImGui()
 {
     ImGui::DragFloat(u8"”­ŽËŠÔŠu", &fireTime, 0.001f, 0.0f, 100.0f);
-    ImGui::DragFloat("friction1", &friction1, 0.01f, 0.0f, 100.0f);
-    ImGui::DragFloat("friction2", &friction2, 0.01f, 0.0f, 100.0f);
+    ImGui::DragFloat(u8"”­ŽËˆÐ—Í", &power, 0.01f, 0.0f, 100.0f);
+    ImGui::DragFloat(u8"‹ó‹C’ïR", &friction1, 0.01f, 0.0f, 100.0f);
+    ImGui::DragFloat(u8"’n–Ê–€ŽC", &friction2, 0.01f, 0.0f, 100.0f);
 }
 
 #include "Components/ProjectileCom.h"
@@ -119,7 +120,7 @@ void TestCharacter_AttackState::Fire()
     bullet->transform_->SetScale({ 0.1f,0.1f,0.1f });
 
     ProjectileContext context;
-    context.velocity = owner->GetGameObject()->transform_->GetWorldFront() * 30.0f;
+    context.velocity = owner->GetGameObject()->transform_->GetWorldFront() * power;
     context.frictionAir = friction1;
     context.frictionGround = friction2;
 
