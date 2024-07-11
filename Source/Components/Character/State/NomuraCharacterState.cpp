@@ -122,13 +122,29 @@ void NomuraCharacter_ESkillState::ImGui()
 
 void NomuraCharacter_ReloadState::Enter()
 {
-
+    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Shot_Enter"), false, 0.8f);
 }
 
 void NomuraCharacter_ReloadState::Execute(const float& elapsedTime)
 {
 
+    if (animationCom.lock()->IsPlayUpperAnimation())
+    {
+        DirectX::XMVECTOR VeloVec=DirectX::XMLoadFloat3(&moveCom.lock()->GetVelocity());
 
+        charaCom.lock()->Reload();
+       
+        if (DirectX::XMVector3Length(VeloVec).m128_f32[0] > 0.1f)
+        {
+            ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
+            ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+        }
+        else if (DirectX::XMVector3Length(VeloVec).m128_f32[0] == 0.0f)
+        {
+            ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+            ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+        }
+    }
 
 
 

@@ -51,6 +51,13 @@ void CharacterCom::Update(float elapsedTime)
         SpaceSkill();
     }
 
+    //–ì‘º’Ç‰Á RƒL[
+    if (CharacterInput::UltimetButton_R & GetButtonDown())
+    {
+        UltSkill();
+    }
+
+
     //ƒJƒƒ‰§Œä
     CameraControl();
 }

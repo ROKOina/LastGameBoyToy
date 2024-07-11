@@ -17,12 +17,15 @@ public:
 
     void SubSkill()override;
 
+    void UltSkill()override;
+
     //void SpaceSkill()override;
+    void Reload();
 private:
 
     void FireInterval(float elapsedTime);
 
-    void Reload();
+    void ReloadManagement();
 
     void BulletManagement();
 private:
