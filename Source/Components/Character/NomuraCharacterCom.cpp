@@ -12,6 +12,7 @@ void NomuraCharacterCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<NomuraCharacter_AttackState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<NomuraCharacter_ESkillState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::RELOAD, std::make_shared<NomuraCharacter_ReloadState>(this));
 
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::MOVE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
@@ -58,7 +59,7 @@ void NomuraCharacterCom::MainAttack()
 
 void NomuraCharacterCom::SubSkill()
 {
-    auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
+    /*auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
 
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
@@ -83,7 +84,12 @@ void NomuraCharacterCom::SubSkill()
         moveCom->AddNonMaxSpeedForce(moveVec);
     }
 
-    Reload();
+    Reload();*/
+}
+
+void NomuraCharacterCom::UltSkill()
+{
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
 }
 
 //void NomuraCharacterCom::SpaceSkill()
@@ -117,4 +123,9 @@ void NomuraCharacterCom::BulletManagement()
     {
         remainingBullets = false;
     }
+}
+
+void NomuraCharacterCom::ReloadManagement()
+{
+    
 }
