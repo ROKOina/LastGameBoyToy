@@ -34,9 +34,9 @@ void ProjectileCom::Update(float elapsedTime)
   ApplyVelocity(simulateSpeed);
 }
 
-void ProjectileCom::Rebound(const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT3& vec)
+void ProjectileCom::Rebound(const DirectX::XMFLOAT3& normal)
 {
-  float vn = Mathf::Dot(normal, vec);
+  float vn = Mathf::Dot(normal, context.velocity);
   if (vn > 0)return;
   vn *= -(context.restitution + 1);
 
@@ -136,11 +136,9 @@ void ProjectileCom::ApplyVelocity(const float& simulateSpeed)
   DirectX::XMFLOAT3 vec = newPosition - oldPosition;
 
   if (context.isCollideTerrain) {
-    DirectX::XMFLOAT3 offsetVec = Mathf::Normalize(vec) * STEP_OFFSET;
-
 #ifdef _DEBUG
     Graphics::Instance().GetLineRenderer()->AddVertex(oldPosition, { 1,1,0,1 });
-    Graphics::Instance().GetLineRenderer()->AddVertex(newPosition + offsetVec, { 1,1,0,1 });
+    Graphics::Instance().GetLineRenderer()->AddVertex(newPosition, { 1,1,0,1 });
 
 #endif // _DEBUG
 
@@ -171,7 +169,7 @@ void ProjectileCom::ApplyVelocity(const float& simulateSpeed)
       }
 
       hitTerrain = true;
-      Rebound(normal, velocity);
+      Rebound(normal);
     }
   }
 

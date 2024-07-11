@@ -129,7 +129,7 @@ void TestCharacter_AttackState::Fire()
     ///////////////////////////////
 
     //’e
-    bullet_bulletCom->SetAliveTime(20.0f);
+    bullet_bulletCom->SetAliveTime(2.0f);
 }
 
 

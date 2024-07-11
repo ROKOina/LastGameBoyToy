@@ -36,7 +36,7 @@ public:
 
 private:
   // 地形に当たった時にバウンドする
-  void Rebound(const DirectX::XMFLOAT3& normal,const DirectX::XMFLOAT3& vec);
+  void Rebound(const DirectX::XMFLOAT3& normal);
 
   // 地面との当たり判定
   void CheckHitGround(const float& simulateSpeed);
