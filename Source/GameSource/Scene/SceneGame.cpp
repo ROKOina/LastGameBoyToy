@@ -59,9 +59,9 @@ void SceneGame::Initialize()
         a->PlayAnimation(0, true, false, 0.001f);
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
-        //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
+        std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
     }
 
     //カメラをプレイヤーの子どもにして制御する

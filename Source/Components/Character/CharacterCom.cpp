@@ -30,6 +30,18 @@ void CharacterCom::Update(float elapsedTime)
         MainAttack();
     }
 
+    ////デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
+    //if (CharacterInput::SubAttackButton & GetButtonDown()
+    //    && GamePad::BTN_RIGHT_SHOULDER & GetButton())
+    //{
+    //    SubAttack();
+    //}
+
+    if (CharacterInput::SubAttackButton & GetButtonDown())
+    {
+        SubAttack();
+    }
+
 #else
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {

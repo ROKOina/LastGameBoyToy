@@ -15,6 +15,8 @@ public:
 
     void MainAttack()override;
 
+    void SubAttack()override;
+
     void SubSkill()override;
 
     void UltSkill()override;
@@ -39,10 +41,14 @@ private:
     float firingInterval = 0.3f;
     float firingIntervalTimer = 0.3f;
 
+
+
     bool  launchPermission = true;
+    bool  rapidLaunchPermission = true;
+
 
     bool  remainingBullets = true;
-
+    bool  rapidRemainingBullets = true;
    
     //ƒ_ƒbƒVƒ…
     bool dashFlag = false;

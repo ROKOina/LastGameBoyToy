@@ -176,7 +176,7 @@ void FootIKCom::MoveBone(Legs leg)
             //ƒ^[ƒQƒbƒg•ûŒü‚É‰ñ“]‚³‚¹‚é
             if ((int)leg == (int)Legs::RIGHT)
             {
-                legNodes[(int)LegNodes::RIGHT_WAIST]->
+                //legNodes[(int)LegNodes::RIGHT_WAIST]->
             }
             
         }

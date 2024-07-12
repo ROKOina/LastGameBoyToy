@@ -10,6 +10,7 @@ void NomuraCharacterCom::Start()
     moveStateMachine.AddState(CHARACTER_MOVE_ACTIONS::JUMP, std::make_shared<BaseCharacter_JumpState>(this));
     
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<NomuraCharacter_AttackState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<NomuraCharacter_SubAttackState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<NomuraCharacter_ESkillState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::RELOAD, std::make_shared<NomuraCharacter_ReloadState>(this));
@@ -55,6 +56,11 @@ void NomuraCharacterCom::MainAttack()
 
         firingIntervalTimer = firingInterval;
     }
+}
+
+void NomuraCharacterCom::SubAttack()
+{
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
 }
 
 void NomuraCharacterCom::SubSkill()
