@@ -126,14 +126,14 @@ void __fastcall NetClient::Update()
     ///******       データ受信        ******///
     Receive();
 
+    ///******       データ送信        ******///
+    Send();
+
     //フレーム数を合わせる
     if (!IsSynchroFrame(false))
         return;
 
     nowFrame++;
-
-    ///******       データ送信        ******///
-    Send();
 
     //次のフレームに行くことを許可する
     isNextFrame = true;

@@ -98,14 +98,14 @@ void __fastcall NetServer::Update()
 
 #endif
 
+    ///******       データ送信        ******///
+    Send();
+
     //フレーム数を合わせる
     if (!IsSynchroFrame(true))
         return;
 
     nowFrame++; //フレーム加算
-
-    ///******       データ送信        ******///
-    Send();
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
