@@ -75,13 +75,12 @@ void __fastcall NetServer::Initialize()
     clientDatas.emplace_back(serverData);
 
     //リングバッファ初期化
-    bufRing = std::make_unique<RingBuffer<int>>(10);
+    bufRing = std::make_unique<RingBuffer<int>>(30);
 }
 
 void __fastcall NetServer::Update()
 {
 
-    //完全同期用
     isNextFrame = false;
 
     ///******       データ受信        ******///
@@ -100,7 +99,7 @@ void __fastcall NetServer::Update()
 #endif
 
     //フレーム数を合わせる
-    if (!IsSynchroFrame())
+    if (!IsSynchroFrame(true))
         return;
 
     nowFrame++; //フレーム加算
@@ -190,7 +189,7 @@ void NetServer::Receive()
             {
                 if (c.id == id)continue;
                 saveInt.emplace_back(nowFrame - c.nowFrame);
-    }
+            }
 
             //登録済みなら上書き
             for (auto& nData : clientND)

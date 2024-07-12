@@ -62,16 +62,22 @@ void NetwarkPost::RenderUpdate()
     }
 }
 
-bool NetwarkPost::IsSynchroFrame()
+bool NetwarkPost::IsSynchroFrame(bool isServer)
 {
     for (auto& c : clientDatas)
     {
         if (c.id == id)continue;
 
+        if (!isServer)    //サーバー側は全てのクライアントと比較する
+            if (c.id != 0)continue;
+
         if (nowFrame - c.nowFrame > 3)
         {
             return false;
         }
+
+        if (!isServer)
+            break;
     }
 
     return true;
