@@ -62,3 +62,18 @@ void NetwarkPost::RenderUpdate()
     }
 }
 
+bool NetwarkPost::IsSynchroFrame()
+{
+    for (auto& c : clientDatas)
+    {
+        if (c.id == id)continue;
+
+        if (nowFrame - c.nowFrame > 3)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+

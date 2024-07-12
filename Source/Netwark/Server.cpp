@@ -100,15 +100,8 @@ void __fastcall NetServer::Update()
 #endif
 
     //フレーム数を合わせる
-    for (auto& c : clientDatas)
-    {
-        if (c.id == id)continue;
-
-        if (nowFrame - c.nowFrame > 3)
-        {
-            return;
-        }
-    }
+    if (!IsSynchroFrame())
+        return;
 
     nowFrame++; //フレーム加算
 

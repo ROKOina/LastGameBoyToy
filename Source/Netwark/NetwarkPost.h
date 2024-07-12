@@ -28,6 +28,11 @@ public:
     const bool IsNextFrame() { return isNextFrame; }
 
 protected:
+    //フレーム同期できているか（出来てるならtrue）
+    bool IsSynchroFrame();
+
+protected:
+
     unsigned __int64 sock;
     unsigned __int64 multicastSock;
 
