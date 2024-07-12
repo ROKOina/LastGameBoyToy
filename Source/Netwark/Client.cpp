@@ -87,10 +87,15 @@ void __fastcall NetClient::Initialize()
         std::cout << "error_code:" << WSAGetLastError();
     }
 
-    //// 接続受付のソケットをブロッキング(ノンブロッキング)に設定
-    //u_long val = 1;
-    //ioctlsocket(multicastSock, FIONBIO, &val);
+#ifdef PerfectSyn
 
+#else
+
+    // 接続受付のソケットをブロッキング(ノンブロッキング)に設定
+    u_long val = 1;
+    ioctlsocket(multicastSock, FIONBIO, &val);
+
+#endif
     // マルチキャストグループへ登録処理( join )
     // マルチキャストグループ用構造体ip_mreqを使用する
     // マルチキャストアドレスは「224.10.1.1」を使用
@@ -107,6 +112,9 @@ void __fastcall NetClient::Initialize()
         reinterpret_cast<const char*>(&mr), sizeof(mr));
 
     isNextFrame = true;
+
+    //リングバッファ初期化
+    bufRing = std::make_unique<RingBuffer<int>>(10);
 }
 
 void __fastcall NetClient::Update()
@@ -119,36 +127,30 @@ void __fastcall NetClient::Update()
     inputDown |= gamePad.GetButtonDown();
     inputUp |= gamePad.GetButtonUp();
 
-    //パケットロス回避のため、3フレーム毎に送る
-    //static int cou = 0;
-    //cou++;
-    //if (cou > 3) {
-        //仮でポジションを送る
-        std::vector<NetData> netData;
-        NetData n;
-        n.id = id;
-        n.radi = 1.1f;
-        DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-        n.pos = p;
-        n.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-        n.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-        n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+    //仮でポジションを送る
+    std::vector<NetData> netData;
+    NetData n;
+    n.id = id;
+    n.radi = 1.1f;
+    DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+    n.pos = p;
+    n.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+    n.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+    n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
 
-        n.input = input;
-        n.inputDown = inputDown;
-        n.inputUp = inputUp;
-        input = 0;
-        inputDown = 0;
-        inputUp = 0;
+    n.input = input;
+    n.inputDown = inputDown;
+    n.inputUp = inputUp;
+    input = 0;
+    inputDown = 0;
+    inputUp = 0;
 
-        netData.emplace_back(n);
+    netData.emplace_back(n);
 
-        //送信型に変換
-        std::stringstream ss = NetDataSendCast(netData);
+    //送信型に変換
+    std::stringstream ss = NetDataSendCast(netData);
 
-        sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
-    //    cou = 0;
-    //}
+    sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
 
 
     ///******       データ受信        ******///

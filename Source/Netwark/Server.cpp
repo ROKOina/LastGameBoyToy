@@ -73,17 +73,15 @@ void __fastcall NetServer::Initialize()
     NetData serverData;
     serverData.id = id;
     clientDatas.emplace_back(serverData);
+
+    //リングバッファ初期化
+    bufRing = std::make_unique<RingBuffer<int>>(10);
 }
-static std::vector<int> kari;
-static int kk = 0;
-#include "RingBuffer.h"
-RingBuffer<int>* bufRing = new RingBuffer<int>(8);
+
 void __fastcall NetServer::Update()
 {
 
     isNextFrame = false;
-
-    kk++;
 
     ///******       データ受信        ******///
     char buffer[MAX_BUFFER_NET] = {};
@@ -108,18 +106,6 @@ void __fastcall NetServer::Update()
                 bool isRegisterClient = false;
                 for (auto& client : clientDatas)
                 {
-
-
-                    //if (client.id == 1)
-                    //{
-                    //    kari.emplace_back(kk);
-                    //    kk = 0;
-                    //    if (client.input == 0)
-                    //        int i = 0;
-                    //}
-
-
-
                     if (nData.id == client.id)
                     {
                         isRegisterClient = true;
@@ -142,6 +128,8 @@ void __fastcall NetServer::Update()
         std::cout << "message send:" << buffer << std::endl;
     }
 
+#ifdef PerfectSyn
+
     //入退室終了なら
     if (isEndJoin)
         //登録クライアントの情報が揃った場合に進む
@@ -150,8 +138,9 @@ void __fastcall NetServer::Update()
             return;
         }
 
+#endif
+
     ///******       データ送信        ******///
-    // マルチキャストアドレスを宛先に指定してメッセージを送信、パケットロス回避のため３フレーム毎
 
     //入力情報更新
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -161,10 +150,6 @@ void __fastcall NetServer::Update()
     inputUp |= gamePad.GetButtonUp();
 
 
-    //static int cou = 0;
-    //cou++;
-    //if (cou > 3)
-    //{
     for (auto& client : clientDatas)
     {
         //自分自身(server)のキャラ情報を送る
@@ -189,11 +174,12 @@ void __fastcall NetServer::Update()
 
     sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
         reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
-    //    cou = 0;
-    //}
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
+
+
+#ifdef PerfectSyn
 
     //入退室後処理
     if (isEndJoin)
@@ -206,6 +192,8 @@ void __fastcall NetServer::Update()
         serverData.id = id;
         clientDatas.emplace_back(serverData);
     }
+
+#endif
 }
 
 #include <imgui.h>
@@ -230,7 +218,7 @@ void NetServer::ImGui()
         isEndJoin |= endJoin;
     }
 
-    bool aaa=false;
+    bool aaa = false;
     if (ImGui::Checkbox("Enqueue", &aaa)) {
         static int bb = 0;
         bufRing->Enqueue(bb);
