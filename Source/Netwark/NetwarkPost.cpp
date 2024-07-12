@@ -27,6 +27,8 @@ __fastcall NetwarkPost::~NetwarkPost()
 
     // WSAèIóπ
     WSACleanup();
+
+    bufRing.release();
 }
 
 void NetwarkPost::RenderUpdate()

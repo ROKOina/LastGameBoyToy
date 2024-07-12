@@ -96,6 +96,7 @@ void __fastcall NetClient::Initialize()
     ioctlsocket(multicastSock, FIONBIO, &val);
 
 #endif
+
     // マルチキャストグループへ登録処理( join )
     // マルチキャストグループ用構造体ip_mreqを使用する
     // マルチキャストアドレスは「224.10.1.1」を使用
@@ -118,46 +119,50 @@ void __fastcall NetClient::Initialize()
 }
 
 void __fastcall NetClient::Update()
-{
-    nowFrame++;
-
-    ///******       データ送信        ******///
-    //入力情報更新
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
-    input |= gamePad.GetButton();
-    inputDown |= gamePad.GetButtonDown();
-    inputUp |= gamePad.GetButtonUp();
-
-    //仮でポジションを送る
-    std::vector<NetData> netData;
-    NetData n;
-    n.id = id;
-    n.radi = 1.1f;
-    DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-    n.pos = p;
-    n.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-    n.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-    n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
-
-    n.input = input;
-    n.inputDown = inputDown;
-    n.inputUp = inputUp;
-    input = 0;
-    inputDown = 0;
-    inputUp = 0;
-
-    n.nowFrame = nowFrame;
-
-    netData.emplace_back(n);
-
-    //送信型に変換
-    std::stringstream ss = NetDataSendCast(netData);
-
-    sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
+{    
+    //完全同期用
+    isNextFrame = false;
 
 
     ///******       データ受信        ******///
+    Receive();
+
+    //フレーム数を合わせる
+    for (auto& c : clientDatas)
+    {
+        if (c.id == id)continue;
+
+        if (nowFrame - c.nowFrame > 3)
+        {
+            return;
+        }
+    }
+
+    nowFrame++;
+
+    ///******       データ送信        ******///
+    Send();
+
+    //次のフレームに行くことを許可する
+    isNextFrame = true;
+}
+
+#include <imgui.h>
+void NetClient::ImGui()
+{
+    ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("NetClient", nullptr, ImGuiWindowFlags_None);
+
+    int ID = id;
+    ImGui::InputInt("id", &ID);
+
+    ImGui::End();
+}
+
+void NetClient::Receive()
+{    
     //マルチキャストアドレスからデータ受信
     char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
@@ -197,16 +202,39 @@ void __fastcall NetClient::Update()
     }
 }
 
-#include <imgui.h>
-void NetClient::ImGui()
+void NetClient::Send()
 {
-    ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+    //入力情報更新
+    GamePad& gamePad = Input::Instance().GetGamePad();
 
-    ImGui::Begin("NetClient", nullptr, ImGuiWindowFlags_None);
+    input |= gamePad.GetButton();
+    inputDown |= gamePad.GetButtonDown();
+    inputUp |= gamePad.GetButtonUp();
 
-    int ID = id;
-    ImGui::InputInt("id", &ID);
+    //仮でポジションを送る
+    std::vector<NetData> netData;
+    NetData n;
+    n.id = id;
+    n.radi = 1.1f;
+    DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+    n.pos = p;
+    n.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+    n.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+    n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
 
-    ImGui::End();
+    n.input = input;
+    n.inputDown = inputDown;
+    n.inputUp = inputUp;
+    input = 0;
+    inputDown = 0;
+    inputUp = 0;
+
+    n.nowFrame = nowFrame;
+
+    netData.emplace_back(n);
+
+    //送信型に変換
+    std::stringstream ss = NetDataSendCast(netData);
+
+    sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
 }

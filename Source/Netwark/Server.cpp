@@ -80,61 +80,12 @@ void __fastcall NetServer::Initialize()
 
 void __fastcall NetServer::Update()
 {
-    nowFrame++; //フレーム加算
+
+    //完全同期用
     isNextFrame = false;
 
     ///******       データ受信        ******///
-    char buffer[MAX_BUFFER_NET] = {};
-    struct sockaddr_in fromAddr;
-    int addrSize = sizeof(struct sockaddr_in);
-    //クライアントの数だけ回すようにする
-    for (int i = 0; i < clientDatas.size() + 1; ++i)
-    {
-        int isRecv = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&fromAddr, &addrSize);
-
-        if (isRecv > 0)
-        {
-            std::cout << "msg : " << buffer << std::endl;
-            recvData = buffer;
-
-            //仮
-            std::vector<NetData> clientND = NetDataRecvCast(recvData);
-
-            //フレーム差
-            static std::vector<int> saveInt;
-            for (auto& c : clientND)
-            {
-                if (c.id == id)continue;
-                saveInt.emplace_back(nowFrame - c.nowFrame);
-            }
-
-            //登録済みなら上書き
-            for (auto& nData : clientND)
-            {
-                bool isRegisterClient = false;
-                for (auto& client : clientDatas)
-                {
-                    if (nData.id == client.id)
-                    {
-                        isRegisterClient = true;
-                        client = nData;
-                        break;
-                    }
-                }
-                //登録されていないなら登録
-                if (!isRegisterClient)
-                    clientDatas.emplace_back(nData);
-            }
-
-            //クライアント情報更新
-            RenderUpdate();
-        }
-        else
-        {
-            std::cout << WSAGetLastError << std::endl;
-        }
-        std::cout << "message send:" << buffer << std::endl;
-    }
+    Receive();
 
 #ifdef PerfectSyn
 
@@ -148,41 +99,21 @@ void __fastcall NetServer::Update()
 
 #endif
 
-    ///******       データ送信        ******///
-
-    //入力情報更新
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
-    input |= gamePad.GetButton();
-    inputDown |= gamePad.GetButtonDown();
-    inputUp |= gamePad.GetButtonUp();
-
-    for (auto& client : clientDatas)
+    //フレーム数を合わせる
+    for (auto& c : clientDatas)
     {
-        //自分自身(server)のキャラ情報を送る
-        if (client.id != id)continue;
+        if (c.id == id)continue;
 
-        client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-        client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-        client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-        client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
-
-        client.input = input;
-        client.inputDown = inputDown;
-        client.inputUp = inputUp;
-        input = 0;
-        inputDown = 0;
-        inputUp = 0;
-
-        client.nowFrame = nowFrame;
-
-        break;
+        if (nowFrame - c.nowFrame > 3)
+        {
+            return;
+        }
     }
-    //送信型に変換してデータを全て送る
-    std::stringstream ss = NetDataSendCast(clientDatas);
 
-    sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
-        reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
+    nowFrame++; //フレーム加算
+
+    ///******       データ送信        ******///
+    Send();
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
@@ -240,4 +171,97 @@ void NetServer::ImGui()
 
 
     ImGui::End();
+}
+
+void NetServer::Receive()
+{
+    char buffer[MAX_BUFFER_NET] = {};
+    struct sockaddr_in fromAddr;
+    int addrSize = sizeof(struct sockaddr_in);
+    //クライアントの数だけ回すようにする
+    for (int i = 0; i < clientDatas.size() + 1; ++i)
+    {
+        int isRecv = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&fromAddr, &addrSize);
+
+        if (isRecv > 0)
+        {
+            std::cout << "msg : " << buffer << std::endl;
+            recvData = buffer;
+
+            //仮
+            std::vector<NetData> clientND = NetDataRecvCast(recvData);
+
+            //フレーム差
+            static std::vector<int> saveInt;
+            for (auto& c : clientND)
+            {
+                if (c.id == id)continue;
+                saveInt.emplace_back(nowFrame - c.nowFrame);
+    }
+
+            //登録済みなら上書き
+            for (auto& nData : clientND)
+            {
+                bool isRegisterClient = false;
+                for (auto& client : clientDatas)
+                {
+                    if (nData.id == client.id)
+                    {
+                        isRegisterClient = true;
+                        client = nData;
+                        break;
+                    }
+                }
+                //登録されていないなら登録
+                if (!isRegisterClient)
+                    clientDatas.emplace_back(nData);
+            }
+
+            //クライアント情報更新
+            RenderUpdate();
+}
+        else
+        {
+            std::cout << WSAGetLastError << std::endl;
+        }
+        std::cout << "message send:" << buffer << std::endl;
+    }
+
+}
+
+void NetServer::Send()
+{
+    //入力情報更新
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    input |= gamePad.GetButton();
+    inputDown |= gamePad.GetButtonDown();
+    inputUp |= gamePad.GetButtonUp();
+
+    for (auto& client : clientDatas)
+    {
+        //自分自身(server)のキャラ情報を送る
+        if (client.id != id)continue;
+
+        client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+        client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+        client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+        client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+
+        client.input = input;
+        client.inputDown = inputDown;
+        client.inputUp = inputUp;
+        input = 0;
+        inputDown = 0;
+        inputUp = 0;
+
+        client.nowFrame = nowFrame;
+
+        break;
+    }
+    //送信型に変換してデータを全て送る
+    std::stringstream ss = NetDataSendCast(clientDatas);
+
+    sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
+        reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
 }

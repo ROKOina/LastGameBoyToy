@@ -17,6 +17,11 @@ public:
     void ImGui() override;
 
 private:
+    //óM
+    void Receive();
+    //‘—M
+    void Send();
+
     std::string ipv4Adress;
     struct sockaddr_in addr = {0};
 

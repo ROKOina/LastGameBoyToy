@@ -16,6 +16,11 @@ public:
     void ImGui() override;
 
 private:
+    //óM
+    void Receive();
+    //‘—M
+    void Send();
+
     struct sockaddr_in multicastAddr;
 
 };
