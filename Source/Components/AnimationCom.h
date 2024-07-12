@@ -74,6 +74,11 @@ public:
     float GetAnimationSeconds() const { return currentSeconds; }
     void SetAnimationSeconds(float seconds) { currentSeconds = seconds; }
 
+    // 現在のアニメーション番号取得
+    int GetCurrentAnimationIndex()const { return currentAnimation; }
+    int GetCurrentUpperAnimationIndex()const { return currentUpperAnimation; }
+    int GetCurrentLowerAnimationIndex()const { return currentLowerAnimation; }
+
     //ルートモーションの値を取るノードを検索
     void SetupRootMotion(const char* rootMotionNodeName);
     //ルートモーションの腰を取るノードを検索

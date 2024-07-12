@@ -115,25 +115,26 @@ void __fastcall NetClient::Initialize()
     isNextFrame = true;
 
     //リングバッファ初期化
-    bufRing = std::make_unique<RingBuffer<int>>(30);
+    bufRing = std::make_unique<RingBuffer<int>>(10);
 }
 
 void __fastcall NetClient::Update()
 {    
+    //完全同期用
     isNextFrame = false;
 
 
     ///******       データ受信        ******///
     Receive();
 
-    ///******       データ送信        ******///
-    Send();
-
     //フレーム数を合わせる
-    if (!IsSynchroFrame(false))
+    if (!IsSynchroFrame())
         return;
 
     nowFrame++;
+
+    ///******       データ送信        ******///
+    Send();
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
@@ -170,15 +171,6 @@ void NetClient::Receive()
         std::cout << "multicast msg recieve: " << buffer << std::endl;
 
         clientDatas = NetDataRecvCast(recvData);
-
-        //フレーム差
-        static std::vector<int> saveInt;
-        for (auto& c : clientDatas)
-        {
-            if (c.id == id)continue;
-            saveInt.emplace_back(nowFrame - c.nowFrame);
-        }
-
 
         //最初の交信時
         if (!firstConect)

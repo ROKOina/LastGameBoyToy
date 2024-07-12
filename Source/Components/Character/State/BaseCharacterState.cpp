@@ -89,7 +89,6 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
     moveCom.lock()->AddForce(v);
 
-
     if (moveCom.lock()->OnGround())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);

@@ -29,7 +29,7 @@ public:
 
 protected:
     //フレーム同期できているか（出来てるならtrue）
-    bool IsSynchroFrame(bool isServer);
+    bool IsSynchroFrame();
 
 protected:
 
@@ -47,7 +47,6 @@ protected:
 
     //各クライアントのフレーム保存
     long long nowFrame;
-    long long sendFrame;
     
 
     //ディレイ方式

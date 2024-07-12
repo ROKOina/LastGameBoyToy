@@ -19,7 +19,8 @@ void TestCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
+    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
     //ダッシュ用の速度設定
     float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
@@ -54,6 +55,9 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
+
+    //方向アニメーションを再生
+    charaCom.lock()->DirectionAnimation(animationCom.lock(), moveVec, "Walk_Forward", "Walk_Back", "Walk_Right", "Walk_Left", true, 0.4f);
 }
 
 void TestCharacter_AttackState::Enter()
@@ -75,11 +79,11 @@ void TestCharacter_AttackState::Execute(const float& elapsedTime)
         fireTimer += elapsedTime;
     }
 
-  //ボタンを離したら攻撃やめ
-  if (CharacterInput::MainAttackButton & owner->GetButtonUp())
-  {
-    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-  }
+    //ボタンを離したら攻撃やめ
+    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
 }
 
 void TestCharacter_AttackState::Exit()
@@ -132,7 +136,6 @@ void TestCharacter_AttackState::Fire()
     //弾
     bullet_bulletCom->SetAliveTime(2.0f);
 }
-
 
 void TestCharacter_DashState::Enter()
 {
