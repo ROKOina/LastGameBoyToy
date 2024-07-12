@@ -40,6 +40,10 @@ protected:
     unsigned int inputUp;
     unsigned int inputDown;
 
+    //各クライアントのフレーム保存
+    long long nowFrame;
+    
+
     //ディレイ方式
     std::unique_ptr<RingBuffer<int>> bufRing;
 

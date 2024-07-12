@@ -119,6 +119,8 @@ void __fastcall NetClient::Initialize()
 
 void __fastcall NetClient::Update()
 {
+    nowFrame++;
+
     ///******       データ送信        ******///
     //入力情報更新
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -145,6 +147,8 @@ void __fastcall NetClient::Update()
     inputDown = 0;
     inputUp = 0;
 
+    n.nowFrame = nowFrame;
+
     netData.emplace_back(n);
 
     //送信型に変換
@@ -169,6 +173,21 @@ void __fastcall NetClient::Update()
         std::cout << "multicast msg recieve: " << buffer << std::endl;
 
         clientDatas = NetDataRecvCast(recvData);
+
+        //最初の交信時
+        if (!firstConect)
+        {
+            firstConect = true;
+            //フレームを保存
+            for (auto& c : clientDatas)
+            {
+                if (c.id == 0)
+                {
+                    nowFrame = c.nowFrame;
+                    break;
+                }
+            }
+        }
 
         RenderUpdate();
     }

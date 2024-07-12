@@ -80,7 +80,7 @@ void __fastcall NetServer::Initialize()
 
 void __fastcall NetServer::Update()
 {
-
+    nowFrame++; //フレーム加算
     isNextFrame = false;
 
     ///******       データ受信        ******///
@@ -99,6 +99,14 @@ void __fastcall NetServer::Update()
 
             //仮
             std::vector<NetData> clientND = NetDataRecvCast(recvData);
+
+            //フレーム差
+            static std::vector<int> saveInt;
+            for (auto& c : clientND)
+            {
+                if (c.id == id)continue;
+                saveInt.emplace_back(nowFrame - c.nowFrame);
+            }
 
             //登録済みなら上書き
             for (auto& nData : clientND)
@@ -149,7 +157,6 @@ void __fastcall NetServer::Update()
     inputDown |= gamePad.GetButtonDown();
     inputUp |= gamePad.GetButtonUp();
 
-
     for (auto& client : clientDatas)
     {
         //自分自身(server)のキャラ情報を送る
@@ -166,6 +173,8 @@ void __fastcall NetServer::Update()
         input = 0;
         inputDown = 0;
         inputUp = 0;
+
+        client.nowFrame = nowFrame;
 
         break;
     }
