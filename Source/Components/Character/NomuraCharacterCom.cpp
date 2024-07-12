@@ -60,7 +60,10 @@ void NomuraCharacterCom::MainAttack()
 
 void NomuraCharacterCom::SubAttack()
 {
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
+    if (nowMagazine > 0)
+    {
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
+    }
 }
 
 void NomuraCharacterCom::SubSkill()

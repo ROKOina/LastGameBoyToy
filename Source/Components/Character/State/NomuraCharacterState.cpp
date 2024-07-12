@@ -121,6 +121,7 @@ void NomuraCharacter_SubAttackState::Execute(const float& elapsedTime)
     {
         //UŒ‚ˆ—
         BuletFire(owner->GetGameObject(), 30.0f, attackPower);
+        charaCom.lock()->MinusMagazin();
         fireTimer = 0.0f;
     }
     else
@@ -129,7 +130,7 @@ void NomuraCharacter_SubAttackState::Execute(const float& elapsedTime)
     }
 
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    if (CharacterInput::SubAttackButton & owner->GetButtonUp())
+    if (charaCom.lock()->GetNowMagazin()==0)
     {
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }

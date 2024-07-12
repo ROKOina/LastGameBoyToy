@@ -22,7 +22,17 @@ public:
     void UltSkill()override;
 
     //void SpaceSkill()override;
+
+public:
+    //ゲッターセッター その他
+    int GetNowMagazin() { return nowMagazine; }
+
+    void MinusMagazin() { nowMagazine -= 1; }
+
+public:
+
     void Reload();
+
 private:
 
     void FireInterval(float elapsedTime);
