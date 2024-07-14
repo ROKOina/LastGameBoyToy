@@ -572,7 +572,7 @@ void AnimationCom::AimIK()
         DirectX::XMFLOAT3 up = { 0, 0, 1 };
 
         // ターゲット位置をプレイヤーのローカル空間に変換
-        DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("player")->transform_->GetWorldTransform()));
+        DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform()));
         DirectX::XMStoreFloat3(&target, DirectX::XMVector4Transform(targetVec, playerTransformInv));
 
         // エイムボーンからターゲットへのローカル空間でのベクトルを計算

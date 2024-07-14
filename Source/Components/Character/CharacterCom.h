@@ -76,6 +76,10 @@ public:
   void SetCameraObj(GameObject* obj) { cameraObj = obj; }
   float GetJumpPower() { return jumpPower; }
 
+  void SetHitPoint(float value) { hitPoint = value; }
+  float GetHitPoint() { return hitPoint; }
+  void AddHitPoint(float value) { hitPoint += value; }
+
   // 操作入力情報
   void SetUserInput(const GamePadButton& button) { userInput = button; }
   void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
@@ -100,6 +104,7 @@ protected:
 
   bool useMoveFlag = true;//falseにするとmoveStateを使わない
   float jumpPower = 10.0f;
+  float hitPoint = 100.0f;
 
 private:
   // キャラクターの操作入力情報

@@ -5,6 +5,7 @@
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
 
+#include "Components\System\GameObject.h"
 #include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
 

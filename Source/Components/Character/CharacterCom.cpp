@@ -9,13 +9,23 @@
 void CharacterCom::Update(float elapsedTime)
 {
     //ƒJƒƒ‰‚ªŒü‚¢‚Ä‚¢‚é•ûŒü‚Öù‰ñ
-    DirectX::XMFLOAT3 cameraForward = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront();
+    GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
+    std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
+    DirectX::XMFLOAT3 cameraForward = cameraCom->GetFront();
     cameraForward.y = 0;
     
     GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
     GetGameObject()->transform_->UpdateTransform();
     GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
 
+    //€–Sˆ—
+    if (hitPoint <= 0)
+    {
+        GetGameObject()->GetComponent<MovementCom>()->AddForce({ 0, 10.0f, 0 });
+        return;
+    }
+
+    //ƒXƒe[ƒgˆ—
     attackStateMachine.Update(elapsedTime);
     if(useMoveFlag)moveStateMachine.Update(elapsedTime);
 
@@ -101,7 +111,7 @@ void CharacterCom::CameraControl()
         //‰ñ“]
         DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
         euler.y += moveX * 8.0f;
-        //euler.x += moveY * 5.0f;
+        euler.x += moveY * 5.0f;
 
         //‰ñ“]§Œä
         if (euler.x > 70)

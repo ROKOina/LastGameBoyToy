@@ -32,6 +32,8 @@
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 
+#include "Components\Character\Generate\TestCharacterGenerate.h"
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -46,6 +48,8 @@ void SceneGame::Initialize()
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
+
+    //GameObj testPlayer = GenerateTestCharacter({ 6,3,0 });
 
     //プレイヤー
     {
@@ -62,6 +66,10 @@ void SceneGame::Initialize()
         std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
         //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
+
+        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
+        sphere->SetMyTag(COLLIDER_TAG::Player);
+        sphere->SetRadius(2.0f);
     }
 
     //カメラをプレイヤーの子どもにして制御する
