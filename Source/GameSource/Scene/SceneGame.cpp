@@ -87,7 +87,7 @@ void SceneGame::Initialize()
 
     //テスト
     {
-      //Graphics::Instance().SetWorldSpeed(0.1f);
+        //Graphics::Instance().SetWorldSpeed(0.1f);
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("SciFiGate");
         obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
@@ -114,7 +114,6 @@ void SceneGame::Initialize()
         obj->SetName("test");
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
         r->LoadModel("Data/Ball/b.mdl");
-
     }
 
 #pragma endregion
@@ -163,9 +162,8 @@ void SceneGame::Update(float elapsedTime)
     SetUserInputs();
 
     // ゲームオブジェクトの更新
-    GameObjectManager::Instance().Update(elapsedTime);
-    
     GameObjectManager::Instance().UpdateTransform();
+    GameObjectManager::Instance().Update(elapsedTime);
 
     ////コンポーネントゲット
     //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("zombie");

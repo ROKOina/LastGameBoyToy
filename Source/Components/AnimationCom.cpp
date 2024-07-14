@@ -544,64 +544,70 @@ void AnimationCom::AimIK()
     // ゲームオブジェクトのレンダラーコンポーネントからモデルを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
+    // FPSカメラの前方方向のワールド空間でのターゲット位置を取得
+    DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
+    DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
+
+    // プレイヤーのワールドトランスフォームの逆行列を取得
+    DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("player")->transform_->GetWorldTransform()));
+
     for (size_t neckBoneIndex : AimBone)
     {
         // モデルからエイムボーンノードを取得
         Model::Node& aimbone = model->GetNodes()[neckBoneIndex];
 
-        // フリーカメラの前方方向のワールド空間でのターゲット位置を取得
-        DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
-
         // エイムボーンのワールド空間での位置を取得
         DirectX::XMFLOAT3 aimPosition = { aimbone.worldTransform._41, aimbone.worldTransform._42, aimbone.worldTransform._43 };
 
-        // 正規化されたターゲット方向とエイムボーンからターゲットへの方向の内積を計算
-        DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
-        DirectX::XMVECTOR aimPositionVec = DirectX::XMLoadFloat3(&aimPosition);
-        DirectX::XMVECTOR targetDir = DirectX::XMVector3Normalize(targetVec);
-        DirectX::XMVECTOR aimToTargetDir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(targetVec, aimPositionVec));
-        float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(targetDir, aimToTargetDir));
-
-        // 内積がしきい値を超える場合、処理をスキップ
-        if (abs(dot) > 1.0f)
-        {
-            return;
-        }
-
-        // ローカル空間でのアップベクトルを定義
-        DirectX::XMFLOAT3 up = { 0, 0, 1 };
-
         // ターゲット位置をプレイヤーのローカル空間に変換
-        DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("player")->transform_->GetWorldTransform()));
         DirectX::XMStoreFloat3(&target, DirectX::XMVector4Transform(targetVec, playerTransformInv));
 
         // エイムボーンからターゲットへのローカル空間でのベクトルを計算
         DirectX::XMFLOAT3 toTarget = { target.x - aimPosition.x, target.y - aimPosition.y, target.z - aimPosition.z };
+        DirectX::XMVECTOR toTargetVec = DirectX::XMLoadFloat3(&toTarget);
+
+        // ローカル空間でのアップベクトルを定義
+        DirectX::XMFLOAT3 up = { 0, 0, 1 };
+        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&up);
 
         // エイムボーンのグローバルトランスフォームの逆行列を取得
         DirectX::XMMATRIX inverseGlobalTransform = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&aimbone.worldTransform));
 
         // toTargetとupベクトルをエイムボーンのローカル空間に変換
-        DirectX::XMVECTOR toTargetVec = DirectX::XMLoadFloat3(&toTarget);
-        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&up);
-        DirectX::XMStoreFloat3(&toTarget, DirectX::XMVector3TransformNormal(toTargetVec, inverseGlobalTransform));
-        DirectX::XMStoreFloat3(&up, DirectX::XMVector3TransformNormal(upVec, inverseGlobalTransform));
+        toTargetVec = DirectX::XMVector3TransformNormal(toTargetVec, inverseGlobalTransform);
+        upVec = DirectX::XMVector3TransformNormal(upVec, inverseGlobalTransform);
 
         // 回転軸をupベクトルとtoTargetベクトルの外積として計算
-        DirectX::XMVECTOR axis = DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&up), DirectX::XMLoadFloat3(&toTarget));
+        DirectX::XMVECTOR axis = DirectX::XMVector3Cross(upVec, toTargetVec);
 
         // upベクトルとtoTargetベクトルの間の回転角を計算
-        float angle = DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenVectors(DirectX::XMLoadFloat3(&up), DirectX::XMLoadFloat3(&toTarget)));
+        float angle = DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenVectors(upVec, toTargetVec));
+
+        // 回転角を制限
+        angle = (std::min)(angle, DirectX::XMConvertToRadians(50.0f));
+
+        // カメラの向きによって回転方向を修正
+        DirectX::XMVECTOR cameraForward = DirectX::XMLoadFloat3(&target); // ここでカメラの前方ベクトルを使用
+        if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(cameraForward, targetVec)) < 0)
+        {
+            angle = -angle;
+        }
 
         // 計算した軸と角度で回転行列を作成
         DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationAxis(DirectX::XMVector3Normalize(axis), angle);
 
-        // 回転行列をクォータニオンとして保存
-        DirectX::XMFLOAT4 rotationQuaternion;
-        DirectX::XMStoreFloat4(&rotationQuaternion, DirectX::XMQuaternionRotationMatrix(rotation));
+        // 現在の回転と目標回転を取得
+        DirectX::XMVECTOR currentQuat = DirectX::XMLoadFloat4(&aimbone.rotate);
+        DirectX::XMVECTOR targetQuat = DirectX::XMQuaternionRotationMatrix(rotation);
+
+        // 線形補完の係数を設定（0.0から1.0の間）
+        float lerpFactor = 0.9f; // 補完率を設定
+
+        // クォータニオンの線形補完
+        DirectX::XMVECTOR interpolatedQuat = DirectX::XMQuaternionSlerp(currentQuat, targetQuat, lerpFactor);
 
         // 計算した回転をエイムボーンに適用
-        aimbone.rotate = rotationQuaternion;
+        DirectX::XMStoreFloat4(&aimbone.rotate, interpolatedQuat);
     }
 }
 

@@ -132,38 +132,38 @@ void CharacterCom::CameraControl()
             return;
         }
 
-        std::shared_ptr<CameraCom> camera = cameraObj->GetComponent<CameraCom>();
-
+        //マウスカーソルを取得
         POINT cursor;
         ::GetCursorPos(&cursor);
-
         DirectX::XMFLOAT2 newCursor = DirectX::XMFLOAT2(static_cast<float>(cursor.x), static_cast<float>(cursor.y));
-
         ::SetCursorPos(500, 500);
 
+        //動かす速度(感度)
         float moveX = (newCursor.x - 500) * 0.02f;
         float moveY = (newCursor.y - 500) * 0.02f;
 
-        //std::shared_ptr<GameObject> cameraPost = GameObjectManager::Instance().Find("cameraPostPlayer");
-
-        //回転
+        //Y軸回転(ここでオブジェクトの回転)
         DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
         euler.y += moveX * 8.0f;
-        //euler.x += moveY * 5.0f;
+        GetGameObject()->transform_->SetEulerRotation(euler);
+
+        //X軸回転(カメラのTransformを回転)
+        std::shared_ptr<GameObject> cameraplayer = GameObjectManager::Instance().Find("cameraPostPlayer");
+        DirectX::XMFLOAT3 cameraeuler = cameraplayer->transform_->GetEulerRotation();
+        cameraeuler.x += moveY * 5.0f;
+        cameraplayer->transform_->SetEulerRotation(cameraeuler);
 
         //回転制御
-        if (euler.x > 70)
+        if (cameraeuler.x > 70)
         {
-            euler.x = 70;
-            GetGameObject()->transform_->SetEulerRotation(euler);
+            cameraeuler.x = 70;
+            cameraplayer->transform_->SetEulerRotation(cameraeuler);
         }
-        if (euler.x < -70)
+        if (cameraeuler.x < -70)
         {
-            euler.x = -70;
-            GetGameObject()->transform_->SetEulerRotation(euler);
+            cameraeuler.x = -70;
+            cameraplayer->transform_->SetEulerRotation(cameraeuler);
         }
-
-        GetGameObject()->transform_->SetEulerRotation(euler);
     }
     else
     {
