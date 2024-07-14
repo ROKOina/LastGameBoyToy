@@ -64,10 +64,22 @@ void TestCharacter_AttackState::Enter()
 {
     //ショットアニメーション再生
     animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Shot_Enter"), true, 0.8f);
+
+    //当たり判定有効化
+    std::shared_ptr<CapsuleColliderCom> collision = charaCom.lock()->GetGunFireCollision()->GetComponent<CapsuleColliderCom>();
+    collision->SetEnabled(true);
 }
 
 void TestCharacter_AttackState::Execute(const float& elapsedTime)
 {
+    //銃の判定の向き設定
+    std::shared_ptr<CapsuleColliderCom> collision = charaCom.lock()->GetGunFireCollision()->GetComponent<CapsuleColliderCom>();
+    Model::Node* hand = renderCom.lock()->GetModel()->FindNode("Rb_Hand_R");
+    DirectX::XMFLOAT4X4 fireTrans = hand->worldTransform;
+    DirectX::XMFLOAT3 firePos = Mathf::TransformSamplePosition(fireTrans);
+    collision->SetPosition1(firePos);
+    collision->SetPosition2(owner->GetGameObject()->transform_->GetWorldFront() * firePower);
+
     //弾発射
     if (fireTimer >= fireTime)
     {
@@ -94,47 +106,22 @@ void TestCharacter_AttackState::Exit()
 void TestCharacter_AttackState::ImGui()
 {
     ImGui::DragFloat(u8"発射間隔", &fireTime, 0.001f, 0.0f, 100.0f);
-    ImGui::DragFloat(u8"発射威力", &power, 0.01f, 0.0f, 100.0f);
+    ImGui::DragFloat(u8"発射威力", &firePower, 0.01f, 0.0f, 100.0f);
     ImGui::DragFloat(u8"空気抵抗", &friction1, 0.01f, 0.0f, 100.0f);
     ImGui::DragFloat(u8"地面摩擦", &friction2, 0.01f, 0.0f, 100.0f);
+
+    ImGui::DragFloat(u8"メイン攻撃 攻撃力", &attackPower, 0.01f, 0.0f, 100.0f);
 }
 
 #include "Components/ProjectileCom.h"
 void TestCharacter_AttackState::Fire()
 {
-    //弾丸オブジェクトを生成///////
-
-    GameObj bullet = GameObjectManager::Instance().Create();
-    bullet->SetName("blackball");
-
-    Model::Node* hand = renderCom.lock()->GetModel()->FindNode("Rb_Hand_R");
-    DirectX::XMFLOAT4X4 fireTrans = hand->worldTransform;
-    DirectX::XMFLOAT3 firePos = Mathf::TransformSamplePosition(fireTrans);//owner->GetGameObject()->transform_->GetWorldPosition();
-    //firePos.y = 1.0f;
-    bullet->transform_->SetWorldPosition(firePos);
-
-    std::shared_ptr<RendererCom> bullet_renderCom = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
-    bullet_renderCom->LoadModel("Data/Ball/t.mdl");
-
-    std::shared_ptr<SphereColliderCom> sphereCollider = bullet->AddComponent<SphereColliderCom>();
-    sphereCollider->SetPushBack(false);
-    sphereCollider->SetMyTag(COLLIDER_TAG::PlayerAttack);
-    sphereCollider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyAttack);
-
-    bullet->transform_->SetScale({ 0.1f,0.1f,0.1f });
-
-    ProjectileContext context;
-    context.velocity = owner->GetGameObject()->transform_->GetWorldFront() * power;
-    context.frictionAir = friction1;
-    context.frictionGround = friction2;
-
-    std::shared_ptr<ProjectileCom> bullet_moveCom = bullet->AddComponent<ProjectileCom>(context);
-    std::shared_ptr<BulletCom> bullet_bulletCom = bullet->AddComponent<BulletCom>();
-
-    ///////////////////////////////
-
-    //弾
-    bullet_bulletCom->SetAliveTime(2.0f);
+    std::shared_ptr<CapsuleColliderCom> collision = charaCom.lock()->GetGunFireCollision()->GetComponent<CapsuleColliderCom>();
+    
+    for (HitObj& obj : collision->OnHitGameObject())
+    {
+        obj.gameObject.lock()->GetComponent<CharacterCom>()->AddHitPoint(-attackPower);
+    }
 }
 
 void TestCharacter_DashState::Enter()

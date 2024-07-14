@@ -88,13 +88,17 @@ public:
     void SetCameraObj(GameObject* obj) { cameraObj = obj; }
     float GetJumpPower() { return jumpPower; }
 
-    // 操作入力情報
-    void SetUserInput(const GamePadButton& button) { userInput = button; }
-    void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
-    void SetUserInputUp(const GamePadButton& button) { userInputUp = button; }
-    GamePadButton GetButton() { return userInput; }
-    GamePadButton GetButtonDown() { return userInputDown; }
-    GamePadButton GetButtonUp() { return userInputUp; }
+  void SetHitPoint(float value) { hitPoint = value; }
+  float GetHitPoint() { return hitPoint; }
+  void AddHitPoint(float value) { hitPoint += value; }
+
+  // 操作入力情報
+  void SetUserInput(const GamePadButton& button) { userInput = button; }
+  void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
+  void SetUserInputUp(const GamePadButton& button) { userInputUp = button; }
+  GamePadButton GetButton() { return userInput; }
+  GamePadButton GetButtonDown() { return userInputDown; }
+  GamePadButton GetButtonUp() { return userInputUp; }
 
     void SetLeftStick(const  DirectX::XMFLOAT2& stick) { leftStick = stick; }
     void SetRightStick(const DirectX::XMFLOAT2& stick) { rightStick = stick; }
@@ -110,8 +114,9 @@ protected:
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
     GameObject* cameraObj = nullptr;
 
-    bool useMoveFlag = true;//falseにするとmoveStateを使わない
-    float jumpPower = 10.0f;
+  bool useMoveFlag = true;//falseにするとmoveStateを使わない
+  float jumpPower = 10.0f;
+  float hitPoint = 100.0f;
 
 private:
     // キャラクターの操作入力情報

@@ -549,7 +549,7 @@ void AnimationCom::AimIK()
     DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
 
     // プレイヤーのワールドトランスフォームの逆行列を取得
-    DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("player")->transform_->GetWorldTransform()));
+    DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform()));
 
     for (size_t neckBoneIndex : AimBone)
     {

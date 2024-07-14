@@ -9,13 +9,23 @@
 void CharacterCom::Update(float elapsedTime)
 {
     //カメラが向いている方向へ旋回
-    DirectX::XMFLOAT3 cameraForward = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront();
+    GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
+    std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
+    DirectX::XMFLOAT3 cameraForward = cameraCom->GetFront();
     cameraForward.y = 0;
 
     GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
     GetGameObject()->transform_->UpdateTransform();
     GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
 
+    //死亡処理
+    if (hitPoint <= 0)
+    {
+        GetGameObject()->GetComponent<MovementCom>()->AddForce({ 0, 10.0f, 0 });
+        return;
+    }
+
+    //ステート処理
     attackStateMachine.Update(elapsedTime);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
 
