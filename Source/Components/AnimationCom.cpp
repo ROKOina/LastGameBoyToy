@@ -545,6 +545,10 @@ void AnimationCom::AimIK()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
     // FPSカメラの前方方向のワールド空間でのターゲット位置を取得
+    if (!GameObjectManager::Instance().Find("cameraPostPlayer"))
+    {
+        return;
+    }
     DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
     DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
 
