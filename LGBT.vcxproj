@@ -149,6 +149,7 @@
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\Generate\TestCharacterGenerate.h" />
     <ClInclude Include="Source\Components\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />

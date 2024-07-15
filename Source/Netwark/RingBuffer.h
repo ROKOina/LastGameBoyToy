@@ -22,8 +22,8 @@ public:
     // デストラクタ
     ~RingBuffer()
     {
-        // メモリ解放
-        delete[] arr;
+        //// メモリ解放
+        //delete[] arr;
     }
 
     // データ登録

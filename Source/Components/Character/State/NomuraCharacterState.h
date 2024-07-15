@@ -41,6 +41,27 @@ public:
     
 };
 
+//e˜AË
+class NomuraCharacter_SubAttackState :public NomuraCharacter_BaseState
+{
+public:
+    NomuraCharacter_SubAttackState(CharacterCom* owner) :NomuraCharacter_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapasedTime) override;
+    void ImGui()override;
+
+
+private:
+
+    float attackPower = 0;
+    float maxAttackPower = 1;
+
+    float fireTimer = 0.0f;
+    float fireTime = 0.1f;
+   
+};
+
 //ˆê’Uƒ[ƒŠƒ“ƒO
 class NomuraCharacter_ESkillState :public NomuraCharacter_BaseState
 {

@@ -15,14 +15,29 @@ public:
 
     void MainAttack()override;
 
+    void SubAttack()override;
+
     void SubSkill()override;
 
+    void UltSkill()override;
+
     //void SpaceSkill()override;
+
+public:
+    //ゲッターセッター その他
+    int GetNowMagazin() { return nowMagazine; }
+
+    void MinusMagazin() { nowMagazine -= 1; }
+
+public:
+
+    void Reload();
+
 private:
 
     void FireInterval(float elapsedTime);
 
-    void Reload();
+    void ReloadManagement();
 
     void BulletManagement();
 private:
@@ -36,10 +51,14 @@ private:
     float firingInterval = 0.3f;
     float firingIntervalTimer = 0.3f;
 
+
+
     bool  launchPermission = true;
+    bool  rapidLaunchPermission = true;
+
 
     bool  remainingBullets = true;
-
+    bool  rapidRemainingBullets = true;
    
     //ダッシュ
     bool dashFlag = false;

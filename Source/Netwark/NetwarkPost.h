@@ -2,6 +2,10 @@
 
 #include <string>
 #include "NetData.h"
+#include "RingBuffer.h"
+
+//完全同期設定
+//#define PerfectSyn
 
 class NetwarkPost
 {
@@ -24,6 +28,11 @@ public:
     const bool IsNextFrame() { return isNextFrame; }
 
 protected:
+    //フレーム同期できているか（出来てるならtrue）
+    bool IsSynchroFrame();
+
+protected:
+
     unsigned __int64 sock;
     unsigned __int64 multicastSock;
 
@@ -35,6 +44,13 @@ protected:
     unsigned int input;
     unsigned int inputUp;
     unsigned int inputDown;
+
+    //各クライアントのフレーム保存
+    long long nowFrame;
+    
+
+    //ディレイ方式
+    std::unique_ptr<RingBuffer<int>> bufRing;
 
     //完全同期用
     bool isEndJoin = false; //入室終了フラグ

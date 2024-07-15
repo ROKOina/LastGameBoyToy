@@ -27,6 +27,8 @@ __fastcall NetwarkPost::~NetwarkPost()
 
     // WSAI—¹
     WSACleanup();
+
+    bufRing.release();
 }
 
 void NetwarkPost::RenderUpdate()
@@ -58,5 +60,20 @@ void NetwarkPost::RenderUpdate()
         clientObj->GetComponent<MovementCom>()->SetVelocity(client.velocity);
         clientObj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(client.nonVelocity);
     }
+}
+
+bool NetwarkPost::IsSynchroFrame()
+{
+    for (auto& c : clientDatas)
+    {
+        if (c.id == id)continue;
+
+        if (nowFrame - c.nowFrame > 3)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 

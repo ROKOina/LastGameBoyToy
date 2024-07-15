@@ -80,6 +80,7 @@ public:
     //eq
     //’Ç‰Á
     std::shared_ptr<GameObject> AddChildObject();
+    void AddChildObject(std::shared_ptr<GameObject> obj) { childrenObject_.emplace_back(obj); obj->parentObject_ = shared_from_this(); };
 
     //eæ“¾
     std::shared_ptr<GameObject> GetParent() { return parentObject_.lock(); }

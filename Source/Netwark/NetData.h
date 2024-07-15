@@ -67,6 +67,7 @@ struct NetData
     unsigned int inputDown;
     unsigned int input;
     unsigned int inputUp;
+    long long nowFrame;
     //int pSize;
     //std::vector<int> p;
 };
@@ -78,6 +79,7 @@ static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
     out << h.nonVelocity << " ";
     out << h.rotato << " ";
     out << h.input << " "<< h.inputDown << " "<< h.inputUp << " ";
+    out << h.nowFrame << " ";
     //for (auto& i : h.p)
     //{
 
@@ -92,6 +94,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.nonVelocity;
     in >> h.rotato;
     in >> h.input>> h.inputDown >> h.inputUp;
+    in >> h.nowFrame;
     return in;
 }
 
