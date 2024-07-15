@@ -25,18 +25,24 @@ void FootIKCom::Start()
 
 void FootIKCom::Update(float elassedTime)
 {
-    //ターゲットポジションを取得
-    targetPos[(int)Legs::RIGHT] = GetTargetPosition(Legs::RIGHT);
-    targetPos[(int)Legs::LEFT] = GetTargetPosition(Legs::LEFT);
-
+    //Sleep(10 * 60);
     DebugRenderer* debug = Graphics::Instance().GetDebugRenderer();
-    debug->DrawSphere(targetPos[(int)Legs::LEFT], 0.05f, { 1,0,0,1 });
-    debug->DrawSphere(targetPos[(int)Legs::RIGHT], 0.05f, { 1,0,0,1 });
 
+    // //ターゲットポジションを取得
+     if (GetTargetPosition(Legs::RIGHT, targetPos[(int)Legs::RIGHT])) {
+         MoveBone(Legs::RIGHT);
+     }
+     
+     if (GetTargetPosition(Legs::LEFT, targetPos[(int)Legs::LEFT])) {
+         MoveBone(Legs::LEFT);
+     }
+   
+    debug->DrawSphere(targetPos[(int)Legs::RIGHT], 0.05f, { 1,0,0,1 });
+    debug->DrawSphere(targetPos[(int)Legs::LEFT], 0.05f, { 0,0,1,1 });
 }
 
 //ターゲットポジション取得
-DirectX::XMFLOAT3 FootIKCom::GetTargetPosition(Legs leg)
+bool FootIKCom::GetTargetPosition(Legs leg, DirectX::XMFLOAT3& resultPos)
 {
     //デバック描画
     DebugRenderer* debug = Graphics::Instance().GetDebugRenderer();
@@ -53,7 +59,6 @@ DirectX::XMFLOAT3 FootIKCom::GetTargetPosition(Legs leg)
         //膝から足首のベクトル
         end = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_ANKLE]->worldTransform) - Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_KNEES]->worldTransform);
 
-
     }
     //左足のターゲットポジション
     else
@@ -68,76 +73,94 @@ DirectX::XMFLOAT3 FootIKCom::GetTargetPosition(Legs leg)
     end = Mathf::Normalize(end);
 
     //オフセット分レイを伸ばす
-    float offset = 100;
+    float offset = 0.7f;
     end *= offset;
 
-    DirectX::XMFLOAT3 hitPos;
-    RayCastManager::Instance().RayCast(
+    end += start;
+
+    auto line = Graphics::Instance().GetLineRenderer();
+    if ((int)leg == (int)Legs::RIGHT) {
+        line->AddVertex(start, { 0,1,1,1 });
+        line->AddVertex(end, { 0,1,1,1 });
+    }
+    else {
+        line->AddVertex(start, { 1,1,0,1 });
+        line->AddVertex(end, { 1,1,0,1 });
+    }
+
+    bool result = RayCastManager::Instance().RayCast(
         start,
         end,
-        hitPos);
+        resultPos);
 
-    debug->DrawSphere(start, 0.05f, { 1,0,0,1 });
+    debug->DrawSphere(start, 0.05f, { 1,0,1,1 });
 
+    if (!result) {
+      
+        //targetPos[(int)leg] = end;
+    }
 
     //レイキャストの結果を返す
-    return hitPos;
+    return result;
 }
 
 void FootIKCom::MoveBone(Legs leg)
 {
-    DirectX::XMFLOAT3  waistBone;   //腰
-    DirectX::XMFLOAT3  knessBone;   //膝
-    DirectX::XMFLOAT3  ankletBone;  //足首
+    DirectX::XMFLOAT3  waistBonePosition;   //腰
+    DirectX::XMFLOAT3  knessBonePosition;   //膝
+    DirectX::XMFLOAT3  ankletBonePosition;  //足首
 
     //各ボーンのワールド座標を取得
     //右足
     if ((int)leg == (int)Legs::RIGHT)
     {
-        waistBone = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_WAIST]->worldTransform);
-        knessBone = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_KNEES]->worldTransform);
-        ankletBone = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_ANKLE]->worldTransform);
-       
+        waistBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_WAIST]->worldTransform);
+        knessBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_KNEES]->worldTransform);
+        ankletBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_ANKLE]->worldTransform);
+
     }
     //左足
     else
     {
-        waistBone = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_WAIST]->worldTransform);
-        knessBone = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_KNEES]->worldTransform);
-        ankletBone = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_ANKLE]->worldTransform);
+        waistBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_WAIST]->worldTransform);
+        knessBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_KNEES]->worldTransform);
+        ankletBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_ANKLE]->worldTransform);
     }
-    
+
     //ベクトルを算出
-    DirectX::XMFLOAT3 waistKnessVec  = knessBone  - waistBone;   //腰から膝のベクトル
-    DirectX::XMFLOAT3 knessaAnkleVec = ankletBone - knessBone;  //膝から足首のベクトル
+    DirectX::XMFLOAT3 waistKnessVec = knessBonePosition - waistBonePosition;   //腰から膝のベクトル
+    DirectX::XMFLOAT3 knessAnkleVec = ankletBonePosition - knessBonePosition;  //膝から足首のベクトル
     DirectX::XMFLOAT3 waistTargetVec;  //足からターゲットのベクトル
     if ((int)leg == (int)Legs::RIGHT)
     {
-        waistTargetVec = targetPos[(int)Legs::RIGHT] - waistBone;
+        waistTargetVec = targetPos[(int)Legs::RIGHT] - waistBonePosition;
     }
     else
     {
-        waistTargetVec = targetPos[(int)Legs::LEFT] - waistBone;
+        waistTargetVec = targetPos[(int)Legs::LEFT] - waistBonePosition;
     }
 
     //長さを求める
-    float waistKnessLength  = Mathf::Length(waistKnessVec);
-    float knessaAnkleLength = Mathf::Length(knessaAnkleVec);
+    float waistKnessLength = Mathf::Length(waistKnessVec);
+    float knessAnkleLength = Mathf::Length(knessAnkleVec);
     float waistTargetLength = Mathf::Length(waistTargetVec);
 
+    float addLength = waistKnessLength + knessAnkleLength;
 
-
-    
-    float addLength = waistKnessLength + knessaAnkleLength;
     //先端ボーン座標がターゲット座標に近づくように根本ボーンと中間ボーンを回転制御する
     {
         auto rotateBone = [](Model::Node& bone, const DirectX::XMFLOAT3& Direction1, const DirectX::XMFLOAT3& Direction2)
             {
                 //回転軸算出
-                DirectX::XMFLOAT3 WorldAixs = Mathf::Cross(Direction1,Direction2);
-                if (Mathf::Equal(WorldAixs, {0,0,0})) return;
-                
-       
+                DirectX::XMFLOAT3 WorldAixs = Mathf::Cross(Direction1, Direction2);
+                if (Mathf::Equal(WorldAixs, { 0,0,0 }))
+                {
+                    return;
+                }
+                if (Mathf::Equal(Direction1, Direction2))
+                {
+                    return;
+                }
 
                 //回転軸をローカル空間変換
                 DirectX::XMMATRIX ParentWorldTransform = DirectX::XMLoadFloat4x4(&bone.worldTransform);
@@ -147,41 +170,117 @@ void FootIKCom::MoveBone(Legs leg)
 
                 //角度を算出
                 float dot = Mathf::Dot(Direction1, Direction2);
+                if (dot == 0)
+                {
+                    return;
+                }
                 float angle = acosf(dot);
 
-                //回転クォータニオン算出
-                DirectX::XMVECTOR LocalRotationAxis = DirectX::XMQuaternionRotationAxis(LocalAxis, angle);
-                //ここもしかしたらlocaltransformからrotate取らなきゃいけないかも？
-                DirectX::XMVECTOR LocalRotation = DirectX::XMLoadFloat4(&bone.rotate);
-                LocalRotation = DirectX::XMQuaternionMultiply(LocalRotation, LocalRotationAxis);
-                DirectX::XMStoreFloat4(&bone.rotate, LocalRotation);
+               //回転クォータニオン算出
+               DirectX::XMVECTOR LocalRotationAxis = DirectX::XMQuaternionRotationAxis(LocalAxis, angle);
+               DirectX::XMVECTOR LocalRotation = DirectX::XMLoadFloat4(&bone.rotate);
+               LocalRotation = DirectX::XMQuaternionMultiply(LocalRotation, LocalRotationAxis);
+               DirectX::XMStoreFloat4(&bone.rotate, LocalRotation);
+                
             };
+
         //各ベクトルを単位ベクトル化
         DirectX::XMFLOAT3 waistTargetDirection = Mathf::Normalize(waistTargetVec);
-        DirectX::XMFLOAT3 knessaAnkleDirection = Mathf::Normalize(knessaAnkleVec);
-        DirectX::XMFLOAT3 waistKnessDirection  = Mathf::Normalize(waistKnessVec);
+        DirectX::XMFLOAT3 knessAnkleDirection = Mathf::Normalize(knessAnkleVec);
+        DirectX::XMFLOAT3 waistKnessDirection = Mathf::Normalize(waistKnessVec);
 
         //ターゲット方向に回転させる
+        //腰の回転
         if ((int)leg == (int)Legs::RIGHT)
         {
-            rotateBone(*legNodes[(int)LegNodes::RIGHT_WAIST], waistKnessDirection, waistTargetDirection);
+           rotateBone(*legNodes[(int)LegNodes::RIGHT_WAIST], waistKnessDirection, waistTargetDirection);
         }
         else
         {
-            rotateBone(*legNodes[(int)LegNodes::LEFT_WAIST], waistKnessDirection, waistTargetDirection);
+           rotateBone(*legNodes[(int)LegNodes::LEFT_WAIST], waistKnessDirection, waistTargetDirection);
         }
 
         if (addLength <= waistTargetLength)
         {
-            //ターゲット方向に回転させる
-            if ((int)leg == (int)Legs::RIGHT)
-            {
-                legNodes[(int)LegNodes::RIGHT_WAIST]->
-            }
-            
+           //ターゲット方向に回転させる
+           //膝の回転
+           if ((int)leg == (int)Legs::RIGHT)
+           {
+               UpdateWorldTransform(legNodes[(int)LegNodes::RIGHT_WAIST]);
+               DirectX::XMFLOAT3 kneesTargetVec = targetPos[(int)Legs::RIGHT] - knessBonePosition;
+               DirectX::XMFLOAT3 kneestTargetDirection = Mathf::Normalize(kneesTargetVec);
+               rotateBone(*legNodes[(int)LegNodes::RIGHT_KNEES], knessAnkleDirection, kneestTargetDirection);
+           }
+           else
+           {
+               UpdateWorldTransform(legNodes[(int)LegNodes::LEFT_WAIST]);
+               DirectX::XMFLOAT3 kneesTargetVec = targetPos[(int)Legs::LEFT] - knessBonePosition;
+               DirectX::XMFLOAT3 kneestTargetDirection = Mathf::Normalize(kneesTargetVec);
+               rotateBone(*legNodes[(int)LegNodes::LEFT_KNEES], knessAnkleDirection, kneestTargetDirection);
+           }
+        }
+
+        if (addLength > waistTargetLength)
+        {
+         //三つのベクトルで面積を算出
+         float s = (addLength + waistTargetLength) / 2;
+         s = sqrtf(s * (s - waistKnessLength) * (s - knessAnkleLength) * (s - waistTargetLength));
+         //算出した面積で高さを算出
+         float t = s * 2 / waistKnessLength;
+         //直角三角形の斜辺と高さから角度を算出
+         float root = asinf(t / waistTargetLength);
+        }
+
+        if ((int)leg == (int)Legs::RIGHT)
+        {
+          UpdateWorldTransform(legNodes[(int)LegNodes::RIGHT_WAIST]);
+          knessBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_KNEES]->worldTransform);
+          ankletBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::RIGHT_ANKLE]->worldTransform);
+          
+          DirectX::XMFLOAT3 knessTargetVec = targetPos[(int)Legs::RIGHT] - knessBonePosition;
+          DirectX::XMFLOAT3 knessTargetDirection = Mathf::Normalize(knessTargetVec);
+          knessAnkleVec = ankletBonePosition - knessBonePosition;
+          knessAnkleDirection = Mathf::Normalize(knessAnkleDirection);
+          rotateBone(*legNodes[(int)LegNodes::RIGHT_KNEES], knessAnkleDirection, knessTargetDirection);
+          UpdateWorldTransform(legNodes[(int)LegNodes::RIGHT_ANKLE]);
+
+        }
+        else
+        {
+           UpdateWorldTransform(legNodes[(int)LegNodes::LEFT_WAIST]);
+           knessBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_KNEES]->worldTransform);
+           ankletBonePosition = Float4x4ToFloat3(legNodes[(int)LegNodes::LEFT_ANKLE]->worldTransform);
+           
+           DirectX::XMFLOAT3 knessTargetVec = targetPos[(int)Legs::LEFT] - knessBonePosition;
+           DirectX::XMFLOAT3 knessTargetDirection = Mathf::Normalize(knessTargetVec);
+           knessAnkleVec = ankletBonePosition - knessBonePosition;
+           knessAnkleDirection = Mathf::Normalize(knessAnkleDirection);
+           rotateBone(*legNodes[(int)LegNodes::LEFT_KNEES], knessAnkleDirection, knessTargetDirection);
+           UpdateWorldTransform(legNodes[(int)LegNodes::LEFT_ANKLE]);
         }
     }
 }
+
+void FootIKCom::UpdateWorldTransform(Model::Node* legNode)
+{
+    Model::Node* node = legNode;
+    DirectX::XMMATRIX LocalRotationTransform = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&node->rotate));
+    DirectX::XMMATRIX LocalPositionTransform = DirectX::XMMatrixTranslation(node->translate.x, node->translate.y, node->translate.z);
+    DirectX::XMMATRIX LocalTransform = DirectX::XMMatrixMultiply(LocalRotationTransform, LocalPositionTransform);
+    if (node->parent != nullptr)
+    {
+        DirectX::XMMATRIX ParentWorldTransform = DirectX::XMLoadFloat4x4(&node->parent->worldTransform);
+        DirectX::XMMATRIX WorldTransform = DirectX::XMMatrixMultiply(LocalTransform, ParentWorldTransform);
+        DirectX::XMStoreFloat4x4(&node->worldTransform, WorldTransform);
+    }
+    else
+    {
+        DirectX::XMStoreFloat4x4(&node->worldTransform, LocalTransform);
+    }
+
+}
+
+
 
 void FootIKCom::OnGUI()
 {
