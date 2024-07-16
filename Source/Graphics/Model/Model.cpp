@@ -25,6 +25,7 @@ Model::Model(std::shared_ptr<ModelResource> resource)
         dst.translate = src.translate;
         dst.layer = src.layer;
 
+            
         if (dst.parent != nullptr)
         {
             dst.parent->children.emplace_back(&dst);

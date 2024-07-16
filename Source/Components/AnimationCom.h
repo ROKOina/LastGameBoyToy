@@ -100,6 +100,8 @@ private:
     //ノードを探す
     void SearchAimNode();
 
+    //
+
 private:
 
     //ルートモーション関連
@@ -202,4 +204,9 @@ private:
 
     //AimIK用変数
     std::vector<int>AimBone;
+
+    //上半身アニメーション
+    std::vector<Model::Node>& upperNodes;
+    //下半身アニメーション
+    std::vector<Model::Node>& lowerNodes;
 };
