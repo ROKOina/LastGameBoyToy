@@ -14,10 +14,10 @@ void FootIKCom::Start()
     {
         for (auto& node : GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetNodes())
         {
-            if (node.layer == i + 3)
-            {
-                legNodes[i] = &node;
-            }
+            //if (node.layer == i + 3)
+            //{
+            //    legNodes[i] = &node;
+            //}
         }
     }
     stageModel = GameObjectManager::Instance().Find("stage")->GetComponent<RendererCom>()->GetModel();

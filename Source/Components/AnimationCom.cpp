@@ -12,6 +12,9 @@ void AnimationCom::Start()
 {
     //ノード検索
     SearchAimNode();
+
+    //上半身と下半身仕分け
+    SeparateNode();
 }
 
 // 更新処理
@@ -246,30 +249,34 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
             float rate = (upperCurrentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
 
             int nodeCount = static_cast<int>(model->GetNodes().size());
-            for (int nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+            int upperNodeCount = static_cast<int>(upperNodes.size());
+            for (int nodeIndex = 0,upperNodeIndex = 0; upperNodeIndex < upperNodeCount; ++nodeIndex)
             {
+                if (upperNodes[upperNodeIndex]->nodeIndex != model->GetNodes()[nodeIndex].nodeIndex) {
+                    continue;
+                }
                 //2つのキーフレーム間の補完計算
                 const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
                 const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
 
                 if (blendRate < 1.0f)
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 1 && upperIsPlayAnimation)
+                    if (upperIsPlayAnimation)
                     {
                         //現在の姿勢と次のキーフレームとの姿勢の補完
-                        ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
+                        ComputeSwitchAnimation(key1, blendRate,*upperNodes[upperNodeIndex]);
                     }
                 }
                 //通常の計算
                 else
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 1 && upperIsPlayAnimation)
+                    if (upperIsPlayAnimation)
                     {
-                        ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                        ComputeAnimation(key0, key1, rate, *upperNodes[upperNodeIndex]);
                     }
                 }
+                upperNodeIndex++;
             }
-
             AimIK();
 
             break;
@@ -303,7 +310,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
     }
 }
 
-//上半身別アニメーション更新
+//下半身別アニメーション更新
 void AnimationCom::AnimationLowerUpdate(float elapsedTime)
 {
     //モデルからリソースを取得
@@ -338,32 +345,37 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
             //再生時間とキーフレームの時間から補完率を算出する
             float rate = (lowerCurrentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
 
-            int nodeCount = static_cast<int>(model->GetNodes().size());
-            for (int nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex)
+            int lowerNodeCount = static_cast<int>(lowerNodes.size());
+            for (int nodeIndex = 0, lowerNodeIndex = 0; lowerNodeIndex < lowerNodeCount; ++nodeIndex)
             {
+                if (lowerNodes[lowerNodeIndex]->nodeIndex != model->GetNodes()[nodeIndex].nodeIndex) {
+                    continue;
+                }                
                 //2つのキーフレーム間の補完計算
                 const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
                 const ModelResource::NodeKeyData& key1 = keyframe1.nodeKeys.at(nodeIndex);
 
                 if (blendRate < 1.0f)
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 2 && lowerIsPlayAnimation)
+                    if (lowerIsPlayAnimation)
                     {
                         //現在の姿勢と次のキーフレームとの姿勢の補完
-                        ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
+                        ComputeSwitchAnimation(key1, blendRate,*lowerNodes[lowerNodeIndex]);
                     }
                 }
                 //通常の計算
                 else
                 {
-                    if (model->GetNodes()[nodeIndex].layer == 2 && lowerIsPlayAnimation)
+                    if (lowerIsPlayAnimation)
                     {
-                        ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                        ComputeAnimation(key0, key1, rate,*lowerNodes[lowerNodeIndex]);
                     }
                 }
+                lowerNodeIndex++;
             }
             break;
         }
+      
     }
 
     //時間経過
@@ -378,38 +390,38 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
         return;
     }
 
-    //再生時間が終端時間を超えたら
-    if (lowerCurrentAnimationSeconds >= animation.secondsLength)
-    {
-        if (animationLowerLoopFlag)
-        {
-            //再生時間を巻き戻す
-            lowerCurrentAnimationSeconds -= animation.secondsLength;
-            //ルートモーション用の計算
-            if (rootMotionNodeIndex >= 0)
-            {
-                //零クリアするとHips分の値がずれるのでアニメーションの最初のフレームのHipsの値を入れて初期化
-                cahcheRootMotionTranslation.x = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.x;
-                cahcheRootMotionTranslation.z = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.z;
-
-                //キャッシュルートモーションでクリア
-                model->GetNodes()[rootMotionHipNodeIndex].translate.x = cahcheRootMotionTranslation.x;
-                model->GetNodes()[rootMotionHipNodeIndex].translate.z = cahcheRootMotionTranslation.z;
-            }
-        }
-        else
-        {
-            animationLowerEndFlag = true;
-            lowerComplementFlag = true;
-        }
-    }
-
-    rootMotionFlag = true;
-    if (rootFlag)
-    {
-        //ルートモーション計算
-        ComputeRootMotion();
-    }
+   //再生時間が終端時間を超えたら
+   if (lowerCurrentAnimationSeconds >= animation.secondsLength)
+   {
+       if (animationLowerLoopFlag)
+       {
+           //再生時間を巻き戻す
+           lowerCurrentAnimationSeconds -= animation.secondsLength;
+           //ルートモーション用の計算
+           if (rootMotionNodeIndex >= 0)
+           {
+               //零クリアするとHips分の値がずれるのでアニメーションの最初のフレームのHipsの値を入れて初期化
+               cahcheRootMotionTranslation.x = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.x;
+               cahcheRootMotionTranslation.z = animation.keyframes[0].nodeKeys[rootMotionHipNodeIndex].translate.z;
+  
+               //キャッシュルートモーションでクリア
+               model->GetNodes()[rootMotionHipNodeIndex].translate.x = cahcheRootMotionTranslation.x;
+               model->GetNodes()[rootMotionHipNodeIndex].translate.z = cahcheRootMotionTranslation.z;
+           }
+       }
+       else
+       {
+           animationLowerEndFlag = true;
+           lowerComplementFlag = true;
+       }
+   }
+  
+   rootMotionFlag = true;
+   if (rootFlag)
+   {
+       //ルートモーション計算
+       ComputeRootMotion();
+   }
 }
 
 //上半身アニメーション再生中か？
@@ -630,6 +642,27 @@ void AnimationCom::SearchAimNode()
         }
     }
 }
+
+//上半身と下半身のノードを分ける
+void AnimationCom::SeparateNode()
+{
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    for (auto& node : model->GetNodes())
+    {
+        for (auto& layer : node.layer)
+        {
+            //上半身
+            if (layer == 1) {
+                upperNodes.emplace_back(&node);
+            }
+            //下半身
+            else if (layer == 2) {
+                lowerNodes.emplace_back(&node);
+            }
+        }
+    }
+}
+
 
 //ルートモーションの値を取るノードを検索
 void AnimationCom::SetupRootMotion(const char* rootMotionNodeIndex)

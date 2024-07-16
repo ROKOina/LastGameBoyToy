@@ -100,7 +100,8 @@ private:
     //ノードを探す
     void SearchAimNode();
 
-    //
+    //上半身と下半身のノードを分ける
+    void SeparateNode();
 
 private:
 
@@ -206,7 +207,7 @@ private:
     std::vector<int>AimBone;
 
     //上半身アニメーション
-    std::vector<Model::Node>& upperNodes;
+    std::vector<Model::Node*> upperNodes;
     //下半身アニメーション
-    std::vector<Model::Node>& lowerNodes;
+    std::vector<Model::Node*> lowerNodes;
 };
