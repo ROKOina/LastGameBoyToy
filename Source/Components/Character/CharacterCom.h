@@ -5,6 +5,7 @@
 #include "GameSource\Math\Mathf.h"
 #include "Input\Input.h"
 #include "../AnimationCom.h"
+#include <array>
 
 //プレイヤー用キー入力補助クラス
 class CharacterInput
@@ -91,14 +92,19 @@ public:
   void SetHitPoint(float value) { hitPoint = value; }
   float GetHitPoint() { return hitPoint; }
   void AddHitPoint(float value) { hitPoint += value; }
+  
+  void SetCharaID(int id) { charaID = id; }
+  int GetCharaID() { return charaID; }
+  void AddGiveDamage(int index, float damage) { giveDamage[index] += damage; }
+  std::array<float, 6> GetGiveDamage() { return giveDamage; }
 
-  // 操作入力情報
-  void SetUserInput(const GamePadButton& button) { userInput = button; }
-  void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
-  void SetUserInputUp(const GamePadButton& button) { userInputUp = button; }
-  GamePadButton GetButton() { return userInput; }
-  GamePadButton GetButtonDown() { return userInputDown; }
-  GamePadButton GetButtonUp() { return userInputUp; }
+    // 操作入力情報
+    void SetUserInput(const GamePadButton& button) { userInput = button; }
+    void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
+    void SetUserInputUp(const GamePadButton& button) { userInputUp = button; }
+    GamePadButton GetButton() { return userInput; }
+    GamePadButton GetButtonDown() { return userInputDown; }
+    GamePadButton GetButtonUp() { return userInputUp; }
 
     void SetLeftStick(const  DirectX::XMFLOAT2& stick) { leftStick = stick; }
     void SetRightStick(const DirectX::XMFLOAT2& stick) { rightStick = stick; }
@@ -117,6 +123,9 @@ protected:
   bool useMoveFlag = true;//falseにするとmoveStateを使わない
   float jumpPower = 10.0f;
   float hitPoint = 100.0f;
+
+  int charaID = 0;//どのクライアントがこのキャラを担当するか
+  std::array<float, 6> giveDamage;//敵に与えたダメージ量や味方に与えた回復
 
 private:
     // キャラクターの操作入力情報

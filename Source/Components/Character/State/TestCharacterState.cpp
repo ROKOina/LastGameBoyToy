@@ -119,8 +119,12 @@ void TestCharacter_AttackState::Fire()
     std::shared_ptr<CapsuleColliderCom> collision = charaCom.lock()->GetGunFireCollision()->GetComponent<CapsuleColliderCom>();
     
     for (HitObj& obj : collision->OnHitGameObject())
-    {
+    {   
+        //ダメージ処理
         obj.gameObject.lock()->GetComponent<CharacterCom>()->AddHitPoint(-attackPower);
+
+        //送信用
+        owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID(), -attackPower);
     }
 }
 

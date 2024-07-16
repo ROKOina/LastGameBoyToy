@@ -49,13 +49,12 @@ void SceneDebugGame::Initialize()
     }
 
     //プレイヤー
-    player = GenerateTestCharacter({ 0,3,0 });
-    std::shared_ptr<GameObject> cameraPost = player.lock()->AddChildObject();
+    players[n->GetNetId()] = GenerateTestCharacter({0,3,0});
+    std::shared_ptr<GameObject> cameraPost = players[n->GetNetId()].lock()->AddChildObject();
     cameraPost->SetName("cameraPostPlayer");
     std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
     cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
-
-    player.lock()->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    players[n->GetNetId()].lock()->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
     //サンドバッグ
     GameObj bot = GameObjectManager::Instance().Create();
@@ -204,9 +203,10 @@ void SceneDebugGame::SetPlayerInput()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    if (player.use_count() == 0)return;
+    //このクライアントの担当プレイヤーがいなかったらやめる
+    if (players[n->GetNetId()].use_count() == 0)return;
 
-    std::shared_ptr<CharacterCom> chara = player.lock()->GetComponent<CharacterCom>();
+    std::shared_ptr<CharacterCom> chara = players[n->GetNetId()].lock()->GetComponent<CharacterCom>();
     if (chara.use_count() == 0) return;
 
     // 入力情報をプレイヤーキャラクターに送信
@@ -224,22 +224,9 @@ void SceneDebugGame::SetOnlineInput()
 
     for (auto& client : n->GetNetDatas())
     {
-        ////自分自身の場合は入力情報を更新
-        //if (client.id == n->GetNetId())
-        //{
-        //    GamePad& gamePad = Input::Instance().GetGamePad();
-
-        //    client.input |= gamePad.GetButton();
-        //    client.inputDown |= gamePad.GetButtonDown();
-        //    client.inputUp |= gamePad.GetButtonUp();
-        //}
-
-        std::string name = "Net" + std::to_string(client.id);
-        std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
-
-        if (clientObj)
+        if (players[client.id].use_count() != 0)
         {
-            std::shared_ptr<CharacterCom> chara = clientObj->GetComponent<CharacterCom>();
+            std::shared_ptr<CharacterCom> chara = players[client.id].lock()->GetComponent<CharacterCom>();
 
             if (!chara)continue;
 
@@ -248,8 +235,18 @@ void SceneDebugGame::SetOnlineInput()
             chara->SetUserInputDown(client.inputDown);
             chara->SetUserInputUp(client.inputUp);
 
-            //chara->SetLeftStick(gamePad.GetAxisL());
-            //chara->SetRightStick(gamePad.GetAxisR());
+            //ダメージ情報更新
+            for (int i = 0; i < MAX_PLAYER_NUM; ++i)
+            {
+                if (players[i].use_count() == 0) continue;
+
+                players[i].lock()->GetComponent<CharacterCom>()->AddHitPoint(client.damageData[i]);
+            }
         }
     }
+}
+
+void SceneState_Login::Enter()
+{
+
 }

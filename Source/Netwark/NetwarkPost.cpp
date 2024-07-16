@@ -13,6 +13,8 @@
 #include "Components/MovementCom.h"
 #include "Components/Character/InazawaCharacterCom.h"
 
+#include "GameSource\Scene\SceneDebugGame.h"
+
 __fastcall NetwarkPost::~NetwarkPost()
 {
     // ソケット終了
