@@ -22,6 +22,11 @@ void TestCharacter_MoveState::Enter()
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
+   
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), animationCom.lock()->FindAnimation("Walk_Right"), animationCom.lock()->FindAnimation("Walk_Back"), animationCom.lock()->FindAnimation("Walk_Left"), true, false, 2, 0.5f, 0.0f);
+    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Shot_Enter"),true,0.2f);
+
+
     //ダッシュ用の速度設定
     float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
     maxDashAccele = 10.0f;
