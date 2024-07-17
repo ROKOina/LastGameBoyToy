@@ -22,6 +22,9 @@ void TestCharacter_MoveState::Enter()
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
+   
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), animationCom.lock()->FindAnimation("Walk_Right"), animationCom.lock()->FindAnimation("Walk_Back"), animationCom.lock()->FindAnimation("Walk_Left"), true, false, 2, 0.5f, 0.0f);
+
     //ダッシュ用の速度設定
     float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
     maxDashAccele = 10.0f;
@@ -119,12 +122,8 @@ void TestCharacter_AttackState::Fire()
     std::shared_ptr<CapsuleColliderCom> collision = charaCom.lock()->GetGunFireCollision()->GetComponent<CapsuleColliderCom>();
     
     for (HitObj& obj : collision->OnHitGameObject())
-    {   
-        //ダメージ処理
+    {
         obj.gameObject.lock()->GetComponent<CharacterCom>()->AddHitPoint(-attackPower);
-
-        //送信用
-        owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID(), -attackPower);
     }
 }
 

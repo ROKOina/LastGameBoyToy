@@ -3,7 +3,6 @@
 #include <DirectXMath.h>
 #include <sstream>
 #include <vector>
-#include <array>
 
 #define MAX_BUFFER_NET 65536
 
@@ -41,18 +40,6 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
         return in;
     }
 
-//array
-static std::stringstream& operator>>(std::stringstream& in, std::array<float,6>& h)
-{
-    in >> float(h[0]) >> float(h[1]) >> float(h[2]) >> float(h[3]) >> float(h[4]) >> float(h[5]);
-    return in;
-}
-static std::stringstream& operator<<(std::stringstream& out, const std::array<float, 6>& h)
-{
-    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
-    return out;
-}
-
 ////フレームと入力
 //struct InputFrame
 //{
@@ -81,8 +68,6 @@ struct NetData
     unsigned int input;
     unsigned int inputUp;
     long long nowFrame;
-    std::array<float,6> damageData;//キャラに与えたダメージ
-
     //int pSize;
     //std::vector<int> p;
 };
@@ -95,7 +80,6 @@ static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
     out << h.rotato << " ";
     out << h.input << " "<< h.inputDown << " "<< h.inputUp << " ";
     out << h.nowFrame << " ";
-    out << h.damageData << " ";
     //for (auto& i : h.p)
     //{
 
@@ -111,7 +95,6 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.rotato;
     in >> h.input>> h.inputDown >> h.inputUp;
     in >> h.nowFrame;
-    in >> h.damageData;
     return in;
 }
 

@@ -11,7 +11,6 @@
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 #include "Components/MovementCom.h"
-#include "Components/Character/CharacterCom.h"
 
 NetClient::~NetClient()
 {
@@ -210,13 +209,11 @@ void NetClient::Send()
     NetData n;
     n.id = id;
     n.radi = 1.1f;
-
-    GameObject* player = GameObjectManager::Instance().Find("player").get();
-
-    n.pos = player->transform_->GetWorldPosition();
-    n.velocity = player->GetComponent<MovementCom>()->GetVelocity();
-    n.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-    n.rotato = player->transform_->GetRotation();
+    DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+    n.pos = p;
+    n.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
+    n.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+    n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
 
     n.input = input;
     n.inputDown = inputDown;
@@ -226,8 +223,6 @@ void NetClient::Send()
     inputUp = 0;
 
     n.nowFrame = nowFrame;
-
-    n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
     netData.emplace_back(n);
 

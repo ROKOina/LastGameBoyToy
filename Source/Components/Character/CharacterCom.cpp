@@ -40,6 +40,13 @@ void CharacterCom::Update(float elapsedTime)
         MainAttack();
     }
 
+    ////デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
+    //if (CharacterInput::SubAttackButton & GetButtonDown()
+    //    && GamePad::BTN_RIGHT_SHOULDER & GetButton())
+    //{
+    //    SubAttack();
+    //}
+
     if (CharacterInput::SubAttackButton & GetButtonDown())
     {
         SubAttack();
@@ -80,6 +87,8 @@ void CharacterCom::OnGUI()
 {
     moveStateMachine.ImGui();
     attackStateMachine.ImGui();
+
+    ImGui::InputFloat("StickAngle", &stickAngle);
 }
 
 //方向アニメーション
@@ -96,27 +105,54 @@ void CharacterCom::DirectionAnimation(std::weak_ptr<AnimationCom>animationCom, c
     //{
     //    m_model->m_animation.AnimationSpeed(m_sticklength);
     //}
+    ////前方向
+    //if (m_dotz > 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(forward.c_str()))
+    //{
+    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(forward.c_str()), loop,false, true, blendrate);
+    //}
+    ////後ろ方向
+    //else if (m_dotz < 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(back.c_str()))
+    //{
+    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(back.c_str()), loop, false, true, blendrate);
+    //}
+    ////右方向
+    //else if (m_crossy > 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(right.c_str()))
+    //{
+    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(right.c_str()), loop, false, true, blendrate);
+    //}
+    ////左方向
+    //else if (m_crossy < 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(left.c_str()))
+    //{
+    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(left.c_str()), loop, false, true, blendrate);
+    //}
 
-    //前方向
-    if (m_dotz > 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(forward.c_str()))
+
+    //ステックのアングル生成
+    if (!leftStick.x == 0.0f && !leftStick.y == 0.0f)
     {
-        animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(forward.c_str()), loop, false, blendrate);
+        stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
     }
-    //後ろ方向
-    else if (m_dotz < 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(back.c_str()))
+
+    if (stickAngle < 0.0f)
     {
-        animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(back.c_str()), loop, false, blendrate);
+        stickAngle += 360.0f;
     }
-    //右方向
-    else if (m_crossy > 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(right.c_str()))
-    {
-        animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(right.c_str()), loop, false, blendrate);
-    }
-    //左方向
-    else if (m_crossy < 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(left.c_str()))
-    {
-        animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(left.c_str()), loop, false, blendrate);
-    }
+
+    //       上
+    //       ｌ
+    //       ｌ　
+    // 左ーーｌーー右
+    // 　 　 ｌ　
+    // 　　  ｌ
+    // 　　　下
+    
+
+
+
+
+
+    
+
 }
 
 void CharacterCom::CameraControl()
