@@ -790,11 +790,11 @@ void AnimationCom::AimIK()
         float angle = DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenVectors(upVec, toTargetVec));
 
         // 回転角を制限
-        angle = (std::min)(angle, DirectX::XMConvertToRadians(50.0f));
+        angle = (std::min)(angle, DirectX::XMConvertToRadians(60.0f));
 
         // カメラの向きによって回転方向を修正
         DirectX::XMVECTOR cameraForward = DirectX::XMLoadFloat3(&target); // ここでカメラの前方ベクトルを使用
-        if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(cameraForward, targetVec)) < 0)
+        if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(cameraForward, targetVec)) > 0)
         {
             angle = -angle;
         }
@@ -803,17 +803,10 @@ void AnimationCom::AimIK()
         DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationAxis(DirectX::XMVector3Normalize(axis), angle);
 
         // 現在の回転と目標回転を取得
-        DirectX::XMVECTOR currentQuat = DirectX::XMLoadFloat4(&aimbone.rotate);
         DirectX::XMVECTOR targetQuat = DirectX::XMQuaternionRotationMatrix(rotation);
 
-        // 線形補完の係数を設定（0.0から1.0の間）
-        float lerpFactor = 0.9f; // 補完率を設定
-
-        // クォータニオンの線形補完
-        DirectX::XMVECTOR interpolatedQuat = DirectX::XMQuaternionSlerp(currentQuat, targetQuat, lerpFactor);
-
-        // 計算した回転をエイムボーンに適用
-        DirectX::XMStoreFloat4(&aimbone.rotate, interpolatedQuat);
+        //計算した回転をエイムボーンに適用
+        DirectX::XMStoreFloat(&aimbone.rotate.x, targetQuat);
     }
 }
 
