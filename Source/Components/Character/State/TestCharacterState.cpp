@@ -62,7 +62,9 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     }
 
     //方向アニメーションを再生
-    charaCom.lock()->DirectionAnimation(animationCom.lock(), moveVec, "Walk_Forward", "Walk_Back", "Walk_Right", "Walk_Left", true, 0.4f);
+    DirectX::XMFLOAT3 velocity = Mathf::Normalize(moveCom.lock()->GetVelocity());
+    charaCom.lock()->DirectionAnimation(animationCom.lock(), velocity, "Walk_Forward", "Walk_Back", "Walk_Right", "Walk_Left", true, 0.4f);
+    //charaCom.lock()->DirectionAnimation(animationCom.lock(), moveVec, "Walk_Forward", "Walk_Back", "Walk_Right", "Walk_Left", true, 0.4f);
 }
 
 void TestCharacter_AttackState::Enter()
