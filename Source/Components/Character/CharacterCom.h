@@ -105,6 +105,7 @@ public:
     DirectX::XMFLOAT2 GetLeftStick() { return leftStick; }
     DirectX::XMFLOAT2 GetRightStick() { return rightStick; }
     float GetStickAngle() { return stickAngle; }
+    void  SetStickAngle(const float angle) {  stickAngle = angle; }
 
 private:
     //ƒJƒƒ‰‘€ì

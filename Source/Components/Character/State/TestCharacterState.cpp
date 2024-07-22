@@ -23,10 +23,10 @@ void TestCharacter_MoveState::Enter()
     //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
    
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), animationCom.lock()->FindAnimation("Walk_Right"), animationCom.lock()->FindAnimation("Walk_Back"), animationCom.lock()->FindAnimation("Walk_Left"), true, false, 2, 0.5f, 0.0f);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), animationCom.lock()->FindAnimation("Walk_Back"), animationCom.lock()->FindAnimation("Walk_Right"), animationCom.lock()->FindAnimation("Walk_Left"), true, false, 2, 0.5f, 0.0f);
 
     //ダッシュ用の速度設定
-    float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
+    float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed(); 
     maxDashAccele = 10.0f;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele = 1.0f;
@@ -50,6 +50,7 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     //待機
     if (moveVec == 0)
     {
+        charaCom.lock()->SetStickAngle(0.0f);
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
 
