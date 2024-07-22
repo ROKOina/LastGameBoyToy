@@ -64,6 +64,7 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
 
     //方向アニメーションを再生
     charaCom.lock()->DirectionAnimation(animationCom.lock(), moveVec, "Walk_Forward", "Walk_Back", "Walk_Right", "Walk_Left", true, 0.4f);
+   
 }
 
 void TestCharacter_AttackState::Enter()

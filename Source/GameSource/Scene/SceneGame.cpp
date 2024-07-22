@@ -305,8 +305,7 @@ void SceneGame::SetOnlineInput()
 
             DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
 
-            DirectX::XMFLOAT2 leftS = { 0,0 };
-            //DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
+            DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
 
             chara->SetLeftStick(leftS);
             //chara->SetRightStick(gamePad.GetAxisR());
