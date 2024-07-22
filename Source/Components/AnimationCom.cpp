@@ -481,7 +481,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         const ModelResource::NodeKeyData& key1 = walkBack.nodeKeys.at(nodeIndex);
 
 
-                        walkBlendRate = (stickAngle - 180.0f) / 180.0f;
+                        walkBlendRate = (stickAngle - 180.0f) / 90.0f;
 
                         if (blendRate < 1.0f)
                         {
@@ -507,7 +507,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         const ModelResource::NodeKeyData& key1 = walkRight.nodeKeys.at(nodeIndex);
 
 
-                        walkBlendRate = (stickAngle - 270.0f) / 270.0f;
+                        walkBlendRate = (stickAngle - 270.0f) / 90.0f;
 
                         if (blendRate < 1.0f)
                         {
@@ -629,10 +629,10 @@ void AnimationCom::PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float
 //下半身のみアニメーション再生関数
 void AnimationCom::PlayLowerBodyOnlyAnimation(int lowerAnimaId,int lowerAnimeTwoId,int lowerAnimeThreeId,int lowerAnimeFourId, bool loop, bool rootFlga,int blendType, float animeChangeRate,float animeBlendRate)
 {
-    currentLowerAnimation = lowerAnimaId;
-    lowerAnimationTwoIndex = lowerAnimeTwoId;
-    lowerAnimationThreeIndex = lowerAnimeThreeId;
-    lowerAnimationFourIndex = lowerAnimeFourId;
+    currentLowerAnimation = lowerAnimaId; //前
+    lowerAnimationTwoIndex = lowerAnimeTwoId;//後
+    lowerAnimationThreeIndex = lowerAnimeThreeId;//右
+    lowerAnimationFourIndex = lowerAnimeFourId;//左
     lowerCurrentAnimationSeconds = 0.0f;
     animationLowerLoopFlag = loop;
     animationLowerEndFlag = false;

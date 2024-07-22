@@ -111,6 +111,7 @@ public:
         return false;
     }
     float GetStickAngle() { return stickAngle; }
+    void  SetStickAngle(const float angle) {  stickAngle = angle; }
 
 private:
     //ƒJƒƒ‰‘€ì
