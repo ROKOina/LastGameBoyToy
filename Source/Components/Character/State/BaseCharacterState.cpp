@@ -24,7 +24,8 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //ˆÚ“®
-    if (moveVec != 0)
+    if(owner->IsPushLeftStick())
+    //if (moveVec != 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
@@ -49,7 +50,8 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //‘Ò‹@
-    if (moveVec == 0)
+    if(!owner->IsPushLeftStick())
+    //if (moveVec == 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }

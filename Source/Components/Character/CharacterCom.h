@@ -104,6 +104,12 @@ public:
     void SetRightStick(const DirectX::XMFLOAT2& stick) { rightStick = stick; }
     DirectX::XMFLOAT2 GetLeftStick() { return leftStick; }
     DirectX::XMFLOAT2 GetRightStick() { return rightStick; }
+    bool IsPushLeftStick(){
+        if (leftStick.x * leftStick.x + leftStick.y * leftStick.y > 0)
+            return true;
+
+        return false;
+    }
     float GetStickAngle() { return stickAngle; }
 
 private:
