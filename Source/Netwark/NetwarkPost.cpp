@@ -28,7 +28,6 @@ __fastcall NetwarkPost::~NetwarkPost()
     // WSA終了
     WSACleanup();
 
-    bufRing.release();
 }
 
 void NetwarkPost::RenderUpdate()
@@ -71,7 +70,7 @@ bool NetwarkPost::IsSynchroFrame(bool isServer)
         if (!isServer)    //サーバー側は全てのクライアントと比較する
             if (c.id != 0)continue;
 
-        if (nowFrame - c.nowFrame > 3)
+        if (nowFrame - c.nowFrame > 10)
         {
             return false;
         }

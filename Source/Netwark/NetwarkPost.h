@@ -7,6 +7,12 @@
 //完全同期設定
 //#define PerfectSyn
 
+//簡易フレーム同期
+//#define EasyFrameSyn
+
+//遅延方式
+#define DelaySystem
+
 class NetwarkPost
 {
 public:
@@ -47,14 +53,30 @@ protected:
 
     //各クライアントのフレーム保存
     long long nowFrame;
-    long long sendFrame;
     
 
-    //ディレイ方式
-    std::unique_ptr<RingBuffer<int>> bufRing;
+    //リングバッファ
+    std::unique_ptr<RingBuffer<SaveBuffer>> bufRing;
 
     //完全同期用
     bool isEndJoin = false; //入室終了フラグ
     bool isNextFrame = false;   //次のフレームに行けるか
     int clientNum;
+
+    //ディレイ方式用
+    const float delaySec = 6/60;
+    int delayNow;
+    long long playFrame;    //現在実行フレーム
+
+    //インプット保存（サーバー用）
+    struct SaveInput
+    {
+        int id;
+        std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
+        SaveInput()
+        {
+            inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
+        }
+    };
+    std::vector<SaveInput> saveInput;
 };

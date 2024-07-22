@@ -302,3 +302,13 @@ void SceneGame::SetOnlineInput()
         }
     }
 }
+
+void SceneGame::DelayOnlineInput()
+{
+    if (!n)return;
+
+    //for (auto& netClient : n->GetNetDatas())
+    //{
+    //    netClient.id
+    //}
+}

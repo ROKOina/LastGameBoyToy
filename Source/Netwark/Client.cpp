@@ -15,6 +15,7 @@
 NetClient::~NetClient()
 {
     NetwarkPost::~NetwarkPost();
+    bufRing.release();
 }
 
 
@@ -115,7 +116,7 @@ void __fastcall NetClient::Initialize()
     isNextFrame = true;
 
     //リングバッファ初期化
-    bufRing = std::make_unique<RingBuffer<int>>(30);
+    bufRing = std::make_unique<RingBuffer<SaveBuffer>>(30);
 }
 
 void __fastcall NetClient::Update()
@@ -129,9 +130,15 @@ void __fastcall NetClient::Update()
     ///******       データ送信        ******///
     Send();
 
+
+#ifdef EasyFrameSyn
+
     //フレーム数を合わせる
     if (!IsSynchroFrame(false))
         return;
+
+#endif // EasyFrameSyn
+
 
     nowFrame++;
 
@@ -149,6 +156,15 @@ void NetClient::ImGui()
 
     int ID = id;
     ImGui::InputInt("id", &ID);
+
+    int frame;
+    if (clientDatas.size() >= 2)
+    {
+        frame = clientDatas[0].nowFrame;
+        ImGui::InputInt("nowFram", &frame);
+    }
+    frame = nowFrame;
+    ImGui::InputInt("nowFrame1", &frame);
 
     ImGui::End();
 }
@@ -212,6 +228,14 @@ void NetClient::Send()
     inputDown |= gamePad.GetButtonDown();
     inputUp |= gamePad.GetButtonUp();
 
+    //入力をリングバッファに保存
+    SaveBuffer s;
+    s.frame = nowFrame;
+    s.input = input;
+    s.inputDown = inputDown;
+    s.inputUp = inputUp;
+    bufRing->Enqueue(s);
+
     //仮でポジションを送る
     std::vector<NetData> netData;
     NetData n;
@@ -231,6 +255,9 @@ void NetClient::Send()
     inputUp = 0;
 
     n.nowFrame = nowFrame;
+
+    //開始から６フレームのインプット送る
+    n.saveInputBuf = bufRing->GetHeadFromSize(6);
 
     netData.emplace_back(n);
 

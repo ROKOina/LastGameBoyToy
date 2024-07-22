@@ -40,6 +40,7 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
         return in;
     }
 
+
 ////ƒtƒŒ[ƒ€‚Æ“ü—Í
 //struct InputFrame
 //{
@@ -55,6 +56,34 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
 //};
 //
 
+struct SaveBuffer
+{
+    int frame;
+    unsigned int inputDown;
+    unsigned int input;
+    unsigned int inputUp;
+};
+//SaveBuffer
+static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>& vec)
+{
+    int size = vec.size();
+    out << size << " ";
+    for (auto& v : vec)
+    {
+        out << v.frame << " " << v.input << " " << v.inputDown << " " << v.inputUp << " ";
+    }
+}
+static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& vec)
+{
+    int size;
+    in >> size;
+    for (int i = 0; i < size; ++i)
+    {
+        SaveBuffer s;
+        in >> s.frame >> s.input >> s.inputDown >> s.inputUp;
+        vec.emplace_back(s);
+    }
+}
 
 struct NetData
 {
@@ -68,10 +97,14 @@ struct NetData
     unsigned int input;
     unsigned int inputUp;
     long long nowFrame;
+    long long playDelay;
+
+    std::vector<SaveBuffer> saveInputBuf;
+
     //int pSize;
     //std::vector<int> p;
 };
-static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
+static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
     out << h.id << " " << h.radi << " ";
     out << h.pos << " ";
@@ -80,6 +113,8 @@ static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
     out << h.rotato << " ";
     out << h.input << " "<< h.inputDown << " "<< h.inputUp << " ";
     out << h.nowFrame << " ";
+    VectorSaveBufferOut(out, h.saveInputBuf);
+
     //for (auto& i : h.p)
     //{
 
@@ -95,6 +130,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.rotato;
     in >> h.input>> h.inputDown >> h.inputUp;
     in >> h.nowFrame;
+    VectorSaveBufferIn(in, h.saveInputBuf);
+
     return in;
 }
 
