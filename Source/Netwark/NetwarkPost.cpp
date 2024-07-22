@@ -12,6 +12,7 @@
 #include "Components/AnimationCom.h"
 #include "Components/MovementCom.h"
 #include "Components/Character/InazawaCharacterCom.h"
+#include "Components\Character\TestCharacterCom.h"
 
 __fastcall NetwarkPost::~NetwarkPost()
 {
@@ -50,6 +51,7 @@ void NetwarkPost::RenderUpdate()
             r->LoadModel("Data/OneCoin/robot.mdl");
             std::shared_ptr<AnimationCom> a = clientObj->AddComponent<AnimationCom>();
             std::shared_ptr<MovementCom> m = clientObj->AddComponent<MovementCom>();
+            std::shared_ptr<TestCharacterCom> c = clientObj->AddComponent<TestCharacterCom>();
             //std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
         }
 

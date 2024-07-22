@@ -15,7 +15,7 @@ void BaseCharacter_IdleState::Enter()
 {
     //歩きアニメーション再生開始
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, false, 0.1f);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), 1,1,1,true, false,0, 0.1f,0.0f);
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -88,7 +88,6 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 
     DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
     moveCom.lock()->AddForce(v);
-
 
     if (moveCom.lock()->OnGround())
     {

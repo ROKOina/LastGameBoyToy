@@ -35,7 +35,7 @@ public:
 
 protected:
     //フレーム同期できているか（出来てるならtrue）
-    bool IsSynchroFrame(bool isServer);
+    bool IsSynchroFrame(bool );
 
 protected:
 

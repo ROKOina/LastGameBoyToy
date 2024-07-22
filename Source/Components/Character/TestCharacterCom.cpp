@@ -23,7 +23,7 @@ void TestCharacterCom::Start()
 
 void TestCharacterCom::MainAttack()
 {
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK); 
 }
 
 void TestCharacterCom::SubSkill()

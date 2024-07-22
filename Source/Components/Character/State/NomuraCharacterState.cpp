@@ -77,7 +77,7 @@ void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
     }
     
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
+    if (CharacterInput::MainAttackButton & owner->GetButtonDown())
     {
         //UŒ‚ˆ—
         BuletFire(owner->GetGameObject(), 30.0f, attackPower);
@@ -93,6 +93,58 @@ void NomuraCharacter_AttackState::ImGui()
 }
 
 #pragma endregion
+
+#pragma region SubAttack
+
+void NomuraCharacter_SubAttackState::Enter()
+{
+
+}
+
+void NomuraCharacter_SubAttackState::Execute(const float& elapsedTime)
+{
+
+
+    MoveInputVec(owner->GetGameObject(), 0.5f);
+
+    if (moveCom.lock()->OnGround())
+        JumpInput(owner->GetGameObject());
+
+    //UŒ‚ˆÐ—Í
+    attackPower += elapsedTime;
+    if (attackPower > maxAttackPower) {
+        attackPower = maxAttackPower;
+    }
+
+    //’e”­ŽË
+    if (fireTimer >= fireTime)
+    {
+        //UŒ‚ˆ—
+        BuletFire(owner->GetGameObject(), 30.0f, attackPower);
+        charaCom.lock()->MinusMagazin();
+        fireTimer = 0.0f;
+    }
+    else
+    {
+        fireTimer += elapsedTime;
+    }
+
+    //UŒ‚I—¹ˆ—•UŒ‚ˆ—
+    if (charaCom.lock()->GetNowMagazin()==0)
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
+}
+
+void NomuraCharacter_SubAttackState::ImGui()
+{
+
+}
+
+
+
+#pragma endregion
+
 
 #pragma region ESkill
 

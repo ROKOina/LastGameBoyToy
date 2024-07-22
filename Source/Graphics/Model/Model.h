@@ -22,7 +22,7 @@ public:
         DirectX::XMFLOAT3	translate;
         DirectX::XMFLOAT4X4	localTransform;
         DirectX::XMFLOAT4X4	worldTransform;
-        int layer;
+        std::vector<int>    layer;
 
         std::vector<Node*>	children;
     };
@@ -69,5 +69,5 @@ private:
 private:
     std::shared_ptr<ModelResource>	resource;
     std::vector<Node>				nodes;
-    
+
 };

@@ -1,10 +1,12 @@
 #pragma once
 
+#include <memory>
 #include "Scene.h"
 #include "Graphics\Sprite\Sprite.h"
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
 
+#include "Components\System\GameObject.h"
 #include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
 
@@ -40,4 +42,6 @@ private:
 private:
     std::unique_ptr<NetwarkPost> n;
     Light* mainDirectionalLight = nullptr;
+
+    std::weak_ptr<GameObject> player;
 };

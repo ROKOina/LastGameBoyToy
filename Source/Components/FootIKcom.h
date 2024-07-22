@@ -41,12 +41,15 @@ public:
 
 public:
     //ターゲットポジション取得
-    DirectX::XMFLOAT3 GetTargetPosition(Legs leg);
+    bool GetTargetPosition(Legs leg, DirectX::XMFLOAT3& resultPos);
     //セッター
     void SetLegNodes() {};
 
     //ボーンの計算
     void MoveBone(Legs leg);
+
+    //ボーンのワールド行列更新
+    void UpdateWorldTransform(Model::Node* legNode);
 private:
     //足ノードを保持
     Model::Node* legNodes[(int)LegNodes::Max] = {};
