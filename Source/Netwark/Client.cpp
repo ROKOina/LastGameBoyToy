@@ -128,9 +128,9 @@ void __fastcall NetClient::Update()
     ///******       データ受信        ******///
     Receive();
 
-    //フレーム数を合わせる
-    if (!IsSynchroFrame())
-        return;
+    ////フレーム数を合わせる
+    //if (!IsSynchroFrame())
+    //    return;
 
     nowFrame++;
 
@@ -151,6 +151,13 @@ void NetClient::ImGui()
 
     int ID = id;
     ImGui::InputInt("id", &ID);
+
+    int count = 0;
+    for (auto& c : clientDatas)
+    {
+        ImGui::DragFloat("damageData" + count, &c.damageData[0]);
+        count++;
+    }
 
     ImGui::End();
 }
@@ -211,7 +218,7 @@ void NetClient::Send()
     n.id = id;
     n.radi = 1.1f;
 
-    GameObject* player = GameObjectManager::Instance().Find("player").get();
+    GameObject* player = GameObjectManager::Instance().Find(("player" + std::to_string(id)).c_str()).get();
 
     n.pos = player->transform_->GetWorldPosition();
     n.velocity = player->GetComponent<MovementCom>()->GetVelocity();
@@ -228,6 +235,7 @@ void NetClient::Send()
     n.nowFrame = nowFrame;
 
     n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
+    n.damageData[0] = id;//player->GetComponent<CharacterCom>()->GetGiveDamage();
 
     netData.emplace_back(n);
 

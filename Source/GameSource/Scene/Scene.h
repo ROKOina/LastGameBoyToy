@@ -38,7 +38,7 @@ public:
     //シーンのコンスタントバッファの初期化
     void ConstantBufferInitialize();
 
-protected:
+public:
     //シーンのコンスタントバッファの構造体
     struct SceneConstants
     {

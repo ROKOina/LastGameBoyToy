@@ -61,7 +61,7 @@ void InazawaCharacterCom::OnGUI()
 
 void InazawaCharacterCom::MainAttack()
 {
-    if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
+    if (attackStateMachine.GetCurrentIndex() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
 }
 

@@ -23,6 +23,7 @@ public:
 
 public:
      std::vector<NetData>& GetNetDatas() { return clientDatas; }
+     std::vector<int>& GetNewLoginID() { return newLoginID; }
     const int GetNetId() { return id; }
 
     const bool IsNextFrame() { return isNextFrame; }
@@ -38,6 +39,7 @@ protected:
 
     std::string recvData = "ABC";
     std::vector<NetData> clientDatas;
+    std::vector<int> newLoginID;//V‚µ‚­ƒQ[ƒ€‚É“ü‚Á‚Ä‚«‚½ID
     int id;
 
 

@@ -6,6 +6,14 @@
 //“–‚½‚è”»’è
 #pragma region Collider
 
+void Collider::OnGUI()
+{
+    int mytag = myTag_;
+    int judgetag = judgeTag_;
+    ImGui::InputInt("MyTag", &mytag);
+    ImGui::InputInt("Tag", &judgetag);
+}
+
 //”»’è‘O‚ÌƒNƒŠƒA
 void Collider::ColliderStartClear()
 {
@@ -454,6 +462,8 @@ bool Collider::BoxVsCapsule(std::shared_ptr<Collider> otherSide)
 // GUI•`‰æ
 void SphereColliderCom::OnGUI()
 {
+    Collider::OnGUI();
+
     ImGui::DragFloat("radius", &radius_,0.1f);
     ImGui::DragFloat3("offsetPos", &offsetButtonPos_.x,0.1f);
     if (isPushBack_)
@@ -499,6 +509,8 @@ void BoxColliderCom::DebugRender()
 // GUI•`‰æ
 void CapsuleColliderCom::OnGUI()
 {
+    Collider::OnGUI();
+
     ImGui::DragFloat3("p0", &capsule_.p0.x, 0.1f);
     ImGui::DragFloat3("p1", &capsule_.p1.x, 0.1f);
     ImGui::DragFloat("radius", &capsule_.radius, 0.01f);

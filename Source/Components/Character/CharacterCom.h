@@ -125,7 +125,7 @@ protected:
   float hitPoint = 100.0f;
 
   int charaID = 0;//どのクライアントがこのキャラを担当するか
-  std::array<float, 6> giveDamage;//敵に与えたダメージ量や味方に与えた回復
+  std::array<float, 6> giveDamage = { 1,1,1,1,1,1 };//敵に与えたダメージ量や味方に与えた回復
 
 private:
     // キャラクターの操作入力情報

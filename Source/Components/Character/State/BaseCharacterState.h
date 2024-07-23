@@ -50,16 +50,17 @@ protected:
 class BaseCharacter_IdleState : public BaseCharacter_BaseState
 {
 public:
-    BaseCharacter_IdleState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+    BaseCharacter_IdleState(CharacterCom* owner) : BaseCharacter_BaseState(owner) { name = "Base_IdleState"; }
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void ImGui() override;
 };
 
 class BaseCharacter_MoveState : public BaseCharacter_BaseState
 {
 public:
-    BaseCharacter_MoveState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+    BaseCharacter_MoveState(CharacterCom* owner) : BaseCharacter_BaseState(owner) { name = "Base_MoveState"; }
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;

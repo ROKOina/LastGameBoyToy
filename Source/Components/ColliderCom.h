@@ -73,7 +73,7 @@ public:
     virtual void Update(float elapsedTime) {}
 
     // GUI•`‰æ
-    virtual void OnGUI() {}
+    virtual void OnGUI();
 
     // debug•`‰æ
     virtual void DebugRender() {}

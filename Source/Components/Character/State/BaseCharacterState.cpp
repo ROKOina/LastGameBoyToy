@@ -35,6 +35,10 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     }
 }
 
+void BaseCharacter_IdleState::ImGui()
+{
+}
+
 void BaseCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始

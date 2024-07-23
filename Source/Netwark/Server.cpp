@@ -9,6 +9,7 @@
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 #include "Components/MovementCom.h"
+#include "Components/Character/CharacterCom.h"
 
 __fastcall NetServer::~NetServer()
 {
@@ -99,9 +100,9 @@ void __fastcall NetServer::Update()
 
 #endif
 
-    //フレーム数を合わせる
-    if (!IsSynchroFrame())
-        return;
+    ////フレーム数を合わせる
+    //if (!IsSynchroFrame())
+    //    return;
 
     nowFrame++; //フレーム加算
 
@@ -236,10 +237,11 @@ void NetServer::Send()
         //自分自身(server)のキャラ情報を送る
         if (client.id != id)continue;
 
-        client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-        client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-        client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-        client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+        GameObject* player = GameObjectManager::Instance().Find(("player" + std::to_string(id)).c_str()).get();
+        client.pos = player->transform_->GetWorldPosition();
+        client.velocity = player->GetComponent<MovementCom>()->GetVelocity();
+        client.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+        client.rotato = player->transform_->GetRotation();
 
         client.input = input;
         client.inputDown = inputDown;
@@ -249,6 +251,7 @@ void NetServer::Send()
         inputUp = 0;
 
         client.nowFrame = nowFrame;
+        client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
         break;
     }
