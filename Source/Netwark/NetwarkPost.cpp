@@ -12,8 +12,7 @@
 #include "Components/AnimationCom.h"
 #include "Components/MovementCom.h"
 #include "Components/Character/InazawaCharacterCom.h"
-
-#include "GameSource\Scene\SceneDebugGame.h"
+#include "Components\Character\TestCharacterCom.h"
 
 __fastcall NetwarkPost::~NetwarkPost()
 {
@@ -30,7 +29,6 @@ __fastcall NetwarkPost::~NetwarkPost()
     // WSA終了
     WSACleanup();
 
-    bufRing.release();
 }
 
 void NetwarkPost::RenderUpdate()
@@ -39,14 +37,22 @@ void NetwarkPost::RenderUpdate()
     {
         if (client.id == id)continue;
 
-        std::string name = "player" + std::to_string(client.id);
+        std::string name = "Net" + std::to_string(client.id);
         std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
 
         //初期化
         if (!clientObj)
         {
-            newLoginID.emplace_back(client.id);
-            continue;
+            clientObj = GameObjectManager::Instance().Create();
+            clientObj->SetName(name.c_str());
+            clientObj->transform_->SetWorldPosition({ 0, 0, 0 });
+            clientObj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+            std::shared_ptr<RendererCom> r = clientObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+            r->LoadModel("Data/OneCoin/robot.mdl");
+            std::shared_ptr<AnimationCom> a = clientObj->AddComponent<AnimationCom>();
+            std::shared_ptr<MovementCom> m = clientObj->AddComponent<MovementCom>();
+            std::shared_ptr<TestCharacterCom> c = clientObj->AddComponent<TestCharacterCom>();
+            //std::shared_ptr<InazawaCharacterCom> c = clientObj->AddComponent<InazawaCharacterCom>();
         }
 
         //位置更新
@@ -54,28 +60,25 @@ void NetwarkPost::RenderUpdate()
         clientObj->transform_->SetRotation(client.rotato);
         clientObj->GetComponent<MovementCom>()->SetVelocity(client.velocity);
         clientObj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(client.nonVelocity);
-
-        //ダメージ情報更新
-        for (int i = 0; i < SceneDebugGame::MAX_PLAYER_NUM; ++i)
-        {
-            std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find(("player" + std::to_string(i)).c_str());
-            if (player.use_count() == 0) continue;
-
-            player->GetComponent<CharacterCom>()->AddHitPoint(client.damageData[i]);
-        }
     }
 }
 
-bool NetwarkPost::IsSynchroFrame()
+bool NetwarkPost::IsSynchroFrame(bool isServer)
 {
     for (auto& c : clientDatas)
     {
         if (c.id == id)continue;
 
-        if (nowFrame - c.nowFrame > 3)
+        if (!isServer)    //サーバー側は全てのクライアントと比較する
+            if (c.id != 0)continue;
+
+        if (nowFrame - c.nowFrame > 10)
         {
             return false;
         }
+
+        if (!isServer)
+            break;
     }
 
     return true;

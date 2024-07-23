@@ -22,8 +22,12 @@ void TestCharacter_MoveState::Enter()
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
+   
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), animationCom.lock()->FindAnimation("Walk_Back"), animationCom.lock()->FindAnimation("Walk_Right"), animationCom.lock()->FindAnimation("Walk_Left"), true, false, 2, 0.5f, 0.0f);
+
+
     //ダッシュ用の速度設定
-    float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed();
+    float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed(); 
     maxDashAccele = 10.0f;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele = 1.0f;
@@ -45,8 +49,10 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
     transCom.lock()->Turn(moveVec, 0.1f);
 
     //待機
-    if (moveVec == 0)
+    if(!owner->IsPushLeftStick())
+    //if (moveVec == 0)
     {
+        charaCom.lock()->SetStickAngle(0.0f);
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
 
@@ -58,6 +64,7 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
 
     //方向アニメーションを再生
     charaCom.lock()->DirectionAnimation(animationCom.lock(), moveVec, "Walk_Forward", "Walk_Back", "Walk_Right", "Walk_Left", true, 0.4f);
+   
 }
 
 void TestCharacter_AttackState::Enter()
@@ -78,7 +85,7 @@ void TestCharacter_AttackState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT4X4 fireTrans = hand->worldTransform;
     DirectX::XMFLOAT3 firePos = Mathf::TransformSamplePosition(fireTrans);
     collision->SetPosition1(firePos);
-    collision->SetPosition2(SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>()->GetFront() * firePower);
+    collision->SetPosition2(owner->GetGameObject()->transform_->GetWorldFront() * firePower);
 
     //弾発射
     if (fireTimer >= fireTime)
@@ -119,12 +126,8 @@ void TestCharacter_AttackState::Fire()
     std::shared_ptr<CapsuleColliderCom> collision = charaCom.lock()->GetGunFireCollision()->GetComponent<CapsuleColliderCom>();
     
     for (HitObj& obj : collision->OnHitGameObject())
-    {   
-        //ダメージ処理
+    {
         obj.gameObject.lock()->GetComponent<CharacterCom>()->AddHitPoint(-attackPower);
-
-        //送信用
-        owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID(), -attackPower);
     }
 }
 

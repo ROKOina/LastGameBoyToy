@@ -224,6 +224,18 @@ float4 shadow(float2 texcoord)
     return lerp(float4(1, 1, 1, 1), shadowcolor, shadow_threshold);
 }
 
+// Vignetteの計算
+float vignette(float2 uv)
+{
+    // 中心からの距離を計算
+    float2 distance = uv - float2(0.5, 0.5);
+    float len = length(distance);
+
+    // 距離に基づいてビネット効果を計算
+    float vignette = smoothstep(vignettesize, vignettesize - vignetteintensity, len);
+    return vignette;
+}
+
 float4 main(VS_OUT pin) : SV_TARGET
 {
     //シーンのテクスチャマップをサンプリングしている
@@ -241,6 +253,10 @@ float4 main(VS_OUT pin) : SV_TARGET
     //影
     float4 shadow_color = shadow(pin.texcoord);
     sampled_color.rgb *= shadow_color.rgb;
+
+    //ビネット
+    float vignette_factor = vignette(pin.texcoord);
+    sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette_factor);
 
     //明るさ(画面全体の)とコントラスト(画面の明暗)、色相と彩度
     sampled_color.rgb = hue_saturation(sampled_color.rgb, hue, saturation);

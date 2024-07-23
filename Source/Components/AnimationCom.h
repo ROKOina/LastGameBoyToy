@@ -52,8 +52,8 @@ public:
     void PlayAnimation(int animeID, bool loop, bool rootFlag = false, float blendSeconds = 0.25f);
     //上半身だけアニメーション再生
     void PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds);
-    //下半身だけアニメーション再生
-    void PlayLowerBodyOnlyAnimation(int lowerAnimaId, bool loop, bool rootFlag, float blendSeconds);
+    //下半身だけアニメーション再生 lowerAnimeTwoIdはブレンドアニメーションしないときは‐1を入れといて下さい blendType　 0=ノーマルアニメーション 1=ブレンドアニメーション 2=歩きブレンドアニメーション
+    void PlayLowerBodyOnlyAnimation(int lowerAnimaId,int lowerAnimeTwoId,int lowerAnimeThreeId,int lowerAnimeFourId, bool loop, bool rootFlag,int blendType, float animeChangeRate,float animeBlendRate);
     //再生中か
     bool IsPlayAnimation() const { return currentAnimation >= 0; }
     //上半身アニメーション再生中か？
@@ -93,12 +93,17 @@ private:
     void ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node& node);
     //アニメーション切り替え時の計算
     void ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node);
+    //前回のアニメーションとのブレンド歩き専用
+    void ComputeWalkIdleAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, float blendRate, float walkRate, Model::Node& node);
 
     //AimIK関数
     void AimIK();
 
     //ノードを探す
     void SearchAimNode();
+
+    //上半身と下半身のノードを分ける
+    void SeparateNode();
 
 private:
 
@@ -153,10 +158,18 @@ private:
     //上半身下半身のアニメーション番号
     int                             upperAnimationIndex = 0;
     int                             lowerAnimationIndex = 0;
+    int                             lowerAnimationTwoIndex = 0;
+    int                             lowerAnimationThreeIndex = 0;
+    int                             lowerAnimationFourIndex = 0;
+
     //上半身のノードの番号
     int                             upperID = 2;
     //下半身ノードの番号
     int                             lowerID = 1;
+
+    //下半身のアニメーション制御の番号 0=normal 1=blendAnime 2=walkAnime
+    int                             lowerBlendType = 0;
+
     //上半身下半身アニメーションを変更した時の変数
     float                           upperAnimationChangeRate = 0.0f;
     float                           lowerAnimationChangeRate = 0.0f;
@@ -196,10 +209,19 @@ private:
     //上半身下半身補完フラグ
     bool                            upperComplementFlag = false;
     bool                            lowerComplementFlag = false;
+    //上半身下半身ブレンドアニメーション管理フラグ
+    bool                            upperBlendTypeFlag = false;
+    bool                            lowerBlendTypeFlag = false;
+
 
     //アニメーション更新変数
     int animaType = 0;
 
     //AimIK用変数
     std::vector<int>AimBone;
+
+    //上半身アニメーション
+    std::vector<Model::Node*> upperNodes;
+    //下半身アニメーション
+    std::vector<Model::Node*> lowerNodes;
 };

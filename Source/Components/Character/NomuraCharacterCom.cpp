@@ -48,7 +48,7 @@ void NomuraCharacterCom::OnGUI()
 
 void NomuraCharacterCom::MainAttack()
 {
-    if (attackStateMachine.GetCurrentIndex() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL && launchPermission&& remainingBullets)
+    if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL && launchPermission&& remainingBullets)
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
         launchPermission = false;

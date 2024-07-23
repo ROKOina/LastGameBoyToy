@@ -2,38 +2,13 @@
 
 #include <memory>
 #include "Scene.h"
-#include "GameSource\Sprite\SpriteObject.h"
+#include "Graphics\Sprite\Sprite.h"
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
 
 #include "Components\System\GameObject.h"
-#include "Components\System\StateMachine.h"
 #include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
-#include <array>
-
-//前方宣言
-class SceneDebugGame;
-
-enum class SCENE_ACT
-{
-    LOGIN,
-    CHARACTER_SELECT,
-    BATTLE,
-};
-
-class SceneState : public State<Scene>
-{
-    void Enter() override {};
-    void Execute(const float& elapsedTime) override {};
-    void Exit() override {};
-
-protected:
-    virtual void Update(float elapsedTime) {};
-    virtual void Render(float elapsedTime) {};
-
-    bool isUpdate = true;//trueならUpdate,falseならRenderをExecuteで使う
-};
 
 // ゲームシーン
 class SceneDebugGame :public Scene
@@ -54,14 +29,7 @@ public:
     // 描画処理
     void Render(float elapsedTime)override;
 
-    void LoginInitialize();
-    void LoginUpdate(float elapsedTime);
-    void LoginRender(float elapsedTime);
-
-    void GameInitialize();
-    void GameUpdate(float elapsedTime);
-    void GameRender(float elapsedTime);
-
+private:
     // 各プレイヤーの入力情報を、それぞれのキャラクターに送る
     void SetUserInputs();
 
@@ -71,19 +39,9 @@ public:
     // 他のプレイヤー( オンライン )の入力情報
     void SetOnlineInput();
 
-public:
-    static constexpr int MAX_PLAYER_NUM = 6;
-
-    std::array<std::weak_ptr<GameObject>, MAX_PLAYER_NUM>& GetPlayers() { return players; }
-    std::unique_ptr<NetwarkPost>& GetNetWarkPost() { return n; }
-    Light* GetMainDirectionalLight() { return mainDirectionalLight; }
-
 private:
     std::unique_ptr<NetwarkPost> n;
     Light* mainDirectionalLight = nullptr;
 
-    bool isLogin = true;
-    std::array<std::weak_ptr<GameObject>,MAX_PLAYER_NUM> players;
+    std::weak_ptr<GameObject> player;
 };
-
-

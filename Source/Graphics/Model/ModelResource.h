@@ -24,7 +24,7 @@ public:
         DirectX::XMFLOAT3	scale;
         DirectX::XMFLOAT4	rotate;
         DirectX::XMFLOAT3	translate;
-        int                 layer = 0;
+        std::vector<int>    layer;
 
         template<class Archive>
         void serialize(Archive& archive, int version);

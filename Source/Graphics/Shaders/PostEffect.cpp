@@ -138,6 +138,9 @@ void PostEffect::PostEffectImGui()
         ImGui::SliderFloat("saturation", &m_posteffect->data.saturation, -1.0f, +1.0f);
         ImGui::SliderFloat("bloomextractionthreshold", &m_posteffect->data.bloomextractionthreshold, +0.0f, +10.0f);
         ImGui::SliderFloat("blurconvolutionintensity", &m_posteffect->data.blurconvolutionintensity, +0.0f, +10.0f);
+        ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
+        ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
+        ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
     }
 
     //ƒ‰ƒCƒg‚Ìimgui

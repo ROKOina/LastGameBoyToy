@@ -303,8 +303,22 @@ void SceneGame::SetOnlineInput()
             chara->SetUserInputDown(client.inputDown);
             chara->SetUserInputUp(client.inputUp);
 
-            //chara->SetLeftStick(gamePad.GetAxisL());
+            DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
+
+            DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
+
+            chara->SetLeftStick(leftS);
             //chara->SetRightStick(gamePad.GetAxisR());
         }
     }
+}
+
+void SceneGame::DelayOnlineInput()
+{
+    if (!n)return;
+
+    //for (auto& netClient : n->GetNetDatas())
+    //{
+    //    netClient.id
+    //}
 }

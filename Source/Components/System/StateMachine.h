@@ -22,11 +22,7 @@ public:
 
     void ImGui()
     {
-        //現在のステート
-        std::string stateName = currentState->GetName();
-        ImGui::Text(stateName.c_str());
-
-        //ステートのImGUI
+        // コンポーネント
         for (auto& state : stateList)
         {
             if (state.second->GetName().empty())continue;
@@ -87,7 +83,7 @@ public:
         return false;
     }
 
-    Enum GetCurrentIndex() { return currentIndex; }
+    Enum GetCurrentState() { return currentIndex; }
     Enum GetNextState() { return nextIndex; }
     Enum GetOldState() { return oldIndex; }
 

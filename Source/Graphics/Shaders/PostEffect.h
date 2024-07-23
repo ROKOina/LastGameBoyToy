@@ -45,6 +45,7 @@ private:
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
     {
+        DirectX::XMFLOAT4 vignettecolor = { 1.0f,0.0f,0.0f,1.0f };
         float colorize[3] = { 1, 1, 1 };
         float brightness = 0.0f;
         float contrast = 0.10f;
@@ -53,7 +54,8 @@ private:
         float bloomextractionthreshold = 0.800f;
         float blurconvolutionintensity = 0.200f;
         float exposure = 1.8f;
-        DirectX::XMFLOAT2 dummy = {};
+        float vignettesize = 0.8f;
+        float vignetteintensity = 0.7f;
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
