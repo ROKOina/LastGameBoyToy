@@ -16,6 +16,7 @@
 NetClient::~NetClient()
 {
     NetwarkPost::~NetwarkPost();
+    bufRing.release();
 }
 
 
@@ -116,26 +117,31 @@ void __fastcall NetClient::Initialize()
     isNextFrame = true;
 
     //リングバッファ初期化
-    bufRing = std::make_unique<RingBuffer<int>>(10);
+    bufRing = std::make_unique<RingBuffer<SaveBuffer>>(30);
 }
 
 void __fastcall NetClient::Update()
 {    
-    //完全同期用
     isNextFrame = false;
 
 
     ///******       データ受信        ******///
     Receive();
 
-    ////フレーム数を合わせる
-    //if (!IsSynchroFrame())
-    //    return;
-
-    nowFrame++;
-
     ///******       データ送信        ******///
     Send();
+
+
+#ifdef EasyFrameSyn
+
+    //フレーム数を合わせる
+    if (!IsSynchroFrame(false))
+        return;
+
+#endif // EasyFrameSyn
+
+
+    nowFrame++;
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
@@ -152,12 +158,14 @@ void NetClient::ImGui()
     int ID = id;
     ImGui::InputInt("id", &ID);
 
-    int count = 0;
-    for (auto& c : clientDatas)
+    int frame;
+    if (clientDatas.size() >= 2)
     {
-        ImGui::DragFloat("damageData" + count, &c.damageData[0]);
-        count++;
+        frame = clientDatas[0].nowFrame;
+        ImGui::InputInt("nowFram", &frame);
     }
+    frame = nowFrame;
+    ImGui::InputInt("nowFrame1", &frame);
 
     ImGui::End();
 }
@@ -179,6 +187,15 @@ void NetClient::Receive()
         std::cout << "multicast msg recieve: " << buffer << std::endl;
 
         clientDatas = NetDataRecvCast(recvData);
+
+        //フレーム差
+        static std::vector<int> saveInt;
+        for (auto& c : clientDatas)
+        {
+            if (c.id == id)continue;
+            saveInt.emplace_back(nowFrame - c.nowFrame);
+        }
+
 
         //最初の交信時
         if (!firstConect)
@@ -212,6 +229,14 @@ void NetClient::Send()
     inputDown |= gamePad.GetButtonDown();
     inputUp |= gamePad.GetButtonUp();
 
+    //入力をリングバッファに保存
+    SaveBuffer s;
+    s.frame = nowFrame;
+    s.input = input;
+    s.inputDown = inputDown;
+    s.inputUp = inputUp;
+    bufRing->Enqueue(s);
+
     //仮でポジションを送る
     std::vector<NetData> netData;
     NetData n;
@@ -233,9 +258,10 @@ void NetClient::Send()
     inputUp = 0;
 
     n.nowFrame = nowFrame;
-
     n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
-    n.damageData[0] = id;//player->GetComponent<CharacterCom>()->GetGiveDamage();
+
+    //開始から６フレームのインプット送る
+    n.saveInputBuf = bufRing->GetHeadFromSize(6);
 
     netData.emplace_back(n);
 

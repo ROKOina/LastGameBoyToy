@@ -15,7 +15,7 @@ void BaseCharacter_IdleState::Enter()
 {
     //歩きアニメーション再生開始
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, false, 0.1f);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), 1,1,1,true, false,0, 0.1f,0.0f);
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -24,7 +24,8 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //移動
-    if (moveVec != 0)
+    if(owner->IsPushLeftStick())
+    //if (moveVec != 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
@@ -53,7 +54,8 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //待機
-    if (moveVec == 0)
+    if(!owner->IsPushLeftStick())
+    //if (moveVec == 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }

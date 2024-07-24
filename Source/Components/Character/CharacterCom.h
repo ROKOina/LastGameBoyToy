@@ -92,24 +92,32 @@ public:
   void SetHitPoint(float value) { hitPoint = value; }
   float GetHitPoint() { return hitPoint; }
   void AddHitPoint(float value) { hitPoint += value; }
-  
+
   void SetCharaID(int id) { charaID = id; }
   int GetCharaID() { return charaID; }
   void AddGiveDamage(int index, float damage) { giveDamage[index] += damage; }
   std::array<float, 6> GetGiveDamage() { return giveDamage; }
 
-    // 操作入力情報
-    void SetUserInput(const GamePadButton& button) { userInput = button; }
-    void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
-    void SetUserInputUp(const GamePadButton& button) { userInputUp = button; }
-    GamePadButton GetButton() { return userInput; }
-    GamePadButton GetButtonDown() { return userInputDown; }
-    GamePadButton GetButtonUp() { return userInputUp; }
+  // 操作入力情報
+  void SetUserInput(const GamePadButton& button) { userInput = button; }
+  void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
+  void SetUserInputUp(const GamePadButton& button) { userInputUp = button; }
+  GamePadButton GetButton() { return userInput; }
+  GamePadButton GetButtonDown() { return userInputDown; }
+  GamePadButton GetButtonUp() { return userInputUp; }
 
     void SetLeftStick(const  DirectX::XMFLOAT2& stick) { leftStick = stick; }
     void SetRightStick(const DirectX::XMFLOAT2& stick) { rightStick = stick; }
     DirectX::XMFLOAT2 GetLeftStick() { return leftStick; }
     DirectX::XMFLOAT2 GetRightStick() { return rightStick; }
+    bool IsPushLeftStick(){
+        if (leftStick.x * leftStick.x + leftStick.y * leftStick.y > 0)
+            return true;
+
+        return false;
+    }
+    float GetStickAngle() { return stickAngle; }
+    void  SetStickAngle(const float angle) {  stickAngle = angle; }
 
 private:
     //カメラ操作
@@ -125,7 +133,7 @@ protected:
   float hitPoint = 100.0f;
 
   int charaID = 0;//どのクライアントがこのキャラを担当するか
-  std::array<float, 6> giveDamage = { 1,1,1,1,1,1 };//敵に与えたダメージ量や味方に与えた回復
+  std::array<float, 6> giveDamage = { 0,0,0,0,0,0 };//敵に与えたダメージ量や味方に与えた回復
 
 private:
     // キャラクターの操作入力情報
@@ -134,4 +142,6 @@ private:
     unsigned int userInputUp = 0x00;
     DirectX::XMFLOAT2 leftStick = {};
     DirectX::XMFLOAT2 rightStick = {};
+    //野村追加  
+    float stickAngle = 0.0f;
 };

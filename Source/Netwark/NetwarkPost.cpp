@@ -12,9 +12,8 @@
 #include "Components/AnimationCom.h"
 #include "Components/MovementCom.h"
 #include "Components/Character/InazawaCharacterCom.h"
-
+#include "Components\Character\TestCharacterCom.h"
 #include "GameSource\Scene\SceneDebugGame.h"
-
 __fastcall NetwarkPost::~NetwarkPost()
 {
     // ソケット終了
@@ -30,7 +29,6 @@ __fastcall NetwarkPost::~NetwarkPost()
     // WSA終了
     WSACleanup();
 
-    bufRing.release();
 }
 
 void NetwarkPost::RenderUpdate()
@@ -54,28 +52,25 @@ void NetwarkPost::RenderUpdate()
         clientObj->transform_->SetRotation(client.rotato);
         clientObj->GetComponent<MovementCom>()->SetVelocity(client.velocity);
         clientObj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(client.nonVelocity);
-
-        //ダメージ情報更新
-        for (int i = 0; i < SceneDebugGame::MAX_PLAYER_NUM; ++i)
-        {
-            std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find(("player" + std::to_string(i)).c_str());
-            if (player.use_count() == 0) continue;
-
-            player->GetComponent<CharacterCom>()->AddHitPoint(client.damageData[i]);
-        }
     }
 }
 
-bool NetwarkPost::IsSynchroFrame()
+bool NetwarkPost::IsSynchroFrame(bool isServer)
 {
     for (auto& c : clientDatas)
     {
         if (c.id == id)continue;
 
-        if (nowFrame - c.nowFrame > 3)
+        if (!isServer)    //サーバー側は全てのクライアントと比較する
+            if (c.id != 0)continue;
+
+        if (nowFrame - c.nowFrame > 10)
         {
             return false;
         }
+
+        if (!isServer)
+            break;
     }
 
     return true;

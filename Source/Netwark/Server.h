@@ -18,6 +18,7 @@ public:
 private:
     //óM
     void Receive();
+
     //‘—M
     void Send();
 

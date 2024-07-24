@@ -38,6 +38,8 @@ private:
     // 他のプレイヤー( オンライン )の入力情報
     void SetOnlineInput();
 
+    //ディレイ方式用入力
+    void DelayOnlineInput();
 private:
     std::unique_ptr<NetwarkPost> n;
     Light* mainDirectionalLight = nullptr;

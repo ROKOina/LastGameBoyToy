@@ -292,13 +292,13 @@ void SceneDebugGame::SetOnlineInput()
             chara->SetUserInputDown(client.inputDown);
             chara->SetUserInputUp(client.inputUp);
 
-            ////ダメージ情報更新
-            //for (int i = 0; i < SceneDebugGame::MAX_PLAYER_NUM; ++i)
-            //{
-            //    if (players[i].use_count() == 0) continue;
+            //ダメージ情報更新
+            for (int i = 0; i < SceneDebugGame::MAX_PLAYER_NUM; ++i)
+            {
+                if (players[i].use_count() == 0) continue;
 
-            //    players[i].lock()->GetComponent<CharacterCom>()->AddHitPoint(client.damageData[i]);
-            //}
+                players[i].lock()->GetComponent<CharacterCom>()->AddHitPoint(client.damageData[i]);
+            }
         }
     }
 }

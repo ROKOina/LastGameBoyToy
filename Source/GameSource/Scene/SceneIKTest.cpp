@@ -51,7 +51,7 @@ void SceneIKTest::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-        std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
+        //td::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
     }
 
     //ステージ

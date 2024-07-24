@@ -2,12 +2,11 @@
 
 #include <memory>
 #include "Scene.h"
-#include "GameSource\Sprite\SpriteObject.h"
+#include "Graphics\Sprite\Sprite.h"
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
 
 #include "Components\System\GameObject.h"
-#include "Components\System\StateMachine.h"
 #include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
 #include <array>
@@ -18,22 +17,11 @@ class SceneDebugGame;
 enum class SCENE_ACT
 {
     LOGIN,
-    CHARACTER_SELECT,
+    CHARACTER_SLECT,
     BATTLE,
 };
 
-class SceneState : public State<Scene>
-{
-    void Enter() override {};
-    void Execute(const float& elapsedTime) override {};
-    void Exit() override {};
 
-protected:
-    virtual void Update(float elapsedTime) {};
-    virtual void Render(float elapsedTime) {};
-
-    bool isUpdate = true;//trueならUpdate,falseならRenderをExecuteで使う
-};
 
 // ゲームシーン
 class SceneDebugGame :public Scene
@@ -85,5 +73,3 @@ private:
     bool isLogin = true;
     std::array<std::weak_ptr<GameObject>,MAX_PLAYER_NUM> players;
 };
-
-
