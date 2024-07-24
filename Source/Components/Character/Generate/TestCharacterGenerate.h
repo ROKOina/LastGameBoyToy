@@ -7,7 +7,7 @@
 #include "Components\RendererCom.h"
 #include "Components\ColliderCom.h"
 
-static GameObj GenerateTestCharacter(DirectX::XMFLOAT3 pos)
+static GameObj GenerateTestCharacter(int id, DirectX::XMFLOAT3 pos)
 {
     GameObj obj = GameObjectManager::Instance().Create();
     
