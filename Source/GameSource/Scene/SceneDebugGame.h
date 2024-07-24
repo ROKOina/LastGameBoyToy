@@ -11,6 +11,16 @@
 #include "Graphics/Light/Light.h"
 #include <array>
 
+//前方宣言
+class SceneDebugGame;
+
+enum class SCENE_ACT
+{
+    LOGIN,
+    CHARACTER_SLECT,
+    BATTLE,
+};
+
 
 
 // ゲームシーン
@@ -32,7 +42,14 @@ public:
     // 描画処理
     void Render(float elapsedTime)override;
 
-private:
+    void LoginInitialize();
+    void LoginUpdate(float elapsedTime);
+    void LoginRender(float elapsedTime);
+
+    void GameInitialize();
+    void GameUpdate(float elapsedTime);
+    void GameRender(float elapsedTime);
+
     // 各プレイヤーの入力情報を、それぞれのキャラクターに送る
     void SetUserInputs();
 
@@ -54,5 +71,5 @@ private:
     Light* mainDirectionalLight = nullptr;
 
     bool isLogin = true;
-    std::array<std::weak_ptr<GameObject>,MAX_PLAYER_NUM> players;
+    std::array<std::weak_ptr<GameObject>, MAX_PLAYER_NUM> players;
 };
