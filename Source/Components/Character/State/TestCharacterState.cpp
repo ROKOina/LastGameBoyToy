@@ -127,7 +127,11 @@ void TestCharacter_AttackState::Fire()
     
     for (HitObj& obj : collision->OnHitGameObject())
     {
+        //ダメージ処理
         obj.gameObject.lock()->GetComponent<CharacterCom>()->AddHitPoint(-attackPower);
+
+        //送信用
+        owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID(), -attackPower);
     }
 }
 

@@ -45,7 +45,7 @@ protected:
     std::string recvData = "ABC";
     std::vector<NetData> clientDatas;
     int id;
-
+    std::vector<int> newLoginID;
 
     unsigned int input;
     unsigned int inputUp;

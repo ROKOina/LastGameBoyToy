@@ -9,6 +9,7 @@
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 #include "Components/MovementCom.h"
+#include "Components/Character/CharacterCom.h"
 
 __fastcall NetServer::~NetServer()
 {
@@ -288,10 +289,11 @@ void NetServer::Send()
         //Ž©•ªŽ©g(server)‚ÌƒLƒƒƒ‰î•ñ‚ð‘—‚é
         if (client.id != id)continue;
 
-        client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-        client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-        client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-        client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+        GameObj player = GameObjectManager::Instance().Find("player");
+        client.pos = player->transform_->GetWorldPosition();
+        client.velocity = player->GetComponent<MovementCom>()->GetVelocity();
+        client.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+        client.rotato = player->transform_->GetRotation();
 
         client.input = input;
         client.inputDown = inputDown;
@@ -302,6 +304,7 @@ void NetServer::Send()
 
         client.nowFrame = nowFrame;
         client.playDelay = playFrame;
+        client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
         break;
     }
