@@ -29,6 +29,7 @@ public:
 
 public:
      std::vector<NetData>& GetNetDatas() { return clientDatas; }
+     std::vector<int>& GetNewLoginID() { return newLoginID; }
     const int GetNetId() { return id; }
 
     const bool IsNextFrame() { return isNextFrame; }

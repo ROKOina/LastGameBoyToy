@@ -289,7 +289,7 @@ void NetServer::Send()
         //Ž©•ªŽ©g(server)‚ÌƒLƒƒƒ‰î•ñ‚ð‘—‚é
         if (client.id != id)continue;
 
-        GameObj player = GameObjectManager::Instance().Find("player");
+        GameObj player = GameObjectManager::Instance().Find(("player" + std::to_string(client.id)).c_str());
         client.pos = player->transform_->GetWorldPosition();
         client.velocity = player->GetComponent<MovementCom>()->GetVelocity();
         client.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();

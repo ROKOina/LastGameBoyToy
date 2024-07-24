@@ -37,7 +37,7 @@ void NetwarkPost::RenderUpdate()
     {
         if (client.id == id)continue;
 
-        std::string name = "Net" + std::to_string(client.id);
+        std::string name = "player" + std::to_string(client.id);
         std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
 
         //‰Šú‰»
