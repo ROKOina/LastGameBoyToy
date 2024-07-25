@@ -15283,7 +15283,7 @@ ImGuiDockNode::ImGuiDockNode(ImGuiID id)
     TabBar = NULL;
     SplitAxis = ImGuiAxis_None;
 
-    State = ImGuiDockNodeState_Unknown;
+    PhotonState = ImGuiDockNodeState_Unknown;
     LastBgColor = IM_COL32_WHITE;
     HostWindow = VisibleWindow = NULL;
     CentralNode = OnlyNodeWithWindows = NULL;
@@ -15604,7 +15604,7 @@ static void ImGui::DockNodeUpdateFlagsAndCollapse(ImGuiDockNode* node)
             if (node->Windows.Size == 1 && !node->IsCentralNode())
             {
                 DockNodeHideHostWindow(node);
-                node->State = ImGuiDockNodeState_HostWindowHiddenBecauseSingleWindow;
+                node->PhotonState = ImGuiDockNodeState_HostWindowHiddenBecauseSingleWindow;
                 DockNodeRemoveWindow(node, window, node->ID); // Will delete the node so it'll be invalid on return
                 return;
             }
@@ -15781,7 +15781,7 @@ static void ImGui::DockNodeUpdate(ImGuiDockNode* node)
         }
 
         DockNodeHideHostWindow(node);
-        node->State = ImGuiDockNodeState_HostWindowHiddenBecauseSingleWindow;
+        node->PhotonState = ImGuiDockNodeState_HostWindowHiddenBecauseSingleWindow;
         node->WantCloseAll = false;
         node->WantCloseTabId = 0;
         node->HasCloseButton = node->HasWindowMenuButton = false;
@@ -15812,7 +15812,7 @@ static void ImGui::DockNodeUpdate(ImGuiDockNode* node)
             ref_window = node->Windows[0];
         if (ref_window->AutoFitFramesX > 0 || ref_window->AutoFitFramesY > 0)
         {
-            node->State = ImGuiDockNodeState_HostWindowHiddenBecauseWindowsAreResizing;
+            node->PhotonState = ImGuiDockNodeState_HostWindowHiddenBecauseWindowsAreResizing;
             return;
         }
     }
@@ -17889,7 +17889,7 @@ void ImGui::BeginDocked(ImGuiWindow* window, bool* p_open)
     // FIXME-DOCK: replace ->HostWindow NULL compare with something more explicit (~was initially intended as a first frame test)
     if (node->HostWindow == NULL)
     {
-        if (node->State == ImGuiDockNodeState_HostWindowHiddenBecauseWindowsAreResizing)
+        if (node->PhotonState == ImGuiDockNodeState_HostWindowHiddenBecauseWindowsAreResizing)
             window->DockIsActive = true;
         if (node->Windows.Size > 1)
             DockNodeHideWindowDuringHostWindowCreation(window);
@@ -17900,7 +17900,7 @@ void ImGui::BeginDocked(ImGuiWindow* window, bool* p_open)
     IM_ASSERT(node->HostWindow);
     IM_ASSERT(node->IsLeafNode());
     IM_ASSERT(node->Size.x >= 0.0f && node->Size.y >= 0.0f);
-    node->State = ImGuiDockNodeState_HostWindowVisible;
+    node->PhotonState = ImGuiDockNodeState_HostWindowVisible;
 
     // Undock if we are submitted earlier than the host window
     if (!(node->MergedFlags & ImGuiDockNodeFlags_KeepAliveOnly) && window->BeginOrderWithinContext < node->HostWindow->BeginOrderWithinContext)

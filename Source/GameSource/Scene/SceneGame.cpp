@@ -34,6 +34,8 @@
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
+#include "Netwark/Photon/StdIO_UIListener.h"
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -146,11 +148,18 @@ void SceneGame::Initialize()
     ConstantBufferInitialize();
 
 #pragma endregion
+
+    StdIO_UIListener* l = new StdIO_UIListener();
+    photonNet = std::make_unique<BasicsApplication>(l);
+//BasicsApplication::run(l);
+//delete l;
+
 }
 
 // 終了化
 void SceneGame::Finalize()
 {
+    photonNet->close();
 }
 
 // 更新処理
@@ -165,6 +174,8 @@ void SceneGame::Update(float elapsedTime)
             return;
         }
     }
+
+    photonNet->run();
 
     // キーの入力情報を各キャラクターに割り当てる
     SetUserInputs();
@@ -243,6 +254,8 @@ void SceneGame::Render(float elapsedTime)
 
         ImGui::End();
     }
+
+    photonNet->ImGui();
 }
 
 void SceneGame::SetUserInputs()
