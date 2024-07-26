@@ -61,6 +61,7 @@ private:
 	// events, triggered by certain operations of all players in the same room
 	virtual void joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player);
 	virtual void leaveRoomEventAction(int playerNr, bool isInactive);
+	//データ受信
 	virtual void customEventAction(int playerNr, nByte eventCode, const ExitGames::Common::Object& eventContent);
 
 	// callbacks for operations on PhotonLoadBalancing server
@@ -73,6 +74,7 @@ private:
 	virtual void leaveRoomReturn(int errorCode, const ExitGames::Common::JString& errorString);
 	virtual void joinLobbyReturn(void);
 	virtual void leaveLobbyReturn(void);
+	virtual void onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegions*/, const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegionServers*/);
 
 	void sendData(void);
 

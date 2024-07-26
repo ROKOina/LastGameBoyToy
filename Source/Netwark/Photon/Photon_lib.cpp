@@ -3,6 +3,11 @@
 
 #include "Logger.h"
 
+#include "../NetData.h"
+#include "Components/System/GameObject.h"
+#include "Components/TransformCom.h"
+#include "Components/RendererCom.h"
+
 static const ExitGames::Common::JString appID = L"0d572336-477d-43ad-895e-59f4eeebbca9"; // set your app id here
 static const ExitGames::Common::JString appVersion = L"1.0";
 
@@ -19,7 +24,7 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 	: mState(PhotonState::INITIALIZED)
 	, mpOutputListener(uiListener)
 	//第四引数でクライアントのパラメーター・設定をしている
-	, mLoadBalancingClient(*this, appID, appVersion, ExitGames::LoadBalancing::ClientConstructOptions(0U, true, 0U, true))
+	, mLoadBalancingClient(*this, appID, appVersion, ExitGames::LoadBalancing::ClientConstructOptions(0U, true, ExitGames::LoadBalancing::RegionSelectionMode::SELECT, true))
 	, mSendCount(0)
 	, mReceiveCount(0)
 #ifdef _EG_MS_COMPILER
@@ -38,14 +43,13 @@ void PhotonLib::update(void)
 {
 	switch(mState)
 	{
-		case PhotonState::INITIALIZED:
-			mLoadBalancingClient.connect(ExitGames::LoadBalancing::ConnectOptions().setAuthenticationValues(ExitGames::LoadBalancing::AuthenticationValues().setUserID(ExitGames::Common::JString()+GETTIMEMS())).setUsername(PLAYER_NAME+GETTIMEMS()).setTryUseDatagramEncryption(true));
-			mState = PhotonState::CONNECTING;
-			break;
+	case PhotonState::INITIALIZED:
+		mLoadBalancingClient.connect(ExitGames::LoadBalancing::ConnectOptions().setAuthenticationValues(ExitGames::LoadBalancing::AuthenticationValues().setUserID(ExitGames::Common::JString() + GETTIMEMS())).setUsername(PLAYER_NAME + GETTIMEMS()).setTryUseDatagramEncryption(true));
+		mState = PhotonState::CONNECTING;
+		break;
 		case PhotonState::CONNECTED:
 			mLoadBalancingClient.opJoinOrCreateRoom(gameName);
 			mState = PhotonState::JOINING;
-
 			break;
 		case PhotonState::JOINED:
 			sendData();
@@ -111,13 +115,36 @@ int PhotonLib::GetPlayerNum()
 void PhotonLib::sendData(void)
 {
 	ExitGames::Common::Hashtable event;
-	event.put(static_cast<nByte>(0), ++mSendCount);
+
+	//仮オブジェ
+	GameObj net1 = GameObjectManager::Instance().Find("A");
+	if (!net1)
+	{
+		net1 = GameObjectManager::Instance().Create();
+		net1->SetName("A");
+		std::shared_ptr<RendererCom> r = net1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+		r->LoadModel("Data/OneCoin/robot.mdl");
+		net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+	}
+
+	std::vector<NetData> n;
+	NetData& netD = n.emplace_back(NetData());
+	auto tra = net1->transform_->GetWorldPosition();
+	netD.pos = { tra.x,tra.y,tra.z };
+
+	std::stringstream s = NetDataSendCast(n);
+	event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
+	//event.put(static_cast<nByte>(0), ++mSendCount);
 	// send to ourselves only
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
-	mLoadBalancingClient.opRaiseEvent(true, event, 0);
-	//mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
-	if(mSendCount >= MAX_SENDCOUNT)
-		mState = PhotonState::SENT_DATA;
+	//自分以外全員に送信
+	//mLoadBalancingClient.opRaiseEvent(true, event, 0);
+	//特定のナンバーに送信
+	mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+
+	////MAX_SENDCOUNT以上になるとPhotonState::SENT_DATAへ
+	//if(mSendCount >= MAX_SENDCOUNT)
+	//	mState = PhotonState::SENT_DATA;
 }
 
 void PhotonLib::debugReturn(int /*debugLevel*/, const ExitGames::Common::JString& string)
@@ -177,8 +204,13 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 	case 0:
 		if (eventContent.getValue((nByte)0))
 		{
-			auto p = ((ExitGames::Common::ValueObject<int64>*)(eventContent.getValue((nByte)0)));
-			mReceiveCount = ((ExitGames::Common::ValueObject<int64>*)(eventContent.getValue((nByte)0)))->getDataCopy();
+			ExitGames::Common::JString s;
+			s = ((ExitGames::Common::ValueObject<ExitGames::Common::JString>*)(eventContent.getValue((nByte)0)))->getDataCopy();
+			//mReceiveCount = ((ExitGames::Common::ValueObject<int64>*)(eventContent.getValue((nByte)0)))->getDataCopy();
+			auto ne = NetDataRecvCast(WStringToString(s.cstr()));
+
+			GameObj net1 = GameObjectManager::Instance().Find("A");
+			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
 		}
 		if(mState == PhotonState::SENT_DATA && mReceiveCount >= mSendCount)
 		{
@@ -232,8 +264,15 @@ void PhotonLib::createRoomReturn(int localPlayerNr, const ExitGames::Common::Has
 	mState = PhotonState::JOINED;
 }
 
-void PhotonLib::joinOrCreateRoomReturn(int localPlayerNr, const ExitGames::Common::Hashtable& /*gameProperties*/, const ExitGames::Common::Hashtable& /*playerProperties*/, int errorCode, const ExitGames::Common::JString& errorString)
+void PhotonLib::joinOrCreateRoomReturn(int localPlayerNr, const ExitGames::Common::Hashtable& /*gameProperties*/, const ExitGames::Common::Hashtable& playerProperties, int errorCode, const ExitGames::Common::JString& errorString)
 {
+	ExitGames::Common::Hashtable h;
+	auto a = playerProperties.getKeys();
+	if (a.getSize() > 0)
+	{
+		auto v = h.getValue(playerProperties.getKeys()[0]);
+		int i = 0;
+	}
 	EGLOG(ExitGames::Common::DebugLevel::INFO, L"");
 	if(errorCode)
 	{
@@ -308,4 +347,20 @@ void PhotonLib::leaveLobbyReturn(void)
 {
 	EGLOG(ExitGames::Common::DebugLevel::INFO, L"");
 	mpOutputListener->writeString(L"left lobby");
+}
+
+void PhotonLib::onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& availableRegions, const ExitGames::Common::JVector<ExitGames::Common::JString>& availableRegionServers)
+{
+	std::vector<ExitGames::Common::JString> v;
+	for (int i = 0; i < availableRegions.getSize(); ++i)
+	{
+		v.emplace_back(availableRegions[i]);
+		if (availableRegions[i] == ExitGames::Common::JString(L"jp"))
+		{
+			if (!mLoadBalancingClient.selectRegion(ExitGames::Common::JString(L"jp")))
+			{
+				Logger::Print("onAvailableRegions sippai");
+			}
+		}
+	}
 }
