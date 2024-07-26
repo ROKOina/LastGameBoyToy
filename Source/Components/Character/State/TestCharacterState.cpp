@@ -85,7 +85,9 @@ void TestCharacter_AttackState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT4X4 fireTrans = hand->worldTransform;
     DirectX::XMFLOAT3 firePos = Mathf::TransformSamplePosition(fireTrans);
     collision->SetPosition1(firePos);
-    collision->SetPosition2(owner->GetGameObject()->transform_->GetWorldFront() * firePower);
+
+    GameObj camera = SceneManager::Instance().GetActiveCamera();
+    collision->SetPosition2(camera->transform_->GetWorldPosition() + (camera->transform_->GetWorldFront() * firePower));
 
     //’e”­ŽË
     if (fireTimer >= fireTime)
