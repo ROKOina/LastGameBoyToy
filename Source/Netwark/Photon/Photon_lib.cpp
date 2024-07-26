@@ -229,13 +229,14 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			}
 
 			if(playerNr==0)
-			if (!hostFrame)
-			{
-				frame = ne[0].id;
-			}
+				if (!hostFrame)
+				{
+					frame = ne[0].id;
+					hostFrame = true;
+				}
 
 			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
-			//Logger::Print(std::string(std::to_string(frame - ne[0].id) + "\n").c_str());
+			Logger::Print(std::string(std::to_string(frame - ne[0].id) + "\n").c_str());
 		}
 		if(mState == PhotonState::SENT_DATA && mReceiveCount >= mSendCount)
 		{
