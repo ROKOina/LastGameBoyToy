@@ -90,5 +90,6 @@ private:
 	int64 mSendCount;
 	int64 mReceiveCount;
 
+	bool hostFrame = false;
 	long long frame = 0;
 };

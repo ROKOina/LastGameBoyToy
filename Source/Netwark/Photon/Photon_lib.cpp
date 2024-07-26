@@ -145,9 +145,9 @@ void PhotonLib::sendData(void)
 	//event.put(static_cast<nByte>(0), ++mSendCount);
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
 	//自分以外全員に送信
-	//mLoadBalancingClient.opRaiseEvent(true, event, 0);
+	mLoadBalancingClient.opRaiseEvent(true, event, 0);
 	//特定のナンバーに送信
-	mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+	//mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
 
 	////MAX_SENDCOUNT以上になるとPhotonState::SENT_DATAへ
 	//if(mSendCount >= MAX_SENDCOUNT)
@@ -226,6 +226,12 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				std::shared_ptr<RendererCom> r = net1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
 				r->LoadModel("Data/OneCoin/robot.mdl");
 				net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+			}
+
+			if(playerNr==0)
+			if (!hostFrame)
+			{
+				frame = ne[0].id;
 			}
 
 			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
