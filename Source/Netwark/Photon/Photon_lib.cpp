@@ -41,6 +41,7 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 
 void PhotonLib::update(void)
 {
+	frame++;
 	switch(mState)
 	{
 	case PhotonState::INITIALIZED:
@@ -112,35 +113,41 @@ int PhotonLib::GetPlayerNum()
 	return myPlayerNumber;
 }
 
+int PhotonLib::GetRoomPlayersNum()
+{
+	auto a = mLoadBalancingClient.getCurrentlyJoinedRoom().getCustomProperties();
+
+	int maxPlayersCount = mLoadBalancingClient.getCurrentlyJoinedRoom().getMaxPlayers();
+
+	int count = mLoadBalancingClient.getCurrentlyJoinedRoom().getPlayerCount();
+	return count;
+}
+
+std::string PhotonLib::GetRoomName()
+{
+	return WStringToString(mLoadBalancingClient.getCurrentlyJoinedRoom().getName().cstr());
+}
+
 void PhotonLib::sendData(void)
 {
 	ExitGames::Common::Hashtable event;
 
-	//仮オブジェ
-	GameObj net1 = GameObjectManager::Instance().Find("A");
-	if (!net1)
-	{
-		net1 = GameObjectManager::Instance().Create();
-		net1->SetName("A");
-		std::shared_ptr<RendererCom> r = net1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-		r->LoadModel("Data/OneCoin/robot.mdl");
-		net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-	}
+	auto obj= GameObjectManager::Instance().Find("player");
 
 	std::vector<NetData> n;
 	NetData& netD = n.emplace_back(NetData());
-	auto tra = net1->transform_->GetWorldPosition();
+	auto tra = obj->transform_->GetWorldPosition();
+	netD.id = frame;
 	netD.pos = { tra.x,tra.y,tra.z };
 
 	std::stringstream s = NetDataSendCast(n);
 	event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
 	//event.put(static_cast<nByte>(0), ++mSendCount);
-	// send to ourselves only
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
 	//自分以外全員に送信
-	mLoadBalancingClient.opRaiseEvent(true, event, 0);
+	//mLoadBalancingClient.opRaiseEvent(true, event, 0);
 	//特定のナンバーに送信
-	//mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+	mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
 
 	////MAX_SENDCOUNT以上になるとPhotonState::SENT_DATAへ
 	//if(mSendCount >= MAX_SENDCOUNT)
@@ -209,8 +216,20 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			//mReceiveCount = ((ExitGames::Common::ValueObject<int64>*)(eventContent.getValue((nByte)0)))->getDataCopy();
 			auto ne = NetDataRecvCast(WStringToString(s.cstr()));
 
-			GameObj net1 = GameObjectManager::Instance().Find("A");
+			//仮オブジェ
+			std::string name = "A" + std::to_string(playerNr);
+			GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+			if (!net1)
+			{
+				net1 = GameObjectManager::Instance().Create();
+				net1->SetName(name.c_str());
+				std::shared_ptr<RendererCom> r = net1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+				r->LoadModel("Data/OneCoin/robot.mdl");
+				net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+			}
+
 			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
+			//Logger::Print(std::string(std::to_string(frame - ne[0].id) + "\n").c_str());
 		}
 		if(mState == PhotonState::SENT_DATA && mReceiveCount >= mSendCount)
 		{

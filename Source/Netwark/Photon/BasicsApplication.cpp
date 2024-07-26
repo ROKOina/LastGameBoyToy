@@ -36,7 +36,7 @@ void BasicsApplication::run(/*UIListener* listener*/)
 	auto Jstring = photonLib->getStateString();
 	if (Jstring.length() && Jstring != lastStateString)
 	{
-		PrintLog(WStringToString(Jstring.cstr()).c_str());
+		//PrintLog(WStringToString(Jstring.cstr()).c_str());
 	}
 
 	//listener->writeString(lastStateString=lib.getStateString());
@@ -67,6 +67,15 @@ void BasicsApplication::ImGui()
 	//状態表示
 	std::string nowState = photonLib->stateStr[photonLib->GetPhotonState()];
 	ImGui::Text(("State : " + nowState).c_str());
+
+	ImGui::Separator();
+
+	//ルーム名前
+	ImGui::Text(("RoomName : " + photonLib->GetRoomName()).c_str());
+
+	//ルーム人数表示
+	int roomCount = photonLib->GetRoomPlayersNum();
+	ImGui::InputInt("roomPlayersNum", &roomCount);
 
 
 	ImGui::End();

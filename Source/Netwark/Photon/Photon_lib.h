@@ -12,6 +12,9 @@ public:
 
 	int GetPlayerNum();
 
+	int GetRoomPlayersNum();
+	std::string GetRoomName();
+
 	class PhotonState
 	{
 	public:
@@ -86,4 +89,6 @@ private:
 
 	int64 mSendCount;
 	int64 mReceiveCount;
+
+	long long frame = 0;
 };
