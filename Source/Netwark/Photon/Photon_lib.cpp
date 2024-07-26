@@ -228,7 +228,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
 			}
 
-			if(playerNr==0)
+			if(playerNr==1)
 				if (!hostFrame)
 				{
 					frame = ne[0].id;
