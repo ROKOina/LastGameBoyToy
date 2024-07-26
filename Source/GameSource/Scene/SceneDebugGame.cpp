@@ -99,8 +99,8 @@ void SceneDebugGame::LoginInitialize()
         obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
         obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        r->LoadModel("Data/Stage_Abe/Stage_Abe.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/Stage_Abe/Stage_Abe.collision");
     }
 
 #pragma endregion

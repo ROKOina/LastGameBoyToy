@@ -172,13 +172,6 @@ void SceneGame::Update(float elapsedTime)
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-    ////コンポーネントゲット
-    //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("zombie");
-    //std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
-    //std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-    //DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
-    //a->updateRootMotion(pos);
 }
 
 // 描画処理
