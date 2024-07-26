@@ -138,9 +138,9 @@ void PhotonLib::sendData(void)
 	// send to ourselves only
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
 	//自分以外全員に送信
-	//mLoadBalancingClient.opRaiseEvent(true, event, 0);
+	mLoadBalancingClient.opRaiseEvent(true, event, 0);
 	//特定のナンバーに送信
-	mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+	//mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
 
 	////MAX_SENDCOUNT以上になるとPhotonState::SENT_DATAへ
 	//if(mSendCount >= MAX_SENDCOUNT)
