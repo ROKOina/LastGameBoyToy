@@ -17,7 +17,7 @@ PostEffect::PostEffect()
     for (int i = 0; i < static_cast<int>(offscreen::max); ++i) {
         m_offScreenBuffer[i] = std::make_unique<FrameBuffer>(Graphics.GetDevice(),
             static_cast<uint32_t>(Graphics.GetScreenWidth()), static_cast<uint32_t>(Graphics.GetScreenHeight()),
-            DXGI_FORMAT_R32G32B32A32_FLOAT, false);
+            DXGI_FORMAT_R32G32B32A32_FLOAT, true);
     }
 
     //ピクセルシェーダー
@@ -26,7 +26,7 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
 
     //MultiRenderTarget作成
-    m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 5);
+    m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 6);
 
     //影作成
     m_cascadedshadowmap = std::make_unique<CascadedShadowMap>(Graphics.GetDevice(), 1024 * 4, 1024 * 4);
@@ -66,8 +66,9 @@ void PostEffect::EndDeferred()
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
 
     // Gバッファを元に描画 ( PBR + IBL )
-    FullScreenQuad::Instance().Blit(dc, m_gBuffer->GetShaderResources(), 0,
-        m_gBuffer->BufferCount(), m_pixelshaders[static_cast<int>(pixelshader::deferred)].Get());
+    ID3D11ShaderResourceView* d[]
+    { m_gBuffer->GetShaderResources()[0],m_gBuffer->GetShaderResources()[1],m_gBuffer->GetShaderResources()[2],m_gBuffer->GetShaderResources()[3] ,m_gBuffer->GetShaderResources()[4] };
+    FullScreenQuad::Instance().Blit(dc, m_gBuffer->GetShaderResources(), 0, _countof(d), m_pixelshaders[static_cast<int>(pixelshader::deferred)].Get());
 
     // 深度ステンシルを戻す
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
@@ -99,7 +100,7 @@ void PostEffect::PostEffectRender()
 
     // 色調補正
     ID3D11ShaderResourceView* posteffect[]
-    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get() };
+    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get(),m_gBuffer->GetShaderResources()[5] };
     FullScreenQuad::Instance().Blit(dc, posteffect, 0, _countof(posteffect), m_pixelshaders[static_cast<int>(pixelshader::colorGrading)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
@@ -138,6 +139,9 @@ void PostEffect::PostEffectImGui()
         ImGui::SliderFloat("saturation", &m_posteffect->data.saturation, -1.0f, +1.0f);
         ImGui::SliderFloat("bloomextractionthreshold", &m_posteffect->data.bloomextractionthreshold, +0.0f, +10.0f);
         ImGui::SliderFloat("blurconvolutionintensity", &m_posteffect->data.blurconvolutionintensity, +0.0f, +10.0f);
+        ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
+        ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
+        ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
     }
 
     //ライトのimgui

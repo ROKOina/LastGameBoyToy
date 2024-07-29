@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -69,8 +69,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;Common-cpp_vc17_debug_windows_mt_x64.lib;LoadBalancing-cpp_vc17_debug_windows_mt_x64.lib;Photon-cpp_vc17_debug_windows_mt_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);.\External\photon-windows-sdk_v5-0-11-0\Common-cpp;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp;.\External\photon-windows-sdk_v5-0-11-0\Common-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -92,7 +92,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -102,8 +102,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;Common-cpp_vc17_release_windows_mt_x64.lib;LoadBalancing-cpp_vc17_release_windows_mt_x64.lib;Photon-cpp_vc17_release_windows_mt_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);.\External\photon-windows-sdk_v5-0-11-0\Common-cpp;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp;.\External\photon-windows-sdk_v5-0-11-0\Common-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -219,10 +219,6 @@
     <ClInclude Include="Source\Netwark\Client.h" />
     <ClInclude Include="Source\Netwark\NetData.h" />
     <ClInclude Include="Source\Netwark\NetwarkPost.h" />
-    <ClInclude Include="Source\Netwark\Photon\BasicsApplication.h" />
-    <ClInclude Include="Source\Netwark\Photon\Photon_lib.h" />
-    <ClInclude Include="Source\Netwark\Photon\StdIO_UIListener.h" />
-    <ClInclude Include="Source\Netwark\Photon\UIListener.h" />
     <ClInclude Include="Source\Netwark\RingBuffer.h" />
     <ClInclude Include="Source\Netwark\Server.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
@@ -316,9 +312,6 @@
     <ClCompile Include="Source\GameSource\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Netwark\Client.cpp" />
     <ClCompile Include="Source\Netwark\NetwarkPost.cpp" />
-    <ClCompile Include="Source\Netwark\Photon\BasicsApplication.cpp" />
-    <ClCompile Include="Source\Netwark\Photon\Photon_lib.cpp" />
-    <ClCompile Include="Source\Netwark\Photon\StdIO_UIListener.cpp" />
     <ClCompile Include="Source\Netwark\Server.cpp" />
     <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
   </ItemGroup>
@@ -433,6 +426,10 @@
     <FxCompile Include="HLSL\3D\ShadowVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\SilhouettePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

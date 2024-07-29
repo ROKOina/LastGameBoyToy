@@ -128,10 +128,10 @@ void CharacterCom::DirectionAnimation(std::weak_ptr<AnimationCom>animationCom, c
 
 
     //ステックのアングル生成
-    if (!leftStick.x == 0.0f && !leftStick.y == 0.0f)
-    {
+   /* if (!SceneManager::Instance().InputVec().x == 0.0f && !SceneManager::Instance().InputVec().z == 0.0f)
+    {*/
         stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
-    }
+    //}
 
     if (stickAngle < 0.0f)
     {

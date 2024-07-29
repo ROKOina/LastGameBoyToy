@@ -189,6 +189,7 @@ private:
     void RenderDeferred();
     void RenderForward();
     void RenderShadow();
+    void RenderSilhoutte();
     void RenderUseDepth();
 
     //CPUパーティクル描画

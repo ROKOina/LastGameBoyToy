@@ -7,6 +7,7 @@
 Texture2D texturemaps : register(t0);
 Texture2D depth_map : register(t1);
 Texture2DArray shadow_map : register(t2);
+Texture2D outlinecolor : register(t3);
 
 //明るさ(画面全体の)とコントラスト(画像の明暗)
 float3 brightness_contrast(float3 fragment_color, float brightness, float contrast)
@@ -224,6 +225,18 @@ float4 shadow(float2 texcoord)
     return lerp(float4(1, 1, 1, 1), shadowcolor, shadow_threshold);
 }
 
+// Vignetteの計算
+float vignette(float2 uv)
+{
+    // 中心からの距離を計算
+    float2 distance = uv - float2(0.5, 0.5);
+    float len = length(distance);
+
+    // 距離に基づいてビネット効果を計算
+    float vignette = smoothstep(vignettesize, vignettesize - vignetteintensity, len);
+    return vignette;
+}
+
 float4 main(VS_OUT pin) : SV_TARGET
 {
     //シーンのテクスチャマップをサンプリングしている
@@ -242,9 +255,68 @@ float4 main(VS_OUT pin) : SV_TARGET
     float4 shadow_color = shadow(pin.texcoord);
     sampled_color.rgb *= shadow_color.rgb;
 
+    //ビネット
+    float vignette_factor = vignette(pin.texcoord);
+    sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette_factor);
+
     //明るさ(画面全体の)とコントラスト(画面の明暗)、色相と彩度
     sampled_color.rgb = hue_saturation(sampled_color.rgb, hue, saturation);
     sampled_color.rgb = brightness_contrast(sampled_color.rgb, brightness, contrast);
+
+    //アウトライン
+    float4 depthDiag;
+    float4 depthAxis;
+
+    float2 texelSize = float2(width, height);
+    float2 uvDist = float2(1.0 / width, 1.0 / height);
+    float centerDepth = depth_map.Sample(sampler_states[LINEAR], pin.texcoord); // Center
+    depthDiag.x = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist); // TR
+    depthDiag.y = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist * float2(-1.0f, 1.0f)); // TL
+    depthDiag.z = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist * float2(-1.0f, 1.0f)); // BR
+    depthDiag.w = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist); // BL
+    depthAxis.x = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist * float2(0.0f, 1.0f)); // T
+    depthAxis.y = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist * float2(1.0f, 0.0f)); // L
+    depthAxis.z = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist * float2(1.0f, 0.0f)); // R
+    depthAxis.w = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist * float2(0.0f, 1.0f)); // B
+
+    const float4 vertDiagCoeff = float4(-1.0f, -1.0f, 1.0f, 1.0f); // TR, TL, BR, BL
+    const float4 horizDiagCoeff = float4(1.0f, -1.0f, 1.0f, -1.0f);
+    const float4 vertAxisCoeff = float4(-2.0f, 0.0f, 0.0f, 2.0f); // T, L, R, B
+    const float4 horizAxisCoeff = float4(0.0f, -2.0f, 2.0f, 0.0f);
+
+    float4 sobelH = depthDiag * horizDiagCoeff + depthAxis * horizAxisCoeff;
+    float4 sobelV = depthDiag * vertDiagCoeff + depthAxis * vertAxisCoeff;
+    float sobelX = dot(sobelH, float4(1.0f, 1.0f, 1.0f, 1.0f));
+    float sobelY = dot(sobelV, float4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    float sobel = sqrt(sobelX * sobelX + sobelY * sobelY);
+
+    // ビュー空間の位置を計算
+    float3 viewPos;
+    viewPos.xy = (pin.texcoord.xy * 2.0f - 1.0f) * float2(width, height) * centerDepth;
+    viewPos.z = centerDepth;
+
+    // ビュー空間座標をワールド座標に変換
+    float4 clipPos = float4(viewPos, 1.0f);
+    float4 worldPos = mul(clipPos, inverseviewprojection);
+    worldPos /= worldPos.w;
+
+    float distance = length(worldPos.xyz - cameraposition);
+
+    // 適応的なしきい値を設定
+    float minThreshold = 0.001;
+    float maxThreshold = 0.01;
+    float threshold = lerp(maxThreshold, minThreshold, saturate(distance / 10.0f)); // 距離に応じたしきい値の設定
+
+    //カメラとの距離が非常に近い場合には輪郭線を描画しない
+    float minDistance = 1.0; // この距離以内ではアウトラインを描画しない
+    bool drawOutline = distance > minDistance;
+
+    //Sobel演算に基づくエッジ検出
+    float depthEdge = (drawOutline && sobel > threshold) ? 1.0f : 0.0f;
+
+    // 輪郭線を描画
+    sampled_color += float4(depthEdge, depthEdge, depthEdge, 1.0f) * outlinecolor.Sample(sampler_states[LINEAR], pin.texcoord);
 
     return sampled_color;
 }

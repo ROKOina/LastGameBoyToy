@@ -8,8 +8,6 @@
 #include "Components\System\GameObject.h"
 #include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
-#include "Netwark/Photon/BasicsApplication.h"
-
 
 // ÉQÅ[ÉÄÉVÅ[Éì
 class SceneGame :public Scene
@@ -44,6 +42,5 @@ private:
     void DelayOnlineInput();
 private:
     std::unique_ptr<NetwarkPost> n;
-    std::unique_ptr<BasicsApplication> photonNet;
     Light* mainDirectionalLight = nullptr;
 };
