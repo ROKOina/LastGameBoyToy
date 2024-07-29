@@ -82,12 +82,16 @@ void BasicsApplication::ImGui()
 	int serverTimeOF = photonLib->GetServerTimeOffset();
 	ImGui::InputInt("serverTime", &serverTime);
 
+	int A = serverTime / 1000;
+	A %= 10;
+	ImGui::InputInt("A", &A);
+
 
 	//時間デバッグ比較用
 	serverTime += serverTimeOF;
 	if (serverTime != 0)
 	{
-		int slTime = 1000;
+		int slTime = 10000;
 		static int saveTime = 0;
 		static int oldSerTime = serverTime;
 		saveTime += serverTime - oldSerTime;
@@ -98,6 +102,7 @@ void BasicsApplication::ImGui()
 			saveTime = 0;
 			reverseB = !reverseB;
 		}
+		if (saveTime < 0)saveTime = 0;
 		ImGui::InputInt("saveTime", &saveTime);
 		ImGui::Checkbox("SerVV", &reverseB);
 	}
