@@ -12,6 +12,9 @@ public:
 
 	int GetPlayerNum();
 
+	int GetServerTime();
+	int GetServerTimeOffset();
+
 	int GetRoomPlayersNum();
 	std::string GetRoomName();
 

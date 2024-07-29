@@ -77,6 +77,34 @@ void BasicsApplication::ImGui()
 	int roomCount = photonLib->GetRoomPlayersNum();
 	ImGui::InputInt("roomPlayersNum", &roomCount);
 
+	//サーバー時間
+	int serverTime = photonLib->GetServerTime();
+	int serverTimeOF = photonLib->GetServerTimeOffset();
+	ImGui::InputInt("serverTime", &serverTime);
+
+
+	//時間デバッグ比較用
+	serverTime += serverTimeOF;
+	if (serverTime != 0)
+	{
+		int slTime = 1000;
+		static int saveTime = 0;
+		static int oldSerTime = serverTime;
+		saveTime += serverTime - oldSerTime;
+		oldSerTime = serverTime;
+		static bool reverseB = true;
+		if (saveTime > slTime)
+		{
+			saveTime = 0;
+			reverseB = !reverseB;
+		}
+		ImGui::InputInt("saveTime", &saveTime);
+		ImGui::Checkbox("SerVV", &reverseB);
+	}
+
+
+	ImGui::InputInt("serverTimeOFF", &serverTimeOF);
+
 
 	ImGui::End();
 }

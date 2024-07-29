@@ -113,6 +113,20 @@ int PhotonLib::GetPlayerNum()
 	return myPlayerNumber;
 }
 
+int PhotonLib::GetServerTime()
+{
+	int serverTime = mLoadBalancingClient.getServerTime();
+
+	return serverTime;
+}
+
+int PhotonLib::GetServerTimeOffset()
+{
+	return mLoadBalancingClient.getServerTimeOffset();
+}
+
+
+
 int PhotonLib::GetRoomPlayersNum()
 {
 	auto a = mLoadBalancingClient.getCurrentlyJoinedRoom().getCustomProperties();
