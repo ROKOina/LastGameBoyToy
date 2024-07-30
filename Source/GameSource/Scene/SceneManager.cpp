@@ -6,6 +6,10 @@
 #include "Graphics/Graphics.h"
 #include "Input\Input.h"
 
+#include "SceneDebugGame.h"
+#include "SceneGame.h"
+#include "SceneIKTest.h"
+
 SceneManager::SceneManager()
 {
 }
@@ -24,10 +28,10 @@ void SceneManager::Update(float elapsedTime)
 
         //新しいシーンを設定
         currentScene_ = nextScene_;
-        nextScene_ = nullptr;
 
         //シーン初期化処理
         if (!currentScene_->IsReady())currentScene_->Initialize();
+        nextScene_ = nullptr;
     }
 
     if (currentScene_ != nullptr)
@@ -51,6 +55,9 @@ void SceneManager::Render(float elapsedTime)
     {
         currentScene_->Render(elapsedTime);
     }
+
+    //imgui
+    ImGui();
 }
 
 //シーンクリア
@@ -69,6 +76,50 @@ void SceneManager::ChangeScene(Scene* scene)
 {
     //新しいシーンを設定
     nextScene_ = scene;
+
+    //危険かも
+    GameObjectManager::Instance().AllRemove();
+}
+
+//imgui
+void SceneManager::ImGui()
+{
+    const Scene* scene = GetScene();
+    if (scene != nullptr)
+    {
+        ImGui::Begin("Scene");
+        if (ImGui::CollapsingHeader((char*)u8"シーン", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            constexpr const char* scene_names[] =
+            {
+                "SceneGame",
+                "SceneDebugGame",
+                "SceneIKTest",
+            };
+            int scene_id = 0;
+            int last_index = sizeof(scene_names) / sizeof(const char*);
+            for (int i = 0; i < _countof(scene_names); i++)
+            {
+                if (scene->GetName() == scene_names[i])scene_id = i;
+            }
+            if (ImGui::Combo("Scene", &scene_id, scene_names, last_index, _countof(scene_names) - 1))
+            {
+                Scene* scenes[] =
+                {
+                    // Game scenes
+                    new SceneGame,
+                    new SceneDebugGame,
+                    new SceneIKTest,
+                };
+                ChangeScene((scenes[scene_id]));
+                for (int i = 0; i < _countof(scenes); i++)
+                {
+                    if (i != scene_id)delete	scenes[i];
+                }
+            }
+        }
+        ImGui::End();
+    }
 }
 
 DirectX::XMFLOAT3 SceneManager::InputVec() const

@@ -21,8 +21,6 @@ enum class SCENE_ACT
     BATTLE,
 };
 
-
-
 // ゲームシーン
 class SceneDebugGame :public Scene
 {
@@ -41,6 +39,9 @@ public:
 
     // 描画処理
     void Render(float elapsedTime)override;
+
+    //名前取得
+    std::string GetName() const override { return "SceneDebugGame"; };
 
     void LoginInitialize();
     void LoginUpdate(float elapsedTime);

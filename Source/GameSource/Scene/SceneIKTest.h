@@ -27,6 +27,9 @@ public:
     // •`‰æˆ—
     void Render(float elapsedTime)override;
 
+    //–¼‘Oæ“¾
+    std::string GetName() const override { return "SceneIKTest"; };
+
 private:
     Light* mainDirectionalLight = nullptr;
 };

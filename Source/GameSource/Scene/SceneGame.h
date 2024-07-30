@@ -28,6 +28,9 @@ public:
     // 描画処理
     void Render(float elapsedTime)override;
 
+    //名前取得
+    std::string GetName() const override { return "SceneGame"; };
+
 private:
     // 各プレイヤーの入力情報を、それぞれのキャラクターに送る
     void SetUserInputs();
