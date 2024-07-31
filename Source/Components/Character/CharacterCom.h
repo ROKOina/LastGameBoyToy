@@ -62,17 +62,7 @@ public:
     // GUI描画
     void OnGUI() override;
 
-    //方向アニメーション
-    void DirectionAnimation(
-        std::weak_ptr<AnimationCom>animationCom,
-        const DirectX::XMFLOAT3& movevec,
-        const std::string& forward,
-        const std::string& back,
-        const std::string& right,
-        const std::string& left,
-        bool loop,
-        const float& blendrate);
-
+   
     virtual void MainAttack() {};
     virtual void SubAttack() {};
 

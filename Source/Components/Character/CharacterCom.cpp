@@ -18,6 +18,16 @@ void CharacterCom::Update(float elapsedTime)
     GetGameObject()->transform_->UpdateTransform();
     GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
 
+
+    //ステックのアングル取得
+    stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
+
+    //ステックの角度制限
+    if (stickAngle < 0.0f)
+    {
+        stickAngle += 360.0f;
+    }
+
     //死亡処理
     if (hitPoint <= 0)
     {
@@ -91,69 +101,6 @@ void CharacterCom::OnGUI()
     ImGui::InputFloat("StickAngle", &stickAngle);
 }
 
-//方向アニメーション
-void CharacterCom::DirectionAnimation(std::weak_ptr<AnimationCom>animationCom, const DirectX::XMFLOAT3& movevec, const std::string& forward, const std::string& back, const std::string& right, const std::string& left, bool loop, const float& blendrate)
-{
-    //前後判定
-    float m_dotz = Mathf::Dot(GetGameObject()->transform_->GetWorldFront(), movevec);
-
-    //外積のY成分で左右判定
-    float m_crossy = Mathf::Cross(GetGameObject()->transform_->GetWorldFront(), movevec).y;
-
-    ////ステックの入力加減で変わるアニメーションの速度が変わる
-    //if (speed)
-    //{
-    //    m_model->m_animation.AnimationSpeed(m_sticklength);
-    //}
-    ////前方向
-    //if (m_dotz > 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(forward.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(forward.c_str()), loop,false, true, blendrate);
-    //}
-    ////後ろ方向
-    //else if (m_dotz < 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(back.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(back.c_str()), loop, false, true, blendrate);
-    //}
-    ////右方向
-    //else if (m_crossy > 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(right.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(right.c_str()), loop, false, true, blendrate);
-    //}
-    ////左方向
-    //else if (m_crossy < 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(left.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(left.c_str()), loop, false, true, blendrate);
-    //}
-
-
-    //ステックのアングル生成
-   /* if (!SceneManager::Instance().InputVec().x == 0.0f && !SceneManager::Instance().InputVec().z == 0.0f)
-    {*/
-        stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
-    //}
-
-    if (stickAngle < 0.0f)
-    {
-        stickAngle += 360.0f;
-    }
-
-    //       上
-    //       ｌ
-    //       ｌ　
-    // 左ーーｌーー右
-    // 　 　 ｌ　
-    // 　　  ｌ
-    // 　　　下
-    
-
-
-
-
-
-    
-
-}
 
 void CharacterCom::CameraControl()
 {
