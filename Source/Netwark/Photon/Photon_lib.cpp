@@ -3,10 +3,14 @@
 
 #include "Logger.h"
 
+#include "Input\Input.h"
+#include "Input\GamePad.h"
+
 #include "../NetData.h"
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 #include "Components/RendererCom.h"
+#include "Components\Character\TestCharacterCom.h"
 
 static const ExitGames::Common::JString appID = L"0d572336-477d-43ad-895e-59f4eeebbca9"; // set your app id here
 static const ExitGames::Common::JString appVersion = L"1.0";
@@ -41,7 +45,26 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 
 void PhotonLib::update(void)
 {
-	frame++;
+
+	//自分の入力保存
+	int myID = GetPlayerNum();
+	for (auto& s : saveInputPhoton)
+	{
+		if (s.id != myID)continue;
+
+		GamePad& gamePad = Input::Instance().GetGamePad();
+
+		SaveBuffer save;
+		save.frame = GetServerTime();
+		save.input = gamePad.GetButton();
+		save.inputDown = gamePad.GetButtonDown();
+		save.inputUp = gamePad.GetButtonUp();
+
+		s.inputBuf->Enqueue(save);
+
+		break;
+	}
+
 	switch(mState)
 	{
 	case PhotonState::INITIALIZED:
@@ -73,6 +96,8 @@ void PhotonLib::update(void)
 			break;
 	}
 	mLoadBalancingClient.service();
+
+	MyCharaInput();
 }
 
 ExitGames::Common::JString PhotonLib::getStateString(void)
@@ -106,6 +131,53 @@ ExitGames::Common::JString PhotonLib::getStateString(void)
 	}
 }
 
+void PhotonLib::MyCharaInput()
+{
+	return;
+	//自分の入力適用
+	static int oldInputFrame = GetServerTime();
+	std::vector<SaveBuffer> myInput;
+
+	int myID = GetPlayerNum();
+	for (auto& s : saveInputPhoton)
+	{
+		if (s.id != myID)continue;
+
+		myInput = s.inputBuf->GetHeadFromSize(20);
+
+		break;
+	}
+
+	unsigned int inputDown = 0;
+	unsigned int input = 0;
+	unsigned int inputUp = 0;
+	for (auto& myI : myInput)
+	{
+		if (myI.frame < oldInputFrame)continue;
+		inputDown |= myI.inputDown;
+		input |= myI.input;
+		inputUp |= myI.inputUp;
+	}
+
+	oldInputFrame = GetServerTime();
+
+	std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
+	if (obj.use_count() == 0)return;
+
+	std::shared_ptr<CharacterCom> chara = obj->GetComponent<CharacterCom>();
+	if (chara.use_count() == 0) return;
+
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	// 入力情報をプレイヤーキャラクターに送信
+	chara->SetUserInput(input);
+	chara->SetUserInputDown(inputDown);
+	chara->SetUserInputUp(inputUp);
+
+	chara->SetLeftStick(gamePad.GetAxisL());
+	chara->SetRightStick(gamePad.GetAxisR());
+}
+
 int PhotonLib::GetPlayerNum()
 {
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
@@ -123,6 +195,16 @@ int PhotonLib::GetServerTime()
 int PhotonLib::GetServerTimeOffset()
 {
 	return mLoadBalancingClient.getServerTimeOffset();
+}
+
+int PhotonLib::GetRoundTripTime()
+{
+	return mLoadBalancingClient.getRoundTripTime();
+}
+
+int PhotonLib::GetRoundTripTimeVariance()
+{
+	return mLoadBalancingClient.getRoundTripTimeVariance();
 }
 
 
@@ -151,8 +233,21 @@ void PhotonLib::sendData(void)
 	std::vector<NetData> n;
 	NetData& netD = n.emplace_back(NetData());
 	auto tra = obj->transform_->GetWorldPosition();
-	netD.id = frame;
 	netD.pos = { tra.x,tra.y,tra.z };
+
+	//自分の入力を送る
+	int myID = GetPlayerNum();
+	for (auto& s : saveInputPhoton)
+	{
+		if (s.id != myID)continue;
+
+		//先頭10フレームの入力を送る
+		netD.saveInputBuf = s.inputBuf->GetHeadFromSize(10);
+
+		break;
+	}
+
+
 
 	std::stringstream s = NetDataSendCast(n);
 	event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
@@ -202,12 +297,37 @@ void PhotonLib::serverErrorReturn(int errorCode)
 	mpOutputListener->writeString(ExitGames::Common::JString(L"received error ") + errorCode + " from server");
 }
 
-void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& /*playernrs*/, const ExitGames::LoadBalancing::Player& player)
+void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player)
 {
 	Logger::Print(std::string("ls joined the game" + WStringToString(player.getName().cstr())).c_str());
 	EGLOG(ExitGames::Common::DebugLevel::INFO, L"%ls joined the game", player.getName().cstr());
 	mpOutputListener->writeString(L"");
 	mpOutputListener->writeString(ExitGames::Common::JString(L"player ") + playerNr + L" " + player.getName() + L" has joined the game");
+
+	//入力情報保存バッファ追加
+	for (int playerNum = 0; playerNum < playernrs.getSize(); ++playerNum)
+	{
+		//新規クライアント確認
+		bool isNewClient = true;
+		for (auto& s : saveInputPhoton)
+		{
+			if (s.id != playerNum)continue;
+
+			isNewClient = false;
+			break;
+		}
+		if (isNewClient)
+		{
+			//追加
+			SaveInput& saveInputJoin = saveInputPhoton.emplace_back(SaveInput());
+			saveInputJoin.id = playerNr;
+
+			//今のフレームを入れる
+			SaveBuffer saveBuf;
+			saveBuf.frame = GetServerTime();
+			saveInputJoin.inputBuf->Enqueue(saveBuf);
+		}
+	}
 }
 
 void PhotonLib::leaveRoomEventAction(int playerNr, bool isInactive)
@@ -242,15 +362,17 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
 			}
 
-			if(playerNr==1)
-				if (!hostFrame)
-				{
-					frame = ne[0].id;
-					hostFrame = true;
-				}
-
 			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
-			Logger::Print(std::string(std::to_string(frame - ne[0].id) + "\n").c_str());
+
+			//入力を保存
+			for (int i = ne[0].saveInputBuf.size() - 1; i >= 0; --i)
+			{
+				SaveBuffer newInput = ne[0].saveInputBuf[i];
+
+				SaveBuffer currentInput = saveInputPhoton[playerNr - 1].inputBuf->GetHead();
+				if (currentInput.frame < newInput.frame)	//新しいフレームから始める
+					saveInputPhoton[playerNr - 1].inputBuf->Enqueue(newInput);
+			}
 		}
 		if(mState == PhotonState::SENT_DATA && mReceiveCount >= mSendCount)
 		{

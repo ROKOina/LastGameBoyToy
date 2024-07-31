@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+#include "../NetwarkPost.h"
+
 class PhotonLib : private ExitGames::LoadBalancing::Listener
 {
 public:
@@ -10,10 +12,16 @@ public:
 	void update(void);
 	ExitGames::Common::JString getStateString(void);
 
+	void MyCharaInput();
+
 	int GetPlayerNum();
 
 	int GetServerTime();
 	int GetServerTimeOffset();
+
+	//レイテンシ
+	int GetRoundTripTime();
+	int GetRoundTripTimeVariance();
 
 	int GetRoomPlayersNum();
 	std::string GetRoomName();
@@ -65,6 +73,7 @@ private:
 	virtual void serverErrorReturn(int errorCode);
 
 	// events, triggered by certain operations of all players in the same room
+	//入室時に入る
 	virtual void joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player);
 	virtual void leaveRoomEventAction(int playerNr, bool isInactive);
 	//データ受信
@@ -93,6 +102,15 @@ private:
 	int64 mSendCount;
 	int64 mReceiveCount;
 
-	bool hostFrame = false;
-	long long frame = 0;
+	//各クライアントインプット保存
+	struct SaveInput
+	{
+		int id;
+		std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
+		SaveInput()
+		{
+			inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
+		}
+	};
+	std::vector<SaveInput> saveInputPhoton;
 };

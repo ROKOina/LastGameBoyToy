@@ -96,8 +96,8 @@ public:
         for (int i = 0; i < size; ++i)
         {
             if (this->size <= i)break;
-            int index = this->size + headIndex - i;
-            index %= this->size;
+            int index = this->cap + headIndex - i;
+            index %= this->cap;
             v.emplace_back(arr[index]);
         }
         return v;

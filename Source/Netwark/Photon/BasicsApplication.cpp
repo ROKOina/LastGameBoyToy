@@ -77,6 +77,7 @@ void BasicsApplication::ImGui()
 	int roomCount = photonLib->GetRoomPlayersNum();
 	ImGui::InputInt("roomPlayersNum", &roomCount);
 
+
 	//サーバー時間
 	int serverTime = photonLib->GetServerTime();
 	int serverTimeOF = photonLib->GetServerTimeOffset();
@@ -88,7 +89,7 @@ void BasicsApplication::ImGui()
 
 
 	//時間デバッグ比較用
-	serverTime += serverTimeOF;
+	//serverTime += serverTimeOF;
 	if (serverTime != 0)
 	{
 		int slTime = 10000;
@@ -110,6 +111,9 @@ void BasicsApplication::ImGui()
 
 	ImGui::InputInt("serverTimeOFF", &serverTimeOF);
 
+	int roundTime = photonLib->GetRoundTripTime();
+	int roundTimeV = photonLib->GetRoundTripTimeVariance();
+	ImGui::InputInt("roundTime", &roundTime);
 
 	ImGui::End();
 }

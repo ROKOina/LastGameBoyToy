@@ -59,9 +59,9 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
 struct SaveBuffer
 {
     int frame;
-    unsigned int inputDown;
-    unsigned int input;
-    unsigned int inputUp;
+    unsigned int inputDown = 0;
+    unsigned int input = 0;
+    unsigned int inputUp = 0;
 };
 //SaveBuffer
 static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>& vec)
