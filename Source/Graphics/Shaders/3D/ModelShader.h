@@ -14,7 +14,7 @@ public:
     ~ModelShader() {};
 
     //描画初期設定
-    void Begin(ID3D11DeviceContext* dc, int blendmode, RASTERIZERSTATE rasterizerState = RASTERIZERSTATE::SOLID_CULL_BACK);
+    void Begin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode);
     void ShadowBegin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode);
 
     //描画処理
@@ -45,9 +45,17 @@ public:
         DirectX::XMFLOAT2 dummy = {};
     };
 
+    //アウトラインのコンスタントバッファ
+    struct outlineconstants
+    {
+        DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
+        float outlineintensity = 1.0f;
+    };
+
 private:
     std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
+    std::unique_ptr<ConstantBuffer<outlineconstants>> m_outlineconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;

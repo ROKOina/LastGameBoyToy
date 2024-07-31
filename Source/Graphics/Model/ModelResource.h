@@ -41,6 +41,10 @@ public:
         float               Metalness = 1;
         float               Roughness = 1;
 
+        //オブジェクト毎の定数バッファをメッシュに入れておく(シリアライズはしないかも)
+        DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
+        float outlineintensity = 1.0f;
+
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView[6];
 
         void LoadTexture(ID3D11Device* device, const char* filename, int number);

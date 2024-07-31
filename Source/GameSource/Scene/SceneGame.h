@@ -8,8 +8,8 @@
 #include "Components\System\GameObject.h"
 #include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
-#include "Netwark/Photon/BasicsApplication.h"
 
+#include "Netwark/Photon/BasicsApplication.h"
 
 // ゲームシーン
 class SceneGame :public Scene
@@ -29,6 +29,9 @@ public:
 
     // 描画処理
     void Render(float elapsedTime)override;
+
+    //名前取得
+    std::string GetName() const override { return "SceneGame"; };
 
 private:
     // 各プレイヤーの入力情報を、それぞれのキャラクターに送る

@@ -1621,7 +1621,7 @@ struct IMGUI_API ImGuiDockNode
     ImGuiDockNodeFlags      LocalFlags;                 // (Write) Flags specific to this node
     ImGuiDockNodeFlags      LocalFlagsInWindows;        // (Write) Flags specific to this node, applied from windows
     ImGuiDockNodeFlags      MergedFlags;                // (Read)  Effective flags (== SharedFlags | LocalFlagsInNode | LocalFlagsInWindows)
-    ImGuiDockNodeState      PhotonState;
+    ImGuiDockNodeState      State;
     ImGuiDockNode* ParentNode;
     ImGuiDockNode* ChildNodes[2];              // [Split node only] Child nodes (left/right or top/bottom). Consider switching to an array.
     ImVector<ImGuiWindow*>  Windows;                    // Note: unordered list! Iterate TabBar->Tabs for user-order.

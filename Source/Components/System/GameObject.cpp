@@ -37,11 +37,11 @@ void GameObject::Update(float elapsedTime)
 
 void GameObject::OnDestroy()
 {
-  for (std::shared_ptr<Component>& component : components_)
-  {
-    if (!component->GetEnabled())continue;
-    component->OnDestroy();
-  }
+    for (std::shared_ptr<Component>& component : components_)
+    {
+        if (!component->GetEnabled())continue;
+        component->OnDestroy();
+    }
 }
 
 // 行列の更新
@@ -221,6 +221,9 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //デファードレンダリングの初期設定 ( レンダーターゲットをデファード用の物に変更 )
     m_posteffect->SetDeferredTarget();
 
+    //シルエット描画
+    //RenderSilhoutte();
+
     //3D描画
     RenderDeferred();
 
@@ -236,12 +239,12 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     // フォワードレンダリング
     RenderForward();
 
-  //デバッグレンダー
-  Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
-  Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+    //デバッグレンダー
+    Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+    Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
 
-  // 深度マップをコピーしてGPUに設定
-  m_posteffect->DepthCopyAndBind(8);
+    // 深度マップをコピーしてGPUに設定
+    m_posteffect->DepthCopyAndBind(8);
 
     // 深度マップを使用するシェーダー
     RenderUseDepth();
@@ -249,16 +252,16 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //ポストエフェクト
     m_posteffect->PostEffectRender();
 
-  //debug
-  if (Graphics::Instance().IsDebugGUI())
-  {
-    //当たり判定用デバッグ描画
-    for (auto& col : colliderObject_)
+    //debug
+    if (Graphics::Instance().IsDebugGUI())
     {
-      if (!col.lock()->GetEnabled())continue;
-      if (!col.lock()->GetGameObject()->GetEnabled())continue;
-      col.lock()->DebugRender();
-    }
+        //当たり判定用デバッグ描画
+        for (auto& col : colliderObject_)
+        {
+            if (!col.lock()->GetEnabled())continue;
+            if (!col.lock()->GetGameObject()->GetEnabled())continue;
+            col.lock()->DebugRender();
+        }
 
         // リスター描画
         DrawLister();
@@ -459,14 +462,14 @@ void GameObjectManager::RemoveGameObjects()
     // 削除リストに何もなかったら、何もしない
     if (removeGameObject_.empty())return;
 
-  // 削除リストのオブジェクトを削除
-  {
-    std::vector<std::weak_ptr<GameObject>> parentObj;
-    for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
+    // 削除リストのオブジェクトを削除
     {
-      obj->OnDestroy();
-      EraseObject(startGameObject_, obj);
-      EraseObject(updateGameObject_, obj);
+        std::vector<std::weak_ptr<GameObject>> parentObj;
+        for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
+        {
+            obj->OnDestroy();
+            EraseObject(startGameObject_, obj);
+            EraseObject(updateGameObject_, obj);
 
             std::set<std::shared_ptr<GameObject>>::iterator itSelection = selectionGameObject_.find(obj);
             if (itSelection != selectionGameObject_.end())
@@ -479,14 +482,14 @@ void GameObjectManager::RemoveGameObjects()
         }
         removeGameObject_.clear();
 
-    //child解放
-    for (std::weak_ptr<GameObject> parent : parentObj)
-    {
-      if (!parent.expired()) {
-        parent.lock()->EraseExpiredChild();
-      }
+        //child解放
+        for (std::weak_ptr<GameObject> parent : parentObj)
+        {
+            if (!parent.expired()) {
+                parent.lock()->EraseExpiredChild();
+            }
+        }
     }
-  }
 
     //各オブジェクト解放(削除)
       //collider解放
@@ -650,6 +653,25 @@ void GameObjectManager::RenderShadow()
         if (model != nullptr)
         {
             modelrender.lock()->ShadowRender();
+        }
+    }
+}
+
+//シルエット描画
+void GameObjectManager::RenderSilhoutte()
+{
+    if (renderSortObject_.size() <= 0)return;
+
+    //シルエット描画
+    for (std::weak_ptr<RendererCom>& modelrender : renderSortObject_)
+    {
+        if (!modelrender.lock()->GetGameObject()->GetEnabled())continue;
+        if (!modelrender.lock()->GetEnabled())continue;
+
+        Model* model = modelrender.lock()->GetModel();
+        if (model != nullptr)
+        {
+            modelrender.lock()->SilhoutteRender();
         }
     }
 }

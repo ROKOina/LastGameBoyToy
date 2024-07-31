@@ -6,14 +6,21 @@
 // pow関数に負の値が入る可能性を報告する警告を無効化
 #pragma warning (disable : 3571)
 
-Texture2D DiffuseMap : register(t0); //カラーテクスチャ
-Texture2D NormalMap : register(t1); //法線テクスチャ
-Texture2D MetallicMap : register(t2); //メタリックマップ
-Texture2D RoughnessMap : register(t3); //ラフネスマップ
-Texture2D AOMap : register(t4); //AOマップ
-Texture2D EmissionMap : register(t5); //エミッションマップ
+Texture2D DiffuseMap : register(t0);   // カラーテクスチャ
+Texture2D NormalMap : register(t1);    // 法線テクスチャ
+Texture2D MetallicMap : register(t2);  // メタリックマップ
+Texture2D RoughnessMap : register(t3); // ラフネスマップ
+Texture2D AOMap : register(t4);        // AOマップ
+Texture2D EmissionMap : register(t5);  // エミッションマップ
 
-//MRT対応
+// アウトラインの定数バッファ
+cbuffer OutLine : register(b11)
+{
+    float3 outlineColor;
+    float outlineintensity;
+}
+
+// MRT対応
 struct PS_OUT
 {
     float4 diffuse : SV_TARGET0;
@@ -21,59 +28,56 @@ struct PS_OUT
     float4 position : SV_TARGET2;
     float4 MRO : SV_TARGET3;
     float4 emission : SV_TARGET4;
+    float4 outline : SV_TARGET5;
 };
 
 /*
-
 デファード描画用のレンダーターゲットに、
 色、法線、位置、金属度、粗さ、環境遮蔽、発光の情報を書き込んでいくシェーダー
-
 */
 PS_OUT main(VS_OUT pin)
 {
     PS_OUT pout = (PS_OUT) 0;
-    
-    //色テクスチャをサンプリング
-    {
-        float4 diffusecolor = DiffuseMap.Sample(sampler_states[ANISOTROPIC], pin.texcoord) * pin.color;
-        // リニア空間に変換
-        pout.diffuse = diffusecolor;
-        pout.diffuse.rgb = pow(pout.diffuse.rgb, GAMMA);
-    }
-    
+
+    // 色テクスチャをサンプリング
+    float4 diffuseColor = DiffuseMap.Sample(sampler_states[ANISOTROPIC], pin.texcoord) * pin.color;
+    // リニア空間に変換
+    pout.diffuse = diffuseColor;
+    pout.diffuse.rgb = pow(pout.diffuse.rgb, GAMMA);
+
     // 法線マップ
+    float3 normal = NormalMap.Sample(sampler_states[ANISOTROPIC], pin.texcoord).xyz;
+    normal = normal * 2 - 1;
+    // 変換用の3x3行列を用意
+    float3x3 CM =
     {
-        // 法線マップからxyz成分を取得して( -1 ～ +1 )の間にスケーリング
-        float3 normal = NormalMap.Sample(sampler_states[ANISOTROPIC], pin.texcoord).xyz;
-        normal = normal * 2 - 1;
-	    // 変換用の3X3行列を用意
-        float3x3 CM =
-        {
-            pin.tangent,
-            pin.binormal,
-            pin.normal
-        };
-	    // 法線マップで取得した法線情報に変換行列を掛け合わせる
-        float3 N = normalize(mul(normal, CM));
-        // ワールド空間の法線( 0 ～ 1 )の間にスケーリング
-        N = (N * 0.5) + 0.5;
-        pout.normal = float4(N, 1.0);
-    }
-    
+        pin.tangent,
+        pin.binormal,
+        pin.normal
+    };
+    // 法線マップで取得した法線情報に変換行列を掛け合わせる
+    float3 N = normalize(mul(normal, CM));
+    // ワールド空間の法線 (0 ～ 1) の間にスケーリング
+    N = (N * 0.5) + 0.5;
+    pout.normal = float4(N, 1.0);
+
     pout.position = float4(pin.world_position, 1.0f);
-    
-    //金属テクスチャをサンプリング
+
+    // 金属テクスチャをサンプリング
     float metallic = saturate(MetallicMap.Sample(sampler_states[LINEAR], pin.texcoord).r * Metalness);
-    //光沢テクスチャをサンプリング
+    // 光沢テクスチャをサンプリング
     float roughness = saturate(RoughnessMap.Sample(sampler_states[LINEAR], pin.texcoord).r * Roughness);
-    //AOマップ
+    // AOマップ
     float ao = AOMap.Sample(sampler_states[LINEAR], pin.texcoord).r;
-    
+
     pout.MRO = float4(metallic, roughness, ao, 1.0f);
 
-    //エミッション
+    // エミッション
     float3 emission = EmissionMap.Sample(sampler_states[LINEAR], pin.texcoord).rgb * emissivecolor.rgb * emissiveintensity;
     pout.emission = float4(emission.rgb, 1.0f);
-    
+
+    //アウトライン
+    pout.outline = float4(outlineColor * outlineintensity, 1.0f);
+
     return pout;
 }

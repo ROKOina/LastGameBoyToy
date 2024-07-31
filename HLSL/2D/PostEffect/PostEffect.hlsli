@@ -1,5 +1,6 @@
 cbuffer CbPostEffect : register(b3)
 {
+    float4 vignettecolor;
     float3 colorize;
     float brightness;
     float contrast;
@@ -8,5 +9,6 @@ cbuffer CbPostEffect : register(b3)
     float bloom_extraction_threshold;
     float blur_convolution_intensity;
     float exposure;
-    float2 Cbdummy;
+    float vignettesize;
+    float vignetteintensity;
 };

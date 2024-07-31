@@ -350,6 +350,14 @@ Graphics::Graphics(HWND hWnd)
             desc.RenderTarget[5].DestBlendAlpha = D3D11_BLEND_ZERO;
             desc.RenderTarget[5].BlendOpAlpha = D3D11_BLEND_OP_ADD;
             desc.RenderTarget[5].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+            desc.RenderTarget[6].BlendEnable = FALSE;
+            desc.RenderTarget[6].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+            desc.RenderTarget[6].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+            desc.RenderTarget[6].BlendOp = D3D11_BLEND_OP_ADD;
+            desc.RenderTarget[6].SrcBlendAlpha = D3D11_BLEND_ONE;
+            desc.RenderTarget[6].DestBlendAlpha = D3D11_BLEND_ZERO;
+            desc.RenderTarget[6].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+            desc.RenderTarget[6].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
             hr = device_->CreateBlendState(&desc, blendStates[static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS)].GetAddressOf());
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
@@ -400,6 +408,16 @@ Graphics::Graphics(HWND hWnd)
             desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
             desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
             hr = device_->CreateDepthStencilState(&desc, depthStencilStates[static_cast<size_t>(DEPTHSTATE::ZT_OFF_ZW_OFF)].GetAddressOf());
+            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        }
+
+        // SILHOUETTE
+        {
+            desc.DepthEnable = TRUE;
+            desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+            desc.DepthFunc = D3D11_COMPARISON_GREATER;
+
+            hr = device_->CreateDepthStencilState(&desc, depthStencilStates[static_cast<size_t>(DEPTHSTATE::SILHOUETTE)].GetAddressOf());
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
 
@@ -638,6 +656,7 @@ Graphics::Graphics(HWND hWnd)
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::FAKE_DEPTH)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::FAKE_DEPTH);
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SCI_FI_GATE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SCI_FI_GATE);
         m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SHADOW)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SHADOW);
+        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SILHOUETTE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SILHOUETTE);
     }
 
     // ƒŒƒ“ƒ_ƒ‰

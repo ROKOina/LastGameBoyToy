@@ -51,7 +51,16 @@ void SceneGame::Initialize()
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
-    //GameObj testPlayer = GenerateTestCharacter({ 6,3,0 });
+    //ステージ
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("stage");
+        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/canyon/stage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+    }
 
     //プレイヤー
     {
@@ -71,7 +80,7 @@ void SceneGame::Initialize()
 
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
-        sphere->SetRadius(2.0f);
+        sphere->SetRadius(0.5f);
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -82,48 +91,6 @@ void SceneGame::Initialize()
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
         cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
-    }
-
-    //ステージ
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-    }
-
-    //テスト
-    {
-        //Graphics::Instance().SetWorldSpeed(0.1f);
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("SciFiGate");
-        obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
-        obj->transform_->SetScale({ 0.06f,0.0001f,0.02f });
-        obj->transform_->SetEulerRotation({ 90,0,0 });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
-        r->LoadModel("Data/UtilityModels/plane.mdl");
-        r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
-
-        auto& cb = r->SetVariousConstant<SciFiGateConstants>();
-        cb->simulateSpeed1 = 1.1f;
-        cb->simulateSpeed2 = -0.3f;
-        cb->uvScrollDir1 = { 1.0f,1.0f };
-        cb->uvScrollDir2 = { 0.0f,1.0f };
-        cb->uvScale1 = { 2.0f,1.0f };
-        cb->intensity1 = 0.8f;
-        cb->intensity2 = 1.6f;
-        cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
-        cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
-        cb->contourIntensity = 1.5f;
-    }
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("test");
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
-        r->LoadModel("Data/Ball/b.mdl");
     }
 
 #pragma endregion
@@ -149,11 +116,9 @@ void SceneGame::Initialize()
 
 #pragma endregion
 
+
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
-//BasicsApplication::run(l);
-//delete l;
-
 }
 
 // 終了化
@@ -183,13 +148,6 @@ void SceneGame::Update(float elapsedTime)
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-    ////コンポーネントゲット
-    //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("zombie");
-    //std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
-    //std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-    //DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
-    //a->updateRootMotion(pos);
 }
 
 // 描画処理
