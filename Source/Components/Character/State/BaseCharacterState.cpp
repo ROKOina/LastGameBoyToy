@@ -15,7 +15,15 @@ void BaseCharacter_IdleState::Enter()
 {
     //歩きアニメーション再生開始
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), 1,1,1,true, false,0, 0.1f,0.0f);
+
+    AnimationCom::PlayLowBodyAnimParam param =
+    {
+        param.lowerAnimaOneId= animationCom.lock()->FindAnimation("Idle"),
+        param.loop=true,
+        param.animeChangeRate=0.1f
+    };
+
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
