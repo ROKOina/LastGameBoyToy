@@ -45,6 +45,19 @@ public:
         UpperBlendLowerAnimation,
     };
 
+    struct PlayLowBodyAnimParam
+    {
+        int   lowerAnimaOneId; //再生したいアニメーションを入れて下さい
+        int   lowerAnimeTwoId=0;  ///歩きモーション用
+        int   lowerAnimeThreeId=0;///歩きモーション用
+        int   lowerAnimeFourId=0; ///歩きモーション用
+        bool  loop=false;         //ループ再生するかしないか
+        bool  rootFlag=false;     //ルートモーションするかしないか
+        int   blendType=0;        // 0=ノーマルアニメーション 1=ブレンドアニメーション 2=歩きブレンドアニメーション
+        float animeChangeRate=0.0f; //アニメーション切り替え時のアニメーション変更速度
+        float animeBlendRate=0.0f;  //ブレンドの利率
+    };
+
 public:
     //アニメーション再生関数
 
@@ -53,7 +66,7 @@ public:
     //上半身だけアニメーション再生
     void PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds);
     //下半身だけアニメーション再生 lowerAnimeTwoIdはブレンドアニメーションしないときは‐1を入れといて下さい blendType　 0=ノーマルアニメーション 1=ブレンドアニメーション 2=歩きブレンドアニメーション
-    void PlayLowerBodyOnlyAnimation(int lowerAnimaId,int lowerAnimeTwoId,int lowerAnimeThreeId,int lowerAnimeFourId, bool loop, bool rootFlag,int blendType, float animeChangeRate,float animeBlendRate);
+    void PlayLowerBodyOnlyAnimation(PlayLowBodyAnimParam param);
     //再生中か
     bool IsPlayAnimation() const { return currentAnimation >= 0; }
     //上半身アニメーション再生中か？
@@ -66,6 +79,8 @@ public:
 
     //アニメIDを返す
     int FindAnimation(const char* animeName);
+
+    
 
 public:
     //ゲッターセッター
@@ -212,6 +227,7 @@ private:
     //上半身下半身ブレンドアニメーション管理フラグ
     bool                            upperBlendTypeFlag = false;
     bool                            lowerBlendTypeFlag = false;
+
 
 
     //アニメーション更新変数

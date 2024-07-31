@@ -417,6 +417,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                 }
                 else if (lowerBlendType == 2)
                 {
+
                     float walkBlendRate = 0.0f;
 
                     float stickAngle = GetGameObject()->GetComponent<CharacterCom>()->GetStickAngle();
@@ -627,21 +628,21 @@ void AnimationCom::PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float
 }
 
 //下半身のみアニメーション再生関数
-void AnimationCom::PlayLowerBodyOnlyAnimation(int lowerAnimaId,int lowerAnimeTwoId,int lowerAnimeThreeId,int lowerAnimeFourId, bool loop, bool rootFlga,int blendType, float animeChangeRate,float animeBlendRate)
+void AnimationCom::PlayLowerBodyOnlyAnimation(PlayLowBodyAnimParam param)
 {
-    currentLowerAnimation = lowerAnimaId; //前
-    lowerAnimationTwoIndex = lowerAnimeTwoId;//後
-    lowerAnimationThreeIndex = lowerAnimeThreeId;//右
-    lowerAnimationFourIndex = lowerAnimeFourId;//左
+    currentLowerAnimation = param.lowerAnimaOneId; //前
+    lowerAnimationTwoIndex = param.lowerAnimeTwoId;//後
+    lowerAnimationThreeIndex = param.lowerAnimeThreeId;//右
+    lowerAnimationFourIndex = param.lowerAnimeFourId;//左
     lowerCurrentAnimationSeconds = 0.0f;
-    animationLowerLoopFlag = loop;
+    animationLowerLoopFlag = param.loop;
     animationLowerEndFlag = false;
-    lowerAnimationChangeTime = animeChangeRate;
+    lowerAnimationChangeTime =param.animeChangeRate;
     lowerIsPlayAnimation = true;
     beforeOneFream = false;
     lowerAnimationChangeRate = 0.0f;
-    this->rootFlag = rootFlga;
-    lowerBlendType = blendType;
+    this->rootFlag = param.rootFlag;
+    lowerBlendType =param.blendType;
 
 }
 

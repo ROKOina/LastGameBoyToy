@@ -19,12 +19,22 @@ void TestCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    //animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, false, 0.2f);
 
+    AnimationCom::PlayLowBodyAnimParam param =
+    {
+        param.lowerAnimaOneId = animationCom.lock()->FindAnimation("Walk_Forward"),
+        param.lowerAnimeTwoId= animationCom.lock()->FindAnimation("Walk_Back"),
+        param.lowerAnimeThreeId= animationCom.lock()->FindAnimation("Walk_Right"),
+        param.lowerAnimeFourId= animationCom.lock()->FindAnimation("Walk_Left"),
+        param.loop=true,
+        param.rootFlag=false,
+        param.blendType=2,
+        param.animeChangeRate=0.5f,
+        param.animeBlendRate=0.0f
+
+    };
    
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), animationCom.lock()->FindAnimation("Walk_Back"), animationCom.lock()->FindAnimation("Walk_Right"), animationCom.lock()->FindAnimation("Walk_Left"), true, false, 2, 0.5f, 0.0f);
-
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
 
     //ダッシュ用の速度設定
     float maxDashAccele = moveCom.lock()->GetMoveMaxSpeed(); 
@@ -62,8 +72,7 @@ void TestCharacter_MoveState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 
-    //方向アニメーションを再生
-    charaCom.lock()->DirectionAnimation(animationCom.lock(), moveVec, "Walk_Forward", "Walk_Back", "Walk_Right", "Walk_Left", true, 0.4f);
+    
    
 }
 
