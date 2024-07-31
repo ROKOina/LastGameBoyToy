@@ -70,7 +70,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;Common-cpp_vc17_debug_windows_mt_x64.lib;LoadBalancing-cpp_vc17_debug_windows_mt_x64.lib;Photon-cpp_vc17_debug_windows_mt_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);.\External\photon-windows-sdk_v5-0-11-0\Common-cpp;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp;.\External\photon-windows-sdk_v5-0-11-0\Common-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);.\External\photon-windows-sdk_v5-0-11-0\Common-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
