@@ -12,7 +12,9 @@ public:
 	void update(void);
 	ExitGames::Common::JString getStateString(void);
 
+	void NetInputUpdate();
 	void MyCharaInput();
+	void NetCharaInput();
 
 	int GetPlayerNum();
 
@@ -22,6 +24,9 @@ public:
 	//レイテンシ
 	int GetRoundTripTime();
 	int GetRoundTripTimeVariance();
+
+	//他の入室者との最新フレーム差
+	std::vector<int> GetTrips();
 
 	int GetRoomPlayersNum();
 	std::string GetRoomName();
@@ -63,6 +68,15 @@ public:
 	PhotonState::States GetPhotonState() { return mState; }
 
 private:
+	void sendData(void);
+
+	// events, triggered by certain operations of all players in the same room
+	//入室時に入る
+	virtual void joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player);
+	virtual void leaveRoomEventAction(int playerNr, bool isInactive);
+	//データ受信
+	virtual void customEventAction(int playerNr, nByte eventCode, const ExitGames::Common::Object& eventContent);
+
 	// receive and print out debug out here
 	virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);
 
@@ -72,12 +86,6 @@ private:
 	virtual void warningReturn(int warningCode);
 	virtual void serverErrorReturn(int errorCode);
 
-	// events, triggered by certain operations of all players in the same room
-	//入室時に入る
-	virtual void joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player);
-	virtual void leaveRoomEventAction(int playerNr, bool isInactive);
-	//データ受信
-	virtual void customEventAction(int playerNr, nByte eventCode, const ExitGames::Common::Object& eventContent);
 
 	// callbacks for operations on PhotonLoadBalancing server
 	virtual void connectReturn(int errorCode, const ExitGames::Common::JString& errorString, const ExitGames::Common::JString& region, const ExitGames::Common::JString& cluster);
@@ -89,9 +97,10 @@ private:
 	virtual void leaveRoomReturn(int errorCode, const ExitGames::Common::JString& errorString);
 	virtual void joinLobbyReturn(void);
 	virtual void leaveLobbyReturn(void);
+	//地域を決める
 	virtual void onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegions*/, const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegionServers*/);
 
-	void sendData(void);
+
 
 	PhotonState::States mState;
 
@@ -105,12 +114,25 @@ private:
 	//各クライアントインプット保存
 	struct SaveInput
 	{
-		int id;
-		std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 		SaveInput()
 		{
 			inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
 		}
+
+		int id;
+		std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
+
+
+		//次の入力情報を格納
+		struct NextInput
+		{
+			int oldFrame;
+			unsigned int inputDown = 0;
+			unsigned int input = 0;
+			unsigned int inputUp = 0;
+		};
+		NextInput nextInput;
 	};
+
 	std::vector<SaveInput> saveInputPhoton;
 };

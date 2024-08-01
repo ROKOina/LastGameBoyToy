@@ -115,5 +115,12 @@ void BasicsApplication::ImGui()
 	int roundTimeV = photonLib->GetRoundTripTimeVariance();
 	ImGui::InputInt("roundTime", &roundTime);
 
+	std::vector<int> trips = photonLib->GetTrips();
+	for (int i = 0; i < trips.size(); ++i)
+	{
+		ImGui::InputInt(("trip" + std::to_string(i)).c_str(), &trips[i]);
+	}
+
+
 	ImGui::End();
 }

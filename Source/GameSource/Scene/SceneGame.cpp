@@ -81,6 +81,16 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
+
+        //当たり判定オブジェ(エラー直し用)
+        {
+            //ヒットスキャン用オブジェクト
+            GameObj collision = GameObjectManager::Instance().Create();
+            std::shared_ptr<CapsuleColliderCom> capsule = collision->AddComponent<CapsuleColliderCom>();
+            collision->SetName("playerCollision");
+
+            c->SetGunFireCollision(collision);
+        }
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -219,10 +229,10 @@ void SceneGame::Render(float elapsedTime)
 void SceneGame::SetUserInputs()
 {
     // プレイヤーの入力情報
-    SetPlayerInput();
+    //SetPlayerInput();
 
     // 他のプレイヤーの入力情報
-    SetOnlineInput();
+    //SetOnlineInput();
 }
 
 void SceneGame::SetPlayerInput()

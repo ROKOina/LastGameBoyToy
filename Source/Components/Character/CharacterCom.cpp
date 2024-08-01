@@ -99,6 +99,13 @@ void CharacterCom::OnGUI()
     attackStateMachine.ImGui();
 
     ImGui::InputFloat("StickAngle", &stickAngle);
+
+    int i = userInput;
+    ImGui::InputInt("input", &i);
+    i = userInputDown;
+    ImGui::InputInt("userInputDown", &i);
+    i = userInputUp;
+    ImGui::InputInt("userInputUp", &i);
 }
 
 
