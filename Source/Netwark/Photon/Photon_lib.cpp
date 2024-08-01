@@ -243,7 +243,7 @@ void PhotonLib::DelayUpdate()
 
 		for (int j = 0; j < saveInputPhoton.size(); ++j)
 		{
-			if (myID != saveInputPhoton[i].id)continue;
+			if (myID != saveInputPhoton[j].id)continue;
 			saveInputPhoton[i].myDelay = saveInputPhoton[j].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
 			break;
 		}
