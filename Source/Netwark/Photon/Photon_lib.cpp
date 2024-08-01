@@ -77,6 +77,9 @@ void PhotonLib::update(void)
 			mLoadBalancingClient.opJoinOrCreateRoom(gameName);
 			mState = PhotonState::JOINING;
 			break;
+		case PhotonState::JOINING:
+			oldMs = GetServerTime();
+			break;
 		case PhotonState::JOINED:
 			//情報送信
 			if (GetServerTime() - oldMs > sendMs)
@@ -104,6 +107,7 @@ void PhotonLib::update(void)
 	}
 	mLoadBalancingClient.service();
 
+	DelayUpdate();
 	NetInputUpdate();
 	MyCharaInput();
 	NetCharaInput();
@@ -153,16 +157,28 @@ void PhotonLib::NetInputUpdate()
 
 		std::vector<SaveBuffer> saveB;
 		saveB = s.inputBuf->GetHeadFromSize(100);
+
+		bool isInputInit = false;
 		for (auto& b : saveB)
 		{
 			if (b.frame < s.nextInput.oldFrame)break;
-			if (b.frame > nowTime - 50)continue;;
+			if (b.frame > nowTime - s.myDelay)continue;
+
+			if (!isInputInit)	//最初に入った時に入力初期化
+			{
+				s.nextInput.inputDown = 0;
+				s.nextInput.input = 0;
+				s.nextInput.inputUp = 0;
+
+				isInputInit = true;
+			}
+
 			s.nextInput.inputDown |= b.inputDown;
 			s.nextInput.input |= b.input;
 			s.nextInput.inputUp |= b.inputUp;
 		}
 
-		s.nextInput.oldFrame = nowTime - 50;
+		s.nextInput.oldFrame = nowTime - s.myDelay;
 	}
 
 }
@@ -216,6 +232,24 @@ void PhotonLib::NetCharaInput()
 	}
 }
 
+void PhotonLib::DelayUpdate()
+{
+	if (saveInputPhoton.size() <= 0)return;
+
+	int myID = GetPlayerNum();
+	for (int i = 0; i < saveInputPhoton.size(); ++i)
+	{
+		if (myID == saveInputPhoton[i].id)continue;
+
+		for (int j = 0; j < saveInputPhoton.size(); ++j)
+		{
+			if (myID != saveInputPhoton[i].id)continue;
+			saveInputPhoton[i].myDelay = saveInputPhoton[j].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
+			break;
+		}
+	}
+}
+
 int PhotonLib::GetPlayerNum()
 {
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
@@ -253,9 +287,13 @@ std::vector<int> PhotonLib::GetTrips()
 	std::vector<int> trips;
 	trips.resize(saveInputPhoton.size()-1);
 
-	for (int i = 1; i < saveInputPhoton.size(); ++i)
+	int myID = GetPlayerNum();
+	int count = 0;
+	for (auto& s : saveInputPhoton)
 	{
-		trips[i - 1] = saveInputPhoton[0].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
+		if (myID == s.id)continue;
+		trips[count] = s.myDelay;
+		count++;
 	}
 
 	return trips;
@@ -433,11 +471,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 					SaveBuffer currentInput = s.inputBuf->GetHead();
 					if (currentInput.frame < newInput.frame)	//新しいフレームから始める
 						s.inputBuf->Enqueue(newInput);
-
-
-					s.nextInput.input = 0;
-					s.nextInput.inputDown = 0;
-					s.nextInput.inputUp = 0;
 
 				}
 			}

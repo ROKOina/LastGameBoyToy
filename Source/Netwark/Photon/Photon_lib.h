@@ -16,6 +16,9 @@ public:
 	void MyCharaInput();
 	void NetCharaInput();
 
+	//他の入室者との差を保存
+	void DelayUpdate();
+
 	int GetPlayerNum();
 
 	int GetServerTime();
@@ -27,6 +30,7 @@ public:
 
 	//他の入室者との最新フレーム差
 	std::vector<int> GetTrips();
+
 
 	int GetRoomPlayersNum();
 	std::string GetRoomName();
@@ -115,7 +119,7 @@ private:
 
 	//送信頻度（ms）
 	int sendMs = 35;
-	int oldMs= INT32_MAX;
+	int oldMs;
 
 
 
@@ -130,6 +134,8 @@ private:
 		int id;
 		std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
+		//自分のIDから見たディレイ
+		int myDelay = 50;
 
 		//次の入力情報を格納
 		struct NextInput
