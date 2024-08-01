@@ -95,6 +95,10 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
+    int s = (int)(moveStateMachine.GetCurrentState());
+    ImGui::InputInt("moveS", &s);
+    s = (int)(attackStateMachine.GetCurrentState());
+    ImGui::InputInt("attackS", &s);
     moveStateMachine.ImGui();
     attackStateMachine.ImGui();
 

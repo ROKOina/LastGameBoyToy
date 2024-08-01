@@ -28,8 +28,7 @@ static void JumpInput(std::shared_ptr<GameObject> obj, float speed = 1)
 {
     auto& moveCom = obj->GetComponent<MovementCom>();
 
-    GamePad gamePad = Input::Instance().GetGamePad();
-    if (CharacterInput::JumpButton_SPACE & gamePad.GetButtonDown())
+    if (CharacterInput::JumpButton_SPACE & obj->GetComponent<CharacterCom>()->GetButtonDown())
     {
         DirectX::XMFLOAT3 power = { 0,obj->GetComponent<CharacterCom>()->GetJumpPower() * speed,0 };
         moveCom->AddForce(power);

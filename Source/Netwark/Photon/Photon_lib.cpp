@@ -148,10 +148,10 @@ void PhotonLib::NetInputUpdate()
 {
 	for (auto& s : saveInputPhoton)
 	{
-		////‰Šú‰»
-		//s.nextInput.inputDown = 0;
-		//s.nextInput.input = 0;
-		//s.nextInput.inputUp = 0;
+		//‰Šú‰»
+		s.nextInput.inputDown = 0;
+		s.nextInput.input = 0;
+		s.nextInput.inputUp = 0;
 
 		int nowTime = GetServerTime();
 
