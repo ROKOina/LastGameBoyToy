@@ -121,6 +121,9 @@ void BasicsApplication::ImGui()
 		ImGui::InputInt(("trip" + std::to_string(i)).c_str(), &trips[i]);
 	}
 
+	int sendMs = photonLib->SendMs();
+	ImGui::InputInt("sendMS", &sendMs);
+
 
 	ImGui::End();
 }

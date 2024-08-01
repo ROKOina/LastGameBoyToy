@@ -31,6 +31,8 @@ public:
 	int GetRoomPlayersNum();
 	std::string GetRoomName();
 
+	int SendMs();
+
 	class PhotonState
 	{
 	public:
@@ -110,6 +112,12 @@ private:
 
 	int64 mSendCount;
 	int64 mReceiveCount;
+
+	//送信頻度（ms）
+	int sendMs = 35;
+	int oldMs= INT32_MAX;
+
+
 
 	//各クライアントインプット保存
 	struct SaveInput

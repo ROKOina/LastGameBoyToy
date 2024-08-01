@@ -78,7 +78,12 @@ void PhotonLib::update(void)
 			mState = PhotonState::JOINING;
 			break;
 		case PhotonState::JOINED:
-			sendData();
+			//情報送信
+			if (GetServerTime() - oldMs > sendMs)
+			{
+				sendData();
+				oldMs = GetServerTime();
+			}
 			break;
 		case PhotonState::RECEIVED_DATA:
 			mLoadBalancingClient.opLeaveRoom();
@@ -271,6 +276,11 @@ std::string PhotonLib::GetRoomName()
 	return WStringToString(mLoadBalancingClient.getCurrentlyJoinedRoom().getName().cstr());
 }
 
+int PhotonLib::SendMs()
+{
+	return GetServerTime() - oldMs;
+}
+
 
 
 
@@ -324,10 +334,11 @@ void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVect
 	for (int playerNum = 0; playerNum < playernrs.getSize(); ++playerNum)
 	{
 		//新規クライアント確認
+		int newClientID = playernrs[playerNum];
 		bool isNewClient = true;
 		for (auto& s : saveInputPhoton)
 		{
-			if (s.id != playerNum)continue;
+			if (s.id != newClientID)continue;
 
 			isNewClient = false;
 			break;
@@ -336,7 +347,7 @@ void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVect
 		{
 			//追加
 			SaveInput& saveInputJoin = saveInputPhoton.emplace_back(SaveInput());
-			saveInputJoin.id = playerNr;
+			saveInputJoin.id = newClientID;
 			saveInputJoin.nextInput.oldFrame = GetServerTime() - 100;
 
 			//今のフレームを入れる
