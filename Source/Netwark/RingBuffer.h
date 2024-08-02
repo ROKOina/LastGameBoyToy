@@ -18,7 +18,7 @@ public:
         // 配列の開始アドレスを末尾アドレス、開始アドレス変数に保存
         head = tail = &arr[0];
         // 開始インデックス番号
-        headIndex = 0;
+        headIndex = -1;
         // 保存サイズ
         size = 0;
     }
@@ -55,17 +55,19 @@ public:
     }
 
     // データ削除
-    const T* Dequeue()
+    const T& Dequeue()
     {
         if (size > 0)
         {
+            T saveTail = *tail;
             int s = cap + headIndex - size + 2;
             s %= cap;
 
             tail = &arr[s];
             size--;
+            return saveTail;
         }
-        return nullptr;
+        return T();
     }
 
 
@@ -110,7 +112,7 @@ private:
     //T* arr = nullptr;
     //T* head = nullptr;
     //T* tail = nullptr;
-    int headIndex = 0;
+    int headIndex = -1;
     size_t cap;     //最大サイズ
     size_t size;    //現在のサイズ
 };

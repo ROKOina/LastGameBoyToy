@@ -13,6 +13,9 @@
 #include "Components/MovementCom.h"
 #include "Components/ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
+#include "Components\Character\InazawaCharacterCom.h"
+
+#include "StaticSendDataManager.h"
 
 #include "imgui.h"
 
@@ -224,11 +227,6 @@ void PhotonLib::NetInputUpdate()
 {
 	for (auto& s : saveInputPhoton)
 	{
-		//初期化
-		s.nextInput.inputDown = 0;
-		s.nextInput.input = 0;
-		s.nextInput.inputUp = 0;
-
 		int nowTime = GetServerTime();
 
 		std::vector<SaveBuffer> saveB;
@@ -280,7 +278,7 @@ void PhotonLib::MyCharaInput()
 		chara->SetUserInputDown(s.nextInput.inputDown);
 		chara->SetUserInputUp(s.nextInput.inputUp);
 
-		s.nextInput.input = 0;
+		//s.nextInput.input = 0;
 		s.nextInput.inputDown = 0;
 		s.nextInput.inputUp = 0;
 
@@ -306,6 +304,9 @@ void PhotonLib::NetCharaInput()
 		chara->SetUserInput(s.nextInput.input);
 		chara->SetUserInputDown(s.nextInput.inputDown);
 		chara->SetUserInputUp(s.nextInput.inputUp);
+
+		s.nextInput.inputDown = 0;
+		s.nextInput.inputUp = 0;
 	}
 }
 
@@ -404,12 +405,23 @@ void PhotonLib::sendData(void)
 {
 	ExitGames::Common::Hashtable event;
 
-	auto obj = GameObjectManager::Instance().Find("player");
+	auto& obj = GameObjectManager::Instance().Find("player");
 
 	std::vector<NetData> n;
 	NetData& netD = n.emplace_back(NetData());
 	auto tra = obj->transform_->GetWorldPosition();
 	netD.pos = { tra.x,tra.y,tra.z };
+
+	auto& move = obj->GetComponent<MovementCom>();
+	netD.velocity = move->GetVelocity();
+
+	//ダメージ情報送信
+	auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
+	for (auto& data : sendDatas)
+	{
+		netD.damageData[data.id] += data.damage;
+		data.damage = 0;
+	}
 
 	//自分の入力を送る
 	int myID = GetPlayerNum();
@@ -503,27 +515,38 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				r->LoadModel("Data/OneCoin/robot.mdl");
 				std::shared_ptr<AnimationCom> a = net1->AddComponent<AnimationCom>();
 				a->PlayAnimation(0, true, false, 0.001f);
+				//std::shared_ptr<TestCharacterCom> c = net1->AddComponent<TestCharacterCom>();
+				std::shared_ptr<InazawaCharacterCom> c = net1->AddComponent<InazawaCharacterCom>();
+				c->SetCharaID(playerNr);
 				std::shared_ptr<MovementCom> m = net1->AddComponent<MovementCom>();
-				std::shared_ptr<TestCharacterCom> c = net1->AddComponent<TestCharacterCom>();
 
 				std::shared_ptr<SphereColliderCom> sphere = net1->AddComponent<SphereColliderCom>();
-				sphere->SetMyTag(COLLIDER_TAG::Player);
+				sphere->SetMyTag(COLLIDER_TAG::Enemy);
 				sphere->SetRadius(0.5f);
 
-				//当たり判定オブジェ(エラー直し用)
-				{
-					//ヒットスキャン用オブジェクト
-					GameObj collision = GameObjectManager::Instance().Create();
-					std::shared_ptr<CapsuleColliderCom> capsule = collision->AddComponent<CapsuleColliderCom>();
-					collision->SetName(("playerCollision" + std::to_string(playerNr)).c_str());
+				////当たり判定オブジェ(エラー直し用)
+				//{
+				//	//ヒットスキャン用オブジェクト
+				//	GameObj collision = GameObjectManager::Instance().Create();
+				//	std::shared_ptr<CapsuleColliderCom> capsule = collision->AddComponent<CapsuleColliderCom>();
+				//	collision->SetName(("playerCollision" + std::to_string(playerNr)).c_str());
 
-					c->SetGunFireCollision(collision);
+				//	c->SetGunFireCollision(collision);
 
-				}
+				//}
 			}
 
 			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
+			net1->GetComponent<MovementCom>()->SetVelocity(ne[0].velocity);
 
+			//ダメージ情報
+			for (int id = 0; id < ne[0].damageData.size(); ++id)
+			{
+				if (id != GetPlayerNum())continue;
+
+				net1->GetComponent<CharacterCom>()->AddHitPoint(-ne[0].damageData[id]);
+				break;
+			}
 			//入力を保存
 			for (int i = ne[0].saveInputBuf.size() - 1; i >= 0; --i)
 			{

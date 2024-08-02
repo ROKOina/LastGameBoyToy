@@ -7,13 +7,17 @@
 #include "../AnimationCom.h"
 #include <array>
 
+#include "../MovementCom.h"
+
+
 //プレイヤー用キー入力補助クラス
 class CharacterInput
 {
 public:
     static constexpr GamePadButton JumpButton_SPACE = GamePad::BTN_A;
-    static constexpr GamePadButton MainSkillButton_Q = GamePad::BTN_RIGHT_SHOULDER;
-    static constexpr GamePadButton SubSkillButton_E = GamePad::BTN_LEFT_SHOULDER;
+    static constexpr GamePadButton LeftShiftButton = GamePad::BTN_LEFT_SHOULDER;
+    static constexpr GamePadButton MainSkillButton_Q = GamePad::BTN_B;
+    static constexpr GamePadButton SubSkillButton_E = GamePad::BTN_X;
     static constexpr GamePadButton UltimetButton_R = GamePad::BTN_Y;
     static constexpr GamePadButton MainAttackButton = GamePad::BTN_RIGHT_TRIGGER;   //マウス左
     static constexpr GamePadButton SubAttackButton = GamePad::BTN_LEFT_TRIGGER;     //マウス右
@@ -63,13 +67,19 @@ public:
     // GUI描画
     void OnGUI() override;
 
-   
+    //左クリック
     virtual void MainAttack() {};
+    //右クリック
     virtual void SubAttack() {};
 
+    //Q
     virtual void MainSkill() {};
+    //E
     virtual void SubSkill() {};
+    //R
     virtual void UltSkill() {};
+    //LeftShift
+    virtual void LeftShiftSkill() {};
 
     virtual void SpaceSkill() {}
 
@@ -83,10 +93,20 @@ public:
   float GetHitPoint() { return hitPoint; }
   void AddHitPoint(float value) { hitPoint += value; }
 
+  void SetMoveMaxSpeed(float speed) 
+  { 
+      GetGameObject()->GetComponent<MovementCom>()->SetMoveMaxSpeed(speed);
+  }
+  float GetMoveMaxSpeed() 
+  { 
+      return GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
+  }
+
   void SetCharaID(int id) { charaID = id; }
   int GetCharaID() { return charaID; }
   void AddGiveDamage(int index, float damage) { giveDamage[index] += damage; }
   std::array<float, 6> GetGiveDamage() { return giveDamage; }
+
 
   // 操作入力情報
   void SetUserInput(const GamePadButton& button) { userInput = button; }
@@ -126,6 +146,7 @@ protected:
   std::array<float, 6> giveDamage = { 0,0,0,0,0,0 };//敵に与えたダメージ量や味方に与えた回復
 
 private:
+
     // キャラクターの操作入力情報
     unsigned int userInput = 0x00;
     unsigned int userInputDown = 0x00;

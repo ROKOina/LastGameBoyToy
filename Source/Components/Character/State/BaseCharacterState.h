@@ -16,7 +16,7 @@ static void MoveInputVec(std::shared_ptr<GameObject> obj, float speed = 1)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //•à‚­
-    DirectX::XMFLOAT3 v = moveVec * moveCom->GetMoveAcceleration() * speed;
+    DirectX::XMFLOAT3 v = moveVec * speed;
     moveCom->AddForce(v);
 
     //ù‰ñˆ—

@@ -120,7 +120,7 @@ private:
   float friction_ = 15;  //摩擦
 
   float moveMaxSpeed_ = 10.0f;
-  float moveAcceleration_ = 1.0f;
+  float moveAcceleration_ = 2.0f;
 
   inline static float maxGravity = -0.7f; // 最大落下速度
   inline static float stepOffset = 0.5f; // レイキャスト用のオフセット

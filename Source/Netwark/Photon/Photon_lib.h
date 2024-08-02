@@ -13,7 +13,7 @@ public:
 	void ImGui();
 	ExitGames::Common::JString getStateString(void);
 
-	//“ü—Íî•ñŒğM
+	//“ü—Íî•ñXV
 	void NetInputUpdate();
 	void MyCharaInput();
 	void NetCharaInput();

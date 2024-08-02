@@ -36,6 +36,8 @@
 
 #include "Netwark/Photon/StdIO_UIListener.h"
 
+#include "Netwark/Photon/StaticSendDataManager.h"
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -72,25 +74,25 @@ void SceneGame::Initialize()
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         a->PlayAnimation(0, true, false, 0.001f);
-        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
+        //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
         //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
+        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
 
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
 
-        //当たり判定オブジェ(エラー直し用)
-        {
-            //ヒットスキャン用オブジェクト
-            GameObj collision = GameObjectManager::Instance().Create();
-            std::shared_ptr<CapsuleColliderCom> capsule = collision->AddComponent<CapsuleColliderCom>();
-            collision->SetName("playerCollision");
+        ////当たり判定オブジェ(エラー直し用)
+        //{
+        //    //ヒットスキャン用オブジェクト
+        //    GameObj collision = GameObjectManager::Instance().Create();
+        //    std::shared_ptr<CapsuleColliderCom> capsule = collision->AddComponent<CapsuleColliderCom>();
+        //    collision->SetName("playerCollision");
 
-            c->SetGunFireCollision(collision);
-        }
+        //    c->SetGunFireCollision(collision);
+        //}
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -129,6 +131,12 @@ void SceneGame::Initialize()
 
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
+
+    StaticSendDataManager::NetSendData s;
+    s.id = 2;
+    StaticSendDataManager::Instance().SetNetSendData(s);
+    StaticSendDataManager::Instance().GetNetSendDatas();
+    int i = 0;
 }
 
 // 終了化

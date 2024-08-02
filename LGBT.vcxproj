@@ -221,6 +221,7 @@
     <ClInclude Include="Source\Netwark\NetwarkPost.h" />
     <ClInclude Include="Source\Netwark\Photon\BasicsApplication.h" />
     <ClInclude Include="Source\Netwark\Photon\Photon_lib.h" />
+    <ClInclude Include="Source\Netwark\Photon\StaticSendDataManager.h" />
     <ClInclude Include="Source\Netwark\Photon\StdIO_UIListener.h" />
     <ClInclude Include="Source\Netwark\Photon\UIListener.h" />
     <ClInclude Include="Source\Netwark\RingBuffer.h" />

@@ -18,6 +18,8 @@ enum COLLIDER_TAG : uint64_t
     EnemyAttack     = 1 << 11,
     EnemyPushBack = 1 << 12,
 
+    Bullet = 1 << 13,
+
     Wall            = 1 << 30,
 };
 static COLLIDER_TAG operator| (COLLIDER_TAG L, COLLIDER_TAG R)
