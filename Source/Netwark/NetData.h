@@ -110,7 +110,6 @@ struct NetData
     unsigned int input;
     unsigned int inputUp;
     long long nowFrame;
-    long long playDelay;
 
     std::vector<SaveBuffer> saveInputBuf;
     std::array<float, 6> damageData;//キャラに与えたダメージ

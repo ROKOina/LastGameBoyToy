@@ -544,9 +544,15 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			{
 				if (id != GetPlayerNum())continue;
 
+				if (ne[0].damageData[id] > 0)
+				{
+					int a = 0;
+				}
+
 				net1->GetComponent<CharacterCom>()->AddHitPoint(-ne[0].damageData[id]);
 				break;
 			}
+
 			//“ü—Í‚ð•Û‘¶
 			for (int i = ne[0].saveInputBuf.size() - 1; i >= 0; --i)
 			{
