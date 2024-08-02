@@ -11,6 +11,7 @@
 #include "SystemStruct/TransformUtils.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "GameSource/GameScript/FreeCameraCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -307,7 +308,17 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
     if (selectObject.find(obj) != selectObject.end())
     {
         nodeFlags |= ImGuiTreeNodeFlags_Selected;
+
+        if (ImGui::IsMouseDoubleClicked(0))
+        {
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
+
+           
+        }
     }
+
+    
 
     //子がいないなら、▼付けない
     if (obj->GetChildren().size() == 0)
@@ -550,6 +561,20 @@ void GameObjectManager::DrawLister()
 
             //親子GUI用の再起関数
             CycleDrawLister(obj, selectionGameObject_);
+
+
+            //if (ImGui::TreeNode(obj->GetName()) 
+            //{
+            //    // ここでobjに関連する情報を取得します。
+            //    DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+            //   
+            //    
+            //    
+            //   
+            //}
+                
+  
+
         }
     }
     ImGui::End();
