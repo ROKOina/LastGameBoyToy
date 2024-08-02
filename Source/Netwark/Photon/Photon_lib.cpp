@@ -14,6 +14,8 @@
 #include "Components/ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
 
+#include "imgui.h"
+
 static const ExitGames::Common::JString appID = L"0d572336-477d-43ad-895e-59f4eeebbca9"; // set your app id here
 static const ExitGames::Common::JString appVersion = L"1.0";
 
@@ -31,8 +33,6 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 	, mpOutputListener(uiListener)
 	//第四引数でクライアントのパラメーター・設定をしている
 	, mLoadBalancingClient(*this, appID, appVersion, ExitGames::LoadBalancing::ClientConstructOptions(0U, true, ExitGames::LoadBalancing::RegionSelectionMode::SELECT, true))
-	, mSendCount(0)
-	, mReceiveCount(0)
 #ifdef _EG_MS_COMPILER
 #	pragma warning(pop)
 #endif
@@ -113,6 +113,82 @@ void PhotonLib::update(void)
 	NetCharaInput();
 }
 
+void PhotonLib::ImGui()
+{
+	//ネットワーク決定仮ボタン
+	ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+	ImGui::Begin("PhotonNet", nullptr, ImGuiWindowFlags_None);
+
+	//ID表示
+	int photonID = GetPlayerNum();
+	ImGui::InputInt("photonID", &photonID);
+
+	//状態表示
+	std::string nowState = stateStr[GetPhotonState()];
+	ImGui::Text(("State : " + nowState).c_str());
+
+	ImGui::Separator();
+
+	//ルーム名前
+	ImGui::Text(("RoomName : " + GetRoomName()).c_str());
+
+	//ルーム人数表示
+	int roomCount = GetRoomPlayersNum();
+	ImGui::InputInt("roomPlayersNum", &roomCount);
+
+
+	//サーバー時間
+	int serverTime = GetServerTime();
+	int serverTimeOF = GetServerTimeOffset();
+	ImGui::InputInt("serverTime", &serverTime);
+
+	int A = serverTime / 1000;
+	A %= 10;
+	ImGui::InputInt("A", &A);
+
+
+	//時間デバッグ比較用
+	//serverTime += serverTimeOF;
+	if (serverTime != 0)
+	{
+		int slTime = 10000;
+		static int saveTime = 0;
+		static int oldSerTime = serverTime;
+		saveTime += serverTime - oldSerTime;
+		oldSerTime = serverTime;
+		static bool reverseB = true;
+		if (saveTime > slTime)
+		{
+			saveTime = 0;
+			reverseB = !reverseB;
+		}
+		if (saveTime < 0)saveTime = 0;
+		ImGui::InputInt("saveTime", &saveTime);
+		ImGui::Checkbox("SerVV", &reverseB);
+	}
+
+
+	ImGui::InputInt("serverTimeOFF", &serverTimeOF);
+
+	int roundTime = GetRoundTripTime();
+	int roundTimeV = GetRoundTripTimeVariance();
+	ImGui::InputInt("roundTime", &roundTime);
+
+	std::vector<int> trips = GetTrips();
+	for (int i = 0; i < trips.size(); ++i)
+	{
+		ImGui::InputInt(("trip" + std::to_string(i)).c_str(), &trips[i]);
+	}
+
+	int sendMs = SendMs();
+	ImGui::InputInt("sendMS", &sendMs);
+
+
+	ImGui::End();
+}
+
 ExitGames::Common::JString PhotonLib::getStateString(void)
 {
 	switch(mState)
@@ -126,9 +202,9 @@ ExitGames::Common::JString PhotonLib::getStateString(void)
 		case PhotonState::JOINING:
 			return L"joining\n";
 		case PhotonState::JOINED:
-			return ExitGames::Common::JString(L"ingame\nsent event Nr. ") + mSendCount + L"\nreceived event Nr. " + mReceiveCount;
+			return L"JOINED\n";
 		case PhotonState::SENT_DATA:
-			return ExitGames::Common::JString(L"sending completed") + L"\nreceived event Nr. " + mReceiveCount;
+			return L"SENT_DATA\n";
 		case PhotonState::RECEIVED_DATA:
 			return L"receiving completed\n";
 		case PhotonState::LEAVING:
@@ -161,6 +237,7 @@ void PhotonLib::NetInputUpdate()
 		bool isInputInit = false;
 		for (auto& b : saveB)
 		{
+			//前回のフレームから今回のフレームからディレイした分までの入力を保存
 			if (b.frame < s.nextInput.oldFrame)break;
 			if (b.frame > nowTime - s.myDelay)continue;
 
@@ -244,6 +321,7 @@ void PhotonLib::DelayUpdate()
 		for (int j = 0; j < saveInputPhoton.size(); ++j)
 		{
 			if (myID != saveInputPhoton[j].id)continue;
+			//先頭フレームの差を保存
 			saveInputPhoton[i].myDelay = saveInputPhoton[j].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
 			break;
 		}
@@ -349,16 +427,12 @@ void PhotonLib::sendData(void)
 
 	std::stringstream s = NetDataSendCast(n);
 	event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
-	//event.put(static_cast<nByte>(0), ++mSendCount);
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
 	//自分以外全員に送信
 	mLoadBalancingClient.opRaiseEvent(true, event, 0);
 	//特定のナンバーに送信
 	//mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
 
-	////MAX_SENDCOUNT以上になるとPhotonState::SENT_DATAへ
-	//if(mSendCount >= MAX_SENDCOUNT)
-	//	mState = PhotonState::SENT_DATA;
 }
 
 void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player)
@@ -413,7 +487,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 		{
 			ExitGames::Common::JString s;
 			s = ((ExitGames::Common::ValueObject<ExitGames::Common::JString>*)(eventContent.getValue((nByte)0)))->getDataCopy();
-			//mReceiveCount = ((ExitGames::Common::ValueObject<int64>*)(eventContent.getValue((nByte)0)))->getDataCopy();
 			auto ne = NetDataRecvCast(WStringToString(s.cstr()));
 
 			//仮オブジェ
@@ -421,12 +494,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
 			if (!net1)
 			{
-				//net1 = GameObjectManager::Instance().Create();
-				//net1->SetName(name.c_str());
-				//std::shared_ptr<RendererCom> r = net1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-				//r->LoadModel("Data/OneCoin/robot.mdl");
-				//net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-
 				//netプレイヤー
 				net1 = GameObjectManager::Instance().Create();
 				net1->SetName(name.c_str());
@@ -437,10 +504,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				std::shared_ptr<AnimationCom> a = net1->AddComponent<AnimationCom>();
 				a->PlayAnimation(0, true, false, 0.001f);
 				std::shared_ptr<MovementCom> m = net1->AddComponent<MovementCom>();
-				//std::shared_ptr<InazawaCharacterCom> c = net1->AddComponent<InazawaCharacterCom>();
 				std::shared_ptr<TestCharacterCom> c = net1->AddComponent<TestCharacterCom>();
-				//std::shared_ptr<UenoCharacterCom> c = net1->AddComponent<UenoCharacterCom>();
-				//std::shared_ptr<NomuraCharacterCom> c = net1->AddComponent<NomuraCharacterCom>();
 
 				std::shared_ptr<SphereColliderCom> sphere = net1->AddComponent<SphereColliderCom>();
 				sphere->SetMyTag(COLLIDER_TAG::Player);
@@ -471,17 +535,10 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 					SaveBuffer currentInput = s.inputBuf->GetHead();
 					if (currentInput.frame < newInput.frame)	//新しいフレームから始める
 						s.inputBuf->Enqueue(newInput);
-
 				}
 			}
 
 
-		}
-		if (mState == PhotonState::SENT_DATA && mReceiveCount >= mSendCount)
-		{
-			mState = PhotonState::RECEIVED_DATA;
-			mSendCount = 0;
-			mReceiveCount = 0;
 		}
 		break;
 	default:

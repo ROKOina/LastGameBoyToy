@@ -10,8 +10,10 @@ class PhotonLib : private ExitGames::LoadBalancing::Listener
 public:
 	PhotonLib(UIListener*);
 	void update(void);
+	void ImGui();
 	ExitGames::Common::JString getStateString(void);
 
+	//入力情報交信
 	void NetInputUpdate();
 	void MyCharaInput();
 	void NetCharaInput();
@@ -113,9 +115,6 @@ private:
 	UIListener* mpOutputListener;
 	ExitGames::LoadBalancing::Client mLoadBalancingClient;
 	ExitGames::Common::Logger mLogger;
-
-	int64 mSendCount;
-	int64 mReceiveCount;
 
 	//送信頻度（ms）
 	int sendMs = 35;
