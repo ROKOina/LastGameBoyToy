@@ -54,5 +54,14 @@ public:
         const Model* model,
         HitResult& result
     );
+
+    static bool IntersectRayVsSphere(
+        const DirectX::XMVECTOR& rayStart,
+        const DirectX::XMVECTOR& rayDirection,		// óvê≥ãKâª
+        float rayDist,
+        const DirectX::XMVECTOR& spherePos,
+        float radius,
+        HitResult& result
+    );
 };
 

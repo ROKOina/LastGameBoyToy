@@ -295,3 +295,36 @@ bool Collision::IntersectRayVsModel(
 
     return hit;
 }
+
+// ÉåÉCVsãÖ
+bool Collision::IntersectRayVsSphere(
+    const DirectX::XMVECTOR& rayStart,
+    const DirectX::XMVECTOR& rayDirection,		// óvê≥ãKâª
+    float rayDist,
+    const DirectX::XMVECTOR& spherePos,
+    float radius,
+    HitResult& result)
+{
+    DirectX::XMVECTOR ray2sphere = DirectX::XMVectorSubtract(spherePos, rayStart);
+    float projection = DirectX::XMVectorGetX(DirectX::XMVector3Dot(ray2sphere, rayDirection));
+    float distSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(ray2sphere)) - projection * projection;
+
+    if (distSq < radius * radius)
+    {
+        float distance = projection - sqrtf(radius * radius - distSq);
+        if (distance > 0.0f)
+        {
+            if (distance < rayDist)
+            {
+                DirectX::XMVECTOR Position = DirectX::XMVectorAdd(rayStart, DirectX::XMVectorScale(rayDirection, distance));
+                DirectX::XMStoreFloat3(&result.position, Position);
+                result.distance = distance;
+                DirectX::XMStoreFloat3(&result.normal, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(Position, spherePos)));
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
