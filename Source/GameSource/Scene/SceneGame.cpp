@@ -64,6 +64,22 @@ void SceneGame::Initialize()
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
 
+    {//当たり判定用
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("robo");
+        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/OneCoin/robot.mdl");
+        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        a->PlayAnimation(0, true, false, 0.001f);
+
+        std::shared_ptr<RayColliderCom> sphere = obj->AddComponent<RayColliderCom>();
+        sphere->SetMyTag(COLLIDER_TAG::Enemy);
+        sphere->SetJudgeTag(COLLIDER_TAG::Player);
+
+    }
+
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -83,6 +99,17 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
+
+
+        //攻撃レイキャストスタート位置
+        {
+            std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
+            rayChild->SetName("rayObj");
+
+            std::shared_ptr<RayColliderCom> sphere = rayChild->AddComponent<RayColliderCom>();
+            sphere->SetMyTag(COLLIDER_TAG::Player);
+            sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
+        }
 
         ////当たり判定オブジェ(エラー直し用)
         //{

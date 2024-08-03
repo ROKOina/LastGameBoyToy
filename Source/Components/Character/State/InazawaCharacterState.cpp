@@ -11,7 +11,6 @@
 void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float power = 1)
 {
     //’eŠÛƒIƒuƒWƒFƒNƒg‚ð¶¬///////
-
     GameObj obj = GameObjectManager::Instance().Create();
     obj->SetName("blackball");
 
@@ -39,6 +38,22 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
     //’e
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>();
     bulletCom->SetAliveTime(2.0f);
+}
+
+void RayFire(std::shared_ptr<GameObject> objPoint)
+{
+    DirectX::XMFLOAT3 start;
+    DirectX::XMFLOAT3 end;
+
+    auto& rayPoint = objPoint->GetChildFind("rayObj");
+
+    if (!rayPoint)return;
+
+    start = rayPoint->transform_->GetWorldPosition();
+    end = start + (objPoint->transform_->GetWorldFront() * 100);
+
+    rayPoint->GetComponent<RayColliderCom>()->SetStart(start);
+    rayPoint->GetComponent<RayColliderCom>()->SetEnd(end);
 }
 
 InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : State(owner)
@@ -76,13 +91,21 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
         //UŒ‚ˆ—
-        Fire(owner->GetGameObject(), arrowSpeed, attackPower);
+        //Fire(owner->GetGameObject(), arrowSpeed, attackPower);
+        RayFire(owner->GetGameObject());
 
         auto& chara = GetComp(CharacterCom);
         chara->SetMoveMaxSpeed(saveMaxSpeed);
 
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
+
+    //auto& rayPoint = owner->GetGameObject()->GetChildFind("rayObj");
+    //for (auto& hit : rayPoint->GetComponent<Collider>()->OnHitGameObject())
+    //{
+    //    ataPos = hit.hitPos;
+    //}
+    //Graphics::Instance().GetDebugRenderer()->DrawSphere(ataPos, 0.3f, { 0,1,1,1 });
 }
 
 void InazawaCharacter_AttackState::ImGui()
@@ -135,6 +158,7 @@ void InazawaCharacter_ESkillState::ImGui()
     ImGui::DragInt("arrowCount", &arrowCount);
     ImGui::DragFloat("interval", &interval);
     ImGui::DragFloat("skillTimerEnd", &skillTimer);
+
 }
 
 

@@ -90,6 +90,14 @@ void PhotonLib::update(void)
 				sendData();
 				oldMs = GetServerTime();
 			}
+			else
+			{
+				//‚à‚µoldMS‚É’l‚ª‰Šú’l‚¾‚Á‚½ê‡
+				if (oldMs == 0)
+				{
+					oldMs = GetServerTime();
+				}
+			}
 			break;
 		case PhotonState::RECEIVED_DATA:
 			mLoadBalancingClient.opLeaveRoom();
@@ -549,7 +557,8 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 					int a = 0;
 				}
 
-				net1->GetComponent<CharacterCom>()->AddHitPoint(-ne[0].damageData[id]);
+				auto& obj = GameObjectManager::Instance().Find("player");
+				obj->GetComponent<CharacterCom>()->AddHitPoint(-ne[0].damageData[id]);
 				break;
 			}
 
