@@ -11,6 +11,7 @@
 #include "SystemStruct/TransformUtils.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "GameSource/GameScript/FreeCameraCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -149,7 +150,7 @@ void GameObject::AudioRelease()
 // 作成
 std::shared_ptr<GameObject> GameObjectManager::Create()
 {
-    //std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
 
     std::shared_ptr<GameObject> obj = std::make_shared<GameObject>();
     obj->AddComponent<TransformCom>();
@@ -220,9 +221,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
 
     //デファードレンダリングの初期設定 ( レンダーターゲットをデファード用の物に変更 )
     m_posteffect->SetDeferredTarget();
-
-    //シルエット描画
-    //RenderSilhoutte();
 
     //3D描画
     RenderDeferred();
@@ -307,7 +305,17 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
     if (selectObject.find(obj) != selectObject.end())
     {
         nodeFlags |= ImGuiTreeNodeFlags_Selected;
+
+        if (ImGui::IsMouseDoubleClicked(0))
+        {
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
+
+           
+        }
     }
+
+    
 
     //子がいないなら、▼付けない
     if (obj->GetChildren().size() == 0)
@@ -550,6 +558,20 @@ void GameObjectManager::DrawLister()
 
             //親子GUI用の再起関数
             CycleDrawLister(obj, selectionGameObject_);
+
+
+            //if (ImGui::TreeNode(obj->GetName()) 
+            //{
+            //    // ここでobjに関連する情報を取得します。
+            //    DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+            //   
+            //    
+            //    
+            //   
+            //}
+                
+  
+
         }
     }
     ImGui::End();

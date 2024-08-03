@@ -1,7 +1,6 @@
 #include "ColliderCom.h"
 #include "Graphics\Graphics.h"
 #include "Components\TransformCom.h"
-#include "Components\RendererCom.h"
 #include <imgui.h>
 
 //当たり判定
@@ -29,20 +28,6 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     int otherType = otherSide->colliderType_;
 
     bool isJudge = false;
-    bool isJudgeMyRay = false;
-    bool isJudgeOtherRay = false;
-
-    //レイ
-    HitResult rayResult;
-    if (myType == COLLIDER_TYPE::RayCollider)
-    {
-        isJudgeMyRay = RayVsModel(otherSide, rayResult, true);//vsModel
-    }
-    HitResult otherRayResult;
-    if (otherType == COLLIDER_TYPE::RayCollider)
-    {
-        isJudgeOtherRay = RayVsModel(otherSide, otherRayResult, false);//vsModel
-    }
 
     //球
     if (myType == COLLIDER_TYPE::SphereCollider) {
@@ -75,38 +60,18 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
             isJudge = BoxVsCapsule(otherSide);
     }
 
+
     //当たった時はゲームオブジェクトで保存
     if (isJudge)
     {
         if (judgeTag_ == otherSide->myTag_) {
             HitObj h;
-            h.hitPos = rayResult.position;
             h.gameObject = otherSide->GetGameObject();
             hitObj_.emplace_back(h);
         }
 
         if (otherSide->judgeTag_ == myTag_) {
             HitObj h;
-            h.hitPos = otherRayResult.position;
-            h.gameObject = GetGameObject();
-            otherSide->hitObj_.emplace_back(h);
-        }
-    }
-    //レイ用
-    if (isJudgeMyRay)
-    {
-        if (judgeTag_ == otherSide->myTag_) {
-            HitObj h;
-            h.hitPos = rayResult.position;
-            h.gameObject = otherSide->GetGameObject();
-            hitObj_.emplace_back(h);
-        }
-    }
-    if (isJudgeOtherRay)
-    {
-        if (otherSide->judgeTag_ == myTag_) {
-            HitObj h;
-            h.hitPos = otherRayResult.position;
             h.gameObject = GetGameObject();
             otherSide->hitObj_.emplace_back(h);
         }
@@ -478,45 +443,6 @@ bool Collider::BoxVsCapsule(std::shared_ptr<Collider> otherSide)
     return false;
 }
 
-bool Collider::RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay)
-{
-    //形状を判定
-    std::shared_ptr<RayColliderCom> ray;
-    Model* model;
-
-    if (isMyRay)
-    {
-        ray = std::static_pointer_cast<RayColliderCom>(shared_from_this());
-
-        auto& renderer = otherSide->GetGameObject()->GetComponent<RendererCom>();
-        if (!renderer)return false;
-        model = renderer->GetModel();
-    }
-    else
-    {
-        ray = std::static_pointer_cast<RayColliderCom>(otherSide);
-
-        auto& renderer = shared_from_this()->GetGameObject()->GetComponent<RendererCom>();
-        if (!renderer)return false;
-        model = renderer->GetModel();
-    }
-
-    DirectX::XMFLOAT3 s = ray->GetStart();
-    DirectX::XMFLOAT3 e = ray->GetEnd();
-    if (0.1f > DirectX::XMVector3Length(DirectX::XMLoadFloat3(&(s - e))).m128_f32[0])
-    {
-        return false;
-    }
-    if (Collision::IntersectRayVsModel(s, e, model, h))
-    {
-        ray->SetHitPos(h.position);
-        return true;
-    }
-
-    return false;
-
-}
-
 #pragma endregion
 
 
@@ -593,41 +519,6 @@ void CapsuleColliderCom::DebugRender()
     DirectX::XMVECTOR P1 = DirectX::XMLoadFloat3(&pos1);
     float length = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(P0, P1)));
     Graphics::Instance().GetDebugRenderer()->DrawCylinder(pos0, pos1, capsule_.radius, length, { 0,0,1,1 });
-}
-
-#pragma endregion
-
-//ray
-#pragma region RayCollider
-
-void RayColliderCom::OnGUI()
-{
-    ImGui::DragFloat3("start", &start.x, 0.1f);
-    ImGui::DragFloat3("end", &end.x, 0.1f);
-    ImGui::Checkbox("hitDraw", &hitDraw);
-}
-
-// debug描画
-void RayColliderCom::DebugRender()
-{
-    float debugRadius = 0.1f;
-    //p0
-    DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
-    DirectX::XMFLOAT3 pos0 = { start.x,start.y,start.z };
-    Graphics::Instance().GetDebugRenderer()->DrawSphere(pos0, debugRadius, { 1,0,1,1 });
-    //p1
-    DirectX::XMFLOAT3 pos1 = { end.x,end.y,end.z };
-    Graphics::Instance().GetDebugRenderer()->DrawSphere(pos1, debugRadius, { 1,0,1,1 });
-    //円柱部分
-    DirectX::XMVECTOR P0 = DirectX::XMLoadFloat3(&pos0);
-    DirectX::XMVECTOR P1 = DirectX::XMLoadFloat3(&pos1);
-    float length = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMVectorSubtract(P0, P1)));
-    Graphics::Instance().GetDebugRenderer()->DrawCylinder(pos0, pos1, debugRadius, length, { 1,0,1,1 });
-
-    if (hitDraw)
-    {
-        Graphics::Instance().GetDebugRenderer()->DrawSphere(hitPos, debugRadius + 0.2f, { 1,1,0.1f,1 });
-    }
 }
 
 #pragma endregion

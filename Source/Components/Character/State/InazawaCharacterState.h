@@ -23,19 +23,12 @@ protected:
 class InazawaCharacter_AttackState : public InazawaCharacter_BaseState
 {
 public:
-    InazawaCharacter_AttackState(CharacterCom* owner) :InazawaCharacter_BaseState(owner) 
-    {
-        name = "MainAttack";
-        auto& chara = GetComp(CharacterCom);
-        saveMaxSpeed = chara->GetMoveMaxSpeed();
-    }
+    InazawaCharacter_AttackState(CharacterCom* owner) :InazawaCharacter_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void ImGui() override;
 
-    float saveMaxSpeed;
-    float attackMaxMoveSpeed = 5.0f;
     float attackPower = 0;
     float maxAttackPower = 1;
     float arrowSpeed = 40;
@@ -44,10 +37,7 @@ public:
 class InazawaCharacter_ESkillState : public InazawaCharacter_BaseState
 {
 public:
-    InazawaCharacter_ESkillState(CharacterCom* owner) :InazawaCharacter_BaseState(owner)
-    {
-        name = "ESkill";
-    }
+    InazawaCharacter_ESkillState(CharacterCom* owner) :InazawaCharacter_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;

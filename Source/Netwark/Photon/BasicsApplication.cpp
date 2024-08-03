@@ -29,6 +29,8 @@ BasicsApplication::BasicsApplication(UIListener* listener)
 
 void BasicsApplication::run(/*UIListener* listener*/)
 {
+	//while(!listener->anyKeyPressed())
+	//{
 	static JString lastStateString;
 	photonLib->update();
 	auto Jstring = photonLib->getStateString();
@@ -36,6 +38,11 @@ void BasicsApplication::run(/*UIListener* listener*/)
 	{
 		//PrintLog(WStringToString(Jstring.cstr()).c_str());
 	}
+
+	//listener->writeString(lastStateString=lib.getStateString());
+	//SLEEP(100);
+	//}
+	//listener->onLibClosed();
 }
 
 void BasicsApplication::close()
@@ -47,5 +54,66 @@ void BasicsApplication::close()
 
 void BasicsApplication::ImGui()
 {
-	photonLib->ImGui();
+	//ネットワーク決定仮ボタン
+	ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+	ImGui::Begin("PhotonNet", nullptr, ImGuiWindowFlags_None);
+
+	//ID表示
+	int photonID = photonLib->GetPlayerNum();
+	ImGui::InputInt("photonID", &photonID);
+
+	//状態表示
+	std::string nowState = photonLib->stateStr[photonLib->GetPhotonState()];
+	ImGui::Text(("State : " + nowState).c_str());
+
+	ImGui::Separator();
+
+	//ルーム名前
+	ImGui::Text(("RoomName : " + photonLib->GetRoomName()).c_str());
+
+	//ルーム人数表示
+	int roomCount = photonLib->GetRoomPlayersNum();
+	ImGui::InputInt("roomPlayersNum", &roomCount);
+
+
+	//サーバー時間
+	int serverTime = photonLib->GetServerTime();
+	int serverTimeOF = photonLib->GetServerTimeOffset();
+	ImGui::InputInt("serverTime", &serverTime);
+
+	int A = serverTime / 1000;
+	A %= 10;
+	ImGui::InputInt("A", &A);
+
+
+	//時間デバッグ比較用
+	//serverTime += serverTimeOF;
+	if (serverTime != 0)
+	{
+		int slTime = 10000;
+		static int saveTime = 0;
+		static int oldSerTime = serverTime;
+		saveTime += serverTime - oldSerTime;
+		oldSerTime = serverTime;
+		static bool reverseB = true;
+		if (saveTime > slTime)
+		{
+			saveTime = 0;
+			reverseB = !reverseB;
+		}
+		if (saveTime < 0)saveTime = 0;
+		ImGui::InputInt("saveTime", &saveTime);
+		ImGui::Checkbox("SerVV", &reverseB);
+	}
+
+
+	ImGui::InputInt("serverTimeOFF", &serverTimeOF);
+
+	int roundTime = photonLib->GetRoundTripTime();
+	int roundTimeV = photonLib->GetRoundTripTimeVariance();
+	ImGui::InputInt("roundTime", &roundTime);
+
+	ImGui::End();
 }

@@ -78,10 +78,6 @@ void CharacterCom::Update(float elapsedTime)
     {
         SubSkill();
     }
-    if (CharacterInput::LeftShiftButton & GetButtonDown())
-    {
-        LeftShiftSkill();
-    }
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         SpaceSkill();
@@ -99,24 +95,10 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
-    float hp = hitPoint;
-    ImGui::DragFloat("HP", &hp);
-
-    int s = (int)(moveStateMachine.GetCurrentState());
-    ImGui::InputInt("moveS", &s);
-    s = (int)(attackStateMachine.GetCurrentState());
-    ImGui::InputInt("attackS", &s);
     moveStateMachine.ImGui();
     attackStateMachine.ImGui();
 
     ImGui::InputFloat("StickAngle", &stickAngle);
-
-    int i = userInput;
-    ImGui::InputInt("input", &i);
-    i = userInputDown;
-    ImGui::InputInt("userInputDown", &i);
-    i = userInputUp;
-    ImGui::InputInt("userInputUp", &i);
 }
 
 

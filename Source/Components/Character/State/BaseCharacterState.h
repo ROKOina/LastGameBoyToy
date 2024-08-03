@@ -16,7 +16,7 @@ static void MoveInputVec(std::shared_ptr<GameObject> obj, float speed = 1)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //•à‚­
-    DirectX::XMFLOAT3 v = moveVec * speed;
+    DirectX::XMFLOAT3 v = moveVec * moveCom->GetMoveAcceleration() * speed;
     moveCom->AddForce(v);
 
     //ù‰ñˆ—
@@ -28,7 +28,8 @@ static void JumpInput(std::shared_ptr<GameObject> obj, float speed = 1)
 {
     auto& moveCom = obj->GetComponent<MovementCom>();
 
-    if (CharacterInput::JumpButton_SPACE & obj->GetComponent<CharacterCom>()->GetButtonDown())
+    GamePad gamePad = Input::Instance().GetGamePad();
+    if (CharacterInput::JumpButton_SPACE & gamePad.GetButtonDown())
     {
         DirectX::XMFLOAT3 power = { 0,obj->GetComponent<CharacterCom>()->GetJumpPower() * speed,0 };
         moveCom->AddForce(power);

@@ -221,7 +221,6 @@
     <ClInclude Include="Source\Netwark\NetwarkPost.h" />
     <ClInclude Include="Source\Netwark\Photon\BasicsApplication.h" />
     <ClInclude Include="Source\Netwark\Photon\Photon_lib.h" />
-    <ClInclude Include="Source\Netwark\Photon\StaticSendDataManager.h" />
     <ClInclude Include="Source\Netwark\Photon\StdIO_UIListener.h" />
     <ClInclude Include="Source\Netwark\Photon\UIListener.h" />
     <ClInclude Include="Source\Netwark\RingBuffer.h" />
@@ -434,9 +433,6 @@
     <FxCompile Include="HLSL\3D\ShadowVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\3D\SilhouettePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
