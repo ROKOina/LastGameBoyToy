@@ -45,9 +45,6 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     context->PSSetShader(pixelShader_.Get(), nullptr, 0);
     context->IASetInputLayout(inputLayout_.Get());
 
-    // 定数バッファ設定
-    //cbmesh->Activate(context, 0, true, false, false, false, false, false);
-
     // レンダーステート設定
     context->OMSetBlendState(Graphics::Instance().GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
     context->OMSetDepthStencilState(Graphics::Instance().GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
@@ -83,8 +80,6 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     spheres_.clear();
 
     //箱描画
-    stride = sizeof(vertex);
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     context->IASetVertexBuffers(0, 1, boxVertexBuffer_.GetAddressOf(), &stride, &offset);
     context->IASetIndexBuffer(boxIndexBuffer_.Get(), DXGI_FORMAT_R32_UINT, 0);
     for (const Box& box : boxes_)
@@ -106,8 +101,6 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     boxes_.clear();
 
     // 円柱描画
-    stride = sizeof(DirectX::XMFLOAT3);
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     context->IASetVertexBuffers(0, 1, cylinderVertexBuffer_.GetAddressOf(), &stride, &offset);
     for (const Cylinder& cylinder : cylinders_)
     {

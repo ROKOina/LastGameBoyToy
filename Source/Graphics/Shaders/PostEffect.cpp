@@ -168,6 +168,16 @@ void PostEffect::PostEffectImGui()
     ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::posteffect)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::End();
+
+    ////scene描画
+    //ImGui::Begin("SceneView");
+    //// ウィンドウの位置とサイズを取得
+    //ImVec2 size = ImGui::GetContentRegionAvail();
+    //// フレームバッファのシェーダーリソースビューを取得
+    //ImTextureID texture_id = (ImTextureID)(Graphics::Instance().GetDebugRenderTarget()->GetShaderResourceView().Get());
+    //// 画像を表示
+    //ImGui::Image(texture_id, size);
+    //ImGui::End();
 }
 
 void PostEffect::StartOffScreenRendering()

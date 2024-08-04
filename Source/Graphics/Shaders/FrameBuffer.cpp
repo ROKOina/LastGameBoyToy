@@ -69,6 +69,7 @@ FrameBuffer::FrameBuffer(ID3D11Device* device, uint32_t width, uint32_t height, 
 void FrameBuffer::Clear(ID3D11DeviceContext* immediate_context, float r, float g, float b, float a, float depth)
 {
     float color[4]{ r, g, b, a };
+
     immediate_context->ClearRenderTargetView(m_rendertargetview.Get(), color);
 
     if (m_depthstencilview)

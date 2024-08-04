@@ -8,6 +8,7 @@
 #include "Components\System\GameObject.h"
 #include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
+#include "Components/NodeCollsionCom.h"
 
 #include "Netwark/Photon/BasicsApplication.h"
 

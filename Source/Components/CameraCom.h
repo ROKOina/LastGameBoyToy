@@ -54,6 +54,8 @@ public:
     //右方向取得
     const DirectX::XMFLOAT3& GetRight()const { return right_; }
 
+    void SetFocus(DirectX::XMFLOAT3 pos) { focus_ = pos;}
+
     //カメラシェイク実行
     void CameraShake(float power, float seconds) {
         shakePower_ = power;

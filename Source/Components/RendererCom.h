@@ -31,6 +31,9 @@ public:
     //シルエット描画
     void SilhoutteRender();
 
+    //guizmo
+    void BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+
     // GUI描画
     void OnGUI() override;
 

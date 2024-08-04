@@ -7,21 +7,21 @@
 //当たり判定のタグ
 enum COLLIDER_TAG : uint64_t
 {
-    NONE_COL            = 1 << 0,
+    NONE_COL = 1 << 0,
 
-    Player          = 1 << 1,
-    PlayerAttack    = 1 << 2,
-    PlayerAttackAssist      = 1 << 3,
-    PlayerPushBack      = 1 << 4,
-    JustAvoid       = 1 << 5,
+    Player = 1 << 1,
+    PlayerAttack = 1 << 2,
+    PlayerAttackAssist = 1 << 3,
+    PlayerPushBack = 1 << 4,
+    JustAvoid = 1 << 5,
 
-    Enemy           = 1 << 10,
-    EnemyAttack     = 1 << 11,
+    Enemy = 1 << 10,
+    EnemyAttack = 1 << 11,
     EnemyPushBack = 1 << 12,
 
     Bullet = 1 << 13,
 
-    Wall            = 1 << 30,
+    Wall = 1 << 30,
 };
 static COLLIDER_TAG operator| (COLLIDER_TAG L, COLLIDER_TAG R)
 {
@@ -54,7 +54,7 @@ enum class COLLIDER_TYPE {
 static bool operator== (int L, COLLIDER_TYPE R)
 {
     return static_cast<int>(L) == static_cast<int>(R);
-       
+
 }
 
 //当たった時用の構造体
@@ -128,7 +128,7 @@ private:
 
 private:
     //当たり判定タグ
-    COLLIDER_TAG myTag_= COLLIDER_TAG::NONE_COL;    //自分のタグ
+    COLLIDER_TAG myTag_ = COLLIDER_TAG::NONE_COL;    //自分のタグ
     COLLIDER_TAG judgeTag_ = COLLIDER_TAG::NONE_COL; //当たり判定をするタグ
 
     //今のフレームで当たっているものを保存

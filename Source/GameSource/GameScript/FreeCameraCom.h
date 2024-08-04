@@ -26,6 +26,10 @@ public:
     // GUI•`‰æ
     void OnGUI() override;
 
+    void SetFocusPos(DirectX::XMFLOAT3 pos) { focusPos = pos; }
+
+    void SetDistance(float dis)             {distance = dis;}
+
     //FreeCameraƒNƒ‰ƒX
 public:
 
