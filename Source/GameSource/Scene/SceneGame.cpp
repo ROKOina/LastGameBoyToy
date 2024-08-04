@@ -81,7 +81,7 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
-        obj->AddComponent<NodeCollsionCom>("Data//CollsionData//test.nodecollsion");
+        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
     }
 
     //カメラをプレイヤーの子どもにして制御する

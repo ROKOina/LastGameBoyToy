@@ -32,7 +32,10 @@ public:
     struct CollsionParameter
     {
         int nodeid = {};
+        int endnodeid = {};
+        int collsiontype = {};
         float radius = 0.0f;
+        float height = 0.0f;
 
         template<class Archive>
         void serialize(Archive& archive, int version);

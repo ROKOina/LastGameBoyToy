@@ -25,6 +25,17 @@ public:
 
 private:
 
+    //デバッグプリミティブの形状
+    enum class CollsionType
+    {
+        SPHER,
+        CYLINDER,
+        MAX
+    };
+    CollsionType m_collsiontype = CollsionType::SPHER;
+
+private:
+
     const char* m_filename = {};
     Model* model = nullptr;
 };
