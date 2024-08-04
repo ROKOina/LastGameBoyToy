@@ -270,6 +270,8 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
         //ポストエフェクトimgui
         m_posteffect->PostEffectImGui();
     }
+
+    DrawGuizmo(view, projection);
 }
 
 void GameObjectManager::Render2D(float elapsedTime)
@@ -310,12 +312,8 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
         {
             GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
             GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
-
-           
         }
     }
-
-    
 
     //子がいないなら、▼付けない
     if (obj->GetChildren().size() == 0)
@@ -395,6 +393,13 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
         selectedObject->transform_->SetScale(scale);
         selectedObject->transform_->SetRotation(rotate);
         selectedObject->transform_->SetWorldPosition(position);
+    }
+
+    //ボーン毎のguizmo
+    if (renderSortObject_.size() <= 0)return;
+    for (std::weak_ptr<RendererCom>& r : renderSortObject_)
+    {
+        r.lock()->BoneGuizmo(view, projection);
     }
 }
 
@@ -558,20 +563,6 @@ void GameObjectManager::DrawLister()
 
             //親子GUI用の再起関数
             CycleDrawLister(obj, selectionGameObject_);
-
-
-            //if (ImGui::TreeNode(obj->GetName()) 
-            //{
-            //    // ここでobjに関連する情報を取得します。
-            //    DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
-            //   
-            //    
-            //    
-            //   
-            //}
-                
-  
-
         }
     }
     ImGui::End();

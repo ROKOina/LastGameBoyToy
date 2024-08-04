@@ -5,6 +5,8 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "ModelResource.h"
+#include <imgui.h>
+#include <ImGuizmo.h>
 
 class Model
 {
@@ -14,7 +16,7 @@ public:
 
     struct Node
     {
-        int                 nodeIndex;
+        int nodeIndex;
         const char* name;
         Node* parent;
         DirectX::XMFLOAT3	scale;
@@ -23,15 +25,23 @@ public:
         DirectX::XMFLOAT4X4	localTransform;
         DirectX::XMFLOAT4X4	worldTransform;
         std::vector<int>    layer;
-
         std::vector<Node*>	children;
     };
 
-   
+    //コリジョンのパラメータ
+    struct CollsionParameter
+    {
+        int nodeid = {};
+        float radius = 0.0f;
+
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
+    std::vector<CollsionParameter>cp;
+
     // 行列計算
     void UpdateTransform(const DirectX::XMMATRIX& Transform);
 
-    
     const std::vector<Node>& GetNodes() const { return nodes; }
     std::vector<Node>& GetNodes() { return nodes; }
     const ModelResource* GetResource() const { return resource.get(); }
@@ -39,9 +49,8 @@ public:
 
 #ifdef _DEBUG
 
-
 #endif // _DEBUG
-   
+
     //シリアライズに適用させる為の処理
     void CopyModel();
 
@@ -55,6 +64,23 @@ public:
     //特定のノードの番号検索
     int FindNodeIndex(const char* name);
 
+    //ノードのimgui
+    void ImGui(Model::Node* node);
+
+    //シリアライズ
+    void Serialize();
+
+    //デシリアライズ
+    void Deserialize(const char* filename);
+
+    //読み込み
+    void LoadDesirialize();
+
+    //imguiguizmo
+    void BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+
+    //node
+    Model::Node* selectionNode = nullptr;
 
 private:
 
@@ -68,6 +94,7 @@ private:
 
 private:
     std::shared_ptr<ModelResource>	resource;
-    std::vector<Node>				nodes;
-
+    std::vector<Node> nodes;
+    ImGuizmo::OPERATION					guizmoOperation = ImGuizmo::TRANSLATE;
+    ImGuizmo::MODE						guizmoMode = ImGuizmo::LOCAL;
 };

@@ -81,6 +81,7 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
+        obj->AddComponent<NodeCollsionCom>("Data//CollsionData//test.nodecollsion");
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -170,9 +171,6 @@ void SceneGame::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
-    //guizmo描画
-    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 
     if (n)
         n->ImGui();

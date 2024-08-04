@@ -132,6 +132,12 @@ void RendererCom::SilhoutteRender()
     }
 }
 
+//ƒ{[ƒ“‚Ìguizmo
+void RendererCom::BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    model_->BoneGuizmo(view, projection);
+}
+
 // GUI•`‰æ
 void RendererCom::OnGUI()
 {
