@@ -5,6 +5,32 @@
 
 #include "../NetwarkPost.h"
 
+static std::string WStringToString
+(
+	std::wstring oWString
+)
+{
+	// wstring → SJIS
+	int iBufferSize = WideCharToMultiByte(CP_OEMCP, 0, oWString.c_str()
+		, -1, (char*)NULL, 0, NULL, NULL);
+
+	// バッファの取得
+	CHAR* cpMultiByte = new CHAR[iBufferSize];
+
+	// wstring → SJIS
+	WideCharToMultiByte(CP_OEMCP, 0, oWString.c_str(), -1, cpMultiByte
+		, iBufferSize, NULL, NULL);
+
+	// stringの生成
+	std::string oRet(cpMultiByte, cpMultiByte + iBufferSize - 1);
+
+	// バッファの破棄
+	delete[] cpMultiByte;
+
+	// 変換結果を返す
+	return(oRet);
+}
+
 class PhotonLib : private ExitGames::LoadBalancing::Listener
 {
 public:
@@ -13,6 +39,15 @@ public:
 	void ImGui();
 	ExitGames::Common::JString getStateString(void);
 
+	void LobbyImGui();
+
+private:
+	//入室許可
+	bool joinPermission = false;
+	//部屋名
+	std::string roomName;
+
+public:
 	//入力情報更新
 	void NetInputUpdate();
 	void MyCharaInput();

@@ -76,10 +76,13 @@ void PhotonLib::update(void)
 		mLoadBalancingClient.connect(ExitGames::LoadBalancing::ConnectOptions().setAuthenticationValues(ExitGames::LoadBalancing::AuthenticationValues().setUserID(ExitGames::Common::JString() + GETTIMEMS())).setUsername(PLAYER_NAME + GETTIMEMS()).setTryUseDatagramEncryption(true));
 		mState = PhotonState::CONNECTING;
 		break;
-		case PhotonState::CONNECTED:
-			mLoadBalancingClient.opJoinOrCreateRoom(gameName);
-			mState = PhotonState::JOINING;
-			break;
+	case PhotonState::CONNECTED:
+	{
+		if (!joinPermission)break;
+		mLoadBalancingClient.opJoinOrCreateRoom(ExitGames::Common::JString(roomName.c_str()));
+		mState = PhotonState::JOINING;
+		break;
+	}
 		case PhotonState::JOINING:
 			oldMs = GetServerTime();
 			break;
@@ -198,6 +201,8 @@ void PhotonLib::ImGui()
 
 
 	ImGui::End();
+
+	LobbyImGui();
 }
 
 ExitGames::Common::JString PhotonLib::getStateString(void)
@@ -228,6 +233,57 @@ ExitGames::Common::JString PhotonLib::getStateString(void)
 			return L"disconnected\n";
 		default:
 			return L"unknown state";
+	}
+}
+
+void PhotonLib::LobbyImGui()
+{
+	if (!joinPermission)
+	{
+		//ネットワーク決定仮ボタン
+		ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+		ImGui::Begin("PhotonNetLobby", nullptr, ImGuiWindowFlags_None);
+
+
+		//新しくルーム生成
+		char name[256];
+		::strncpy_s(name, sizeof(name), roomName.c_str(), sizeof(name));
+		if (ImGui::InputText(" ", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			roomName = name;
+		}
+
+		if (ImGui::Button("CreateOrJoinRoom"))
+		{
+			if (roomName.size() > 0)
+				joinPermission = true;
+		}
+
+		ImGui::Separator();
+
+		//ルームに参加
+		auto rooms = mLoadBalancingClient.getRoomList();
+
+		for (int i = 0; i < rooms.getSize(); ++i)
+		{
+			ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
+
+			std::string selectRoom = WStringToString(rooms[i]->getName().cstr());
+			ImGui::TreeNodeEx(&rooms[i], nodeFlags, selectRoom.c_str());
+
+			// クリックすると選択
+			if (ImGui::IsItemClicked())
+			{
+				roomName = selectRoom;
+			}
+
+			ImGui::TreePop();
+		}
+
+
+		ImGui::End();
 	}
 }
 
