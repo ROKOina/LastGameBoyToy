@@ -35,7 +35,10 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+    if (std::strcmp(objPoint->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
 
     //’e
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>();

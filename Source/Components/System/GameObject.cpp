@@ -150,7 +150,7 @@ void GameObject::AudioRelease()
 // ì¬
 std::shared_ptr<GameObject> GameObjectManager::Create()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    //std::lock_guard<std::mutex> lock(mutex_);
 
     std::shared_ptr<GameObject> obj = std::make_shared<GameObject>();
     obj->AddComponent<TransformCom>();
