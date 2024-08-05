@@ -48,14 +48,14 @@ public:
     struct PlayLowBodyAnimParam
     {
         int   lowerAnimaOneId; //再生したいアニメーションを入れて下さい
-        int   lowerAnimeTwoId=0;  ///歩きモーション用
-        int   lowerAnimeThreeId=0;///歩きモーション用
-        int   lowerAnimeFourId=0; ///歩きモーション用
-        bool  loop=false;         //ループ再生するかしないか
-        bool  rootFlag=false;     //ルートモーションするかしないか
-        int   blendType=0;        // 0=ノーマルアニメーション 1=ブレンドアニメーション 2=歩きブレンドアニメーション
-        float animeChangeRate=0.0f; //アニメーション切り替え時のアニメーション変更速度
-        float animeBlendRate=0.0f;  //ブレンドの利率
+        int   lowerAnimeTwoId = 0;  ///歩きモーション用
+        int   lowerAnimeThreeId = 0;///歩きモーション用
+        int   lowerAnimeFourId = 0; ///歩きモーション用
+        bool  loop = false;         //ループ再生するかしないか
+        bool  rootFlag = false;     //ルートモーションするかしないか
+        int   blendType = 0;        // 0=ノーマルアニメーション 1=ブレンドアニメーション 2=歩きブレンドアニメーション
+        float animeChangeRate = 0.0f; //アニメーション切り替え時のアニメーション変更速度
+        float animeBlendRate = 0.0f;  //ブレンドの利率
     };
 
 public:
@@ -79,8 +79,6 @@ public:
 
     //アニメIDを返す
     int FindAnimation(const char* animeName);
-
-    
 
 public:
     //ゲッターセッター
@@ -111,19 +109,12 @@ private:
     //前回のアニメーションとのブレンド歩き専用
     void ComputeWalkIdleAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, float blendRate, float walkRate, Model::Node& node);
 
-    //AimIK関数
-    void AimIK();
-
-    //ノードを探す
-    void SearchAimNode();
-
     //上半身と下半身のノードを分ける
     void SeparateNode();
 
 private:
 
     //ルートモーション関連
-
     //ルートモーションの移動値を計算
     void ComputeRootMotion();
 
@@ -228,13 +219,8 @@ private:
     bool                            upperBlendTypeFlag = false;
     bool                            lowerBlendTypeFlag = false;
 
-
-
     //アニメーション更新変数
     int animaType = 0;
-
-    //AimIK用変数
-    std::vector<int>AimBone;
 
     //上半身アニメーション
     std::vector<Model::Node*> upperNodes;

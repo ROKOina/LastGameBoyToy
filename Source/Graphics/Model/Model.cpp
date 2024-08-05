@@ -353,3 +353,16 @@ void Model::BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X
         }
     }
 }
+
+//子ノード検索
+void Model::GetAllDescendants(int parentNodeId, std::vector<Model::Node*>& descendants)
+{
+    for (auto& node : nodes)
+    {
+        if (node.parent != nullptr && node.parent->nodeIndex == parentNodeId)
+        {
+            descendants.push_back(&node);
+            GetAllDescendants(node.nodeIndex, descendants); // 再帰的に子ノードを取得
+        }
+    }
+}

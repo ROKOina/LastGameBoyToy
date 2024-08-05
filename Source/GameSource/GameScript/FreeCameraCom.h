@@ -28,7 +28,7 @@ public:
 
     void SetFocusPos(DirectX::XMFLOAT3 pos) { focusPos = pos; }
 
-    void SetDistance(float dis)             {distance = dis;}
+    void SetDistance(float dis) { distance = dis; }
 
     //FreeCameraƒNƒ‰ƒX
 public:
