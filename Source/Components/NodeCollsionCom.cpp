@@ -23,6 +23,36 @@ void NodeCollsionCom::Start()
 //更新処理
 void NodeCollsionCom::Update(float elapsedTime)
 {
+    // 衝突パラメータの高さを自動計算
+    for (auto& cp : model->cp)
+    {
+        DirectX::XMFLOAT3 pos =
+        {
+            model->GetNodes()[cp.nodeid].worldTransform._41,
+            model->GetNodes()[cp.nodeid].worldTransform._42,
+            model->GetNodes()[cp.nodeid].worldTransform._43
+        };
+
+        DirectX::XMFLOAT3 endpos = { 0.0f, 0.0f, 0.0f };
+        if (cp.endnodeid >= 0 && cp.endnodeid < model->GetNodes().size())
+        {
+            endpos =
+            {
+                model->GetNodes()[cp.endnodeid].worldTransform._41,
+                model->GetNodes()[cp.endnodeid].worldTransform._42,
+                model->GetNodes()[cp.endnodeid].worldTransform._43
+            };
+        }
+
+        // `pos` と `endpos` までの距離を計算
+        DirectX::XMVECTOR posVec = DirectX::XMLoadFloat3(&pos);
+        DirectX::XMVECTOR endposVec = DirectX::XMLoadFloat3(&endpos);
+        DirectX::XMVECTOR distanceVec = DirectX::XMVectorSubtract(endposVec, posVec);
+        float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(distanceVec));
+
+        // 高さを設定
+        cp.height = distance;
+    }
 }
 
 //GUI描画
