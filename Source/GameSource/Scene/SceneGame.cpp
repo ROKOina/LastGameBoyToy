@@ -90,16 +90,15 @@ void SceneGame::Initialize()
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         a->PlayAnimation(0, true, false, 0.001f);
+        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
         //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
         //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
-        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
 
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
-
 
         //攻撃レイキャストスタート位置
         {
@@ -111,15 +110,7 @@ void SceneGame::Initialize()
             sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
         }
 
-        ////当たり判定オブジェ(エラー直し用)
-        //{
-        //    //ヒットスキャン用オブジェクト
-        //    GameObj collision = GameObjectManager::Instance().Create();
-        //    std::shared_ptr<CapsuleColliderCom> capsule = collision->AddComponent<CapsuleColliderCom>();
-        //    collision->SetName("playerCollision");
-
-        //    c->SetGunFireCollision(collision);
-        //}
+        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -155,15 +146,8 @@ void SceneGame::Initialize()
 
 #pragma endregion
 
-
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
-
-    StaticSendDataManager::NetSendData s;
-    s.id = 2;
-    StaticSendDataManager::Instance().SetNetSendData(s);
-    StaticSendDataManager::Instance().GetNetSendDatas();
-    int i = 0;
 }
 
 // 終了化
@@ -188,7 +172,7 @@ void SceneGame::Update(float elapsedTime)
     photonNet->run();
 
     // キーの入力情報を各キャラクターに割り当てる
-    SetUserInputs();
+    //SetUserInputs();
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
@@ -216,9 +200,6 @@ void SceneGame::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
-    //オブジェクト描画
-    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 
     if (n)
         n->ImGui();
@@ -264,10 +245,10 @@ void SceneGame::Render(float elapsedTime)
 void SceneGame::SetUserInputs()
 {
     // プレイヤーの入力情報
-    //SetPlayerInput();
+    SetPlayerInput();
 
     // 他のプレイヤーの入力情報
-    //SetOnlineInput();
+    SetOnlineInput();
 }
 
 void SceneGame::SetPlayerInput()

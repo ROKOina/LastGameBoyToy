@@ -77,7 +77,6 @@ void SceneDebugGame::Render(float elapsedTime)
     }
 }
 
-
 void SceneDebugGame::LoginInitialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -239,9 +238,6 @@ void SceneDebugGame::GameRender(float elapsedTime)
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GetMainDirectionalLight()->GetDirection());
 
-    //オブジェクト描画
-    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
-
     if (n)
         n->ImGui();
 }
@@ -302,6 +298,3 @@ void SceneDebugGame::SetOnlineInput()
         }
     }
 }
-
-
-

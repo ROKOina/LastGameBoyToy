@@ -4,6 +4,7 @@
 #include "SystemStruct/QuaternionStruct.h"
 #include "Graphics/Graphics.h"
 #include <windows.h>
+#include "Input/Input.h"
 
 //コンストラクタ
 FreeCameraCom::FreeCameraCom() : CameraCom::CameraCom(45, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.1f, 1000.0f)
@@ -73,14 +74,19 @@ void FreeCameraCom::Update(float elapsedTime)
                 focusPos.y += up.y * y;
                 focusPos.z += up.z * y;
             }
-            else if (::GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+            //else if (::GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+            //{
+
+            //    // ズーム
+            //    distance += (-moveY - moveX) * distance * 0.1f;
+            //    if (distance < 0.1f)
+            //        distance = 0.1f;
+            //}
+            if (Input::Instance().GetMouse().GetWheel()!= 0)
             {
                 // ズーム
-                distance += (-moveY - moveX) * distance * 0.1f;
-                if (distance < 0.1f)
-                    distance = 0.1f;
+                distance -= static_cast<float>(Input::Instance().GetMouse().GetWheel()) * distance * 0.001f;
             }
-
             DirectX::XMFLOAT3 front = GetGameObject()->transform_->GetWorldFront();
 
             DirectX::XMFLOAT3 eye;

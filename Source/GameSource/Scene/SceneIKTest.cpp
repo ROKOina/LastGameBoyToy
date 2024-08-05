@@ -106,7 +106,4 @@ void SceneIKTest::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
-    //オブジェクト描画
-    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 }

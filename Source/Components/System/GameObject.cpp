@@ -11,6 +11,7 @@
 #include "SystemStruct/TransformUtils.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "GameSource/GameScript/FreeCameraCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -149,7 +150,7 @@ void GameObject::AudioRelease()
 // 作成
 std::shared_ptr<GameObject> GameObjectManager::Create()
 {
-    //std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
 
     std::shared_ptr<GameObject> obj = std::make_shared<GameObject>();
     obj->AddComponent<TransformCom>();
@@ -221,9 +222,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //デファードレンダリングの初期設定 ( レンダーターゲットをデファード用の物に変更 )
     m_posteffect->SetDeferredTarget();
 
-    //シルエット描画
-    //RenderSilhoutte();
-
     //3D描画
     RenderDeferred();
 
@@ -272,6 +270,8 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
         //ポストエフェクトimgui
         m_posteffect->PostEffectImGui();
     }
+
+    DrawGuizmo(view, projection);
 }
 
 void GameObjectManager::Render2D(float elapsedTime)
@@ -307,6 +307,12 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
     if (selectObject.find(obj) != selectObject.end())
     {
         nodeFlags |= ImGuiTreeNodeFlags_Selected;
+
+        if (ImGui::IsMouseDoubleClicked(0))
+        {
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
+        }
     }
 
     //子がいないなら、▼付けない
@@ -387,6 +393,13 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
         selectedObject->transform_->SetScale(scale);
         selectedObject->transform_->SetRotation(rotate);
         selectedObject->transform_->SetWorldPosition(position);
+    }
+
+    //ボーン毎のguizmo
+    if (renderSortObject_.size() <= 0)return;
+    for (std::weak_ptr<RendererCom>& r : renderSortObject_)
+    {
+        r.lock()->BoneGuizmo(view, projection);
     }
 }
 

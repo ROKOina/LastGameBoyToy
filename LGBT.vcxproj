@@ -164,6 +164,7 @@
     <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
+    <ClInclude Include="Source\Components\NodeCollsionCom.h" />
     <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
@@ -221,7 +222,6 @@
     <ClInclude Include="Source\Netwark\NetwarkPost.h" />
     <ClInclude Include="Source\Netwark\Photon\BasicsApplication.h" />
     <ClInclude Include="Source\Netwark\Photon\Photon_lib.h" />
-    <ClInclude Include="Source\Netwark\Photon\StaticSendDataManager.h" />
     <ClInclude Include="Source\Netwark\Photon\StdIO_UIListener.h" />
     <ClInclude Include="Source\Netwark\Photon\UIListener.h" />
     <ClInclude Include="Source\Netwark\RingBuffer.h" />
@@ -269,6 +269,7 @@
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
+    <ClCompile Include="Source\Components\NodeCollsionCom.cpp" />
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
     <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
@@ -434,9 +435,6 @@
     <FxCompile Include="HLSL\3D\ShadowVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\3D\SilhouettePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
