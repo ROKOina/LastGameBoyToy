@@ -82,6 +82,9 @@ public:
     //imguiguizmo
     void BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    //éqÉmÅ[Éhåüçı
+    void GetAllDescendants(int parentNodeId, std::vector<Model::Node*>& descendants);
+
     //node
     Model::Node* selectionNode = nullptr;
 
@@ -98,6 +101,6 @@ private:
 private:
     std::shared_ptr<ModelResource>	resource;
     std::vector<Node> nodes;
-    ImGuizmo::OPERATION					guizmoOperation = ImGuizmo::TRANSLATE;
-    ImGuizmo::MODE						guizmoMode = ImGuizmo::LOCAL;
+    ImGuizmo::OPERATION	guizmoOperation = ImGuizmo::TRANSLATE;
+    ImGuizmo::MODE guizmoMode = ImGuizmo::LOCAL;
 };

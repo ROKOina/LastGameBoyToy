@@ -134,16 +134,48 @@ void NodeCollsionCom::OnGUI()
                     break;
 
                 case NodeCollsionCom::CollsionType::CYLINDER:
-                    // ノード選択のためのドロップダウンメニュー
-                    if (ImGui::BeginCombo("EndNode", cp.endnodeid >= 0 ? model->GetNodes()[cp.endnodeid].name : "None"))
+
+                    // ノード選択用のリストを表示
+                    if (model->selectionNode != nullptr)
                     {
-                        for (size_t j = 0; j < model->GetNodes().size(); ++j)
+                        if (ImGui::BeginCombo("EndNode Selection", "Select a Node"))
                         {
-                            const auto& node = model->GetNodes()[j];
-                            bool isSelected = (cp.endnodeid == j);
-                            if (ImGui::Selectable(node.name, isSelected))
+                            for (const auto& node : model->GetNodes())
                             {
-                                cp.endnodeid = j;
+                                bool isSelected = (node.nodeIndex == model->selectionNode->nodeIndex);
+                                if (ImGui::Selectable(node.name, isSelected))
+                                {
+                                    // ノード名を選択してendnodeidに設定
+                                    for (auto& cp : model->cp)
+                                    {
+                                        if (cp.nodeid == model->selectionNode->nodeIndex)
+                                        {
+                                            cp.endnodeid = node.nodeIndex;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (isSelected)
+                                {
+                                    ImGui::SetItemDefaultFocus();
+                                }
+                            }
+                            ImGui::EndCombo();
+                        }
+                    }
+
+                    // ノード選択のためのドロップダウンメニュー
+                    if (ImGui::BeginCombo("EndNodeChilderen", cp.endnodeid >= 0 ? model->GetNodes()[cp.endnodeid].name : "None"))
+                    {
+                        std::vector<Model::Node*> descendants;
+                        model->GetAllDescendants(model->selectionNode->nodeIndex, descendants);
+
+                        for (auto& node : descendants)
+                        {
+                            bool isSelected = (cp.endnodeid == node->nodeIndex);
+                            if (ImGui::Selectable(node->name, isSelected))
+                            {
+                                cp.endnodeid = node->nodeIndex;
                             }
                             if (isSelected)
                             {
@@ -154,7 +186,6 @@ void NodeCollsionCom::OnGUI()
                     }
                     // 衝突パラメータの設定
                     ImGui::DragFloat("Radius", &cp.radius, 0.1f, 0.0f, 5.0f);
-                    ImGui::DragFloat("Height", &cp.height, 0.1f, 0.0f, 5.0f);
                     break;
 
                 default:

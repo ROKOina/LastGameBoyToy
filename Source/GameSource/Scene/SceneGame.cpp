@@ -19,6 +19,7 @@
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
+#include "Components/AimIKCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ColliderCom.h"
@@ -89,6 +90,8 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        obj->AddComponent<AimIKCom>("Spine");
+        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
         a->PlayAnimation(0, true, false, 0.001f);
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
@@ -99,8 +102,6 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
-
-        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
 
         //攻撃レイキャストスタート位置
         {
