@@ -48,9 +48,8 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 	ExitGames::Common::Base::setDebugOutputLevel(DEBUG_RELEASE(ExitGames::Common::DebugLevel::INFO, ExitGames::Common::DebugLevel::WARNINGS)); // all classes that inherit from Base
 }
 
-void PhotonLib::update(void)
+void PhotonLib::update(float elapsedTime)
 {
-
 	//自分の入力保存
 	int myID = GetPlayerNum();
 	for (auto& s : saveInputPhoton)
@@ -85,6 +84,7 @@ void PhotonLib::update(void)
 	}
 		case PhotonState::JOINING:
 			oldMs = GetServerTime();
+			startTime= GetServerTime();
 			break;
 		case PhotonState::JOINED:
 			//情報送信
@@ -99,6 +99,7 @@ void PhotonLib::update(void)
 				if (oldMs == 0)
 				{
 					oldMs = GetServerTime();
+					startTime = GetServerTime();
 				}
 			}
 			break;
@@ -154,6 +155,10 @@ void PhotonLib::ImGui()
 
 
 	//サーバー時間
+	float time = (GetServerTime() - startTime) / 1000.0f;
+	ImGui::DragFloat("time", &time);
+	
+
 	int serverTime = GetServerTime();
 	int serverTimeOF = GetServerTimeOffset();
 	ImGui::InputInt("serverTime", &serverTime);

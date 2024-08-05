@@ -27,10 +27,10 @@ BasicsApplication::BasicsApplication(UIListener* listener)
 }
 
 
-void BasicsApplication::run(/*UIListener* listener*/)
+void BasicsApplication::run(float elapsedTime)
 {
 	static JString lastStateString;
-	photonLib->update();
+	photonLib->update(elapsedTime);
 	auto Jstring = photonLib->getStateString();
 	if (Jstring.length() && Jstring != lastStateString)
 	{

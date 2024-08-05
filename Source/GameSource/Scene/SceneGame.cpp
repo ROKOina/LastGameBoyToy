@@ -74,8 +74,8 @@ void SceneGame::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         a->PlayAnimation(0, true, false, 0.001f);
 
-        std::shared_ptr<RayColliderCom> sphere = obj->AddComponent<RayColliderCom>();
-        sphere->SetMyTag(COLLIDER_TAG::Enemy);
+        //std::shared_ptr<RayColliderCom> sphere = obj->AddComponent<RayColliderCom>();
+        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
 
         obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
@@ -169,7 +169,7 @@ void SceneGame::Update(float elapsedTime)
         }
     }
 
-    photonNet->run();
+    photonNet->run(elapsedTime);
 
     // キーの入力情報を各キャラクターに割り当てる
     //SetUserInputs();

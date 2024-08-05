@@ -35,7 +35,7 @@ class PhotonLib : private ExitGames::LoadBalancing::Listener
 {
 public:
 	PhotonLib(UIListener*);
-	void update(void);
+	void update(float elapsedTime);
 	void ImGui();
 	ExitGames::Common::JString getStateString(void);
 
@@ -144,6 +144,8 @@ private:
 	virtual void onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegions*/, const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegionServers*/);
 
 
+
+	int startTime = 0;
 
 	PhotonState::States mState;
 

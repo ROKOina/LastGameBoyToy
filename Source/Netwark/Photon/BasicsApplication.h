@@ -8,7 +8,7 @@ public:
 	BasicsApplication::BasicsApplication(UIListener* listener);
 	//Launch main loop 
 	//this function takes uwnership of listener
-	void run(/*UIListener* listener*/);
+	void run(float elapsedTime);
 	void close();
 
 	void ImGui();
