@@ -136,7 +136,7 @@ void BaseCharacter_JumpState::Exit()
 
 void BaseCharacter_NoneAttack::Enter()
 {
-    //歩きアニメーション再生開始
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
+    ////歩きアニメーション再生開始
+    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }

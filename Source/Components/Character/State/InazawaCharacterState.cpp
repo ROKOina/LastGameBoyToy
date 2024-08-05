@@ -3,6 +3,7 @@
 
 #include "Components\RendererCom.h"
 #include "Components\CameraCom.h"
+#include "Components\AnimationCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\BulletCom.h"
 
@@ -108,6 +109,12 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
+        owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+        owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
+            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"),false
+        );
+
+
         //UŒ‚ˆ—
         Fire(owner->GetGameObject(), arrowSpeed, attackPower);
         //RayFire(owner->GetGameObject());
