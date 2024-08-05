@@ -593,7 +593,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				std::shared_ptr<BoxColliderCom> sphere = net1->AddComponent<BoxColliderCom>();
 				sphere->SetMyTag(COLLIDER_TAG::Enemy);
 				sphere->SetSize({ 0.7f,1.2f,0.7f });
-				sphere->SetOffsetPosition({ 0.0f,1.3f,0.0f });
+				sphere->SetOffsetPosition(DirectX::XMFLOAT3(0.0f, 1.3f, 0.0f));
 
 				////当たり判定オブジェ(エラー直し用)
 				//{
