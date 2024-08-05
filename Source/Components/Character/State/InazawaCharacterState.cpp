@@ -106,8 +106,8 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
         //UŒ‚ˆ—
-        //Fire(owner->GetGameObject(), arrowSpeed, attackPower);
-        RayFire(owner->GetGameObject());
+        Fire(owner->GetGameObject(), arrowSpeed, attackPower);
+        //RayFire(owner->GetGameObject());
 
         auto& chara = GetComp(CharacterCom);
         chara->SetMoveMaxSpeed(saveMaxSpeed);
