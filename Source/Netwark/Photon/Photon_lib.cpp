@@ -585,9 +585,10 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				c->SetCharaID(playerNr);
 				std::shared_ptr<MovementCom> m = net1->AddComponent<MovementCom>();
 
-				std::shared_ptr<SphereColliderCom> sphere = net1->AddComponent<SphereColliderCom>();
+				std::shared_ptr<BoxColliderCom> sphere = net1->AddComponent<BoxColliderCom>();
 				sphere->SetMyTag(COLLIDER_TAG::Enemy);
-				sphere->SetRadius(0.5f);
+				sphere->SetSize({ 0.7f,1.2f,0.7f });
+				sphere->SetOffsetPosition({ 0.0f,1.3f,0.0f });
 
 				////当たり判定オブジェ(エラー直し用)
 				//{

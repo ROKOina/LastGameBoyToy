@@ -100,18 +100,18 @@ void SceneGame::Initialize()
         //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
 
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
-        sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
+        sphere->SetMyTag(COLLIDER_TAG::Player);
 
-        //攻撃レイキャストスタート位置
-        {
-            std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
-            rayChild->SetName("rayObj");
+        ////攻撃レイキャストスタート位置
+        //{
+        //    std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
+        //    rayChild->SetName("rayObj");
 
-            std::shared_ptr<RayColliderCom> sphere = rayChild->AddComponent<RayColliderCom>();
-            sphere->SetMyTag(COLLIDER_TAG::Player);
-            sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
-        }
+        //    std::shared_ptr<RayColliderCom> sphere = rayChild->AddComponent<RayColliderCom>();
+        //    sphere->SetMyTag(COLLIDER_TAG::Player);
+        //    sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
+        //}
     }
 
     //カメラをプレイヤーの子どもにして制御する
