@@ -13,17 +13,25 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
 
 void BaseCharacter_IdleState::Enter()
 {
-    //歩きアニメーション再生開始
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    ////歩きアニメーション再生開始
+    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
 
-    AnimationCom::PlayLowBodyAnimParam param =
-    {
-        param.lowerAnimaOneId= animationCom.lock()->FindAnimation("Idle"),
-        param.loop=true,
-        param.animeChangeRate=0.1f
-    };
+    //AnimationCom::PlayLowBodyAnimParam param =
+    //{
+    //    param.lowerAnimaOneId = animationCom.lock()->FindAnimation("Idle"),
+    //    param.loop = true,
+    //    param.rootFlag = false,
+    //    param.blendType = 0,
+    //    param.animeChangeRate = 0.5f,
+    //    param.animeBlendRate = 0.0f
 
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
+    //};
+
+
+    //animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -47,7 +55,23 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 void BaseCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+
+    AnimationCom::PlayLowBodyAnimParam param =
+    {
+        param.lowerAnimaOneId = animationCom.lock()->FindAnimation("Walk_Forward"),
+        param.lowerAnimeTwoId = animationCom.lock()->FindAnimation("Walk_Back"),
+        param.lowerAnimeThreeId = animationCom.lock()->FindAnimation("Walk_Right"),
+        param.lowerAnimeFourId = animationCom.lock()->FindAnimation("Walk_Left"),
+        param.loop = true,
+        param.rootFlag = false,
+        param.blendType = 2,
+        param.animeChangeRate = 0.5f,
+        param.animeBlendRate = 0.0f
+
+    };
+
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
