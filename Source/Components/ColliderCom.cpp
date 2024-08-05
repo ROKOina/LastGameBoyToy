@@ -36,12 +36,12 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     HitResult rayResult;
     if (myType == COLLIDER_TYPE::RayCollider)
     {
-        isJudgeMyRay = RayVsModel(otherSide, rayResult, true);//vsModel
+        isJudgeMyRay = RayVsNodeCollision(otherSide, rayResult, true);//vsModel
     }
     HitResult otherRayResult;
     if (otherType == COLLIDER_TYPE::RayCollider)
     {
-        isJudgeOtherRay = RayVsModel(otherSide, otherRayResult, false);//vsModel
+        isJudgeOtherRay = RayVsNodeCollision(otherSide, otherRayResult, false);//vsModel
     }
 
     //球
@@ -478,7 +478,7 @@ bool Collider::BoxVsCapsule(std::shared_ptr<Collider> otherSide)
     return false;
 }
 
-bool Collider::RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay)
+bool Collider::RayVsNodeCollision(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay)
 {
     //形状を判定
     std::shared_ptr<RayColliderCom> ray;
@@ -491,6 +491,7 @@ bool Collider::RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, boo
         auto& renderer = otherSide->GetGameObject()->GetComponent<RendererCom>();
         if (!renderer)return false;
         model = renderer->GetModel();
+        if (model->cp.size() <= 0)return false;
     }
     else
     {
@@ -499,23 +500,111 @@ bool Collider::RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, boo
         auto& renderer = shared_from_this()->GetGameObject()->GetComponent<RendererCom>();
         if (!renderer)return false;
         model = renderer->GetModel();
+        if (model->cp.size() <= 0)return false;
     }
-
+    
     DirectX::XMFLOAT3 s = ray->GetStart();
     DirectX::XMFLOAT3 e = ray->GetEnd();
-    if (0.1f > DirectX::XMVector3Length(DirectX::XMLoadFloat3(&(s - e))).m128_f32[0])
+
+    //ヒット距離を最大で初期化
+    h.distance = FLT_MAX;
+
+    bool isHit = false;
+
+    for (auto& col : model->cp)
     {
-        return false;
-    }
-    if (Collision::IntersectRayVsModel(s, e, model, h))
-    {
-        ray->SetHitPos(h.position);
-        return true;
+        DirectX::XMFLOAT3 startPos =
+        {
+            model->GetNodes()[col.nodeid].worldTransform._41,
+            model->GetNodes()[col.nodeid].worldTransform._42,
+            model->GetNodes()[col.nodeid].worldTransform._43
+        };
+
+        //sphere
+        if (col.collsiontype == 0)
+        {
+            HitResult hit;
+            if (Collision::IntersectRayVsSphere(
+                DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
+                DirectX::XMLoadFloat3(&startPos), col.radius, hit))
+            {
+                //距離を見て近ければ上書きする
+                if (h.distance > hit.distance)
+                {
+                    h = hit;
+                    isHit = true;
+                }
+            }
+        }
+        //clynder
+        else if (col.collsiontype == 1)
+        {
+            DirectX::XMFLOAT3 endPos =
+            {
+                model->GetNodes()[col.endnodeid].worldTransform._41,
+                model->GetNodes()[col.endnodeid].worldTransform._42,
+                model->GetNodes()[col.endnodeid].worldTransform._43
+            };
+
+            HitResult hit;
+            if (Collision::IntersectRayVsOrientedCylinder(
+                DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
+                DirectX::XMLoadFloat3(&startPos), DirectX::XMLoadFloat3(&endPos), col.radius, hit))
+            {
+                //距離を見て近ければ上書きする
+                if (h.distance > hit.distance)
+                {
+                    h = hit;
+                    isHit = true;
+                }
+            }
+
+        }
     }
 
-    return false;
+    if(isHit)ray->SetHitPosDebug(h.position);
 
+    return isHit;
 }
+
+//bool Collider::RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay)
+//{
+//    //形状を判定
+//    std::shared_ptr<RayColliderCom> ray;
+//    Model* model;
+//
+//    if (isMyRay)
+//    {
+//        ray = std::static_pointer_cast<RayColliderCom>(shared_from_this());
+//
+//        auto& renderer = otherSide->GetGameObject()->GetComponent<RendererCom>();
+//        if (!renderer)return false;
+//        model = renderer->GetModel();
+//    }
+//    else
+//    {
+//        ray = std::static_pointer_cast<RayColliderCom>(otherSide);
+//
+//        auto& renderer = shared_from_this()->GetGameObject()->GetComponent<RendererCom>();
+//        if (!renderer)return false;
+//        model = renderer->GetModel();
+//    }
+//
+//    DirectX::XMFLOAT3 s = ray->GetStart();
+//    DirectX::XMFLOAT3 e = ray->GetEnd();
+//    if (0.1f > DirectX::XMVector3Length(DirectX::XMLoadFloat3(&(s - e))).m128_f32[0])
+//    {
+//        return false;
+//    }
+//    if (Collision::IntersectRayVsModel(s, e, model, h))
+//    {
+//        ray->SetHitPos(h.position);
+//        return true;
+//    }
+//
+//    return false;
+//
+//}
 
 #pragma endregion
 

@@ -76,8 +76,8 @@ void SceneGame::Initialize()
 
         std::shared_ptr<RayColliderCom> sphere = obj->AddComponent<RayColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Enemy);
-        sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
+        obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
 
     //プレイヤー
@@ -100,6 +100,8 @@ void SceneGame::Initialize()
         sphere->SetMyTag(COLLIDER_TAG::Player);
         sphere->SetRadius(0.5f);
 
+        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
+
         //攻撃レイキャストスタート位置
         {
             std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
@@ -109,8 +111,6 @@ void SceneGame::Initialize()
             sphere->SetMyTag(COLLIDER_TAG::Player);
             sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
         }
-
-        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
     }
 
     //カメラをプレイヤーの子どもにして制御する

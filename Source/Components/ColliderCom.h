@@ -124,7 +124,10 @@ private:
     bool BoxVsCapsule(std::shared_ptr<Collider> otherSide);
 
     //レイvモデル
-    bool RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay);
+    //bool RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay);
+
+    //レイVSノードコリジョン
+    bool RayVsNodeCollision(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay);
 
 private:
     //当たり判定タグ
@@ -292,7 +295,7 @@ public:
     const DirectX::XMFLOAT3& GetStart() { return start; }
     const DirectX::XMFLOAT3& GetEnd() { return end; }
 
-    void SetHitPos(DirectX::XMFLOAT3 p) { hitPos = p; }
+    void SetHitPosDebug(DirectX::XMFLOAT3 p) { hitPos = p; }
 
 private:
     DirectX::XMFLOAT3 start = { 0,0,0 };

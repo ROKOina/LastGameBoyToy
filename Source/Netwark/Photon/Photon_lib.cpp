@@ -435,6 +435,7 @@ std::vector<int> PhotonLib::GetTrips()
 	for (auto& s : saveInputPhoton)
 	{
 		if (myID == s.id)continue;
+		if (trips.size() <= count)break;
 		trips[count] = s.myDelay;
 		count++;
 	}
