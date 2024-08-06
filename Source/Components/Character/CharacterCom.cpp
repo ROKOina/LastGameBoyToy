@@ -8,15 +8,15 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
-    //カメラが向いている方向へ旋回
-    GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
-    std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
-    DirectX::XMFLOAT3 cameraForward = cameraCom->GetFront();
-    cameraForward.y = 0;
+    ////カメラが向いている方向へ旋回
+    //GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
+    //std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
+    //DirectX::XMFLOAT3 cameraForward = cameraCom->GetFront();
+    //cameraForward.y = 0;
 
-    GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
-    GetGameObject()->transform_->UpdateTransform();
-    GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
+    //GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
+    //GetGameObject()->transform_->UpdateTransform();
+    //GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
 
 
     //ステックのアングル取得

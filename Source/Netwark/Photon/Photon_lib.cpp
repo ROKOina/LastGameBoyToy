@@ -481,6 +481,8 @@ void PhotonLib::sendData(void)
 	NetData& netD = n.emplace_back(NetData());
 	auto tra = obj->transform_->GetWorldPosition();
 	netD.pos = { tra.x,tra.y,tra.z };
+	auto rota = obj->transform_->GetRotation();
+	netD.rotato = rota;
 
 	auto& move = obj->GetComponent<MovementCom>();
 	netD.velocity = move->GetVelocity();
@@ -608,6 +610,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			}
 
 			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
+			net1->transform_->SetRotation(ne[0].rotato);
 			net1->GetComponent<MovementCom>()->SetVelocity(ne[0].velocity);
 
 			//ƒ_ƒ[ƒWî•ñ
