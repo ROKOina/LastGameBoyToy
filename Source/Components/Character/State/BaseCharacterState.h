@@ -30,7 +30,7 @@ static void JumpInput(std::shared_ptr<GameObject> obj, float speed = 1)
 
     if (CharacterInput::JumpButton_SPACE & obj->GetComponent<CharacterCom>()->GetButtonDown())
     {
-        DirectX::XMFLOAT3 power = { 0,obj->GetComponent<CharacterCom>()->GetJumpPower() * speed,0 };
+        DirectX::XMFLOAT3 power = { 0.0f,obj->GetComponent<CharacterCom>()->GetJumpPower() * speed,0.0f };
         moveCom->AddForce(power);
     }
 }
@@ -53,6 +53,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    virtual const char* GetName() const override { return "Idle"; }
 };
 
 class BaseCharacter_MoveState : public BaseCharacter_BaseState
@@ -62,6 +63,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    virtual const char* GetName() const override { return "Move"; }
 };
 
 class BaseCharacter_JumpState : public BaseCharacter_BaseState
@@ -72,6 +74,7 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
+    virtual const char* GetName() const override { return "Jump"; }
 
 private:
 
@@ -87,4 +90,5 @@ public:
     BaseCharacter_NoneAttack(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
+    virtual const char* GetName() const override { return "NoneAttack"; }
 };
