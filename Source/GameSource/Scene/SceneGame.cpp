@@ -296,10 +296,10 @@ void SceneGame::SetOnlineInput()
 
             if (!chara)continue;
 
-            // 入力情報をプレイヤーキャラクターに送信
-            chara->SetUserInput(client.input);
-            chara->SetUserInputDown(client.inputDown);
-            chara->SetUserInputUp(client.inputUp);
+            //// 入力情報をプレイヤーキャラクターに送信
+            //chara->SetUserInput(client.input);
+            //chara->SetUserInputDown(client.inputDown);
+            //chara->SetUserInputUp(client.inputUp);
 
             DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
 

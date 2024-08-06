@@ -57,21 +57,21 @@ void NetwarkPost::RenderUpdate()
 
 bool NetwarkPost::IsSynchroFrame(bool isServer)
 {
-    for (auto& c : clientDatas)
-    {
-        if (c.id == id)continue;
+    //for (auto& c : clientDatas)
+    //{
+    //    if (c.id == id)continue;
 
-        if (!isServer)    //サーバー側は全てのクライアントと比較する
-            if (c.id != 0)continue;
+    //    if (!isServer)    //サーバー側は全てのクライアントと比較する
+    //        if (c.id != 0)continue;
 
-        if (nowFrame - c.nowFrame > 10)
-        {
-            return false;
-        }
+    //    if (nowFrame - c.nowFrame > 10)
+    //    {
+    //        return false;
+    //    }
 
-        if (!isServer)
-            break;
-    }
+    //    if (!isServer)
+    //        break;
+    //}
 
     return true;
 }

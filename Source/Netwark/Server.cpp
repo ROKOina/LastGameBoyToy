@@ -171,13 +171,13 @@ void NetServer::ImGui()
     //}
 
 
-    int frame = nowFrame;
-    ImGui::InputInt("nowFrame", &frame);
-    if (clientDatas.size() >= 2)
-    {
-        frame = clientDatas[1].nowFrame;
-        ImGui::InputInt("nowFram1", &frame);
-    }
+    //int frame = nowFrame;
+    //ImGui::InputInt("nowFrame", &frame);
+    //if (clientDatas.size() >= 2)
+    //{
+    //    frame = clientDatas[1].nowFrame;
+    //    ImGui::InputInt("nowFram1", &frame);
+    //}
 
     ImGui::End();
 }
@@ -200,13 +200,13 @@ void NetServer::Receive()
             //仮
             std::vector<NetData> clientND = NetDataRecvCast(recvData);
 
-            //フレーム差
-            static std::vector<int> saveInt;
-            for (auto& c : clientND)
-            {
-                if (c.id == id)continue;
-                saveInt.emplace_back(nowFrame - c.nowFrame);
-            }
+            ////フレーム差
+            //static std::vector<int> saveInt;
+            //for (auto& c : clientND)
+            //{
+            //    if (c.id == id)continue;
+            //    saveInt.emplace_back(nowFrame - c.nowFrame);
+            //}
 
             //登録済みなら上書き
             for (auto& nData : clientND)
@@ -295,14 +295,14 @@ void NetServer::Send()
         client.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
         client.rotato = player->transform_->GetRotation();
 
-        client.input = input;
-        client.inputDown = inputDown;
-        client.inputUp = inputUp;
+        //client.input = input;
+        //client.inputDown = inputDown;
+        //client.inputUp = inputUp;
         input = 0;
         inputDown = 0;
         inputUp = 0;
 
-        client.nowFrame = nowFrame;
+        //client.nowFrame = nowFrame;
         client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
         break;

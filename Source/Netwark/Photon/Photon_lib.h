@@ -57,6 +57,8 @@ public:
 	void DelayUpdate();
 
 	int GetPlayerNum();
+	//マスタークライアントなのか
+	bool GetIsMasterPlayer();
 
 	int GetServerTime();
 	int GetServerTimeOffset();
@@ -172,6 +174,8 @@ private:
 
 		//自分のIDから見たディレイ
 		int myDelay = 50;
+
+		int teamID = 0;
 
 		//次の入力情報を格納
 		struct NextInput

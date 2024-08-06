@@ -22,10 +22,7 @@
 static const ExitGames::Common::JString appID = L"0d572336-477d-43ad-895e-59f4eeebbca9"; // set your app id here
 static const ExitGames::Common::JString appVersion = L"1.0";
 
-static ExitGames::Common::JString gameName = L"Basics";
-
 static const ExitGames::Common::JString PLAYER_NAME = L"user";
-static const int MAX_SENDCOUNT = 100;
 
 PhotonLib::PhotonLib(UIListener* uiListener)
 #ifdef _EG_MS_COMPILER
@@ -50,12 +47,12 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 
 void PhotonLib::update(float elapsedTime)
 {
-	//自分の入力保存
 	int myID = GetPlayerNum();
 	for (auto& s : saveInputPhoton)
 	{
 		if (s.id != myID)continue;
 
+		//自分の入力保存
 		GamePad& gamePad = Input::Instance().GetGamePad();
 
 		SaveBuffer save;
@@ -65,6 +62,10 @@ void PhotonLib::update(float elapsedTime)
 		save.inputUp = gamePad.GetButtonUp();
 
 		s.inputBuf->Enqueue(save);
+
+		//ちーむID保存
+		auto& obj = GameObjectManager::Instance().Find("player");
+		obj->GetComponent<CharacterCom>()->SetTeamID(s.teamID);
 
 		break;
 	}
@@ -139,6 +140,36 @@ void PhotonLib::ImGui()
 	//ID表示
 	int photonID = GetPlayerNum();
 	ImGui::InputInt("photonID", &photonID);
+
+	//マスタークライアントか
+	bool isMaster = GetIsMasterPlayer();
+	ImGui::Checkbox("master", &isMaster);
+
+	if (isMaster)
+	{
+		if (ImGui::TreeNode("teamWake"))
+		{
+			for (auto& s : saveInputPhoton)
+			{
+				ImGui::InputInt(std::string("player" + std::to_string(s.id) + "teamID").c_str(), &s.teamID);
+			}
+
+			ImGui::TreePop();
+		}
+	}
+	else
+	{
+		if (ImGui::TreeNode("team"))
+		{
+			for (auto& s : saveInputPhoton)
+			{
+				int tem = s.teamID;
+				ImGui::InputInt(std::string("player" + std::to_string(s.id) + "teamID").c_str(), &tem);
+			}
+
+			ImGui::TreePop();
+		}
+	}
 
 	//状態表示
 	std::string nowState = stateStr[GetPhotonState()];
@@ -347,7 +378,6 @@ void PhotonLib::MyCharaInput()
 		chara->SetUserInputDown(s.nextInput.inputDown);
 		chara->SetUserInputUp(s.nextInput.inputUp);
 
-		//s.nextInput.input = 0;
 		s.nextInput.inputDown = 0;
 		s.nextInput.inputUp = 0;
 
@@ -403,6 +433,13 @@ int PhotonLib::GetPlayerNum()
 	int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
 
 	return myPlayerNumber;
+}
+
+bool PhotonLib::GetIsMasterPlayer()
+{
+	bool isMaster = mLoadBalancingClient.getLocalPlayer().getIsMasterClient();
+
+	return isMaster;
 }
 
 int PhotonLib::GetServerTime()
@@ -479,6 +516,10 @@ void PhotonLib::sendData(void)
 
 	std::vector<NetData> n;
 	NetData& netD = n.emplace_back(NetData());
+
+	//マスタークライアントか
+	netD.isMasterClient = GetIsMasterPlayer();
+
 	auto tra = obj->transform_->GetWorldPosition();
 	netD.pos = { tra.x,tra.y,tra.z };
 	auto rota = obj->transform_->GetRotation();
@@ -493,6 +534,15 @@ void PhotonLib::sendData(void)
 	{
 		netD.damageData[data.id] += data.damage;
 		data.damage = 0;
+	}
+
+	//マスタークライアントの場合はチームIDを送る
+	if (GetIsMasterPlayer())
+	{
+		for (auto& s : saveInputPhoton)
+		{
+			netD.teamID[s.id] = s.teamID;
+		}
 	}
 
 	//自分の入力を送る
@@ -559,6 +609,16 @@ void PhotonLib::leaveRoomEventAction(int playerNr, bool isInactive)
 	EGLOG(ExitGames::Common::DebugLevel::INFO, L"");
 	mpOutputListener->writeString(L"");
 	mpOutputListener->writeString(ExitGames::Common::JString(L"player ") + playerNr + L" has left the game");
+
+
+	//退出者処理
+	for (int i = 0; i < saveInputPhoton.size(); ++i)
+	{
+		if (saveInputPhoton[i].id != playerNr)continue;
+
+		saveInputPhoton.erase(saveInputPhoton.begin() + i);
+		break;
+	}
 }
 
 void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames::Common::Object& eventContentObj)
@@ -572,6 +632,16 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			ExitGames::Common::JString s;
 			s = ((ExitGames::Common::ValueObject<ExitGames::Common::JString>*)(eventContent.getValue((nByte)0)))->getDataCopy();
 			auto ne = NetDataRecvCast(WStringToString(s.cstr()));
+
+			//マスタークライアント以外はチームを保存
+			if (ne[0].isMasterClient)
+			{
+				for (auto& s : saveInputPhoton)
+				{
+					s.teamID = ne[0].teamID[s.id];
+				}
+			}
+
 
 			//仮オブジェ
 			std::string name = "netPlayer" + std::to_string(playerNr);

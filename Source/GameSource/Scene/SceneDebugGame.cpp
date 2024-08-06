@@ -283,10 +283,10 @@ void SceneDebugGame::SetOnlineInput()
 
             if (!chara)continue;
 
-            // 入力情報をプレイヤーキャラクターに送信
-            chara->SetUserInput(client.input);
-            chara->SetUserInputDown(client.inputDown);
-            chara->SetUserInputUp(client.inputUp);
+            //// 入力情報をプレイヤーキャラクターに送信
+            //chara->SetUserInput(client.input);
+            //chara->SetUserInputDown(client.inputDown);
+            //chara->SetUserInputUp(client.inputUp);
 
             //ダメージ情報更新
             for (int i = 0; i < SceneDebugGame::MAX_PLAYER_NUM; ++i)

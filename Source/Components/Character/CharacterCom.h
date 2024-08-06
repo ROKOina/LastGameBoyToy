@@ -102,8 +102,12 @@ public:
       return GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
   }
 
+  //ネット側で決める
   void SetCharaID(int id) { charaID = id; }
   int GetCharaID() { return charaID; }
+  //ネット側で決める
+  void SetTeamID(int id) { teamID = id; }
+  int GetTeamID() { return teamID; }
   void AddGiveDamage(int index, float damage) { giveDamage[index] += damage; }
   std::array<float, 6> GetGiveDamage() { return giveDamage; }
 
@@ -142,6 +146,7 @@ protected:
   float jumpPower = 10.0f;
   float hitPoint = 100.0f;
 
+  int teamID = 0;   //自分のチーム
   int charaID = 0;//どのクライアントがこのキャラを担当するか
   std::array<float, 6> giveDamage = { 0,0,0,0,0,0 };//敵に与えたダメージ量や味方に与えた回復
 

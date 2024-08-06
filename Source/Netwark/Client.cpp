@@ -158,14 +158,14 @@ void NetClient::ImGui()
     int ID = id;
     ImGui::InputInt("id", &ID);
 
-    int frame;
-    if (clientDatas.size() >= 2)
-    {
-        frame = clientDatas[0].nowFrame;
-        ImGui::InputInt("nowFram", &frame);
-    }
-    frame = nowFrame;
-    ImGui::InputInt("nowFrame1", &frame);
+    //int frame;
+    //if (clientDatas.size() >= 2)
+    //{
+    //    frame = clientDatas[0].nowFrame;
+    //    ImGui::InputInt("nowFram", &frame);
+    //}
+    //frame = nowFrame;
+    //ImGui::InputInt("nowFrame1", &frame);
 
     ImGui::End();
 }
@@ -188,29 +188,29 @@ void NetClient::Receive()
 
         clientDatas = NetDataRecvCast(recvData);
 
-        //フレーム差
-        static std::vector<int> saveInt;
-        for (auto& c : clientDatas)
-        {
-            if (c.id == id)continue;
-            saveInt.emplace_back(nowFrame - c.nowFrame);
-        }
+        ////フレーム差
+        //static std::vector<int> saveInt;
+        //for (auto& c : clientDatas)
+        //{
+        //    if (c.id == id)continue;
+        //    saveInt.emplace_back(nowFrame - c.nowFrame);
+        //}
 
 
-        //最初の交信時
-        if (!firstConect)
-        {
-            firstConect = true;
-            //フレームを保存
-            for (auto& c : clientDatas)
-            {
-                if (c.id == 0)
-                {
-                    nowFrame = c.nowFrame;
-                    break;
-                }
-            }
-        }
+        ////最初の交信時
+        //if (!firstConect)
+        //{
+        //    firstConect = true;
+        //    //フレームを保存
+        //    for (auto& c : clientDatas)
+        //    {
+        //        if (c.id == 0)
+        //        {
+        //            nowFrame = c.nowFrame;
+        //            break;
+        //        }
+        //    }
+        //}
 
         RenderUpdate();
     }
@@ -250,14 +250,14 @@ void NetClient::Send()
     n.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
     n.rotato = player->transform_->GetRotation();
 
-    n.input = input;
-    n.inputDown = inputDown;
-    n.inputUp = inputUp;
+    //n.input = input;
+    //n.inputDown = inputDown;
+    //n.inputUp = inputUp;
     input = 0;
     inputDown = 0;
     inputUp = 0;
 
-    n.nowFrame = nowFrame;
+    //n.nowFrame = nowFrame;
     n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
     //開始から６フレームのインプット送る
