@@ -4,10 +4,10 @@
 #include "TransformCom.h"
 
 //コンストラクタ
-AimIKCom::AimIKCom(const char* ainbonename)
+AimIKCom::AimIKCom(const char* aimbonename)
 {
     //名前をコピー
-    copyname = ainbonename;
+    copyname = aimbonename;
 }
 
 // 開始処理
@@ -95,7 +95,7 @@ void AimIKCom::AimIK()
 }
 
 //ikさせるboneを探す
-void AimIKCom::SearchAimNode(const char* ainbonename)
+void AimIKCom::SearchAimNode(const char* aimbonename)
 {
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
@@ -103,7 +103,7 @@ void AimIKCom::SearchAimNode(const char* ainbonename)
     {
         const Model::Node& node = model->GetNodes().at(nodeIndex);
 
-        if (strstr(node.name, ainbonename) == node.name)
+        if (strstr(node.name, aimbonename) == node.name)
         {
             AimBone.push_back(static_cast<int>(nodeIndex));
         }

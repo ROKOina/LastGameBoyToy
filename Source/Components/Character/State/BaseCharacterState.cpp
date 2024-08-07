@@ -27,11 +27,9 @@ void BaseCharacter_IdleState::Enter()
 
     //};
 
-
     //animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
-
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -40,8 +38,8 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //ˆÚ“®
-    if(owner->IsPushLeftStick())
-    //if (moveVec != 0)
+    if (owner->IsPushLeftStick())
+        //if (moveVec != 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
@@ -68,7 +66,6 @@ void BaseCharacter_MoveState::Enter()
         param.blendType = 2,
         param.animeChangeRate = 0.5f,
         param.animeBlendRate = 0.0f
-
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
@@ -82,8 +79,8 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //‘Ò‹@
-    if(!owner->IsPushLeftStick())
-    //if (moveVec == 0)
+    if (!owner->IsPushLeftStick())
+        //if (moveVec == 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
