@@ -8,7 +8,7 @@ class AimIKCom : public Component
 {
     //コンポーネントオーバーライド
 public:
-    AimIKCom(const char* ainbonename);
+    AimIKCom(const char* aimbonename);
     ~AimIKCom() {}
 
     // 名前取得
@@ -29,7 +29,7 @@ private:
     void AimIK();
 
     //ikさせるboneを探す
-    void SearchAimNode(const char* ainbonename);
+    void SearchAimNode(const char* aimbonename);
 
 private:
 

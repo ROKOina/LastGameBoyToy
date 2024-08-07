@@ -5,6 +5,7 @@
 #include "Components\Character\BulletCom.h"
 #include "BaseCharacterState.h"
 
+//基底クラスのコンポーネント
 UenoCharacterState_BaseState::UenoCharacterState_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
@@ -14,37 +15,120 @@ UenoCharacterState_BaseState::UenoCharacterState_BaseState(CharacterCom* owner) 
     animationCom = GetComp(AnimationCom);
 }
 
-void UenoCharacterState_AttackState::Enter()
+#pragma 待機
+void UenoCharacterState_IdleState::Enter()
 {
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
 }
 
-//ステート更新処理
-void UenoCharacterState_AttackState::Execute(const float& elapsedTime)
+void UenoCharacterState_IdleState::Execute(const float& elapsedTime)
 {
-    MoveInputVec(owner->GetGameObject(), 0.5f);
+    //ステック入力があれば移動ステートに遷移
+    if (owner->IsPushLeftStick())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
+        return;
+    }
 
+    //ジャンプ入力
+    if (GamePad::BTN_A & owner->GetButtonDown())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma 移動
+void UenoCharacterState_MoveState::Enter()
+{
+    //歩きアニメーション再生開始
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+
+    //4方向の歩きアニメーション
+    AnimationCom::PlayLowBodyAnimParam param =
+    {
+        param.lowerAnimaOneId = animationCom.lock()->FindAnimation("Walk_Forward"),
+        param.lowerAnimeTwoId = animationCom.lock()->FindAnimation("Walk_Back"),
+        param.lowerAnimeThreeId = animationCom.lock()->FindAnimation("Walk_Right"),
+        param.lowerAnimeFourId = animationCom.lock()->FindAnimation("Walk_Left"),
+        param.loop = true,
+        param.rootFlag = false,
+        param.blendType = 2,
+        param.animeChangeRate = 0.5f,
+        param.animeBlendRate = 0.2f
+    };
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
+}
+
+void UenoCharacterState_MoveState::Execute(const float& elapsedTime)
+{
+    //移動
+    MoveInputVec(owner->GetGameObject());
+
+    //入力がなかったら待機
+    if (!owner->IsPushLeftStick())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+        return;
+    }
+
+    //ジャンプ入力
+    if (GamePad::BTN_A & owner->GetButtonDown())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma ジャンプ
+void UenoCharacterState_JumpState::Enter()
+{
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
+
+    //ジャンプベクトル
+    JumpInput(owner->GetGameObject());
+}
+
+void UenoCharacterState_JumpState::Execute(const float& elapsedTime)
+{
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma ジャンプループ
+void UenoCharacterState_JumpLoopState::Enter()
+{
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Loop"), true);
+}
+
+void UenoCharacterState_JumpLoopState::Execute(const float& elapsedTime)
+{
+    //地面についていれば
     if (moveCom.lock()->OnGround())
-        JumpInput(owner->GetGameObject());
-
-    //攻撃終了処理＆攻撃処理
-    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        charaCom.lock()->SetLazerFlag(false);
-        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-        t = true;
-    }
-    else
-    {
-        if (t)
+        //入力がなかったら待機
+        if (!owner->IsPushLeftStick())
         {
-            charaCom.lock()->gpulazerparticle->Reset();
-            t = false;
+            ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+            return;
         }
-        charaCom.lock()->SetLazerFlag(true);
+
+        //ステック入力があれば移動ステートに遷移
+        if (owner->IsPushLeftStick())
+        {
+            ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
+            return;
+        }
     }
 }
-
-//imgui
-void UenoCharacterState_AttackState::ImGui()
-{
-}
+#pragma endregion
