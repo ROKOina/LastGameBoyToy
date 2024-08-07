@@ -12,6 +12,7 @@
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
+#include "Graphics/Sprite/Sprite.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -98,15 +99,6 @@ void GameObject::OnGUI()
             component->OnGUI();
             ImGui::TreePop();
         }
-    }
-}
-
-void GameObject::Render2D(float elapsedTime)
-{
-    // コンポーネント
-    for (std::shared_ptr<Component>& component : components_)
-    {
-        component->Render2D(elapsedTime);
     }
 }
 
@@ -250,6 +242,9 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //ポストエフェクト
     m_posteffect->PostEffectRender();
 
+    //スプライト描画
+    SpriteRender();
+
     //debug
     if (Graphics::Instance().IsDebugGUI())
     {
@@ -272,14 +267,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     }
 
     DrawGuizmo(view, projection);
-}
-
-void GameObjectManager::Render2D(float elapsedTime)
-{
-    for (std::shared_ptr<GameObject>& obj : updateGameObject_)
-    {
-        obj->Render2D(elapsedTime);
-    }
 }
 
 //ゲームオブジェクトを探す
@@ -437,6 +424,13 @@ void GameObjectManager::StartUpObjects()
             gpuparticleobject.emplace_back(gpuparticlecomp);
         }
 
+        //スプライトオブジェクトがあれば入る
+        std::shared_ptr<Sprite>spritecomp = obj->GetComponent<Sprite>();
+        if (spritecomp)
+        {
+            spriteobject.emplace_back(spritecomp);
+        }
+
         obj->Start();
         updateGameObject_.emplace_back(obj);
 
@@ -546,6 +540,16 @@ void GameObjectManager::RemoveGameObjects()
         {
             gpuparticleobject.erase(gpuparticleobject.begin() + per);
             --per;
+        }
+    }
+
+    //spriteobject解放
+    for (int spr = 0; spr < spriteobject.size(); ++spr)
+    {
+        if (spriteobject[spr].expired())
+        {
+            spriteobject.erase(spriteobject.begin() + spr);
+            --spr;
         }
     }
 
@@ -742,6 +746,20 @@ void GameObjectManager::GPUParticleRender()
         if (!po.lock()->GetEnabled())continue;
 
         po.lock()->Render();
+    }
+}
+
+//スプライト描画
+void GameObjectManager::SpriteRender()
+{
+    if (spriteobject.size() <= 0)return;
+
+    for (std::weak_ptr<Sprite>& sp : spriteobject)
+    {
+        if (!sp.lock()->GetGameObject()->GetEnabled())continue;
+        if (!sp.lock()->GetEnabled())continue;
+
+        sp.lock()->Render();
     }
 }
 

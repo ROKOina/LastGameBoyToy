@@ -32,6 +32,7 @@
 #include "GameSource/GameScript/FPSCameraCom.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "Graphics/Sprite/Sprite.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -81,15 +82,6 @@ void SceneGame::Initialize()
         obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
 
-    //{//chara
-    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("chara");
-    //    obj->transform_->SetWorldPosition({ 0, 0, 0 });
-    //    obj->transform_->SetScale({ 1, 1, 1 });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/chara/chara.mdl");
-    //}
-
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -131,6 +123,13 @@ void SceneGame::Initialize()
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
         cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    }
+
+    //UIテスト
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("UiTest");
+        obj->AddComponent<Sprite>("Data\\UIData\\test.ui");
     }
 
 #pragma endregion

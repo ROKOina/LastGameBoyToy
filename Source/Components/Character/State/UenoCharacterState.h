@@ -20,6 +20,55 @@ protected:
     std::weak_ptr<AnimationCom> animationCom;
 };
 
+//待機
+class UenoCharacterState_IdleState : public UenoCharacterState_BaseState
+{
+public:
+    UenoCharacterState_IdleState(CharacterCom* owner) :UenoCharacterState_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Idle"; }
+};
+
+//移動
+class UenoCharacterState_MoveState : public UenoCharacterState_BaseState
+{
+public:
+    UenoCharacterState_MoveState(CharacterCom* owner) :UenoCharacterState_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Move"; }
+};
+
+//ジャンプ
+class UenoCharacterState_JumpState : public UenoCharacterState_BaseState
+{
+public:
+    UenoCharacterState_JumpState(CharacterCom* owner) : UenoCharacterState_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    virtual const char* GetName() const override { return "Jump"; }
+};
+
+//ジャンプループ
+class UenoCharacterState_JumpLoopState : public UenoCharacterState_BaseState
+{
+public:
+    UenoCharacterState_JumpLoopState(CharacterCom* owner) : UenoCharacterState_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    virtual const char* GetName() const override { return "JumpLoop"; }
+};
+
+//攻撃(修正)
 class UenoCharacterState_AttackState : public UenoCharacterState_BaseState
 {
 public:
@@ -27,9 +76,6 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void ImGui() override;
-
-private:
-
-    bool t = false;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Attack"; }
 };
