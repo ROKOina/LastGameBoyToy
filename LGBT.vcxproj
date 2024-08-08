@@ -164,6 +164,7 @@
     <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
+    <ClInclude Include="Source\Components\PostureControlCmp.h" />
     <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
@@ -264,6 +265,7 @@
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
+    <ClCompile Include="Source\Components\PostureControlCmp.cpp" />
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
     <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
