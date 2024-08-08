@@ -13,9 +13,23 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
 
 void BaseCharacter_IdleState::Enter()
 {
-    //歩きアニメーション再生開始
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), 1,1,1,true, false,0, 0.1f,0.0f);
+    ////歩きアニメーション再生開始
+    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+
+    //AnimationCom::PlayLowBodyAnimParam param =
+    //{
+    //    param.lowerAnimaOneId = animationCom.lock()->FindAnimation("Idle"),
+    //    param.loop = true,
+    //    param.rootFlag = false,
+    //    param.blendType = 0,
+    //    param.animeChangeRate = 0.5f,
+    //    param.animeBlendRate = 0.0f
+
+    //};
+
+    //animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -24,7 +38,8 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //移動
-    if (moveVec != 0)
+    if (owner->IsPushLeftStick())
+        //if (moveVec != 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
@@ -38,7 +53,22 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 void BaseCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+
+    AnimationCom::PlayLowBodyAnimParam param =
+    {
+        param.lowerAnimaOneId = animationCom.lock()->FindAnimation("Walk_Forward"),
+        param.lowerAnimeTwoId = animationCom.lock()->FindAnimation("Walk_Back"),
+        param.lowerAnimeThreeId = animationCom.lock()->FindAnimation("Walk_Right"),
+        param.lowerAnimeFourId = animationCom.lock()->FindAnimation("Walk_Left"),
+        param.loop = true,
+        param.rootFlag = false,
+        param.blendType = 2,
+        param.animeChangeRate = 0.5f,
+        param.animeBlendRate = 0.0f
+    };
+
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
@@ -49,7 +79,8 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //待機
-    if (moveVec == 0)
+    if (!owner->IsPushLeftStick())
+        //if (moveVec == 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
@@ -102,7 +133,7 @@ void BaseCharacter_JumpState::Exit()
 
 void BaseCharacter_NoneAttack::Enter()
 {
-    //歩きアニメーション再生開始
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
+    ////歩きアニメーション再生開始
+    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }

@@ -3,79 +3,74 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include "Components/System/Component.h"
 
 // スプライト
-class Sprite
+class Sprite :public Component
 {
 public:
-	Sprite();
-	Sprite(const char* filename);
-	~Sprite() {}
 
-	struct Vertex
-	{
-		DirectX::XMFLOAT3	position;
-		DirectX::XMFLOAT4	color;
-		DirectX::XMFLOAT2	texcoord;
-	};
+    Sprite(const char* filename);
+    ~Sprite() {}
 
-	// 描画実行
-	void Render(ID3D11DeviceContext *dc,
-		float dx, float dy,
-		float dw, float dh,
-		float sx, float sy,
-		float sw, float sh,
-		float angle,
-		float r, float g, float b, float a);
+    //初期設定
+    void Start()override {};
 
-	// テクスチャ幅取得
-	int GetTextureWidth() const { return textureWidth_; }
+    //更新処理
+    void Update(float elapsedTime)override {};
 
-	// テクスチャ高さ取得
-	int GetTextureHeight() const { return textureHeight_; }
+    //描画
+    void Render();
 
-	//テクスチャ変更
-	void SetShaderResourceView(ID3D11ShaderResourceView* srv,float textureWidth,float textureHeight);
+    //imgui
+    void OnGUI()override;
 
-	//ディゾルブ用画像登録
-	void SetDissolveSRV(const char* filename);
+    //名前設定
+    const char* GetName() const override { return "Sprite"; }
 
 private:
-	Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader_;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader>			pixelShader_;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout>			inputLayout_;
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer>				vertexBuffer_;
+    //シリアライズ
+    void Serialize();
 
+    //デシリアライズ
+    void Desirialize(const char* filename);
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	shaderResourceView_;
+    //読み込み
+    void LoadDesirialize();
 
 public:
-	//効果一覧
-	struct DissolveConstans
-	{
-		float isDissolve = false;
 
-		float dissolveThreshold= 0.5f;	// ディゾルブ
-		float edgeThreshold=0.5f; 		// ふちの閾値
-		float dummy;
-		DirectX::XMFLOAT4	edgeColor{1,0,0,1};			// ふちの色
-	};
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	dissolveSRV_;
+    //保存するパラメータ
+    struct SaveParameterCPU
+    {
+        DirectX::XMFLOAT4 color = { 1,1,1,1 };
+        DirectX::XMFLOAT2 position = {};
+        DirectX::XMFLOAT2 scale = {};
+        float angle = {};
+        std::string	filename;
 
-	//効果まとめる
-	struct Effect2DConstans
-	{
-		DissolveConstans dissolveConstant;
-	};
-	Effect2DConstans effectConstans_;
-
-	Effect2DConstans& GetEffectSpriteData() { return effectConstans_; }
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
+    SaveParameterCPU spc;
 
 private:
-	//効果を掛ける時に使用するバッファ
-	Microsoft::WRL::ComPtr<ID3D11Buffer>				effectBuffer_;
 
-	int textureWidth_ = 0;
-	int textureHeight_ = 0;
+    //頂点構造体
+    struct Vertex
+    {
+        DirectX::XMFLOAT3	position;
+        DirectX::XMFLOAT4	color;
+        DirectX::XMFLOAT2	texcoord;
+    };
+
+private:
+
+    Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader_;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>			pixelShader_;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>			inputLayout_;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>				vertexBuffer_;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	shaderResourceView_;
+    D3D11_TEXTURE2D_DESC texture2ddesc_ = {};
 };

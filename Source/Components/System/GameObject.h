@@ -17,6 +17,7 @@ class RendererCom;
 class CPUParticle;
 class GPUParticle;
 class Collider;
+class Sprite;
 
 // ゲームオブジェクト
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -39,9 +40,6 @@ public:
 
     // GUI表示
     virtual void OnGUI();
-
-    //sprite描画用
-    virtual void Render2D(float elapsedTime);
 
     // 名前の設定
     void SetName(const char* name) { this->name_ = name; }
@@ -160,9 +158,6 @@ public:
     // 描画
     void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& lightdirection);
 
-    //sprite描画
-    void Render2D(float elapsedTime);
-
     //ゲームオブジェクトを探す
     std::shared_ptr<GameObject> Find(const char* name);
 
@@ -189,6 +184,7 @@ private:
     void RenderDeferred();
     void RenderForward();
     void RenderShadow();
+    void RenderSilhoutte();
     void RenderUseDepth();
 
     //CPUパーティクル描画
@@ -196,6 +192,9 @@ private:
 
     //GPUパーティクル描画
     void GPUParticleRender();
+
+    //スプライト描画
+    void SpriteRender();
 
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
@@ -224,6 +223,9 @@ private:
 
     //GPUparticle描画
     std::vector<std::weak_ptr<GPUParticle>>gpuparticleobject;
+
+    //スプライト描画
+    std::vector<std::weak_ptr<Sprite>>spriteobject;
 
     //ポストエフェクト
     std::unique_ptr<PostEffect>m_posteffect;

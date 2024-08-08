@@ -27,7 +27,8 @@ enum class CB_INDEX
     GPU_PARTICLE_SAVE = 7,
     LIGHT_DATA = 8,
     SHADOW_PAR = 9,
-    SCENE = 10
+    SCENE = 10,
+    OUTLINE = 11
 };
 
 //ブレンドステート
@@ -66,6 +67,8 @@ enum class DEPTHSTATE
     ZT_ON_ZW_OFF,   // テスト有、書き込み無
     ZT_OFF_ZW_ON,   // テスト無、書き込み有
     ZT_OFF_ZW_OFF,  // テスト無、書き込み無
+
+    SILHOUETTE,     // シルエット
 
     // 以降ステンシルマスク用
     MASK,
@@ -115,6 +118,9 @@ enum class SHADER_ID_MODEL
 
     //影
     SHADOW,
+
+    //シルエット
+    SILHOUETTE,
 
     MAX
 };

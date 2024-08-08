@@ -32,6 +32,13 @@ public:
     //シーン切り替え
     void ChangeScene(Scene* scene);
 
+    //imgui
+    void ImGui();
+
+    // シーン取得
+    Scene* GetScene() { return currentScene_; }
+    Scene* GetNextScene() { return nextScene_; }
+
     //カメラ
     void AddCameraActiveCount() { cameraActiveCount++; }
     const bool& GetCameraChange() const { return isChangeCamera; }

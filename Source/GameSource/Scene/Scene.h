@@ -3,6 +3,7 @@
 #include "Graphics/Shaders/ConstantBuffer.h"
 #include <DirectXMath.h>
 #include <memory>
+#include <string>
 
 //前方宣言
 class CameraCom;
@@ -10,8 +11,15 @@ class CameraCom;
 //シーン
 class Scene
 {
+private:
+    // コピーコンストラクタ防止
+    Scene(const Scene&) = delete;
+    Scene(Scene&&)  noexcept = delete;
+    Scene& operator=(Scene const&) = delete;
+    Scene& operator=(Scene&&) noexcept = delete;
+
 public:
-    Scene() {}
+    Scene();
     virtual ~Scene() {}
 
     //初期化
@@ -25,6 +33,9 @@ public:
 
     //描画処理
     virtual void Render(float elapsedTime) = 0;
+
+    //名前取得
+    virtual std::string GetName() const = 0;
 
     //準備完了しているか
     bool IsReady()const { return isReady_; }
@@ -58,7 +69,6 @@ protected:
 
         DirectX::XMFLOAT2 screenResolution = {};
         DirectX::XMFLOAT2 dummy = {};
-
     };
     std::unique_ptr<ConstantBuffer<SceneConstants>>sc;
 

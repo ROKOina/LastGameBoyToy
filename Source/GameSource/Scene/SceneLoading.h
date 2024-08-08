@@ -8,8 +8,8 @@
 class SceneLoading :public Scene
 {
 public:
-    SceneLoading(Scene* nextScene):nextScene_(nextScene){}
-    ~SceneLoading(){}
+    SceneLoading(Scene* nextScene) :nextScene_(nextScene) {}
+    ~SceneLoading() {}
 
     //初期化
     void Initialize()override;
@@ -23,11 +23,14 @@ public:
     //描画処理
     void Render(float elapsedTime)override;
 
+    //名前取得
+    std::string GetName() const override { return "SceneLoading"; };
+
 private:
     //ローディングスレッド
     static void LoadingThread(SceneLoading* scene);
 
-private :
+private:
     Sprite* sprite_ = nullptr;
 
     Scene* nextScene_ = nullptr;

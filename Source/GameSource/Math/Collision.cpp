@@ -295,3 +295,146 @@ bool Collision::IntersectRayVsModel(
 
     return hit;
 }
+
+// レイVs球
+bool Collision::IntersectRayVsSphere(
+    const DirectX::XMVECTOR& rayStart,
+    const DirectX::XMVECTOR& rayDirection,		// 要正規化
+    float rayDist,
+    const DirectX::XMVECTOR& spherePos,
+    float radius,
+    HitResult& result)
+{
+    DirectX::XMVECTOR ray2sphere = DirectX::XMVectorSubtract(spherePos, rayStart);
+    float projection = DirectX::XMVectorGetX(DirectX::XMVector3Dot(ray2sphere, rayDirection));
+    float distSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(ray2sphere)) - projection * projection;
+
+    if (distSq < radius * radius)
+    {
+        float distance = projection - sqrtf(radius * radius - distSq);
+        if (distance > 0.0f)
+        {
+            if (distance < rayDist)
+            {
+                DirectX::XMVECTOR Position = DirectX::XMVectorAdd(rayStart, DirectX::XMVectorScale(rayDirection, distance));
+                DirectX::XMStoreFloat3(&result.position, Position);
+                result.distance = distance;
+                DirectX::XMStoreFloat3(&result.normal, DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(Position, spherePos)));
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Collision::IntersectRayVsOrientedCylinder(const DirectX::XMVECTOR& rayStart, const DirectX::XMVECTOR& rayDirection, float rayDist, const DirectX::XMVECTOR& startCylinder, const DirectX::XMVECTOR& endCylinder, float radius, HitResult& result, DirectX::XMVECTOR* onCenterLinPos)
+{
+    using namespace DirectX;
+
+    XMVECTOR d = XMVectorSubtract(endCylinder, startCylinder);
+    XMVECTOR m = XMVectorSubtract(rayStart, startCylinder);
+    XMVECTOR n = XMVectorScale(rayDirection, rayDist);
+
+    float md = XMVectorGetX(XMVector3Dot(m, d));
+    float nd = XMVectorGetX(XMVector3Dot(n, d));
+    float dd = XMVectorGetX(XMVector3Dot(d, d));
+
+    // 線分全体が円柱の底面・上面に垂直なスラブに対して外側にあるかどうかを判定
+    if (md < 0.0f && md + nd < 0.0f) return false;
+    if (md > dd && md + nd > dd) return false;
+
+    float nn = XMVectorGetX(XMVector3Dot(n, n));
+    float mm = XMVectorGetX(XMVector3Dot(m, m));
+    float a = dd * nn - nd * nd;
+    float k = mm - radius * radius;
+    float c = dd * k - md * md;
+
+    // レイと円柱の軸の平行性をチェック
+    const float parallelThreshold = 1e-5f;
+    bool isParallel = fabsf(a) < parallelThreshold * dd * nn;
+
+    if (isParallel)
+    {
+        // レイが円柱の軸に平行な場合
+        if (c > 0.0f) return false;  // レイは円柱の外側
+
+        float t;
+        if (md < 0.0f)
+            t = -md / nd;  // 底面との交差
+        else if (md > dd)
+            t = (dd - md) / nd;  // 上面との交差
+        else
+            t = 0.0f;  // レイの始点が円柱内部
+
+        if (t < 0.0f || t > 1.0f) return false;
+
+        result.distance = t * rayDist;
+        XMStoreFloat3(&result.position, XMVectorAdd(rayStart, XMVectorScale(rayDirection, result.distance)));
+        XMVECTOR closestPoint = XMVectorAdd(startCylinder, XMVectorScale(d, md / dd));
+        XMStoreFloat3(&result.normal, XMVector3Normalize(XMVectorSubtract(XMLoadFloat3(&result.position), closestPoint)));
+
+        if (onCenterLinPos)
+        {
+            *onCenterLinPos = closestPoint;
+        }
+        return true;
+    }
+
+    // レイが円柱の軸に平行でない場合
+    float mn = XMVectorGetX(XMVector3Dot(m, n));
+    float b = dd * mn - nd * md;
+    float D = b * b - a * c;  // 判別式
+
+    if (D < 0.0f) return false;  // 実数解がないので交差していない
+
+    // 解の公式により、交点までの距離を算出
+    float sqrtD = sqrtf(D);
+    float t1 = (-b - sqrtD) / a;
+    float t2 = (-b + sqrtD) / a;
+
+    // t1とt2の順序を保証
+    if (t1 > t2) std::swap(t1, t2);
+
+    float t;
+    if (t1 >= 0.0f && t1 <= 1.0f)
+        t = t1;
+    else if (t2 >= 0.0f && t2 <= 1.0f)
+        t = t2;
+    else
+        return false;  // 両方の解が範囲外
+
+    float z = md + t * nd;
+
+    // 円柱の高さ内にあるか確認
+    if (z < 0.0f)
+    {
+        // 底面との交差を確認
+        t = -md / nd;
+        if (t < 0.0f || t > 1.0f) return false;
+        if (a * t * t + 2 * b * t + c > 0.0f) return false;
+    }
+    else if (z > dd)
+    {
+        // 上面との交差を確認
+        t = (dd - md) / nd;
+        if (t < 0.0f || t > 1.0f) return false;
+        if (a * t * t + 2 * b * t + c > 0.0f) return false;
+    }
+
+    // 交差が確定
+    result.distance = t * rayDist;
+    XMStoreFloat3(&result.position, XMVectorAdd(rayStart, XMVectorScale(rayDirection, result.distance)));
+    XMVECTOR closestPoint = XMVectorAdd(startCylinder, XMVectorScale(d, md / dd));
+    XMVECTOR hitPoint = XMVectorAdd(m, XMVectorScale(n, t));
+    XMVECTOR projection = XMVectorScale(d, XMVectorGetX(XMVector3Dot(hitPoint, d)) / dd);
+    XMStoreFloat3(&result.normal, XMVector3Normalize(XMVectorSubtract(hitPoint, projection)));
+
+    if (onCenterLinPos)
+    {
+        *onCenterLinPos = XMVectorAdd(startCylinder, projection);
+    }
+
+    return true;
+}

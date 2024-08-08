@@ -3,14 +3,17 @@
 
 #include "Components\RendererCom.h"
 #include "Components\CameraCom.h"
+#include "Components\AnimationCom.h"
+#include "Components\ColliderCom.h"
 #include "Components\Character\BulletCom.h"
 
 #include "BaseCharacterState.h"
 
+#include "GameSource/Math/Collision.h"
+
 void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float power = 1)
 {
     //’eŠÛƒIƒuƒWƒFƒNƒg‚ğ¶¬///////
-
     GameObj obj = GameObjectManager::Instance().Create();
     obj->SetName("blackball");
 
@@ -23,17 +26,52 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
 
     ///////////////////////////////
 
-
     //’e”­Ë
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
     float gravity = 10 - power * 9;
-    moveCom->SetGravity(-gravity);
+    moveCom->SetGravityEffect(-gravity);
     moveCom->SetFriction(0.0f);
     moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + arrowSpeed * power));
+
+    std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
+    coll->SetMyTag(COLLIDER_TAG::Bullet);
+    if (std::strcmp(objPoint->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
 
     //’e
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>();
     bulletCom->SetAliveTime(2.0f);
+}
+
+void RayFire(std::shared_ptr<GameObject> objPoint)
+{
+    DirectX::XMFLOAT3 start;
+    DirectX::XMFLOAT3 end;
+
+    auto& rayPoint = objPoint->GetChildFind("rayObj");
+
+    if (!rayPoint)return;
+
+    start = rayPoint->transform_->GetWorldPosition();
+    end = start + (objPoint->transform_->GetWorldFront() * 100);
+
+    //ƒŒƒCVsƒXƒtƒBƒA
+    DirectX::XMVECTOR Start = DirectX::XMLoadFloat3(&start);
+    DirectX::XMVECTOR Dir = DirectX::XMLoadFloat3(&Mathf::Normalize(end - start));
+    auto& sphere = GameObjectManager::Instance().Find("robo");
+    DirectX::XMVECTOR Sph = DirectX::XMLoadFloat3(&sphere->transform_->GetWorldPosition());
+    HitResult h;
+    if (Collision::IntersectRayVsSphere(Start, Dir, 100, Sph, 1.0f, h))
+    {
+        int i = 0;
+    }
+
+    //ƒŒƒC
+
+    rayPoint->GetComponent<RayColliderCom>()->SetStart(start);
+    rayPoint->GetComponent<RayColliderCom>()->SetEnd(end);
 }
 
 InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : State(owner)
@@ -50,17 +88,19 @@ InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : St
 void InazawaCharacter_AttackState::Enter()
 {
     attackPower = 0;
+    auto& chara = GetComp(CharacterCom);
+    chara->SetMoveMaxSpeed(attackMaxMoveSpeed);
 }
 
 void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
 {
-    MoveInputVec(owner->GetGameObject(), 0.5f);
+    //MoveInputVec(owner->GetGameObject(), 0.5f);
 
-    if (moveCom.lock()->OnGround())
-        JumpInput(owner->GetGameObject());
+    //if (moveCom.lock()->OnGround())
+    //    JumpInput(owner->GetGameObject());
 
     //UŒ‚ˆĞ—Í
-    attackPower+=elapsedTime;
+    attackPower += elapsedTime;
     if (attackPower > maxAttackPower) {
         attackPower = maxAttackPower;
     }
@@ -68,11 +108,27 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
+        owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+        owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
+            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
+        );
+
         //UŒ‚ˆ—
         Fire(owner->GetGameObject(), arrowSpeed, attackPower);
+        //RayFire(owner->GetGameObject());
 
-        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+        auto& chara = GetComp(CharacterCom);
+        chara->SetMoveMaxSpeed(saveMaxSpeed);
+
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
+
+    //auto& rayPoint = owner->GetGameObject()->GetChildFind("rayObj");
+    //for (auto& hit : rayPoint->GetComponent<Collider>()->OnHitGameObject())
+    //{
+    //    ataPos = hit.hitPos;
+    //}
+    //Graphics::Instance().GetDebugRenderer()->DrawSphere(ataPos, 0.3f, { 0,1,1,1 });
 }
 
 void InazawaCharacter_AttackState::ImGui()
@@ -81,8 +137,7 @@ void InazawaCharacter_AttackState::ImGui()
     ImGui::DragFloat("arrowSpeed", &arrowSpeed);
 }
 
-
-#pragma endregion 
+#pragma endregion
 
 #pragma region ESkill
 
@@ -103,10 +158,10 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 
-    MoveInputVec(owner->GetGameObject());
+    //MoveInputVec(owner->GetGameObject());
 
-    if (moveCom.lock()->OnGround())
-        JumpInput(owner->GetGameObject());
+    //if (moveCom.lock()->OnGround())
+    //    JumpInput(owner->GetGameObject());
 
     intervalTimer += elapsedTime;
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
@@ -127,5 +182,4 @@ void InazawaCharacter_ESkillState::ImGui()
     ImGui::DragFloat("skillTimerEnd", &skillTimer);
 }
 
-
-#pragma endregion 
+#pragma endregion

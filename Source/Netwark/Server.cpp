@@ -9,10 +9,12 @@
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 #include "Components/MovementCom.h"
+#include "Components/Character/CharacterCom.h"
 
 __fastcall NetServer::~NetServer()
 {
     NetwarkPost::~NetwarkPost();
+    bufRing.release();
 }
 
 void __fastcall NetServer::Initialize()
@@ -75,17 +77,17 @@ void __fastcall NetServer::Initialize()
     clientDatas.emplace_back(serverData);
 
     //リングバッファ初期化
-    bufRing = std::make_unique<RingBuffer<int>>(10);
+    bufRing = std::make_unique<RingBuffer<SaveBuffer>>(30);
 }
 
 void __fastcall NetServer::Update()
 {
 
-    //完全同期用
     isNextFrame = false;
 
     ///******       データ受信        ******///
     Receive();
+
 
 #ifdef PerfectSyn
 
@@ -99,14 +101,21 @@ void __fastcall NetServer::Update()
 
 #endif
 
-    //フレーム数を合わせる
-    if (!IsSynchroFrame())
-        return;
-
-    nowFrame++; //フレーム加算
 
     ///******       データ送信        ******///
     Send();
+
+
+#ifdef EasyFrameSyn
+
+    //フレーム数を合わせる
+    if (!IsSynchroFrame(true))
+        return;
+
+#endif // EasyFrameSyn
+
+
+    nowFrame++; //フレーム加算
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
@@ -151,17 +160,24 @@ void NetServer::ImGui()
         isEndJoin |= endJoin;
     }
 
-    bool aaa = false;
-    if (ImGui::Checkbox("Enqueue", &aaa)) {
-        static int bb = 0;
-        bufRing->Enqueue(bb);
-        bb++;
-    }
-    if (ImGui::Checkbox("Dele", &aaa)) {
-        bufRing->Dequeue();
-    }
+    //bool aaa = false;
+    //if (ImGui::Checkbox("Enqueue", &aaa)) {
+    //    static int bb = 0;
+    //    bufRing->Enqueue(bb);
+    //    bb++;
+    //}
+    //if (ImGui::Checkbox("Dele", &aaa)) {
+    //    bufRing->Dequeue();
+    //}
 
 
+    //int frame = nowFrame;
+    //ImGui::InputInt("nowFrame", &frame);
+    //if (clientDatas.size() >= 2)
+    //{
+    //    frame = clientDatas[1].nowFrame;
+    //    ImGui::InputInt("nowFram1", &frame);
+    //}
 
     ImGui::End();
 }
@@ -184,13 +200,13 @@ void NetServer::Receive()
             //仮
             std::vector<NetData> clientND = NetDataRecvCast(recvData);
 
-            //フレーム差
-            static std::vector<int> saveInt;
-            for (auto& c : clientND)
-            {
-                if (c.id == id)continue;
-                saveInt.emplace_back(nowFrame - c.nowFrame);
-    }
+            ////フレーム差
+            //static std::vector<int> saveInt;
+            //for (auto& c : clientND)
+            //{
+            //    if (c.id == id)continue;
+            //    saveInt.emplace_back(nowFrame - c.nowFrame);
+            //}
 
             //登録済みなら上書き
             for (auto& nData : clientND)
@@ -198,16 +214,45 @@ void NetServer::Receive()
                 bool isRegisterClient = false;
                 for (auto& client : clientDatas)
                 {
-                    if (nData.id == client.id)
+                    if (nData.id != client.id)continue;
+
+                    isRegisterClient = true;
+                    client = nData;
+
+                    //入力追加
+                    for (auto& in : saveInput)
                     {
-                        isRegisterClient = true;
-                        client = nData;
+                        if (nData.id != in.id)continue;
+
+                        //フレームをみて追加
+                        for (int inputSize = nData.saveInputBuf.size() - 1; inputSize >= 0; --inputSize)
+                        {
+                            auto& headInput = in.inputBuf->GetHead();   //先頭データ取得
+                            if (headInput.frame < nData.saveInputBuf[inputSize].frame)
+                            {
+                                in.inputBuf->Enqueue(nData.saveInputBuf[inputSize]);
+                            }
+                        }
+
+                        ////そのまま追加バージョン
+                        //SaveBuffer sb;
+                        //sb.frame = nData.nowFrame;
+
+                        //in.inputBuf->Enqueue(sb);
+
                         break;
                     }
+                    break;
                 }
                 //登録されていないなら登録
                 if (!isRegisterClient)
+                {
                     clientDatas.emplace_back(nData);
+
+                    //入力用
+                    auto& saveInputClient = saveInput.emplace_back(SaveInput());
+                    saveInputClient.id = nData.id;
+                }
             }
 
             //クライアント情報更新
@@ -231,24 +276,34 @@ void NetServer::Send()
     inputDown |= gamePad.GetButtonDown();
     inputUp |= gamePad.GetButtonUp();
 
+    //入力をリングバッファに保存
+    SaveBuffer s;
+    s.frame = nowFrame;
+    s.input = input;
+    s.inputDown = inputDown;
+    s.inputUp = inputUp;
+    bufRing->Enqueue(s);
+
     for (auto& client : clientDatas)
     {
         //自分自身(server)のキャラ情報を送る
         if (client.id != id)continue;
 
-        client.pos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-        client.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-        client.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-        client.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
+        GameObj player = GameObjectManager::Instance().Find(("player" + std::to_string(client.id)).c_str());
+        client.pos = player->transform_->GetWorldPosition();
+        client.velocity = player->GetComponent<MovementCom>()->GetVelocity();
+        client.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+        client.rotato = player->transform_->GetRotation();
 
-        client.input = input;
-        client.inputDown = inputDown;
-        client.inputUp = inputUp;
+        //client.input = input;
+        //client.inputDown = inputDown;
+        //client.inputUp = inputUp;
         input = 0;
         inputDown = 0;
         inputUp = 0;
 
-        client.nowFrame = nowFrame;
+        //client.nowFrame = nowFrame;
+        client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
         break;
     }

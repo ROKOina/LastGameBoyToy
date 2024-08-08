@@ -5,12 +5,14 @@
 #include <string>
 
 //コンストラクタ
-RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, RASTERIZERSTATE rs, bool shadowrender) :m_rasterizerState(rs)
+RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode, bool shadowrender, bool silhoutterender) :m_depth(depthmode), m_rasterizerState(rasterizermode)
 {
-    m_blend = static_cast<int>(blendmode);
+    m_blend = blendmode;
     m_modelshader = std::make_unique<ModelShader>(id);
     m_shadow = std::make_unique<ModelShader>(SHADER_ID_MODEL::SHADOW);
+    m_silhoutte = std::make_unique<ModelShader>(SHADER_ID_MODEL::SILHOUETTE);
     m_shadowrender = shadowrender;
+    m_silhoutterender = silhoutterender;
 
     shaderID = id;
 }
@@ -27,12 +29,16 @@ void RendererCom::Render()
     ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
 
     // 定数バッファをGPUに設定
-    if (variousConstant.get() != nullptr) {
+    if (variousConstant.get() != nullptr)
+    {
         variousConstant->UpdateConstantBuffer(dc);
     }
 
+    //シルエット描画
+    SilhoutteRender();
+
     //セット
-    m_modelshader->Begin(dc, m_blend, m_rasterizerState);
+    m_modelshader->Begin(dc, m_blend, m_depth, m_rasterizerState);
 
     //モデルを描画
     for (auto& mesh : model_->GetResource()->GetMeshes())
@@ -77,7 +83,7 @@ void RendererCom::ShadowRender()
     if (m_shadowrender)
     {
         //セット
-        m_shadow->ShadowBegin(dc, BLENDSTATE::NONE, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK);
+        m_shadow->ShadowBegin(dc, BLENDSTATE::REPLACE, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK);
 
         //モデルを描画
         for (auto& mesh : model_->GetResource()->GetMeshes())
@@ -97,10 +103,49 @@ void RendererCom::ShadowRender()
     }
 }
 
+//シルエット描画
+void RendererCom::SilhoutteRender()
+{
+    Graphics& Graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
+
+    //シルエット描画をフラグで制御
+    if (m_silhoutterender)
+    {
+        m_silhoutte->Begin(dc, BLENDSTATE::ALPHA, DEPTHSTATE::SILHOUETTE, RASTERIZERSTATE::SOLID_CULL_BACK);
+
+        //シルエットを描画
+        for (auto& mesh : model_->GetResource()->GetMeshes())
+        {
+            for (auto& subset : mesh.subsets)
+            {
+                //頂点・インデックスバッファ等設定
+                m_silhoutte->SetBuffer(dc, model_->GetNodes(), mesh);
+
+                //サブセット毎で描画
+                m_silhoutte->SetSubset(dc, subset);
+            }
+        }
+
+        //解放
+        m_silhoutte->End(dc);
+    }
+}
+
+//ボーンのguizmo
+void RendererCom::BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    model_->BoneGuizmo(view, projection);
+}
+
 // GUI描画
 void RendererCom::OnGUI()
 {
+    ImGui::SameLine();
     ImGui::Checkbox("shadow", &m_shadowrender);
+    ImGui::SameLine();
+    ImGui::Checkbox("silhoutte", &m_silhoutterender);
+
     //デバッグ用にブレンドモード設定
     constexpr const char* BlendName[] =
     {
@@ -117,8 +162,48 @@ void RendererCom::OnGUI()
     };
     //ブレンドモード設定リストとのサイズが違うとエラーを出す
     static_assert(ARRAYSIZE(BlendName) != static_cast<int>(BLENDSTATE::MAX) - 1, "BlendName Size Error!");
+
     //ブレンドモード設定
-    ImGui::Combo("BlendMode", &m_blend, BlendName, static_cast<int>(BLENDSTATE::MAX), 10);
+    int blendMode = static_cast<int>(m_blend);
+    ImGui::Combo("BlendMode", &blendMode, BlendName, static_cast<int>(BLENDSTATE::MAX), static_cast<int>(BLENDSTATE::MAX));
+    m_blend = static_cast<BLENDSTATE>(blendMode);
+
+    //デバッグ用にデプスモード設定
+    constexpr const char* DepthName[] =
+    {
+      "NONE",
+      "ZT_ON_ZW_ON",
+      "ZT_ON_ZW_OFF",
+      "ZT_OFF_ZW_ON",
+      "ZT_OFF_ZW_OFF",
+      "SILHOUETTE",
+      "MASK",
+      "APPLY_MASK",
+      "EXCLUSIVE",
+    };
+    //ブレンドモード設定リストとのサイズが違うとエラーを出す
+    static_assert(ARRAYSIZE(DepthName) != static_cast<int>(DEPTHSTATE::MAX) - 1, "DepthName Size Error!");
+
+    //デプスステンシルモード設定
+    int depthMode = static_cast<int>(m_depth);
+    ImGui::Combo("DepthMode", &depthMode, DepthName, static_cast<int>(DEPTHSTATE::MAX), static_cast<int>(DEPTHSTATE::MAX));
+    m_depth = static_cast<DEPTHSTATE>(depthMode);
+
+    //デバッグ用にラスタライズモード設定
+    constexpr const char* RasterizerName[] =
+    {
+      "SOLID_CULL_NONE",
+      "SOLID_CULL_BACK",
+      "SOLID_CULL_FRONT",
+      "WIREFRAME",
+    };
+    //ラスタライズモード設定リストとのサイズが違うとエラーを出す
+    static_assert(ARRAYSIZE(RasterizerName) != static_cast<int>(RASTERIZERSTATE::MAX) - 1, "RasterizerName Size Error!");
+
+    //ラスタライズモード設定
+    int rasMode = static_cast<int>(m_rasterizerState);
+    ImGui::Combo("RasterizerMode", &rasMode, RasterizerName, static_cast<int>(RASTERIZERSTATE::MAX), static_cast<int>(RASTERIZERSTATE::MAX));
+    m_rasterizerState = static_cast<RASTERIZERSTATE>(rasMode);
 
 #ifdef _DEBUG
     MaterialSelector();
@@ -229,6 +314,8 @@ void RendererCom::MaterialSelector()
             ImGui::DragFloat("Metallic", &material->Metalness, 0.01f, 0.0f, 1.0f);
             ImGui::ColorEdit3("EmissiveColor", &material->emissivecolor.x, ImGuiColorEditFlags_None);
             ImGui::DragFloat("EmissivePower", &material->emissiveintensity, 0.1f, 0.0f, 100.0f);
+            ImGui::ColorEdit3("outlineColor", &material->outlineColor.x);
+            ImGui::DragFloat("outlineintensity", &material->outlineintensity, 0.1f, 0.0f, 10.0f);
 
             // マテリアルファイルを上書き
             if (ImGui::Button("Save")) {

@@ -8,7 +8,7 @@
 
 //ÉnÉìÉ]Å[
 
-class InazawaCharacter_BaseState : public State<CharacterCom> 
+class InazawaCharacter_BaseState : public State<CharacterCom>
 {
 public:
     InazawaCharacter_BaseState(CharacterCom* owner);
@@ -23,12 +23,19 @@ protected:
 class InazawaCharacter_AttackState : public InazawaCharacter_BaseState
 {
 public:
-    InazawaCharacter_AttackState(CharacterCom* owner) :InazawaCharacter_BaseState(owner) {}
+    InazawaCharacter_AttackState(CharacterCom* owner) :InazawaCharacter_BaseState(owner)
+    {
+        auto& chara = GetComp(CharacterCom);
+        saveMaxSpeed = chara->GetMoveMaxSpeed();
+    }
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void ImGui() override;
+    virtual const char* GetName() const override { return "Attack"; }
 
+    float saveMaxSpeed;
+    float attackMaxMoveSpeed = 5.0f;
     float attackPower = 0;
     float maxAttackPower = 1;
     float arrowSpeed = 40;
@@ -37,11 +44,14 @@ public:
 class InazawaCharacter_ESkillState : public InazawaCharacter_BaseState
 {
 public:
-    InazawaCharacter_ESkillState(CharacterCom* owner) :InazawaCharacter_BaseState(owner) {}
+    InazawaCharacter_ESkillState(CharacterCom* owner) :InazawaCharacter_BaseState(owner)
+    {
+    }
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void ImGui() override;
+    virtual const char* GetName() const override { return "ESkill"; }
 
     float arrowSpeed = 25.0f;
     int arrowCount;
@@ -49,4 +59,3 @@ public:
     float interval = 0.25f;
     float skillTimer = 5.0f;
 };
-

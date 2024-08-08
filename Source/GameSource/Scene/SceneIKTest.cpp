@@ -60,7 +60,7 @@ void SceneIKTest::Initialize()
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, 0.0f, 0 });
         obj->transform_->SetScale({ 0.6f, 0.6f, 0.6f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/IKTestStage/ExampleStage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/IKTestStage/ExampleStage.collision");
     }
@@ -106,7 +106,4 @@ void SceneIKTest::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
-    //オブジェクト描画
-    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 }

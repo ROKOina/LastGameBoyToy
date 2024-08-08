@@ -19,6 +19,7 @@
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
+#include "Components/AimIKCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ColliderCom.h"
@@ -31,8 +32,13 @@
 #include "GameSource/GameScript/FPSCameraCom.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "Graphics/Sprite/Sprite.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
+
+#include "Netwark/Photon/StdIO_UIListener.h"
+
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 // 初期化
 void SceneGame::Initialize()
@@ -49,7 +55,32 @@ void SceneGame::Initialize()
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
-    //GameObj testPlayer = GenerateTestCharacter({ 6,3,0 });
+    //ステージ
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("stage");
+        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/canyon/stage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+    }
+
+    {//当たり判定用
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("robo");
+        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/OneCoin/robot.mdl");
+        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        a->PlayAnimation(0, true, false, 0.001f);
+
+        //std::shared_ptr<RayColliderCom> sphere = obj->AddComponent<RayColliderCom>();
+        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
+
+        obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
+    }
 
     //プレイヤー
     {
@@ -60,16 +91,28 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        obj->AddComponent<AimIKCom>("Spine");
+        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
         a->PlayAnimation(0, true, false, 0.001f);
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
+        //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
         //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
         //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
 
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
+        sphere->SetRadius(0.5f);
         sphere->SetMyTag(COLLIDER_TAG::Player);
-        sphere->SetRadius(2.0f);
+
+        ////攻撃レイキャストスタート位置
+        //{
+        //    std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
+        //    rayChild->SetName("rayObj");
+
+        //    std::shared_ptr<RayColliderCom> sphere = rayChild->AddComponent<RayColliderCom>();
+        //    sphere->SetMyTag(COLLIDER_TAG::Player);
+        //    sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
+        //}
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -82,46 +125,11 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
-    //ステージ
+    //UIテスト
     {
         auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-    }
-
-    //テスト
-    {
-        //Graphics::Instance().SetWorldSpeed(0.1f);
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("SciFiGate");
-        obj->transform_->SetWorldPosition({ 0, 1.8f, 5 });
-        obj->transform_->SetScale({ 0.06f,0.0001f,0.02f });
-        obj->transform_->SetEulerRotation({ 90,0,0 });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::SCI_FI_GATE, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
-        r->LoadModel("Data/UtilityModels/plane.mdl");
-        r->LoadMaterial("Data/UtilityModels/SciFiGate.Material");
-
-        auto& cb = r->SetVariousConstant<SciFiGateConstants>();
-        cb->simulateSpeed1 = 1.1f;
-        cb->simulateSpeed2 = -0.3f;
-        cb->uvScrollDir1 = { 1.0f,1.0f };
-        cb->uvScrollDir2 = { 0.0f,1.0f };
-        cb->uvScale1 = { 2.0f,1.0f };
-        cb->intensity1 = 0.8f;
-        cb->intensity2 = 1.6f;
-        cb->effectColor1 = { 1.0f,0.4f,0.0f,1.0f };
-        cb->effectColor2 = { 1.0f,0.2f,0.0f,1.0f };
-        cb->contourIntensity = 1.5f;
-    }
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("test");
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFAULT, BLENDSTATE::ADD, RASTERIZERSTATE::SOLID_CULL_NONE);
-        r->LoadModel("Data/Ball/b.mdl");
+        obj->SetName("UiTest");
+        obj->AddComponent<Sprite>("Data\\UIData\\test.ui");
     }
 
 #pragma endregion
@@ -146,11 +154,15 @@ void SceneGame::Initialize()
     ConstantBufferInitialize();
 
 #pragma endregion
+
+    StdIO_UIListener* l = new StdIO_UIListener();
+    photonNet = std::make_unique<BasicsApplication>(l);
 }
 
 // 終了化
 void SceneGame::Finalize()
 {
+    photonNet->close();
 }
 
 // 更新処理
@@ -166,19 +178,14 @@ void SceneGame::Update(float elapsedTime)
         }
     }
 
+    photonNet->run(elapsedTime);
+
     // キーの入力情報を各キャラクターに割り当てる
-    SetUserInputs();
+    //SetUserInputs();
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-    ////コンポーネントゲット
-    //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("zombie");
-    //std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
-    //std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
-    //DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
-    //a->updateRootMotion(pos);
 }
 
 // 描画処理
@@ -202,9 +209,6 @@ void SceneGame::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
-    //オブジェクト描画
-    GameObjectManager::Instance().DrawGuizmo(sc->data.view, sc->data.projection);
 
     if (n)
         n->ImGui();
@@ -243,6 +247,8 @@ void SceneGame::Render(float elapsedTime)
 
         ImGui::End();
     }
+
+    photonNet->ImGui();
 }
 
 void SceneGame::SetUserInputs()
@@ -298,13 +304,27 @@ void SceneGame::SetOnlineInput()
 
             if (!chara)continue;
 
-            // 入力情報をプレイヤーキャラクターに送信
-            chara->SetUserInput(client.input);
-            chara->SetUserInputDown(client.inputDown);
-            chara->SetUserInputUp(client.inputUp);
+            //// 入力情報をプレイヤーキャラクターに送信
+            //chara->SetUserInput(client.input);
+            //chara->SetUserInputDown(client.inputDown);
+            //chara->SetUserInputUp(client.inputUp);
 
-            //chara->SetLeftStick(gamePad.GetAxisL());
+            DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
+
+            DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
+
+            chara->SetLeftStick(leftS);
             //chara->SetRightStick(gamePad.GetAxisR());
         }
     }
+}
+
+void SceneGame::DelayOnlineInput()
+{
+    if (!n)return;
+
+    //for (auto& netClient : n->GetNetDatas())
+    //{
+    //    netClient.id
+    //}
 }

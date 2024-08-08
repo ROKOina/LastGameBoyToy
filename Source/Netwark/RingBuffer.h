@@ -1,5 +1,7 @@
 #pragma once
 
+#include <deque>
+
 // リングバッファクラス
 template<class T>
 class RingBuffer {
@@ -11,11 +13,12 @@ public:
         // 最大サイズを保存
         cap = elems;
         // サイズ分で配列作成
-        arr = new T[elems];
+        arr.resize(elems);
+        //arr = new T[elems];
         // 配列の開始アドレスを末尾アドレス、開始アドレス変数に保存
-        tail = head = arr;
+        head = tail = &arr[0];
         // 開始インデックス番号
-        headIndex = 0;
+        headIndex = -1;
         // 保存サイズ
         size = 0;
     }
@@ -29,38 +32,42 @@ public:
     // データ登録
     int Enqueue(const T& data)
     {
-        //サイズが最大なら先頭(head)を削除してから入れる
+        headIndex++;
+        headIndex %= cap;
+
+        arr[headIndex] = data;
+        head = &arr[headIndex];
+
+        //サイズが最大なら末尾(tail)を削除してから入れる
         if (size >= cap)
         {
-            arr[headIndex] = data;
-            tail = &arr[headIndex];
-            //先頭を変更
-            headIndex ++;
-            headIndex %= cap;
-            head = &arr[headIndex];
+            int s = headIndex + 1;
+            s %= cap;
+
+            //末尾を変更
+            tail = &arr[s];
         }
         else
         {
-            int s = (headIndex + size) % cap;
-
-            arr[s] = data;
-            tail = &arr[s];
             size++;
         }
         return 0;
     }
 
     // データ削除
-    T* Dequeue()
+    const T& Dequeue()
     {
         if (size > 0)
         {
-            headIndex++;
-            headIndex %= cap;
-            head = &arr[headIndex];
+            T saveTail = *tail;
+            int s = cap + headIndex - size + 2;
+            s %= cap;
+
+            tail = &arr[s];
             size--;
+            return saveTail;
         }
-        return nullptr;
+        return T();
     }
 
 
@@ -70,22 +77,42 @@ public:
         return size;
     }
 
-    // 指定Indexのデータを返す
-    T* GetData(int index)
-    {
-
-    }
-
     // 終了位置のデータを取得
-    T* GetTail()
+    const T& GetTail()
     {
-        return tail;
+        if (size <= 0)return T();
+        return *tail;
     }
+
+    // 開始位置のデータを取得
+    const T& GetHead()
+    {
+        if (size <= 0)return T();
+        return *head;
+    }
+
+    //最初位置から引数サイズ文のvetorを返す
+    std::vector<T> GetHeadFromSize(int size)
+    {
+        std::vector<T> v;
+        for (int i = 0; i < size; ++i)
+        {
+            if (this->size <= i)break;
+            int index = this->cap + headIndex - i;
+            index %= this->cap;
+            v.emplace_back(arr[index]);
+        }
+        return v;
+    }
+
 private:
-    T* arr = nullptr;
-    T* head = nullptr;
-    T* tail = nullptr;
-    int headIndex = 0;
+    std::deque<T> arr;
+    T* tail;
+    T* head;
+    //T* arr = nullptr;
+    //T* head = nullptr;
+    //T* tail = nullptr;
+    int headIndex = -1;
     size_t cap;     //最大サイズ
     size_t size;    //現在のサイズ
 };

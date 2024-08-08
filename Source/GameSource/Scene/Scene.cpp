@@ -40,3 +40,7 @@ void Scene::ConstantBufferUpdate(float elapsedTime)
     //XV‚·‚é
     sc->Activate(Graphics::Instance().GetDeviceContext(), (int)CB_INDEX::SCENE, true, true, true, true, true, true);
 }
+
+Scene::Scene()
+{
+}

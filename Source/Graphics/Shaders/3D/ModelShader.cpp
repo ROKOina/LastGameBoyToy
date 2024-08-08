@@ -42,6 +42,10 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
         VSPath = { "Shader\\ShadowVS.cso" };
         GSPath = { "Shader\\ShadowGS.cso" };
         break;
+    case SHADER_ID_MODEL::SILHOUETTE:
+        VSPath = { "Shader\\DefaltVS.cso" };
+        PSPath = { "Shader\\SilhouettePS.cso" };
+        break;
 
     default:
         assert(!"引数のShaderに想定されていない値が入れられている");
@@ -77,11 +81,12 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
         // オブジェクト用のコンスタントバッファ,サブセット用
         m_objectconstants = std::make_unique<ConstantBuffer<objectconstants>>(Graphics.GetDevice());
         m_subsetconstants = std::make_unique<ConstantBuffer<subsetconstants>>(Graphics.GetDevice());
+        m_outlineconstants = std::make_unique<ConstantBuffer<outlineconstants>>(Graphics.GetDevice());
     }
 }
 
 //描画設定
-void ModelShader::Begin(ID3D11DeviceContext* dc, int blendmode, RASTERIZERSTATE rasterizerState)
+void ModelShader::Begin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode)
 {
     //シェーダーのセット
     dc->VSSetShader(m_vertexshader.Get(), nullptr, 0);
@@ -92,9 +97,9 @@ void ModelShader::Begin(ID3D11DeviceContext* dc, int blendmode, RASTERIZERSTATE 
     const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     //レンダーステートの設定（ループの外で1回だけ設定）
-    dc->OMSetBlendState(Graphics.GetBlendState(static_cast<BLENDSTATE>(blendmode)), blendFactor, 0xFFFFFFFF);
-    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
-    dc->RSSetState(Graphics.GetRasterizerState(rasterizerState));
+    dc->OMSetBlendState(Graphics.GetBlendState(blendmode), blendFactor, 0xFFFFFFFF);
+    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(depthmode), 1);
+    dc->RSSetState(Graphics.GetRasterizerState(rasterizermode));
 }
 
 void ModelShader::ShadowBegin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode)
@@ -151,6 +156,11 @@ void ModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset
     m_subsetconstants->data.Metalness = subset.material->Metalness;
     m_subsetconstants->data.Roughness = subset.material->Roughness;
     m_subsetconstants->Activate(dc, (int)CB_INDEX::SUBSET, true, true, false, false, false, false);
+
+    //オブジェクト毎に使いたい定数バッファ
+    m_outlineconstants->data.outlineColor = subset.material->outlineColor;
+    m_outlineconstants->data.outlineintensity = subset.material->outlineintensity;
+    m_outlineconstants->Activate(dc, (int)CB_INDEX::OUTLINE, false, true, false, false, false, false);
 
     //シェーダーリソースビュー設定
     dc->PSSetShaderResources(0, std::size(subset.material->shaderResourceView), subset.material->shaderResourceView[0].GetAddressOf());

@@ -8,26 +8,22 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
-    //カメラが向いている方向へ旋回
-    GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
-    std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
-    DirectX::XMFLOAT3 cameraForward = cameraCom->GetFront();
-    cameraForward.y = 0;
+    //ステックのアングル取得
+    stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
 
-    GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
-    GetGameObject()->transform_->UpdateTransform();
-    GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
-
-    //死亡処理
-    if (hitPoint <= 0)
+    //ステックの角度制限
+    if (stickAngle < 0.0f)
     {
-        GetGameObject()->GetComponent<MovementCom>()->AddForce({ 0, 10.0f, 0 });
-        return;
+        stickAngle += 360.0f;
     }
 
     //ステート処理
     attackStateMachine.Update(elapsedTime);
-    if (useMoveFlag)moveStateMachine.Update(elapsedTime);
+    if (useMoveFlag)
+    {
+        //ここで移動をしない
+        moveStateMachine.Update(elapsedTime);
+    }
 
 #ifdef _DEBUG
 
@@ -39,13 +35,6 @@ void CharacterCom::Update(float elapsedTime)
     {
         MainAttack();
     }
-
-    ////デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    //if (CharacterInput::SubAttackButton & GetButtonDown()
-    //    && GamePad::BTN_RIGHT_SHOULDER & GetButton())
-    //{
-    //    SubAttack();
-    //}
 
     if (CharacterInput::SubAttackButton & GetButtonDown())
     {
@@ -68,6 +57,10 @@ void CharacterCom::Update(float elapsedTime)
     {
         SubSkill();
     }
+    if (CharacterInput::LeftShiftButton & GetButtonDown())
+    {
+        LeftShiftSkill();
+    }
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         SpaceSkill();
@@ -85,74 +78,24 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
+    float hp = hitPoint;
+    ImGui::DragFloat("HP", &hp);
+
+    int s = (int)(moveStateMachine.GetCurrentState());
+    ImGui::InputInt("moveS", &s);
+    s = (int)(attackStateMachine.GetCurrentState());
+    ImGui::InputInt("attackS", &s);
     moveStateMachine.ImGui();
     attackStateMachine.ImGui();
 
     ImGui::InputFloat("StickAngle", &stickAngle);
-}
 
-//方向アニメーション
-void CharacterCom::DirectionAnimation(std::weak_ptr<AnimationCom>animationCom, const DirectX::XMFLOAT3& movevec, const std::string& forward, const std::string& back, const std::string& right, const std::string& left, bool loop, const float& blendrate)
-{
-    //前後判定
-    float m_dotz = Mathf::Dot(GetGameObject()->transform_->GetWorldFront(), movevec);
-
-    //外積のY成分で左右判定
-    float m_crossy = Mathf::Cross(GetGameObject()->transform_->GetWorldFront(), movevec).y;
-
-    ////ステックの入力加減で変わるアニメーションの速度が変わる
-    //if (speed)
-    //{
-    //    m_model->m_animation.AnimationSpeed(m_sticklength);
-    //}
-    ////前方向
-    //if (m_dotz > 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(forward.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(forward.c_str()), loop,false, true, blendrate);
-    //}
-    ////後ろ方向
-    //else if (m_dotz < 0 && fabs(m_crossy) < fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(back.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(back.c_str()), loop, false, true, blendrate);
-    //}
-    ////右方向
-    //else if (m_crossy > 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(right.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(right.c_str()), loop, false, true, blendrate);
-    //}
-    ////左方向
-    //else if (m_crossy < 0 && fabs(m_crossy) >= fabs(m_dotz) && animationCom.lock()->GetCurrentLowerAnimationIndex() != animationCom.lock()->FindAnimation(left.c_str()))
-    //{
-    //    animationCom.lock()->PlayLowerBodyOnlyAnimation(animationCom.lock()->FindAnimation(left.c_str()), loop, false, true, blendrate);
-    //}
-
-
-    //ステックのアングル生成
-    if (!leftStick.x == 0.0f && !leftStick.y == 0.0f)
-    {
-        stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
-    }
-
-    if (stickAngle < 0.0f)
-    {
-        stickAngle += 360.0f;
-    }
-
-    //       上
-    //       ｌ
-    //       ｌ　
-    // 左ーーｌーー右
-    // 　 　 ｌ　
-    // 　　  ｌ
-    // 　　　下
-    
-
-
-
-
-
-    
-
+    int i = userInput;
+    ImGui::InputInt("input", &i);
+    i = userInputDown;
+    ImGui::InputInt("userInputDown", &i);
+    i = userInputUp;
+    ImGui::InputInt("userInputUp", &i);
 }
 
 void CharacterCom::CameraControl()

@@ -11,6 +11,8 @@
 #include "SystemStruct/TransformUtils.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "GameSource/GameScript/FreeCameraCom.h"
+#include "Graphics/Sprite/Sprite.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -37,11 +39,11 @@ void GameObject::Update(float elapsedTime)
 
 void GameObject::OnDestroy()
 {
-  for (std::shared_ptr<Component>& component : components_)
-  {
-    if (!component->GetEnabled())continue;
-    component->OnDestroy();
-  }
+    for (std::shared_ptr<Component>& component : components_)
+    {
+        if (!component->GetEnabled())continue;
+        component->OnDestroy();
+    }
 }
 
 // 行列の更新
@@ -100,15 +102,6 @@ void GameObject::OnGUI()
     }
 }
 
-void GameObject::Render2D(float elapsedTime)
-{
-    // コンポーネント
-    for (std::shared_ptr<Component>& component : components_)
-    {
-        component->Render2D(elapsedTime);
-    }
-}
-
 //親子
 std::shared_ptr<GameObject> GameObject::AddChildObject()
 {
@@ -149,7 +142,7 @@ void GameObject::AudioRelease()
 // 作成
 std::shared_ptr<GameObject> GameObjectManager::Create()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    //std::lock_guard<std::mutex> lock(mutex_);
 
     std::shared_ptr<GameObject> obj = std::make_shared<GameObject>();
     obj->AddComponent<TransformCom>();
@@ -236,12 +229,12 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     // フォワードレンダリング
     RenderForward();
 
-  //デバッグレンダー
-  Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
-  Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+    //デバッグレンダー
+    Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+    Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
 
-  // 深度マップをコピーしてGPUに設定
-  m_posteffect->DepthCopyAndBind(8);
+    // 深度マップをコピーしてGPUに設定
+    m_posteffect->DepthCopyAndBind(8);
 
     // 深度マップを使用するシェーダー
     RenderUseDepth();
@@ -249,16 +242,19 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //ポストエフェクト
     m_posteffect->PostEffectRender();
 
-  //debug
-  if (Graphics::Instance().IsDebugGUI())
-  {
-    //当たり判定用デバッグ描画
-    for (auto& col : colliderObject_)
+    //スプライト描画
+    SpriteRender();
+
+    //debug
+    if (Graphics::Instance().IsDebugGUI())
     {
-      if (!col.lock()->GetEnabled())continue;
-      if (!col.lock()->GetGameObject()->GetEnabled())continue;
-      col.lock()->DebugRender();
-    }
+        //当たり判定用デバッグ描画
+        for (auto& col : colliderObject_)
+        {
+            if (!col.lock()->GetEnabled())continue;
+            if (!col.lock()->GetGameObject()->GetEnabled())continue;
+            col.lock()->DebugRender();
+        }
 
         // リスター描画
         DrawLister();
@@ -269,14 +265,8 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
         //ポストエフェクトimgui
         m_posteffect->PostEffectImGui();
     }
-}
 
-void GameObjectManager::Render2D(float elapsedTime)
-{
-    for (std::shared_ptr<GameObject>& obj : updateGameObject_)
-    {
-        obj->Render2D(elapsedTime);
-    }
+    DrawGuizmo(view, projection);
 }
 
 //ゲームオブジェクトを探す
@@ -304,6 +294,17 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
     if (selectObject.find(obj) != selectObject.end())
     {
         nodeFlags |= ImGuiTreeNodeFlags_Selected;
+
+        if (ImGui::IsMouseDoubleClicked(0))
+        {
+            ImGuiIO& io = ImGui::GetIO();
+
+            // ImGui上にマウスカーソルがある場合は処理しない
+            if (!io.WantCaptureMouse) return;
+
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
+            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
+        }
     }
 
     //子がいないなら、▼付けない
@@ -385,6 +386,13 @@ void GameObjectManager::DrawGuizmo(const DirectX::XMFLOAT4X4& view, const Direct
         selectedObject->transform_->SetRotation(rotate);
         selectedObject->transform_->SetWorldPosition(position);
     }
+
+    //ボーン毎のguizmo
+    if (renderSortObject_.size() <= 0)return;
+    for (std::weak_ptr<RendererCom>& r : renderSortObject_)
+    {
+        r.lock()->BoneGuizmo(view, projection);
+    }
 }
 
 void GameObjectManager::StartUpObjects()
@@ -414,6 +422,13 @@ void GameObjectManager::StartUpObjects()
         if (gpuparticlecomp)
         {
             gpuparticleobject.emplace_back(gpuparticlecomp);
+        }
+
+        //スプライトオブジェクトがあれば入る
+        std::shared_ptr<Sprite>spritecomp = obj->GetComponent<Sprite>();
+        if (spritecomp)
+        {
+            spriteobject.emplace_back(spritecomp);
         }
 
         obj->Start();
@@ -459,14 +474,14 @@ void GameObjectManager::RemoveGameObjects()
     // 削除リストに何もなかったら、何もしない
     if (removeGameObject_.empty())return;
 
-  // 削除リストのオブジェクトを削除
-  {
-    std::vector<std::weak_ptr<GameObject>> parentObj;
-    for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
+    // 削除リストのオブジェクトを削除
     {
-      obj->OnDestroy();
-      EraseObject(startGameObject_, obj);
-      EraseObject(updateGameObject_, obj);
+        std::vector<std::weak_ptr<GameObject>> parentObj;
+        for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
+        {
+            obj->OnDestroy();
+            EraseObject(startGameObject_, obj);
+            EraseObject(updateGameObject_, obj);
 
             std::set<std::shared_ptr<GameObject>>::iterator itSelection = selectionGameObject_.find(obj);
             if (itSelection != selectionGameObject_.end())
@@ -479,14 +494,14 @@ void GameObjectManager::RemoveGameObjects()
         }
         removeGameObject_.clear();
 
-    //child解放
-    for (std::weak_ptr<GameObject> parent : parentObj)
-    {
-      if (!parent.expired()) {
-        parent.lock()->EraseExpiredChild();
-      }
+        //child解放
+        for (std::weak_ptr<GameObject> parent : parentObj)
+        {
+            if (!parent.expired()) {
+                parent.lock()->EraseExpiredChild();
+            }
+        }
     }
-  }
 
     //各オブジェクト解放(削除)
       //collider解放
@@ -525,6 +540,16 @@ void GameObjectManager::RemoveGameObjects()
         {
             gpuparticleobject.erase(gpuparticleobject.begin() + per);
             --per;
+        }
+    }
+
+    //spriteobject解放
+    for (int spr = 0; spr < spriteobject.size(); ++spr)
+    {
+        if (spriteobject[spr].expired())
+        {
+            spriteobject.erase(spriteobject.begin() + spr);
+            --spr;
         }
     }
 
@@ -654,6 +679,25 @@ void GameObjectManager::RenderShadow()
     }
 }
 
+//シルエット描画
+void GameObjectManager::RenderSilhoutte()
+{
+    if (renderSortObject_.size() <= 0)return;
+
+    //シルエット描画
+    for (std::weak_ptr<RendererCom>& modelrender : renderSortObject_)
+    {
+        if (!modelrender.lock()->GetGameObject()->GetEnabled())continue;
+        if (!modelrender.lock()->GetEnabled())continue;
+
+        Model* model = modelrender.lock()->GetModel();
+        if (model != nullptr)
+        {
+            modelrender.lock()->SilhoutteRender();
+        }
+    }
+}
+
 void GameObjectManager::RenderUseDepth()
 {
     if (renderSortObject_.size() <= 0) return;
@@ -702,6 +746,20 @@ void GameObjectManager::GPUParticleRender()
         if (!po.lock()->GetEnabled())continue;
 
         po.lock()->Render();
+    }
+}
+
+//スプライト描画
+void GameObjectManager::SpriteRender()
+{
+    if (spriteobject.size() <= 0)return;
+
+    for (std::weak_ptr<Sprite>& sp : spriteobject)
+    {
+        if (!sp.lock()->GetGameObject()->GetEnabled())continue;
+        if (!sp.lock()->GetEnabled())continue;
+
+        sp.lock()->Render();
     }
 }
 

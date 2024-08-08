@@ -1,24 +1,27 @@
 #pragma once
 
 #include "Components\System\Component.h"
+#include "GameSource/Math/Collision.h"
 //当たり判定をするコンポーネントまとめてここに書く
 
 //当たり判定のタグ
 enum COLLIDER_TAG : uint64_t
 {
-    NONE_COL            = 1 << 0,
+    NONE_COL = 1 << 0,
 
-    Player          = 1 << 1,
-    PlayerAttack    = 1 << 2,
-    PlayerAttackAssist      = 1 << 3,
-    PlayerPushBack      = 1 << 4,
-    JustAvoid       = 1 << 5,
+    Player = 1 << 1,
+    PlayerAttack = 1 << 2,
+    PlayerAttackAssist = 1 << 3,
+    PlayerPushBack = 1 << 4,
+    JustAvoid = 1 << 5,
 
-    Enemy           = 1 << 10,
-    EnemyAttack     = 1 << 11,
+    Enemy = 1 << 10,
+    EnemyAttack = 1 << 11,
     EnemyPushBack = 1 << 12,
 
-    Wall            = 1 << 30,
+    Bullet = 1 << 13,
+
+    Wall = 1 << 30,
 };
 static COLLIDER_TAG operator| (COLLIDER_TAG L, COLLIDER_TAG R)
 {
@@ -46,16 +49,18 @@ enum class COLLIDER_TYPE {
     SphereCollider,
     BoxCollider,
     CapsuleCollider,
+    RayCollider,
 };
 static bool operator== (int L, COLLIDER_TYPE R)
 {
     return static_cast<int>(L) == static_cast<int>(R);
-       
+
 }
 
 //当たった時用の構造体
 struct HitObj {
     std::weak_ptr<GameObject> gameObject;
+    DirectX::XMFLOAT3 hitPos;//レイ専用
 };
 
 //継承して一つの配列に落とし込む
@@ -118,9 +123,15 @@ private:
     //箱vカプセル
     bool BoxVsCapsule(std::shared_ptr<Collider> otherSide);
 
+    //レイvモデル
+    //bool RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay);
+
+    //レイVSノードコリジョン
+    bool RayVsNodeCollision(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay);
+
 private:
     //当たり判定タグ
-    COLLIDER_TAG myTag_= COLLIDER_TAG::NONE_COL;    //自分のタグ
+    COLLIDER_TAG myTag_ = COLLIDER_TAG::NONE_COL;    //自分のタグ
     COLLIDER_TAG judgeTag_ = COLLIDER_TAG::NONE_COL; //当たり判定をするタグ
 
     //今のフレームで当たっているものを保存
@@ -253,4 +264,42 @@ public:
 
 private:
     Capsule capsule_;
+};
+
+class RayColliderCom : public Collider
+{
+    //コンポーネントオーバーライド
+public:
+    RayColliderCom() { colliderType_ = static_cast<int>(COLLIDER_TYPE::RayCollider); }
+    ~RayColliderCom() {}
+
+    // 名前取得
+    const char* GetName() const override { return "RayCollider"; }
+
+    // 開始処理
+    void Start() override {}
+
+    // 更新処理
+    void Update(float elapsedTime) override {}
+
+    // GUI描画
+    void OnGUI() override;
+
+    // debug描画
+    void DebugRender() override;
+
+    //RayColliderクラス
+public:
+    void SetStart(DirectX::XMFLOAT3 pos) { start = pos; }
+    void SetEnd(DirectX::XMFLOAT3 pos) { end = pos; }
+    const DirectX::XMFLOAT3& GetStart() { return start; }
+    const DirectX::XMFLOAT3& GetEnd() { return end; }
+
+    void SetHitPosDebug(DirectX::XMFLOAT3 p) { hitPos = p; }
+
+private:
+    DirectX::XMFLOAT3 start = { 0,0,0 };
+    DirectX::XMFLOAT3 end = { 0,0,0 };
+    bool hitDraw = false;
+    DirectX::XMFLOAT3 hitPos = { FLT_MAX,FLT_MAX,FLT_MAX };
 };

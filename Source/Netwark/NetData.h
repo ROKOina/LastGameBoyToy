@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <sstream>
 #include <vector>
+#include <array>
 
 #define MAX_BUFFER_NET 65536
 
@@ -40,6 +41,29 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
         return in;
     }
 
+//array
+static std::stringstream& operator>>(std::stringstream& in, std::array<float, 6>& h)
+{
+    in >> float(h[0]) >> float(h[1]) >> float(h[2]) >> float(h[3]) >> float(h[4]) >> float(h[5]);
+    return in;
+}
+static std::stringstream& operator<<(std::stringstream& out, const std::array<float, 6>& h)
+{
+    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
+    return out;
+}
+static std::stringstream& operator>>(std::stringstream& in, std::array<int, 6>& h)
+{
+    in >> int(h[0]) >> int(h[1]) >> int(h[2]) >> int(h[3]) >> int(h[4]) >> int(h[5]);
+    return in;
+}
+static std::stringstream& operator<<(std::stringstream& out, const std::array<int, 6>& h)
+{
+    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
+    return out;
+}
+
+
 ////フレームと入力
 //struct InputFrame
 //{
@@ -55,31 +79,63 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
 //};
 //
 
+struct SaveBuffer
+{
+    int frame;
+    unsigned int inputDown = 0;
+    unsigned int input = 0;
+    unsigned int inputUp = 0;
+};
+//SaveBuffer
+static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>& vec)
+{
+    int size = vec.size();
+    out << size << " ";
+    for (auto& v : vec)
+    {
+        out << v.frame << " " << v.input << " " << v.inputDown << " " << v.inputUp << " ";
+    }
+}
+static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& vec)
+{
+    int size;
+    in >> size;
+    for (int i = 0; i < size; ++i)
+    {
+        SaveBuffer s;
+        in >> s.frame >> s.input >> s.inputDown >> s.inputUp;
+        vec.emplace_back(s);
+    }
+}
 
 struct NetData
 {
+    bool isMasterClient;
     int id;
     float radi;
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT3 velocity;
     DirectX::XMFLOAT3 nonVelocity;
     DirectX::XMFLOAT4 rotato;
-    unsigned int inputDown;
-    unsigned int input;
-    unsigned int inputUp;
-    long long nowFrame;
+
+    std::vector<SaveBuffer> saveInputBuf;
+    std::array<float, 6> damageData;//キャラに与えたダメージ
+    std::array<float, 6> teamID;//チームのID
     //int pSize;
     //std::vector<int> p;
 };
-static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
+static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
+    out << h.isMasterClient << " ";
     out << h.id << " " << h.radi << " ";
     out << h.pos << " ";
     out << h.velocity << " ";
     out << h.nonVelocity << " ";
     out << h.rotato << " ";
-    out << h.input << " "<< h.inputDown << " "<< h.inputUp << " ";
-    out << h.nowFrame << " ";
+    out << h.damageData << " ";
+    out << h.teamID << " ";
+    VectorSaveBufferOut(out, h.saveInputBuf);
+
     //for (auto& i : h.p)
     //{
 
@@ -88,13 +144,16 @@ static std::stringstream& operator<<(std::stringstream& out, const NetData& h)
 }
 static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
+    in >> h.isMasterClient;
     in >> h.id >> h.radi;
     in >> h.pos;
     in >> h.velocity;
     in >> h.nonVelocity;
     in >> h.rotato;
-    in >> h.input>> h.inputDown >> h.inputUp;
-    in >> h.nowFrame;
+    in >> h.damageData;
+    in >> h.teamID;
+    VectorSaveBufferIn(in, h.saveInputBuf);
+
     return in;
 }
 

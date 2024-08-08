@@ -10,7 +10,7 @@ class RendererCom : public Component
 {
     // コンポーネントオーバーライド
 public:
-    RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, RASTERIZERSTATE rs = RASTERIZERSTATE::SOLID_CULL_BACK, bool shadowrender = true);
+    RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, DEPTHSTATE depthmode = DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE rasterizermode = RASTERIZERSTATE::SOLID_CULL_BACK, bool shadowrender = true, bool silhoutterender = true);
     ~RendererCom() {}
 
     // 名前取得
@@ -27,6 +27,12 @@ public:
 
     //影描画
     void ShadowRender();
+
+    //シルエット描画
+    void SilhoutteRender();
+
+    //guizmo
+    void BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     // GUI描画
     void OnGUI() override;
@@ -74,9 +80,12 @@ private:
     std::unique_ptr<Model>	model_;
     std::unique_ptr<ModelShader> m_modelshader;
     std::unique_ptr<ModelShader>m_shadow;
-    int m_blend = 9;
+    std::unique_ptr<ModelShader>m_silhoutte;
     bool m_shadowrender = true;
+    bool m_silhoutterender = true;
     RASTERIZERSTATE m_rasterizerState = RASTERIZERSTATE::SOLID_CULL_BACK;
+    BLENDSTATE m_blend = BLENDSTATE::MULTIPLERENDERTARGETS;
+    DEPTHSTATE m_depth = DEPTHSTATE::ZT_ON_ZW_ON;
 
     std::shared_ptr<BaseConstants> variousConstant = nullptr;
 

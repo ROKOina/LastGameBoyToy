@@ -11,10 +11,12 @@
 #include "Components/System/GameObject.h"
 #include "Components/TransformCom.h"
 #include "Components/MovementCom.h"
+#include "Components/Character/CharacterCom.h"
 
 NetClient::~NetClient()
 {
     NetwarkPost::~NetwarkPost();
+    bufRing.release();
 }
 
 
@@ -115,26 +117,31 @@ void __fastcall NetClient::Initialize()
     isNextFrame = true;
 
     //リングバッファ初期化
-    bufRing = std::make_unique<RingBuffer<int>>(10);
+    bufRing = std::make_unique<RingBuffer<SaveBuffer>>(30);
 }
 
 void __fastcall NetClient::Update()
 {    
-    //完全同期用
     isNextFrame = false;
 
 
     ///******       データ受信        ******///
     Receive();
 
-    //フレーム数を合わせる
-    if (!IsSynchroFrame())
-        return;
-
-    nowFrame++;
-
     ///******       データ送信        ******///
     Send();
+
+
+#ifdef EasyFrameSyn
+
+    //フレーム数を合わせる
+    if (!IsSynchroFrame(false))
+        return;
+
+#endif // EasyFrameSyn
+
+
+    nowFrame++;
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
@@ -150,6 +157,15 @@ void NetClient::ImGui()
 
     int ID = id;
     ImGui::InputInt("id", &ID);
+
+    //int frame;
+    //if (clientDatas.size() >= 2)
+    //{
+    //    frame = clientDatas[0].nowFrame;
+    //    ImGui::InputInt("nowFram", &frame);
+    //}
+    //frame = nowFrame;
+    //ImGui::InputInt("nowFrame1", &frame);
 
     ImGui::End();
 }
@@ -172,20 +188,29 @@ void NetClient::Receive()
 
         clientDatas = NetDataRecvCast(recvData);
 
-        //最初の交信時
-        if (!firstConect)
-        {
-            firstConect = true;
-            //フレームを保存
-            for (auto& c : clientDatas)
-            {
-                if (c.id == 0)
-                {
-                    nowFrame = c.nowFrame;
-                    break;
-                }
-            }
-        }
+        ////フレーム差
+        //static std::vector<int> saveInt;
+        //for (auto& c : clientDatas)
+        //{
+        //    if (c.id == id)continue;
+        //    saveInt.emplace_back(nowFrame - c.nowFrame);
+        //}
+
+
+        ////最初の交信時
+        //if (!firstConect)
+        //{
+        //    firstConect = true;
+        //    //フレームを保存
+        //    for (auto& c : clientDatas)
+        //    {
+        //        if (c.id == 0)
+        //        {
+        //            nowFrame = c.nowFrame;
+        //            break;
+        //        }
+        //    }
+        //}
 
         RenderUpdate();
     }
@@ -204,25 +229,39 @@ void NetClient::Send()
     inputDown |= gamePad.GetButtonDown();
     inputUp |= gamePad.GetButtonUp();
 
+    //入力をリングバッファに保存
+    SaveBuffer s;
+    s.frame = nowFrame;
+    s.input = input;
+    s.inputDown = inputDown;
+    s.inputUp = inputUp;
+    bufRing->Enqueue(s);
+
     //仮でポジションを送る
     std::vector<NetData> netData;
     NetData n;
     n.id = id;
     n.radi = 1.1f;
-    DirectX::XMFLOAT3 p = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
-    n.pos = p;
-    n.velocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetVelocity();
-    n.nonVelocity = GameObjectManager::Instance().Find("player")->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-    n.rotato = GameObjectManager::Instance().Find("player")->transform_->GetRotation();
 
-    n.input = input;
-    n.inputDown = inputDown;
-    n.inputUp = inputUp;
+    GameObject* player = GameObjectManager::Instance().Find(("player" + std::to_string(id)).c_str()).get();
+
+    n.pos = player->transform_->GetWorldPosition();
+    n.velocity = player->GetComponent<MovementCom>()->GetVelocity();
+    n.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+    n.rotato = player->transform_->GetRotation();
+
+    //n.input = input;
+    //n.inputDown = inputDown;
+    //n.inputUp = inputUp;
     input = 0;
     inputDown = 0;
     inputUp = 0;
 
-    n.nowFrame = nowFrame;
+    //n.nowFrame = nowFrame;
+    n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
+
+    //開始から６フレームのインプット送る
+    n.saveInputBuf = bufRing->GetHeadFromSize(6);
 
     netData.emplace_back(n);
 
