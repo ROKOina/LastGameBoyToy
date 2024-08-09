@@ -12,6 +12,8 @@
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\HaveAllAttackCharacter.h"
 
+#include "HitProcess/HitProcessCom.h"
+
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject> obj)
 {
 	switch (list)
@@ -76,7 +78,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
-    //攻撃レイキャストスタート位置
+    //攻撃レイキャスト
     {
         std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
         rayChild->SetName("rayObj");
@@ -94,6 +96,36 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
             rayCol->SetMyTag(COLLIDER_TAG::Enemy);
             rayCol->SetJudgeTag(COLLIDER_TAG::Player);
         }
+        rayCol->SetEnabled(false);
+
+        //ダメージ処理用
+        std::shared_ptr<HitProcessCom> hitDamage = rayChild->AddComponent<HitProcessCom>();
+        hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    }
+
+    //回復カプセル
+    {
+        std::shared_ptr<GameObject> cupsuleChild = obj->AddChildObject();
+        cupsuleChild->SetName("capsuleObj");
+
+        cupsuleChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+
+        std::shared_ptr<CapsuleColliderCom> capsuleCol = cupsuleChild->AddComponent<CapsuleColliderCom>();
+        if (std::strcmp(obj->GetName(), "player") == 0)
+        {
+            capsuleCol->SetMyTag(COLLIDER_TAG::Player);
+            capsuleCol->SetJudgeTag(COLLIDER_TAG::Enemy);
+        }
+        else
+        {
+            capsuleCol->SetMyTag(COLLIDER_TAG::Enemy);
+            capsuleCol->SetJudgeTag(COLLIDER_TAG::Player);
+        }
+        capsuleCol->SetEnabled(false);
+
+        //ヒール処理用
+        std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>();
+        hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
     }
 
 }

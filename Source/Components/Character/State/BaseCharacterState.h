@@ -88,7 +88,10 @@ class BaseCharacter_HitscanState : public BaseCharacter_BaseState
     //  <RayColliderCom>を追加する
 
 public:
-    BaseCharacter_HitscanState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+    BaseCharacter_HitscanState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
+    {
+        name = "Hitscan";
+    }
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
@@ -97,6 +100,27 @@ public:
 
 private:
     float rayLength = 100;
+};
+
+class BaseCharacter_CapsuleState : public BaseCharacter_BaseState
+{
+    //　※　カプセルOBJを起動するだけのステート　※
+    //  ownerのObjの子に"capsuleObj"という名前のObjを作る
+    //  NodeCollsionCom以外の形状と判定する
+
+public:
+    BaseCharacter_CapsuleState(CharacterCom* owner) : BaseCharacter_BaseState(owner) 
+    {
+        name = "Capsule";
+    }
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    void ImGui() override;
+
+private:
+    float capsuleLength = 5;
 };
 
 class BaseCharacter_NoneAttack : public BaseCharacter_BaseState

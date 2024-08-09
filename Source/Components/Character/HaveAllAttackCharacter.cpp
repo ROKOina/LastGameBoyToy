@@ -14,6 +14,7 @@ void HaveAllAttackCharaCom::Start()
     //auto& ba = std::dynamic_pointer_cast<BaseCharacter_JumpState>(a);
 
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<BaseCharacter_HitscanState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<BaseCharacter_CapsuleState>(this));
     //attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<InazawaCharacter_ESkillState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
@@ -32,9 +33,21 @@ void HaveAllAttackCharaCom::OnGUI()
     CharacterCom::OnGUI();
 }
 
-void HaveAllAttackCharaCom::MainAttack()
+void HaveAllAttackCharaCom::MainAttackPushing()
 {
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+    if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK
+        && attackStateMachine.GetNextState() != CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK
+        && attackStateMachine.GetOldState() != CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+}
+
+void HaveAllAttackCharaCom::SubAttackPushing()
+{
+    if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_ATTACK
+        && attackStateMachine.GetNextState() != CHARACTER_ATTACK_ACTIONS::SUB_ATTACK
+        && attackStateMachine.GetOldState() != CHARACTER_ATTACK_ACTIONS::SUB_ATTACK
+        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
 }
 
 void HaveAllAttackCharaCom::SubSkill()

@@ -21,7 +21,7 @@ void TestCharacterCom::Start()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
-void TestCharacterCom::MainAttack()
+void TestCharacterCom::MainAttackDown()
 {
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK); 
 }

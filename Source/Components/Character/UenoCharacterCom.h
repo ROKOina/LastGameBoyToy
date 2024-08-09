@@ -21,7 +21,7 @@ public:
     void OnGUI() override;
 
     //メインアタック
-    void MainAttack()override;
+    void MainAttackDown()override;
 
 public:
 

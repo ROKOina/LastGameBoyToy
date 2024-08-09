@@ -46,7 +46,7 @@ void NomuraCharacterCom::OnGUI()
 
 
 
-void NomuraCharacterCom::MainAttack()
+void NomuraCharacterCom::MainAttackDown()
 {
     if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL && launchPermission&& remainingBullets)
     {
@@ -58,7 +58,7 @@ void NomuraCharacterCom::MainAttack()
     }
 }
 
-void NomuraCharacterCom::SubAttack()
+void NomuraCharacterCom::SubAttackDown()
 {
     if (nowMagazine > 0)
     {

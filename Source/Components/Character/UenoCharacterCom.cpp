@@ -51,7 +51,7 @@ void UenoCharacterCom::OnGUI()
 }
 
 //メインアタック
-void UenoCharacterCom::MainAttack()
+void UenoCharacterCom::MainAttackDown()
 {
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
 }

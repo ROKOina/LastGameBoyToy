@@ -47,7 +47,12 @@ void CharacterCom::Update(float elapsedTime)
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
-        MainAttack();
+        MainAttackDown();
+    }
+    else if (CharacterInput::MainAttackButton & GetButton()
+        && GamePad::BTN_LEFT_SHOULDER & GetButton())
+    {
+        MainAttackPushing();
     }
 
     ////デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
@@ -59,7 +64,11 @@ void CharacterCom::Update(float elapsedTime)
 
     if (CharacterInput::SubAttackButton & GetButtonDown())
     {
-        SubAttack();
+        SubAttackDown();
+    }
+    else if (CharacterInput::SubAttackButton & GetButton())
+    {
+        SubAttackPushing();
     }
 
 #else

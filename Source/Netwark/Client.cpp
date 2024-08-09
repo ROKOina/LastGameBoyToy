@@ -258,7 +258,7 @@ void NetClient::Send()
     inputUp = 0;
 
     //n.nowFrame = nowFrame;
-    n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
+    //n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
     //開始から６フレームのインプット送る
     n.saveInputBuf = bufRing->GetHeadFromSize(6);

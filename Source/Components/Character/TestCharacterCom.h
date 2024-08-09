@@ -7,7 +7,7 @@ class TestCharacterCom : public CharacterCom
 public:
     void Start() override;
 
-    void MainAttack() override;
+    void MainAttackDown() override;
     void SubSkill() override;
 
     void SetGunFireCollision(GameObj obj) { gunFireCollision = obj; }

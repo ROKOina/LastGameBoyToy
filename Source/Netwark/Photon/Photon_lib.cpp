@@ -567,8 +567,12 @@ void PhotonLib::sendData(void)
 	auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
 	for (auto& data : sendDatas)
 	{
-		netD.damageData[data.id] += data.damage;
-		data.damage = 0;
+		if (data.sendType == 0)	//ダメージ
+			netD.damageData[data.id] += data.value;
+		else if (data.sendType == 1)	//ヒール
+			netD.healData[data.id] += data.value;
+		else if (data.sendType == 1)	//スタン
+			int a = 0;
 	}
 
 	//マスタークライアントの場合はチームIDを送る
@@ -703,13 +707,17 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			{
 				if (id != GetPlayerNum())continue;
 
-				if (ne[0].damageData[id] > 0)
-				{
-					int a = 0;
-				}
+				auto& obj = GameObjectManager::Instance().Find("player");
+				obj->GetComponent<CharacterCom>()->AddDamagePoint(-ne[0].damageData[id]);
+				break;
+			}
+			//ヒール情報
+			for (int id = 0; id < ne[0].healData.size(); ++id)
+			{
+				if (id != GetPlayerNum())continue;
 
 				auto& obj = GameObjectManager::Instance().Find("player");
-				obj->GetComponent<CharacterCom>()->AddHitPoint(-ne[0].damageData[id]);
+				obj->GetComponent<CharacterCom>()->AddHealPoint(ne[0].healData[id]);
 				break;
 			}
 

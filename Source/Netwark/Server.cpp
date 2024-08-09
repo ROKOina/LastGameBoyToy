@@ -303,7 +303,7 @@ void NetServer::Send()
         inputUp = 0;
 
         //client.nowFrame = nowFrame;
-        client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
+        //client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
         break;
     }

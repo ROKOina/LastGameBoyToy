@@ -2,7 +2,7 @@
 #include "Input\Input.h"
 #include "BaseCharacterState.h"
 #include "Components/ColliderCom.h"
-#include "Netwark/Photon/StaticSendDataManager.h"
+
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -12,6 +12,8 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
     transCom = GetComp(TransformCom);
     animationCom = GetComp(AnimationCom);
 }
+
+#pragma region Idle
 
 void BaseCharacter_IdleState::Enter()
 {
@@ -54,6 +56,10 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     }
 }
 
+#pragma endregion
+
+#pragma region Move
+
 void BaseCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
@@ -95,6 +101,10 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 }
+
+#pragma endregion
+
+#pragma region Jump
 
 void BaseCharacter_JumpState::Enter()
 {
@@ -139,6 +149,10 @@ void BaseCharacter_JumpState::Exit()
     HoveringTimer = 0.0f;
 }
 
+#pragma endregion
+
+#pragma region Hitscan
+
 void BaseCharacter_HitscanState::Enter()
 {
 }
@@ -148,13 +162,13 @@ void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
     auto& ray = owner->GetGameObject()->GetChildFind("rayObj");
     if (ray)
     {
-        //有効に
-        ray->SetEnabled(true);
-
         //視点の向きにレイを飛ばす
         auto& rayCol = ray->GetComponent<RayColliderCom>();
         if (rayCol)
         {
+            //有効に
+            rayCol->SetEnabled(true);
+
             DirectX::XMFLOAT3 pos = ray->transform_->GetWorldPosition();
              
             //自分か判断する
@@ -167,15 +181,6 @@ void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
             
             rayCol->SetStart(pos);
             rayCol->SetEnd(pos + front * rayLength);
-
-            //ヒットを送信
-            for (auto& hit : rayCol->OnHitGameObject())
-            {
-                auto& chara = hit.gameObject.lock()->GetComponent<CharacterCom>();
-                if (!chara)continue;
-                int hitID = chara->GetNetID();
-                StaticSendDataManager::Instance().SetSendDamage(charaCom.lock()->GetNetID(), hitID, 1);
-            }
         }
     }
 
@@ -187,8 +192,12 @@ void BaseCharacter_HitscanState::Exit()
 {
     //無効に
     auto& ray = owner->GetGameObject()->GetChildFind("rayObj");
-    if (ray)ray->SetEnabled(false);
-
+    if (ray)
+    {
+        auto& rayCol = ray->GetComponent<RayColliderCom>();
+        if (rayCol)
+            rayCol->SetEnabled(false);
+    }
 }
 
 void BaseCharacter_HitscanState::ImGui()
@@ -196,9 +205,69 @@ void BaseCharacter_HitscanState::ImGui()
     ImGui::DragFloat("rayLength", &rayLength);
 }
 
+#pragma endregion
+
+#pragma region Capsule
+
+void BaseCharacter_CapsuleState::Enter()
+{
+}
+
+void BaseCharacter_CapsuleState::Execute(const float& elapsedTime)
+{
+    auto& capsule = owner->GetGameObject()->GetChildFind("capsuleObj");
+    if (capsule)
+    {
+        auto& capsuleCol = capsule->GetComponent<CapsuleColliderCom>();
+        if (capsuleCol)
+        {
+            //有効に
+            capsuleCol->SetEnabled(true);
+
+            //自分か判断する
+            DirectX::XMFLOAT3 front;
+            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
+            if (playerNetID == charaCom.lock()->GetNetID())
+                front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
+            else
+                front = charaCom.lock()->GetFpsCameraDir();
+
+            capsuleCol->SetPosition1(DirectX::XMFLOAT3(0, 0, 0));
+            capsuleCol->SetPosition2(front * capsuleLength);
+        }
+    }
+
+    //サブよりメインを優先
+    if (CharacterInput::MainAttackButton & owner->GetButtonDown())
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+
+    if (CharacterInput::SubAttackButton & owner->GetButtonUp())
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+void BaseCharacter_CapsuleState::Exit()
+{
+    //無効に
+    auto& capsule = owner->GetGameObject()->GetChildFind("capsuleObj");
+    if (capsule)
+    {
+        auto& capsuleCol = capsule->GetComponent<CapsuleColliderCom>();
+        if (capsuleCol)
+            capsuleCol->SetEnabled(false);
+    }
+}
+
+void BaseCharacter_CapsuleState::ImGui()
+{
+    ImGui::DragFloat("capsuleLength", &capsuleLength);
+}
+
+#pragma endregion
+
 void BaseCharacter_NoneAttack::Enter()
 {
     ////歩きアニメーション再生開始
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }
+

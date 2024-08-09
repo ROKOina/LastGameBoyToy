@@ -68,9 +68,11 @@ public:
     void OnGUI() override;
 
     //左クリック
-    virtual void MainAttack() {};
+    virtual void MainAttackDown() {};
+    virtual void MainAttackPushing() {};
     //右クリック
-    virtual void SubAttack() {};
+    virtual void SubAttackDown() {};
+    virtual void SubAttackPushing() {};
 
     //Q
     virtual void MainSkill() {};
@@ -91,7 +93,9 @@ public:
 
   void SetHitPoint(float value) { hitPoint = value; }
   float GetHitPoint() { return hitPoint; }
-  void AddHitPoint(float value) { hitPoint += value; }
+
+  void AddDamagePoint(float value) { hitPoint += value; }
+  void AddHealPoint(float value) { hitPoint += value; }
 
   void SetMoveMaxSpeed(float speed) 
   { 

@@ -36,12 +36,12 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     HitResult rayResult;
     if (myType == COLLIDER_TYPE::RayCollider)
     {
-        isJudgeMyRay = RayVsNodeCollision(otherSide, rayResult, true);//vsModel
+        isJudgeMyRay = RayVsNodeCollision(otherSide, rayResult, true);
     }
     HitResult otherRayResult;
     if (otherType == COLLIDER_TYPE::RayCollider)
     {
-        isJudgeOtherRay = RayVsNodeCollision(otherSide, otherRayResult, false);//vsModel
+        isJudgeOtherRay = RayVsNodeCollision(otherSide, otherRayResult, false);
     }
 
     //‹…

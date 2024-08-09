@@ -273,6 +273,8 @@ private:
 class RayColliderCom : public Collider
 {
     //コンポーネントオーバーライド
+
+    //  RayとNodeCollsionComのみの当たり（互いにそれしか対応してない）
 public:
     RayColliderCom() { colliderType_ = static_cast<int>(COLLIDER_TYPE::RayCollider); }
     ~RayColliderCom() {}

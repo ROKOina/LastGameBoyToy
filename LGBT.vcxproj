@@ -152,6 +152,7 @@
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
     <ClInclude Include="Source\Components\Character\Generate\TestCharacterGenerate.h" />
     <ClInclude Include="Source\Components\Character\HaveAllAttackCharacter.h" />
+    <ClInclude Include="Source\Components\Character\HitProcess\HitProcessCom.h" />
     <ClInclude Include="Source\Components\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\RegisterChara.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
@@ -261,6 +262,7 @@
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\HaveAllAttackCharacter.cpp" />
+    <ClCompile Include="Source\Components\Character\HitProcess\HitProcessCom.cpp" />
     <ClCompile Include="Source\Components\Character\NomuraCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\RegisterChara.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
