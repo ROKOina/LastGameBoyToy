@@ -1,6 +1,8 @@
 #include "BaseCharacterState.h"
 #include "Input\Input.h"
 #include "BaseCharacterState.h"
+#include "Components/ColliderCom.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -103,6 +105,9 @@ void BaseCharacter_JumpState::Enter()
     JumpInput(owner->GetGameObject());
     moveVec = SceneManager::Instance().InputVec();
     moveCom.lock()->SetOnGround(false);
+
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
@@ -132,6 +137,63 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 void BaseCharacter_JumpState::Exit()
 {
     HoveringTimer = 0.0f;
+}
+
+void BaseCharacter_HitscanState::Enter()
+{
+}
+
+void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
+{
+    auto& ray = owner->GetGameObject()->GetChildFind("rayObj");
+    if (ray)
+    {
+        //有効に
+        ray->SetEnabled(true);
+
+        //視点の向きにレイを飛ばす
+        auto& rayCol = ray->GetComponent<RayColliderCom>();
+        if (rayCol)
+        {
+            DirectX::XMFLOAT3 pos = ray->transform_->GetWorldPosition();
+             
+            //自分か判断する
+            DirectX::XMFLOAT3 front;
+            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
+            if (playerNetID == charaCom.lock()->GetNetID())
+                front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
+            else
+                front = charaCom.lock()->GetFpsCameraDir();
+            
+            rayCol->SetStart(pos);
+            rayCol->SetEnd(pos + front * rayLength);
+
+            //ヒットを送信
+            for (auto& hit : rayCol->OnHitGameObject())
+            {
+                auto& chara = hit.gameObject.lock()->GetComponent<CharacterCom>();
+                if (!chara)continue;
+                int hitID = chara->GetNetID();
+                StaticSendDataManager::Instance().SetSendDamage(charaCom.lock()->GetNetID(), hitID, 1);
+            }
+        }
+    }
+
+    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+void BaseCharacter_HitscanState::Exit()
+{
+    //無効に
+    auto& ray = owner->GetGameObject()->GetChildFind("rayObj");
+    if (ray)ray->SetEnabled(false);
+
+}
+
+void BaseCharacter_HitscanState::ImGui()
+{
+    ImGui::DragFloat("rayLength", &rayLength);
 }
 
 void BaseCharacter_NoneAttack::Enter()

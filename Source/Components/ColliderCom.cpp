@@ -80,14 +80,16 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     {
         if (judgeTag_ == otherSide->myTag_) {
             HitObj h;
-            h.hitPos = rayResult.position;
+            h.rayResult.hitPos = rayResult.position;
+            h.rayResult.dist = rayResult.distance;
             h.gameObject = otherSide->GetGameObject();
             hitObj_.emplace_back(h);
         }
 
         if (otherSide->judgeTag_ == myTag_) {
             HitObj h;
-            h.hitPos = otherRayResult.position;
+            h.rayResult.hitPos = otherRayResult.position;
+            h.rayResult.dist = otherRayResult.distance;
             h.gameObject = GetGameObject();
             otherSide->hitObj_.emplace_back(h);
         }
@@ -97,7 +99,8 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     {
         if (judgeTag_ == otherSide->myTag_) {
             HitObj h;
-            h.hitPos = rayResult.position;
+            h.rayResult.hitPos = rayResult.position;
+            h.rayResult.dist = rayResult.distance;
             h.gameObject = otherSide->GetGameObject();
             hitObj_.emplace_back(h);
         }
@@ -106,7 +109,8 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     {
         if (otherSide->judgeTag_ == myTag_) {
             HitObj h;
-            h.hitPos = otherRayResult.position;
+            h.rayResult.hitPos = otherRayResult.position;
+            h.rayResult.dist = otherRayResult.distance;
             h.gameObject = GetGameObject();
             otherSide->hitObj_.emplace_back(h);
         }

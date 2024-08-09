@@ -24,7 +24,7 @@ static GameObj GenerateTestCharacter(int teamId, DirectX::XMFLOAT3 pos)
 
     std::shared_ptr<MovementCom> moveComp = obj->AddComponent<MovementCom>();
     std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-    c->SetCharaID(teamId);
+    c->SetNetID(teamId);
 
     std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
     //ヒットスキャン用オブジェクト

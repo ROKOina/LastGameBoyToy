@@ -9,7 +9,7 @@
 class BulletCom : public Component
 {
 public:
-    BulletCom() {};
+    BulletCom(int ownerID) : ownerID(ownerID) {};
     ~BulletCom() override {};
 
     // 名前取得
@@ -30,7 +30,10 @@ public:
     //セッター・ゲッター
     void SetAliveTime(float time) { aliveTime = time; };
 
+    void SetOwnerID(int id) { ownerID = id; }
+
 private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
+    int ownerID;
 };

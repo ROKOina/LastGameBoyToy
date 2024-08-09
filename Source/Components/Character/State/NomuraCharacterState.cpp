@@ -39,7 +39,8 @@ void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, floa
     moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + arrowSpeed * power));
 
     //’e
-    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(2.0f);
 }
 

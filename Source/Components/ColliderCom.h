@@ -60,7 +60,11 @@ static bool operator== (int L, COLLIDER_TYPE R)
 //当たった時用の構造体
 struct HitObj {
     std::weak_ptr<GameObject> gameObject;
-    DirectX::XMFLOAT3 hitPos;//レイ専用
+    struct RayHitResult//レイ専用
+    {
+        DirectX::XMFLOAT3 hitPos;
+        float dist;
+    }rayResult;
 };
 
 //継承して一つの配列に落とし込む

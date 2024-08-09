@@ -103,8 +103,8 @@ public:
   }
 
   //ネット側で決める
-  void SetCharaID(int id) { charaID = id; }
-  int GetCharaID() { return charaID; }
+  void SetNetID(int id) { netID = id; }
+  int GetNetID() { return netID; }
   //ネット側で決める
   void SetTeamID(int id) { teamID = id; }
   int GetTeamID() { return teamID; }
@@ -133,6 +133,12 @@ public:
     float GetStickAngle() { return stickAngle; }
     void  SetStickAngle(const float angle) {  stickAngle = angle; }
 
+    DirectX::XMFLOAT3 GetFpsCameraDir() { return fpsCameraDir; }
+    void  SetFpsCameraDir(const DirectX::XMFLOAT3 dir) { fpsCameraDir = dir; }
+
+    int GetCharaID() { return charaID; }
+    void  SetCharaID(const int id) { charaID = id; }
+
 private:
     //カメラ操作
     void CameraControl();
@@ -147,7 +153,7 @@ protected:
   float hitPoint = 100.0f;
 
   int teamID = 0;   //自分のチーム
-  int charaID = 0;//どのクライアントがこのキャラを担当するか
+  int netID = 0;//どのクライアントがこのキャラを担当するか
   std::array<float, 6> giveDamage = { 0,0,0,0,0,0 };//敵に与えたダメージ量や味方に与えた回復
 
 private:
@@ -158,6 +164,12 @@ private:
     unsigned int userInputUp = 0x00;
     DirectX::XMFLOAT2 leftStick = {};
     DirectX::XMFLOAT2 rightStick = {};
+
+    //ネットに送る用のカメラの向き
+    DirectX::XMFLOAT3 fpsCameraDir;
+
+    int charaID;    //キャラクター識別用
+
     //野村追加  
     float stickAngle = 0.0f;
 };

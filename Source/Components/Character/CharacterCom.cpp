@@ -117,6 +117,8 @@ void CharacterCom::OnGUI()
     ImGui::InputInt("userInputDown", &i);
     i = userInputUp;
     ImGui::InputInt("userInputUp", &i);
+
+    ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
 }
 
 

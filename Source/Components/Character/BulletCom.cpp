@@ -12,11 +12,8 @@ void BulletCom::Update(float elapsedTime)
         //ネットで送信
         for (auto& c : collider->OnHitGameObject())
         {
-            StaticSendDataManager::NetSendData sendData;
-            sendData.id = c.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID();
-            sendData.damage = 1;
-            StaticSendDataManager::Instance().SetNetSendData(sendData);
-
+            int sendID = c.gameObject.lock()->GetComponent<CharacterCom>()->GetNetID();
+            StaticSendDataManager::Instance().SetSendDamage(ownerID, sendID, 1);
         }
         GameObjectManager::Instance().Remove(this->GetGameObject());
     }

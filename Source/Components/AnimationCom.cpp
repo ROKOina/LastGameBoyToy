@@ -702,6 +702,16 @@ void AnimationCom::ComputeWalkIdleAnimation(const ModelResource::NodeKeyData& ke
     DirectX::XMStoreFloat3(&node.translate, T);
 }
 
+//子供をすべて保存
+void RegisterChildLayer(std::vector<Model::Node*>& nodes, Model::Node& node)
+{
+    nodes.emplace_back(&node);
+    for (auto& n : node.children)
+    {
+        RegisterChildLayer(nodes, *n);
+    }
+}
+
 //上半身と下半身のノードを分ける
 void AnimationCom::SeparateNode()
 {
@@ -712,11 +722,13 @@ void AnimationCom::SeparateNode()
         {
             //上半身
             if (layer == 1) {
-                upperNodes.emplace_back(&node);
+                RegisterChildLayer(upperNodes, node);
+                //upperNodes.emplace_back(&node);
             }
             //下半身
             else if (layer == 2) {
-                lowerNodes.emplace_back(&node);
+                RegisterChildLayer(lowerNodes, node);
+                //lowerNodes.emplace_back(&node);
             }
         }
     }

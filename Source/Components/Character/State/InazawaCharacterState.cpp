@@ -42,7 +42,8 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
         coll->SetJudgeTag(COLLIDER_TAG::Player);
 
     //弾
-    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(2.0f);
 }
 
@@ -58,19 +59,7 @@ void RayFire(std::shared_ptr<GameObject> objPoint)
     start = rayPoint->transform_->GetWorldPosition();
     end = start + (objPoint->transform_->GetWorldFront() * 100);
 
-    //レイVsスフィア
-    DirectX::XMVECTOR Start = DirectX::XMLoadFloat3(&start);
-    DirectX::XMVECTOR Dir = DirectX::XMLoadFloat3(&Mathf::Normalize(end - start));
-    auto& sphere = GameObjectManager::Instance().Find("robo");
-    DirectX::XMVECTOR Sph = DirectX::XMLoadFloat3(&sphere->transform_->GetWorldPosition());
-    HitResult h;
-    if (Collision::IntersectRayVsSphere(Start, Dir, 100, Sph, 1.0f, h))
-    {
-        int i = 0;
-    }
-
     //レイ
-
     rayPoint->GetComponent<RayColliderCom>()->SetStart(start);
     rayPoint->GetComponent<RayColliderCom>()->SetEnd(end);
 }

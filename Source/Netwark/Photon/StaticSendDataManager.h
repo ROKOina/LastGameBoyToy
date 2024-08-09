@@ -25,8 +25,9 @@ public:
         int damage;
     };
 
-    //送信情報を追加
-    void SetNetSendData(NetSendData data) { sendData->Enqueue(data); }
+    //ダメージを送信
+    void SetSendDamage(int myID, int sendID, int damage);
+
     //送信情報を全て取得して消す
     std::vector<NetSendData> GetNetSendDatas() 
     {

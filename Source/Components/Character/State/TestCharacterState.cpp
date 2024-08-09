@@ -142,7 +142,7 @@ void TestCharacter_AttackState::Fire()
         obj.gameObject.lock()->GetComponent<CharacterCom>()->AddHitPoint(-attackPower);
 
         //‘—M—p
-        owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID(), -attackPower);
+        owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetNetID(), -attackPower);
     }
 }
 

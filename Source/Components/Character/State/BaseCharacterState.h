@@ -81,6 +81,24 @@ private:
     float HoveringTime = 0.05f;
 };
 
+class BaseCharacter_HitscanState : public BaseCharacter_BaseState
+{
+    //　※　ヒットスキャンOBJを起動するだけのステート　※
+    //  ownerのObjの子に"rayObj"という名前のObjを作り
+    //  <RayColliderCom>を追加する
+
+public:
+    BaseCharacter_HitscanState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    void ImGui() override;
+
+private:
+    float rayLength = 100;
+};
+
 class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
 {
 public:

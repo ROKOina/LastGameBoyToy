@@ -87,6 +87,8 @@ public:
     Enum GetNextState() { return nextIndex; }
     Enum GetOldState() { return oldIndex; }
 
+    StatePtr& GetState(Enum e) { return stateList[e]; }
+
 private:
     StatePtr currentState = nullptr;
     Enum nextIndex;

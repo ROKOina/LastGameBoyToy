@@ -151,7 +151,9 @@
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
     <ClInclude Include="Source\Components\Character\Generate\TestCharacterGenerate.h" />
+    <ClInclude Include="Source\Components\Character\HaveAllAttackCharacter.h" />
     <ClInclude Include="Source\Components\Character\NomuraCharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\RegisterChara.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
     <ClInclude Include="Source\Components\Character\State\InazawaCharacterState.h" />
@@ -223,6 +225,7 @@
     <ClInclude Include="Source\Netwark\NetwarkPost.h" />
     <ClInclude Include="Source\Netwark\Photon\BasicsApplication.h" />
     <ClInclude Include="Source\Netwark\Photon\Photon_lib.h" />
+    <ClInclude Include="Source\Netwark\Photon\StaticSendDataManager.h" />
     <ClInclude Include="Source\Netwark\Photon\StdIO_UIListener.h" />
     <ClInclude Include="Source\Netwark\Photon\UIListener.h" />
     <ClInclude Include="Source\Netwark\RingBuffer.h" />
@@ -257,7 +260,9 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\HaveAllAttackCharacter.cpp" />
     <ClCompile Include="Source\Components\Character\NomuraCharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\RegisterChara.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\State\InazawaCharacterState.cpp" />
@@ -322,6 +327,7 @@
     <ClCompile Include="Source\Netwark\NetwarkPost.cpp" />
     <ClCompile Include="Source\Netwark\Photon\BasicsApplication.cpp" />
     <ClCompile Include="Source\Netwark\Photon\Photon_lib.cpp" />
+    <ClCompile Include="Source\Netwark\Photon\StaticSendDataManager.cpp" />
     <ClCompile Include="Source\Netwark\Photon\StdIO_UIListener.cpp" />
     <ClCompile Include="Source\Netwark\Server.cpp" />
     <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
