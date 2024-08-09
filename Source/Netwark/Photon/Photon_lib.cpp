@@ -712,27 +712,36 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 			{
 				if (id != GetPlayerNum())continue;
 
-				auto& obj = GameObjectManager::Instance().Find("player");
-				obj->GetComponent<CharacterCom>()->AddDamagePoint(-ne[0].damageData[id]);
-				break;
+				if (ne[0].damageData[id] > 0)
+				{
+					auto& obj = GameObjectManager::Instance().Find("player");
+					obj->GetComponent<CharacterCom>()->AddDamagePoint(-ne[0].damageData[id]);
+					break;
+				}
 			}
 			//ƒq[ƒ‹î•ñ
 			for (int id = 0; id < ne[0].healData.size(); ++id)
 			{
 				if (id != GetPlayerNum())continue;
 
-				auto& obj = GameObjectManager::Instance().Find("player");
-				obj->GetComponent<CharacterCom>()->AddHealPoint(ne[0].healData[id]);
-				break;
+				if (ne[0].healData[id] > 0)
+				{
+					auto& obj = GameObjectManager::Instance().Find("player");
+					obj->GetComponent<CharacterCom>()->AddHealPoint(ne[0].healData[id]);
+					break;
+				}
 			}
 			//ƒXƒ^ƒ“î•ñ
 			for (int id = 0; id < ne[0].stanData.size(); ++id)
 			{
 				if (id != GetPlayerNum())continue;
 
-				auto& obj = GameObjectManager::Instance().Find("player");
-				obj->GetComponent<CharacterCom>()->SetStanSeconds(ne[0].stanData[id]);
-				break;
+				if (ne[0].stanData[id] >= 0.1f)
+				{
+					auto& obj = GameObjectManager::Instance().Find("player");
+					obj->GetComponent<CharacterCom>()->SetStanSeconds(ne[0].stanData[id]);
+					break;
+				}
 			}
 
 			//“ü—Í‚ğ•Û‘¶
