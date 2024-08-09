@@ -37,12 +37,12 @@ void AimIKCom::AimIK()
         return;
     }
     DirectX::XMFLOAT3 target;
-    auto& chara = GetGameObject()->AddComponent<CharacterCom>();
+    auto& chara = GetGameObject()->GetComponent<CharacterCom>();
     int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
     if (playerNetID == chara->GetNetID())
         target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
     else
-        target = GetGameObject()->AddComponent<CharacterCom>()->GetFpsCameraDir();
+        target = GetGameObject()->GetComponent<CharacterCom>()->GetFpsCameraDir();
 
     DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
 
