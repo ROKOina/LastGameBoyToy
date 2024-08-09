@@ -2,6 +2,7 @@
 #include "RendererCom.h"
 #include "CameraCom.h"
 #include "TransformCom.h"
+#include "Character/CharacterCom.h"
 
 //コンストラクタ
 AimIKCom::AimIKCom(const char* ainbonename)
@@ -35,7 +36,14 @@ void AimIKCom::AimIK()
     {
         return;
     }
-    DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
+    DirectX::XMFLOAT3 target;
+    auto& chara = GetGameObject()->AddComponent<CharacterCom>();
+    int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
+    if (playerNetID == chara->GetNetID())
+        target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
+    else
+        target = GetGameObject()->AddComponent<CharacterCom>()->GetFpsCameraDir();
+
     DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
 
     // プレイヤーのワールドトランスフォームの逆行列を取得
