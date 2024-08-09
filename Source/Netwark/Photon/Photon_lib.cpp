@@ -72,6 +72,7 @@ void PhotonLib::update(float elapsedTime)
 
 		break;
 	}
+	GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetNetID(myID);
 
 	switch(mState)
 	{
@@ -690,6 +691,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				net1->SetName(name.c_str());
 
 				RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(ne[0].charaID), net1);
+				net1->GetComponent<CharacterCom>()->SetNetID(playerNr);
 			}
 
 			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });

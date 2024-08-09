@@ -8,7 +8,7 @@ void StaticSendDataManager::SetSendDamage(int myID, int sendID, int damage)
     auto& player = GameObjectManager::Instance().Find("player");
     auto& chara = player->GetComponent<CharacterCom>();
 
-    if (chara->GetNetID() == myID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
+    if (chara->GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
 
     NetSendData data;
     data.id = sendID;
