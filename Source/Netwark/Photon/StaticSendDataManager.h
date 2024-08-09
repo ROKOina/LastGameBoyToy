@@ -25,14 +25,18 @@ public:
 
         int sendType;   //0:damage 1:heal 2:stan
 
-        int value;
+        int valueI;
+        float valueF;
     };
 
     //ダメージを送信
     void SetSendDamage(int myID, int sendID, int damage);
 
     //ヒールを送信
-    void SetSendHead(int myID, int sendID, int damage);
+    void SetSendHeal(int myID, int sendID, int heal);
+
+    //スタンを送信
+    void SetSendStan(int myID, int sendID, float stanSec);
 
     //送信情報を全て取得して消す
     std::vector<NetSendData> GetNetSendDatas() 

@@ -24,8 +24,13 @@ public:
     {
         DAMAGE,
         HEAL,
+        STAN,
     };
     void SetHitType(HitProcessCom::HIT_TYPE type) { hitType = type; }
+
+    void SetHitInterval(float sec) { hitIntervalTime = sec; }
+
+    void SetValue(float value) { this->value = value; }
 
 private:
     void HitProcess(int myID, int hitID);

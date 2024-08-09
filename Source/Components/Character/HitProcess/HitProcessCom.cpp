@@ -46,7 +46,10 @@ void HitProcessCom::HitProcess(int myID, int hitID)
         StaticSendDataManager::Instance().SetSendDamage(myID, hitID, value);
         break;
     case HitProcessCom::HIT_TYPE::HEAL:
-        StaticSendDataManager::Instance().SetSendHead(myID, hitID, value);
+        StaticSendDataManager::Instance().SetSendHeal(myID, hitID, value);
+        break;
+    case HitProcessCom::HIT_TYPE::STAN:
+        StaticSendDataManager::Instance().SetSendStan(myID, hitID, value);
         break;
     default:
         break;

@@ -124,6 +124,7 @@ struct NetData
     std::vector<SaveBuffer> saveInputBuf;
     std::array<int, 6> damageData;//キャラに与えたダメージ
     std::array<int, 6> healData;//キャラに与えたヒール
+    std::array<float, 6> stanData;//キャラに与えたスタン
     std::array<int, 6> teamID;//チームのID
     int charaID;    //キャラのID
 
@@ -140,6 +141,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     out << h.rotato << " ";
     out << h.damageData << " ";
     out << h.healData << " ";
+    out << h.stanData << " ";
     out << h.teamID << " ";
     out << h.charaID << " ";
     VectorSaveBufferOut(out, h.saveInputBuf);
@@ -160,6 +162,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.rotato;
     in >> h.damageData;
     in >> h.healData;
+    in >> h.stanData;
     in >> h.teamID;
     in >> h.charaID;
     VectorSaveBufferIn(in, h.saveInputBuf);

@@ -8,6 +8,8 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
+    StanUpdate(elapsedTime);
+
     ////カメラが向いている方向へ旋回
     //GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
     //std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
@@ -111,6 +113,10 @@ void CharacterCom::OnGUI()
     float hp = hitPoint;
     ImGui::DragFloat("HP", &hp);
 
+    bool stan = isStan;
+    ImGui::Checkbox("isStan", &stan);
+    ImGui::DragFloat("stanTimer", &stanTimer);
+
     int s = (int)(moveStateMachine.GetCurrentState());
     ImGui::InputInt("moveS", &s);
     s = (int)(attackStateMachine.GetCurrentState());
@@ -190,4 +196,27 @@ void CharacterCom::CameraControl()
             return;
         }
     }
+}
+
+void CharacterCom::StanUpdate(float elapsedTime)
+{
+    isStan = false;
+
+    //タイマー処理
+    if (stanTimer > 0)
+    {
+        isStan = true;
+        stanTimer -= elapsedTime;
+    }
+
+    if (!isStan)return;
+
+    //スタン中なら
+
+    //入力受け付けない
+    userInput = 0;
+    userInputDown = 0;
+    userInputUp = 0;
+    leftStick = { 0,0 };
+    rightStick = { 0,0 };
 }

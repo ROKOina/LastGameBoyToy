@@ -5,6 +5,7 @@
 #include "GameSource\Scene\SceneManager.h"
 #include "GameSource\Math\Mathf.h"
 #include "Input\Input.h"
+#include "HitProcess/HitProcessCom.h"
 
 class BulletCom : public Component
 {
@@ -32,8 +33,24 @@ public:
 
     void SetOwnerID(int id) { ownerID = id; }
 
+    void SetBulletType(HitProcessCom::HIT_TYPE type) { hitType = type; }
+
 private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
     int ownerID;
+
+    HitProcessCom::HIT_TYPE hitType;
 };
+
+class BulletCreate
+{
+public:
+    //ダメージ弾生成
+    static void DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
+
+    //スタン弾生成
+    static void StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
+};
+
+

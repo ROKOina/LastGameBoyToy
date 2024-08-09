@@ -126,6 +126,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
         //ƒq[ƒ‹ˆ——p
         std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>();
         hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
+        hitHeal->SetValue(2);
     }
 
 }

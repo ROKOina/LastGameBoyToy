@@ -97,6 +97,8 @@ public:
   void AddDamagePoint(float value) { hitPoint += value; }
   void AddHealPoint(float value) { hitPoint += value; }
 
+  void SetStanSeconds(float sec) { stanTimer = sec; }
+
   void SetMoveMaxSpeed(float speed) 
   { 
       GetGameObject()->GetComponent<MovementCom>()->SetMoveMaxSpeed(speed);
@@ -147,6 +149,9 @@ private:
     //カメラ操作
     void CameraControl();
 
+    //スタン更新
+    void StanUpdate(float elapsedTime);
+
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
@@ -155,6 +160,9 @@ protected:
   bool useMoveFlag = true;//falseにするとmoveStateを使わない
   float jumpPower = 10.0f;
   float hitPoint = 100.0f;
+
+  bool isStan = false;
+  float stanTimer = 0;
 
   int teamID = 0;   //自分のチーム
   int netID = 0;//どのクライアントがこのキャラを担当するか

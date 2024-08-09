@@ -123,6 +123,24 @@ private:
     float capsuleLength = 5;
 };
 
+class BaseCharacter_StanBallState : public BaseCharacter_BaseState
+{
+public:
+    BaseCharacter_StanBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
+    {
+        name = "StanBall";
+    }
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    void ImGui() override;
+
+private:
+    float speed=40;
+    float power=1;
+};
+
 class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
 {
 public:

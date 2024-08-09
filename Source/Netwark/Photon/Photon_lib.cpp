@@ -568,12 +568,17 @@ void PhotonLib::sendData(void)
 	for (auto& data : sendDatas)
 	{
 		if (data.sendType == 0)	//ダメージ
-			netD.damageData[data.id] += data.value;
+			netD.damageData[data.id] += data.valueI;
 		else if (data.sendType == 1)	//ヒール
-			netD.healData[data.id] += data.value;
-		else if (data.sendType == 1)	//スタン
-			int a = 0;
+			netD.healData[data.id] += data.valueI;
+		else if (data.sendType == 2)	//スタン
+		{
+			//一番長いスタン時間を与える
+			if (netD.stanData[data.id] < data.valueF)
+				netD.stanData[data.id] = data.valueF;
+		}
 	}
+
 
 	//マスタークライアントの場合はチームIDを送る
 	if (GetIsMasterPlayer())
@@ -718,6 +723,15 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 
 				auto& obj = GameObjectManager::Instance().Find("player");
 				obj->GetComponent<CharacterCom>()->AddHealPoint(ne[0].healData[id]);
+				break;
+			}
+			//スタン情報
+			for (int id = 0; id < ne[0].stanData.size(); ++id)
+			{
+				if (id != GetPlayerNum())continue;
+
+				auto& obj = GameObjectManager::Instance().Find("player");
+				obj->GetComponent<CharacterCom>()->SetStanSeconds(ne[0].stanData[id]);
 				break;
 			}
 

@@ -3,6 +3,8 @@
 #include "BaseCharacterState.h"
 #include "Components/ColliderCom.h"
 
+#include "Components\Character\BulletCom.h"
+
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -184,7 +186,7 @@ void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
         }
     }
 
-    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
+    if (!(CharacterInput::MainAttackButton & owner->GetButton()))
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
@@ -241,7 +243,7 @@ void BaseCharacter_CapsuleState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButtonDown())
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
 
-    if (CharacterInput::SubAttackButton & owner->GetButtonUp())
+    if (!(CharacterInput::SubAttackButton & owner->GetButton()))
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
@@ -260,6 +262,30 @@ void BaseCharacter_CapsuleState::Exit()
 void BaseCharacter_CapsuleState::ImGui()
 {
     ImGui::DragFloat("capsuleLength", &capsuleLength);
+}
+
+#pragma endregion
+
+#pragma region StanBall
+
+void BaseCharacter_StanBallState::Enter()
+{
+    BulletCreate::StanFire(owner->GetGameObject(), speed, power);
+}
+
+void BaseCharacter_StanBallState::Execute(const float& elapsedTime)
+{
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+void BaseCharacter_StanBallState::Exit()
+{
+}
+
+void BaseCharacter_StanBallState::ImGui()
+{
+    ImGui::DragFloat("speed", &speed);
+    ImGui::DragFloat("power", &power);
 }
 
 #pragma endregion
