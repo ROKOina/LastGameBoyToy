@@ -1,10 +1,6 @@
 #include "BaseCharacterState.h"
 #include "Input\Input.h"
 #include "BaseCharacterState.h"
-#include "Components/ColliderCom.h"
-
-#include "Components\Character\BulletCom.h"
-
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -14,8 +10,6 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
     transCom = GetComp(TransformCom);
     animationCom = GetComp(AnimationCom);
 }
-
-#pragma region Idle
 
 void BaseCharacter_IdleState::Enter()
 {
@@ -33,11 +27,9 @@ void BaseCharacter_IdleState::Enter()
 
     //};
 
-
     //animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
-
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -46,8 +38,8 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //移動
-    if(owner->IsPushLeftStick())
-    //if (moveVec != 0)
+    if (owner->IsPushLeftStick())
+        //if (moveVec != 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
@@ -57,10 +49,6 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 }
-
-#pragma endregion
-
-#pragma region Move
 
 void BaseCharacter_MoveState::Enter()
 {
@@ -78,7 +66,6 @@ void BaseCharacter_MoveState::Enter()
         param.blendType = 2,
         param.animeChangeRate = 0.5f,
         param.animeBlendRate = 0.0f
-
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
@@ -92,8 +79,8 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //待機
-    if(!owner->IsPushLeftStick())
-    //if (moveVec == 0)
+    if (!owner->IsPushLeftStick())
+        //if (moveVec == 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
@@ -104,10 +91,6 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     }
 }
 
-#pragma endregion
-
-#pragma region Jump
-
 void BaseCharacter_JumpState::Enter()
 {
     //ジャンプ
@@ -117,9 +100,6 @@ void BaseCharacter_JumpState::Enter()
     JumpInput(owner->GetGameObject());
     moveVec = SceneManager::Instance().InputVec();
     moveCom.lock()->SetOnGround(false);
-
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
@@ -151,149 +131,9 @@ void BaseCharacter_JumpState::Exit()
     HoveringTimer = 0.0f;
 }
 
-#pragma endregion
-
-#pragma region Hitscan
-
-void BaseCharacter_HitscanState::Enter()
-{
-}
-
-void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
-{
-    auto& ray = owner->GetGameObject()->GetChildFind("rayObj");
-    if (ray)
-    {
-        //視点の向きにレイを飛ばす
-        auto& rayCol = ray->GetComponent<RayColliderCom>();
-        if (rayCol)
-        {
-            //有効に
-            rayCol->SetEnabled(true);
-
-            DirectX::XMFLOAT3 pos = ray->transform_->GetWorldPosition();
-             
-            //自分か判断する
-            DirectX::XMFLOAT3 front;
-            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-            if (playerNetID == charaCom.lock()->GetNetID())
-                front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
-            else
-                front = charaCom.lock()->GetFpsCameraDir();
-            
-            rayCol->SetStart(pos);
-            rayCol->SetEnd(pos + front * rayLength);
-        }
-    }
-
-    if (!(CharacterInput::MainAttackButton & owner->GetButton()))
-        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-}
-
-void BaseCharacter_HitscanState::Exit()
-{
-    //無効に
-    auto& ray = owner->GetGameObject()->GetChildFind("rayObj");
-    if (ray)
-    {
-        auto& rayCol = ray->GetComponent<RayColliderCom>();
-        if (rayCol)
-            rayCol->SetEnabled(false);
-    }
-}
-
-void BaseCharacter_HitscanState::ImGui()
-{
-    ImGui::DragFloat("rayLength", &rayLength);
-}
-
-#pragma endregion
-
-#pragma region Capsule
-
-void BaseCharacter_CapsuleState::Enter()
-{
-}
-
-void BaseCharacter_CapsuleState::Execute(const float& elapsedTime)
-{
-    auto& capsule = owner->GetGameObject()->GetChildFind("capsuleObj");
-    if (capsule)
-    {
-        auto& capsuleCol = capsule->GetComponent<CapsuleColliderCom>();
-        if (capsuleCol)
-        {
-            //有効に
-            capsuleCol->SetEnabled(true);
-
-            //自分か判断する
-            DirectX::XMFLOAT3 front;
-            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-            if (playerNetID == charaCom.lock()->GetNetID())
-                front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
-            else
-                front = charaCom.lock()->GetFpsCameraDir();
-
-            capsuleCol->SetPosition1(DirectX::XMFLOAT3(0, 0, 0));
-            capsuleCol->SetPosition2(front * capsuleLength);
-        }
-    }
-
-    //サブよりメインを優先
-    if (CharacterInput::MainAttackButton & owner->GetButtonDown())
-        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
-
-    if (!(CharacterInput::SubAttackButton & owner->GetButton()))
-        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-}
-
-void BaseCharacter_CapsuleState::Exit()
-{
-    //無効に
-    auto& capsule = owner->GetGameObject()->GetChildFind("capsuleObj");
-    if (capsule)
-    {
-        auto& capsuleCol = capsule->GetComponent<CapsuleColliderCom>();
-        if (capsuleCol)
-            capsuleCol->SetEnabled(false);
-    }
-}
-
-void BaseCharacter_CapsuleState::ImGui()
-{
-    ImGui::DragFloat("capsuleLength", &capsuleLength);
-}
-
-#pragma endregion
-
-#pragma region StanBall
-
-void BaseCharacter_StanBallState::Enter()
-{
-    BulletCreate::StanFire(owner->GetGameObject(), speed, power);
-}
-
-void BaseCharacter_StanBallState::Execute(const float& elapsedTime)
-{
-    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-}
-
-void BaseCharacter_StanBallState::Exit()
-{
-}
-
-void BaseCharacter_StanBallState::ImGui()
-{
-    ImGui::DragFloat("speed", &speed);
-    ImGui::DragFloat("power", &power);
-}
-
-#pragma endregion
-
 void BaseCharacter_NoneAttack::Enter()
 {
     ////歩きアニメーション再生開始
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }
-

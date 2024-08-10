@@ -13,7 +13,7 @@ public:
 
     void OnGUI() override;
 
-    void MainAttackDown() override;
+    void MainAttack() override;
 
     void SubSkill() override;
 

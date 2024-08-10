@@ -293,7 +293,7 @@ void SceneDebugGame::SetOnlineInput()
             {
                 if (players[i].use_count() == 0) continue;
 
-                players[i].lock()->GetComponent<CharacterCom>()->AddDamagePoint(client.damageData[i]);
+                players[i].lock()->GetComponent<CharacterCom>()->AddHitPoint(client.damageData[i]);
             }
         }
     }

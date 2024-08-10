@@ -1,59 +1,30 @@
-#include "easing.h"
+#pragma warning (disable : 4244)
 #include <DirectXMath.h>
+#include "Easing.h"
 
-//==============================================================================
-//
-//		Easing.cpp
-//
-//      Robert Penner's Easing Functions
-//      URL http://robertpenner.com/easing/
-//      上記サイトのC++をクリックし、PennerEasingをクリックすると、各種easing関数を
-//      入手することができる
-//
-//==============================================================================
-
-#if 20
-//******************************************************************************
-// TODO:20 イージング関数
 //------------------------------------------------------------------------------
-/*
-課題）
-    今までは、パーティクルに0.94fや0.98fをかけ続ける事でアルファを減らしたり、スケールを
-    小さくしてきた。ここで、イージング関数というものを取り入れて、より思い通りの曲線で数値が
-    変位するようにしたい。
+//
+//  イージング関数
+//
+//------------------------------------------------------------------------------
 
-    インターネットで「イージング関数」もしくは「easing」等で検索して、使い方を調べてみなさい。
+// Linear
+float Linear::ease(float t, float b, float c, float d)
+{
+    return b * (1.0f - (t / d)) + (c * (t / d));
+}
 
-ヒント）
-    イージング関数の見本がダウンロードできるサイトを掲載しておく。
-    なお、こういった解説サイトはいつ消えるかわからないので、必要なページは各自でバックアップを
-    取っておいた方が良い。
-
-    Robert Penner's Easing Functions
-    https://github.com/jesusgollonet/ofpennereasing
-    PennerEasingをクリックして、必要な.cppと.hを入手できる。
-
-
-    下記サイトでは各イージング関数の動きを視覚的に確認できる。
-
-    Easing Functions Cheat Sheet
-    https://easings.net/
-*/
-//******************************************************************************
-#endif
-
-//例）
 // Sine
 float Sine::easeIn(float t, float b, float c, float d) {
-    return static_cast<float>(-c * cosf(t / d * (DirectX::XM_PI / 2)) + c + b);
+    return -c * cosf(t / d * (DirectX::XM_PI / 2)) + c + b;
 }
 
 float Sine::easeOut(float t, float b, float c, float d) {
-    return static_cast<float>(c * sinf(t / d * (DirectX::XM_PI / 2)) + b);
+    return c * sinf(t / d * (DirectX::XM_PI / 2)) + b;
 }
 
 float Sine::easeInOut(float t, float b, float c, float d) {
-    return static_cast<float>(-c / 2 * (cosf(DirectX::XM_PI * t / d) - 1) + b);
+    return -c / 2 * (cosf(DirectX::XM_PI * t / d) - 1) + b;
 }
 
 // Quad
@@ -67,13 +38,6 @@ float Quad::easeOut(float t, float b, float c, float d) {
 float Quad::easeInOut(float t, float b, float c, float d) {
     if ((t /= d / 2) < 1) return ((c / 2) * (t * t)) + b;
     return -c / 2 * (((t - 2) * (--t)) - 1) + b;
-    /*
-    originally return -c/2 * (((t-2)*(--t)) - 1) + b;
-
-    I've had to swap (--t)*(t-2) due to diffence in behaviour in
-    pre-increment operators between java and c++, after hours
-    of joy
-    */
 }
 
 // Cubic
@@ -117,30 +81,30 @@ float Quint::easeInOut(float t, float b, float c, float d) {
 
 // Expo
 float Expo::easeIn(float t, float b, float c, float d) {
-    return static_cast<float>((t == 0) ? b : c * pow(2, 10 * (t / d - 1)) + b);
+    return (t == 0) ? b : c * pow(2, 10 * (t / d - 1)) + b;
 }
 float Expo::easeOut(float t, float b, float c, float d) {
-    return static_cast<float>((t == d) ? b + c : c * (-pow(2, -10 * t / d) + 1) + b);
+    return (t == d) ? b + c : c * (-pow(2, -10 * t / d) + 1) + b;
 }
 
 float Expo::easeInOut(float t, float b, float c, float d) {
     if (t == 0) return b;
     if (t == d) return b + c;
-    if ((t /= d / 2) < 1) return static_cast<float>(c / 2 * pow(2, 10 * (t - 1)) + b);
-    return static_cast<float>(c / 2 * (-pow(2, -10 * --t) + 2) + b);
+    if ((t /= d / 2) < 1) return c / 2 * pow(2, 10 * (t - 1)) + b;
+    return c / 2 * (-pow(2, -10 * --t) + 2) + b;
 }
 
 // Circ
 float Circ::easeIn(float t, float b, float c, float d) {
-    return static_cast<float>(-c * (sqrt(1 - (t /= d) * t) - 1) + b);
+    return -c * (sqrt(1 - (t /= d) * t) - 1) + b;
 }
 float Circ::easeOut(float t, float b, float c, float d) {
-    return static_cast<float>(c * sqrt(1 - (t = t / d - 1) * t) + b);
+    return c * sqrt(1 - (t = t / d - 1) * t) + b;
 }
 
 float Circ::easeInOut(float t, float b, float c, float d) {
-    if ((t /= d / 2) < 1) return static_cast<float>(-c / 2 * (sqrt(1 - t * t) - 1) + b);
-    return static_cast<float>(c / 2 * (sqrt(1 - t * (t -= 2)) + 1) + b);
+    if ((t /= d / 2) < 1) return -c / 2 * (sqrt(1 - t * t) - 1) + b;
+    return c / 2 * (sqrt(1 - t * (t -= 2)) + 1) + b;
 }
 
 // Back
@@ -161,15 +125,14 @@ float Back::easeInOut(float t, float b, float c, float d) {
     return c / 2 * ((postFix)*t * (((s *= (1.525f)) + 1) * t + s) + 2) + b;
 }
 
-
 // Elastic
 float Elastic::easeIn(float t, float b, float c, float d) {
     if (t == 0) return b;  if ((t /= d) == 1) return b + c;
     float p = d * .3f;
     float a = c;
     float s = p / 4;
-    float postFix = static_cast<float>(a * pow(2, 10 * (t -= 1))); // this is a fix, again, with post-increment operators
-    return static_cast<float>(-(postFix * sin((t * d - s) * (2 * PI) / p)) + b);
+    float postFix = a * pow(2, 10 * (t -= 1));
+    return -(postFix * sin((t * d - s) * (2 * DirectX::XM_PI) / p)) + b;
 }
 
 float Elastic::easeOut(float t, float b, float c, float d) {
@@ -177,7 +140,7 @@ float Elastic::easeOut(float t, float b, float c, float d) {
     float p = d * .3f;
     float a = c;
     float s = p / 4;
-    return static_cast<float>((a * pow(2, -10 * t) * sin((t * d - s) * (2 * PI) / p) + c + b));
+    return (a * pow(2, -10 * t) * sin((t * d - s) * (2 * DirectX::XM_PI) / p) + c + b);
 }
 
 float Elastic::easeInOut(float t, float b, float c, float d) {
@@ -187,11 +150,11 @@ float Elastic::easeInOut(float t, float b, float c, float d) {
     float s = p / 4;
 
     if (t < 1) {
-        float postFix = static_cast<float>(a * pow(2, 10 * (t -= 1))); // postIncrement is evil
-        return static_cast<float>(-.5f * (postFix * sin((t * d - s) * (2 * PI) / p)) + b);
+        float postFix = a * pow(2, 10 * (t -= 1));
+        return -.5f * (postFix * sin((t * d - s) * (2 * DirectX::XM_PI) / p)) + b;
     }
-    float postFix = static_cast<float>(a * pow(2, -10 * (t -= 1))); // postIncrement is evil
-    return static_cast<float>(postFix * sin((t * d - s) * (2 * PI) / p) * .5f + c + b);
+    float postFix = a * pow(2, -10 * (t -= 1));
+    return postFix * sin((t * d - s) * (2 * DirectX::XM_PI) / p) * .5f + c + b;
 }
 
 // Bounce
@@ -219,4 +182,230 @@ float Bounce::easeOut(float t, float b, float c, float d) {
 float Bounce::easeInOut(float t, float b, float c, float d) {
     if (t < d / 2) return easeIn(t * 2, 0, c, d) * .5f + b;
     else return easeOut(t * 2 - d, 0, c, d) * .5f + c * .5f + b;
+}
+
+float Easing::Other(EaseInOutType easeInOutType, EaseType easeType, float t, float b, float c, float d)
+{
+    switch (easeInOutType)
+    {
+    case EaseInOutType::In:
+        return In(easeType, t, b, c, d);
+        break;
+    case EaseInOutType::Out:
+        return Out(easeType, t, b, c, d);
+        break;
+    case EaseInOutType::InOut:
+        return InOut(easeType, t, b, c, d);
+        break;
+    }
+    return 0.0f;
+}
+
+float Easing::In(EaseType easeType, float t, float b, float c, float d)
+{
+    switch (easeType)
+    {
+    case EaseType::Linear:
+        return Linear::ease(t, b, c, d);
+        break;
+    case EaseType::Sine:
+        return Sine::easeIn(t, b, c, d);
+        break;
+    case EaseType::Quad:
+        return Quad::easeIn(t, b, c, d);
+        break;
+    case EaseType::Cubic:
+        return Cubic::easeIn(t, b, c, d);
+        break;
+    case EaseType::Quart:
+        return Quart::easeIn(t, b, c, d);
+        break;
+    case EaseType::Quint:
+        return Quint::easeIn(t, b, c, d);
+        break;
+    case EaseType::Expo:
+        return Expo::easeIn(t, b, c, d);
+        break;
+    case EaseType::Circ:
+        return Circ::easeIn(t, b, c, d);
+        break;
+    case EaseType::Back:
+        return Back::easeIn(t, b, c, d);
+        break;
+    case EaseType::Elastic:
+        return Elastic::easeIn(t, b, c, d);
+        break;
+    case EaseType::Bounce:
+        return Bounce::easeIn(t, b, c, d);
+        break;
+    }
+    return 0.0f;
+}
+
+float Easing::Out(EaseType easeType, float t, float b, float c, float d)
+{
+    switch (easeType)
+    {
+    case EaseType::Linear:
+        return Linear::ease(t, b, c, d);
+        break;
+    case EaseType::Sine:
+        return Sine::easeOut(t, b, c, d);
+        break;
+    case EaseType::Quad:
+        return Quad::easeOut(t, b, c, d);
+        break;
+    case EaseType::Cubic:
+        return Cubic::easeOut(t, b, c, d);
+        break;
+    case EaseType::Quart:
+        return Quart::easeOut(t, b, c, d);
+        break;
+    case EaseType::Quint:
+        return Quint::easeOut(t, b, c, d);
+        break;
+    case EaseType::Expo:
+        return Expo::easeOut(t, b, c, d);
+        break;
+    case EaseType::Circ:
+        return Circ::easeOut(t, b, c, d);
+        break;
+    case EaseType::Back:
+        return Back::easeOut(t, b, c, d);
+        break;
+    case EaseType::Elastic:
+        return Elastic::easeOut(t, b, c, d);
+        break;
+    case EaseType::Bounce:
+        return Bounce::easeOut(t, b, c, d);
+        break;
+    }
+    return 0.0f;
+}
+
+float Easing::InOut(EaseType easeType, float t, float b, float c, float d)
+{
+    switch (easeType)
+    {
+    case EaseType::Linear:
+        return Linear::ease(t, b, c, d);
+        break;
+    case EaseType::Sine:
+        return Sine::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Quad:
+        return Quad::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Cubic:
+        return Cubic::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Quart:
+        return Quart::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Quint:
+        return Quint::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Expo:
+        return Expo::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Circ:
+        return Circ::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Back:
+        return Back::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Elastic:
+        return Elastic::easeInOut(t, b, c, d);
+        break;
+    case EaseType::Bounce:
+        return Bounce::easeInOut(t, b, c, d);
+        break;
+    }
+    return 0.0f;
+}
+
+// イージングの方向の文字列表現
+const char* EaseInOutTypeToString(EaseInOutType type)
+{
+    switch (type)
+    {
+    case EaseInOutType::In: return "In";
+    case EaseInOutType::Out: return "Out";
+    case EaseInOutType::InOut: return "InOut";
+    default: return "Unknown";
+    }
+}
+
+// イージングのタイプの文字列表現
+const char* EaseTypeToString(EaseType type)
+{
+    switch (type)
+    {
+    case EaseType::Linear: return "Linear";
+    case EaseType::Sine: return "Sine";
+    case EaseType::Quad: return "Quad";
+    case EaseType::Cubic: return "Cubic";
+    case EaseType::Quart: return "Quart";
+    case EaseType::Quint: return "Quint";
+    case EaseType::Expo: return "Expo";
+    case EaseType::Circ: return "Circ";
+    case EaseType::Back: return "Back";
+    case EaseType::Elastic: return "Elastic";
+    case EaseType::Bounce: return "Bounce";
+    default: return "Unknown";
+    }
+}
+
+//imgui
+float EasingImGui(int& easingtype, int& easingmovetype, float& t)
+{
+    EaseType selectedEaseType = static_cast<EaseType>(easingtype); // 初期選択値
+    EaseInOutType selectedEaseInOutType = static_cast<EaseInOutType>(easingmovetype); // 初期選択値
+
+    // イージングタイプのドロップダウンメニューを作成
+    const char* easeTypeItems[(int)EaseType::Max];
+    for (int i = 0; i < (int)EaseType::Max; ++i)
+    {
+        easeTypeItems[i] = EaseTypeToString(static_cast<EaseType>(i));
+    }
+
+    if (ImGui::Combo("Easing Type", &easingtype, easeTypeItems, (int)EaseType::Max))
+    {
+        selectedEaseType = static_cast<EaseType>(easingtype);
+    }
+
+    // イージング方向のドロップダウンメニューを作成
+    const char* easeInOutTypeItems[(int)EaseInOutType::Max];
+    for (int i = 0; i < (int)EaseInOutType::Max; ++i)
+    {
+        easeInOutTypeItems[i] = EaseInOutTypeToString(static_cast<EaseInOutType>(i));
+    }
+
+    if (ImGui::Combo("Ease In/Out Type", &easingmovetype, easeInOutTypeItems, (int)EaseInOutType::Max))
+    {
+        selectedEaseInOutType = static_cast<EaseInOutType>(easingmovetype);
+    }
+
+    // tのドラッグ設定
+    ImGui::DragFloat("Time (t)", &t, 0.001f, 0.0f, 1.0f, "%.3f");
+
+    // 選択されたイージングタイプと方向に基づいてイージング関数を呼び出す
+    float result = 0.0f;
+
+    switch (selectedEaseInOutType)
+    {
+    case EaseInOutType::In:
+        result = Easing::In(selectedEaseType, t);
+        break;
+    case EaseInOutType::Out:
+        result = Easing::Out(selectedEaseType, t);
+        break;
+    case EaseInOutType::InOut:
+        result = Easing::InOut(selectedEaseType, t);
+        break;
+    }
+
+    ImGui::Text("Result: %f", result);
+
+    return result;
 }

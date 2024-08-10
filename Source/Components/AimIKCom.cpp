@@ -2,13 +2,12 @@
 #include "RendererCom.h"
 #include "CameraCom.h"
 #include "TransformCom.h"
-#include "Character/CharacterCom.h"
 
 //コンストラクタ
-AimIKCom::AimIKCom(const char* ainbonename)
+AimIKCom::AimIKCom(const char* aimbonename)
 {
     //名前をコピー
-    copyname = ainbonename;
+    copyname = aimbonename;
 }
 
 // 開始処理
@@ -36,14 +35,7 @@ void AimIKCom::AimIK()
     {
         return;
     }
-    DirectX::XMFLOAT3 target;
-    auto& chara = GetGameObject()->GetComponent<CharacterCom>();
-    int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-    if (playerNetID == chara->GetNetID())
-        target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
-    else
-        target = GetGameObject()->GetComponent<CharacterCom>()->GetFpsCameraDir();
-
+    DirectX::XMFLOAT3 target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
     DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
 
     // プレイヤーのワールドトランスフォームの逆行列を取得
@@ -103,7 +95,7 @@ void AimIKCom::AimIK()
 }
 
 //ikさせるboneを探す
-void AimIKCom::SearchAimNode(const char* ainbonename)
+void AimIKCom::SearchAimNode(const char* aimbonename)
 {
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
@@ -111,7 +103,7 @@ void AimIKCom::SearchAimNode(const char* ainbonename)
     {
         const Model::Node& node = model->GetNodes().at(nodeIndex);
 
-        if (strstr(node.name, ainbonename) == node.name)
+        if (strstr(node.name, aimbonename) == node.name)
         {
             AimBone.push_back(static_cast<int>(nodeIndex));
         }

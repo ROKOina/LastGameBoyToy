@@ -4,7 +4,6 @@
 #include <string>
 
 #include "../NetwarkPost.h"
-#include "Components/Character/RegisterChara.h"
 
 static std::string WStringToString
 (
@@ -47,13 +46,6 @@ private:
 	bool joinPermission = false;
 	//•”‰®–¼
 	std::string roomName;
-	//charaID
-	std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
-	{
-		"INAZAWA",
-		"HAVE_ALL_ATTACK",
-	};
-	int charaID = 0;
 
 public:
 	//“ü—Íî•ñXV
@@ -192,7 +184,6 @@ private:
 			unsigned int inputDown = 0;
 			unsigned int input = 0;
 			unsigned int inputUp = 0;
-			DirectX::XMFLOAT3 fpsCameraDir;
 		};
 		NextInput nextInput;
 	};

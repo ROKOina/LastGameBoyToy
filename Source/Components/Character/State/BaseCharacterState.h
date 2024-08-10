@@ -24,13 +24,13 @@ static void MoveInputVec(std::shared_ptr<GameObject> obj, float speed = 1)
 }
 
 //ジャンプ
-static void JumpInput(std::shared_ptr<GameObject> obj, float speed = 1)
+static void JumpInput(std::shared_ptr<GameObject> obj, float speed = 0.3f)
 {
     auto& moveCom = obj->GetComponent<MovementCom>();
 
     if (CharacterInput::JumpButton_SPACE & obj->GetComponent<CharacterCom>()->GetButtonDown())
     {
-        DirectX::XMFLOAT3 power = { 0,obj->GetComponent<CharacterCom>()->GetJumpPower() * speed,0 };
+        DirectX::XMFLOAT3 power = { 0.0f,obj->GetComponent<CharacterCom>()->GetJumpPower() * speed,0.0f };
         moveCom->AddForce(power);
     }
 }
@@ -53,6 +53,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    virtual const char* GetName() const override { return "Idle"; }
 };
 
 class BaseCharacter_MoveState : public BaseCharacter_BaseState
@@ -62,6 +63,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    virtual const char* GetName() const override { return "Move"; }
 };
 
 class BaseCharacter_JumpState : public BaseCharacter_BaseState
@@ -72,6 +74,7 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
+    virtual const char* GetName() const override { return "Jump"; }
 
 private:
 
@@ -81,70 +84,11 @@ private:
     float HoveringTime = 0.05f;
 };
 
-class BaseCharacter_HitscanState : public BaseCharacter_BaseState
-{
-    //　※　ヒットスキャンOBJを起動するだけのステート　※
-    //  ownerのObjの子に"rayObj"という名前のObjを作り
-    //  <RayColliderCom>を追加する
-
-public:
-    BaseCharacter_HitscanState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
-    {
-        name = "Hitscan";
-    }
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    void Exit() override;
-    void ImGui() override;
-
-private:
-    float rayLength = 100;
-};
-
-class BaseCharacter_CapsuleState : public BaseCharacter_BaseState
-{
-    //　※　カプセルOBJを起動するだけのステート　※
-    //  ownerのObjの子に"capsuleObj"という名前のObjを作る
-    //  NodeCollsionCom以外の形状と判定する
-
-public:
-    BaseCharacter_CapsuleState(CharacterCom* owner) : BaseCharacter_BaseState(owner) 
-    {
-        name = "Capsule";
-    }
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    void Exit() override;
-    void ImGui() override;
-
-private:
-    float capsuleLength = 5;
-};
-
-class BaseCharacter_StanBallState : public BaseCharacter_BaseState
-{
-public:
-    BaseCharacter_StanBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
-    {
-        name = "StanBall";
-    }
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    void Exit() override;
-    void ImGui() override;
-
-private:
-    float speed=40;
-    float power=1;
-};
-
 class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
 {
 public:
     BaseCharacter_NoneAttack(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
+    virtual const char* GetName() const override { return "NoneAttack"; }
 };

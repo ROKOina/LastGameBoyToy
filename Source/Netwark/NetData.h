@@ -85,7 +85,6 @@ struct SaveBuffer
     unsigned int inputDown = 0;
     unsigned int input = 0;
     unsigned int inputUp = 0;
-    DirectX::XMFLOAT3 fpsDir;
 };
 //SaveBuffer
 static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>& vec)
@@ -95,7 +94,6 @@ static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>&
     for (auto& v : vec)
     {
         out << v.frame << " " << v.input << " " << v.inputDown << " " << v.inputUp << " ";
-        out << v.fpsDir << " ";
     }
 }
 static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& vec)
@@ -106,7 +104,6 @@ static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& v
     {
         SaveBuffer s;
         in >> s.frame >> s.input >> s.inputDown >> s.inputUp;
-        in >> s.fpsDir;
         vec.emplace_back(s);
     }
 }
@@ -122,12 +119,8 @@ struct NetData
     DirectX::XMFLOAT4 rotato;
 
     std::vector<SaveBuffer> saveInputBuf;
-    std::array<int, 6> damageData;//キャラに与えたダメージ
-    std::array<int, 6> healData;//キャラに与えたヒール
-    std::array<float, 6> stanData;//キャラに与えたスタン
-    std::array<int, 6> teamID;//チームのID
-    int charaID;    //キャラのID
-
+    std::array<float, 6> damageData;//キャラに与えたダメージ
+    std::array<float, 6> teamID;//チームのID
     //int pSize;
     //std::vector<int> p;
 };
@@ -140,10 +133,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     out << h.nonVelocity << " ";
     out << h.rotato << " ";
     out << h.damageData << " ";
-    out << h.healData << " ";
-    out << h.stanData << " ";
     out << h.teamID << " ";
-    out << h.charaID << " ";
     VectorSaveBufferOut(out, h.saveInputBuf);
 
     //for (auto& i : h.p)
@@ -161,10 +151,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.nonVelocity;
     in >> h.rotato;
     in >> h.damageData;
-    in >> h.healData;
-    in >> h.stanData;
     in >> h.teamID;
-    in >> h.charaID;
     VectorSaveBufferIn(in, h.saveInputBuf);
 
     return in;

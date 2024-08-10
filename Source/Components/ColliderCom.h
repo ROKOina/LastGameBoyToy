@@ -60,11 +60,7 @@ static bool operator== (int L, COLLIDER_TYPE R)
 //当たった時用の構造体
 struct HitObj {
     std::weak_ptr<GameObject> gameObject;
-    struct RayHitResult//レイ専用
-    {
-        DirectX::XMFLOAT3 hitPos;
-        float dist;
-    }rayResult;
+    DirectX::XMFLOAT3 hitPos;//レイ専用
 };
 
 //継承して一つの配列に落とし込む
@@ -273,8 +269,6 @@ private:
 class RayColliderCom : public Collider
 {
     //コンポーネントオーバーライド
-
-    //  RayとNodeCollsionComのみの当たり（互いにそれしか対応してない）
 public:
     RayColliderCom() { colliderType_ = static_cast<int>(COLLIDER_TYPE::RayCollider); }
     ~RayColliderCom() {}
