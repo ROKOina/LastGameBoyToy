@@ -636,7 +636,8 @@ bool Sprite::cursorVsCollsionBox()
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
     DirectX::XMFLOAT2 pos = { spc.position.x + spc.collsionpositionoffset.x ,spc.position.y + spc.collsionpositionoffset.y };
-    DirectX::XMFLOAT2 curVecPos = pos - cur;
+    DirectX::XMFLOAT2 curVecPos = cur - pos;
+    curVecPos.y *= -1;
 
     //長さを測る
     float upLen = Mathf::Dot(normalUp, curVecPos);
