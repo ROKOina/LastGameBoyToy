@@ -126,11 +126,10 @@ struct NetData
 {
     bool isMasterClient;
     int id;
-    float radi;
     DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT3 velocity;
-    DirectX::XMFLOAT3 nonVelocity;
-    DirectX::XMFLOAT4 rotato;
+    //DirectX::XMFLOAT3 velocity;
+    //DirectX::XMFLOAT3 nonVelocity;
+    //DirectX::XMFLOAT4 rotato;
 
     std::vector<SaveBuffer> saveInputBuf;
     std::array<int, 6> damageData;//キャラに与えたダメージ
@@ -145,11 +144,11 @@ struct NetData
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
     out << h.isMasterClient << " ";
-    out << h.id << " " << h.radi << " ";
+    out << h.id << " " ;
     out << h.pos << " ";
-    out << h.velocity << " ";
-    out << h.nonVelocity << " ";
-    out << h.rotato << " ";
+    //out << h.velocity << " ";
+    //out << h.nonVelocity << " ";
+    //out << h.rotato << " ";
     out << h.damageData << " ";
     out << h.healData << " ";
     out << h.stanData << " ";
@@ -166,11 +165,11 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
     in >> h.isMasterClient;
-    in >> h.id >> h.radi;
+    in >> h.id;
     in >> h.pos;
-    in >> h.velocity;
-    in >> h.nonVelocity;
-    in >> h.rotato;
+    //in >> h.velocity;
+    //in >> h.nonVelocity;
+    //in >> h.rotato;
     in >> h.damageData;
     in >> h.healData;
     in >> h.stanData;

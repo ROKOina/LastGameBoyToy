@@ -323,11 +323,11 @@ void SceneGame::SetOnlineInput()
             //chara->SetUserInputDown(client.inputDown);
             //chara->SetUserInputUp(client.inputUp);
 
-            DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
+            //DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
 
-            DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
+            //DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
 
-            chara->SetLeftStick(leftS);
+            //chara->SetLeftStick(leftS);
             //chara->SetRightStick(gamePad.GetAxisR());
         }
     }

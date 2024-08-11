@@ -570,13 +570,13 @@ void PhotonLib::sendData(void)
 	//マスタークライアントか
 	netD.isMasterClient = GetIsMasterPlayer();
 
-	auto tra = obj->transform_->GetWorldPosition();
-	netD.pos = { tra.x,tra.y,tra.z };
-	auto rota = obj->transform_->GetRotation();
-	netD.rotato = rota;
+	//auto tra = obj->transform_->GetWorldPosition();
+	//netD.pos = { tra.x,tra.y,tra.z };
+	//auto rota = obj->transform_->GetRotation();
+	//netD.rotato = rota;
 
-	auto& move = obj->GetComponent<MovementCom>();
-	netD.velocity = move->GetVelocity();
+	//auto& move = obj->GetComponent<MovementCom>();
+	//netD.velocity = move->GetVelocity();
 
 	//ダメージ情報送信
 	auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
