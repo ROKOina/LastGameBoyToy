@@ -82,7 +82,7 @@ void AimIKCom::AimIK()
         float angle = DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenVectors(upVec, toTargetVec));
 
         // 回転角を制限
-        angle = (std::min)(angle, DirectX::XMConvertToRadians(60.0f));
+        angle = (std::min)(angle, DirectX::XMConvertToRadians(15.0f));
 
         // カメラの向きによって回転方向を修正
         DirectX::XMVECTOR cameraForward = DirectX::XMLoadFloat3(&target); // ここでカメラの前方ベクトルを使用
