@@ -7,14 +7,16 @@
 
 void HitProcessCom::Update(float elapsedTime)
 {
+    isHit = false;
+
     //ƒqƒbƒgŠÔŠu
     hitIntervalTimer += elapsedTime;
     if (hitIntervalTimer < hitIntervalTime)return;
 
     //ƒqƒbƒg‚ð‘—M
     std::shared_ptr<Collider> col = GetGameObject()->GetComponent<Collider>();
-    std::shared_ptr<CharacterCom> parentChara = GetGameObject()->GetParent()->GetComponent<CharacterCom>();
     if (!col)return;
+    std::shared_ptr<CharacterCom> parentChara = myObj.lock()->GetComponent<CharacterCom>();
     if (!parentChara)return;
 
     for (auto& hit : col->OnHitGameObject())
@@ -26,6 +28,8 @@ void HitProcessCom::Update(float elapsedTime)
         HitProcess(parentChara->GetNetID(), hitChara->GetNetID());
 
         hitIntervalTimer = 0;
+
+        isHit = true;
     }
 }
 

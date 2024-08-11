@@ -5,33 +5,40 @@
 #include "Components\Character\CharacterCom.h"
 #include "Components\System\GameObject.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
+#include "HitProcess/HitProcessCom.h"
 
 void BulletCom::Update(float elapsedTime)
 {
-    std::shared_ptr<SphereColliderCom> collider = GetGameObject()->GetComponent<SphereColliderCom>();
-    if (collider->OnHitGameObject().size())
+    //std::shared_ptr<SphereColliderCom> collider = GetGameObject()->GetComponent<SphereColliderCom>();
+    //if (collider->OnHitGameObject().size())
+    //{
+    //    //ネットで送信
+    //    for (auto& c : collider->OnHitGameObject())
+    //    {
+    //        int sendID = c.gameObject.lock()->GetComponent<CharacterCom>()->GetNetID();
+    //        switch (hitType)
+    //        {
+    //        case HitProcessCom::HIT_TYPE::DAMAGE:
+    //            StaticSendDataManager::Instance().SetSendDamage(ownerID, sendID, 1);
+    //            break;
+    //        case HitProcessCom::HIT_TYPE::HEAL:
+    //            StaticSendDataManager::Instance().SetSendHeal(ownerID, sendID, 1);
+    //            break;
+    //        case HitProcessCom::HIT_TYPE::STAN:
+    //            StaticSendDataManager::Instance().SetSendStan(ownerID, sendID, 2);
+    //            break;
+    //        default:
+    //            break;
+    //        }
+    //    }
+    //    GameObjectManager::Instance().Remove(this->GetGameObject());
+    //}
+
+    if (GetGameObject()->GetComponent<HitProcessCom>()->IsHit())
     {
-        //ネットで送信
-        for (auto& c : collider->OnHitGameObject())
-        {
-            int sendID = c.gameObject.lock()->GetComponent<CharacterCom>()->GetNetID();
-            switch (hitType)
-            {
-            case HitProcessCom::HIT_TYPE::DAMAGE:
-                StaticSendDataManager::Instance().SetSendDamage(ownerID, sendID, 1);
-                break;
-            case HitProcessCom::HIT_TYPE::HEAL:
-                StaticSendDataManager::Instance().SetSendHeal(ownerID, sendID, 1);
-                break;
-            case HitProcessCom::HIT_TYPE::STAN:
-                StaticSendDataManager::Instance().SetSendStan(ownerID, sendID, 2);
-                break;
-            default:
-                break;
-            }
-        }
         GameObjectManager::Instance().Remove(this->GetGameObject());
     }
+
     //弾消去
     EraseBullet(elapsedTime);
 }
@@ -43,13 +50,19 @@ void BulletCom::EraseBullet(float elapsedTime)
     {
         GameObjectManager::Instance().Remove(this->GetGameObject());
     }
+
+    //地面に着いたら消す
+    if (GetGameObject()->GetComponent<MovementCom>()->OnGround())
+    {
+        GameObjectManager::Instance().Remove(this->GetGameObject());
+    }
 }
 
 
 
 
 //ダメージ弾生成
-void DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
+void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
 {
     //弾丸オブジェクトを生成///////
     GameObj obj = GameObjectManager::Instance().Create();
@@ -84,6 +97,11 @@ void DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float p
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetBulletType(HitProcessCom::HIT_TYPE::DAMAGE);
     bulletCom->SetAliveTime(2.0f);
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(objPoint);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(5);
 }
 
 
@@ -123,5 +141,10 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetBulletType(HitProcessCom::HIT_TYPE::STAN);
     bulletCom->SetAliveTime(2.0f);
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit= obj->AddComponent<HitProcessCom>(objPoint);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::STAN);
+    hit->SetValue(5);
 }
 

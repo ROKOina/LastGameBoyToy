@@ -5,7 +5,9 @@
 class HitProcessCom : public Component
 {
 public:
-    HitProcessCom() :hitIntervalTimer(0){}
+    HitProcessCom(std::shared_ptr<GameObject> obj)
+        : hitIntervalTimer(0), myObj(obj)
+    {}
     ~HitProcessCom() override {}
 
     // –¼‘Oæ“¾
@@ -32,10 +34,15 @@ public:
 
     void SetValue(float value) { this->value = value; }
 
+    bool IsHit() { return isHit; }
+
 private:
     void HitProcess(int myID, int hitID);
 
 private:
+    //’e‚Ì‚¿å
+    std::weak_ptr<GameObject> myObj;
+
     //í—Ş
     HIT_TYPE hitType = HIT_TYPE::DAMAGE;
 
@@ -46,4 +53,6 @@ private:
     //—^‚¦‚é”
     int value = 1;
 
+    //“–‚½‚Á‚Ä‚¢‚é‚©
+    bool isHit = false;
 };

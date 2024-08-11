@@ -77,7 +77,8 @@ void SceneGame::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         a->PlayAnimation(0, true, false, 0.001f);
 
-        std::shared_ptr<RayColliderCom> sphere = obj->AddComponent<RayColliderCom>();
+        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
+        sphere->SetRadius(1.0f);
         sphere->SetMyTag(COLLIDER_TAG::Enemy);
 
         obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");

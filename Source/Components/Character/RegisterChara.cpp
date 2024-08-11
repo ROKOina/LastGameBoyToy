@@ -99,7 +99,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
         rayCol->SetEnabled(false);
 
         //ダメージ処理用
-        std::shared_ptr<HitProcessCom> hitDamage = rayChild->AddComponent<HitProcessCom>();
+        std::shared_ptr<HitProcessCom> hitDamage = rayChild->AddComponent<HitProcessCom>(obj);
         hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     }
 
@@ -124,7 +124,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
         capsuleCol->SetEnabled(false);
 
         //ヒール処理用
-        std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>();
+        std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>(obj);
         hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
         hitHeal->SetValue(2);
     }
