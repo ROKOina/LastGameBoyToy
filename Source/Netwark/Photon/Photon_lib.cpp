@@ -382,18 +382,19 @@ void PhotonLib::NetInputUpdate()
 				s.nextInput.input = 0;
 				s.nextInput.inputUp = 0;
 
+				//ˆÚ“®
+				s.nextInput.leftStick = b.leftStick;
+				s.nextInput.pos = b.pos;
+				s.nextInput.rotato = b.rotato;
+				//ƒJƒƒ‰î•ñ
+				s.nextInput.fpsCameraDir = b.fpsDir;
+
 				isInputInit = true;
 			}
 
 			s.nextInput.inputDown |= b.inputDown;
 			s.nextInput.input |= b.input;
 			s.nextInput.inputUp |= b.inputUp;
-			//ˆÚ“®
-			s.nextInput.leftStick = b.leftStick;
-			s.nextInput.pos = b.pos;
-			s.nextInput.rotato = b.rotato;
-			//ƒJƒƒ‰î•ñ
-			s.nextInput.fpsCameraDir = b.fpsDir;
 		}
 
 		s.nextInput.oldFrame = nowTime - s.myDelay;
