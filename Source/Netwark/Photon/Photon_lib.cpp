@@ -47,6 +47,7 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 
 void PhotonLib::update(float elapsedTime)
 {
+	auto& myPlayer = GameObjectManager::Instance().Find("player");
 	int myID = GetPlayerNum();
 	for (auto& s : saveInputPhoton)
 	{
@@ -60,19 +61,24 @@ void PhotonLib::update(float elapsedTime)
 		save.input = gamePad.GetButton();
 		save.inputDown = gamePad.GetButtonDown();
 		save.inputUp = gamePad.GetButtonUp();
+
+		//移動
+		save.leftStick = gamePad.GetAxisL();
+		save.pos = myPlayer->transform_->GetWorldPosition();
+		save.rotato = myPlayer->transform_->GetRotation();
+
 		//FPSカメラの向き保存
-		auto& obj = GameObjectManager::Instance().Find("player");
-		auto& fpsCamera = obj->GetChildFind("cameraPostPlayer");
+		auto& fpsCamera = myPlayer->GetChildFind("cameraPostPlayer");
 		save.fpsDir = fpsCamera->transform_->GetWorldFront();
 
 		s.inputBuf->Enqueue(save);
 
 		//ちーむID保存
-		obj->GetComponent<CharacterCom>()->SetTeamID(s.teamID);
+		myPlayer->GetComponent<CharacterCom>()->SetTeamID(s.teamID);
 
 		break;
 	}
-	GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetNetID(myID);
+	myPlayer->GetComponent<CharacterCom>()->SetNetID(myID);
 
 	switch(mState)
 	{
@@ -382,6 +388,10 @@ void PhotonLib::NetInputUpdate()
 			s.nextInput.inputDown |= b.inputDown;
 			s.nextInput.input |= b.input;
 			s.nextInput.inputUp |= b.inputUp;
+			//移動
+			s.nextInput.leftStick = b.leftStick;
+			s.nextInput.pos = b.pos;
+			s.nextInput.rotato = b.rotato;
 			//カメラ情報
 			s.nextInput.fpsCameraDir = b.fpsDir;
 		}
@@ -399,8 +409,6 @@ void PhotonLib::MyCharaInput()
 	std::shared_ptr<CharacterCom> chara = obj->GetComponent<CharacterCom>();
 	if (chara.use_count() == 0) return;
 
-	GamePad& gamePad = Input::Instance().GetGamePad();
-
 	// 入力情報をプレイヤーキャラクターに送信
 	int myID = GetPlayerNum();
 	for (auto& s : saveInputPhoton)
@@ -410,6 +418,8 @@ void PhotonLib::MyCharaInput()
 		chara->SetUserInput(s.nextInput.input);
 		chara->SetUserInputDown(s.nextInput.inputDown);
 		chara->SetUserInputUp(s.nextInput.inputUp);
+		
+		chara->SetLeftStick(s.nextInput.leftStick);
 
 		s.nextInput.inputDown = 0;
 		s.nextInput.inputUp = 0;
@@ -418,7 +428,9 @@ void PhotonLib::MyCharaInput()
 	}
 
 
-	chara->SetLeftStick(gamePad.GetAxisL());
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	//chara->SetLeftStick(gamePad.GetAxisL());
 	chara->SetRightStick(gamePad.GetAxisR());
 }
 
@@ -436,6 +448,9 @@ void PhotonLib::NetCharaInput()
 		chara->SetUserInput(s.nextInput.input);
 		chara->SetUserInputDown(s.nextInput.inputDown);
 		chara->SetUserInputUp(s.nextInput.inputUp);
+		//移動
+		netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
+		netPlayer->transform_->SetRotation(s.nextInput.rotato);
 		//カメラ情報
 		chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
 
@@ -703,9 +718,9 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				net1->GetComponent<CharacterCom>()->SetNetID(playerNr);
 			}
 
-			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
-			net1->transform_->SetRotation(ne[0].rotato);
-			net1->GetComponent<MovementCom>()->SetVelocity(ne[0].velocity);
+			//net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
+			//net1->transform_->SetRotation(ne[0].rotato);
+			//net1->GetComponent<MovementCom>()->SetVelocity(ne[0].velocity);
 
 			//ダメージ情報
 			for (int id = 0; id < ne[0].damageData.size(); ++id)

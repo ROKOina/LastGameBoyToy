@@ -33,14 +33,10 @@ public:
 
     void SetOwnerID(int id) { ownerID = id; }
 
-    void SetBulletType(HitProcessCom::HIT_TYPE type) { hitType = type; }
-
 private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
     int ownerID;
-
-    HitProcessCom::HIT_TYPE hitType;
 };
 
 class BulletCreate

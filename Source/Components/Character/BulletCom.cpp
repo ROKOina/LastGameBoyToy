@@ -95,7 +95,6 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     //’e
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
-    bulletCom->SetBulletType(HitProcessCom::HIT_TYPE::DAMAGE);
     bulletCom->SetAliveTime(2.0f);
 
     //”»’è—p
@@ -139,7 +138,6 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
     //’e
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
-    bulletCom->SetBulletType(HitProcessCom::HIT_TYPE::STAN);
     bulletCom->SetAliveTime(2.0f);
 
     //”»’è—p

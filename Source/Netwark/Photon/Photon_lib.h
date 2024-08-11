@@ -192,6 +192,11 @@ private:
 			unsigned int inputDown = 0;
 			unsigned int input = 0;
 			unsigned int inputUp = 0;
+
+			DirectX::XMFLOAT2 leftStick;
+			DirectX::XMFLOAT3 pos;
+			DirectX::XMFLOAT4 rotato;
+
 			DirectX::XMFLOAT3 fpsCameraDir;
 		};
 		NextInput nextInput;

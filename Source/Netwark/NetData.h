@@ -85,7 +85,12 @@ struct SaveBuffer
     unsigned int inputDown = 0;
     unsigned int input = 0;
     unsigned int inputUp = 0;
-    DirectX::XMFLOAT3 fpsDir;
+
+    DirectX::XMFLOAT2 leftStick;    //ˆÚ“®
+    DirectX::XMFLOAT3 pos;       //ˆÊ’u
+    DirectX::XMFLOAT4 rotato;       //‰ñ“]
+
+    DirectX::XMFLOAT3 fpsDir;       //FPSŽ‹“_‚Ì•ûŒü
 };
 //SaveBuffer
 static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>& vec)
@@ -95,6 +100,7 @@ static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>&
     for (auto& v : vec)
     {
         out << v.frame << " " << v.input << " " << v.inputDown << " " << v.inputUp << " ";
+        out << v.leftStick << " ";
         out << v.fpsDir << " ";
     }
 }
@@ -106,6 +112,7 @@ static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& v
     {
         SaveBuffer s;
         in >> s.frame >> s.input >> s.inputDown >> s.inputUp;
+        in >> s.leftStick;
         in >> s.fpsDir;
         vec.emplace_back(s);
     }
