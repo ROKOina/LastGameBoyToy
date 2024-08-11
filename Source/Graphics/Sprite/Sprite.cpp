@@ -625,14 +625,37 @@ bool Sprite::cursorVsCollsionBox()
     float mousePosx = mouse.GetPositionX();
     float mousePosy = mouse.GetPositionY();
 
-    const float trLeft = spc.position.x + spc.collsionpositionoffset.x - (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f;
-    const float trRight = spc.position.x + spc.collsionpositionoffset.x + (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f;
-    const float trTop = spc.position.y + spc.collsionpositionoffset.y - (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f;
-    const float trBottom = spc.position.y + spc.collsionpositionoffset.y + (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f;
 
-    if (mousePosx < trLeft)return false;
-    if (mousePosx > trRight)return false;
-    if (mousePosy < trTop)return false;
-    if (mousePosy > trBottom)return false;
+    //法線ベクトル作成
+    float x{ sinf(DirectX::XMConvertToRadians(spc.angle)) };
+    float y{ cosf(DirectX::XMConvertToRadians(spc.angle)) };
+    DirectX::XMFLOAT2 normalUp = Mathf::Normalize({ x,y });
+    DirectX::XMFLOAT3 normalCross = Mathf::Cross({ normalUp.x,normalUp.y,0 }, { 0,0,1 });
+    DirectX::XMFLOAT2 normalRight = Mathf::Normalize({ normalCross.x,normalCross.y });
+
+    //カーソル位置からコリジョンボックスのベクトル
+    DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
+    DirectX::XMFLOAT2 pos = { spc.position.x + spc.collsionpositionoffset.x ,spc.position.y + spc.collsionpositionoffset.y };
+    DirectX::XMFLOAT2 curVecPos = pos - cur;
+
+    //長さを測る
+    float upLen = Mathf::Dot(normalUp, curVecPos);
+    float rightLen = Mathf::Dot(normalRight, curVecPos);
+
+    //判定
+    DirectX::XMFLOAT2 scale = { (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f ,(spc.scale.y + spc.collsionscaleoffset.y) * 0.5f };
+    if (upLen * upLen > scale.y * scale.y)return false;
+    if (rightLen * rightLen > scale.x * scale.x)return false;
+
+
+    //const float trLeft = spc.position.x + spc.collsionpositionoffset.x - (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f;
+    //const float trRight = spc.position.x + spc.collsionpositionoffset.x + (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f;
+    //const float trTop = spc.position.y + spc.collsionpositionoffset.y - (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f;
+    //const float trBottom = spc.position.y + spc.collsionpositionoffset.y + (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f;
+
+    //if (mousePosx < trLeft)return false;
+    //if (mousePosx > trRight)return false;
+    //if (mousePosy < trTop)return false;
+    //if (mousePosy > trBottom)return false;
     return true;
 }
