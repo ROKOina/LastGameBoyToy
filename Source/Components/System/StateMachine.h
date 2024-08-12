@@ -22,18 +22,20 @@ public:
 
     void ImGui()
     {
-        // コンポーネント
-        for (auto& state : stateList)
+        if (currentState != nullptr)
         {
-            if (state.second->GetName().empty())continue;
+            ImGui::Text("Current State: %s", currentState->GetName());
+        }
+        else
+        {
+            ImGui::Text("Current State: None");
+        }
 
-            ImGui::Spacing();
-            ImGui::Separator();
-
-            ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-            if (ImGui::TreeNodeEx(state.second->GetName().c_str(), nodeFlags))
+        for (const auto& [key, state] : stateList)
+        {
+            if (ImGui::TreeNode(state->GetName()))
             {
-                state.second->ImGui();
+                state->ImGui();
                 ImGui::TreePop();
             }
         }
@@ -87,8 +89,6 @@ public:
     Enum GetNextState() { return nextIndex; }
     Enum GetOldState() { return oldIndex; }
 
-    StatePtr& GetState(Enum e) { return stateList[e]; }
-
 private:
     StatePtr currentState = nullptr;
     Enum nextIndex;
@@ -97,5 +97,3 @@ private:
 
     std::map<Enum, StatePtr> stateList;
 };
-
-

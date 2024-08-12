@@ -17,11 +17,12 @@ public:
     // このステートから他のステートに遷移するときに一度だけ呼ばれる
     virtual void Exit() {};
 
+    //imgui
     virtual void ImGui() {}
 
-    std::string GetName() { return name; }
+    // 名前取得
+    virtual const char* GetName() const = 0;
 
 protected:
-    std::string name = "";
     T* owner = nullptr;
 };

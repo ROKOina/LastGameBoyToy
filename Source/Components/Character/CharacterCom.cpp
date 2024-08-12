@@ -8,19 +8,6 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
-    StanUpdate(elapsedTime);
-
-    ////カメラが向いている方向へ旋回
-    //GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
-    //std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
-    //DirectX::XMFLOAT3 cameraForward = cameraCom->GetFront();
-    //cameraForward.y = 0;
-
-    //GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
-    //GetGameObject()->transform_->UpdateTransform();
-    //GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
-
-
     //ステックのアングル取得
     stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
 
@@ -30,16 +17,13 @@ void CharacterCom::Update(float elapsedTime)
         stickAngle += 360.0f;
     }
 
-    //死亡処理
-    if (hitPoint <= 0)
-    {
-        GetGameObject()->GetComponent<MovementCom>()->AddForce({ 0, 10.0f, 0 });
-        return;
-    }
-
     //ステート処理
     attackStateMachine.Update(elapsedTime);
-    if (useMoveFlag)moveStateMachine.Update(elapsedTime);
+    if (useMoveFlag)
+    {
+        //ここで移動をしない
+        moveStateMachine.Update(elapsedTime);
+    }
 
 #ifdef _DEBUG
 
@@ -49,28 +33,12 @@ void CharacterCom::Update(float elapsedTime)
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
-        MainAttackDown();
+        MainAttack();
     }
-    else if (CharacterInput::MainAttackButton & GetButton()
-        && GamePad::BTN_LEFT_SHOULDER & GetButton())
-    {
-        MainAttackPushing();
-    }
-
-    ////デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    //if (CharacterInput::SubAttackButton & GetButtonDown()
-    //    && GamePad::BTN_RIGHT_SHOULDER & GetButton())
-    //{
-    //    SubAttack();
-    //}
 
     if (CharacterInput::SubAttackButton & GetButtonDown())
     {
-        SubAttackDown();
-    }
-    else if (CharacterInput::SubAttackButton & GetButton())
-    {
-        SubAttackPushing();
+        SubAttack();
     }
 
 #else
@@ -113,10 +81,6 @@ void CharacterCom::OnGUI()
     float hp = hitPoint;
     ImGui::DragFloat("HP", &hp);
 
-    bool stan = isStan;
-    ImGui::Checkbox("isStan", &stan);
-    ImGui::DragFloat("stanTimer", &stanTimer);
-
     int s = (int)(moveStateMachine.GetCurrentState());
     ImGui::InputInt("moveS", &s);
     s = (int)(attackStateMachine.GetCurrentState());
@@ -132,11 +96,7 @@ void CharacterCom::OnGUI()
     ImGui::InputInt("userInputDown", &i);
     i = userInputUp;
     ImGui::InputInt("userInputUp", &i);
-
-    ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
-    ImGui::InputInt("netID", &netID);
 }
-
 
 void CharacterCom::CameraControl()
 {
@@ -196,27 +156,4 @@ void CharacterCom::CameraControl()
             return;
         }
     }
-}
-
-void CharacterCom::StanUpdate(float elapsedTime)
-{
-    isStan = false;
-
-    //タイマー処理
-    if (stanTimer > 0)
-    {
-        isStan = true;
-        stanTimer -= elapsedTime;
-    }
-
-    if (!isStan)return;
-
-    //スタン中なら
-
-    //入力受け付けない
-    userInput = 0;
-    userInputDown = 0;
-    userInputUp = 0;
-    leftStick = { 0,0 };
-    rightStick = { 0,0 };
 }

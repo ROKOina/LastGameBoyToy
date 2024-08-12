@@ -58,6 +58,10 @@ private:
     //ターゲットポジション
     DirectX::XMFLOAT3 targetPos[(int)Legs::Max] = {};
 
+    //ターゲットポール
+    DirectX::XMFLOAT4X4 poleLocalTransform[(int)Legs::Max] = {};
+    DirectX::XMFLOAT4X4 poleWorldTransform[(int)Legs::Max] = {};
+    
     //StageModel
     Model*  stageModel;
 };

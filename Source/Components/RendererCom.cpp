@@ -181,7 +181,7 @@ void RendererCom::OnGUI()
       "APPLY_MASK",
       "EXCLUSIVE",
     };
-    //ブレンドモード設定リストとのサイズが違うとエラーを出す
+    //デプスモード設定リストとのサイズが違うとエラーを出す
     static_assert(ARRAYSIZE(DepthName) != static_cast<int>(DEPTHSTATE::MAX) - 1, "DepthName Size Error!");
 
     //デプスステンシルモード設定

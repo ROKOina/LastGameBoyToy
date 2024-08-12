@@ -47,7 +47,6 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 
 void PhotonLib::update(float elapsedTime)
 {
-	auto& myPlayer = GameObjectManager::Instance().Find("player");
 	int myID = GetPlayerNum();
 	for (auto& s : saveInputPhoton)
 	{
@@ -62,23 +61,14 @@ void PhotonLib::update(float elapsedTime)
 		save.inputDown = gamePad.GetButtonDown();
 		save.inputUp = gamePad.GetButtonUp();
 
-		//移動
-		save.leftStick = gamePad.GetAxisL();
-		save.pos = myPlayer->transform_->GetWorldPosition();
-		save.rotato = myPlayer->transform_->GetRotation();
-
-		//FPSカメラの向き保存
-		auto& fpsCamera = myPlayer->GetChildFind("cameraPostPlayer");
-		save.fpsDir = fpsCamera->transform_->GetWorldFront();
-
 		s.inputBuf->Enqueue(save);
 
 		//ちーむID保存
-		myPlayer->GetComponent<CharacterCom>()->SetTeamID(s.teamID);
+		auto& obj = GameObjectManager::Instance().Find("player");
+		obj->GetComponent<CharacterCom>()->SetTeamID(s.teamID);
 
 		break;
 	}
-	myPlayer->GetComponent<CharacterCom>()->SetNetID(myID);
 
 	switch(mState)
 	{
@@ -292,38 +282,11 @@ void PhotonLib::LobbyImGui()
 
 		ImGui::Begin("PhotonNetLobby", nullptr, ImGuiWindowFlags_None);
 
-		//キャラ選択
-		if (ImGui::TreeNode("character"))
-		{
-			int charaIndex = 0;
-			for (auto& name : charaIDList)
-			{
-				ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
-
-				if (charaID == charaIndex)
-				{
-					nodeFlags |= ImGuiTreeNodeFlags_Selected;
-				}
-
-				ImGui::TreeNodeEx(&name, nodeFlags, name.c_str());
-
-				if (ImGui::IsItemClicked())
-				{
-					charaID = charaIndex;
-				}
-
-				++charaIndex;
-
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}
-
 
 		//新しくルーム生成
 		char name[256];
 		::strncpy_s(name, sizeof(name), roomName.c_str(), sizeof(name));
-		if (ImGui::InputText(" ", name, sizeof(name)))
+		if (ImGui::InputText(" ", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			roomName = name;
 		}
@@ -382,13 +345,6 @@ void PhotonLib::NetInputUpdate()
 				s.nextInput.input = 0;
 				s.nextInput.inputUp = 0;
 
-				//移動
-				s.nextInput.leftStick = b.leftStick;
-				s.nextInput.pos = b.pos;
-				s.nextInput.rotato = b.rotato;
-				//カメラ情報
-				s.nextInput.fpsCameraDir = b.fpsDir;
-
 				isInputInit = true;
 			}
 
@@ -410,6 +366,8 @@ void PhotonLib::MyCharaInput()
 	std::shared_ptr<CharacterCom> chara = obj->GetComponent<CharacterCom>();
 	if (chara.use_count() == 0) return;
 
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
 	// 入力情報をプレイヤーキャラクターに送信
 	int myID = GetPlayerNum();
 	for (auto& s : saveInputPhoton)
@@ -419,8 +377,6 @@ void PhotonLib::MyCharaInput()
 		chara->SetUserInput(s.nextInput.input);
 		chara->SetUserInputDown(s.nextInput.inputDown);
 		chara->SetUserInputUp(s.nextInput.inputUp);
-		
-		chara->SetLeftStick(s.nextInput.leftStick);
 
 		s.nextInput.inputDown = 0;
 		s.nextInput.inputUp = 0;
@@ -429,9 +385,7 @@ void PhotonLib::MyCharaInput()
 	}
 
 
-	GamePad& gamePad = Input::Instance().GetGamePad();
-
-	//chara->SetLeftStick(gamePad.GetAxisL());
+	chara->SetLeftStick(gamePad.GetAxisL());
 	chara->SetRightStick(gamePad.GetAxisR());
 }
 
@@ -449,11 +403,6 @@ void PhotonLib::NetCharaInput()
 		chara->SetUserInput(s.nextInput.input);
 		chara->SetUserInputDown(s.nextInput.inputDown);
 		chara->SetUserInputUp(s.nextInput.inputUp);
-		//移動
-		netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
-		netPlayer->transform_->SetRotation(s.nextInput.rotato);
-		//カメラ情報
-		chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
 
 		s.nextInput.inputDown = 0;
 		s.nextInput.inputUp = 0;
@@ -571,30 +520,21 @@ void PhotonLib::sendData(void)
 	//マスタークライアントか
 	netD.isMasterClient = GetIsMasterPlayer();
 
-	//auto tra = obj->transform_->GetWorldPosition();
-	//netD.pos = { tra.x,tra.y,tra.z };
-	//auto rota = obj->transform_->GetRotation();
-	//netD.rotato = rota;
+	auto tra = obj->transform_->GetWorldPosition();
+	netD.pos = { tra.x,tra.y,tra.z };
+	auto rota = obj->transform_->GetRotation();
+	netD.rotato = rota;
 
-	//auto& move = obj->GetComponent<MovementCom>();
-	//netD.velocity = move->GetVelocity();
+	auto& move = obj->GetComponent<MovementCom>();
+	netD.velocity = move->GetVelocity();
 
 	//ダメージ情報送信
 	auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
 	for (auto& data : sendDatas)
 	{
-		if (data.sendType == 0)	//ダメージ
-			netD.damageData[data.id] += data.valueI;
-		else if (data.sendType == 1)	//ヒール
-			netD.healData[data.id] += data.valueI;
-		else if (data.sendType == 2)	//スタン
-		{
-			//一番長いスタン時間を与える
-			if (netD.stanData[data.id] < data.valueF)
-				netD.stanData[data.id] = data.valueF;
-		}
+		netD.damageData[data.id] += data.damage;
+		data.damage = 0;
 	}
-
 
 	//マスタークライアントの場合はチームIDを送る
 	if (GetIsMasterPlayer())
@@ -604,9 +544,6 @@ void PhotonLib::sendData(void)
 			netD.teamID[s.id] = s.teamID;
 		}
 	}
-
-	//キャラIDを送る
-	netD.charaID = obj->GetComponent<CharacterCom>()->GetCharaID();
 
 	//自分の入力を送る
 	int myID = GetPlayerNum();
@@ -714,14 +651,37 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				//netプレイヤー
 				net1 = GameObjectManager::Instance().Create();
 				net1->SetName(name.c_str());
+				net1->transform_->SetWorldPosition({ 0, 0, 0 });
+				net1->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+				std::shared_ptr<RendererCom> r = net1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+				r->LoadModel("Data/OneCoin/robot.mdl");
+				std::shared_ptr<AnimationCom> a = net1->AddComponent<AnimationCom>();
+				a->PlayAnimation(0, true, false, 0.001f);
+				//std::shared_ptr<TestCharacterCom> c = net1->AddComponent<TestCharacterCom>();
+				std::shared_ptr<InazawaCharacterCom> c = net1->AddComponent<InazawaCharacterCom>();
+				c->SetCharaID(playerNr);
+				std::shared_ptr<MovementCom> m = net1->AddComponent<MovementCom>();
 
-				RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(ne[0].charaID), net1);
-				net1->GetComponent<CharacterCom>()->SetNetID(playerNr);
+				std::shared_ptr<BoxColliderCom> sphere = net1->AddComponent<BoxColliderCom>();
+				sphere->SetMyTag(COLLIDER_TAG::Enemy);
+				sphere->SetSize({ 0.7f,1.2f,0.7f });
+				sphere->SetOffsetPosition(DirectX::XMFLOAT3(0.0f, 1.3f, 0.0f));
+
+				////当たり判定オブジェ(エラー直し用)
+				//{
+				//	//ヒットスキャン用オブジェクト
+				//	GameObj collision = GameObjectManager::Instance().Create();
+				//	std::shared_ptr<CapsuleColliderCom> capsule = collision->AddComponent<CapsuleColliderCom>();
+				//	collision->SetName(("playerCollision" + std::to_string(playerNr)).c_str());
+
+				//	c->SetGunFireCollision(collision);
+
+				//}
 			}
 
-			//net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
-			//net1->transform_->SetRotation(ne[0].rotato);
-			//net1->GetComponent<MovementCom>()->SetVelocity(ne[0].velocity);
+			net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
+			net1->transform_->SetRotation(ne[0].rotato);
+			net1->GetComponent<MovementCom>()->SetVelocity(ne[0].velocity);
 
 			//ダメージ情報
 			for (int id = 0; id < ne[0].damageData.size(); ++id)
@@ -730,34 +690,12 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 
 				if (ne[0].damageData[id] > 0)
 				{
-					auto& obj = GameObjectManager::Instance().Find("player");
-					obj->GetComponent<CharacterCom>()->AddDamagePoint(-ne[0].damageData[id]);
-					break;
+					int a = 0;
 				}
-			}
-			//ヒール情報
-			for (int id = 0; id < ne[0].healData.size(); ++id)
-			{
-				if (id != GetPlayerNum())continue;
 
-				if (ne[0].healData[id] > 0)
-				{
-					auto& obj = GameObjectManager::Instance().Find("player");
-					obj->GetComponent<CharacterCom>()->AddHealPoint(ne[0].healData[id]);
-					break;
-				}
-			}
-			//スタン情報
-			for (int id = 0; id < ne[0].stanData.size(); ++id)
-			{
-				if (id != GetPlayerNum())continue;
-
-				if (ne[0].stanData[id] >= 0.1f)
-				{
-					auto& obj = GameObjectManager::Instance().Find("player");
-					obj->GetComponent<CharacterCom>()->SetStanSeconds(ne[0].stanData[id]);
-					break;
-				}
+				auto& obj = GameObjectManager::Instance().Find("player");
+				obj->GetComponent<CharacterCom>()->AddHitPoint(-ne[0].damageData[id]);
+				break;
 			}
 
 			//入力を保存

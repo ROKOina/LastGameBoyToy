@@ -33,26 +33,26 @@ __fastcall NetwarkPost::~NetwarkPost()
 
 void NetwarkPost::RenderUpdate()
 {
-    //for (auto& client : clientDatas)
-    //{
-    //    if (client.id == id)continue;
+    for (auto& client : clientDatas)
+    {
+        if (client.id == id)continue;
 
-    //    std::string name = "player" + std::to_string(client.id);
-    //    std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
+        std::string name = "player" + std::to_string(client.id);
+        std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
 
-    //    //初期化
-    //    if (!clientObj)
-    //    {
-    //        newLoginID.emplace_back(client.id);
-    //        continue;
-    //    }
+        //初期化
+        if (!clientObj)
+        {
+            newLoginID.emplace_back(client.id);
+            continue;
+        }
 
-    //    //位置更新
-    //    clientObj->transform_->SetWorldPosition(client.pos);
-    //    clientObj->transform_->SetRotation(client.rotato);
-    //    clientObj->GetComponent<MovementCom>()->SetVelocity(client.velocity);
-    //    clientObj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(client.nonVelocity);
-    //}
+        //位置更新
+        clientObj->transform_->SetWorldPosition(client.pos);
+        clientObj->transform_->SetRotation(client.rotato);
+        clientObj->GetComponent<MovementCom>()->SetVelocity(client.velocity);
+        clientObj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(client.nonVelocity);
+    }
 }
 
 bool NetwarkPost::IsSynchroFrame(bool isServer)

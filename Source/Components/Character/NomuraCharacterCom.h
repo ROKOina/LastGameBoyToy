@@ -13,9 +13,9 @@ public:
 
     void OnGUI() override;
 
-    void MainAttackDown()override;
+    void MainAttack()override;
 
-    void SubAttackDown()override;
+    void SubAttack()override;
 
     void SubSkill()override;
 

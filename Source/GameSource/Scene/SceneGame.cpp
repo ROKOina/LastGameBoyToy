@@ -20,26 +20,25 @@
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
 #include "Components/AimIKCom.h"
+#include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\UenoCharacterCom.h"
 #include "Components\Character\NomuraCharacterCom.h"
-#include "Components\Character\HaveAllAttackCharacter.h"
-#include "Components\Character\RegisterChara.h"
 #include "Components/CPUParticle.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
 #include "GameSource/GameScript/FPSCameraCom.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "Graphics/Sprite/Sprite.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
 #include "Netwark/Photon/StdIO_UIListener.h"
 
 #include "Netwark/Photon/StaticSendDataManager.h"
-
 
 // 初期化
 void SceneGame::Initialize()
@@ -77,56 +76,38 @@ void SceneGame::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         a->PlayAnimation(0, true, false, 0.001f);
 
-        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
-        sphere->SetRadius(1.0f);
-        sphere->SetMyTag(COLLIDER_TAG::Enemy);
+        //std::shared_ptr<RayColliderCom> sphere = obj->AddComponent<RayColliderCom>();
+        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
 
         obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
-
-    //{//chara
-    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("chara");
-    //    obj->transform_->SetWorldPosition({ 0, 0, 0 });
-    //    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/pico/pico.mdl");
-    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    //}
 
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK, obj);
+        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/OneCoin/robot.mdl");
+        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+        obj->AddComponent<AimIKCom>("Spine");
+        obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
+        a->PlayAnimation(0, true, false, 0.001f);
+        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+        std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
+        //std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        //std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
+        //std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
 
-        //obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        //obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-        ////obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        //std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        ////r->LoadModel("Data/OneCoin/robot.mdl");
-        //r->LoadModel("Data/pico/pico.mdl");
-        //std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        //obj->AddComponent<AimIKCom>("Spine");
-        //obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
-        //a->PlayAnimation(0, true, false, 0.001f);
-        //std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        //std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
-        ////std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        ////std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-        ////std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
-        ////std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
-
-        //std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
-        //sphere->SetRadius(0.5f);
-        //sphere->SetMyTag(COLLIDER_TAG::Player);
+        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
+        sphere->SetRadius(0.5f);
+        sphere->SetMyTag(COLLIDER_TAG::Player);
 
         ////攻撃レイキャストスタート位置
         //{
         //    std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
         //    rayChild->SetName("rayObj");
-
-        //    rayChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
 
         //    std::shared_ptr<RayColliderCom> sphere = rayChild->AddComponent<RayColliderCom>();
         //    sphere->SetMyTag(COLLIDER_TAG::Player);
@@ -140,10 +121,15 @@ void SceneGame::Initialize()
         std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
         cameraPost->SetName("cameraPostPlayer");
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-        //cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
-        //pico位置
-        cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+        cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    }
+
+    //UIテスト
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("UiTest");
+        obj->AddComponent<Sprite>(nullptr/*"Data\\UIData\\test.ui"*/);
     }
 
 #pragma endregion
@@ -323,11 +309,11 @@ void SceneGame::SetOnlineInput()
             //chara->SetUserInputDown(client.inputDown);
             //chara->SetUserInputUp(client.inputUp);
 
-            //DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
+            DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
 
-            //DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
+            DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
 
-            //chara->SetLeftStick(leftS);
+            chara->SetLeftStick(leftS);
             //chara->SetRightStick(gamePad.GetAxisR());
         }
     }

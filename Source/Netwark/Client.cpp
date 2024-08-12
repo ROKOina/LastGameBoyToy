@@ -237,18 +237,18 @@ void NetClient::Send()
     s.inputUp = inputUp;
     bufRing->Enqueue(s);
 
-    ////仮でポジションを送る
-    //std::vector<NetData> netData;
-    //NetData n;
-    //n.id = id;
-    //n.radi = 1.1f;
+    //仮でポジションを送る
+    std::vector<NetData> netData;
+    NetData n;
+    n.id = id;
+    n.radi = 1.1f;
 
-    //GameObject* player = GameObjectManager::Instance().Find(("player" + std::to_string(id)).c_str()).get();
+    GameObject* player = GameObjectManager::Instance().Find(("player" + std::to_string(id)).c_str()).get();
 
-    //n.pos = player->transform_->GetWorldPosition();
-    //n.velocity = player->GetComponent<MovementCom>()->GetVelocity();
-    //n.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-    //n.rotato = player->transform_->GetRotation();
+    n.pos = player->transform_->GetWorldPosition();
+    n.velocity = player->GetComponent<MovementCom>()->GetVelocity();
+    n.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+    n.rotato = player->transform_->GetRotation();
 
     //n.input = input;
     //n.inputDown = inputDown;
@@ -258,15 +258,15 @@ void NetClient::Send()
     inputUp = 0;
 
     //n.nowFrame = nowFrame;
-    //n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
+    n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
     //開始から６フレームのインプット送る
-    //n.saveInputBuf = bufRing->GetHeadFromSize(6);
+    n.saveInputBuf = bufRing->GetHeadFromSize(6);
 
-    //netData.emplace_back(n);
+    netData.emplace_back(n);
 
-    ////送信型に変換
-    //std::stringstream ss = NetDataSendCast(netData);
+    //送信型に変換
+    std::stringstream ss = NetDataSendCast(netData);
 
-    //sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
+    sendto(sock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0, reinterpret_cast<struct sockaddr*>(&addr), static_cast<int>(sizeof(addr)));
 }
