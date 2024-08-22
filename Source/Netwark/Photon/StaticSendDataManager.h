@@ -21,23 +21,12 @@ public:
     //送信情報
     struct NetSendData
     {
-        int id; //送信相手
-
-        int sendType;   //0:damage 1:heal 2:stan
-
-        int valueI;
-        float valueF;
+        int id;
+        int damage;
     };
 
-    //ダメージを送信
-    void SetSendDamage(int myID, int sendID, int damage);
-
-    //ヒールを送信
-    void SetSendHeal(int myID, int sendID, int heal);
-
-    //スタンを送信
-    void SetSendStan(int myID, int sendID, float stanSec);
-
+    //送信情報を追加
+    void SetNetSendData(NetSendData data) { sendData->Enqueue(data); }
     //送信情報を全て取得して消す
     std::vector<NetSendData> GetNetSendDatas() 
     {

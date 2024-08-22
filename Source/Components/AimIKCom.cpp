@@ -2,13 +2,17 @@
 #include "RendererCom.h"
 #include "CameraCom.h"
 #include "TransformCom.h"
-#include "Character/CharacterCom.h"
+
+#include "AimIKCom.h"
+#include "RendererCom.h"
+#include "CameraCom.h"
+#include "TransformCom.h"
 
 //コンストラクタ
-AimIKCom::AimIKCom(const char* ainbonename)
+AimIKCom::AimIKCom(const char* aimbonename)
 {
     //名前をコピー
-    copyname = ainbonename;
+    copyname = aimbonename;
 }
 
 // 開始処理
@@ -25,85 +29,93 @@ void AimIKCom::Update(float elapsedTime)
     AimIK();
 }
 
+//imgui
+void AimIKCom::OnGUI()
+{
+    ImGui::DragFloat("Dot", &dot);
+}
+
 //計算
 void AimIKCom::AimIK()
 {
-    // ゲームオブジェクトのレンダラーコンポーネントからモデルを取得
+    // レンダラーコンポーネントからモデルを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
-    // FPSカメラの前方方向のワールド空間でのターゲット位置を取得
-    if (!GameObjectManager::Instance().Find("cameraPostPlayer"))
+    // FPSカメラからターゲット位置を取得
+    auto cameraObj = GameObjectManager::Instance().Find("cameraPostPlayer");
+    if (!cameraObj)
     {
         return;
     }
-    DirectX::XMFLOAT3 target;
-    auto& chara = GetGameObject()->GetComponent<CharacterCom>();
-    int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-    if (playerNetID == chara->GetNetID())
-        target = GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetFront();
-    else
-        target = GetGameObject()->GetComponent<CharacterCom>()->GetFpsCameraDir();
+    DirectX::XMFLOAT3 cameraPosition = cameraObj->transform_->GetWorldPosition();
+    DirectX::XMFLOAT3 cameraForward = cameraObj->transform_->GetWorldFront();
 
-    DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&target);
+    // ターゲット位置をカメラの前方に一定距離だけ進んだ位置に設定
+    DirectX::XMFLOAT3 targetPosition = {
+        cameraPosition.x + cameraForward.x * 10.0f, // 距離を10に設定（調整可能）
+        cameraPosition.y + cameraForward.y * 10.0f,
+        cameraPosition.z + cameraForward.z * 10.0f
+    };
 
-    // プレイヤーのワールドトランスフォームの逆行列を取得
+    // プレイヤーの逆行列を取得してターゲット位置をローカル空間に変換
     DirectX::XMMATRIX playerTransformInv = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform()));
+    DirectX::XMVECTOR targetVec = DirectX::XMLoadFloat3(&targetPosition);
+    targetVec = DirectX::XMVector3Transform(targetVec, playerTransformInv);
 
     for (size_t neckBoneIndex : AimBone)
     {
-        // モデルからエイムボーンノードを取得
         Model::Node& aimbone = model->GetNodes()[neckBoneIndex];
 
-        // エイムボーンのワールド空間での位置を取得
+        // エイムボーンのワールド空間位置を取得
         DirectX::XMFLOAT3 aimPosition = { aimbone.worldTransform._41, aimbone.worldTransform._42, aimbone.worldTransform._43 };
 
-        // ターゲット位置をプレイヤーのローカル空間に変換
-        DirectX::XMStoreFloat3(&target, DirectX::XMVector4Transform(targetVec, playerTransformInv));
-
-        // エイムボーンからターゲットへのローカル空間でのベクトルを計算
-        DirectX::XMFLOAT3 toTarget = { target.x - aimPosition.x, target.y - aimPosition.y, target.z - aimPosition.z };
+        // ターゲット位置からエイムボーンへのローカル空間でのベクトルを計算
+        DirectX::XMFLOAT3 toTarget = { targetPosition.x - aimPosition.x, targetPosition.y - aimPosition.y, targetPosition.z - aimPosition.z };
         DirectX::XMVECTOR toTargetVec = DirectX::XMLoadFloat3(&toTarget);
 
         // ローカル空間でのアップベクトルを定義
-        DirectX::XMFLOAT3 up = { 0, 0, 1 };
+        DirectX::XMFLOAT3 up = { 0.0f, 0.0f, 1.0f };
         DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&up);
 
-        // エイムボーンのグローバルトランスフォームの逆行列を取得
+        // toTargetベクトルとupベクトルをエイムボーンのローカル空間に変換
         DirectX::XMMATRIX inverseGlobalTransform = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&aimbone.worldTransform));
-
-        // toTargetとupベクトルをエイムボーンのローカル空間に変換
         toTargetVec = DirectX::XMVector3TransformNormal(toTargetVec, inverseGlobalTransform);
         upVec = DirectX::XMVector3TransformNormal(upVec, inverseGlobalTransform);
 
-        // 回転軸をupベクトルとtoTargetベクトルの外積として計算
+        // 回転軸を計算
         DirectX::XMVECTOR axis = DirectX::XMVector3Cross(upVec, toTargetVec);
+        axis = DirectX::XMVector3Normalize(axis);
 
-        // upベクトルとtoTargetベクトルの間の回転角を計算
+        // 回転角度を計算
         float angle = DirectX::XMVectorGetX(DirectX::XMVector3AngleBetweenVectors(upVec, toTargetVec));
 
-        // 回転角を制限
-        angle = (std::min)(angle, DirectX::XMConvertToRadians(15.0f));
+        // 回転角を制限（最大20度）
+        angle = (std::min)(angle, DirectX::XMConvertToRadians(30.0f));
 
-        // カメラの向きによって回転方向を修正
-        DirectX::XMVECTOR cameraForward = DirectX::XMLoadFloat3(&target); // ここでカメラの前方ベクトルを使用
-        if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(cameraForward, targetVec)) > 0)
+        // カメラの向きに基づいて回転を調整
+        DirectX::XMVECTOR cameraForwardVec = DirectX::XMLoadFloat3(&cameraForward);
+        dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMVector3Normalize(cameraForwardVec), DirectX::XMVector3Normalize(targetVec)));
+
+        if (dot < 0.0f)
         {
             angle = -angle;
         }
 
-        // 計算した軸と角度で回転行列を作成
-        DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationAxis(DirectX::XMVector3Normalize(axis), angle);
+        // 回転行列を作成
+        DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationAxis(axis, angle);
 
-        // 現在の回転と目標回転を取得
+        // 現在の回転を補間して適用
+        DirectX::XMVECTOR currentQuat = DirectX::XMLoadFloat4(&aimbone.rotate);
         DirectX::XMVECTOR targetQuat = DirectX::XMQuaternionRotationMatrix(rotation);
+        DirectX::XMVECTOR newQuat = DirectX::XMQuaternionSlerp(currentQuat, targetQuat, 0.2f);
 
-        //計算した回転をエイムボーンに適用
-        DirectX::XMStoreFloat(&aimbone.rotate.x, targetQuat);
+        // 新しい回転を適用
+        DirectX::XMStoreFloat4(&aimbone.rotate, newQuat);
     }
 }
 
 //ikさせるboneを探す
-void AimIKCom::SearchAimNode(const char* ainbonename)
+void AimIKCom::SearchAimNode(const char* aimbonename)
 {
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
@@ -111,7 +123,7 @@ void AimIKCom::SearchAimNode(const char* ainbonename)
     {
         const Model::Node& node = model->GetNodes().at(nodeIndex);
 
-        if (strstr(node.name, ainbonename) == node.name)
+        if (strstr(node.name, aimbonename) == node.name)
         {
             AimBone.push_back(static_cast<int>(nodeIndex));
         }

@@ -9,6 +9,7 @@
 #include "SceneDebugGame.h"
 #include "SceneGame.h"
 #include "SceneIKTest.h"
+#include <GameSource/Math/Mathf.h>
 
 SceneManager::SceneManager()
 {
@@ -127,46 +128,33 @@ DirectX::XMFLOAT3 SceneManager::InputVec() const
     std::shared_ptr<GameObject> cameraObj = SceneManager::Instance().GetActiveCamera();
     CameraCom* cameraCom = cameraObj->GetComponent<CameraCom>().get();
 
-    //入力情報を取得
+    // 入力情報を取得
     GamePad& gamePad = Input::Instance().GetGamePad();
+
+    //ステックのXY取得
     float ax = gamePad.GetAxisLX();
     float ay = gamePad.GetAxisLY();
 
-    //カメラ方向とスティックの入力値によって進行方向を計算する
-    const DirectX::XMFLOAT3& cameraRight = cameraCom->GetRight();
-    const DirectX::XMFLOAT3& cameraFront = cameraCom->GetFront();
+    // カメラ方向とスティックの入力値によって進行方向を計算する
+    const DirectX::XMFLOAT3& rightVec = cameraCom->GetRight();
+    const DirectX::XMFLOAT3& forwardVec = cameraCom->GetFront();
 
-    //移動ベクトルはXZ平面
+    // 移動ベクトルはXZ平面に水平なベクトルになるようにする
+    // 右方向ベクトルをXZ単位ベクトルに変換
+    DirectX::XMFLOAT2 rightXZ = { rightVec.x,rightVec.z };
+    rightXZ = Mathf::Normalize(rightXZ);
 
-    //カメラ右方向ベクトルをXZ単位ベクトルに変換
-    float cameraRightX = cameraRight.x;
-    float cameraRightZ = cameraRight.z;
-    float cameraRightLength = sqrtf(cameraRightX * cameraRightX + cameraRightZ * cameraRightZ);
-    if (cameraRightLength > 0.0f)
-    {
-        //単位ベクトル化
-        cameraRightX /= cameraRightLength;
-        cameraRightZ /= cameraRightLength;
-    }
+    // 前方向ベクトルをXZ単位ベクトルに変換
+    DirectX::XMFLOAT2 forwardXZ = { forwardVec.x,forwardVec.z };
+    forwardXZ = Mathf::Normalize(forwardXZ);
 
-    //カメラ前方向ベクトルをXZ単位ベクトルに変換
-    float cameraFrontX = cameraFront.x;
-    float cameraFrontZ = cameraFront.z;
-    float cameraFrontLength = sqrtf(cameraFrontX * cameraFrontX + cameraFrontZ * cameraFrontZ);
-    if (cameraFrontLength > 0.0f)
-    {
-        //単位ベクトル化
-        cameraFrontX /= cameraFrontLength;
-        cameraFrontZ /= cameraFrontLength;
-    }
-
-    //スティックの水平入力値をカメラ右方向に反映し、
-    //スティックの垂直入力値をカメラ前方向に反映し、
-    //進行ベクトルを計算する
-    DirectX::XMFLOAT3 vec = {};
-    vec.x = cameraFrontX * ay + cameraRightX * ax;
-    vec.z = cameraFrontZ * ay + cameraRightZ * ax;
-    vec.y = 0.0f;
+    // スティックの水平入力値を右方向に反映し、
+    // スティックの垂直入力値を前方向に反映し、
+    // 進行ベクトルを計算する
+    DirectX::XMFLOAT3 vec;
+    vec.x = forwardXZ.x * ay + rightXZ.x * ax;
+    vec.y = 0;
+    vec.z = forwardXZ.y * ay + rightXZ.y * ax;
 
     return vec;
 }

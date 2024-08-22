@@ -4,8 +4,6 @@
 #include <imgui.h>
 #include <string>
 
-#include "Graphics/Model/ResourceManager.h"
-
 //コンストラクタ
 RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode, bool shadowrender, bool silhoutterender) :m_depth(depthmode), m_rasterizerState(rasterizermode)
 {
@@ -183,7 +181,7 @@ void RendererCom::OnGUI()
       "APPLY_MASK",
       "EXCLUSIVE",
     };
-    //ブレンドモード設定リストとのサイズが違うとエラーを出す
+    //デプスモード設定リストとのサイズが違うとエラーを出す
     static_assert(ARRAYSIZE(DepthName) != static_cast<int>(DEPTHSTATE::MAX) - 1, "DepthName Size Error!");
 
     //デプスステンシルモード設定
@@ -225,16 +223,8 @@ void RendererCom::LoadModel(const char* filename)
 {
     ID3D11Device* device = Graphics::Instance().GetDevice();
     std::shared_ptr<ModelResource> m = std::make_shared<ModelResource>();
+    m->Load(device, filename);
 
-    if (!ResourceManager::Instance().JudgeModelFilename(filename))
-    {
-        m->Load(device, filename);		
-        ResourceManager::Instance().RegisterModel(filename, m);	//リソースマネージャーに追加する
-    }
-    else
-    {
-        m = ResourceManager::Instance().LoadModelResource(filename);	//ロードする
-    }
     model_ = std::make_unique<Model>(m);
 
 #ifdef _DEBUG

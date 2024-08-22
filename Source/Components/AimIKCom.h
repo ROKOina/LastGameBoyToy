@@ -8,7 +8,7 @@ class AimIKCom : public Component
 {
     //コンポーネントオーバーライド
 public:
-    AimIKCom(const char* ainbonename);
+    AimIKCom(const char* aimbonename);
     ~AimIKCom() {}
 
     // 名前取得
@@ -21,7 +21,7 @@ public:
     void Update(float elapsedTime) override;
 
     // GUI描画
-    void OnGUI() override {};
+    void OnGUI() override;
 
 private:
 
@@ -29,11 +29,12 @@ private:
     void AimIK();
 
     //ikさせるboneを探す
-    void SearchAimNode(const char* ainbonename);
+    void SearchAimNode(const char* aimbonename);
 
 private:
 
     //AimIK用変数
     std::vector<int>AimBone;
     const char* copyname = {};
+    float dot = {};
 };

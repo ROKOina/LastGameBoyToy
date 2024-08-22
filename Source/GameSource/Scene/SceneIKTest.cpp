@@ -45,13 +45,13 @@ void SceneIKTest::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
+        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/IKTestModel/IKTest.mdl");
+        r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-        //td::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
+        std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
+        std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
     }
 
     //ステージ
@@ -79,11 +79,6 @@ void SceneIKTest::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-    //コンポーネントゲット
-    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-    std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
-    std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
 }
 
 void SceneIKTest::Render(float elapsedTime)

@@ -13,7 +13,6 @@ void InazawaCharacterCom::Start()
     
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<InazawaCharacter_AttackState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<InazawaCharacter_ESkillState>(this));
-    SetESkillCoolTime(5);
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
 
@@ -37,14 +36,32 @@ void InazawaCharacterCom::Update(float elapsedTime)
         airTimer += elapsedTime;
     }
 
+    //スキルEクールタイム
+    if (useSkillE)
+    {
+        eCoolTimer += elapsedTime;
+        if (eCoolTime < eCoolTimer)
+        {
+            eCoolTimer = 0;
+            useSkillE = false;
+        }
+    }
 }
 
 void InazawaCharacterCom::OnGUI()
 {
     CharacterCom::OnGUI();
+
+    if (ImGui::TreeNode("InaChara"))
+    {
+        bool p = useSkillE;
+        ImGui::Checkbox("useSkillE", &p);
+        ImGui::DragFloat("eCoolTimer", &eCoolTimer);
+        ImGui::TreePop();
+    }
 }
 
-void InazawaCharacterCom::MainAttackDown()
+void InazawaCharacterCom::MainAttack()
 {
     if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
@@ -52,11 +69,11 @@ void InazawaCharacterCom::MainAttackDown()
 
 void InazawaCharacterCom::SubSkill()
 {
-    //if (!useSkillE)
-    //{
+    if (!useSkillE)
+    {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
-    //    useSkillE = true;
-    //}
+        useSkillE = true;
+    }
 }
 
 void InazawaCharacterCom::SpaceSkill()

@@ -284,29 +284,29 @@ void NetServer::Send()
     s.inputUp = inputUp;
     bufRing->Enqueue(s);
 
-    //for (auto& client : clientDatas)
-    //{
-    //    //自分自身(server)のキャラ情報を送る
-    //    if (client.id != id)continue;
+    for (auto& client : clientDatas)
+    {
+        //自分自身(server)のキャラ情報を送る
+        if (client.id != id)continue;
 
-    //    GameObj player = GameObjectManager::Instance().Find(("player" + std::to_string(client.id)).c_str());
-    //    client.pos = player->transform_->GetWorldPosition();
-    //    client.velocity = player->GetComponent<MovementCom>()->GetVelocity();
-    //    client.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
-    //    client.rotato = player->transform_->GetRotation();
+        GameObj player = GameObjectManager::Instance().Find(("player" + std::to_string(client.id)).c_str());
+        client.pos = player->transform_->GetWorldPosition();
+        client.velocity = player->GetComponent<MovementCom>()->GetVelocity();
+        client.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
+        client.rotato = player->transform_->GetRotation();
 
-    //    //client.input = input;
-    //    //client.inputDown = inputDown;
-    //    //client.inputUp = inputUp;
-    //    input = 0;
-    //    inputDown = 0;
-    //    inputUp = 0;
+        //client.input = input;
+        //client.inputDown = inputDown;
+        //client.inputUp = inputUp;
+        input = 0;
+        inputDown = 0;
+        inputUp = 0;
 
-    //    //client.nowFrame = nowFrame;
-    //    //client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
+        //client.nowFrame = nowFrame;
+        client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
-    //    break;
-    //}
+        break;
+    }
     //送信型に変換してデータを全て送る
     std::stringstream ss = NetDataSendCast(clientDatas);
 

@@ -7,7 +7,7 @@
 void SceneLoading::Initialize()
 {
     //スプライト初期化
-    sprite_ = new Sprite("Data/Sprite/yellow.png");
+    //sprite_ = new Sprite("Data/Sprite/yellow.png");
 
     //スレッド開始
     thread_ = new std::thread(LoadingThread, this);
@@ -25,11 +25,11 @@ void SceneLoading::Finalize()
     }
 
     //スプライト終了化
-    if (sprite_ != nullptr)
-    {
-        delete sprite_;
-        sprite_ = nullptr;
-    }
+    //if (sprite_ != nullptr)
+    //{
+    //    delete sprite_;
+    //    sprite_ = nullptr;
+    //}
 }
 
 //更新処理
@@ -81,18 +81,18 @@ void SceneLoading::Render(float elapsedTime)
         //2Dスプライト描画
         {
             //画面下にローでイングアイコンを描画
-            float screenWidth = static_cast<float>(graphics.GetScreenWidth());
-            float screenHeight = static_cast<float>(graphics.GetScreenHeight());
-            float textureWidth = static_cast<float>(sprite_->GetTextureWidth());
-            float textureHeight = static_cast<float>(sprite_->GetTextureHeight());
-            float positionX = screenWidth - textureWidth;
-            float positionY = screenHeight - textureHeight;
+            //float screenWidth = static_cast<float>(graphics.GetScreenWidth());
+            //float screenHeight = static_cast<float>(graphics.GetScreenHeight());
+            //float textureWidth = static_cast<float>(sprite_->GetTextureWidth());
+            //float textureHeight = static_cast<float>(sprite_->GetTextureHeight());
+            //float positionX = screenWidth - textureWidth;
+            //float positionY = screenHeight - textureHeight;
 
-            sprite_->Render(dc,
-                0, 0, screenWidth, screenHeight,
-                0, 0, textureWidth, textureHeight,
-                0,
-                1, 1, 1, 1);
+            //sprite_->Render(dc,
+            //    0, 0, screenWidth, screenHeight,
+            //    0, 0, textureWidth, textureHeight,
+            //    0,
+            //    1, 1, 1, 1);
         }
 
         //バッファ戻す
