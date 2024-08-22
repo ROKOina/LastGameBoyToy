@@ -16,7 +16,6 @@
 #include "Components\Character\InazawaCharacterCom.h"
 
 #include "StaticSendDataManager.h"
-#include "Components/Character/RegisterChara.h"
 
 #include "imgui.h"
 
@@ -195,6 +194,9 @@ void PhotonLib::ImGui()
 
 
 	//サーバー時間
+	if(ImGui::Button("ResetTime"))
+		startTime = GetServerTime();
+
 	float time = (GetServerTime() - startTime) / 1000.0f;
 	ImGui::DragFloat("time", &time);
 	
@@ -257,6 +259,33 @@ void PhotonLib::LobbyImGui()
 		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
 		ImGui::Begin("PhotonNetLobby", nullptr, ImGuiWindowFlags_None);
+
+		//キャラ選択
+		if (ImGui::TreeNode("character"))
+		{
+			int charaIndex = 0;
+			for (auto& name : charaIDList)
+			{
+				ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
+
+				if (charaID == charaIndex)
+				{
+					nodeFlags |= ImGuiTreeNodeFlags_Selected;
+				}
+
+				ImGui::TreeNodeEx(&name, nodeFlags, name.c_str());
+
+				if (ImGui::IsItemClicked())
+				{
+					charaID = charaIndex;
+				}
+
+				++charaIndex;
+
+				ImGui::TreePop();
+			}
+			ImGui::TreePop();
+		}
 
 
 		//新しくルーム生成

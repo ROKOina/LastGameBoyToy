@@ -160,7 +160,10 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.isMasterClient;
     in >> h.id;
     in >> h.damageData;
+    in >> h.healData;
+    in >> h.stanData;
     in >> h.teamID;
+    in >> h.charaID;
     VectorSaveBufferIn(in, h.saveInputBuf);
 
     return in;

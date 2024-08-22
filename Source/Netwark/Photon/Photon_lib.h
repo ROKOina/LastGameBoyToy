@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../NetwarkPost.h"
+#include "Components/Character/RegisterChara.h"
 
 static std::string WStringToString
 (
@@ -46,6 +47,13 @@ private:
 	bool joinPermission = false;
 	//部屋名
 	std::string roomName;
+	//charaID
+	std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
+	{
+		"INAZAWA",
+		"HAVE_ALL_ATTACK",
+	};
+	int charaID = 0;
 
 public:
 	//入力情報更新
@@ -185,11 +193,11 @@ private:
 			unsigned int input = 0;
 			unsigned int inputUp = 0;
 
-			DirectX::XMFLOAT2 leftStick = { 0,0 };    //移動
-			DirectX::XMFLOAT3 pos = { 0,0,0 };       //位置
-			DirectX::XMFLOAT4 rotato = { 0,0,0,1 };       //回転
+			DirectX::XMFLOAT2 leftStick = { 0,0 };
+			DirectX::XMFLOAT3 pos = { 0,0,0 };
+			DirectX::XMFLOAT4 rotato = { 0,0,0,1 };
 
-			DirectX::XMFLOAT3 fpsCameraDir = { 0,0,1 };       //FPS視点の方向
+			DirectX::XMFLOAT3 fpsCameraDir = { 0,0,1 };
 		};
 		NextInput nextInput;
 	};

@@ -222,20 +222,20 @@ void NetClient::Receive()
 
 void NetClient::Send()
 {
-    ////入力情報更新
-    //GamePad& gamePad = Input::Instance().GetGamePad();
+    //入力情報更新
+    GamePad& gamePad = Input::Instance().GetGamePad();
 
-    //input |= gamePad.GetButton();
-    //inputDown |= gamePad.GetButtonDown();
-    //inputUp |= gamePad.GetButtonUp();
+    input |= gamePad.GetButton();
+    inputDown |= gamePad.GetButtonDown();
+    inputUp |= gamePad.GetButtonUp();
 
-    ////入力をリングバッファに保存
-    //SaveBuffer s;
-    //s.frame = nowFrame;
-    //s.input = input;
-    //s.inputDown = inputDown;
-    //s.inputUp = inputUp;
-    //bufRing->Enqueue(s);
+    //入力をリングバッファに保存
+    SaveBuffer s;
+    s.frame = nowFrame;
+    s.input = input;
+    s.inputDown = inputDown;
+    s.inputUp = inputUp;
+    bufRing->Enqueue(s);
 
     ////仮でポジションを送る
     //std::vector<NetData> netData;
@@ -250,17 +250,17 @@ void NetClient::Send()
     //n.nonVelocity = player->GetComponent<MovementCom>()->GetNonMaxSpeedVelocity();
     //n.rotato = player->transform_->GetRotation();
 
-    ////n.input = input;
-    ////n.inputDown = inputDown;
-    ////n.inputUp = inputUp;
-    //input = 0;
-    //inputDown = 0;
-    //inputUp = 0;
+    //n.input = input;
+    //n.inputDown = inputDown;
+    //n.inputUp = inputUp;
+    input = 0;
+    inputDown = 0;
+    inputUp = 0;
 
-    ////n.nowFrame = nowFrame;
+    //n.nowFrame = nowFrame;
     //n.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
-    ////開始から６フレームのインプット送る
+    //開始から６フレームのインプット送る
     //n.saveInputBuf = bufRing->GetHeadFromSize(6);
 
     //netData.emplace_back(n);
