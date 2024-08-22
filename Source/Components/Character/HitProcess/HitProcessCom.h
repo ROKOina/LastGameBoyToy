@@ -2,6 +2,7 @@
 
 #include "Components/System/Component.h"
 
+//ネットに送る用
 class HitProcessCom : public Component
 {
 public:

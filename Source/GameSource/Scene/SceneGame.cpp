@@ -67,6 +67,15 @@ void SceneGame::Initialize()
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
 
+    //{//重いステージ
+    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    //    obj->SetName("OmoiStage");
+    //    obj->transform_->SetWorldPosition({ 0, 0, 0 });
+    //    obj->transform_->SetScale({ 1, 1, 1 });
+    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    //    r->LoadModel("Data/OmoiStage/OmoiStage.mdl");
+    //}
+
     {//当たり判定用
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("robo");
@@ -98,7 +107,7 @@ void SceneGame::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
 
         //obj->transform_->SetWorldPosition({ 0, 0, 0 });
         //obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });

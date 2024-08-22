@@ -39,8 +39,12 @@ public:
 	const bool GetEnabled() const { return isEnabled_; }
 	void SetEnabled(bool enabled) { isEnabled_ = enabled; }
 
+	const float GetLoadTime() const { return loadTime; }
+	void SetLoadTime(float time) { loadTime = time; }
+
 private:
 	std::weak_ptr<GameObject>	gameObject_;
+	float loadTime = 0;
 
 protected:
 	//—LŒø‚©

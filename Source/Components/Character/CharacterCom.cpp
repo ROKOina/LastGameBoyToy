@@ -81,28 +81,41 @@ void CharacterCom::Update(float elapsedTime)
 
 #endif // _DEBUG
 
-    if (CharacterInput::MainSkillButton_Q & GetButtonDown())
+    if (CharacterInput::MainSkillButton_Q & GetButtonDown() 
+        && Qcool.timer >= Qcool.time)
     {
+        Qcool.timer = 0;
         MainSkill();
     }
-    if (CharacterInput::SubSkillButton_E & GetButtonDown())
+    if (CharacterInput::SubSkillButton_E & GetButtonDown()
+        && Ecool.timer >= Ecool.time)
     {
+        Ecool.timer = 0;
         SubSkill();
     }
-    if (CharacterInput::LeftShiftButton & GetButtonDown())
+    if (CharacterInput::LeftShiftButton & GetButtonDown()
+        && LScool.timer >= LScool.time)
     {
+        LScool.timer = 0;
         LeftShiftSkill();
     }
-    if (CharacterInput::JumpButton_SPACE & GetButtonDown())
+    if (CharacterInput::JumpButton_SPACE & GetButtonDown()
+        && Spacecool.timer >= Spacecool.time)
     {
+        Spacecool.timer = 0;
         SpaceSkill();
     }
 
     //野村追加 Rキー
-    if (CharacterInput::UltimetButton_R & GetButtonDown())
+    if (CharacterInput::UltimetButton_R & GetButtonDown()
+        && Rcool.timer >= Rcool.time)
     {
+        Rcool.timer = 0;
         UltSkill();
     }
+
+    //クールダウン更新
+    CoolUpdate(elapsedTime);
 
     //カメラ制御
     CameraControl();
@@ -135,6 +148,26 @@ void CharacterCom::OnGUI()
 
     ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
     ImGui::InputInt("netID", &netID);
+
+    if (ImGui::TreeNode("SkillCool"))
+    {
+        ImGui::DragFloat("QTime", &Qcool.time);
+        ImGui::DragFloat("QTimer", &Qcool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("ETime", &Ecool.time);
+        ImGui::DragFloat("ETimer", &Ecool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("LSTime", &LScool.time);
+        ImGui::DragFloat("LSTimer", &LScool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("SpaceTime", &Spacecool.time);
+        ImGui::DragFloat("SpaceTimer", &Spacecool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("RTime", &Rcool.time);
+        ImGui::DragFloat("RTimer", &Rcool.timer);
+
+        ImGui::TreePop();
+    }
 }
 
 
@@ -219,4 +252,13 @@ void CharacterCom::StanUpdate(float elapsedTime)
     userInputUp = 0;
     leftStick = { 0,0 };
     rightStick = { 0,0 };
+}
+
+void CharacterCom::CoolUpdate(float elapsedTime)
+{
+    Qcool.timer += elapsedTime;
+    Ecool.timer += elapsedTime;
+    Rcool.timer += elapsedTime;
+    LScool.timer += elapsedTime;
+    Spacecool.timer += elapsedTime;
 }

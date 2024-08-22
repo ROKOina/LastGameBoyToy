@@ -145,12 +145,26 @@ public:
     int GetCharaID() { return charaID; }
     void  SetCharaID(const int id) { charaID = id; }
 
+    void SetQSkillCoolTime(float time) { Qcool.time = time; }
+    float GetQSkillCoolTime() { return Qcool.time; }
+    void SetESkillCoolTime(float time) { Ecool.time = time; }
+    float GetESkillCoolTime() { return Ecool.time; }
+    void SetRSkillCoolTime(float time) { Rcool.time = time; }
+    float GetRSkillCoolTime() { return Rcool.time; }
+    void SetLSSkillCoolTime(float time) { LScool.time = time; }
+    float GetLSSkillCoolTime() { return LScool.time; }
+    void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
+    float GetSpaceSkillCoolTime() { return Spacecool.time; }
+
 private:
     //カメラ操作
     void CameraControl();
 
     //スタン更新
     void StanUpdate(float elapsedTime);
+
+    //クールダウン更新
+    void CoolUpdate(float elapsedTime);
 
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
@@ -167,6 +181,18 @@ protected:
   int teamID = 0;   //自分のチーム
   int netID = 0;//どのクライアントがこのキャラを担当するか
   std::array<float, 6> giveDamage = { 0,0,0,0,0,0 };//敵に与えたダメージ量や味方に与えた回復
+
+  //スキルクールダウン
+  struct SkillCoolTime
+  {
+      float time = 0;
+      float timer = 100;
+  };
+  SkillCoolTime Qcool;
+  SkillCoolTime Ecool;
+  SkillCoolTime Rcool;
+  SkillCoolTime LScool;
+  SkillCoolTime Spacecool;
 
 private:
 

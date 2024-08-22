@@ -36,6 +36,7 @@ public:
 private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
+
     int ownerID;
 };
 

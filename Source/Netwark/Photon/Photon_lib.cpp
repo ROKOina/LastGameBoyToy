@@ -95,7 +95,6 @@ void PhotonLib::update(float elapsedTime)
 	}
 		case PhotonState::JOINING:
 			oldMs = GetServerTime();
-			startTime= GetServerTime();
 			break;
 		case PhotonState::JOINED:
 			//情報送信
@@ -110,7 +109,6 @@ void PhotonLib::update(float elapsedTime)
 				if (oldMs == 0)
 				{
 					oldMs = GetServerTime();
-					startTime = GetServerTime();
 				}
 			}
 			break;
@@ -196,42 +194,12 @@ void PhotonLib::ImGui()
 
 
 	//サーバー時間
+	if(ImGui::Button("ResetTime"))
+		startTime = GetServerTime();
+
 	float time = (GetServerTime() - startTime) / 1000.0f;
 	ImGui::DragFloat("time", &time);
 	
-
-	int serverTime = GetServerTime();
-	int serverTimeOF = GetServerTimeOffset();
-	ImGui::InputInt("serverTime", &serverTime);
-
-	int A = serverTime / 1000;
-	A %= 10;
-	ImGui::InputInt("A", &A);
-
-
-	//時間デバッグ比較用
-	//serverTime += serverTimeOF;
-	if (serverTime != 0)
-	{
-		int slTime = 10000;
-		static int saveTime = 0;
-		static int oldSerTime = serverTime;
-		saveTime += serverTime - oldSerTime;
-		oldSerTime = serverTime;
-		static bool reverseB = true;
-		if (saveTime > slTime)
-		{
-			saveTime = 0;
-			reverseB = !reverseB;
-		}
-		if (saveTime < 0)saveTime = 0;
-		ImGui::InputInt("saveTime", &saveTime);
-		ImGui::Checkbox("SerVV", &reverseB);
-	}
-
-
-	ImGui::InputInt("serverTimeOFF", &serverTimeOF);
-
 	int roundTime = GetRoundTripTime();
 	int roundTimeV = GetRoundTripTimeVariance();
 	ImGui::InputInt("roundTime", &roundTime);
@@ -571,14 +539,6 @@ void PhotonLib::sendData(void)
 	//マスタークライアントか
 	netD.isMasterClient = GetIsMasterPlayer();
 
-	//auto tra = obj->transform_->GetWorldPosition();
-	//netD.pos = { tra.x,tra.y,tra.z };
-	//auto rota = obj->transform_->GetRotation();
-	//netD.rotato = rota;
-
-	//auto& move = obj->GetComponent<MovementCom>();
-	//netD.velocity = move->GetVelocity();
-
 	//ダメージ情報送信
 	auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
 	for (auto& data : sendDatas)
@@ -652,6 +612,7 @@ void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVect
 			isNewClient = false;
 			break;
 		}
+
 		if (isNewClient)
 		{
 			//追加
@@ -718,10 +679,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 				RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(ne[0].charaID), net1);
 				net1->GetComponent<CharacterCom>()->SetNetID(playerNr);
 			}
-
-			//net1->transform_->SetWorldPosition({ ne[0].pos.x,ne[0].pos.y,ne[0].pos.z });
-			//net1->transform_->SetRotation(ne[0].rotato);
-			//net1->GetComponent<MovementCom>()->SetVelocity(ne[0].velocity);
 
 			//ダメージ情報
 			for (int id = 0; id < ne[0].damageData.size(); ++id)

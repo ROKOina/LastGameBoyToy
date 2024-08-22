@@ -2,6 +2,7 @@
 #include "Input\Input.h"
 #include "BaseCharacterState.h"
 #include "Components/ColliderCom.h"
+#include "Components/RendererCom.h"
 
 #include "Components\Character\BulletCom.h"
 
@@ -286,6 +287,28 @@ void BaseCharacter_StanBallState::ImGui()
 {
     ImGui::DragFloat("speed", &speed);
     ImGui::DragFloat("power", &power);
+}
+
+#pragma endregion
+
+#pragma region KnockbackBall
+
+void BaseCharacter_KnockbackBallState::Enter()
+{
+
+}
+
+void BaseCharacter_KnockbackBallState::Execute(const float& elapsedTime)
+{
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+void BaseCharacter_KnockbackBallState::Exit()
+{
+}
+
+void BaseCharacter_KnockbackBallState::ImGui()
+{
 }
 
 #pragma endregion

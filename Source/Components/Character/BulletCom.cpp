@@ -33,10 +33,15 @@ void BulletCom::Update(float elapsedTime)
     //    }
     //    GameObjectManager::Instance().Remove(this->GetGameObject());
     //}
-
-    if (GetGameObject()->GetComponent<HitProcessCom>()->IsHit())
+    
+    //ヒットプロセスがあれば処理する
+    auto& hitProcessCom = GetGameObject()->GetComponent<HitProcessCom>();
+    if (hitProcessCom)
     {
-        GameObjectManager::Instance().Remove(this->GetGameObject());
+        if (GetGameObject()->GetComponent<HitProcessCom>()->IsHit())
+        {
+            GameObjectManager::Instance().Remove(this->GetGameObject());
+        }
     }
 
     //弾消去

@@ -141,6 +141,22 @@ private:
     float power=1;
 };
 
+class BaseCharacter_KnockbackBallState : public BaseCharacter_BaseState
+{
+public:
+    BaseCharacter_KnockbackBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
+    {
+        name = "KnockbackBall";
+    }
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    void ImGui() override;
+
+private:
+};
+
 class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
 {
 public:
