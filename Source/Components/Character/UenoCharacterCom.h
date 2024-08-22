@@ -5,7 +5,7 @@
 class UenoCharacterCom : public CharacterCom
 {
 public:
-    UenoCharacterCom();
+    UenoCharacterCom() {};
     ~UenoCharacterCom() {}
 
     // 名前取得
@@ -22,21 +22,4 @@ public:
 
     //メインアタック
     void MainAttackDown()override;
-
-public:
-
-    void SetLazerFlag(const bool& lazer) { lazerflag = lazer; }
-    const bool& GetLazerFlag()const { return lazerflag; }
-
-public:
-
-    std::shared_ptr<GPUParticle>gpulazerparticle;
-
-private:
-
-    //パーティクル更新
-    void LazerParticleUpdate(float elapsedTime);
-
-private:
-    bool lazerflag = false;
 };

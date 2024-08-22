@@ -26,11 +26,10 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
 
     ///////////////////////////////
 
-
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
     float gravity = 10 - power * 9;
-    moveCom->SetGravity(-gravity);
+    moveCom->SetGravityEffect(-gravity);
     moveCom->SetFriction(0.0f);
     moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + arrowSpeed * power));
 
@@ -59,7 +58,19 @@ void RayFire(std::shared_ptr<GameObject> objPoint)
     start = rayPoint->transform_->GetWorldPosition();
     end = start + (objPoint->transform_->GetWorldFront() * 100);
 
+    //ƒŒƒCVsƒXƒtƒBƒA
+    DirectX::XMVECTOR Start = DirectX::XMLoadFloat3(&start);
+    DirectX::XMVECTOR Dir = DirectX::XMLoadFloat3(&Mathf::Normalize(end - start));
+    auto& sphere = GameObjectManager::Instance().Find("robo");
+    DirectX::XMVECTOR Sph = DirectX::XMLoadFloat3(&sphere->transform_->GetWorldPosition());
+    HitResult h;
+    if (Collision::IntersectRayVsSphere(Start, Dir, 100, Sph, 1.0f, h))
+    {
+        int i = 0;
+    }
+
     //ƒŒƒC
+
     rayPoint->GetComponent<RayColliderCom>()->SetStart(start);
     rayPoint->GetComponent<RayColliderCom>()->SetEnd(end);
 }
@@ -90,7 +101,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     //    JumpInput(owner->GetGameObject());
 
     //UŒ‚ˆÐ—Í
-    attackPower+=elapsedTime;
+    attackPower += elapsedTime;
     if (attackPower > maxAttackPower) {
         attackPower = maxAttackPower;
     }
@@ -100,9 +111,8 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     {
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
         owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
-            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"),false
+            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
         );
-
 
         //UŒ‚ˆ—
         Fire(owner->GetGameObject(), arrowSpeed, attackPower);
@@ -128,8 +138,7 @@ void InazawaCharacter_AttackState::ImGui()
     ImGui::DragFloat("arrowSpeed", &arrowSpeed);
 }
 
-
-#pragma endregion 
+#pragma endregion
 
 #pragma region ESkill
 
@@ -172,8 +181,6 @@ void InazawaCharacter_ESkillState::ImGui()
     ImGui::DragInt("arrowCount", &arrowCount);
     ImGui::DragFloat("interval", &interval);
     ImGui::DragFloat("skillTimerEnd", &skillTimer);
-
 }
 
-
-#pragma endregion 
+#pragma endregion

@@ -95,7 +95,7 @@ void NomuraCharacter_AttackState::ImGui()
 
 #pragma endregion
 
-#pragma region SubAttackDown
+#pragma region SubAttack
 
 void NomuraCharacter_SubAttackState::Enter()
 {

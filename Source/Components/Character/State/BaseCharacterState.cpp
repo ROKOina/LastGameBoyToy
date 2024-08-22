@@ -34,11 +34,9 @@ void BaseCharacter_IdleState::Enter()
 
     //};
 
-
     //animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
-
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -319,4 +317,3 @@ void BaseCharacter_NoneAttack::Enter()
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }
-

@@ -53,6 +53,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    virtual const char* GetName() const override { return "Idle"; }
 };
 
 class BaseCharacter_MoveState : public BaseCharacter_BaseState
@@ -62,6 +63,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    virtual const char* GetName() const override { return "Move"; }
 };
 
 class BaseCharacter_JumpState : public BaseCharacter_BaseState
@@ -72,6 +74,7 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
+    virtual const char* GetName() const override { return "Jump"; }
 
 private:
 
@@ -88,15 +91,13 @@ class BaseCharacter_HitscanState : public BaseCharacter_BaseState
     //  <RayColliderCom>Çí«â¡Ç∑ÇÈ
 
 public:
-    BaseCharacter_HitscanState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
-    {
-        name = "Hitscan";
-    }
+    BaseCharacter_HitscanState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
     void ImGui() override;
+    virtual const char* GetName() const override { return "Hitscan"; }
 
 private:
     float rayLength = 100;
@@ -109,15 +110,13 @@ class BaseCharacter_CapsuleState : public BaseCharacter_BaseState
     //  NodeCollsionComà»äOÇÃå`èÛÇ∆îªíËÇ∑ÇÈ
 
 public:
-    BaseCharacter_CapsuleState(CharacterCom* owner) : BaseCharacter_BaseState(owner) 
-    {
-        name = "Capsule";
-    }
+    BaseCharacter_CapsuleState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
     void ImGui() override;
+    virtual const char* GetName() const override { return "Capsule"; }
 
 private:
     float capsuleLength = 5;
@@ -126,15 +125,13 @@ private:
 class BaseCharacter_StanBallState : public BaseCharacter_BaseState
 {
 public:
-    BaseCharacter_StanBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
-    {
-        name = "StanBall";
-    }
+    BaseCharacter_StanBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
     void ImGui() override;
+    virtual const char* GetName() const override { return "StanBall"; }
 
 private:
     float speed=40;
@@ -144,15 +141,13 @@ private:
 class BaseCharacter_KnockbackBallState : public BaseCharacter_BaseState
 {
 public:
-    BaseCharacter_KnockbackBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner)
-    {
-        name = "KnockbackBall";
-    }
+    BaseCharacter_KnockbackBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
     void ImGui() override;
+    virtual const char* GetName() const override { return "KnockbackBall"; }
 
 private:
 };
@@ -163,4 +158,5 @@ public:
     BaseCharacter_NoneAttack(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
+    virtual const char* GetName() const override { return "NoneAttack"; }
 };

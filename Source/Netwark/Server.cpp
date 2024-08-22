@@ -269,20 +269,20 @@ void NetServer::Receive()
 
 void NetServer::Send()
 {
-    //入力情報更新
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    ////入力情報更新
+    //GamePad& gamePad = Input::Instance().GetGamePad();
 
-    input |= gamePad.GetButton();
-    inputDown |= gamePad.GetButtonDown();
-    inputUp |= gamePad.GetButtonUp();
+    //input |= gamePad.GetButton();
+    //inputDown |= gamePad.GetButtonDown();
+    //inputUp |= gamePad.GetButtonUp();
 
-    //入力をリングバッファに保存
-    SaveBuffer s;
-    s.frame = nowFrame;
-    s.input = input;
-    s.inputDown = inputDown;
-    s.inputUp = inputUp;
-    bufRing->Enqueue(s);
+    ////入力をリングバッファに保存
+    //SaveBuffer s;
+    //s.frame = nowFrame;
+    //s.input = input;
+    //s.inputDown = inputDown;
+    //s.inputUp = inputUp;
+    //bufRing->Enqueue(s);
 
     //for (auto& client : clientDatas)
     //{
@@ -303,13 +303,13 @@ void NetServer::Send()
     //    inputUp = 0;
 
     //    //client.nowFrame = nowFrame;
-    //    //client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
+    //    client.damageData = player->GetComponent<CharacterCom>()->GetGiveDamage();
 
     //    break;
     //}
-    //送信型に変換してデータを全て送る
-    std::stringstream ss = NetDataSendCast(clientDatas);
+    ////送信型に変換してデータを全て送る
+    //std::stringstream ss = NetDataSendCast(clientDatas);
 
-    sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
-        reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
+    //sendto(multicastSock, ss.str().c_str(), static_cast<int>(strlen(ss.str().c_str()) + 1), 0,
+    //    reinterpret_cast<struct sockaddr*>(&multicastAddr), static_cast<int>(sizeof(multicastAddr)));
 }

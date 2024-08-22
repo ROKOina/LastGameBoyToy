@@ -36,12 +36,12 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     HitResult rayResult;
     if (myType == COLLIDER_TYPE::RayCollider)
     {
-        isJudgeMyRay = RayVsNodeCollision(otherSide, rayResult, true);
+        isJudgeMyRay = RayVsNodeCollision(otherSide, rayResult, true);//vsModel
     }
     HitResult otherRayResult;
     if (otherType == COLLIDER_TYPE::RayCollider)
     {
-        isJudgeOtherRay = RayVsNodeCollision(otherSide, otherRayResult, false);
+        isJudgeOtherRay = RayVsNodeCollision(otherSide, otherRayResult, false);//vsModel
     }
 
     //‹…
@@ -80,16 +80,14 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     {
         if (judgeTag_ == otherSide->myTag_) {
             HitObj h;
-            h.rayResult.hitPos = rayResult.position;
-            h.rayResult.dist = rayResult.distance;
+            h.hitPos = rayResult.position;
             h.gameObject = otherSide->GetGameObject();
             hitObj_.emplace_back(h);
         }
 
         if (otherSide->judgeTag_ == myTag_) {
             HitObj h;
-            h.rayResult.hitPos = otherRayResult.position;
-            h.rayResult.dist = otherRayResult.distance;
+            h.hitPos = otherRayResult.position;
             h.gameObject = GetGameObject();
             otherSide->hitObj_.emplace_back(h);
         }
@@ -99,8 +97,7 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     {
         if (judgeTag_ == otherSide->myTag_) {
             HitObj h;
-            h.rayResult.hitPos = rayResult.position;
-            h.rayResult.dist = rayResult.distance;
+            h.hitPos = rayResult.position;
             h.gameObject = otherSide->GetGameObject();
             hitObj_.emplace_back(h);
         }
@@ -109,8 +106,7 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
     {
         if (otherSide->judgeTag_ == myTag_) {
             HitObj h;
-            h.rayResult.hitPos = otherRayResult.position;
-            h.rayResult.dist = otherRayResult.distance;
+            h.hitPos = otherRayResult.position;
             h.gameObject = GetGameObject();
             otherSide->hitObj_.emplace_back(h);
         }

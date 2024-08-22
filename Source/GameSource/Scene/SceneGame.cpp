@@ -33,13 +33,13 @@
 #include "GameSource/GameScript/FPSCameraCom.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
+#include "Graphics/Sprite/Sprite.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
 #include "Netwark/Photon/StdIO_UIListener.h"
 
 #include "Netwark/Photon/StaticSendDataManager.h"
-
 
 // 初期化
 void SceneGame::Initialize()
@@ -153,6 +153,13 @@ void SceneGame::Initialize()
         //pico位置
         cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    }
+
+    //UIテスト
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("UiTest");
+        obj->AddComponent<Sprite>(nullptr/*"Data\\UIData\\test.ui"*/);
     }
 
 #pragma endregion

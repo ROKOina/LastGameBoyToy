@@ -9,7 +9,6 @@
 
 #include "../MovementCom.h"
 
-
 //プレイヤー用キー入力補助クラス
 class CharacterInput
 {
@@ -35,6 +34,8 @@ public:
         MOVE,
         DASH,
         JUMP,
+        JUMPLOOP,
+        LANDING,
         NONE,
         MAX,
     };
@@ -172,7 +173,7 @@ protected:
     GameObject* cameraObj = nullptr;
 
   bool useMoveFlag = true;//falseにするとmoveStateを使わない
-  float jumpPower = 10.0f;
+  float jumpPower = 0.3f;
   float hitPoint = 100.0f;
 
   bool isStan = false;
