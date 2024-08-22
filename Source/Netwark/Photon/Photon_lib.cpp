@@ -195,9 +195,6 @@ void PhotonLib::ImGui()
 
 
 	//サーバー時間
-	if(ImGui::Button("ResetTime"))
-		startTime = GetServerTime();
-
 	float time = (GetServerTime() - startTime) / 1000.0f;
 	ImGui::DragFloat("time", &time);
 	

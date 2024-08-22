@@ -96,11 +96,9 @@ void CharacterCom::Update(float elapsedTime)
     if (CharacterInput::LeftShiftButton & GetButtonDown()
         && LScool.timer >= LScool.time)
     {
-        LScool.timer = 0;
         LeftShiftSkill();
     }
-    if (CharacterInput::JumpButton_SPACE & GetButtonDown()
-        && Spacecool.timer >= Spacecool.time)
+    if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         Spacecool.timer = 0;
         SpaceSkill();

@@ -409,3 +409,28 @@ float EasingImGui(int& easingtype, int& easingmovetype, float& t)
 
     return result;
 }
+
+//更新
+float EasingUpdate(int& easingtype, int& easingmovetype, float& t)
+{
+    EaseType selectedEaseType = static_cast<EaseType>(easingtype); // 初期選択値
+    EaseInOutType selectedEaseInOutType = static_cast<EaseInOutType>(easingmovetype); // 初期選択値
+
+    // 選択されたイージングタイプと方向に基づいてイージング関数を呼び出す
+    float result = 0.0f;
+
+    switch (selectedEaseInOutType)
+    {
+    case EaseInOutType::In:
+        result = Easing::In(selectedEaseType, t);
+        break;
+    case EaseInOutType::Out:
+        result = Easing::Out(selectedEaseType, t);
+        break;
+    case EaseInOutType::InOut:
+        result = Easing::InOut(selectedEaseType, t);
+        break;
+    }
+
+    return result;
+}

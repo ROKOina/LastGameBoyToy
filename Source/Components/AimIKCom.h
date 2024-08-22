@@ -21,7 +21,7 @@ public:
     void Update(float elapsedTime) override;
 
     // GUI•`‰æ
-    void OnGUI() override {};
+    void OnGUI() override;
 
 private:
 
@@ -36,4 +36,5 @@ private:
     //AimIK—p•Ï”
     std::vector<int>AimBone;
     const char* copyname = {};
+    float dot = {};
 };

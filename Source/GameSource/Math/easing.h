@@ -132,3 +132,6 @@ public:
 
 //imgui•\¦
 float EasingImGui(int& easingtype, int& easingmovetype, float& t);
+
+//XV
+float EasingUpdate(int& easingtype, int& easingmovetype, float& t);

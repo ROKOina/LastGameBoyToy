@@ -29,6 +29,7 @@
 #include "Components\Character\HaveAllAttackCharacter.h"
 #include "Components\Character\RegisterChara.h"
 #include "Components/CPUParticle.h"
+#include "Components\FootIKcom.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
 #include "GameSource/GameScript/FPSCameraCom.h"
 #include "Components/CPUParticle.h"
@@ -66,15 +67,6 @@ void SceneGame::Initialize()
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
-
-    //{//重いステージ
-    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("OmoiStage");
-    //    obj->transform_->SetWorldPosition({ 0, 0, 0 });
-    //    obj->transform_->SetScale({ 1, 1, 1 });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/OmoiStage/OmoiStage.mdl");
-    //}
 
     {//当たり判定用
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -159,7 +151,7 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("UiTest");
-        obj->AddComponent<Sprite>(nullptr/*"Data\\UIData\\test.ui"*/);
+        obj->AddComponent<Sprite>(nullptr, true/*"Data\\UIData\\test.ui"*/);
     }
 
 #pragma endregion

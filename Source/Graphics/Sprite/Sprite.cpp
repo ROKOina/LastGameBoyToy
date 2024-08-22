@@ -16,6 +16,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include "GameSource/Math/easing.h"
+#include "Components/TransformCom.h"
 #include <Input/Input.h>
 
 CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 1)
@@ -103,7 +104,7 @@ void Sprite::SaveParameterCPU::serialize(Archive& archive, int version)
 }
 
 // コンストラクタ
-Sprite::Sprite(const char* filename)
+Sprite::Sprite(const char* filename, bool collsion)
 {
     HRESULT hr = S_OK;
 
@@ -168,10 +169,18 @@ Sprite::Sprite(const char* filename)
         LoadTextureFromFile(device, spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
     }
 
-    //テクスチャ読み込み
-    LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &texture2ddesc_);
+    //コリジョンデータ読み込み
+    if (collsion)
+    {
+        LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &texture2ddesc_);
+    }
+
+    //Dissolveデータ読み込み
     LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
     LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
+
+    //コリジョンを使うか決める
+    ontriiger = collsion;
 }
 
 //更新処理
@@ -180,6 +189,9 @@ void Sprite::Update(float elapsedTime)
     // イージングが有効な場合
     if (play)
     {
+        //イージング更新
+        easingresult = EasingUpdate(spc.easingtype, spc.easingmovetype, easingtime);
+
         // イージング計算
         spc.position = Mathf::Lerp(savepos, spc.easingposition, easingresult);
         spc.color = Mathf::Lerp(savecolor, spc.easingcolor, easingresult);
@@ -230,6 +242,9 @@ void Sprite::Update(float elapsedTime)
             hit = false;
         }
     }
+
+    //スクリーン座標に変換
+    ScreenPos();
 }
 
 //描画
@@ -329,7 +344,7 @@ void Sprite::Render()
     dc->Draw(4, 0);
 
     //当たり判定可視化
-    if (drawcollsion)
+    if (drawcollsion && ontriiger)
     {
         DrawCollsionBox();
     }
@@ -434,10 +449,23 @@ void Sprite::OnGUI()
     // その他のパラメータ
     ImGui::Text("Parameters");
 
+    if (ImGui::TreeNode("ScreennPos"))
+    {
+        //オブジェクトの名前をコピー
+        char name[256];
+        ::strncpy_s(name, sizeof(name), objectname.c_str(), sizeof(name));
+        if (ImGui::InputText((char*)u8"オブジェクトの名前", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            objectname = name;
+        }
+        ImGui::DragFloat3((char*)u8"座標オフセット値", &screenposoffset.x);
+        ImGui::TreePop();
+    }
+
     //コンスタントバッファ
     if (ImGui::TreeNode("ConstantsBuffer"))
     {
-        ImGui::DragFloat2((char*)u8"UVスクロール", &constants.uvscroll.x, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat2((char*)u8"UVスクロール", &constants.uvscroll.x, 0.1f);
         ImGui::DragFloat((char*)u8"クリップ", &constants.cliptime, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"縁しきい値", &constants.edgethreshold, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"縁オフセット値", &constants.edgeoffset, 0.1f, 0.0f, 1.0f);
@@ -472,9 +500,11 @@ void Sprite::OnGUI()
     ImGui::Checkbox((char*)u8"ループ再生", &spc.loop);
     ImGui::SameLine();
     ImGui::Checkbox((char*)u8"ワンカット再生", &spc.comback);
-    ImGui::Checkbox((char*)u8"ヒット！", &hit);
     ImGui::SameLine();
-    ImGui::Checkbox((char*)u8"当たり判定ON", &ontriiger);
+    if (ontriiger)
+    {
+        ImGui::Checkbox((char*)u8"ヒット！", &hit);
+    }
 }
 
 //シリアライズ
@@ -637,7 +667,6 @@ void Sprite::DrawCollsionBox()
     UINT stride{ sizeof(Vertex) };
     UINT offset{ 0 };
     dc->IASetVertexBuffers(0, 1, &collisionVertexBuffer, &stride, &offset);
-    dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     dc->PSSetShaderResources(0, 1, collsionshaderResourceView_.GetAddressOf());
 
     // スプライトの矩形を描画
@@ -657,7 +686,6 @@ bool Sprite::cursorVsCollsionBox()
     Mouse& mouse = Input::Instance().GetMouse();
     float mousePosx = mouse.GetPositionX();
     float mousePosy = mouse.GetPositionY();
-
 
     //法線ベクトル作成
     float x{ sinf(DirectX::XMConvertToRadians(spc.angle)) };
@@ -681,15 +709,63 @@ bool Sprite::cursorVsCollsionBox()
     if (upLen * upLen > scale.y * scale.y)return false;
     if (rightLen * rightLen > scale.x * scale.x)return false;
 
-
-    //const float trLeft = spc.position.x + spc.collsionpositionoffset.x - (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f;
-    //const float trRight = spc.position.x + spc.collsionpositionoffset.x + (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f;
-    //const float trTop = spc.position.y + spc.collsionpositionoffset.y - (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f;
-    //const float trBottom = spc.position.y + spc.collsionpositionoffset.y + (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f;
-
-    //if (mousePosx < trLeft)return false;
-    //if (mousePosx > trRight)return false;
-    //if (mousePosy < trTop)return false;
-    //if (mousePosy > trBottom)return false;
     return true;
+}
+
+// 3D座標をスクリーン座標に変換する関数
+DirectX::XMVECTOR Screen(const DirectX::XMVECTOR& worldPos, const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projectionMatrix, float screenWidth, float screenHeight)
+{
+    // ワールド空間からビュー空間へ
+    DirectX::XMVECTOR viewPos = DirectX::XMVector3TransformCoord(worldPos, viewMatrix);
+
+    // ビュー空間からクリッピング空間へ
+    DirectX::XMVECTOR clipPos = DirectX::XMVector3TransformCoord(viewPos, projectionMatrix);
+
+    // クリッピング空間からスクリーン空間へ
+    float w = DirectX::XMVectorGetW(clipPos);
+    if (w == 0.0f) w = 1.0f; // ゼロ割り防止
+    float x = DirectX::XMVectorGetX(clipPos) / w;
+    float y = DirectX::XMVectorGetY(clipPos) / w;
+
+    // スクリーン座標系に変換
+    float screenX = (x * 0.5f + 0.5f) * screenWidth;
+    float screenY = (1.0f - (y * 0.5f + 0.5f)) * screenHeight;
+
+    return DirectX::XMVectorSet(screenX, screenY, 0.0f, 0.0f);
+}
+
+// スプライトの位置をスクリーン座標に変換する関数
+void Sprite::ScreenPos()
+{
+    // ビューポート
+    D3D11_VIEWPORT viewport;
+    UINT numViewports = 1;
+    Graphics::Instance().GetDeviceContext()->RSGetViewports(&numViewports, &viewport);
+
+    // 変換行列
+    DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetView());
+    DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetProjection());
+
+    // ワールド座標
+    if (objectname != "")
+    {
+        DirectX::XMFLOAT3 pos = GameObjectManager::Instance().Find(objectname.c_str())->transform_->GetWorldPosition() + screenposoffset;
+        DirectX::XMVECTOR WorldPosition = DirectX::XMLoadFloat3(&pos);
+
+        // 3D座標をスクリーン座標に変換
+        DirectX::XMVECTOR ScreenPosition = Screen(
+            WorldPosition,
+            View,
+            Projection,
+            viewport.Width,
+            viewport.Height
+        );
+
+        // スクリーン座標
+        DirectX::XMFLOAT2 screenPosition;
+        DirectX::XMStoreFloat2(&screenPosition, ScreenPosition);
+
+        // スプライトの位置をスクリーン座標に設定
+        spc.position = screenPosition;
+    }
 }

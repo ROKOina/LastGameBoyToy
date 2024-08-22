@@ -4,11 +4,11 @@
 class FootIKCom : public Component
 {
 public:
-    enum class LegNodes{
-        RIGHT_WAIST,   //腰 
+    enum class LegNodes {
+        RIGHT_WAIST,   //腰
         RIGHT_KNEES,   //膝
         RIGHT_ANKLE,   //足首
-        LEFT_WAIST,         
+        LEFT_WAIST,
         LEFT_KNEES,
         LEFT_ANKLE,
         Max,
@@ -37,8 +37,6 @@ public:
     // GUI描画
     void OnGUI() override;
 
-    
-
 public:
     //ターゲットポジション取得
     bool GetTargetPosition(Legs leg, DirectX::XMFLOAT3& resultPos);
@@ -61,7 +59,7 @@ private:
     //ターゲットポール
     DirectX::XMFLOAT4X4 poleLocalTransform[(int)Legs::Max] = {};
     DirectX::XMFLOAT4X4 poleWorldTransform[(int)Legs::Max] = {};
-    
+
     //StageModel
-    Model*  stageModel;
+    Model* stageModel;
 };

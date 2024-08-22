@@ -17,18 +17,12 @@
 //ゲームオブジェクト
 #pragma region GameObject
 
-clock_t startTimeCom = 0, endTimeCom = 0;
 // 開始処理
 void GameObject::Start()
 {
     for (std::shared_ptr<Component>& component : components_)
     {
-        startTimeCom = clock();
-
         component->Start();
-
-        endTimeCom = clock();
-        component->SetLoadTime(endTimeCom - startTimeCom);
     }
 }
 
@@ -97,10 +91,6 @@ void GameObject::OnGUI()
         ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
         if (ImGui::TreeNodeEx(component->GetName(), nodeFlags))
         {
-            float loadTime = component->GetLoadTime();
-            ImGui::DragFloat("loadTime", &loadTime);
-
-
             bool enabled = component->GetEnabled();
             if (ImGui::Checkbox(" ", &enabled))
             {

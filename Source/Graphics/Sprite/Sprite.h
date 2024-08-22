@@ -4,13 +4,14 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "Components/System/Component.h"
+#include "Components/CameraCom.h"
 
 // スプライト
 class Sprite :public Component
 {
 public:
 
-    Sprite(const char* filename);
+    Sprite(const char* filename, bool collsion);
     ~Sprite() {}
 
     //初期設定
@@ -47,6 +48,9 @@ private:
 
     //マウスカーソルとコリジョンボックスの当たり判定
     bool cursorVsCollsionBox();
+
+    //スクリーン座標変換
+    void ScreenPos();
 
 public:
 
@@ -121,4 +125,8 @@ private:
     bool drawcollsion = false;
     bool hit = false;
     bool ontriiger = false;
+
+    //後程シリアライズ
+    std::string objectname = {};
+    DirectX::XMFLOAT3 screenposoffset = {};
 };

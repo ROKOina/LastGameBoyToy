@@ -7,7 +7,7 @@
 void SceneLoading::Initialize()
 {
     //スプライト初期化
-    sprite_ = new Sprite("Data/Sprite/yellow.png");
+    //sprite_ = new Sprite("Data/Sprite/yellow.png");
 
     //スレッド開始
     thread_ = new std::thread(LoadingThread, this);
@@ -25,11 +25,11 @@ void SceneLoading::Finalize()
     }
 
     //スプライト終了化
-    if (sprite_ != nullptr)
-    {
-        delete sprite_;
-        sprite_ = nullptr;
-    }
+    //if (sprite_ != nullptr)
+    //{
+    //    delete sprite_;
+    //    sprite_ = nullptr;
+    //}
 }
 
 //更新処理

@@ -50,7 +50,7 @@ void SceneIKTest::Initialize()
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
+        std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
         std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
     }
 
@@ -79,11 +79,6 @@ void SceneIKTest::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-    //コンポーネントゲット
-    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-    std::shared_ptr<RendererCom> r = obj->GetComponent<RendererCom>();
-    std::shared_ptr<AnimationCom> a = obj->GetComponent<AnimationCom>();
 }
 
 void SceneIKTest::Render(float elapsedTime)
