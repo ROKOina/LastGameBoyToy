@@ -85,10 +85,10 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = 10 - power * 9;
+    float gravity = -0.1 * power;
     moveCom->SetGravity(-gravity);
     moveCom->SetFriction(0.0f);
-    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed * power));
+    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
@@ -128,10 +128,10 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = 10 - power * 9;
+    float gravity = -0.1 * power;
     moveCom->SetGravity(-gravity);
     moveCom->SetFriction(0.0f);
-    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed * power));
+    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);

@@ -99,7 +99,7 @@ void SceneGame::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK, obj);
 
         //obj->transform_->SetWorldPosition({ 0, 0, 0 });
         //obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
