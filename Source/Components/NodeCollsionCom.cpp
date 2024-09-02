@@ -52,6 +52,27 @@ void NodeCollsionCom::Update(float elapsedTime)
 
         // 高さを設定
         cp.height = distance;
+
+        //デバッグプリミティブ描画
+        if (debugrender)
+        {
+            // 常にデバッグプリミティブを描画
+            switch (static_cast<CollsionType>(cp.collsiontype))
+            {
+            case NodeCollsionCom::CollsionType::SPHER:
+                // debugprimitive描画
+                Graphics::Instance().GetDebugRenderer()->DrawSphere(pos, cp.radius, { 1, 0, 0, 1 });
+                break;
+
+            case NodeCollsionCom::CollsionType::CYLINDER:
+                // debugprimitive描画
+                Graphics::Instance().GetDebugRenderer()->DrawCylinder(pos, endpos, cp.radius, cp.height, { 1, 0, 0, 1 });
+                break;
+
+            default:
+                break;
+            }
+        }
     }
 }
 
@@ -91,24 +112,9 @@ void NodeCollsionCom::OnGUI()
                     model->GetNodes()[cp.endnodeid].worldTransform._43
                 };
             }
-
-            // 常にデバッグプリミティブを描画
-            switch (static_cast<CollsionType>(cp.collsiontype))
-            {
-            case NodeCollsionCom::CollsionType::SPHER:
-                // debugprimitive描画
-                Graphics::Instance().GetDebugRenderer()->DrawSphere(pos, cp.radius, { 1, 0, 0, 1 });
-                break;
-
-            case NodeCollsionCom::CollsionType::CYLINDER:
-                // debugprimitive描画
-                Graphics::Instance().GetDebugRenderer()->DrawCylinder(pos, endpos, cp.radius, cp.height, { 1, 0, 0, 1 });
-                break;
-
-            default:
-                break;
-            }
         }
+
+        ImGui::Checkbox((char*)u8"デバッグ描画", &debugrender);
 
         // 衝突パラメータを表示
         for (size_t i = 0; i < model->cp.size(); ++i)

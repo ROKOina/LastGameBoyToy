@@ -49,9 +49,6 @@ private:
     //マウスカーソルとコリジョンボックスの当たり判定
     bool cursorVsCollsionBox();
 
-    //スクリーン座標変換
-    void ScreenPos();
-
 public:
 
     //保存するパラメータ
@@ -89,6 +86,7 @@ public:
         float edgethreshold = 0.6f;
         float edgeoffset = 0.1f;
         DirectX::XMFLOAT3 edgecolor = { 1,1,1 };
+        DirectX::XMFLOAT4X4 world = { 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
     };
     SaveConstantsParameter constants;
 
@@ -125,8 +123,4 @@ private:
     bool drawcollsion = false;
     bool hit = false;
     bool ontriiger = false;
-
-    //後程シリアライズ
-    std::string objectname = {};
-    DirectX::XMFLOAT3 screenposoffset = {};
 };

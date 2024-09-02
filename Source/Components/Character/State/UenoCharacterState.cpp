@@ -28,14 +28,12 @@ void UenoCharacterState_IdleState::Execute(const float& elapsedTime)
     if (owner->IsPushLeftStick())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
-        return;
     }
 
     //ジャンプ入力
     if (GamePad::BTN_A & owner->GetButtonDown())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
-        return;
     }
 }
 #pragma endregion
@@ -57,9 +55,10 @@ void UenoCharacterState_MoveState::Enter()
         param.rootFlag = false,
         param.blendType = 2,
         param.animeChangeRate = 0.5f,
-        param.animeBlendRate = 0.2f
+        param.animeBlendRate = 0.0f
     };
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
+    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("shot"), true, 0.3f);
 }
 
 void UenoCharacterState_MoveState::Execute(const float& elapsedTime)
@@ -71,14 +70,12 @@ void UenoCharacterState_MoveState::Execute(const float& elapsedTime)
     if (!owner->IsPushLeftStick())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
-        return;
     }
 
     //ジャンプ入力
     if (GamePad::BTN_A & owner->GetButtonDown())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
-        return;
     }
 }
 #pragma endregion
@@ -87,7 +84,7 @@ void UenoCharacterState_MoveState::Execute(const float& elapsedTime)
 void UenoCharacterState_JumpState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("jump"), false);
 
     //ジャンプベクトル
     JumpInput(owner->GetGameObject());
@@ -98,8 +95,8 @@ void UenoCharacterState_JumpState::Execute(const float& elapsedTime)
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {
-        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
-        return;
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+        //ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
     }
 }
 #pragma endregion
@@ -120,14 +117,12 @@ void UenoCharacterState_JumpLoopState::Execute(const float& elapsedTime)
         if (!owner->IsPushLeftStick())
         {
             ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
-            return;
         }
 
         //ステック入力があれば移動ステートに遷移
         if (owner->IsPushLeftStick())
         {
             ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
-            return;
         }
     }
 }

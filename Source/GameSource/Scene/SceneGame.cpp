@@ -68,7 +68,8 @@ void SceneGame::Initialize()
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
     }
 
-    {//当たり判定用
+    //当たり判定用
+    {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("robo");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
@@ -85,54 +86,11 @@ void SceneGame::Initialize()
         obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
 
-    //{//chara
-    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("chara");
-    //    obj->transform_->SetWorldPosition({ 0, 0, 0 });
-    //    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/pico/pico.mdl");
-    //    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    //}
-
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK, obj);
-
-        //obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        //obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-        ////obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        //std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        ////r->LoadModel("Data/OneCoin/robot.mdl");
-        //r->LoadModel("Data/pico/pico.mdl");
-        //std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        //obj->AddComponent<AimIKCom>("Spine");
-        //obj->AddComponent<NodeCollsionCom>(nullptr/*"Data//CollsionData//test.nodecollsion"*/);
-        //a->PlayAnimation(0, true, false, 0.001f);
-        //std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        //std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
-        ////std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        ////std::shared_ptr<TestCharacterCom> c = obj->AddComponent<TestCharacterCom>();
-        ////std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
-        ////std::shared_ptr<NomuraCharacterCom> c = obj->AddComponent<NomuraCharacterCom>();
-
-        //std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
-        //sphere->SetRadius(0.5f);
-        //sphere->SetMyTag(COLLIDER_TAG::Player);
-
-        ////攻撃レイキャストスタート位置
-        //{
-        //    std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
-        //    rayChild->SetName("rayObj");
-
-        //    rayChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-
-        //    std::shared_ptr<RayColliderCom> sphere = rayChild->AddComponent<RayColliderCom>();
-        //    sphere->SetMyTag(COLLIDER_TAG::Player);
-        //    sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
-        //}
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::UENO, obj);
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -141,7 +99,7 @@ void SceneGame::Initialize()
         std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
         cameraPost->SetName("cameraPostPlayer");
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-        //cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
+
         //pico位置
         cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
@@ -201,9 +159,6 @@ void SceneGame::Update(float elapsedTime)
     }
 
     photonNet->run(elapsedTime);
-
-    // キーの入力情報を各キャラクターに割り当てる
-    //SetUserInputs();
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
@@ -307,16 +262,6 @@ void SceneGame::SetOnlineInput()
 
     for (auto& client : n->GetNetDatas())
     {
-        ////自分自身の場合は入力情報を更新
-        //if (client.id == n->GetNetId())
-        //{
-        //    GamePad& gamePad = Input::Instance().GetGamePad();
-
-        //    client.input |= gamePad.GetButton();
-        //    client.inputDown |= gamePad.GetButtonDown();
-        //    client.inputUp |= gamePad.GetButtonUp();
-        //}
-
         std::string name = "Net" + std::to_string(client.id);
         std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
 
@@ -325,18 +270,6 @@ void SceneGame::SetOnlineInput()
             std::shared_ptr<CharacterCom> chara = clientObj->GetComponent<CharacterCom>();
 
             if (!chara)continue;
-
-            //// 入力情報をプレイヤーキャラクターに送信
-            //chara->SetUserInput(client.input);
-            //chara->SetUserInputDown(client.inputDown);
-            //chara->SetUserInputUp(client.inputUp);
-
-            //DirectX::XMFLOAT3 velocity = Mathf::Normalize(client.velocity);
-
-            //DirectX::XMFLOAT2 leftS = { velocity.x,velocity.z };
-
-            //chara->SetLeftStick(leftS);
-            //chara->SetRightStick(gamePad.GetAxisR());
         }
     }
 }
@@ -344,9 +277,4 @@ void SceneGame::SetOnlineInput()
 void SceneGame::DelayOnlineInput()
 {
     if (!n)return;
-
-    //for (auto& netClient : n->GetNetDatas())
-    //{
-    //    netClient.id
-    //}
 }

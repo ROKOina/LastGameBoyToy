@@ -22,13 +22,6 @@ void AimIKCom::Start()
     SearchAimNode(copyname);
 }
 
-//更新処理
-void AimIKCom::Update(float elapsedTime)
-{
-    //aimikの計算
-    AimIK();
-}
-
 //imgui
 void AimIKCom::OnGUI()
 {
@@ -52,9 +45,9 @@ void AimIKCom::AimIK()
 
     // ターゲット位置をカメラの前方に一定距離だけ進んだ位置に設定
     DirectX::XMFLOAT3 targetPosition = {
-        cameraPosition.x + cameraForward.x * 10.0f, // 距離を10に設定（調整可能）
-        cameraPosition.y + cameraForward.y * 10.0f,
-        cameraPosition.z + cameraForward.z * 10.0f
+        cameraPosition.x + cameraForward.x * 100.0f, // 距離を10に設定（調整可能）
+        cameraPosition.y + cameraForward.y * 100.0f,
+        cameraPosition.z + cameraForward.z * 100.0f
     };
 
     // プレイヤーの逆行列を取得してターゲット位置をローカル空間に変換

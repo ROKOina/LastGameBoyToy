@@ -38,4 +38,5 @@ private:
 
     const char* m_filename = {};
     Model* model = nullptr;
+    bool debugrender = false;
 };

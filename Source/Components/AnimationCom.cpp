@@ -3,6 +3,7 @@
 #include "TransformCom.h"
 #include "../GameSource/Math/Mathf.h"
 #include "Character/CharacterCom.h"
+#include "Components/AimIKCom.h"
 #include <imgui.h>
 #include <cassert>
 
@@ -155,7 +156,14 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                     //アニメーション計算
                     ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                 }
+
+                //AimIKの更新
+                if (GetGameObject()->GetComponent<AimIKCom>())
+                {
+                    GetGameObject()->GetComponent<AimIKCom>()->AimIK();
+                }
             }
+
             break;
         }
     }
@@ -264,8 +272,16 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                         ComputeAnimation(key0, key1, rate, *upperNodes[upperNodeIndex]);
                     }
                 }
+
+                //AimIKの更新
+                if (GetGameObject()->GetComponent<AimIKCom>())
+                {
+                    GetGameObject()->GetComponent<AimIKCom>()->AimIK();
+                }
+
                 upperNodeIndex++;
             }
+
             break;
         }
     }
@@ -346,11 +362,12 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
             int lowerNodeCount = static_cast<int>(lowerNodes.size());
             for (int nodeIndex = 0, lowerNodeIndex = 0; lowerNodeIndex < lowerNodeCount; ++nodeIndex)
             {
-                if (lowerNodes[lowerNodeIndex]->nodeIndex != model->GetNodes()[nodeIndex].nodeIndex) {
+                if (lowerNodes[lowerNodeIndex]->nodeIndex != model->GetNodes()[nodeIndex].nodeIndex)
+                {
                     continue;
                 }
-                //2つのキーフレーム間の補完計算
 
+                //2つのキーフレーム間の補完計算
                 if (lowerBlendType == 0)
                 {
                     const ModelResource::NodeKeyData& key0 = keyframe0.nodeKeys.at(nodeIndex);
@@ -497,6 +514,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                 }
                 lowerNodeIndex++;
             }
+
             break;
         }
     }

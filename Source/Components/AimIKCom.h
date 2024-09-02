@@ -18,15 +18,15 @@ public:
     void Start() override;
 
     // XVˆ—
-    void Update(float elapsedTime) override;
+    void Update(float elapsedTime) override {};
 
     // GUI•`‰æ
     void OnGUI() override;
 
-private:
-
     //AimIKŠÖ”
     void AimIK();
+
+private:
 
     //ik‚³‚¹‚ébone‚ğ’T‚·
     void SearchAimNode(const char* aimbonename);

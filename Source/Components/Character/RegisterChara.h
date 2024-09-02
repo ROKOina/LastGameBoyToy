@@ -20,6 +20,7 @@ public:
     enum class CHARA_LIST
     {
         INAZAWA,
+        UENO,
         HAVE_ALL_ATTACK,
         MAX,
     };
@@ -30,4 +31,5 @@ public:
 private:
     void InazawaChara(std::shared_ptr<GameObject> obj);
     void HaveAllAttackChara(std::shared_ptr<GameObject> obj);
+    void UenoChara(std::shared_ptr<GameObject> obj);
 };

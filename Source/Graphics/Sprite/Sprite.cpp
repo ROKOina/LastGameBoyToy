@@ -242,9 +242,6 @@ void Sprite::Update(float elapsedTime)
             hit = false;
         }
     }
-
-    //スクリーン座標に変換
-    ScreenPos();
 }
 
 //描画
@@ -451,14 +448,6 @@ void Sprite::OnGUI()
 
     if (ImGui::TreeNode("ScreennPos"))
     {
-        //オブジェクトの名前をコピー
-        char name[256];
-        ::strncpy_s(name, sizeof(name), objectname.c_str(), sizeof(name));
-        if (ImGui::InputText((char*)u8"オブジェクトの名前", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
-        {
-            objectname = name;
-        }
-        ImGui::DragFloat3((char*)u8"座標オフセット値", &screenposoffset.x);
         ImGui::TreePop();
     }
 
@@ -710,62 +699,4 @@ bool Sprite::cursorVsCollsionBox()
     if (rightLen * rightLen > scale.x * scale.x)return false;
 
     return true;
-}
-
-// 3D座標をスクリーン座標に変換する関数
-DirectX::XMVECTOR Screen(const DirectX::XMVECTOR& worldPos, const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projectionMatrix, float screenWidth, float screenHeight)
-{
-    // ワールド空間からビュー空間へ
-    DirectX::XMVECTOR viewPos = DirectX::XMVector3TransformCoord(worldPos, viewMatrix);
-
-    // ビュー空間からクリッピング空間へ
-    DirectX::XMVECTOR clipPos = DirectX::XMVector3TransformCoord(viewPos, projectionMatrix);
-
-    // クリッピング空間からスクリーン空間へ
-    float w = DirectX::XMVectorGetW(clipPos);
-    if (w == 0.0f) w = 1.0f; // ゼロ割り防止
-    float x = DirectX::XMVectorGetX(clipPos) / w;
-    float y = DirectX::XMVectorGetY(clipPos) / w;
-
-    // スクリーン座標系に変換
-    float screenX = (x * 0.5f + 0.5f) * screenWidth;
-    float screenY = (1.0f - (y * 0.5f + 0.5f)) * screenHeight;
-
-    return DirectX::XMVectorSet(screenX, screenY, 0.0f, 0.0f);
-}
-
-// スプライトの位置をスクリーン座標に変換する関数
-void Sprite::ScreenPos()
-{
-    // ビューポート
-    D3D11_VIEWPORT viewport;
-    UINT numViewports = 1;
-    Graphics::Instance().GetDeviceContext()->RSGetViewports(&numViewports, &viewport);
-
-    // 変換行列
-    DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetView());
-    DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->GetProjection());
-
-    // ワールド座標
-    if (objectname != "")
-    {
-        DirectX::XMFLOAT3 pos = GameObjectManager::Instance().Find(objectname.c_str())->transform_->GetWorldPosition() + screenposoffset;
-        DirectX::XMVECTOR WorldPosition = DirectX::XMLoadFloat3(&pos);
-
-        // 3D座標をスクリーン座標に変換
-        DirectX::XMVECTOR ScreenPosition = Screen(
-            WorldPosition,
-            View,
-            Projection,
-            viewport.Width,
-            viewport.Height
-        );
-
-        // スクリーン座標
-        DirectX::XMFLOAT2 screenPosition;
-        DirectX::XMStoreFloat2(&screenPosition, ScreenPosition);
-
-        // スプライトの位置をスクリーン座標に設定
-        spc.position = screenPosition;
-    }
 }

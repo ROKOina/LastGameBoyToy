@@ -168,11 +168,6 @@ private:
     int                             lowerAnimationThreeIndex = 0;
     int                             lowerAnimationFourIndex = 0;
 
-    //上半身のノードの番号
-    int                             upperID = 2;
-    //下半身ノードの番号
-    int                             lowerID = 1;
-
     //下半身のアニメーション制御の番号 0=normal 1=blendAnime 2=walkAnime
     int                             lowerBlendType = 0;
 

@@ -20,6 +20,13 @@ public:
     //imgui
     void OnGUI() override;
 
-    //メインアタック
-    void MainAttackDown()override;
+    void MainAttackPushing() override;
+
+    void SubAttackPushing() override;
+
+    void SubSkill() override;
+
+    void SpaceSkill() override;
+
+    void LeftShiftSkill() override;
 };
