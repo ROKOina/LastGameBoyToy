@@ -83,6 +83,7 @@ void BaseCharacter_MoveState::Enter()
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
+    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), true, 0.3f);
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
