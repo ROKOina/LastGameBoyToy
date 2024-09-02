@@ -36,5 +36,4 @@ private:
     //AimIK—p•Ï”
     std::vector<int>AimBone;
     const char* copyname = {};
-    float dot = {};
 };
