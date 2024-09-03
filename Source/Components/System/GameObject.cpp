@@ -243,7 +243,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     m_posteffect->PostEffectRender();
 
     //スプライト描画
-    SpriteRender();
+    SpriteRender(view, projection);
 
     //debug
     if (Graphics::Instance().IsDebugGUI())
@@ -750,7 +750,7 @@ void GameObjectManager::GPUParticleRender()
 }
 
 //スプライト描画
-void GameObjectManager::SpriteRender()
+void GameObjectManager::SpriteRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     if (spriteobject.size() <= 0)return;
 
@@ -759,7 +759,7 @@ void GameObjectManager::SpriteRender()
         if (!sp.lock()->GetGameObject()->GetEnabled())continue;
         if (!sp.lock()->GetEnabled())continue;
 
-        sp.lock()->Render();
+        sp.lock()->Render(view, projection);
     }
 }
 

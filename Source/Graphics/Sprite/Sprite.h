@@ -21,7 +21,7 @@ public:
     void Update(float elapsedTime)override;
 
     //描画
-    void Render();
+    void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     //imgui
     void OnGUI()override;
@@ -123,4 +123,8 @@ private:
     bool drawcollsion = false;
     bool hit = false;
     bool ontriiger = false;
+
+    //後程シリアライズ
+    std::string objectname = {};
+    DirectX::XMFLOAT3 screenposoffset = {};
 };

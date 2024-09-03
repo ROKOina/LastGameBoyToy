@@ -194,7 +194,7 @@ private:
     void GPUParticleRender();
 
     //スプライト描画
-    void SpriteRender();
+    void SpriteRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);

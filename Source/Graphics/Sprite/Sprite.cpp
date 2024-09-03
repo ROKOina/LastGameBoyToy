@@ -245,46 +245,73 @@ void Sprite::Update(float elapsedTime)
 }
 
 //描画
-void Sprite::Render()
+void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     Graphics& Graphics = Graphics::Instance();
     ID3D11Device* device = Graphics.GetDevice();
     ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
 
-    //viewport設定
+    // ビューポート設定
     D3D11_VIEWPORT viewport{};
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
 
-    //ステートの設定
+    // ステートの設定
     dc->OMSetBlendState(Graphics.GetBlendState(static_cast<BLENDSTATE>(spc.blend)), nullptr, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(static_cast<DEPTHSTATE>(spc.depth)), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
 
-    // スプライトの頂点座標をスクリーン空間に設定
-    float x0{ spc.position.x - spc.scale.x * 0.5f };
-    float y0{ spc.position.y - spc.scale.y * 0.5f };
-    float x1{ spc.position.x + spc.scale.x * 0.5f };
-    float y1{ spc.position.y - spc.scale.y * 0.5f };
-    float x2{ spc.position.x - spc.scale.x * 0.5f };
-    float y2{ spc.position.y + spc.scale.y * 0.5f };
-    float x3{ spc.position.x + spc.scale.x * 0.5f };
-    float y3{ spc.position.y + spc.scale.y * 0.5f };
+    // 変換行列
+    DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
+    DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
 
+    // ワールド座標の計算とスクリーン座標への変換
+    if (!objectname.empty())
+    {
+        auto& gameObject = GameObjectManager::Instance().Find(objectname.c_str());
+        if (gameObject != nullptr)
+        {
+            DirectX::XMFLOAT3 pos = gameObject->transform_->GetWorldPosition();
+            DirectX::XMVECTOR WorldPosition = DirectX::XMLoadFloat3(&pos);
+
+            // スクリーン座標に変換
+            DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3TransformCoord(WorldPosition, View * Projection);
+
+            // スクリーン座標をビューポート座標に変換
+            float viewportX = viewport.TopLeftX + (viewport.Width * (DirectX::XMVectorGetX(ScreenPosition) + 1.0f)) / 2.0f;
+            float viewportY = viewport.TopLeftY + (viewport.Height * (1.0f - DirectX::XMVectorGetY(ScreenPosition))) / 2.0f;
+
+            // スプライトの位置を設定
+            spc.position = { viewportX, viewportY };
+        }
+    }
+
+    // スプライトの頂点座標の計算
+    float x0 = spc.position.x - spc.scale.x * 0.5f;
+    float y0 = spc.position.y - spc.scale.y * 0.5f;
+    float x1 = spc.position.x + spc.scale.x * 0.5f;
+    float y1 = spc.position.y - spc.scale.y * 0.5f;
+    float x2 = spc.position.x - spc.scale.x * 0.5f;
+    float y2 = spc.position.y + spc.scale.y * 0.5f;
+    float x3 = spc.position.x + spc.scale.x * 0.5f;
+    float y3 = spc.position.y + spc.scale.y * 0.5f;
+
+    // スプライトの回転
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)
         {
             x -= cx;
             y -= cy;
 
-            float cos{ cosf(DirectX::XMConvertToRadians(angle)) };
-            float sin{ sinf(DirectX::XMConvertToRadians(angle)) };
-            float tx{ x }, ty{ y };
-            x = cos * tx - sin * ty;
-            y = sin * tx + cos * ty;
+            float cosA = cosf(DirectX::XMConvertToRadians(angle));
+            float sinA = sinf(DirectX::XMConvertToRadians(angle));
+            float tx = x, ty = y;
+            x = cosA * tx - sinA * ty;
+            y = sinA * tx + cosA * ty;
 
             x += cx;
             y += cy;
         };
+
     float cx = spc.position.x;
     float cy = spc.position.y;
     rotate(x0, y0, cx, cy, spc.angle);
@@ -302,12 +329,12 @@ void Sprite::Render()
     x3 = 2.0f * x3 / viewport.Width - 1.0f;
     y3 = 1.0f - 2.0f * y3 / viewport.Height;
 
-    HRESULT hr{ S_OK };
+    // 頂点バッファのマッピング
     D3D11_MAPPED_SUBRESOURCE mapped_subresource{};
-    hr = dc->Map(vertexBuffer_.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_subresource);
+    HRESULT hr = dc->Map(vertexBuffer_.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_subresource);
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-    Vertex* vertices{ reinterpret_cast<Vertex*>(mapped_subresource.pData) };
+    Vertex* vertices = reinterpret_cast<Vertex*>(mapped_subresource.pData);
     if (vertices != nullptr)
     {
         vertices[0].position = { x0, y0 , 0.0f };
@@ -317,16 +344,17 @@ void Sprite::Render()
 
         vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = { spc.color.x, spc.color.y, spc.color.z, spc.color.w };
 
-        vertices[0].texcoord = { 1.0f / texture2ddesc_.Width, 1.0f / texture2ddesc_.Height };
-        vertices[1].texcoord = { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height };
-        vertices[2].texcoord = { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height };
-        vertices[3].texcoord = { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height };
+        // テクスチャ座標
+        vertices[0].texcoord = { 0.0f, 0.0f };
+        vertices[1].texcoord = { 1.0f, 0.0f };
+        vertices[2].texcoord = { 0.0f, 1.0f };
+        vertices[3].texcoord = { 1.0f, 1.0f };
     }
     dc->Unmap(vertexBuffer_.Get(), 0);
 
-    //設定
-    UINT stride{ sizeof(Vertex) };
-    UINT offset{ 0 };
+    // 描画設定
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
     dc->IASetVertexBuffers(0, 1, vertexBuffer_.GetAddressOf(), &stride, &offset);
     dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     dc->VSSetConstantBuffers(0, 1, m_constantbuffer.GetAddressOf());
@@ -340,7 +368,7 @@ void Sprite::Render()
     dc->PSSetShaderResources(2, 1, rampshaderresourceview_.GetAddressOf());
     dc->Draw(4, 0);
 
-    //当たり判定可視化
+    // 当たり判定の可視化
     if (drawcollsion && ontriiger)
     {
         DrawCollsionBox();
@@ -448,6 +476,14 @@ void Sprite::OnGUI()
 
     if (ImGui::TreeNode("ScreennPos"))
     {
+        //オブジェクトの名前をコピー
+        char name[256];
+        ::strncpy_s(name, sizeof(name), objectname.c_str(), sizeof(name));
+        if (ImGui::InputText((char*)u8"オブジェクトの名前", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            objectname = name;
+        }
+        ImGui::DragFloat3((char*)u8"座標オフセット値", &screenposoffset.x);
         ImGui::TreePop();
     }
 
