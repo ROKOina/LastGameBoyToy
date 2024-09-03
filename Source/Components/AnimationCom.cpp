@@ -737,7 +737,7 @@ void AnimationCom::SeparateNode()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     for (auto& node : model->GetNodes())
     {
-        if (std::strcmp(node.name, "Hips") == 0)
+        if (std::strcmp(node.name, "Hip") == 0)
         {
             lowerNodes.emplace_back(&node);
             continue;
@@ -748,12 +748,10 @@ void AnimationCom::SeparateNode()
             //è„îºêg
             if (layer == 1) {
                 RegisterChildLayer(upperNodes, node);
-                //upperNodes.emplace_back(&node);
             }
             //â∫îºêg
             else if (layer == 2) {
                 RegisterChildLayer(lowerNodes, node);
-                //lowerNodes.emplace_back(&node);
             }
         }
     }
