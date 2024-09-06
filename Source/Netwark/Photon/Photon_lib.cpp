@@ -384,6 +384,8 @@ void PhotonLib::MyCharaInput()
         chara->SetUserInputUp(s.nextInput.inputUp);
 
         chara->SetLeftStick(s.nextInput.leftStick);
+        //ƒJƒƒ‰î•ñ
+        chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
 
         s.nextInput.inputDown = 0;
         s.nextInput.inputUp = 0;
@@ -414,6 +416,7 @@ void PhotonLib::NetCharaInput()
         //ˆÚ“®
         netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
+        chara->SetLeftStick(s.nextInput.leftStick);
         //ƒJƒƒ‰î•ñ
         chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
 
