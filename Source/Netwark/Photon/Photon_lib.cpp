@@ -545,6 +545,8 @@ void PhotonLib::sendData(void)
             if (netD.stanData[data.id] < data.valueF)
                 netD.stanData[data.id] = data.valueF;
         }
+        else if (data.sendType == 3)	//ノックバック
+            netD.knockbackData[data.id] += data.valueF3;
     }
 
     //マスタークライアントの場合はチームIDを送る
@@ -699,6 +701,18 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 {
                     auto& obj = GameObjectManager::Instance().Find("player");
                     obj->GetComponent<CharacterCom>()->SetStanSeconds(ne[0].stanData[id]);
+                    break;
+                }
+            }
+            //ノックバック情報
+            for (int id = 0; id < ne[0].knockbackData.size(); ++id)
+            {
+                if (id != GetPlayerNum())continue;
+
+                if (Mathf::Length(ne[0].knockbackData[id]) >= 0.1f)
+                {
+                    auto& obj = GameObjectManager::Instance().Find("player");
+                    obj->GetComponent<MovementCom>()->AddNonMaxSpeedForce(ne[0].knockbackData[id]);
                     break;
                 }
             }

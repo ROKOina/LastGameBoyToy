@@ -147,7 +147,8 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit= obj->AddComponent<HitProcessCom>(objPoint);
-    hit->SetHitType(HitProcessCom::HIT_TYPE::STAN);
-    hit->SetValue(5);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
+    DirectX::XMFLOAT3 vec = { 5,0,0 };
+    hit->SetValue3(vec);
 }
 

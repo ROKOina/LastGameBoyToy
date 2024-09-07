@@ -28,12 +28,14 @@ public:
         DAMAGE,
         HEAL,
         STAN,
+        KNOCKBACK,
     };
     void SetHitType(HitProcessCom::HIT_TYPE type) { hitType = type; }
 
     void SetHitInterval(float sec) { hitIntervalTime = sec; }
 
     void SetValue(float value) { this->value = value; }
+    void SetValue3(DirectX::XMFLOAT3 value3) { this->value3 = value3; }
 
     bool IsHit() { return isHit; }
 
@@ -52,7 +54,8 @@ private:
     float hitIntervalTimer;
 
     //ó^Ç¶ÇÈêî
-    int value = 1;
+    float value = 1.0f; //DAMAGE, HEAL, STAN
+    DirectX::XMFLOAT3 value3 = { 0,0,0 };   //KNOCKBACK
 
     //ìñÇΩÇ¡ÇƒÇ¢ÇÈÇ©
     bool isHit = false;
