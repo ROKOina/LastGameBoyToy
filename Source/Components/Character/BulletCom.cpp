@@ -156,7 +156,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
 {
     //弾丸オブジェクトを生成///////
     GameObj obj = GameObjectManager::Instance().Create();
-    obj->SetName("stanball");
+    obj->SetName("knockbackball");
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     firePos.y += 1.0f;
