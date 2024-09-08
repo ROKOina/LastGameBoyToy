@@ -505,10 +505,10 @@ void Sprite::EasingSprite()
     //当たり判定用の矩形を描画するための頂点
     Vertex easingVertices[]
     {
-        { { x0, y0, 0.0f }, { spc.easingcolor }, { 1.0f / texture2ddesc_.Width, 1.0f / texture2ddesc_.Height } }, // 赤色で表示
-        { { x1, y1, 0.0f }, { spc.easingcolor }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
-        { { x2, y2, 0.0f }, { spc.easingcolor }, { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
-        { { x3, y3, 0.0f }, { spc.easingcolor }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
+        { { x0, y0, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 1.0f / texture2ddesc_.Width, 1.0f / texture2ddesc_.Height } },
+        { { x1, y1, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
+        { { x2, y2, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
+        { { x3, y3, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
     };
 
     // いーじんぐ用の矩形を描画するための頂点バッファの作成
@@ -530,7 +530,7 @@ void Sprite::EasingSprite()
     UINT stride{ sizeof(Vertex) };
     UINT offset{ 0 };
     dc->IASetVertexBuffers(0, 1, &easingVertexBuffer, &stride, &offset);
-    dc->PSSetShaderResources(0, 1, easingshaderresourceview_.GetAddressOf());
+    dc->PSSetShaderResources(0, 1, shaderResourceView_.GetAddressOf());
 
     // スプライトの矩形を描画
     dc->Draw(4, 0);
