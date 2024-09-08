@@ -712,7 +712,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 if (Mathf::Length(ne[0].knockbackData[id]) >= 0.1f)
                 {
                     auto& obj = GameObjectManager::Instance().Find("player");
-                    obj->GetComponent<MovementCom>()->AddNonMaxSpeedForce(ne[0].knockbackData[id]);
+                    obj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(ne[0].knockbackData[id]);
                     break;
                 }
             }

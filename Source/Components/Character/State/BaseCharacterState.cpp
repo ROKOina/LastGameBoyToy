@@ -296,7 +296,7 @@ void BaseCharacter_StanBallState::ImGui()
 
 void BaseCharacter_KnockbackBallState::Enter()
 {
-
+    BulletCreate::KnockbackFire(owner->GetGameObject(), speed, power);
 }
 
 void BaseCharacter_KnockbackBallState::Execute(const float& elapsedTime)
@@ -310,6 +310,8 @@ void BaseCharacter_KnockbackBallState::Exit()
 
 void BaseCharacter_KnockbackBallState::ImGui()
 {
+    ImGui::DragFloat("speed", &speed);
+    ImGui::DragFloat("power", &power);
 }
 
 #pragma endregion

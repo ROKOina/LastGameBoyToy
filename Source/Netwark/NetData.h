@@ -64,22 +64,6 @@ static std::stringstream& operator<<(std::stringstream& out, const std::array<in
     out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
     return out;
 }
-//FLOAT3
-static std::stringstream& operator>>(std::stringstream& in, std::array<DirectX::XMFLOAT3, 6>& h)
-{
-    in >> DirectX::XMFLOAT3(h[0]) >> DirectX::XMFLOAT3(h[1]) >> DirectX::XMFLOAT3(h[2]) >> DirectX::XMFLOAT3(h[3]) >> DirectX::XMFLOAT3(h[4]) >> DirectX::XMFLOAT3(h[5]);
-    return in;
-}
-static std::stringstream& operator<<(std::stringstream& out, const std::array<DirectX::XMFLOAT3, 6>& h)
-{
-    out << h[0] << " ";
-    out << h[1] << " ";
-    out << h[2] << " ";
-    out << h[3] << " ";
-    out << h[4] << " ";
-    out << h[5] << " ";
-    return out;
-}
 
 
 ////ƒtƒŒ[ƒ€‚Æ“ü—Í
@@ -164,7 +148,14 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     out << h.damageData << " ";
     out << h.healData << " ";
     out << h.stanData << " ";
-    out << h.knockbackData << " ";
+
+    out << h.knockbackData[0] << " ";
+    out << h.knockbackData[1] << " ";
+    out << h.knockbackData[2] << " ";
+    out << h.knockbackData[3] << " ";
+    out << h.knockbackData[4] << " ";
+    out << h.knockbackData[5] << " ";
+
     out << h.teamID << " ";
     out << h.charaID << " ";
     VectorSaveBufferOut(out, h.saveInputBuf);
@@ -182,7 +173,14 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.damageData;
     in >> h.healData;
     in >> h.stanData;
-    in >> h.knockbackData;
+
+    in >> h.knockbackData[0];
+    in >> h.knockbackData[1];
+    in >> h.knockbackData[2];
+    in >> h.knockbackData[3];
+    in >> h.knockbackData[4];
+    in >> h.knockbackData[5];
+
     in >> h.teamID;
     in >> h.charaID;
     VectorSaveBufferIn(in, h.saveInputBuf);

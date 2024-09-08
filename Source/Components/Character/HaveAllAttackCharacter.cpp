@@ -16,6 +16,7 @@ void HaveAllAttackCharaCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<BaseCharacter_HitscanState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<BaseCharacter_CapsuleState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<BaseCharacter_StanBallState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL, std::make_shared<BaseCharacter_KnockbackBallState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
 
@@ -61,4 +62,5 @@ void HaveAllAttackCharaCom::SpaceSkill()
 
 void HaveAllAttackCharaCom::LeftShiftSkill()
 {
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
 }
