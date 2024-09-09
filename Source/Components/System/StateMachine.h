@@ -22,6 +22,8 @@ public:
 
     void ImGui()
     {
+        ImGui::Text("Attack Type: %s", currentState->GetAttackTypeName(currentState->attacktype));
+
         if (currentState != nullptr)
         {
             ImGui::Text("Current State: %s", currentState->GetName());
@@ -41,8 +43,10 @@ public:
         }
     }
 
-    void AddState(Enum index, StatePtr state) {
+    void AddState(Enum index, StatePtr state, AttackType m_attacktype = AttackType::NON)
+    {
         stateList.emplace(index, state);
+        state->attacktype = m_attacktype;
     }
 
     void Update(const float& elapsedTime) {

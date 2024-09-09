@@ -117,8 +117,6 @@ void CharacterCom::OnGUI()
     ImGui::Checkbox("isStan", &stan);
     ImGui::DragFloat("stanTimer", &stanTimer);
 
-    ImGui::Text("Attack Type: %s", GetAttackTypeName(attacktype));
-
     int s = (int)(moveStateMachine.GetCurrentState());
     ImGui::InputInt("moveS", &s);
     s = (int)(attackStateMachine.GetCurrentState());

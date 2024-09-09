@@ -52,29 +52,6 @@ public:
         MAX,
     };
 
-    //攻撃の種類
-    enum class AttackType
-    {
-        MELEE,
-        BULLET,
-        LAZER,
-        HEAL,
-        MAX
-    };
-
-    // AttackTypeを文字列に変換する関数
-    const char* GetAttackTypeName(AttackType type)
-    {
-        switch (type)
-        {
-        case AttackType::MELEE: return "Melee";
-        case AttackType::BULLET: return "Bullet";
-        case AttackType::LAZER: return "Lazer";
-        case AttackType::HEAL: return "Heal";
-        default: return "Unknown";
-        }
-    }
-
     //状態異常の種類
     enum class AbnormalCondition
     {
@@ -187,10 +164,6 @@ public:
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
 
-    //アタックタイプ
-    void SetAttackType(AttackType AT) { attacktype = AT; }
-    AttackType GetAttackType() { return attacktype; }
-
 private:
     //カメラ操作
     void CameraControl();
@@ -238,7 +211,6 @@ private:
     DirectX::XMFLOAT2 leftStick = {};
     DirectX::XMFLOAT2 rightStick = {};
 
-    AttackType attacktype;
     AbnormalCondition abnormalcondition;
 
     //ネットに送る用のカメラの向き
