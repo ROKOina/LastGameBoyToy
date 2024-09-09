@@ -127,3 +127,13 @@ void UenoCharacterState_JumpLoopState::Execute(const float& elapsedTime)
     }
 }
 #pragma endregion
+
+#pragma シフトスキル(ジャンプパック)
+void UenoCharacterState_ShiftSkillState::Enter()
+{
+}
+
+void UenoCharacterState_ShiftSkillState::Execute(const float& elapsedTime)
+{
+}
+#pragma endregion

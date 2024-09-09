@@ -187,7 +187,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit= obj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
-    DirectX::XMFLOAT3 knockVec = { 0,1,0 };
-    hit->SetValue3(knockVec);
+    DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
+    DirectX::XMFLOAT3 knockVec = { 0,2,0 };
+    hit->SetValue3(Mathf::Lerp(startpos, knockVec, 0.3f));
 }
-

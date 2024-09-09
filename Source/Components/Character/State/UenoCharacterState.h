@@ -79,3 +79,15 @@ public:
     void ImGui() override {};
     virtual const char* GetName() const override { return "Attack"; }
 };
+
+//シフトスキル(ジャンプパック)
+class UenoCharacterState_ShiftSkillState :public UenoCharacterState_BaseState
+{
+public:
+    UenoCharacterState_ShiftSkillState(CharacterCom* owner) :UenoCharacterState_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "ShiftSkill"; }
+};
