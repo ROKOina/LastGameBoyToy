@@ -41,6 +41,7 @@ void MovementCom::OnGUI()
     ImGui::DragFloat((char*)u8"最大速度", &moveMaxSpeed_, 0.1f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"加速度", &moveAcceleration_, 0.01f, 0.0f, 10.0f);
     ImGui::Checkbox((char*)u8"接地", &onGround_);
+    ImGui::Checkbox((char*)u8"レイキャスト", &isRaycast);
 }
 
 // 縦方向移動更新
@@ -135,7 +136,7 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
 
         // 判定
         RayCastManager::Result hit;
-        if (RayCastManager::Instance().RayCast(start, end, hit))
+        if (isRaycast && RayCastManager::Instance().RayCast(start, end, hit))
         {
             // 地面に接地している
             position.y = hit.position.y;
@@ -176,7 +177,7 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
 
         // レイキャストによる壁判定
         RayCastManager::Result hit;
-        if (RayCastManager::Instance().RayCast(start, end, hit))
+        if (isRaycast && RayCastManager::Instance().RayCast(start, end, hit))
         {
             // 移動後の位置から壁までのベクトル
             DirectX::XMVECTOR Start = XMLoadFloat3(&start);

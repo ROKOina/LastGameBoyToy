@@ -49,7 +49,7 @@ private:
     //種類
     HIT_TYPE hitType = HIT_TYPE::DAMAGE;
 
-    //ヒット間隔
+    //ヒット間隔(レイキャスト用)
     float hitIntervalTime = 0.1f;
     float hitIntervalTimer;
 
