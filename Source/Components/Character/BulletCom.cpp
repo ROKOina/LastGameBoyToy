@@ -55,12 +55,6 @@ void BulletCom::EraseBullet(float elapsedTime)
     {
         GameObjectManager::Instance().Remove(this->GetGameObject());
     }
-
-    //’n–Ê‚É’…‚¢‚½‚çÁ‚·
-    if (GetGameObject()->GetComponent<MovementCom>()->OnGround())
-    {
-        GameObjectManager::Instance().Remove(this->GetGameObject());
-    }
 }
 
 
@@ -89,6 +83,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     moveCom->SetGravity(-gravity);
     moveCom->SetFriction(0.0f);
     moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
+    moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
@@ -132,6 +127,7 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
     moveCom->SetGravity(-gravity);
     moveCom->SetFriction(0.0f);
     moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
+    moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
@@ -174,6 +170,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     moveCom->SetGravity(-gravity);
     moveCom->SetFriction(0.0f);
     moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
+    moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);

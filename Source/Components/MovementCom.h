@@ -81,6 +81,11 @@ public:
     //加速度
     const float& GetMoveAcceleration()const { return moveAcceleration_; }
     void SetMoveAcceleration(float moveAcceleration) { moveAcceleration_ = moveAcceleration; }
+
+    //レイキャスト使用
+    const bool& GetIsRaycast()const { return isRaycast; }
+    void SetIsRaycast(float isRaycast) { this->isRaycast = isRaycast; }
+
 #pragma endregion
 
 private:
@@ -94,4 +99,6 @@ private:
     float moveMaxSpeed_ = 5.0f;                //最大速度
     float moveAcceleration_ = 1.0f;            //加速度
     inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット
+    bool isRaycast = true;                      //レイキャストをするか（true：使用する）
+
 };
