@@ -70,8 +70,29 @@ void NodeCollsionCom::Update(float elapsedTime)
                 break;
 
             case NodeCollsionCom::CollsionType::BOX:
+                //ƒm[ƒh‚Ìƒ[ƒ‹ƒh‰ñ“]’l‚ðŽZo
+                DirectX::XMFLOAT4X4 mat = model->GetNodes()[cp.nodeid].worldTransform;
+                DirectX::XMFLOAT3 m = { mat._11,mat._12,mat._13 };
+                m = Mathf::Normalize(m);
+                mat._11 = m.x;
+                mat._12 = m.y;
+                mat._13 = m.z;
+                m = { mat._21,mat._22,mat._23 };
+                m = Mathf::Normalize(m);
+                mat._21 = m.x;
+                mat._22 = m.y;
+                mat._23 = m.z;
+                m = { mat._31,mat._32,mat._33 };
+                m = Mathf::Normalize(m);
+                mat._31 = m.x;
+                mat._32 = m.y;
+                mat._33 = m.z;
+                DirectX::XMMATRIX worldMat = DirectX::XMLoadFloat4x4(&mat);
+                DirectX::XMFLOAT4 ro;
+                DirectX::XMStoreFloat4(&ro, DirectX::XMQuaternionRotationMatrix(worldMat));
+
                 // debugprimitive•`‰æ
-                Graphics::Instance().GetDebugRenderer()->DrawBox(pos, cp.scale, { 1, 0, 0, 1 });
+                Graphics::Instance().GetDebugRenderer()->DrawBox(pos, cp.scale, { 1, 0, 0, 1 }, ro);
                 break;
 
             default:
