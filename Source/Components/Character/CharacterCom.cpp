@@ -10,17 +10,6 @@ void CharacterCom::Update(float elapsedTime)
 {
     StanUpdate(elapsedTime);
 
-    ////カメラが向いている方向へ旋回
-    //GameObj cameraObj = SceneManager::Instance().GetActiveCamera();
-    //std::shared_ptr<CameraCom> cameraCom = cameraObj->GetComponent<CameraCom>();
-    //DirectX::XMFLOAT3 cameraForward = cameraCom->GetFront();
-    //cameraForward.y = 0;
-
-    //GetGameObject()->transform_->SetRotation(QuaternionStruct::LookRotation(cameraForward).dxFloat4);
-    //GetGameObject()->transform_->UpdateTransform();
-    //GetGameObject()->transform_->SetUpTransform({ 0,1,0 });
-
-
     //ステックのアングル取得
     stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
 
@@ -127,6 +116,8 @@ void CharacterCom::OnGUI()
     bool stan = isStan;
     ImGui::Checkbox("isStan", &stan);
     ImGui::DragFloat("stanTimer", &stanTimer);
+
+    ImGui::Text("Attack Type: %s", GetAttackTypeName(attacktype));
 
     int s = (int)(moveStateMachine.GetCurrentState());
     ImGui::InputInt("moveS", &s);

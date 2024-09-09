@@ -19,6 +19,8 @@ public:
 
     void SubSkill() override;
 
+    void MainAttackDown()override;
+
     void SpaceSkill() override;
 
     void LeftShiftSkill() override;

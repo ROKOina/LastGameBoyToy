@@ -56,6 +56,11 @@ void HaveAllAttackCharaCom::SubSkill()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
 }
 
+void HaveAllAttackCharaCom::MainAttackDown()
+{
+    SetAttackType(CharacterCom::AttackType::BULLET);
+}
+
 void HaveAllAttackCharaCom::SpaceSkill()
 {
 }
