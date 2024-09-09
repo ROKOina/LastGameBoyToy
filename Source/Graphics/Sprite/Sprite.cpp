@@ -178,7 +178,7 @@ Sprite::Sprite(const char* filename, bool collsion)
     //Dissolveデータ読み込み
     LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
     LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    LoadTextureFromFile(device, "Data\\Texture\\easing.png", easingshaderresourceview_.GetAddressOf(), &texture2ddesc_);
+    //LoadTextureFromFile(device, "Data\\Texture\\easing.png", easingshaderresourceview_.GetAddressOf(), &texture2ddesc_);
 
     //コリジョンを使うか決める
     ontriiger = collsion;

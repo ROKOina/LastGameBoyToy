@@ -39,7 +39,7 @@ void HitProcessCom::OnGUI()
     float hitT = hitIntervalTimer;
     ImGui::DragFloat("hitIntervalTimer", &hitT);
 
-    ImGui::DragInt("value", &value, 1, 0, 100);
+    ImGui::DragFloat("value", &value, 0.1f, 0, 100);
 }
 
 void HitProcessCom::HitProcess(int myID, int hitID)
@@ -54,6 +54,9 @@ void HitProcessCom::HitProcess(int myID, int hitID)
         break;
     case HitProcessCom::HIT_TYPE::STAN:
         StaticSendDataManager::Instance().SetSendStan(myID, hitID, value);
+        break;
+    case HitProcessCom::HIT_TYPE::KNOCKBACK:
+        StaticSendDataManager::Instance().SetSendKnockback(myID, hitID, value3);
         break;
     default:
         break;

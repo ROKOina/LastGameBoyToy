@@ -384,6 +384,8 @@ void PhotonLib::MyCharaInput()
         chara->SetUserInputUp(s.nextInput.inputUp);
 
         chara->SetLeftStick(s.nextInput.leftStick);
+        //カメラ情報
+        chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
 
         s.nextInput.inputDown = 0;
         s.nextInput.inputUp = 0;
@@ -414,6 +416,7 @@ void PhotonLib::NetCharaInput()
         //移動
         netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
+        chara->SetLeftStick(s.nextInput.leftStick);
         //カメラ情報
         chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
 
@@ -542,6 +545,8 @@ void PhotonLib::sendData(void)
             if (netD.stanData[data.id] < data.valueF)
                 netD.stanData[data.id] = data.valueF;
         }
+        else if (data.sendType == 3)	//ノックバック
+            netD.knockbackData[data.id] += data.valueF3;
     }
 
     //マスタークライアントの場合はチームIDを送る
@@ -696,6 +701,18 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 {
                     auto& obj = GameObjectManager::Instance().Find("player");
                     obj->GetComponent<CharacterCom>()->SetStanSeconds(ne[0].stanData[id]);
+                    break;
+                }
+            }
+            //ノックバック情報
+            for (int id = 0; id < ne[0].knockbackData.size(); ++id)
+            {
+                if (id != GetPlayerNum())continue;
+
+                if (Mathf::Length(ne[0].knockbackData[id]) >= 0.1f)
+                {
+                    auto& obj = GameObjectManager::Instance().Find("player");
+                    obj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(ne[0].knockbackData[id]);
                     break;
                 }
             }

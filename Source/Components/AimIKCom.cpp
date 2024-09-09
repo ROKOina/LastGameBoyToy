@@ -3,10 +3,7 @@
 #include "CameraCom.h"
 #include "TransformCom.h"
 
-#include "AimIKCom.h"
-#include "RendererCom.h"
-#include "CameraCom.h"
-#include "TransformCom.h"
+#include "Character/CharacterCom.h"
 
 //コンストラクタ
 AimIKCom::AimIKCom(const char* aimbonename)
@@ -34,12 +31,7 @@ void AimIKCom::AimIK()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
     // FPSカメラからターゲット位置を取得
-    auto cameraObj = GameObjectManager::Instance().Find("cameraPostPlayer");
-    if (!cameraObj)
-    {
-        return;
-    }
-    DirectX::XMFLOAT3 cameraForward = cameraObj->transform_->GetWorldFront();
+    DirectX::XMFLOAT3 cameraForward = GetGameObject()->GetComponent<CharacterCom>()->GetFpsCameraDir();
 
     DirectX::XMFLOAT3 playerForward = GetGameObject()->transform_->GetWorldFront();
     DirectX::XMFLOAT3 playerRight = GetGameObject()->transform_->GetWorldRight();

@@ -49,6 +49,14 @@ void MovementCom::VerticalUpdate(float elapsedTime)
     // d—Í‚É‚æ‚é‘¬—Í‚Ì•Ï‰»
     velocity_.y -= gravity_ * gravityeffect * elapsedTime;
     velocity_.y = (std::max)(velocity_.y, fallspeed);
+
+    // Å‘å‘¬“x‚Ì–³‚¢–€ŽCŒvŽZ
+    // –€ŽC—Í
+    float friction = friction_ * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed());
+
+    nonMaxSpeedVelocity_.y -= friction;
+    if (nonMaxSpeedVelocity_.y * nonMaxSpeedVelocity_.y < 0.1f)
+        nonMaxSpeedVelocity_.y = 0;
 }
 
 // ‰¡•ûŒüˆÚ“®XV
