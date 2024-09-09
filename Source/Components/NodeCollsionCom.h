@@ -30,6 +30,7 @@ private:
     {
         SPHER,
         CYLINDER,
+        BOX,
         MAX
     };
     CollsionType m_collsiontype = CollsionType::SPHER;

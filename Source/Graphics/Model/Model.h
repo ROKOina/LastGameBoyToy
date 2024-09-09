@@ -36,6 +36,8 @@ public:
         int collsiontype = {};
         float radius = 0.0f;
         float height = 0.0f;
+        DirectX::XMFLOAT3 scale = { 0,0,0 };
+        DirectX::XMFLOAT3 offsetpos = { 0,0,0 };
 
         template<class Archive>
         void serialize(Archive& archive, int version);

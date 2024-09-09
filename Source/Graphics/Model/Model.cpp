@@ -78,7 +78,9 @@ void Model::CollsionParameter::serialize(Archive& archive, int version)
         CEREAL_NVP(endnodeid),
         CEREAL_NVP(collsiontype),
         CEREAL_NVP(radius),
-        CEREAL_NVP(height)
+        CEREAL_NVP(height),
+        CEREAL_NVP(scale),
+        CEREAL_NVP(offsetpos)
     );
 }
 

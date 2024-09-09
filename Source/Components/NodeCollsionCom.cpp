@@ -28,9 +28,9 @@ void NodeCollsionCom::Update(float elapsedTime)
     {
         DirectX::XMFLOAT3 pos =
         {
-            model->GetNodes()[cp.nodeid].worldTransform._41,
-            model->GetNodes()[cp.nodeid].worldTransform._42,
-            model->GetNodes()[cp.nodeid].worldTransform._43
+            model->GetNodes()[cp.nodeid].worldTransform._41 + cp.offsetpos.x,
+            model->GetNodes()[cp.nodeid].worldTransform._42 + cp.offsetpos.y,
+            model->GetNodes()[cp.nodeid].worldTransform._43 + cp.offsetpos.z
         };
 
         DirectX::XMFLOAT3 endpos = { 0.0f, 0.0f, 0.0f };
@@ -69,6 +69,11 @@ void NodeCollsionCom::Update(float elapsedTime)
                 Graphics::Instance().GetDebugRenderer()->DrawCylinder(pos, endpos, cp.radius, cp.height, { 1, 0, 0, 1 });
                 break;
 
+            case NodeCollsionCom::CollsionType::BOX:
+                // debugprimitive描画
+                Graphics::Instance().GetDebugRenderer()->DrawBox(pos, cp.scale, { 1, 0, 0, 1 });
+                break;
+
             default:
                 break;
             }
@@ -97,9 +102,9 @@ void NodeCollsionCom::OnGUI()
         {
             DirectX::XMFLOAT3 pos =
             {
-                model->GetNodes()[cp.nodeid].worldTransform._41,
-                model->GetNodes()[cp.nodeid].worldTransform._42,
-                model->GetNodes()[cp.nodeid].worldTransform._43
+                model->GetNodes()[cp.nodeid].worldTransform._41 + cp.offsetpos.x,
+                model->GetNodes()[cp.nodeid].worldTransform._42 + cp.offsetpos.y,
+                model->GetNodes()[cp.nodeid].worldTransform._43 + cp.offsetpos.z
             };
 
             DirectX::XMFLOAT3 endpos = { 0.0f, 0.0f, 0.0f };
@@ -126,7 +131,7 @@ void NodeCollsionCom::OnGUI()
                 ImGui::PushID(static_cast<int>(i));
 
                 // コリジョンの形状で出すimguiを決める
-                const char* collisionTypeNames[] = { "Sphere", "Cylinder" };
+                const char* collisionTypeNames[] = { "Sphere", "Cylinder","Box" };
                 int collisionTypeIndex = static_cast<int>(cp.collsiontype);
                 if (ImGui::Combo("Collision Type", &collisionTypeIndex, collisionTypeNames, IM_ARRAYSIZE(collisionTypeNames)))
                 {
@@ -192,6 +197,11 @@ void NodeCollsionCom::OnGUI()
                     }
                     // 衝突パラメータの設定
                     ImGui::DragFloat("Radius", &cp.radius, 0.1f, 0.0f, 5.0f);
+                    break;
+
+                case NodeCollsionCom::CollsionType::BOX:
+                    ImGui::DragFloat3("Scale", &cp.scale.x, 0.1f, 0.0f, 5.0f);
+                    ImGui::DragFloat3("OffsetPos", &cp.offsetpos.x);
                     break;
 
                 default:
