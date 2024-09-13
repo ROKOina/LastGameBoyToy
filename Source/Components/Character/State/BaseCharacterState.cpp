@@ -20,25 +20,8 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
 
 void BaseCharacter_IdleState::Enter()
 {
-    ////歩きアニメーション再生開始
-    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-
-    //AnimationCom::PlayLowBodyAnimParam param =
-    //{
-    //    param.lowerAnimaOneId = animationCom.lock()->FindAnimation("Idle"),
-    //    param.loop = true,
-    //    param.rootFlag = false,
-    //    param.blendType = 0,
-    //    param.animeChangeRate = 0.5f,
-    //    param.animeBlendRate = 0.0f
-
-    //};
-
-
-    //animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
-
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -48,7 +31,6 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 
     //移動
     if(owner->IsPushLeftStick())
-    //if (moveVec != 0)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
