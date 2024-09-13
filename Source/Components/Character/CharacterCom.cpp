@@ -19,13 +19,6 @@ void CharacterCom::Update(float elapsedTime)
         stickAngle += 360.0f;
     }
 
-    //死亡処理
-    if (hitPoint <= 0)
-    {
-        GetGameObject()->GetComponent<MovementCom>()->AddForce({ 0, 10.0f, 0 });
-        return;
-    }
-
     //ステート処理
     attackStateMachine.Update(elapsedTime);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
@@ -45,13 +38,6 @@ void CharacterCom::Update(float elapsedTime)
     {
         MainAttackPushing();
     }
-
-    ////デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    //if (CharacterInput::SubAttackButton & GetButtonDown()
-    //    && GamePad::BTN_RIGHT_SHOULDER & GetButton())
-    //{
-    //    SubAttack();
-    //}
 
     if (CharacterInput::SubAttackButton & GetButtonDown())
     {

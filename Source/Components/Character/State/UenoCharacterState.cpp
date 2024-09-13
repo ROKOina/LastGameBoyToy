@@ -35,6 +35,12 @@ void UenoCharacterState_IdleState::Execute(const float& elapsedTime)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
+
+    //シフトスキル
+    if (GamePad::BTN_LEFT_SHOULDER & owner->GetButtonDown())
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
+    }
 }
 #pragma endregion
 
@@ -77,6 +83,12 @@ void UenoCharacterState_MoveState::Execute(const float& elapsedTime)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
+
+    //シフトスキル
+    if (GamePad::BTN_LEFT_SHOULDER & owner->GetButtonDown())
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
+    }
 }
 #pragma endregion
 
@@ -98,6 +110,12 @@ void UenoCharacterState_JumpState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
         //ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
     }
+
+    //シフトスキル
+    if (GamePad::BTN_LEFT_SHOULDER & owner->GetButtonDown())
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
+    }
 }
 #pragma endregion
 
@@ -105,7 +123,7 @@ void UenoCharacterState_JumpState::Execute(const float& elapsedTime)
 void UenoCharacterState_JumpLoopState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Loop"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("jump"), true);
 }
 
 void UenoCharacterState_JumpLoopState::Execute(const float& elapsedTime)
@@ -131,9 +149,24 @@ void UenoCharacterState_JumpLoopState::Execute(const float& elapsedTime)
 #pragma シフトスキル(ジャンプパック)
 void UenoCharacterState_ShiftSkillState::Enter()
 {
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("jump"), false);
+
+    //ジャンプベクトル
+    std::shared_ptr<GameObject> cameraplayer = GameObjectManager::Instance().Find("cameraPostPlayer");
+    DirectX::XMFLOAT3 power = { 0,cameraplayer->transform_->GetWorldFront().y,0 };
+    moveCom.lock()->AddForce(power);
+
+    //ジャンプパックの起動
+    moveCom.lock()->AddNonMaxSpeedForce(cameraplayer->transform_->GetWorldFront());
 }
 
 void UenoCharacterState_ShiftSkillState::Execute(const float& elapsedTime)
 {
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
+    }
 }
 #pragma endregion

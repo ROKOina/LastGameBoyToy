@@ -19,4 +19,8 @@ public:
 
     // GUI•`‰æ
     void OnGUI() override {};
+
+private:
+
+    float barriertime = 0.0f;
 };

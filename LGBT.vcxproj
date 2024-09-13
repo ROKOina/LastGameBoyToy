@@ -151,6 +151,7 @@
     <ClInclude Include="Source\Components\Character\BarrierCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\Fara.h" />
     <ClInclude Include="Source\Components\Character\Generate\TestCharacterGenerate.h" />
     <ClInclude Include="Source\Components\Character\HaveAllAttackCharacter.h" />
     <ClInclude Include="Source\Components\Character\HitProcess\HitProcessCom.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Source\Components\Character\RegisterChara.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\State\FaraState.h" />
     <ClInclude Include="Source\Components\Character\State\InazawaCharacterState.h" />
     <ClInclude Include="Source\Components\Character\State\NomuraCharacterState.h" />
     <ClInclude Include="Source\Components\Character\State\UenoCharacterState.h" />
@@ -263,12 +265,14 @@
     <ClCompile Include="Source\Components\Character\BarrierCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\Fara.cpp" />
     <ClCompile Include="Source\Components\Character\HaveAllAttackCharacter.cpp" />
     <ClCompile Include="Source\Components\Character\HitProcess\HitProcessCom.cpp" />
     <ClCompile Include="Source\Components\Character\NomuraCharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\RegisterChara.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\State\FaraState.cpp" />
     <ClCompile Include="Source\Components\Character\State\InazawaCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\State\NomuraCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\State\UenoCharacterState.cpp" />
