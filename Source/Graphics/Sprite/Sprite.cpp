@@ -264,6 +264,7 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     // 変換行列
     DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
     DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
+    DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
     // ワールド座標の計算とスクリーン座標への変換
     if (!objectname.empty())
@@ -274,15 +275,34 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
             DirectX::XMFLOAT3 pos = gameObject->transform_->GetWorldPosition();
             DirectX::XMVECTOR WorldPosition = DirectX::XMLoadFloat3(&pos);
 
-            // スクリーン座標に変換
-            DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3TransformCoord(WorldPosition, View * Projection);
+            std::shared_ptr<GameObject> g = GameObjectManager::Instance().Find("freecamera");
+            float len = Mathf::Length(pos - g->transform_->GetWorldPosition());
 
-            // スクリーン座標をビューポート座標に変換
-            float viewportX = viewport.TopLeftX + (viewport.Width * (DirectX::XMVectorGetX(ScreenPosition) + 1.0f)) / 2.0f;
-            float viewportY = viewport.TopLeftY + (viewport.Height * (1.0f - DirectX::XMVectorGetY(ScreenPosition))) / 2.0f;
+            //ワールド座標からスクリーン座標へ変換
+            DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
+                WorldPosition,
+                viewport.TopLeftX,
+                viewport.TopLeftY,
+                viewport.Width,
+                viewport.Height,
+                viewport.MinDepth,
+                viewport.MaxDepth,
+                Projection,
+                View,
+                World
+            );
 
-            // スプライトの位置を設定
-            spc.position = { viewportX, viewportY };
+            //スクリーン座標
+            DirectX::XMStoreFloat2(&spc.position, ScreenPosition);
+
+            float minScale = 30.1f;
+            float maxScale = 100.1f;
+            float scale = Mathf::Lerp(maxScale, minScale, (std::min)(len / 10.0f, 1.0f));
+            //spc.scale = { scale,scale };
+
+            if (len < 0.1f)
+            {
+            }
         }
     }
 
@@ -345,10 +365,10 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
         vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = { spc.color.x, spc.color.y, spc.color.z, spc.color.w };
 
         // テクスチャ座標
-        vertices[0].texcoord = { 0.0f, 0.0f };
-        vertices[1].texcoord = { 1.0f, 0.0f };
-        vertices[2].texcoord = { 0.0f, 1.0f };
-        vertices[3].texcoord = { 1.0f, 1.0f };
+        vertices[0].texcoord = { 1.0f / texture2ddesc_.Width, 1.0f / texture2ddesc_.Height };
+        vertices[1].texcoord = { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height };
+        vertices[2].texcoord = { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height };
+        vertices[3].texcoord = { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height };
     }
     dc->Unmap(vertexBuffer_.Get(), 0);
 
