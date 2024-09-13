@@ -40,7 +40,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
     r->LoadModel("Data/pico/pico.mdl");
     obj->AddComponent<AimIKCom>("Spine");
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data//pico//pico.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
@@ -62,7 +62,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     r->LoadModel("Data/pico/pico.mdl");
     obj->AddComponent<AimIKCom>("Spine");
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data//pico//pico.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     a->PlayAnimation(0, true, false, 0.001f);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
@@ -140,7 +140,7 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
     obj->AddComponent<AimIKCom>("Spine");
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
-    obj->AddComponent<NodeCollsionCom>("Data//PicoLabo//picolabo.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));

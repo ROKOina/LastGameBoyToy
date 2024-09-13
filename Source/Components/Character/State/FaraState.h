@@ -8,10 +8,10 @@
 #include "Components/CPUParticle.h"
 
 //基礎
-class UenoCharacterState_BaseState : public State<CharacterCom>
+class FaraState_BaseState : public State<CharacterCom>
 {
 public:
-    UenoCharacterState_BaseState(CharacterCom* owner);
+    FaraState_BaseState(CharacterCom* owner);
 
 protected:
     std::weak_ptr<UenoCharacterCom> charaCom;
@@ -21,10 +21,10 @@ protected:
 };
 
 //待機
-class UenoCharacterState_IdleState : public UenoCharacterState_BaseState
+class FaraState_IdleState : public FaraState_BaseState
 {
 public:
-    UenoCharacterState_IdleState(CharacterCom* owner) :UenoCharacterState_BaseState(owner) {}
+    FaraState_IdleState(CharacterCom* owner) :FaraState_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
@@ -33,10 +33,10 @@ public:
 };
 
 //移動
-class UenoCharacterState_MoveState : public UenoCharacterState_BaseState
+class FaraState_MoveState : public FaraState_BaseState
 {
 public:
-    UenoCharacterState_MoveState(CharacterCom* owner) :UenoCharacterState_BaseState(owner) {}
+    FaraState_MoveState(CharacterCom* owner) :FaraState_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
@@ -45,10 +45,10 @@ public:
 };
 
 //ジャンプ
-class UenoCharacterState_JumpState : public UenoCharacterState_BaseState
+class FaraState_JumpState : public FaraState_BaseState
 {
 public:
-    UenoCharacterState_JumpState(CharacterCom* owner) : UenoCharacterState_BaseState(owner) {}
+    FaraState_JumpState(CharacterCom* owner) : FaraState_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
@@ -57,10 +57,10 @@ public:
 };
 
 //ジャンプループ
-class UenoCharacterState_JumpLoopState : public UenoCharacterState_BaseState
+class FaraState_JumpLoopState : public FaraState_BaseState
 {
 public:
-    UenoCharacterState_JumpLoopState(CharacterCom* owner) : UenoCharacterState_BaseState(owner) {}
+    FaraState_JumpLoopState(CharacterCom* owner) : FaraState_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
@@ -81,10 +81,10 @@ public:
 //};
 
 //シフトスキル(ジャンプパック)
-class UenoCharacterState_ShiftSkillState :public UenoCharacterState_BaseState
+class FaraState_ShiftSkillState :public FaraState_BaseState
 {
 public:
-    UenoCharacterState_ShiftSkillState(CharacterCom* owner) :UenoCharacterState_BaseState(owner) {}
+    FaraState_ShiftSkillState(CharacterCom* owner) :FaraState_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;

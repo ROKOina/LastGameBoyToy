@@ -150,6 +150,8 @@ public:
     virtual const char* GetName() const override { return "KnockbackBall"; }
 
 private:
+    float speed = 40;
+    float power = 1;
 };
 
 class BaseCharacter_NoneAttack : public BaseCharacter_BaseState

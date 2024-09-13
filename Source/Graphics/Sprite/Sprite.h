@@ -49,6 +49,9 @@ private:
     //マウスカーソルとコリジョンボックスの当たり判定
     bool cursorVsCollsionBox();
 
+    //いーじんぐ
+    void EasingSprite();
+
 public:
 
     //保存するパラメータ
@@ -110,6 +113,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	collsionshaderResourceView_;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	noiseshaderresourceview_;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	rampshaderresourceview_;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	easingshaderresourceview_;
     Microsoft::WRL::ComPtr<ID3D11Buffer>                m_constantbuffer;
     D3D11_TEXTURE2D_DESC texture2ddesc_ = {};
     DirectX::XMFLOAT2 savepos = {};
@@ -127,4 +131,5 @@ private:
     //後程シリアライズ
     std::string objectname = {};
     DirectX::XMFLOAT3 screenposoffset = {};
+    bool easingsprite = false;
 };

@@ -23,20 +23,24 @@ public:
     {
         int id; //送信相手
 
-        int sendType;   //0:damage 1:heal 2:stan
+        int sendType;   //0:damage 1:heal 2:stan 3:knockback
 
         int valueI;
         float valueF;
+        DirectX::XMFLOAT3 valueF3;
     };
 
     //ダメージを送信
-    void SetSendDamage(int myID, int sendID, int damage);
+    void SetSendDamage(int myID, int sendID, float damage);
 
     //ヒールを送信
-    void SetSendHeal(int myID, int sendID, int heal);
+    void SetSendHeal(int myID, int sendID, float heal);
 
     //スタンを送信
     void SetSendStan(int myID, int sendID, float stanSec);
+
+    //ノックバックを送信
+    void SetSendKnockback(int myID, int sendID, DirectX::XMFLOAT3 knockbackVec);
 
     //送信情報を全て取得して消す
     std::vector<NetSendData> GetNetSendDatas() 

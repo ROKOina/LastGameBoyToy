@@ -48,6 +48,9 @@ public:
 
     //スタン弾生成
     static void StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
+
+    //ノックバック弾生成
+    static void KnockbackFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
 };
 
 

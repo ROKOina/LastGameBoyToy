@@ -21,7 +21,7 @@ public:
     void DrawSphere(const DirectX::XMFLOAT3& center, float radius, const DirectX::XMFLOAT4& color);
 
     // ” •`‰æ
-    void DrawBox(const DirectX::XMFLOAT3& center, DirectX::XMFLOAT3	scale, const DirectX::XMFLOAT4& color);
+    void DrawBox(const DirectX::XMFLOAT3& center, DirectX::XMFLOAT3	scale, const DirectX::XMFLOAT4& color, const DirectX::XMFLOAT4& rotato = { 0,0,0,1 });
 
     // ‰~’Œ•`‰æ
     void DrawCylinder(const DirectX::XMFLOAT3& position1, const DirectX::XMFLOAT3& position2, float radius, float height, const DirectX::XMFLOAT4& color);
@@ -61,6 +61,7 @@ private:
         DirectX::XMFLOAT4	color;
         DirectX::XMFLOAT3	center;
         DirectX::XMFLOAT3	scale;
+        DirectX::XMFLOAT4	rotato;
     };
 
     struct Cylinder

@@ -28,12 +28,14 @@ public:
         DAMAGE,
         HEAL,
         STAN,
+        KNOCKBACK,
     };
     void SetHitType(HitProcessCom::HIT_TYPE type) { hitType = type; }
 
     void SetHitInterval(float sec) { hitIntervalTime = sec; }
 
     void SetValue(float value) { this->value = value; }
+    void SetValue3(DirectX::XMFLOAT3 value3) { this->value3 = value3; }
 
     bool IsHit() { return isHit; }
 
@@ -47,12 +49,13 @@ private:
     //種類
     HIT_TYPE hitType = HIT_TYPE::DAMAGE;
 
-    //ヒット間隔
+    //ヒット間隔(レイキャスト用)
     float hitIntervalTime = 0.1f;
     float hitIntervalTimer;
 
     //与える数
-    int value = 1;
+    float value = 1.0f; //DAMAGE, HEAL, STAN
+    DirectX::XMFLOAT3 value3 = { 0,0,0 };   //KNOCKBACK
 
     //当たっているか
     bool isHit = false;

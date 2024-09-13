@@ -13,10 +13,11 @@ void HaveAllAttackCharaCom::Start()
     //auto& a = moveStateMachine.GetState(CHARACTER_MOVE_ACTIONS::JUMP);
     //auto& ba = std::dynamic_pointer_cast<BaseCharacter_JumpState>(a);
 
-    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<BaseCharacter_HitscanState>(this));
-    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<BaseCharacter_CapsuleState>(this));
-    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<BaseCharacter_StanBallState>(this));
-    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<BaseCharacter_HitscanState>(this),AttackType::BULLET);
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<BaseCharacter_CapsuleState>(this), AttackType::LAZER);
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<BaseCharacter_StanBallState>(this), AttackType::HEAL);
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL, std::make_shared<BaseCharacter_KnockbackBallState>(this), AttackType::HEAL);
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this), AttackType::NON);
 
 
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
@@ -55,10 +56,15 @@ void HaveAllAttackCharaCom::SubSkill()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
 }
 
+void HaveAllAttackCharaCom::MainAttackDown()
+{
+}
+
 void HaveAllAttackCharaCom::SpaceSkill()
 {
 }
 
 void HaveAllAttackCharaCom::LeftShiftSkill()
 {
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
 }

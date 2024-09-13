@@ -42,6 +42,7 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
     }
 
 //array
+//float
 static std::stringstream& operator>>(std::stringstream& in, std::array<float, 6>& h)
 {
     in >> float(h[0]) >> float(h[1]) >> float(h[2]) >> float(h[3]) >> float(h[4]) >> float(h[5]);
@@ -52,6 +53,7 @@ static std::stringstream& operator<<(std::stringstream& out, const std::array<fl
     out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
     return out;
 }
+//int
 static std::stringstream& operator>>(std::stringstream& in, std::array<int, 6>& h)
 {
     in >> int(h[0]) >> int(h[1]) >> int(h[2]) >> int(h[3]) >> int(h[4]) >> int(h[5]);
@@ -132,6 +134,7 @@ struct NetData
     std::array<int, 6> damageData;//キャラに与えたダメージ
     std::array<int, 6> healData;//キャラに与えたヒール
     std::array<float, 6> stanData;//キャラに与えたスタン
+    std::array<DirectX::XMFLOAT3, 6> knockbackData = {};//ノックバックを与える
     std::array<int, 6> teamID;//チームのID
     int charaID;    //キャラのID
 
@@ -145,6 +148,14 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     out << h.damageData << " ";
     out << h.healData << " ";
     out << h.stanData << " ";
+
+    out << h.knockbackData[0] << " ";
+    out << h.knockbackData[1] << " ";
+    out << h.knockbackData[2] << " ";
+    out << h.knockbackData[3] << " ";
+    out << h.knockbackData[4] << " ";
+    out << h.knockbackData[5] << " ";
+
     out << h.teamID << " ";
     out << h.charaID << " ";
     VectorSaveBufferOut(out, h.saveInputBuf);
@@ -162,6 +173,14 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.damageData;
     in >> h.healData;
     in >> h.stanData;
+
+    in >> h.knockbackData[0];
+    in >> h.knockbackData[1];
+    in >> h.knockbackData[2];
+    in >> h.knockbackData[3];
+    in >> h.knockbackData[4];
+    in >> h.knockbackData[5];
+
     in >> h.teamID;
     in >> h.charaID;
     VectorSaveBufferIn(in, h.saveInputBuf);

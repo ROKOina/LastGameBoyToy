@@ -79,7 +79,9 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     }
     spheres_.clear();
 
-    //箱描画
+    //箱描画	
+    stride = sizeof(vertex);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     context->IASetVertexBuffers(0, 1, boxVertexBuffer_.GetAddressOf(), &stride, &offset);
     context->IASetIndexBuffer(boxIndexBuffer_.Get(), DXGI_FORMAT_R32_UINT, 0);
     for (const Box& box : boxes_)
@@ -87,7 +89,8 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         // ワールドビュープロジェクション行列作成
         DirectX::XMMATRIX S = DirectX::XMMatrixScaling(box.scale.x, box.scale.y, box.scale.z);
         DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(box.center.x, box.center.y, box.center.z);
-        DirectX::XMMATRIX W = S * T;
+        DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&box.rotato));
+        DirectX::XMMATRIX W = S * R * T;
         DirectX::XMMATRIX WVP = W * VP;
 
         // 定数バッファ更新
@@ -101,6 +104,8 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     boxes_.clear();
 
     // 円柱描画
+    stride = sizeof(DirectX::XMFLOAT3);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     context->IASetVertexBuffers(0, 1, cylinderVertexBuffer_.GetAddressOf(), &stride, &offset);
     for (const Cylinder& cylinder : cylinders_)
     {
@@ -152,12 +157,13 @@ void DebugRenderer::DrawSphere(const DirectX::XMFLOAT3& center, float radius, co
 }
 
 // 箱描画
-void DebugRenderer::DrawBox(const DirectX::XMFLOAT3& center, DirectX::XMFLOAT3	scale, const DirectX::XMFLOAT4& color)
+void DebugRenderer::DrawBox(const DirectX::XMFLOAT3& center, DirectX::XMFLOAT3	scale, const DirectX::XMFLOAT4& color, const DirectX::XMFLOAT4& rotato)
 {
     Box box;
     box.center = center;
     box.scale = scale;
     box.color = color;
+    box.rotato = rotato;
     boxes_.emplace_back(box);
 }
 

@@ -52,6 +52,13 @@ public:
         MAX,
     };
 
+    //状態異常の種類
+    enum class AbnormalCondition
+    {
+        STAN,
+        MAX
+    };
+
 public:
     CharacterCom() {};
     ~CharacterCom() override {};
@@ -203,6 +210,8 @@ private:
     unsigned int userInputUp = 0x00;
     DirectX::XMFLOAT2 leftStick = {};
     DirectX::XMFLOAT2 rightStick = {};
+
+    AbnormalCondition abnormalcondition;
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;

@@ -1,15 +1,16 @@
 #pragma once
+
 #include "CharacterCom.h"
 #include "Components/GPUParticle.h"
 
-class UenoCharacterCom : public CharacterCom
+class Fara : public CharacterCom
 {
 public:
-    UenoCharacterCom() {};
-    ~UenoCharacterCom() {}
+    Fara() {};
+    ~Fara() {}
 
     // 名前取得
-    const char* GetName() const override { return "UenoCharacter"; }
+    const char* GetName() const override { return "Fara"; }
 
     //初期化
     void Start() override;
@@ -19,7 +20,4 @@ public:
 
     //imgui
     void OnGUI() override;
-
-    //シフトスキル
-    void LeftShiftSkill() override;
 };
