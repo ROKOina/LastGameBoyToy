@@ -57,16 +57,16 @@ public:
     //保存するパラメータ
     struct SaveParameterCPU
     {
-        DirectX::XMFLOAT4 color = { 1,1,1,1 };
-        DirectX::XMFLOAT4 easingcolor = { 1,1,1,1 };
-        DirectX::XMFLOAT2 position = {};
-        DirectX::XMFLOAT2 easingposition = {};
-        DirectX::XMFLOAT2 scale = {};
-        DirectX::XMFLOAT2 easingscale = {};
-        DirectX::XMFLOAT2 collsionscaleoffset = {};
-        DirectX::XMFLOAT2 collsionpositionoffset = {};
-        float angle = {};
-        float easingangle = {};
+        DirectX::XMFLOAT4 color = { 1.0f,1.0f,1.0f,1.0f };
+        DirectX::XMFLOAT4 easingcolor = { 1.0f,1.0f,1.0f,1.0f };
+        DirectX::XMFLOAT2 position = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 easingposition = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 scale = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 easingscale = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 collsionscaleoffset = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 collsionpositionoffset = { 0.0f,0.0f };
+        float angle = { 0.0f };
+        float easingangle = { 0.0f };
         std::string	filename;
         int blend = 1;
         int depth = 1;
@@ -75,6 +75,11 @@ public:
         int easingmovetype = 0;
         bool loop = false;
         bool comback = false;
+        bool easing = false;
+        std::string objectname;
+        DirectX::XMFLOAT3 screenposoffset = { 0.0f,0.0f,0.0f };
+        DirectX::XMFLOAT2 maxscale = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 minscale = { 0.0f,0.0f };
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -89,7 +94,6 @@ public:
         float edgethreshold = 0.6f;
         float edgeoffset = 0.1f;
         DirectX::XMFLOAT3 edgecolor = { 1,1,1 };
-        DirectX::XMFLOAT4X4 world = { 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
     };
     SaveConstantsParameter constants;
 
@@ -117,7 +121,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>                m_constantbuffer;
     D3D11_TEXTURE2D_DESC texture2ddesc_ = {};
     DirectX::XMFLOAT2 savepos = {};
-    DirectX::XMFLOAT4 savecolor = {};
+    DirectX::XMFLOAT4 savecolor = { 1,1,1,1 };
     DirectX::XMFLOAT2 savescale = {};
     float saveangle = {};
     float easingresult = 0.0f;
@@ -127,9 +131,4 @@ private:
     bool drawcollsion = false;
     bool hit = false;
     bool ontriiger = false;
-
-    //後程シリアライズ
-    std::string objectname = {};
-    DirectX::XMFLOAT3 screenposoffset = {};
-    bool easingsprite = false;
 };

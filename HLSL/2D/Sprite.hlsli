@@ -12,5 +12,4 @@ cbuffer SpriteConstants : register(b0)
     float edgethreshold;
     float edgeoffset;
     float3 edgecolor;
-    float4x4 world;
 };

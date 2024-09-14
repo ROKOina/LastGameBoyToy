@@ -99,7 +99,12 @@ void Sprite::SaveParameterCPU::serialize(Archive& archive, int version)
         CEREAL_NVP(easingtype),
         CEREAL_NVP(easingmovetype),
         CEREAL_NVP(loop),
-        CEREAL_NVP(comback)
+        CEREAL_NVP(comback),
+        CEREAL_NVP(easing),
+        CEREAL_NVP(objectname),
+        CEREAL_NVP(screenposoffset),
+        CEREAL_NVP(maxscale),
+        CEREAL_NVP(minscale)
     );
 }
 
@@ -178,7 +183,6 @@ Sprite::Sprite(const char* filename, bool collsion)
     //Dissolveデータ読み込み
     LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
     LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    //LoadTextureFromFile(device, "Data\\Texture\\easing.png", easingshaderresourceview_.GetAddressOf(), &texture2ddesc_);
 
     //コリジョンを使うか決める
     ontriiger = collsion;
@@ -265,44 +269,48 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     // 変換行列
     DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
     DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
-    DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
 
     // ワールド座標の計算とスクリーン座標への変換
-    if (!objectname.empty())
+    if (!spc.objectname.empty())
     {
-        auto& gameObject = GameObjectManager::Instance().Find(objectname.c_str());
+        auto& gameObject = GameObjectManager::Instance().Find(spc.objectname.c_str());
         if (gameObject != nullptr)
         {
-            DirectX::XMFLOAT3 pos = gameObject->transform_->GetWorldPosition();
+            DirectX::XMFLOAT3 pos = gameObject->transform_->GetWorldPosition() + spc.screenposoffset;
             DirectX::XMVECTOR WorldPosition = DirectX::XMLoadFloat3(&pos);
 
-            std::shared_ptr<GameObject> g = GameObjectManager::Instance().Find("freecamera");
-            float len = Mathf::Length(pos - g->transform_->GetWorldPosition());
-
-            //ワールド座標からスクリーン座標へ変換
-            DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
-                WorldPosition,
-                viewport.TopLeftX,
-                viewport.TopLeftY,
-                viewport.Width,
-                viewport.Height,
-                viewport.MinDepth,
-                viewport.MaxDepth,
-                Projection,
-                View,
-                World
-            );
-
-            //スクリーン座標
-            DirectX::XMStoreFloat2(&spc.position, ScreenPosition);
-
-            float minScale = 30.1f;
-            float maxScale = 100.1f;
-            float scale = Mathf::Lerp(maxScale, minScale, (std::min)(len / 10.0f, 1.0f));
-            //spc.scale = { scale,scale };
-
-            if (len < 0.1f)
+            // カメラオブジェクトの取得
+            std::shared_ptr<GameObject> camera = GameObjectManager::Instance().Find("cameraPostPlayer");
+            if (camera != nullptr)
             {
+                DirectX::XMFLOAT3 camPos = camera->transform_->GetWorldPosition();
+                DirectX::XMVECTOR CameraPosition = DirectX::XMLoadFloat3(&camPos);
+
+                // 距離の計算
+                DirectX::XMVECTOR distanceVector = DirectX::XMVectorSubtract(WorldPosition, CameraPosition);
+                float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(distanceVector));
+
+                // ワールド座標からスクリーン座標へ変換
+                DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
+                    WorldPosition,
+                    viewport.TopLeftX,
+                    viewport.TopLeftY,
+                    viewport.Width,
+                    viewport.Height,
+                    viewport.MinDepth,
+                    viewport.MaxDepth,
+                    Projection,
+                    View,
+                    DirectX::XMMatrixIdentity()
+                );
+
+                // スクリーン座標の格納
+                DirectX::XMStoreFloat2(&spc.position, ScreenPosition);
+
+                // 距離に基づくスプライトのスケーリング (線形補間を距離に応じて滑らかに)
+                float scaleFactor = std::clamp(distance / 10.0f, 0.0f, 1.0f);  // クランプで距離を制限
+                DirectX::XMFLOAT2 scale = Mathf::Lerp(spc.maxscale, spc.minscale, scaleFactor);
+                spc.scale = scale;
             }
         }
     }
@@ -396,7 +404,7 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     }
 
     //いーじんぐのスプライト描画
-    if (easingsprite)
+    if (spc.easing)
     {
         EasingSprite();
     }
@@ -669,7 +677,7 @@ void Sprite::OnGUI()
     // イージング設定
     ImGui::Text("Easing Settings");
     easingresult = EasingImGui(spc.easingtype, spc.easingmovetype, easingtime);
-    ImGui::Checkbox("EasingSprite", &easingsprite);
+    ImGui::Checkbox("EasingTrigger", &spc.easing);
 
     // ブレンドモード設定
     constexpr const char* BlendName[] =
@@ -690,16 +698,18 @@ void Sprite::OnGUI()
     // その他のパラメータ
     ImGui::Text("Parameters");
 
-    if (ImGui::TreeNode("ScreennPos"))
+    if (ImGui::TreeNode((char*)u8"3DObjectに引っ付ける"))
     {
         //オブジェクトの名前をコピー
         char name[256];
-        ::strncpy_s(name, sizeof(name), objectname.c_str(), sizeof(name));
+        ::strncpy_s(name, sizeof(name), spc.objectname.c_str(), sizeof(name));
         if (ImGui::InputText((char*)u8"オブジェクトの名前", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
         {
-            objectname = name;
+            spc.objectname = name;
         }
-        ImGui::DragFloat3((char*)u8"座標オフセット値", &screenposoffset.x);
+        ImGui::DragFloat3((char*)u8"座標オフセット値", &spc.screenposoffset.x, 0.1f);
+        ImGui::DragFloat2((char*)u8"最大サイズ", &spc.maxscale.x, 0.1f, 0.0f, 500.0f);
+        ImGui::DragFloat2((char*)u8"最小サイズ", &spc.minscale.x, 0.1f, 0.0f, 500.0f);
         ImGui::TreePop();
     }
 
@@ -820,10 +830,14 @@ void Sprite::StopEasing()
     play = false;
     loopon = false;
     easingtime = 0.0f;
-    spc.position = savepos;
-    spc.color = savecolor;
-    spc.scale = savescale;
-    spc.angle = saveangle;
+
+    if (spc.easing)
+    {
+        spc.position = savepos;
+        spc.color = savecolor;
+        spc.scale = savescale;
+        spc.angle = saveangle;
+    }
 }
 
 //マウスカーソルとコリジョンボックスの当たり判定
