@@ -28,7 +28,10 @@ enum class CB_INDEX
     LIGHT_DATA = 8,
     SHADOW_PAR = 9,
     SCENE = 10,
-    OUTLINE = 11
+    GENERAL = 11,
+    PROJECTIONMAPPING = 12,
+
+    MAX
 };
 
 //ブレンドステート

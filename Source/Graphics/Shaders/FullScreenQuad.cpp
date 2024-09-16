@@ -32,10 +32,9 @@ void FullScreenQuad::Blit(ID3D11DeviceContext* immediate_context, ID3D11ShaderRe
 
     // 埋め込まれた頂点シェーダーを設定
     immediate_context->VSSetShader(m_embeddedvertexshader.Get(), 0, 0);
-    replaced_pixel_shader ? immediate_context->PSSetShader(replaced_pixel_shader, 0, 0) : immediate_context->PSSetShader(m_embeddedpixelshader.Get(), 0, 0);
 
     // ピクセルシェーダーのリソースビューを再度設定
-    immediate_context->PSSetShaderResources(start_slot, num_views, shader_resource_views);
+    immediate_context->PSSetShader(replaced_pixel_shader ? replaced_pixel_shader : m_embeddedpixelshader.Get(), nullptr, 0);
 
     immediate_context->RSSetState(Graphics::Instance().GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
 

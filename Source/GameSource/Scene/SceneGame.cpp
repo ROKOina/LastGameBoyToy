@@ -35,6 +35,7 @@
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 #include "Graphics/Sprite/Sprite.h"
+#include "Components/BulletHoleCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -110,6 +111,13 @@ void SceneGame::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("UiTest");
         obj->AddComponent<Sprite>(nullptr, true/*"Data\\UIData\\test.ui"*/);
+    }
+
+    //’e­ƒeƒXƒg
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("BulletHoleTest");
+        obj->AddComponent<BulletHole>("Data\\Texture\\odoroki.png");
     }
 
 #pragma endregion

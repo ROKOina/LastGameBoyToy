@@ -45,17 +45,19 @@ public:
         DirectX::XMFLOAT2 dummy = {};
     };
 
-    //アウトラインのコンスタントバッファ
-    struct outlineconstants
+    //汎用のコンスタントバッファ
+    struct m_general
     {
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
+        int statictype = 0;
+        DirectX::XMFLOAT3 generaldummy = {};
     };
 
 private:
     std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
-    std::unique_ptr<ConstantBuffer<outlineconstants>> m_outlineconstants;
+    std::unique_ptr<ConstantBuffer<m_general>> m_generalconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;

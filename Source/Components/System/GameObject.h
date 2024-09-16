@@ -16,6 +16,7 @@ class TransformCom;
 class RendererCom;
 class CPUParticle;
 class GPUParticle;
+class BulletHole;
 class Collider;
 class Sprite;
 
@@ -193,6 +194,9 @@ private:
     //GPUパーティクル描画
     void GPUParticleRender();
 
+    //弾痕や特殊エフェクト描画
+    void SpecialRender();
+
     //スプライト描画
     void SpriteRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
@@ -226,6 +230,9 @@ private:
 
     //スプライト描画
     std::vector<std::weak_ptr<Sprite>>spriteobject;
+
+    //弾痕や特殊エフェクト関係の描画
+    std::vector<std::weak_ptr<BulletHole>>m_bulletholeobject;
 
     //ポストエフェクト
     std::unique_ptr<PostEffect>m_posteffect;

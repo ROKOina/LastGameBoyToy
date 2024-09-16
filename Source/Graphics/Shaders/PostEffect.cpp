@@ -5,9 +5,15 @@
 #include <imgui.h>
 #include "Shader.h"
 
+PostEffect* PostEffect::instance_ = nullptr;
+
 //コンストラクタ
 PostEffect::PostEffect()
 {
+    // インスタンス設定
+    _ASSERT_EXPR(instance_ == nullptr, "already instantiated");
+    instance_ = this;
+
     Graphics& Graphics = Graphics::Instance();
 
     //ブルームセット
@@ -26,7 +32,7 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
 
     //MultiRenderTarget作成
-    m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 6);
+    m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 7);
 
     //影作成
     m_cascadedshadowmap = std::make_unique<CascadedShadowMap>(Graphics.GetDevice(), 1024 * 4, 1024 * 4);
@@ -116,12 +122,9 @@ void PostEffect::PostEffectRender()
     m_bloomeffect->Blit(dc);
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
-    //トーンマップ
-    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
-    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
-    dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
-    ID3D11ShaderResourceView* tone[]{ m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->m_shaderresourceviews[0].Get() };
-    FullScreenQuad::Instance().Blit(dc, tone, 0, _countof(tone), m_pixelshaders[static_cast<int>(pixelshader::tonemap)].Get());
+    //特殊エフェクトのバッファー
+    m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->Clear(dc);
+    m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->Activate(dc);
 }
 
 //imgui描画
@@ -165,19 +168,27 @@ void PostEffect::PostEffectImGui()
     ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::Text("FinalPass");
-    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::posteffect)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::specialeffect)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::End();
+}
 
-    ////scene描画
-    //ImGui::Begin("SceneView");
-    //// ウィンドウの位置とサイズを取得
-    //ImVec2 size = ImGui::GetContentRegionAvail();
-    //// フレームバッファのシェーダーリソースビューを取得
-    //ImTextureID texture_id = (ImTextureID)(Graphics::Instance().GetDebugRenderTarget()->GetShaderResourceView().Get());
-    //// 画像を表示
-    //ImGui::Image(texture_id, size);
-    //ImGui::End();
+//トーンマップ描画
+void PostEffect::ToneMapRender()
+{
+    Graphics& Graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
+    const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    // トーンマップ処理の修正
+    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
+    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
+    dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
+    ID3D11ShaderResourceView* tone[] = {
+        m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->m_shaderresourceviews[0].Get()
+    };
+    FullScreenQuad::Instance().Blit(dc, tone, 0, _countof(tone), m_pixelshaders[static_cast<int>(pixelshader::tonemap)].Get());
+    m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->Deactivate(dc);
 }
 
 void PostEffect::StartOffScreenRendering()

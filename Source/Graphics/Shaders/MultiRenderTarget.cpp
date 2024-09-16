@@ -96,6 +96,8 @@ void MultiRenderTarget::DrawImGui()
         ImGui::Image(shaderResourceViews[4].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
         ImGui::Text("Outline");
         ImGui::Image(shaderResourceViews[5].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+        ImGui::Text("General");
+        ImGui::Image(shaderResourceViews[6].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
         ImGui::Text("Depth");
         ImGui::Image(depthStencilSRV.Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
