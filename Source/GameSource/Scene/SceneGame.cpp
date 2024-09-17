@@ -43,6 +43,7 @@
 
 #include "Netwark/Photon/StaticSendDataManager.h"
 
+#include "GameSource/Math/Collision.h"
 // 初期化
 void SceneGame::Initialize()
 {
@@ -67,6 +68,8 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        //obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
+        //obj->AddComponent<NodeCollsionCom>(nullptr);
     }
 
     //当たり判定用
@@ -81,8 +84,9 @@ void SceneGame::Initialize()
         a->PlayAnimation(0, true, false, 0.001f);
 
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
-        sphere->SetRadius(1.0f);
+        sphere->SetRadius(2.0f);
         sphere->SetMyTag(COLLIDER_TAG::Enemy);
+        sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
         obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
@@ -153,6 +157,13 @@ void SceneGame::Finalize()
     photonNet->close();
 }
 
+DirectX::XMFLOAT3 cen = { 0,0,0 };
+DirectX::XMFLOAT3 sca = { 3,3,3 };
+DirectX::XMFLOAT3 rotaa = { 0,0,0 };
+
+DirectX::XMFLOAT3 cenS = { 0,0,0 };
+float scaS = 1;
+
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
@@ -202,6 +213,12 @@ void SceneGame::Render(float elapsedTime)
         //ネットワーク決定仮ボタン
         ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+        ImGui::DragFloat3("center", &cen.x, 0.1f);
+        ImGui::DragFloat3("sca", &sca.x, 0.1f);
+        ImGui::DragFloat3("rotaa", &rotaa.x, 0.1f);
+        ImGui::DragFloat3("centerS", &cenS.x, 0.1f);
+        ImGui::DragFloat("scaS", &scaS,0.1f);
 
         ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
 
