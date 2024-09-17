@@ -43,7 +43,6 @@
 
 #include "Netwark/Photon/StaticSendDataManager.h"
 
-#include "GameSource/Math/Collision.h"
 // 初期化
 void SceneGame::Initialize()
 {
@@ -157,13 +156,6 @@ void SceneGame::Finalize()
     photonNet->close();
 }
 
-DirectX::XMFLOAT3 cen = { 0,0,0 };
-DirectX::XMFLOAT3 sca = { 3,3,3 };
-DirectX::XMFLOAT3 rotaa = { 0,0,0 };
-
-DirectX::XMFLOAT3 cenS = { 0,0,0 };
-float scaS = 1;
-
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
@@ -213,12 +205,6 @@ void SceneGame::Render(float elapsedTime)
         //ネットワーク決定仮ボタン
         ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-
-        ImGui::DragFloat3("center", &cen.x, 0.1f);
-        ImGui::DragFloat3("sca", &sca.x, 0.1f);
-        ImGui::DragFloat3("rotaa", &rotaa.x, 0.1f);
-        ImGui::DragFloat3("centerS", &cenS.x, 0.1f);
-        ImGui::DragFloat("scaS", &scaS,0.1f);
 
         ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
 
