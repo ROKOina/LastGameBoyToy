@@ -23,14 +23,21 @@ void HaveAllAttackCharaCom::Start()
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
-
+#include "../ColliderCom.h"
+bool aho = false;
 void HaveAllAttackCharaCom::Update(float elapsedTime)
 {
+    aho = false;
+    if (GetGameObject()->GetComponent<Collider>()->OnHitGameObject().size() > 0)
+    {
+        aho = true;
+    }
     CharacterCom::Update(elapsedTime);
 }
 
 void HaveAllAttackCharaCom::OnGUI()
 {
+    ImGui::Checkbox("aho,", & aho);
     CharacterCom::OnGUI();
 }
 
