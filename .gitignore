@@ -39,7 +39,6 @@ Shader/
 *.cso
 
 #DDS out
-Data/Texture
 *.DDS
 
 #Imgui out
