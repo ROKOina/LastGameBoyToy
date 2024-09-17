@@ -4,6 +4,18 @@
 #include "GameSource/Math/Collision.h"
 //当たり判定をするコンポーネントまとめてここに書く
 
+//　※　判定される側をNodeCollisionの判定だけに仕様変更　※
+//      判定する側で、BOXだけ大変なのと、使う場面が無いと思うので、実装しません
+// 
+//判定する側
+//  COLLIDER_TYPEから形を選んで、その形のコンポーネントを追加する（例　： obj->AddComponent<SphereColliderCom>() ）
+//  SetMyTagとSetJudgeTagを設定
+
+//判定される側
+//  てきとうな形の（判定をColliderでするので）コンポーネントを追加する
+//  NodeCollsionComを追加する(例　：　obj->AddComponent<NodeCollsionCom>(nullptr)　)
+//  SetMyTagとSetJudgeTagを設定
+
 //当たり判定のタグ
 enum COLLIDER_TAG : uint64_t
 {
@@ -109,22 +121,10 @@ public:
 
 private:
     //当たり判定をする(当たっていたらtrue)
-    //球v球
-    bool SphereVsSphere(std::shared_ptr<Collider> otherSide);
-    //箱v箱
-    bool BoxVsBox(std::shared_ptr<Collider> otherSide);
-    //カプセルvカプセル
-    bool CapsuleVsCapsule(std::shared_ptr<Collider> otherSide);
-
-    //球v箱
-    bool SphereVsBox(std::shared_ptr<Collider> otherSide);
-    //球vカプセル
-    bool SphereVsCapsule(std::shared_ptr<Collider> otherSide);
-    //箱vカプセル
-    bool BoxVsCapsule(std::shared_ptr<Collider> otherSide);
-
-    //レイvモデル
-    //bool RayVsModel(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay);
+    //球vノードコリジョン
+    bool SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool isMyRay);
+    //カプセルvノードコリジョン
+    bool CapsuleVsNodeCollision(std::shared_ptr<Collider> otherSide, bool isMyRay);
 
     //レイVSノードコリジョン
     bool RayVsNodeCollision(std::shared_ptr<Collider> otherSide, HitResult& h, bool isMyRay);

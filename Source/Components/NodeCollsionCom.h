@@ -23,8 +23,7 @@ public:
     // GUI描画
     void OnGUI() override;
 
-private:
-
+public:
     //デバッグプリミティブの形状
     enum class CollsionType
     {
@@ -33,6 +32,7 @@ private:
         BOX,
         MAX
     };
+private:
     CollsionType m_collsiontype = CollsionType::SPHER;
 
 private:

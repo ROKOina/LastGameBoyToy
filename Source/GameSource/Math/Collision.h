@@ -47,6 +47,16 @@ public:
         DirectX::XMFLOAT3& outCylinderPosition
     );
 
+    //球と円柱の交差判定(回転あり)
+    static bool Collision::IntersectSphereVsCylider(
+        const DirectX::XMFLOAT3& spherePosition,
+        float sphereRadius,
+        const DirectX::XMFLOAT3& cylinderPosition,
+        const DirectX::XMFLOAT3& cylinderDir,
+        float cylinderRadius,
+        float cylinderHeight
+    );
+
     //レイとモデルの交差判定
     static bool IntersectRayVsModel(
         const DirectX::XMFLOAT3& start,
@@ -75,5 +85,34 @@ public:
         HitResult& result,
         DirectX::XMVECTOR* onCenterLinPos = {});
 
+    // レイVsBOX（OBB）
+    static bool IntersectRayVsBOX(
+        const DirectX::XMVECTOR& rayStart,
+        const DirectX::XMVECTOR& rayDirection,		// 要正規化
+        float rayDist,
+        const DirectX::XMMATRIX boxWorldTransform,
+        HitResult& result);
+
+    //　球VsOBB
+    static bool IntersectSphereVsOBB(
+        const DirectX::XMVECTOR spherePos,
+        float radius,
+        DirectX::XMMATRIX boxWorldTransform);
+
+    //カプセルVs円柱
+    static bool IntersectCapsuleVsCylinder(
+        const DirectX::XMVECTOR cap1StartPos,
+        const DirectX::XMVECTOR cap1EndPos,
+        float cap1Radius,
+        const DirectX::XMVECTOR cly2StartPos,
+        const DirectX::XMVECTOR cly2EndPos,
+        float cly2Radius);
+
+    //カプセルVsOBB
+    static bool IntersectCapsuleVsOBB(
+        const DirectX::XMVECTOR cap1StartPos,
+        const DirectX::XMVECTOR cap1EndPos,
+        float cap1Radius,
+        DirectX::XMMATRIX boxWorldTransform);
 };
 
