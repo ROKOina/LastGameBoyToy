@@ -68,18 +68,6 @@ public:
     virtual const char* GetName() const override { return "JumpLoop"; }
 };
 
-//攻撃(修正)
-//class UenoCharacterState_AttackState : public UenoCharacterState_BaseState
-//{
-//public:
-//    UenoCharacterState_AttackState(CharacterCom* owner) :UenoCharacterState_BaseState(owner) {}
-//
-//    void Enter() override;
-//    void Execute(const float& elapsedTime) override;
-//    void ImGui() override {};
-//    virtual const char* GetName() const override { return "Attack"; }
-//};
-
 //シフトスキル(ジャンプパック)
 class UenoCharacterState_ShiftSkillState :public UenoCharacterState_BaseState
 {
@@ -88,6 +76,16 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void ImGui() override {};
+    void Exit()override;
+    void ImGui() override;
     virtual const char* GetName() const override { return "ShiftSkill"; }
+
+private:
+
+    float a = 0.2f;
+    float b = 5.0f;
+    float rate = 0.3f;
+    float startbust = 2.0f;
+    float endbust = 25.0f;
+    float influence = 3.0f;
 };

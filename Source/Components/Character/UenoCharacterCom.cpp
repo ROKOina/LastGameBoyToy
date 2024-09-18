@@ -17,6 +17,7 @@ void UenoCharacterCom::Start()
 
     //攻撃ステート
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL, std::make_shared<UenoCharacterState_ShiftSkillState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<BaseCharacter_HitscanState>(this), AttackType::LAZER);
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this), AttackType::NON);
 
     //初期登録
@@ -40,4 +41,10 @@ void UenoCharacterCom::OnGUI()
 void UenoCharacterCom::LeftShiftSkill()
 {
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
+}
+
+//左クリック
+void UenoCharacterCom::MainAttackPushing()
+{
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
 }

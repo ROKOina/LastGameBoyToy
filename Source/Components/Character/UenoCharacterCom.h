@@ -22,4 +22,7 @@ public:
 
     //シフトスキル
     void LeftShiftSkill() override;
+
+    //左クリック
+    void MainAttackPushing() override;
 };

@@ -34,6 +34,7 @@ void MovementCom::Update(float elapsedTime)
 void MovementCom::OnGUI()
 {
     ImGui::DragFloat3((char*)u8"速力", &velocity_.x, 0.1f, -100.0f, 100.0f);
+    ImGui::DragFloat3((char*)u8"最大加速度", &nonMaxSpeedVelocity_.x);
     ImGui::DragFloat((char*)u8"重力", &gravity_, 0.01f, 0.0f, 100.0f);
     ImGui::DragFloat((char*)u8"重力影響度", &gravityeffect, 0.01f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"落下スピード", &fallspeed, 0.1f, -100.0f, 0.0f);
@@ -132,7 +133,7 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
 
         // レイの終点位置は移動後の位置
         DirectX::XMFLOAT3 end = transform->GetWorldPosition();
-        end.y += moveVec - 0.1f;
+        end.y += (moveVec * elapsedTime) - 0.1f;
 
         // 判定
         RayCastManager::Result hit;
@@ -146,7 +147,7 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
         }
         else
         {
-            position.y += moveVec;
+            position.y += moveVec * elapsedTime;
             onGround_ = false;
         }
     }

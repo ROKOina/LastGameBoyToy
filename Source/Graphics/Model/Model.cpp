@@ -9,6 +9,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
+#include <cereal/types/unordered_map.hpp>
 #include <SystemStruct/TransformUtils.h>
 
 CEREAL_CLASS_VERSION(Model::CollsionParameter, 1)
@@ -228,9 +229,7 @@ void Model::ImGui(Model::Node* node)
     }
 
     // ノードに関連付けられたCollisionParameterが存在するかチェック
-    bool hasCollisionParam = std::any_of(cp.begin(), cp.end(), [node](const CollsionParameter& param) {
-        return param.nodeid == node->nodeIndex;
-        });
+    bool hasCollisionParam = (cp.find(node->nodeIndex) != cp.end() && !cp.at(node->nodeIndex).empty());
 
     // ノード名の色を設定
     if (hasCollisionParam)
@@ -258,7 +257,7 @@ void Model::ImGui(Model::Node* node)
     {
         for (Model::Node* child : node->children)
         {
-            ImGui(child);
+            ImGui(child); // 修正: 再帰的にノードを描画
         }
         ImGui::TreePop();
     }

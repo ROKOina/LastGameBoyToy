@@ -92,13 +92,12 @@ private:
     DirectX::XMFLOAT3 velocity_ = { 0,0,0 };   //速力
     DirectX::XMFLOAT3 nonMaxSpeedVelocity_ = { 0,0,0 }; //最大スピードを無視した速力
     float gravity_ = GRAVITY_NORMAL;           //重力
-    float gravityeffect = 1.0f;                //重力の影響度
-    float fallspeed = -0.3;                    //落ちるスピード
+    float gravityeffect = 30.0f;               //重力の影響度
+    float fallspeed = -100.0f;                 //落ちるスピード
     bool onGround_ = false;                    //地面についているか
     float friction_ = 12.620f;                 //摩擦
     float moveMaxSpeed_ = 5.0f;                //最大速度
     float moveAcceleration_ = 1.0f;            //加速度
     inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット
     bool isRaycast = true;                      //レイキャストをするか（true：使用する）
-
 };
