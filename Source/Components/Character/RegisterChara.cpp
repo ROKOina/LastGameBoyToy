@@ -12,6 +12,7 @@
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\HaveAllAttackCharacter.h"
 #include "Components/Character/UenoCharacterCom.h"
+#include "Components/Character/Picohard.h"
 #include "HitProcess/HitProcessCom.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject> obj)
@@ -24,6 +25,10 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     case RegisterChara::CHARA_LIST::UENO:
         UenoChara(obj);
         break;
+    case RegisterChara::CHARA_LIST::PICOHARD:
+        PicohardChara(obj);
+        break;
+
     case RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK:
         HaveAllAttackChara(obj);
         break;
@@ -207,5 +212,70 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
         std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>(obj);
         hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
         hitHeal->SetValue(2);
+    }
+}
+
+//ラインハルト
+void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
+{
+    obj->transform_->SetWorldPosition({ 0, 0, 0 });
+    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    r->LoadModel("Data/pico/pico.mdl");
+    obj->AddComponent<AimIKCom>("Spine");
+    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+    obj->AddComponent<NodeCollsionCom>(nullptr);
+    a->PlayAnimation(0, true, false, 0.001f);
+    std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+    std::shared_ptr<PicohardCharaCom> c = obj->AddComponent<PicohardCharaCom>();
+    c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
+
+    std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
+    ca->SetMyTag(COLLIDER_TAG::Player);
+    ca->SetJudgeTag(COLLIDER_TAG::Enemy);
+
+    //hanma-
+    {
+        //ハンマー軸
+        //X
+        std::shared_ptr<GameObject> zikuX = obj->AddChildObject();
+        zikuX->SetName("hammerZikuX");
+        zikuX->transform_->SetLocalPosition({ 0,88.0f,0 });
+        //Y
+        std::shared_ptr<GameObject> zikuY = zikuX->AddChildObject();
+        zikuY->SetName("hammerZikuY");
+
+
+        std::shared_ptr<GameObject> hanma = zikuY->AddChildObject();
+        hanma->SetName("hammer");
+        hanma->transform_->SetLocalPosition({ 0,0,71.0f });
+
+        auto& s = hanma->AddComponent<SphereColliderCom>();
+        s->SetMyTag(COLLIDER_TAG::Player);
+        s->SetJudgeTag(COLLIDER_TAG::Enemy);
+
+    }
+
+    //たて
+    {
+        //軸
+        std::shared_ptr<GameObject> zikuX = obj->AddChildObject();
+        zikuX->SetName("sieldZikuX");
+        zikuX->transform_->SetWorldPosition({ 0,80,33 });
+
+
+        std::shared_ptr<GameObject> tate = zikuX->AddChildObject();
+        tate->SetName("sield");
+        tate->transform_->SetLocalPosition({ 0,0,30 });
+        tate->transform_->SetScale({ 3,2,0.1f });
+
+        std::shared_ptr<RendererCom> tateRen = tate->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::ALPHA);
+        tateRen->LoadModel("Data/cube/cube.mdl");
+
+        tate->AddComponent<NodeCollsionCom>("Data/cube/sield.nodecollsion");
+
+        std::shared_ptr<SphereColliderCom> s = tate->AddComponent<SphereColliderCom>();
+        s->SetMyTag(COLLIDER_TAG::PlayerSield);
+        s->SetJudgeTag(COLLIDER_TAG::Enemy);
     }
 }

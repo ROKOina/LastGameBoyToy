@@ -25,7 +25,7 @@ enum COLLIDER_TAG : uint64_t
     PlayerAttack = 1 << 2,
     PlayerAttackAssist = 1 << 3,
     PlayerPushBack = 1 << 4,
-    JustAvoid = 1 << 5,
+    PlayerSield = 1 << 5,
 
     Enemy = 1 << 10,
     EnemyAttack = 1 << 11,
