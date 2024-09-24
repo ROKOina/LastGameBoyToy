@@ -23,21 +23,12 @@ void EventCom::Update(float elapsedTime)
             // イベント進行中
             event.totaltime += elapsedTime; for (auto& event : eventList)
             {
-                if (!event.active || event.state == EventState::Finished)
-                {
-                    continue;  // イベントが無効または終了している場合は更新しない
-                }
+                if (!event.active)continue;// イベントが無効または終了している場合は更新しない
 
-                // 開始前なら状態を更新し、次のイベントへ
-                if (event.totaltime < event.starttime)
-                {
-                    event.state = EventState::NotStarted;
-                    continue;
-                }
+                if (event.totaltime < event.starttime)continue;// 開始前なら状態を更新し、次のイベントへ
 
                 // イベント進行中
                 event.totaltime += elapsedTime;
-                event.state = EventState::InProgress;
 
                 // イベント終了判定
                 if (event.totaltime >= event.endtime)
@@ -48,7 +39,6 @@ void EventCom::Update(float elapsedTime)
                     }
                     else
                     {
-                        event.state = EventState::Finished;
                         event.totaltime = event.endtime;  // 完了状態の場合、合計時間を終了時間に設定
                     }
                 }
