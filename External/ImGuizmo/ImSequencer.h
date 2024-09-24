@@ -30,7 +30,8 @@ namespace ImSequencer
         virtual const char* GetItemTypeName(int /*typeIndex*/) const { return ""; }
         virtual const char* GetItemLabel(int /*index*/) const { return ""; }
 
-        virtual void Get(int index, int** start, int** end, int* type, unsigned int* color) = 0;
+        virtual void IntGet(int index, int** start, int** end, int* type, unsigned int* color) = 0;
+        virtual void FloatGet(int index, float** start, float** end, int* type, unsigned int* color) = 0;
         virtual void Add(int /*type*/) {}
         virtual void Del(int /*index*/) {}
         virtual void Duplicate(int /*index*/) {}

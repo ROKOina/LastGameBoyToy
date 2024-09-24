@@ -255,7 +255,8 @@ namespace ImSequencer
             for (int i = 0; i < sequenceCount; i++)
             {
                 int type;
-                sequence->Get(i, NULL, NULL, &type, NULL);
+                sequence->IntGet(i, NULL, NULL, &type, NULL);
+                sequence->FloatGet(i, NULL, NULL, &type, NULL);
                 ImVec2 tpos(contentMin.x + 3, contentMin.y + i * ItemHeight + 2 + customHeight);
                 draw_list->AddText(tpos, 0xFFFFFFFF, sequence->GetItemLabel(i));
 
@@ -319,7 +320,8 @@ namespace ImSequencer
             {
                 int* start, * end;
                 unsigned int color;
-                sequence->Get(i, &start, &end, NULL, &color);
+                sequence->IntGet(i, &start, &end, NULL, &color);
+                sequence->FloatGet(i, reinterpret_cast<float**>(&start), reinterpret_cast<float**>(&end), NULL, &color);
                 size_t localCustomHeight = sequence->GetCustomHeight(i);
 
                 ImVec2 pos = ImVec2(contentMin.x + legendWidth - firstFrameUsed * framePixelWidth, contentMin.y + ItemHeight * i + 1 + customHeight);
@@ -403,7 +405,8 @@ namespace ImSequencer
                 if (std::abs(diffFrame) > 0)
                 {
                     int* start, * end;
-                    sequence->Get(movingEntry, &start, &end, NULL, NULL);
+                    sequence->IntGet(movingEntry, &start, &end, NULL, NULL);
+                    sequence->FloatGet(movingEntry, reinterpret_cast<float**>(&start), reinterpret_cast<float**>(&end), NULL, NULL);
                     if (selectedEntry)
                         *selectedEntry = movingEntry;
                     int& l = *start;

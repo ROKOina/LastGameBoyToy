@@ -169,6 +169,7 @@
     <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
+    <ClInclude Include="Source\Components\EventCom.h" />
     <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
@@ -283,6 +284,7 @@
     <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\EventCom.cpp" />
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
