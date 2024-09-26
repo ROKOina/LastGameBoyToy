@@ -12,6 +12,7 @@
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\HaveAllAttackCharacter.h"
 #include "Components/Character/UenoCharacterCom.h"
+#include "Components/EventCom.h"
 #include "Components/Character/Picohard.h"
 #include "HitProcess/HitProcessCom.h"
 
@@ -81,7 +82,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     //else
     //    box->SetMyTag(COLLIDER_TAG::Enemy);
 
-    std::shared_ptr<CapsuleColliderCom> ca= obj->AddComponent<CapsuleColliderCom>();
+    std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
     ca->SetMyTag(COLLIDER_TAG::Player);
     ca->SetJudgeTag(COLLIDER_TAG::Enemy);
 
@@ -154,6 +155,7 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
     obj->AddComponent<AimIKCom>("Spine");
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
+    obj->AddComponent<EventCom>(nullptr);
     obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));

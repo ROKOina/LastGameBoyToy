@@ -4,6 +4,7 @@
 #include "Components\CameraCom.h"
 #include "Components\Character\BulletCom.h"
 #include "BaseCharacterState.h"
+#include "Components/ColliderCom.h"
 
 //基底クラスのコンポーネント
 UenoCharacterState_BaseState::UenoCharacterState_BaseState(CharacterCom* owner) : State(owner)
@@ -153,12 +154,13 @@ void UenoCharacterState_ShiftSkillState::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("jump"), false);
 
     //ジャンプベクトル
-    std::shared_ptr<GameObject> cameraplayer = GameObjectManager::Instance().Find("cameraPostPlayer");
-    DirectX::XMFLOAT3 power = { 0,cameraplayer->transform_->GetWorldFront().y,0 };
-    moveCom.lock()->AddForce(power);
+    moveCom.lock()->SetFriction(5.0f);
+    DirectX::XMFLOAT3 front = { GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront() };
 
-    //ジャンプパックの起動
-    moveCom.lock()->AddNonMaxSpeedForce(cameraplayer->transform_->GetWorldFront());
+    //xとｚ軸課題です
+    float speedRate = 1 - powf(-powf(rate, a) + 1, b);
+    float moveSpeed = Mathf::Lerp(startbust, endbust * influence, speedRate);
+    moveCom.lock()->SetNonMaxSpeedVelocity(front * moveSpeed);
 }
 
 void UenoCharacterState_ShiftSkillState::Execute(const float& elapsedTime)
@@ -168,5 +170,21 @@ void UenoCharacterState_ShiftSkillState::Execute(const float& elapsedTime)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
     }
+}
+
+void UenoCharacterState_ShiftSkillState::Exit()
+{
+    moveCom.lock()->SetFriction(12.620f);
+}
+
+//imgui
+void UenoCharacterState_ShiftSkillState::ImGui()
+{
+    ImGui::DragFloat("a", &a);
+    ImGui::DragFloat("b", &b);
+    ImGui::DragFloat("rate", &rate);
+    ImGui::DragFloat("startbust", &startbust);
+    ImGui::DragFloat("endbust", &endbust);
+    ImGui::DragFloat("influence", &influence);
 }
 #pragma endregion

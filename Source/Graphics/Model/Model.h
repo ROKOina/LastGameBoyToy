@@ -7,6 +7,7 @@
 #include "ModelResource.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
+#include <unordered_map>
 
 class Model
 {
@@ -42,7 +43,7 @@ public:
         template<class Archive>
         void serialize(Archive& archive, int version);
     };
-    std::vector<CollsionParameter>cp;
+    std::unordered_map<int, std::vector<Model::CollsionParameter>>cp;
 
     // çsóÒåvéZ
     void UpdateTransform(const DirectX::XMMATRIX& Transform);
