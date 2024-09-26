@@ -113,66 +113,69 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
 
     bool isHit = false;
 
-    //for (auto& col : model->cp)
-    //{
-    //    DirectX::XMFLOAT3 startPos =
-    //    {
-    //        model->GetNodes()[col.nodeid].worldTransform._41,
-    //        model->GetNodes()[col.nodeid].worldTransform._42,
-    //        model->GetNodes()[col.nodeid].worldTransform._43
-    //    };
+    for (auto& nodeEntry : model->cp)
+    {
+        for (auto& col : nodeEntry.second)
+        {
+            DirectX::XMFLOAT3 startPos =
+            {
+                model->GetNodes()[col.nodeid].worldTransform._41,
+                model->GetNodes()[col.nodeid].worldTransform._42,
+                model->GetNodes()[col.nodeid].worldTransform._43
+            };
 
-    //    //sphere
-    //    if (col.collsiontype == int(NodeCollsionCom::CollsionType::SPHER))
-    //    {
-    //        float length = Mathf::Length(startPos - spherePos);
-    //        if (length < col.radius + sphereRadius)
-    //        {
-    //            isHit = true;
-    //            //当たっている時点でfor文を抜ける
-    //            break;
-    //        }
-    //    }
-    //    //clynder
-    //    else if (col.collsiontype == int(NodeCollsionCom::CollsionType::CYLINDER))
-    //    {
-    //        if (col.endnodeid < 0)continue;
-    //        DirectX::XMFLOAT3 endPos =
-    //        {
-    //            model->GetNodes()[col.endnodeid].worldTransform._41,
-    //            model->GetNodes()[col.endnodeid].worldTransform._42,
-    //            model->GetNodes()[col.endnodeid].worldTransform._43
-    //        };
+            //sphere
+            if (col.collsiontype == int(NodeCollsionCom::CollsionType::SPHER))
+            {
+                float length = Mathf::Length(startPos - spherePos);
+                if (length < col.radius + sphereRadius)
+                {
+                    isHit = true;
+                    //当たっている時点でfor文を抜ける
+                    break;
+                }
+            }
+            //clynder
+            else if (col.collsiontype == int(NodeCollsionCom::CollsionType::CYLINDER))
+            {
+                if (col.endnodeid < 0)continue;
+                DirectX::XMFLOAT3 endPos =
+                {
+                    model->GetNodes()[col.endnodeid].worldTransform._41,
+                    model->GetNodes()[col.endnodeid].worldTransform._42,
+                    model->GetNodes()[col.endnodeid].worldTransform._43
+                };
 
-    //        if (Collision::IntersectSphereVsCylider(spherePos, sphereRadius,
-    //            startPos, Mathf::Normalize(endPos - startPos), col.radius, col.height))
-    //        {
-    //            isHit = true;
-    //            //当たっている時点でfor文を抜ける
-    //            break;
-    //        }
-    //    }
-    //    //box
-    //    else if (col.collsiontype == int(NodeCollsionCom::CollsionType::BOX))
-    //    {
-    //        //ボックスの行列スケールを調整
-    //        DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&model->GetNodes()[col.nodeid].worldTransform);
-    //        mat.r[0] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[0]), col.scale.x);
-    //        mat.r[1] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[1]), col.scale.y);
-    //        mat.r[2] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[2]), col.scale.z);
-    //        //オフセットポス
-    //        mat.r[3].m128_f32[0] = mat.r[3].m128_f32[0] + col.offsetpos.x;
-    //        mat.r[3].m128_f32[1] = mat.r[3].m128_f32[1] + col.offsetpos.y;
-    //        mat.r[3].m128_f32[2] = mat.r[3].m128_f32[2] + col.offsetpos.z;
+                if (Collision::IntersectSphereVsCylider(spherePos, sphereRadius,
+                    startPos, Mathf::Normalize(endPos - startPos), col.radius, col.height))
+                {
+                    isHit = true;
+                    //当たっている時点でfor文を抜ける
+                    break;
+                }
+            }
+            //box
+            else if (col.collsiontype == int(NodeCollsionCom::CollsionType::BOX))
+            {
+                //ボックスの行列スケールを調整
+                DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&model->GetNodes()[col.nodeid].worldTransform);
+                mat.r[0] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[0]), col.scale.x);
+                mat.r[1] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[1]), col.scale.y);
+                mat.r[2] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[2]), col.scale.z);
+                //オフセットポス
+                mat.r[3].m128_f32[0] = mat.r[3].m128_f32[0] + col.offsetpos.x;
+                mat.r[3].m128_f32[1] = mat.r[3].m128_f32[1] + col.offsetpos.y;
+                mat.r[3].m128_f32[2] = mat.r[3].m128_f32[2] + col.offsetpos.z;
 
-    //        if (Collision::IntersectSphereVsOBB(DirectX::XMLoadFloat3(&spherePos), sphereRadius, mat))
-    //        {
-    //            isHit = true;
-    //            //当たっている時点でfor文を抜ける
-    //            break;
-    //        }
-    //    }
-    //}
+                if (Collision::IntersectSphereVsOBB(DirectX::XMLoadFloat3(&spherePos), sphereRadius, mat))
+                {
+                    isHit = true;
+                    //当たっている時点でfor文を抜ける
+                    break;
+                }
+            }
+        }
+    }
 
     return isHit;
 }
@@ -213,83 +216,86 @@ bool Collider::CapsuleVsNodeCollision(std::shared_ptr<Collider> otherSide, bool 
 
     bool isHit = false;
 
-    //for (auto& col : model->cp)
-    //{
-    //    DirectX::XMFLOAT3 startPos =
-    //    {
-    //        model->GetNodes()[col.nodeid].worldTransform._41,
-    //        model->GetNodes()[col.nodeid].worldTransform._42,
-    //        model->GetNodes()[col.nodeid].worldTransform._43
-    //    };
+    for (auto& nodeEntry : model->cp)
+    {
+        for (auto& col : nodeEntry.second)
+        {
+            DirectX::XMFLOAT3 startPos =
+            {
+                model->GetNodes()[col.nodeid].worldTransform._41,
+                model->GetNodes()[col.nodeid].worldTransform._42,
+                model->GetNodes()[col.nodeid].worldTransform._43
+            };
 
-    //    //sphere
-    //    if (col.collsiontype == int(NodeCollsionCom::CollsionType::SPHER))
-    //    {
-    //        float l = sqrtf(DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, dCapsule)));
-    //        dCapsule = DirectX::XMVector3Normalize(dCapsule);	// 正規化
+            //sphere
+            if (col.collsiontype == int(NodeCollsionCom::CollsionType::SPHER))
+            {
+                float l = sqrtf(DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, dCapsule)));
+                dCapsule = DirectX::XMVector3Normalize(dCapsule);	// 正規化
 
-    //        FLOAT t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, { startPos.x - cP0.x, startPos.y - cP0.y, startPos.z - cP0.z }));	// 射影長の算出
-    //        DirectX::XMVECTOR Q = {};	// 最近点
-    //        if (t < 0)
-    //            Q = DirectX::XMLoadFloat3(&cP0);
-    //        else if (t > l)
-    //            Q = DirectX::XMLoadFloat3(&cP1);
-    //        else
-    //            Q = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&cP0), DirectX::XMVectorScale(dCapsule, t));
+                FLOAT t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, { startPos.x - cP0.x, startPos.y - cP0.y, startPos.z - cP0.z }));	// 射影長の算出
+                DirectX::XMVECTOR Q = {};	// 最近点
+                if (t < 0)
+                    Q = DirectX::XMLoadFloat3(&cP0);
+                else if (t > l)
+                    Q = DirectX::XMLoadFloat3(&cP1);
+                else
+                    Q = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&cP0), DirectX::XMVectorScale(dCapsule, t));
 
-    //        // 交差判定
-    //        DirectX::XMVECTOR Len = DirectX::XMVectorSubtract(Q, DirectX::XMLoadFloat3(&startPos));
+                // 交差判定
+                DirectX::XMVECTOR Len = DirectX::XMVectorSubtract(Q, DirectX::XMLoadFloat3(&startPos));
 
-    //        if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(Len, Len)) < (col.radius + Capsule.radius) * (col.radius + Capsule.radius))// ※２乗同士で高速比較
-    //        {
-    //            isHit = true;
-    //            //当たっている時点でfor文を抜ける
-    //            break;
-    //        }
-    //    }
-    //    //clynder
-    //    else if (col.collsiontype == int(NodeCollsionCom::CollsionType::CYLINDER))
-    //    {
-    //        if (col.endnodeid < 0)continue;
-    //        DirectX::XMFLOAT3 endPos =
-    //        {
-    //            model->GetNodes()[col.endnodeid].worldTransform._41,
-    //            model->GetNodes()[col.endnodeid].worldTransform._42,
-    //            model->GetNodes()[col.endnodeid].worldTransform._43
-    //        };
+                if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(Len, Len)) < (col.radius + Capsule.radius) * (col.radius + Capsule.radius))// ※２乗同士で高速比較
+                {
+                    isHit = true;
+                    //当たっている時点でfor文を抜ける
+                    break;
+                }
+            }
+            //clynder
+            else if (col.collsiontype == int(NodeCollsionCom::CollsionType::CYLINDER))
+            {
+                if (col.endnodeid < 0)continue;
+                DirectX::XMFLOAT3 endPos =
+                {
+                    model->GetNodes()[col.endnodeid].worldTransform._41,
+                    model->GetNodes()[col.endnodeid].worldTransform._42,
+                    model->GetNodes()[col.endnodeid].worldTransform._43
+                };
 
-    //        //カプセル
-    //        if (Collision::IntersectCapsuleVsCylinder(DirectX::XMLoadFloat3(&cP0), DirectX::XMLoadFloat3(&cP1), Capsule.radius,
-    //            DirectX::XMLoadFloat3(&startPos), DirectX::XMLoadFloat3(&endPos), col.radius))
-    //        {
-    //            isHit = true;
-    //            //当たっている時点でfor文を抜ける
-    //            break;
-    //        }
+                //カプセル
+                if (Collision::IntersectCapsuleVsCylinder(DirectX::XMLoadFloat3(&cP0), DirectX::XMLoadFloat3(&cP1), Capsule.radius,
+                    DirectX::XMLoadFloat3(&startPos), DirectX::XMLoadFloat3(&endPos), col.radius))
+                {
+                    isHit = true;
+                    //当たっている時点でfor文を抜ける
+                    break;
+                }
 
-    //    }
-    //    //box
-    //    else if (col.collsiontype == int(NodeCollsionCom::CollsionType::BOX))
-    //    {
-    //        //ボックスの行列スケールを調整
-    //        DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&model->GetNodes()[col.nodeid].worldTransform);
-    //        mat.r[0] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[0]), col.scale.x);
-    //        mat.r[1] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[1]), col.scale.y);
-    //        mat.r[2] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[2]), col.scale.z);
-    //        //オフセットポス
-    //        mat.r[3].m128_f32[0] = mat.r[3].m128_f32[0] + col.offsetpos.x;
-    //        mat.r[3].m128_f32[1] = mat.r[3].m128_f32[1] + col.offsetpos.y;
-    //        mat.r[3].m128_f32[2] = mat.r[3].m128_f32[2] + col.offsetpos.z;
+            }
+            //box
+            else if (col.collsiontype == int(NodeCollsionCom::CollsionType::BOX))
+            {
+                //ボックスの行列スケールを調整
+                DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&model->GetNodes()[col.nodeid].worldTransform);
+                mat.r[0] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[0]), col.scale.x);
+                mat.r[1] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[1]), col.scale.y);
+                mat.r[2] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[2]), col.scale.z);
+                //オフセットポス
+                mat.r[3].m128_f32[0] = mat.r[3].m128_f32[0] + col.offsetpos.x;
+                mat.r[3].m128_f32[1] = mat.r[3].m128_f32[1] + col.offsetpos.y;
+                mat.r[3].m128_f32[2] = mat.r[3].m128_f32[2] + col.offsetpos.z;
 
-    //        if (Collision::IntersectCapsuleVsOBB(DirectX::XMLoadFloat3(&cP0), DirectX::XMLoadFloat3(&cP1), Capsule.radius,
-    //            mat))
-    //        {
-    //            isHit = true;
-    //            //当たっている時点でfor文を抜ける
-    //            break;
-    //        }
-    //    }
-    //}
+                if (Collision::IntersectCapsuleVsOBB(DirectX::XMLoadFloat3(&cP0), DirectX::XMLoadFloat3(&cP1), Capsule.radius,
+                    mat))
+                {
+                    isHit = true;
+                    //当たっている時点でfor文を抜ける
+                    break;
+                }
+            }
+        }
+    }
 
     return isHit;
 }
@@ -327,81 +333,84 @@ bool Collider::RayVsNodeCollision(std::shared_ptr<Collider> otherSide, HitResult
 
     bool isHit = false;
 
-    //for (auto& col : model->cp)
-    //{
-    //    DirectX::XMFLOAT3 startPos =
-    //    {
-    //        model->GetNodes()[col.nodeid].worldTransform._41,
-    //        model->GetNodes()[col.nodeid].worldTransform._42,
-    //        model->GetNodes()[col.nodeid].worldTransform._43
-    //    };
+    for (auto& nodeEntry : model->cp)
+    {
+        for (auto& col : nodeEntry.second)
+        {
+            DirectX::XMFLOAT3 startPos =
+            {
+                model->GetNodes()[col.nodeid].worldTransform._41,
+                model->GetNodes()[col.nodeid].worldTransform._42,
+                model->GetNodes()[col.nodeid].worldTransform._43
+            };
 
-    //    //sphere
-    //    if (col.collsiontype == int(NodeCollsionCom::CollsionType::SPHER))
-    //    {
-    //        HitResult hit;
-    //        if (Collision::IntersectRayVsSphere(
-    //            DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
-    //            DirectX::XMLoadFloat3(&startPos), col.radius, hit))
-    //        {
-    //            //距離を見て近ければ上書きする
-    //            if (h.distance > hit.distance)
-    //            {
-    //                h = hit;
-    //                isHit = true;
-    //            }
-    //        }
-    //    }
-    //    //clynder
-    //    else if (col.collsiontype == int(NodeCollsionCom::CollsionType::CYLINDER))
-    //    {
-    //        DirectX::XMFLOAT3 endPos =
-    //        {
-    //            model->GetNodes()[col.endnodeid].worldTransform._41,
-    //            model->GetNodes()[col.endnodeid].worldTransform._42,
-    //            model->GetNodes()[col.endnodeid].worldTransform._43
-    //        };
+            //sphere
+            if (col.collsiontype == int(NodeCollsionCom::CollsionType::SPHER))
+            {
+                HitResult hit;
+                if (Collision::IntersectRayVsSphere(
+                    DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
+                    DirectX::XMLoadFloat3(&startPos), col.radius, hit))
+                {
+                    //距離を見て近ければ上書きする
+                    if (h.distance > hit.distance)
+                    {
+                        h = hit;
+                        isHit = true;
+                    }
+                }
+            }
+            //clynder
+            else if (col.collsiontype == int(NodeCollsionCom::CollsionType::CYLINDER))
+            {
+                DirectX::XMFLOAT3 endPos =
+                {
+                    model->GetNodes()[col.endnodeid].worldTransform._41,
+                    model->GetNodes()[col.endnodeid].worldTransform._42,
+                    model->GetNodes()[col.endnodeid].worldTransform._43
+                };
 
-    //        HitResult hit;
-    //        if (Collision::IntersectRayVsOrientedCylinder(
-    //            DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
-    //            DirectX::XMLoadFloat3(&startPos), DirectX::XMLoadFloat3(&endPos), col.radius, hit))
-    //        {
-    //            //距離を見て近ければ上書きする
-    //            if (h.distance > hit.distance)
-    //            {
-    //                h = hit;
-    //                isHit = true;
-    //            }
-    //        }
-    //    }
-    //    //box
-    //    else if (col.collsiontype == int(NodeCollsionCom::CollsionType::BOX))
-    //    {
-    //        //ボックスの行列スケールを調整
-    //        DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&model->GetNodes()[col.nodeid].worldTransform);
-    //        mat.r[0] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[0]), col.scale.x);
-    //        mat.r[1] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[1]), col.scale.y);
-    //        mat.r[2] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[2]), col.scale.z);
-    //        //オフセットポス
-    //        mat.r[3].m128_f32[0] = mat.r[3].m128_f32[0] + col.offsetpos.x;
-    //        mat.r[3].m128_f32[1] = mat.r[3].m128_f32[1] + col.offsetpos.y;
-    //        mat.r[3].m128_f32[2] = mat.r[3].m128_f32[2] + col.offsetpos.z;
+                HitResult hit;
+                if (Collision::IntersectRayVsOrientedCylinder(
+                    DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
+                    DirectX::XMLoadFloat3(&startPos), DirectX::XMLoadFloat3(&endPos), col.radius, hit))
+                {
+                    //距離を見て近ければ上書きする
+                    if (h.distance > hit.distance)
+                    {
+                        h = hit;
+                        isHit = true;
+                    }
+                }
+            }
+            //box
+            else if (col.collsiontype == int(NodeCollsionCom::CollsionType::BOX))
+            {
+                //ボックスの行列スケールを調整
+                DirectX::XMMATRIX mat = DirectX::XMLoadFloat4x4(&model->GetNodes()[col.nodeid].worldTransform);
+                mat.r[0] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[0]), col.scale.x);
+                mat.r[1] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[1]), col.scale.y);
+                mat.r[2] = DirectX::XMVectorScale(DirectX::XMVector3Normalize(mat.r[2]), col.scale.z);
+                //オフセットポス
+                mat.r[3].m128_f32[0] = mat.r[3].m128_f32[0] + col.offsetpos.x;
+                mat.r[3].m128_f32[1] = mat.r[3].m128_f32[1] + col.offsetpos.y;
+                mat.r[3].m128_f32[2] = mat.r[3].m128_f32[2] + col.offsetpos.z;
 
-    //        HitResult hit;
-    //        if (Collision::IntersectRayVsBOX(
-    //            DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
-    //            mat, hit))
-    //        {
-    //            //距離を見て近ければ上書きする
-    //            if (h.distance > hit.distance)
-    //            {
-    //                h = hit;
-    //                isHit = true;
-    //            }
-    //        }
-    //    }
-    //}
+                HitResult hit;
+                if (Collision::IntersectRayVsBOX(
+                    DirectX::XMLoadFloat3(&s), DirectX::XMLoadFloat3(&Mathf::Normalize(e - s)), Mathf::Length(e - s),
+                    mat, hit))
+                {
+                    //距離を見て近ければ上書きする
+                    if (h.distance > hit.distance)
+                    {
+                        h = hit;
+                        isHit = true;
+                    }
+                }
+            }
+        }
+    }
 
     if (isHit)ray->SetHitPosDebug(h.position);
 

@@ -95,7 +95,7 @@ void SceneGame::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::PICOHARD, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK, obj);
     }
 
     //カメラをプレイヤーの子どもにして制御する
