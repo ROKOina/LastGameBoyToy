@@ -48,3 +48,24 @@ public:
 
 private:
 };
+
+//ƒ`ƒƒ[ƒW
+class Picohard_LeftShift : public Picohard_BaseState
+{
+public:
+    Picohard_LeftShift(CharacterCom* owner) : Picohard_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    virtual const char* GetName() const override { return "LeftShift"; }
+    void ImGui()override;
+private:
+    float timer;
+    float time = 10;
+    float moveSpeed = 5;
+    float angleSpeed = 30;
+
+    int hitID = -1; //“–‚Ä‚½‘Šè•Û‘¶
+};
+

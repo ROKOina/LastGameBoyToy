@@ -547,6 +547,8 @@ void PhotonLib::sendData(void)
         }
         else if (data.sendType == 3)	//ノックバック
             netD.knockbackData[data.id] += data.valueF3;
+        else if (data.sendType == 4)	//移動位置
+            netD.movePosData[data.id] = data.valueF3;
     }
 
     //マスタークライアントの場合はチームIDを送る
@@ -713,6 +715,18 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 {
                     auto& obj = GameObjectManager::Instance().Find("player");
                     obj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(ne[0].knockbackData[id]);
+                    break;
+                }
+            }
+            //移動位置情報
+            for (int id = 0; id < ne[0].movePosData.size(); ++id)
+            {
+                if (id != GetPlayerNum())continue;
+
+                if (Mathf::Length(ne[0].movePosData[id]) >= 0.1f)
+                {
+                    auto& obj = GameObjectManager::Instance().Find("player");
+                    obj->transform_->SetWorldPosition(ne[0].movePosData[id]);
                     break;
                 }
             }

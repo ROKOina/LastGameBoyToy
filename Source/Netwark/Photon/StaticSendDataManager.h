@@ -23,7 +23,7 @@ public:
     {
         int id; //送信相手
 
-        int sendType;   //0:damage 1:heal 2:stan 3:knockback
+        int sendType;   //0:damage 1:heal 2:stan 3:knockback 4:movePos
 
         int valueI;
         float valueF;
@@ -41,6 +41,9 @@ public:
 
     //ノックバックを送信
     void SetSendKnockback(int myID, int sendID, DirectX::XMFLOAT3 knockbackVec);
+
+    //移動位置を送信
+    void SetSendMovePos(int myID, int sendID, DirectX::XMFLOAT3 movePos);
 
     //送信情報を全て取得して消す
     std::vector<NetSendData> GetNetSendDatas() 

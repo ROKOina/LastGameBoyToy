@@ -164,6 +164,8 @@ public:
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
 
+    void SetMoveFlag(bool flag) { useMoveFlag = flag; }
+
 private:
     //ƒJƒƒ‰‘€ì
     void CameraControl();
