@@ -8,6 +8,8 @@ Texture2D texturemaps : register(t0);
 Texture2D depth_map : register(t1);
 Texture2DArray shadow_map : register(t2);
 Texture2D outlinecolor : register(t3);
+Texture2D decalmap : register(t4);
+Texture2D position : register(t5);
 
 //明るさ(画面全体の)とコントラスト(画像の明暗)
 float3 brightness_contrast(float3 fragment_color, float brightness, float contrast)
@@ -318,5 +320,27 @@ float4 main(VS_OUT pin) : SV_TARGET
     // 輪郭線を描画
     sampled_color += float4(depthEdge, depthEdge, depthEdge, 1.0f) * outlinecolor.Sample(sampler_states[LINEAR], pin.texcoord);
 
-    return sampled_color;
+    //View-Projection の逆行列を使用してワールド空間の座標を取得
+    float4 worldpos = position.Sample(sampler_states[LINEAR], pin.texcoord);
+
+    //ワールド空間からデカール空間への変換
+    float4 decalSpacePosition = mul(worldpos, DecalTransform);
+
+    //デカールの範囲を確認してクリップ
+    //clip(0.5 - abs(decalSpacePosition.x)); // X軸だけでクリップ
+
+    //デカールのテクスチャ座標を計算
+    float2 decalTexCoord = decalSpacePosition.xy + 0.5;
+
+    //テクスチャ座標が [0, 1] の範囲内でなければ適用しない
+    //if (decalTexCoord.x < 0 || decalTexCoord.x > 1 || decalTexCoord.y < 0 || decalTexCoord.y > 1)
+    //{
+    //    clip(-1); // クリップ
+    //}
+
+    //デカールテクスチャをサンプリング
+    float4 dcolor = decalmap.Sample(sampler_states[LINEAR], decalTexCoord);
+    dcolor.rgb = pow(dcolor.rgb, GAMMA);
+    
+    return sampled_color * dcolor;
 }
