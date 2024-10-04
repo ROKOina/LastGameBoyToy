@@ -76,7 +76,8 @@ public:
 
     //最大速度
     const float& GetMoveMaxSpeed()const { return moveMaxSpeed_; }
-    void SetMoveMaxSpeed(float moveMaxSpeed) { moveMaxSpeed_ = moveMaxSpeed; }
+    void SetAddMoveMaxSpeed(float addSpeed) { moveMaxSpeed_ += addSpeed; }  //足す
+    void SetSubMoveMaxSpeed(float subSpeed) { moveMaxSpeed_ -= subSpeed; }  //引く
 
     //加速度
     const float& GetMoveAcceleration()const { return moveAcceleration_; }
@@ -97,7 +98,8 @@ private:
     bool onGround_ = false;                    //地面についているか
     float friction_ = 12.620f;                 //摩擦
     float moveMaxSpeed_ = 5.0f;                //最大速度
-    float moveAcceleration_ = 1.0f;            //加速度
+    float firstMoveMaxSpeed = 5.0f;                //初期最大速度
+    float moveAcceleration_ = 3.0f;            //加速度
     inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット
     bool isRaycast = true;                      //レイキャストをするか（true：使用する）
 };

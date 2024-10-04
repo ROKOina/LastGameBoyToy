@@ -23,8 +23,6 @@ public:
 
     void SpaceSkill() override;
 
-    void LeftShiftSkill() override;
-
 
 private:
 

@@ -28,6 +28,9 @@ void MovementCom::Update(float elapsedTime)
     VerticalUpdate(elapsedTime);
 
     VelocityApplyPositionVertical(elapsedTime, velocity.y);
+
+    //最後に最大スピード初期化
+    moveMaxSpeed_ = firstMoveMaxSpeed;
 }
 
 // GUI描画
@@ -222,7 +225,7 @@ void MovementCom::AddNonMaxSpeedForce(const DirectX::XMFLOAT3& force)
 // 力を追加
 void MovementCom::AddForce(const DirectX::XMFLOAT3& force)
 {
-    velocity_.x += force.x;
-    velocity_.y += force.y;
-    velocity_.z += force.z;
+    velocity_.x += force.x * moveAcceleration_;
+    velocity_.y += force.y * moveAcceleration_;
+    velocity_.z += force.z * moveAcceleration_;
 }

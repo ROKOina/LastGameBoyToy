@@ -171,20 +171,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     out << h.stanData << " ";
 
     Vector3Out(out, h.knockbackData);
-    //out << h.knockbackData[0] << " ";
-    //out << h.knockbackData[1] << " ";
-    //out << h.knockbackData[2] << " ";
-    //out << h.knockbackData[3] << " ";
-    //out << h.knockbackData[4] << " ";
-    //out << h.knockbackData[5] << " ";
 
     Vector3Out(out, h.movePosData);
-    //out << h.movePosData[0] << " ";
-    //out << h.movePosData[1] << " ";
-    //out << h.movePosData[2] << " ";
-    //out << h.movePosData[3] << " ";
-    //out << h.movePosData[4] << " ";
-    //out << h.movePosData[5] << " ";
 
     out << h.teamID << " ";
     out << h.charaID << " ";
@@ -205,20 +193,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.stanData;
 
     Vector3In(in, h.knockbackData);
-    //in >> h.knockbackData[0];
-    //in >> h.knockbackData[1];
-    //in >> h.knockbackData[2];
-    //in >> h.knockbackData[3];
-    //in >> h.knockbackData[4];
-    //in >> h.knockbackData[5];
 
     Vector3In(in, h.movePosData);
-    //in >> h.movePosData[0];
-    //in >> h.movePosData[1];
-    //in >> h.movePosData[2];
-    //in >> h.movePosData[3];
-    //in >> h.movePosData[4];
-    //in >> h.movePosData[5];
 
     in >> h.teamID;
     in >> h.charaID;

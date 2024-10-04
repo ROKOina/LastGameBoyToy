@@ -79,7 +79,6 @@ public:
 private:
 
     DirectX::XMFLOAT3 moveVec = {};
-    DirectX::XMFLOAT3 jumpPower = { 0, 12.0f, 0 };
     float HoveringTimer = 0.0f;
     float HoveringTime = 0.05f;
 };

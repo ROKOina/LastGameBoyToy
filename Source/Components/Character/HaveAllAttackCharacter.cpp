@@ -70,8 +70,3 @@ void HaveAllAttackCharaCom::MainAttackDown()
 void HaveAllAttackCharaCom::SpaceSkill()
 {
 }
-
-void HaveAllAttackCharaCom::LeftShiftSkill()
-{
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
-}

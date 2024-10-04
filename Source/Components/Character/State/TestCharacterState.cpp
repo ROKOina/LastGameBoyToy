@@ -41,7 +41,7 @@ void TestCharacter_MoveState::Enter()
     maxDashAccele = 10.0f;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele = 1.0f;
-    moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
+    //moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
     moveCom.lock()->SetMoveAcceleration(dashAccele);
 }
 
@@ -156,7 +156,7 @@ void TestCharacter_DashState::Enter()
     maxDashAccele += maxDashAcceleration;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele += dashAcceleration;
-    moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
+    //moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
     moveCom.lock()->SetMoveAcceleration(dashAccele);
 }
 
@@ -192,6 +192,6 @@ void TestCharacter_DashState::Exit()
     maxDashAccele -= maxDashAcceleration;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele -= dashAcceleration;
-    moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
+    //moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
     moveCom.lock()->SetMoveAcceleration(dashAccele);
 }

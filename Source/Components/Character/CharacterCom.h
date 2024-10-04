@@ -67,7 +67,7 @@ public:
     const char* GetName() const override { return "Character"; }
 
     // 開始処理
-    void Start() override {};
+    void Start() override {  };
 
     // 更新処理
     void Update(float elapsedTime) override;
@@ -88,8 +88,9 @@ public:
     virtual void SubSkill() {};
     //R
     virtual void UltSkill() {};
-    //LeftShift
-    virtual void LeftShiftSkill() {};
+
+    //LeftShift (固定ダッシュ)
+    void LeftShiftSkill();
 
     virtual void SpaceSkill() {}
 
@@ -106,15 +107,6 @@ public:
   void AddHealPoint(float value) { hitPoint += value; }
 
   void SetStanSeconds(float sec) { stanTimer = sec; }
-
-  void SetMoveMaxSpeed(float speed) 
-  { 
-      GetGameObject()->GetComponent<MovementCom>()->SetMoveMaxSpeed(speed);
-  }
-  float GetMoveMaxSpeed() 
-  { 
-      return GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
-  }
 
   //ネット側で決める
   void SetNetID(int id) { netID = id; }
@@ -159,8 +151,6 @@ public:
     float GetESkillCoolTime() { return Ecool.time; }
     void SetRSkillCoolTime(float time) { Rcool.time = time; }
     float GetRSkillCoolTime() { return Rcool.time; }
-    void SetLSSkillCoolTime(float time) { LScool.time = time; }
-    float GetLSSkillCoolTime() { return LScool.time; }
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
 
@@ -176,13 +166,16 @@ private:
     //クールダウン更新
     void CoolUpdate(float elapsedTime);
 
+    void SetLSSkillCoolTime(float time) { LScool.time = time; }
+    float GetLSSkillCoolTime() { return LScool.time; }
+
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
     GameObject* cameraObj = nullptr;
 
   bool useMoveFlag = true;//falseにするとmoveStateを使わない
-  float jumpPower = 0.3f;
+  float jumpPower = 3.0f;
   float hitPoint = 100.0f;
 
   bool isStan = false;
@@ -212,6 +205,14 @@ private:
     unsigned int userInputUp = 0x00;
     DirectX::XMFLOAT2 leftStick = {};
     DirectX::XMFLOAT2 rightStick = {};
+
+    bool dashFlag = false;
+    float dashGauge = 10;
+    float dashGaugeMax = 10;
+    float dashGaugeMinus = 5;
+    float dashGaugePlus = 8;
+    float dashSpeed = 10;
+    float dashRecast = 1;
 
     AbnormalCondition abnormalcondition;
 
