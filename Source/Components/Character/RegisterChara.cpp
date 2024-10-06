@@ -44,7 +44,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
     r->LoadModel("Data/pico/pico.mdl");
-    obj->AddComponent<AimIKCom>("Spine");
+    obj->AddComponent<AimIKCom>("Spine", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
@@ -66,7 +66,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
     r->LoadModel("Data/pico/pico.mdl");
-    obj->AddComponent<AimIKCom>("Spine");
+    obj->AddComponent<AimIKCom>("Spine", nullptr);
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>(nullptr);
     a->PlayAnimation(0, true, false, 0.001f);
@@ -152,7 +152,7 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
     r->LoadModel("Data/PicoLabo/picolabo.mdl");
     std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::UENO));
-    obj->AddComponent<AimIKCom>("Spine");
+    obj->AddComponent<AimIKCom>("Spine", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
     obj->AddComponent<EventCom>(nullptr);
@@ -224,7 +224,7 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
     r->LoadModel("Data/pico/pico.mdl");
-    obj->AddComponent<AimIKCom>("Spine");
+    obj->AddComponent<AimIKCom>("Spine", nullptr);
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>(nullptr);
     a->PlayAnimation(0, true, false, 0.001f);
@@ -247,7 +247,6 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
         std::shared_ptr<GameObject> zikuY = zikuX->AddChildObject();
         zikuY->SetName("hammerZikuY");
 
-
         std::shared_ptr<GameObject> hanma = zikuY->AddChildObject();
         hanma->SetName("hammer");
         hanma->transform_->SetLocalPosition({ 0,0,71.0f });
@@ -255,7 +254,6 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
         auto& s = hanma->AddComponent<SphereColliderCom>();
         s->SetMyTag(COLLIDER_TAG::Player);
         s->SetJudgeTag(COLLIDER_TAG::Enemy);
-
     }
 
     //‚½‚Ä
@@ -264,7 +262,6 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
         std::shared_ptr<GameObject> zikuX = obj->AddChildObject();
         zikuX->SetName("sieldZikuX");
         zikuX->transform_->SetWorldPosition({ 0,80,33 });
-
 
         std::shared_ptr<GameObject> tate = zikuX->AddChildObject();
         tate->SetName("sield");

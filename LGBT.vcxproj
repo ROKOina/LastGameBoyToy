@@ -150,6 +150,7 @@
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\BulletHoleCom.h" />
     <ClInclude Include="Source\Components\Character\BarrierCom.h" />
+    <ClInclude Include="Source\Components\Character\BossCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
     <ClInclude Include="Source\Components\Character\Fara.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Source\Components\Character\RegisterChara.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\State\BossState.h" />
     <ClInclude Include="Source\Components\Character\State\FaraState.h" />
     <ClInclude Include="Source\Components\Character\State\InazawaCharacterState.h" />
     <ClInclude Include="Source\Components\Character\State\NomuraCharacterState.h" />
@@ -179,6 +181,7 @@
     <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
+    <ClInclude Include="Source\Components\SpawnCom.h" />
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
@@ -268,6 +271,7 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\BulletHoleCom.cpp" />
     <ClCompile Include="Source\Components\Character\BarrierCom.cpp" />
+    <ClCompile Include="Source\Components\Character\BossCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\Fara.cpp" />
@@ -278,6 +282,7 @@
     <ClCompile Include="Source\Components\Character\RegisterChara.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\State\BossState.cpp" />
     <ClCompile Include="Source\Components\Character\State\FaraState.cpp" />
     <ClCompile Include="Source\Components\Character\State\InazawaCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\State\NomuraCharacterState.cpp" />
@@ -296,6 +301,7 @@
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
     <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
+    <ClCompile Include="Source\Components\SpawnCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FPSCameraCom.cpp" />

@@ -341,6 +341,6 @@ float4 main(VS_OUT pin) : SV_TARGET
     //デカールテクスチャをサンプリング
     float4 dcolor = decalmap.Sample(sampler_states[LINEAR], decalTexCoord);
     dcolor.rgb = pow(dcolor.rgb, GAMMA);
-    
-    return sampled_color * dcolor;
+
+    return sampled_color /** dcolor*/;
 }
