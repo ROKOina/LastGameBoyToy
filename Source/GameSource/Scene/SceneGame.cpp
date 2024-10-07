@@ -35,6 +35,7 @@
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 #include "Graphics/Sprite/Sprite.h"
+#include "Components/StageEditorCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -66,6 +67,7 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        obj->AddComponent<StageEditorCom>();
     }
 
     //“–‚½‚è”»’è—p

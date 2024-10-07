@@ -10,6 +10,9 @@
 #include "Graphics/Light/Light.h"
 #include "Components/NodeCollsionCom.h"
 
+#include "Components\ColliderCom.h"
+#include <Windows.h>
+#include <map>
 #include "Netwark/Photon/BasicsApplication.h"
 
 class StageObj;
@@ -37,22 +40,28 @@ public:
     std::string GetName() const override { return "SceneGame"; };
 
 private:
-    std::vector<StageObj*> stageObjcts;
-    Light* mainDirectionalLight = nullptr;
-};
+    //imgui
+    void ImGui();
+    // モデル入力
+    GameObj ImportModel(const char* filename);
 
-class StageObj
-{
-public:
-    StageObj(std::string mdl_name)
-    {
-        name = mdl_name;
-        model = std::make_unique<Model>(mdl_name);
-    }
+    //エディターでいじるステージを選択
+    void StageSelect();
+    //配置するオブジェクトを登録
+    void ObjectRegister();
 
-    Model* GetModel() { return model.get(); }
+    //ステージにオブジェクト配置
+    void ObjectPlace();
+    //マウスとステージの判定
+    bool MouseVsStage(HitResult hit);
 
 private:
-    std::string name;
-    std::unique_ptr<Model> model;
+    GameObj editorObj;
+    GameObj stageObj;
+    
+    char registerObjName[256] = {};
+    std::string selectObjName;
+    std::map<std::string, std::string> gameObjcts;
+
+    Light* mainDirectionalLight = nullptr;
 };

@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;.\External\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -172,6 +172,7 @@
     <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
+    <ClInclude Include="Source\Components\StageEditorCom.h" />
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
@@ -283,6 +284,7 @@
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
     <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
+    <ClCompile Include="Source\Components\StageEditorCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FPSCameraCom.cpp" />

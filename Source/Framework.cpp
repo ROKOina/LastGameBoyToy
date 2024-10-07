@@ -9,6 +9,7 @@
 #include "GameSource\Scene\SceneDebugGame.h"
 #include "GameSource\Scene\SceneManager.h"
 #include "GameSource\Scene\SceneIKTest.h"
+#include "GameSource\Scene\SceneStageEditor.h"
 #include "ImGuiRender.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -29,6 +30,7 @@ Framework::Framework(HWND hWnd)
 {
     //sceneGame.Initialize();
     SceneManager::Instance().ChangeScene(new SceneGame);
+    //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     //SceneManager::Instance().ChangeScene(new SceneDebugGame);
     //SceneManager::Instance().ChangeScene(new SceneTitle);
     //SceneManager::Instance().ChangeScene(new SceneResult);
