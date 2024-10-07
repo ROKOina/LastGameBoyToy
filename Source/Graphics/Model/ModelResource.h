@@ -178,6 +178,9 @@ public:
 
 #endif // _DEBUG
 
+    //上書きセーブ
+    void AnimSerialize();
+
 protected:
     // モデルセットアップ
     void BuildModel(ID3D11Device* device, const char* dirname);
@@ -205,4 +208,5 @@ protected:
     std::vector<Material>	materials_;
     std::vector<Mesh>		meshes_;
     std::vector<Animation>	animations_;
+    std::string fileName;
 };

@@ -83,7 +83,7 @@ struct MySequence : public ImSequencer::SequenceInterface
     {
         
         static char tmps[512];
-        snprintf(tmps, 512, "[%02d] %s", index, GetItemTypeName(myItems[index].mType));
+        snprintf(tmps, 512, GetItemTypeName(myItems[index].mType));
         return tmps;
     }
     //const int GetItemTypeIndex(int typeIndex) const
@@ -105,6 +105,15 @@ struct MySequence : public ImSequencer::SequenceInterface
         SequencerItemTypeNames.erase(index);
     }
 
+    void AllDeleteItem()
+    {
+        int index = myItems.size() - 1;
+        for (int i = index; i >= 0; --i)
+        {
+            DeleteItem(myItems[i].mType);
+            Delete(i);
+        }
+    }
 
     // my datas
     MySequence() : mFrameMin(0), mFrameMax(0) {}

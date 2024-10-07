@@ -458,9 +458,37 @@ void ModelResource::Serialize(const char* filename)
   }
 }
 
+void ModelResource::AnimSerialize()
+{
+    std::string name = fileName;
+    name.erase(name.find('.') + 1);
+    name += "Animation";
+
+    std::ofstream ostream(name, std::ios::binary);
+    if (ostream.is_open())
+    {
+        cereal::BinaryOutputArchive archive(ostream);
+
+        try
+        {
+            archive(
+                CEREAL_NVP(animations_)
+            );
+        }
+        catch (...)
+        {
+            LOG("model deserialize failed.\n%s\n", fileName);
+            return;
+        }
+    }
+
+}
+
 // デシリアライズ
 void ModelResource::Deserialize(const char* filename)
 {
+    fileName = filename;
+
   std::ifstream istream(filename, std::ios::binary);
   if (istream.is_open())
   {
