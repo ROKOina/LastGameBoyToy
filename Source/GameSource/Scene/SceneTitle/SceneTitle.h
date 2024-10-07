@@ -12,7 +12,7 @@
 
 #include "Netwark/Photon/BasicsApplication.h"
 
-//トレーニングシーン
+//タイトルシーン
 class SceneTitle :public Scene
 {
 public:
