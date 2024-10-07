@@ -1,6 +1,7 @@
 #include "NoobEnemyCom.h"
 #include "Components/TransformCom.h"
 #include"../../Character/CharacterCom.h"
+#include"../../Character/CharaStatusCom.h"
 //コンストラクタ
 NoobEnemyCom::NoobEnemyCom()
 {
@@ -126,7 +127,7 @@ void NoobEnemyCom::UpdateExplosion(float elapsedTime)
 	{
 		if (explosionRange > GetPlayerDist())
 		{
-			GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->AddDamagePoint(explosionDamage);
+			GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->AddDamagePoint(explosionDamage);
 			GameObjectManager::Instance().Remove(this->GetGameObject());
 		}
 	}
