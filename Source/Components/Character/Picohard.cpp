@@ -15,7 +15,7 @@ void PicohardCharaCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<Picohard_LeftClick>(this), AttackType::MELEE);
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<Picohard_RightClick>(this), AttackType::NON);
     //attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<BaseCharacter_StanBallState>(this), AttackType::HEAL);
-    //attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL, std::make_shared<BaseCharacter_KnockbackBallState>(this), AttackType::HEAL);
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<Picohard_LeftShift>(this), AttackType::NON);
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this), AttackType::NON);
 
 
@@ -54,6 +54,3 @@ void PicohardCharaCom::SubSkill()
 {
 }
 
-void PicohardCharaCom::LeftShiftSkill()
-{
-}

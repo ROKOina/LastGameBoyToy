@@ -2,6 +2,7 @@
 #include "Input\Input.h"
 
 #include "Components\CameraCom.h"
+#include "Components\Character\CharaStatusCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\BulletCom.h"
 
@@ -41,7 +42,7 @@ void TestCharacter_MoveState::Enter()
     maxDashAccele = 10.0f;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele = 1.0f;
-    moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
+    //moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
     moveCom.lock()->SetMoveAcceleration(dashAccele);
 }
 
@@ -139,7 +140,7 @@ void TestCharacter_AttackState::Fire()
     for (HitObj& obj : collision->OnHitGameObject())
     {
         //ダメージ処理
-        obj.gameObject.lock()->GetComponent<CharacterCom>()->AddDamagePoint(-attackPower);
+        obj.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-attackPower);
 
         //送信用
         owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID(), -attackPower);
@@ -156,7 +157,7 @@ void TestCharacter_DashState::Enter()
     maxDashAccele += maxDashAcceleration;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele += dashAcceleration;
-    moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
+    //moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
     moveCom.lock()->SetMoveAcceleration(dashAccele);
 }
 
@@ -192,6 +193,6 @@ void TestCharacter_DashState::Exit()
     maxDashAccele -= maxDashAcceleration;
     float dashAccele = moveCom.lock()->GetMoveAcceleration();
     dashAccele -= dashAcceleration;
-    moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
+    //moveCom.lock()->SetMoveMaxSpeed(maxDashAccele);
     moveCom.lock()->SetMoveAcceleration(dashAccele);
 }

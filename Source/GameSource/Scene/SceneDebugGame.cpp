@@ -21,6 +21,7 @@
 #include "Components\ColliderCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ColliderCom.h"
+#include "Components\Character\CharaStatusCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\UenoCharacterCom.h"
@@ -293,7 +294,7 @@ void SceneDebugGame::SetOnlineInput()
             {
                 if (players[i].use_count() == 0) continue;
 
-                players[i].lock()->GetComponent<CharacterCom>()->AddDamagePoint(client.damageData[i]);
+                players[i].lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(client.damageData[i]);
             }
         }
     }

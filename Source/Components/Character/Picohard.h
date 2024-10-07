@@ -19,8 +19,6 @@ public:
 
     void SubSkill() override;
 
-    void LeftShiftSkill() override;
-
 
 private:
 

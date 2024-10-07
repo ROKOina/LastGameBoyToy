@@ -123,6 +123,26 @@ static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& v
         vec.emplace_back(s);
     }
 }
+//Vector3
+static void Vector3Out(std::stringstream& out, std::array<DirectX::XMFLOAT3, 6>& vec)
+{
+    out << vec[0] << " ";
+    out << vec[1] << " ";
+    out << vec[2] << " ";
+    out << vec[3] << " ";
+    out << vec[4] << " ";
+    out << vec[5] << " ";
+}
+static void Vector3In(std::stringstream& in, std::array<DirectX::XMFLOAT3, 6>& vec)
+{
+    in >> vec[0];
+    in >> vec[1];
+    in >> vec[2];
+    in >> vec[3];
+    in >> vec[4];
+    in >> vec[5];
+}
+
 
 struct NetData
 {
@@ -135,6 +155,7 @@ struct NetData
     std::array<int, 6> healData;//キャラに与えたヒール
     std::array<float, 6> stanData;//キャラに与えたスタン
     std::array<DirectX::XMFLOAT3, 6> knockbackData = {};//ノックバックを与える
+    std::array<DirectX::XMFLOAT3, 6> movePosData = {};//移動位置を与える
     std::array<int, 6> teamID;//チームのID
     int charaID;    //キャラのID
 
@@ -149,12 +170,9 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     out << h.healData << " ";
     out << h.stanData << " ";
 
-    out << h.knockbackData[0] << " ";
-    out << h.knockbackData[1] << " ";
-    out << h.knockbackData[2] << " ";
-    out << h.knockbackData[3] << " ";
-    out << h.knockbackData[4] << " ";
-    out << h.knockbackData[5] << " ";
+    Vector3Out(out, h.knockbackData);
+
+    Vector3Out(out, h.movePosData);
 
     out << h.teamID << " ";
     out << h.charaID << " ";
@@ -174,12 +192,9 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.healData;
     in >> h.stanData;
 
-    in >> h.knockbackData[0];
-    in >> h.knockbackData[1];
-    in >> h.knockbackData[2];
-    in >> h.knockbackData[3];
-    in >> h.knockbackData[4];
-    in >> h.knockbackData[5];
+    Vector3In(in, h.knockbackData);
+
+    Vector3In(in, h.movePosData);
 
     in >> h.teamID;
     in >> h.charaID;

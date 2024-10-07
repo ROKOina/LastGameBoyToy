@@ -9,6 +9,7 @@
 #include "Components\MovementCom.h"
 #include "Components\NodeCollsionCom.h"
 
+#include "Components/Character/CharaStatusCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\HaveAllAttackCharacter.h"
 #include "Components/Character/UenoCharacterCom.h"
@@ -50,6 +51,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
@@ -73,6 +75,8 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
     c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+
 
     //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
@@ -83,8 +87,17 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     //    box->SetMyTag(COLLIDER_TAG::Enemy);
 
     std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
-    ca->SetMyTag(COLLIDER_TAG::Player);
-    ca->SetJudgeTag(COLLIDER_TAG::Enemy);
+
+    if (std::strcmp(obj->GetName(), "player") == 0)
+    {
+        ca->SetMyTag(COLLIDER_TAG::Player);
+        ca->SetJudgeTag(COLLIDER_TAG::Enemy);
+    }
+    else
+    {
+        ca->SetMyTag(COLLIDER_TAG::Enemy);
+        ca->SetJudgeTag(COLLIDER_TAG::Player);
+    }
 
     //std::shared_ptr<SphereColliderCom> sphere= obj->AddComponent<SphereColliderCom>();
     //sphere->SetRadius(2);
@@ -152,6 +165,8 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
     r->LoadModel("Data/PicoLabo/picolabo.mdl");
     std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::UENO));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+    obj->AddComponent<AimIKCom>("Spine");
     obj->AddComponent<AimIKCom>("Spine", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
@@ -230,11 +245,20 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
     a->PlayAnimation(0, true, false, 0.001f);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<PicohardCharaCom> c = obj->AddComponent<PicohardCharaCom>();
-    c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
+    c->SetCharaID(int(CHARA_LIST::PICOHARD));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
     std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
-    ca->SetMyTag(COLLIDER_TAG::Player);
-    ca->SetJudgeTag(COLLIDER_TAG::Enemy);
+    if (std::strcmp(obj->GetName(), "player") == 0)
+    {
+        ca->SetMyTag(COLLIDER_TAG::Player);
+        ca->SetJudgeTag(COLLIDER_TAG::Enemy);
+    }
+    else
+    {
+        ca->SetMyTag(COLLIDER_TAG::Enemy);
+        ca->SetJudgeTag(COLLIDER_TAG::Player);
+    }
 
     //hanma-
     {
@@ -252,8 +276,17 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
         hanma->transform_->SetLocalPosition({ 0,0,71.0f });
 
         auto& s = hanma->AddComponent<SphereColliderCom>();
-        s->SetMyTag(COLLIDER_TAG::Player);
-        s->SetJudgeTag(COLLIDER_TAG::Enemy);
+        if (std::strcmp(obj->GetName(), "player") == 0)
+        {
+            s->SetMyTag(COLLIDER_TAG::Player);
+            s->SetJudgeTag(COLLIDER_TAG::Enemy);
+        }
+        else
+        {
+            s->SetMyTag(COLLIDER_TAG::Enemy);
+            s->SetJudgeTag(COLLIDER_TAG::Player);
+        }
+
     }
 
     //ÇΩÇƒ
@@ -276,5 +309,27 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
         std::shared_ptr<SphereColliderCom> s = tate->AddComponent<SphereColliderCom>();
         s->SetMyTag(COLLIDER_TAG::PlayerSield);
         s->SetJudgeTag(COLLIDER_TAG::Enemy);
+    }
+
+    //É`ÉÉÅ[ÉWìñÇΩÇËîªíË
+    {
+        std::shared_ptr<GameObject> chargeCol = obj->AddChildObject();
+        chargeCol->SetName("chargeCol");
+        chargeCol->transform_->SetWorldPosition({ 0,80,33 });
+
+        auto& sph = chargeCol->AddComponent<SphereColliderCom>();
+        if (std::strcmp(obj->GetName(), "player") == 0)
+        {
+            sph->SetMyTag(COLLIDER_TAG::Player);
+            sph->SetJudgeTag(COLLIDER_TAG::Enemy);
+        }
+        else
+        {
+            sph->SetMyTag(COLLIDER_TAG::Enemy);
+            sph->SetJudgeTag(COLLIDER_TAG::Player);
+        }
+
+        sph->SetRadius(1);
+        sph->SetEnabled(false);
     }
 }

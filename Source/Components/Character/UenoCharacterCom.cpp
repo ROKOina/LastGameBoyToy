@@ -38,10 +38,6 @@ void UenoCharacterCom::OnGUI()
 }
 
 //シフトスキル(ウィンストンなのでジャンプパック)
-void UenoCharacterCom::LeftShiftSkill()
-{
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
-}
 
 //左クリック
 void UenoCharacterCom::MainAttackPushing()

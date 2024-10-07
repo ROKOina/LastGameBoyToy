@@ -1,6 +1,8 @@
 #include "PicohardState.h"
 #include "Components/ColliderCom.h"
 #include "Components/RendererCom.h"
+#include "Components/CameraCom.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 Picohard_BaseState::Picohard_BaseState(CharacterCom* owner) : State(owner)
 {    
@@ -86,4 +88,99 @@ void Picohard_RightClick::Execute(const float& elapsedTime)
 
 void Picohard_RightClick::Exit()
 {
+}
+
+
+
+void Picohard_LeftShift::Enter()
+{
+    //仮ジャンプアニメ
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), true);
+
+    //当たり判定起動
+    std::shared_ptr<GameObject> chargeCol = owner->GetGameObject()->GetChildFind("chargeCol");
+    chargeCol->GetComponent<Collider>()->SetEnabled(true);
+
+    owner->SetMoveFlag(false);
+    timer = 0;
+
+    hitID = -1;
+}
+
+void Picohard_LeftShift::Execute(const float& elapsedTime)
+{
+    std::shared_ptr<GameObject> myObj = owner->GetGameObject();
+
+    //移動
+    {
+        std::shared_ptr<GameObject> cameraObj = SceneManager::Instance().GetActiveCamera();
+        CameraCom* cameraCom = cameraObj->GetComponent<CameraCom>().get();
+
+        const DirectX::XMFLOAT3& forwardVec = cameraCom->GetFront();
+
+        myObj->GetComponent<MovementCom>()->AddForce(forwardVec * moveSpeed);
+    }
+
+    //回転
+    {
+        // 入力情報を取得
+        GamePad& gamePad = Input::Instance().GetGamePad();
+
+        //ステックのXY取得
+        float ax = gamePad.GetAxisLX();
+
+        DirectX::XMFLOAT3 euler = myObj->transform_->GetEulerRotation();
+        euler.y += ax * angleSpeed * elapsedTime;
+        myObj->transform_->SetEulerRotation(euler);
+    }
+
+    //当たり判定処理
+    std::shared_ptr<GameObject> chargeCol = owner->GetGameObject()->GetChildFind("chargeCol");
+    if (hitID < 0)
+    {
+        auto& hit = chargeCol->GetComponent<Collider>()->OnHitGameObject();
+        for (auto& h : hit)
+        {
+            auto& hitChara = h.gameObject.lock()->GetComponent<CharacterCom>();
+            if (!hitChara)continue;
+
+            hitID = hitChara->GetNetID();
+        }
+    }
+    //ヒット時処理
+    else
+    {
+        //スタン
+        StaticSendDataManager::Instance().SetSendStan(owner->GetNetID(), hitID, 1);
+
+        //相手移動処理
+        DirectX::XMFLOAT3 enemyPos = chargeCol->transform_->GetWorldPosition();
+        StaticSendDataManager::Instance().SetSendMovePos(owner->GetNetID(), hitID, enemyPos);
+    }
+
+    timer += elapsedTime;
+    if (timer > 1.5f && (CharacterInput::LeftShiftButton & owner->GetButton()))
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
+    if (timer > time)
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
+}
+
+void Picohard_LeftShift::Exit()
+{
+    owner->SetMoveFlag(true);    
+    
+    //当たり判定停止
+    std::shared_ptr<GameObject> chargeCol = owner->GetGameObject()->GetChildFind("chargeCol");
+    chargeCol->GetComponent<Collider>()->SetEnabled(false);
+}
+
+void Picohard_LeftShift::ImGui()
+{
+    ImGui::DragFloat("moveSpeed", &moveSpeed, 0.1f);
+    ImGui::DragFloat("angleSpeed", &angleSpeed, 0.1f);
 }

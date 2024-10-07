@@ -29,10 +29,13 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = 10 - power * 9;
-    moveCom->SetGravity(-gravity);
+    float gravity = 0.98f - 0.95f * power;
+    moveCom->SetGravity(gravity);
     moveCom->SetFriction(0.0f);
-    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + arrowSpeed * power));
+
+    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
+
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * arrowSpeed);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
@@ -79,15 +82,12 @@ void InazawaCharacter_AttackState::Enter()
 {
     attackPower = 0;
     auto& chara = GetComp(CharacterCom);
-    chara->SetMoveMaxSpeed(attackMaxMoveSpeed);
 }
 
 void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
 {
-    //MoveInputVec(owner->GetGameObject(), 0.5f);
-
-    //if (moveCom.lock()->OnGround())
-    //    JumpInput(owner->GetGameObject());
+    auto& moveCmp = owner->GetGameObject()->GetComponent<MovementCom>();
+    moveCmp->SetSubMoveMaxSpeed(attackMaxMoveSpeed);
 
     //UŒ‚ˆÐ—Í
     attackPower+=elapsedTime;
@@ -109,17 +109,10 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         //RayFire(owner->GetGameObject());
 
         auto& chara = GetComp(CharacterCom);
-        chara->SetMoveMaxSpeed(saveMaxSpeed);
 
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 
-    //auto& rayPoint = owner->GetGameObject()->GetChildFind("rayObj");
-    //for (auto& hit : rayPoint->GetComponent<Collider>()->OnHitGameObject())
-    //{
-    //    ataPos = hit.hitPos;
-    //}
-    //Graphics::Instance().GetDebugRenderer()->DrawSphere(ataPos, 0.3f, { 0,1,1,1 });
 }
 
 void InazawaCharacter_AttackState::ImGui()

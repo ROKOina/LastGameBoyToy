@@ -59,3 +59,17 @@ void StaticSendDataManager::SetSendKnockback(int myID, int sendID, DirectX::XMFL
     data.valueF3 = knockbackVec;
     sendData->Enqueue(data);
 }
+
+void StaticSendDataManager::SetSendMovePos(int myID, int sendID, DirectX::XMFLOAT3 movePos)
+{
+    auto& player = GameObjectManager::Instance().Find("player");
+    auto& chara = player->GetComponent<CharacterCom>();
+
+    if (chara->GetNetID() == sendID)return;   //Ž©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
+
+    NetSendData data;
+    data.sendType = 4;
+    data.id = sendID;
+    data.valueF3 = movePos;
+    sendData->Enqueue(data);
+}

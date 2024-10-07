@@ -39,12 +39,16 @@ void AnimationCom::Update(float elapsedTime)
 bool isAnimLoop;
 void AnimationCom::OnGUI()
 {
+    ImGui::SameLine();
+    ImGui::Checkbox("isEventWindow", &isEventWindow);
+    if (isEventWindow)AnimEventWindow();
+
     const ModelResource* resource = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource();
     const std::vector<ModelResource::Animation>& animations = resource->GetAnimations();
     //モデルからリソースを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 
-    ImGui::Checkbox("animationLoop", &isAnimLoop);
+    //ImGui::Checkbox("animationLoop", &isAnimLoop);
     ImGui::Separator();
     int index = 0;
     for (ModelResource::Animation anim : animations)
@@ -67,7 +71,7 @@ void AnimationCom::OnGUI()
         }
 
         ImGui::SetNextItemWidth(58);
-        ImGui::DragFloat(animation.name.c_str(), &animation.animationspeed);
+        //ImGui::DragFloat(animation.name.c_str(), &animation.animationspeed);
 
         ImGui::TreeNodeEx(&animation, nodeFlags, animation.name.c_str());
 
@@ -75,8 +79,8 @@ void AnimationCom::OnGUI()
         if (ImGui::IsItemClicked())
         {
             currentAnimation = animationIndex;
-            PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
         }
+
 
         ImGui::TreePop();
         ++animationIndex;
@@ -96,6 +100,48 @@ ModelResource::Animation* AnimationCom::GetSelectionAnimation()
         return const_cast<ModelResource::Animation*>(&animations.at(currentAnimation));
     }
     return nullptr;
+}
+
+void AnimationCom::AnimEventWindow()
+{
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
+
+
+    ImGui::SetNextWindowPos(ImVec2(320, 600), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(630, 100), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("AnimEvent", nullptr, ImGuiWindowFlags_None);
+
+    ImGui::Checkbox("Loop", &isAnimLoop);
+
+    if (ImGui::Button("Play"))
+    {
+        PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
+        animationSpeed = 1;
+    }
+    ImGui::SameLine();
+
+    float animationCurrentSeconds = GetAnimationSeconds();
+    int animationCurrentFrame = static_cast<int>(animationCurrentSeconds * 60.0f);
+    int frameLength = static_cast<int>(anim.secondsLength * 60);
+    ImGui::SetNextItemWidth(50);
+    if (ImGui::DragInt(" ", &animationCurrentFrame, 1.0f, 0, frameLength))
+    {
+        PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
+        SetAnimationSeconds(animationCurrentFrame / 60.0f);
+    }
+    ImGui::SameLine();
+
+    if (ImGui::SliderFloat("Timeline", &animationCurrentSeconds, 0, anim.secondsLength, "current frame = %.3f"))
+    {
+        PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
+        SetAnimationSeconds(animationCurrentSeconds);
+    }
+
+
+    ImGui::End();
 }
 
 //アニメーション更新
@@ -172,12 +218,13 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
     if (endAnimation)
     {
         endAnimation = false;
-        currentAnimation = -1;
+        if (!isEventWindow)
+            currentAnimation = -1;
         return;
     }
 
     // 時間経過
-    currentSeconds += elapsedTime * animation.animationspeed;
+    currentSeconds += elapsedTime * animationSpeed;
     if (currentSeconds >= animation.secondsLength)
     {
         if (loopAnimation)
@@ -287,7 +334,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
     }
 
     //時間経過
-    upperCurrentAnimationSeconds += elapsedTime * animation.animationspeed;
+    upperCurrentAnimationSeconds += elapsedTime * animationSpeed;
 
     //最終フレーム
     if (animationUpperEndFlag)
@@ -520,7 +567,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
     }
 
     //時間経過
-    lowerCurrentAnimationSeconds += elapsedTime * animation.animationspeed;
+    lowerCurrentAnimationSeconds += elapsedTime * animationSpeed;
 
     //最終フレーム
     if (animationLowerEndFlag)

@@ -68,12 +68,30 @@ void CharacterCom::Update(float elapsedTime)
         Ecool.timer = 0;
         SubSkill();
     }
-    if (CharacterInput::LeftShiftButton & GetButtonDown()
-        && LScool.timer >= LScool.time)
+    //ダッシュスキル
+    SetLSSkillCoolTime(dashRecast);
+    if (CharacterInput::LeftShiftButton & GetButton()
+        && LScool.timer >= LScool.time && dashGauge > 0)
     {
-        LScool.timer = 0;
+        dashGauge -= dashGaugeMinus * elapsedTime;
         LeftShiftSkill();
+        dashFlag = true;
     }
+    else
+    {
+        if (dashFlag)
+        {
+            LScool.timer = 0;
+            dashFlag = false;
+        }
+
+        dashGauge += dashGaugePlus * elapsedTime;
+        if (dashGauge > dashGaugeMax)
+        {
+            dashGauge = dashGaugeMax;
+        }
+    }
+
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         Spacecool.timer = 0;
@@ -97,8 +115,13 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
-    float hp = hitPoint;
-    ImGui::DragFloat("HP", &hp);
+    ImGui::DragFloat("jump", &jumpPower, 0.1f);
+
+    ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);
+    ImGui::DragFloat("dashGauge", &dashGauge, 0.1f);
+    ImGui::DragFloat("dashGaugeMax", &dashGaugeMax, 0.1f);
+    ImGui::DragFloat("dashGaugeMinus", &dashGaugeMinus, 0.1f);
+    ImGui::DragFloat("dashGaugePlus", &dashGaugePlus, 0.1f);
 
     bool stan = isStan;
     ImGui::Checkbox("isStan", &stan);
@@ -142,6 +165,15 @@ void CharacterCom::OnGUI()
 
         ImGui::TreePop();
     }
+}
+
+//ダッシュ
+void CharacterCom::LeftShiftSkill()
+{
+    auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
+    float maxSpeed = moveCmp->GetMoveMaxSpeed();
+    maxSpeed += dashSpeed;
+    moveCmp->SetAddMoveMaxSpeed(maxSpeed);
 }
 
 

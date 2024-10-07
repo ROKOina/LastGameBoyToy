@@ -26,7 +26,6 @@ public:
     InazawaCharacter_AttackState(CharacterCom* owner) :InazawaCharacter_BaseState(owner) 
     {
         auto& chara = GetComp(CharacterCom);
-        saveMaxSpeed = chara->GetMoveMaxSpeed();
     }
 
     void Enter() override;
@@ -34,8 +33,7 @@ public:
     void ImGui() override;
     virtual const char* GetName() const override { return "MainAttack"; }
 
-    float saveMaxSpeed;
-    float attackMaxMoveSpeed = 5.0f;
+    float attackMaxMoveSpeed = 3.0f;
     float attackPower = 0;
     float maxAttackPower = 1;
     float arrowSpeed = 40;

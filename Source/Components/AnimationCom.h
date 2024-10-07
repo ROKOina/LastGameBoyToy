@@ -128,6 +128,9 @@ private:
 
     //ノーマルアニメーション
 
+    //アニメーション再生速度
+    float                           animationSpeed = 1.0f;
+
     //現在のアニメーションID
     int								currentAnimation = -1;
     //アニメーションの現在の時間
@@ -221,4 +224,10 @@ private:
     std::vector<Model::Node*> upperNodes;
     //下半身アニメーション
     std::vector<Model::Node*> lowerNodes;
+
+    //アニメーションイベント関連
+    void AnimEventWindow();
+    bool isEventWindow = false; //イベントウィンドウ表示
+    float animEventSeconds = 0; //イベント用のアニメーション時間
+
 };
