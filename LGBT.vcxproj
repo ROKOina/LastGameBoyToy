@@ -239,6 +239,7 @@
     <ClInclude Include="Source\Netwark\Photon\UIListener.h" />
     <ClInclude Include="Source\Netwark\RingBuffer.h" />
     <ClInclude Include="Source\Netwark\Server.h" />
+    <ClInclude Include="Source\SystemStruct\MySequence.h" />
     <ClInclude Include="Source\SystemStruct\QuaternionStruct.h" />
     <ClInclude Include="Source\SystemStruct\TransformUtils.h" />
     <ClInclude Include="Source\ThreadPool\ThreadPool.h" />

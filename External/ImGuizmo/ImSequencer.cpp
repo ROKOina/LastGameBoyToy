@@ -32,7 +32,7 @@ namespace ImSequencer
     static int min(int a, int b) { return (a < b) ? a : b; }
     static int max(int a, int b) { return (a > b) ? a : b; }
 
-    bool Sequencer(SequenceInterface* sequence, int* currentFrame, bool* expanded, int* selectedEntry, int* firstFrame, int sequenceOptions)
+    bool Sequencer(SequenceInterface* sequence, int* currentFrame, bool* expanded, int* selectedEntry, int* firstFrame, int sequenceOptions,bool& MovingCurrentFrame)
     {
         bool ret = false;
         ImGuiIO& io = ImGui::GetIO();
@@ -58,6 +58,7 @@ namespace ImSequencer
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
         ImVec2 canvas_pos = ImGui::GetCursorScreenPos();            // ImDrawList API uses screen coordinates!
         ImVec2 canvas_size = ImGui::GetContentRegionAvail();        // Resize canvas to what's available
+        canvas_size.y = 200;
         static const int scrollBarHeight = 14;
         int firstFrameUsed = firstFrame ? *firstFrame : 0;
 
@@ -67,7 +68,7 @@ namespace ImSequencer
         int frameCount = ImMax(sequence->GetFrameMax() - sequence->GetFrameMin(), 1);
 
         static bool MovingScrollBar = false;
-        static bool MovingCurrentFrame = false;
+        //static bool MovingCurrentFrame = false;
         struct CustomDraw
         {
             int index;
@@ -254,9 +255,8 @@ namespace ImSequencer
             size_t customHeight = 0;
             for (int i = 0; i < sequenceCount; i++)
             {
-                int type;
-                sequence->IntGet(i, NULL, NULL, &type, NULL);
-                sequence->FloatGet(i, NULL, NULL, &type, NULL);
+                //sequence->IntGet(i, NULL, NULL, &type, NULL);
+                //sequence->FloatGet(i, NULL, NULL, &type, NULL);
                 ImVec2 tpos(contentMin.x + 3, contentMin.y + i * ItemHeight + 2 + customHeight);
                 draw_list->AddText(tpos, 0xFFFFFFFF, sequence->GetItemLabel(i));
 
@@ -321,7 +321,7 @@ namespace ImSequencer
                 int* start, * end;
                 unsigned int color;
                 sequence->IntGet(i, &start, &end, NULL, &color);
-                sequence->FloatGet(i, reinterpret_cast<float**>(&start), reinterpret_cast<float**>(&end), NULL, &color);
+                //sequence->FloatGet(i, reinterpret_cast<float**>(&start), reinterpret_cast<float**>(&end), NULL, &color);
                 size_t localCustomHeight = sequence->GetCustomHeight(i);
 
                 ImVec2 pos = ImVec2(contentMin.x + legendWidth - firstFrameUsed * framePixelWidth, contentMin.y + ItemHeight * i + 1 + customHeight);
@@ -406,7 +406,7 @@ namespace ImSequencer
                 {
                     int* start, * end;
                     sequence->IntGet(movingEntry, &start, &end, NULL, NULL);
-                    sequence->FloatGet(movingEntry, reinterpret_cast<float**>(&start), reinterpret_cast<float**>(&end), NULL, NULL);
+                    //sequence->FloatGet(movingEntry, reinterpret_cast<float**>(&start), reinterpret_cast<float**>(&end), NULL, NULL);
                     if (selectedEntry)
                         *selectedEntry = movingEntry;
                     int& l = *start;

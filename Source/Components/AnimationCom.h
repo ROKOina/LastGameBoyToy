@@ -77,6 +77,9 @@ public:
     //アニメーションストップ
     void StopAnimation();
 
+    //アニメーション一時停止
+    void StopOneTimeAnimation() { oneTimeStop = true; }
+
     //アニメIDを返す
     int FindAnimation(const char* animeName);
 
@@ -229,5 +232,5 @@ private:
     void AnimEventWindow();
     bool isEventWindow = false; //イベントウィンドウ表示
     float animEventSeconds = 0; //イベント用のアニメーション時間
-
+    bool oneTimeStop = false;   //一時停止用
 };
