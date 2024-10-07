@@ -150,7 +150,7 @@
     <ClInclude Include="Source\Components\AnimationCom.h" />
     <ClInclude Include="Source\Components\BulletHoleCom.h" />
     <ClInclude Include="Source\Components\Character\BarrierCom.h" />
-    <ClInclude Include="Source\Components\Character\BossCom.h" />
+    <ClInclude Include="Source\Components\Enemy\Boss\BossCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
     <ClInclude Include="Source\Components\Character\Fara.h" />
@@ -272,7 +272,7 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\BulletHoleCom.cpp" />
     <ClCompile Include="Source\Components\Character\BarrierCom.cpp" />
-    <ClCompile Include="Source\Components\Character\BossCom.cpp" />
+    <ClCompile Include="Source\Components\Enemy\Boss\BossCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\Fara.cpp" />

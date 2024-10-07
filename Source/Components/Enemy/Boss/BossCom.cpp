@@ -1,10 +1,13 @@
 #include "BossCom.h"
 #include "GameSource/Math/Mathf.h"
-#include <random>
 
 //初期設定
 void BossCom::Start()
 {
+    // 乱数エンジンのシードを設定
+    std::random_device rd;
+    gen = std::mt19937(rd());
+
     //ステート登録
     state.AddState(BossState::IDLE, std::make_shared<Boss_IdleState>(this));
     state.AddState(BossState::MOVE, std::make_shared<Boss_MoveState>(this));
@@ -12,6 +15,10 @@ void BossCom::Start()
     state.AddState(BossState::JUMPLOOP, std::make_shared <Boss_JumpLoopState>(this));
     state.AddState(BossState::LANDINGATTACK, std::make_shared <Boss_LandingState>(this));
     state.AddState(BossState::ATTACK, std::make_shared <Boss_AttackState>(this));
+    state.AddState(BossState::RANGEATTACK, std::make_shared <Boss_RangeAttackState>(this));
+    state.AddState(BossState::BOMPATTTACK, std::make_shared <Boss_BompAttackState>(this));
+    state.AddState(BossState::HIT, std::make_shared <Boss_DamageState>(this));
+    state.AddState(BossState::DEATH, std::make_shared <Boss_DeathState>(this));
 
     //初期ステート登録
     state.ChangeState(BossState::IDLE);
@@ -30,6 +37,12 @@ void BossCom::Update(float elapsedTime)
 //imgui
 void BossCom::OnGUI()
 {
+    ImGui::Text("Available Numbers:");
+    for (size_t i = 0; i < availableNumbers.size(); ++i)
+    {
+        ImGui::Text("%d", availableNumbers[i]);
+    }
+    ImGui::Checkbox("judge", &judge);
     state.ImGui();
 }
 
@@ -61,10 +74,12 @@ bool BossCom::Search(float range)
         float dot = (frontX * vx) + (frontZ * vz);
         if (dot > 0.0f)
         {
+            judge = true;
             return true;
         }
         if (dot < 0.0f)
         {
+            judge = false;
             return true;
         }
     }
@@ -75,45 +90,44 @@ bool BossCom::Search(float range)
 // 目標地点へ移動
 void BossCom::MoveToTarget(float movespeed, float turnspeed)
 {
-    // ターゲット方向への進行ベクトルを算出
+    // ターゲット方向への進行ベクトル
     DirectX::XMFLOAT2 Tvec = TargetVec();
 
-    //移動、旋回処理
-    DirectX::XMFLOAT3 vec = { Tvec.x,0.0f,Tvec.y };
+    // 移動処理
+    DirectX::XMFLOAT3 vec = { Tvec.x, 0.0f, Tvec.y };
     GetGameObject()->GetComponent<MovementCom>()->AddForce(vec * movespeed);
+
+    // 回転処理
     GetGameObject()->transform_->Turn(vec, turnspeed);
 }
 
 //乱数計算
 int BossCom::ComputeRandom()
 {
+    //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
     {
-        // 全ての数字が一度出た場合、リストをリセット
-        availableNumbers = { 1, 2, 3 };
+        availableNumbers = { 1,2,3 };
     }
 
-    // 乱数生成エンジン (Mersenne Twister)
-    std::random_device rd;  // 非決定的な乱数生成
-    std::mt19937 gen(rd()); // メルセンヌ・ツイスタのシードに乱数を使う
+    // 乱数生成エンジンを使ってランダムにインデックスを生成
     std::uniform_int_distribution<int> dis(0, availableNumbers.size() - 1);
-
-    int index = dis(gen);  // ランダムにインデックスを生成
+    int index = dis(gen);
     int randomValue = availableNumbers[index];
 
-    // 使用済みの値をリストから削除
     availableNumbers.erase(availableNumbers.begin() + index);
 
-    return randomValue;  // ランダムな値を返す
+    return randomValue;
 }
 
 //ジャンプ
 void BossCom::Jump(float power)
 {
-    // ターゲット方向への進行ベクトルを算出
+    // ターゲット方向への進行ベクトル
     DirectX::XMFLOAT2 vec = TargetVec();
 
-    DirectX::XMFLOAT3 jumppower = { vec.x,power,vec.y };
+    // ジャンプ力を設定
+    DirectX::XMFLOAT3 jumppower = { vec.x, power, vec.y };
     GetGameObject()->GetComponent<MovementCom>()->AddForce(jumppower);
 }
 

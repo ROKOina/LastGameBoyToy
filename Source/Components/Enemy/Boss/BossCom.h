@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Components/System/Component.h"
-#include "State/BossState.h"
-#include "../System\StateMachine.h"
+#include "Components/Character/State/BossState.h"
+#include "Components/System/StateMachine.h"
+#include <random>
 
 class BossCom :public Component
 {
@@ -55,8 +56,8 @@ public:
         ATTACK,
         RANGEATTACK,
         BOMPATTTACK,
-        DEATH,
         HIT,
+        DEATH,
         MAX
     };
 
@@ -67,5 +68,7 @@ public:
 private:
     StateMachine<BossCom, BossState> state;
     DirectX::XMFLOAT3 targetposition = {};
-    std::vector<int> availableNumbers = { 1, 2, 3 };
+    std::vector<int> availableNumbers = { };
+    std::mt19937 gen;
+    bool judge = false;
 };

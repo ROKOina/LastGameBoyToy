@@ -1,5 +1,5 @@
 #include "BossState.h"
-#include "Components/Character/BossCom.h"
+#include "Components/Enemy/Boss/BossCom.h"
 
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 {
@@ -18,21 +18,24 @@ void Boss_IdleState::Enter()
 
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
-    //見つけてなかったら歩きに変更
-    if (!owner->Search(7.0f) && owner->ComputeRandom() == 1)
+    // ランダムで行動を切り替える
+    int randomAction = owner->ComputeRandom();
+
+    if (!owner->Search(FLT_MAX) || owner->Search(FLT_MAX))
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
-        return;
-    }
-    if (owner->Search(7.0f) && owner->ComputeRandom() == 2)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
-        return;
-    }
-    if (owner->Search(7.0f) && owner->ComputeRandom() == 3)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
-        return;
+        // 見つけた場合でも、ランダムで行動を変更
+        if (randomAction == 1)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
+        }
+        else if (randomAction == 2)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
+        }
+        else if (randomAction == 3)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
+        }
     }
 }
 
@@ -46,19 +49,28 @@ void Boss_MoveState::Enter()
 
 void Boss_MoveState::Execute(const float& elapsedTime)
 {
-    //移動(ここキモイ)
-    owner->MoveToTarget(1.0f, 2.0f);
+    // ランダムで行動を切り替える
+    int randomAction = owner->ComputeRandom();
 
-    //見つかったら待機に変更
-    if (owner->Search(4.0f) && owner->ComputeRandom() == 1)
+    //移動
+    float speed = static_cast<float>(randomAction) * 0.5f + 1.0f;
+    owner->MoveToTarget(speed, 2.0f);
+
+    if (owner->Search(5.0f))
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
-        return;
-    }
-    if (owner->Search(4.0f) && owner->ComputeRandom() == 2)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
-        return;
+        // 見つけた場合でも、ランダムで行動を変更
+        if (randomAction == 1)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+        }
+        else if (randomAction == 2)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
+        }
+        else if (randomAction == 3)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
+        }
     }
 }
 #pragma endregion
@@ -129,5 +141,43 @@ void Boss_AttackState::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
+}
+#pragma endregion
+
+#pragma region 範囲攻撃
+void Boss_RangeAttackState::Enter()
+{
+}
+void Boss_RangeAttackState::Execute(const float& elapsedTime)
+{
+}
+#pragma endregion
+
+#pragma region ボンプ攻撃
+void Boss_BompAttackState::Enter()
+{
+}
+void Boss_BompAttackState::Execute(const float& elapsedTime)
+{
+}
+#pragma endregion
+
+#pragma region 死亡
+void Boss_DeathState::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Death"), false);
+}
+void Boss_DeathState::Execute(const float& elapsedTime)
+{
+}
+#pragma endregion
+
+#pragma region ダメージ
+void Boss_DamageState::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("GetHit1"), false);
+}
+void Boss_DamageState::Execute(const float& elapsedTime)
+{
 }
 #pragma endregion

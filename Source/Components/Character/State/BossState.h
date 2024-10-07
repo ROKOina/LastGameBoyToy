@@ -90,3 +90,51 @@ public:
     void ImGui() override {};
     virtual const char* GetName() const override { return "Attack"; }
 };
+
+//”ÍˆÍUŒ‚
+class Boss_RangeAttackState : public Boss_BaseState
+{
+public:
+    Boss_RangeAttackState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "RangeAttack"; }
+};
+
+//ƒ{ƒ“ƒvUŒ‚
+class Boss_BompAttackState : public Boss_BaseState
+{
+public:
+    Boss_BompAttackState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "BompAttack"; }
+};
+
+//ƒ_ƒ[ƒW
+class Boss_DamageState : public Boss_BaseState
+{
+public:
+    Boss_DamageState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Damage"; }
+};
+
+//€–S
+class Boss_DeathState : public Boss_BaseState
+{
+public:
+    Boss_DeathState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Death"; }
+};
