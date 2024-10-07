@@ -36,6 +36,7 @@
 #include "Components/GPUParticle.h"
 #include "Graphics/Sprite/Sprite.h"
 #include "Components/BulletHoleCom.h"
+#include  "Components/Enemy/NoobEnemy/NoobEnemyCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -97,6 +98,8 @@ void SceneGame::Initialize()
         obj->SetName("player");
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
     }
+
+    
 
     //カメラをプレイヤーの子どもにして制御する
     {
