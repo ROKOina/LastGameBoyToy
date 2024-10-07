@@ -1,6 +1,7 @@
 #include "NoobEnemyCom.h"
 #include "Components/TransformCom.h"
 #include"../../Character/CharacterCom.h"
+#include"../../Character/CharaStatusCom.h"
 //コンストラクタ
 NoobEnemyCom::NoobEnemyCom()
 {

@@ -7,11 +7,18 @@
 #include <imgui.h>
 #include <cassert>
 
+//シーケンサーエディタ
+#include "SystemStruct/MySequence.h"
+MySequence mySequence;
+
 // 開始処理
 void AnimationCom::Start()
 {
     //上半身と下半身仕分け
     SeparateNode();
+
+    // sequence with default values
+    mySequence.mFrameMin = 0;
 }
 
 // 更新処理
@@ -79,6 +86,11 @@ void AnimationCom::OnGUI()
         if (ImGui::IsItemClicked())
         {
             currentAnimation = animationIndex;
+
+            //最大フレーム数を保存
+            auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
+            int frameLength = static_cast<int>(anim.secondsLength * 60);
+            mySequence.mFrameMax = frameLength;
         }
 
 
@@ -114,7 +126,23 @@ void AnimationCom::AnimEventWindow()
 
     ImGui::Begin("AnimEvent", nullptr, ImGuiWindowFlags_None);
 
+
+
+    float animationCurrentSeconds = GetAnimationSeconds();
+    int animationCurrentFrame = static_cast<int>(animationCurrentSeconds * 60.0f);
+    int frameLength = static_cast<int>(anim.secondsLength * 60);
+
+    // let's create the sequencer
+    static int selectedEntry = -1;
+    static int firstFrame = 0;
+    static bool expanded = true;
+
+    ImGui::PushItemWidth(130);
+
+
+    //再生情報
     ImGui::Checkbox("Loop", &isAnimLoop);
+    ImGui::SameLine();
 
     if (ImGui::Button("Play"))
     {
@@ -123,23 +151,53 @@ void AnimationCom::AnimEventWindow()
     }
     ImGui::SameLine();
 
-    float animationCurrentSeconds = GetAnimationSeconds();
-    int animationCurrentFrame = static_cast<int>(animationCurrentSeconds * 60.0f);
-    int frameLength = static_cast<int>(anim.secondsLength * 60);
-    ImGui::SetNextItemWidth(50);
-    if (ImGui::DragInt(" ", &animationCurrentFrame, 1.0f, 0, frameLength))
-    {
-        PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
-        SetAnimationSeconds(animationCurrentFrame / 60.0f);
-    }
+    ImGui::InputInt("Frame ", &animationCurrentFrame, 1, 100, ImGuiInputTextFlags_ReadOnly);
     ImGui::SameLine();
 
-    if (ImGui::SliderFloat("Timeline", &animationCurrentSeconds, 0, anim.secondsLength, "current frame = %.3f"))
+    ImGui::InputInt("Frame Max", &frameLength, 1, 100, ImGuiInputTextFlags_ReadOnly);
+
+
+    ImGui::PopItemWidth();
+
+    static bool moveFrame = false;
+    Sequencer(&mySequence, &animationCurrentFrame, &expanded, &selectedEntry, &firstFrame, ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_DEL | ImSequencer::SEQUENCER_CHANGE_FRAME,moveFrame);
+    if (moveFrame)
     {
         PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
-        SetAnimationSeconds(animationCurrentSeconds);
+        SetAnimationSeconds(animationCurrentFrame/60.0f);
+        StopOneTimeAnimation();
+
+    }
+    
+    if (selectedEntry != -1)
+    {
+        const MySequence::MySequenceItem& item = mySequence.myItems[selectedEntry];
+
     }
 
+    //イベント追加,削除
+    if (ImGui::Button("Add"))
+    {
+        int index = 0;
+        while(1)
+        {
+            auto& it = mySequence.SequencerItemTypeNames.find(index);
+            if (it == mySequence.SequencerItemTypeNames.end())break;
+            index++;
+        }
+        mySequence.AddTypeName(index, std::string("NEW")+std::to_string(index));
+        mySequence.myItems.push_back(MySequence::MySequenceItem{ index, 0, 10, false });
+    }
+    if (ImGui::Button("Delete"))
+    {
+        if (selectedEntry != -1)
+        {
+            int typeID=mySequence.Delete(selectedEntry);
+            mySequence.DeleteItem(typeID);
+            if (mySequence.GetItemCount() == 0)selectedEntry = -1;
+            if (mySequence.GetItemCount() == selectedEntry)selectedEntry -= 1;
+        }
+    }
 
     ImGui::End();
 }
@@ -224,7 +282,8 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
     }
 
     // 時間経過
-    currentSeconds += elapsedTime * animationSpeed;
+    if (!oneTimeStop)
+        currentSeconds += elapsedTime * animationSpeed;
     if (currentSeconds >= animation.secondsLength)
     {
         if (loopAnimation)
@@ -642,6 +701,7 @@ void AnimationCom::PlayAnimation(int animeID, bool loop, bool rootFlag, float bl
     currentSeconds = 0.0f;
     animationChangeTime = blendSeconds;
     animationChangeRate = 0.0f;
+    oneTimeStop = false;
 }
 
 //上半身のみアニメーション再生関数

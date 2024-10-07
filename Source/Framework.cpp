@@ -16,6 +16,7 @@
 // ‚’¼“¯ŠúŠÔŠuİ’è
 static const int syncInterval = 1;
 
+
 #ifdef _DEBUG
 Framework* Framework::instance = nullptr;
 
@@ -36,6 +37,8 @@ Framework::Framework(HWND hWnd)
 
     //IMGUI‰Šú‰»
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
+
+
 
 #ifdef _DEBUG
     instance = this;
