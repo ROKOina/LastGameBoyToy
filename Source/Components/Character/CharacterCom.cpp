@@ -115,9 +115,6 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
-    float hp = hitPoint;
-    ImGui::DragFloat("HP", &hp);
-
     ImGui::DragFloat("jump", &jumpPower, 0.1f);
 
     ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);

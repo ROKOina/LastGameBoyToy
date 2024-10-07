@@ -100,12 +100,6 @@ public:
     void SetCameraObj(GameObject* obj) { cameraObj = obj; }
     float GetJumpPower() { return jumpPower; }
 
-  void SetHitPoint(float value) { hitPoint = value; }
-  float GetHitPoint() { return hitPoint; }
-
-  void AddDamagePoint(float value) { hitPoint += value; }
-  void AddHealPoint(float value) { hitPoint += value; }
-
   void SetStanSeconds(float sec) { stanTimer = sec; }
 
   //ネット側で決める
@@ -176,7 +170,6 @@ protected:
 
   bool useMoveFlag = true;//falseにするとmoveStateを使わない
   float jumpPower = 3.0f;
-  float hitPoint = 100.0f;
 
   bool isStan = false;
   float stanTimer = 0;

@@ -12,6 +12,7 @@
 #include "Components/RendererCom.h"
 #include "Components/MovementCom.h"
 #include "Components/ColliderCom.h"
+#include "Components\Character\CharaStatusCom.h"
 #include "Components\Character\TestCharacterCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 
@@ -678,7 +679,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 if (ne[0].damageData[id] > 0)
                 {
                     auto& obj = GameObjectManager::Instance().Find("player");
-                    obj->GetComponent<CharacterCom>()->AddDamagePoint(-ne[0].damageData[id]);
+                    obj->GetComponent<CharaStatusCom>()->AddDamagePoint(-ne[0].damageData[id]);
                     break;
                 }
             }
@@ -690,7 +691,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 if (ne[0].healData[id] > 0)
                 {
                     auto& obj = GameObjectManager::Instance().Find("player");
-                    obj->GetComponent<CharacterCom>()->AddHealPoint(ne[0].healData[id]);
+                    obj->GetComponent<CharaStatusCom>()->AddHealPoint(ne[0].healData[id]);
                     break;
                 }
             }

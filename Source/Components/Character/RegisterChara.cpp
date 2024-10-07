@@ -9,6 +9,7 @@
 #include "Components\MovementCom.h"
 #include "Components\NodeCollsionCom.h"
 
+#include "Components/Character/CharaStatusCom.h"
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\HaveAllAttackCharacter.h"
 #include "Components/Character/UenoCharacterCom.h"
@@ -50,6 +51,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
@@ -73,6 +75,8 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
     c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+
 
     //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
@@ -161,6 +165,7 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
     r->LoadModel("Data/PicoLabo/picolabo.mdl");
     std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::UENO));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     obj->AddComponent<AimIKCom>("Spine");
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
@@ -240,6 +245,7 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<PicohardCharaCom> c = obj->AddComponent<PicohardCharaCom>();
     c->SetCharaID(int(CHARA_LIST::PICOHARD));
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
     std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
     if (std::strcmp(obj->GetName(), "player") == 0)

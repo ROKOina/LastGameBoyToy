@@ -152,6 +152,7 @@
     <ClInclude Include="Source\Components\Character\BarrierCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\CharaStatusCom.h" />
     <ClInclude Include="Source\Components\Character\Fara.h" />
     <ClInclude Include="Source\Components\Character\Generate\TestCharacterGenerate.h" />
     <ClInclude Include="Source\Components\Character\HaveAllAttackCharacter.h" />

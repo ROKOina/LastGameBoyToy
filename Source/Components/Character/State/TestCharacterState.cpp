@@ -2,6 +2,7 @@
 #include "Input\Input.h"
 
 #include "Components\CameraCom.h"
+#include "Components\Character\CharaStatusCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\BulletCom.h"
 
@@ -139,7 +140,7 @@ void TestCharacter_AttackState::Fire()
     for (HitObj& obj : collision->OnHitGameObject())
     {
         //ダメージ処理
-        obj.gameObject.lock()->GetComponent<CharacterCom>()->AddDamagePoint(-attackPower);
+        obj.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-attackPower);
 
         //送信用
         owner->AddGiveDamage(obj.gameObject.lock()->GetComponent<CharacterCom>()->GetCharaID(), -attackPower);
