@@ -8,6 +8,7 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
+    characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
 }
 
 #pragma region ‘Ò‹@
@@ -36,6 +37,13 @@ void Boss_IdleState::Execute(const float& elapsedTime)
         {
             bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
         }
+    }
+
+    //Ž€–Sˆ—
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
     }
 }
 
@@ -72,6 +80,13 @@ void Boss_MoveState::Execute(const float& elapsedTime)
             bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
         }
     }
+
+    //Ž€–Sˆ—
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
 }
 #pragma endregion
 
@@ -91,6 +106,13 @@ void Boss_JumpState::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMPLOOP);
         return;
     }
+
+    //Ž€–Sˆ—
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
 }
 #pragma endregion
 
@@ -105,6 +127,13 @@ void Boss_JumpLoopState::Execute(const float& elapsedTime)
     if (moveCom.lock()->OnGround())
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LANDINGATTACK);
+        return;
+    }
+
+    //Ž€–Sˆ—
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
         return;
     }
 }
@@ -124,6 +153,13 @@ void Boss_LandingState::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
+
+    //Ž€–Sˆ—
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
 }
 #pragma endregion
 
@@ -139,6 +175,13 @@ void Boss_AttackState::Execute(const float& elapsedTime)
     if (!animationCom.lock()->IsPlayAnimation())
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+        return;
+    }
+
+    //Ž€–Sˆ—
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
         return;
     }
 }

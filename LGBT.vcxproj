@@ -274,6 +274,7 @@
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
     <ClCompile Include="Source\Components\BulletHoleCom.cpp" />
     <ClCompile Include="Source\Components\Character\BarrierCom.cpp" />
+    <ClCompile Include="Source\Components\Character\CharaStatusCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\Boss\BossCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />

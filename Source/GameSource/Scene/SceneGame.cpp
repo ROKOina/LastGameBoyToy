@@ -45,6 +45,7 @@
 #include "Netwark/Photon/StdIO_UIListener.h"
 
 #include "Netwark/Photon/StaticSendDataManager.h"
+#include <Components/Character/CharaStatusCom.h>
 
 // 初期化
 void SceneGame::Initialize()
@@ -76,7 +77,7 @@ void SceneGame::Initialize()
     }
 
     //当たり判定用
-    std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
+    //std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
         //roboobj->SetName("robo");
         //roboobj->transform_->SetWorldPosition({ 0, 0, 0 });
@@ -140,6 +141,7 @@ void SceneGame::Initialize()
         obj->AddComponent<AnimationCom>();
         obj->AddComponent<BossCom>();
         obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        obj->AddComponent<CharaStatusCom>();
     }
 
     //スポーン

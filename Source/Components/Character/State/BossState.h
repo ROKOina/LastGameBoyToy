@@ -3,6 +3,7 @@
 #include "../../MovementCom.h"
 #include "../../TransformCom.h"
 #include "../../AnimationCom.h"
+#include "Components/Character/CharaStatusCom.h"
 
 class BossCom;
 
@@ -17,6 +18,7 @@ protected:
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
+    std::weak_ptr<CharaStatusCom>characterstatas;
 };
 
 //‘Ò‹@
