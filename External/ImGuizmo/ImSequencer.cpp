@@ -32,7 +32,7 @@ namespace ImSequencer
     static int min(int a, int b) { return (a < b) ? a : b; }
     static int max(int a, int b) { return (a > b) ? a : b; }
 
-    bool Sequencer(SequenceInterface* sequence, int* currentFrame, bool* expanded, int* selectedEntry, int* firstFrame, int sequenceOptions,bool& MovingCurrentFrame)
+    bool Sequencer(SequenceInterface* sequence, int* currentFrame, bool* expanded, int* selectedEntry, int* firstFrame, int sequenceOptions,bool& MovingCurrentFrame, int& delID, int& addID)
     {
         bool ret = false;
         ImGuiIO& io = ImGui::GetIO();
@@ -264,11 +264,13 @@ namespace ImSequencer
                 {
                     bool overDel = SequencerAddDelButton(draw_list, ImVec2(contentMin.x + legendWidth - ItemHeight + 2 - 10, tpos.y + 2), false);
                     if (overDel && io.MouseReleased[0])
-                        delEntry = i;
+                        delID = i;
+                        //delEntry = i;
 
                     bool overDup = SequencerAddDelButton(draw_list, ImVec2(contentMin.x + legendWidth - ItemHeight - ItemHeight + 2 - 10, tpos.y + 2), true);
                     if (overDup && io.MouseReleased[0])
-                        dupEntry = i;
+                        addID = i;
+                        //dupEntry = i;
                 }
                 customHeight += sequence->GetCustomHeight(i);
             }
