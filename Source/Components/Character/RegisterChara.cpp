@@ -77,7 +77,6 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
-
     //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     //box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
@@ -166,7 +165,6 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
     std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::UENO));
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
-    obj->AddComponent<AimIKCom>("Spine");
     obj->AddComponent<AimIKCom>("Spine", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
@@ -286,7 +284,6 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
             s->SetMyTag(COLLIDER_TAG::Enemy);
             s->SetJudgeTag(COLLIDER_TAG::Player);
         }
-
     }
 
     //‚½‚Ä
