@@ -83,9 +83,9 @@ void SpawnCom::SpawnGameObject()
     std::shared_ptr<RendererCom> renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     renderer->LoadModel("Data/Jammo/jammo.mdl");
     obj->AddComponent<MovementCom>();
-    obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
     obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
     obj->AddComponent<AnimationCom>();
+    obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
     obj->AddComponent<NoobEnemyCom>();
 
     // Œ»İ‚Ì¶¬”‚ğƒCƒ“ƒNƒŠƒƒ“ƒg

@@ -79,7 +79,7 @@ private:
     //雑魚敵のパラメーター
 
     //移動スピード
-    float speed = 0.2f;
+    float speed = 0.7f;
     //爆発するまでの距離
     float explosionDist = 1.0f;
     //爆発範囲

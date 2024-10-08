@@ -43,7 +43,6 @@ void BossCom::OnGUI()
     {
         ImGui::Text("%d", availableNumbers[i]);
     }
-    ImGui::Checkbox("judge", &judge);
     state.ImGui();
 }
 
@@ -75,12 +74,10 @@ bool BossCom::Search(float range)
         float dot = (frontX * vx) + (frontZ * vz);
         if (dot > 0.0f)
         {
-            judge = true;
             return true;
         }
         if (dot < 0.0f)
         {
-            judge = false;
             return true;
         }
     }

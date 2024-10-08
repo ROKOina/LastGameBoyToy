@@ -250,6 +250,7 @@ void Boss_RangeAttackState::Execute(const float& elapsedTime)
 #pragma region ƒ{ƒ“ƒvUŒ‚
 void Boss_BompAttackState::Enter()
 {
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Attack"), false);
 }
 void Boss_BompAttackState::Execute(const float& elapsedTime)
 {

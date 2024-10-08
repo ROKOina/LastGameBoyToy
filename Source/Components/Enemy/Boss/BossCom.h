@@ -71,5 +71,4 @@ private:
     DirectX::XMFLOAT3 targetposition = {};
     std::vector<int> availableNumbers = { };
     std::mt19937 gen;
-    bool judge = false;
 };
