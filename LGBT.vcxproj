@@ -200,7 +200,6 @@
     <ClInclude Include="Source\Components\CameraCom.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneDebugGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
-    <ClInclude Include="Source\GameSource\Scene\SceneStageEditor.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
@@ -323,7 +322,6 @@
     <ClCompile Include="Source\GameSource\Scene\Scene.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneDebugGame.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneIKTest.cpp" />
-    <ClCompile Include="Source\GameSource\Scene\SceneStageEditor.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
