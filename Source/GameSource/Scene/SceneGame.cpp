@@ -117,9 +117,9 @@ void SceneGame::Initialize()
 
     //UIテスト
     {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("UiTest");
-        obj->AddComponent<Sprite>("Data\\UIData\\test.ui",true);
+        //auto& obj = GameObjectManager::Instance().Create();
+        //obj->SetName("UiTest");
+        //obj->AddComponent<Sprite>("Data\\UIData\\test.ui",true);
     }
 
     //弾痕テスト
