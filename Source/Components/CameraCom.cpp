@@ -81,11 +81,13 @@ void CameraCom::OnGUI()
 
     bool active = isActiveCamera;
     ImGui::Checkbox("isActive", &active);
+    ImGui::Checkbox("isUiCreate", &isUiCreate);
     if (ImGui::Button("Active"))
     {
         if (!isActiveCamera)
             isNextCamera = true;
     }
+
 }
 
 //Žw’è•ûŒü‚ðŒü‚­

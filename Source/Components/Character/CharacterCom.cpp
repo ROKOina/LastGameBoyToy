@@ -193,6 +193,10 @@ void CharacterCom::CameraControl()
             return;
         }
 
+        //UI配置中はマウスを固定しない
+       if (!cameraObj->GetComponent<CameraCom>()->GetIsUiCreate())
+       {
+
         //マウスカーソルを取得
         POINT cursor;
         ::GetCursorPos(&cursor);
@@ -225,6 +229,7 @@ void CharacterCom::CameraControl()
             cameraeuler.x = -70;
             cameraplayer->transform_->SetEulerRotation(cameraeuler);
         }
+       }
     }
     else
     {

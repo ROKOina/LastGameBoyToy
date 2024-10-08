@@ -186,6 +186,8 @@ Sprite::Sprite(const char* filename, bool collsion)
 
     //コリジョンを使うか決める
     ontriiger = collsion;
+
+    
 }
 
 //更新処理
