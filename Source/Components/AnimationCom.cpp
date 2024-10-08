@@ -10,6 +10,7 @@
 //シーケンサーエディタ
 #include "SystemStruct/MySequence.h"
 MySequence mySequence;
+static int selectedEntry = -1;
 
 // 開始処理
 void AnimationCom::Start()
@@ -86,11 +87,27 @@ void AnimationCom::OnGUI()
         if (ImGui::IsItemClicked())
         {
             currentAnimation = animationIndex;
+            selectionAnimation = GetSelectionAnimation();
 
+            //アニメーションイベント設定
+            selectedEntry = -1;
             //最大フレーム数を保存
             auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
             int frameLength = static_cast<int>(anim.secondsLength * 60);
             mySequence.mFrameMax = frameLength;
+
+            //アニメーションイベント登録
+            mySequence.AllDeleteItem();
+            int index = 0;
+            for (auto& animEve : selectionAnimation->animationevents)
+            {
+                mySequence.AddTypeName(index, animEve.name);
+                auto& event = mySequence.myItems.emplace_back();
+                event.mFrameStart = animEve.startframe;
+                event.mFrameEnd = animEve.endframe;
+                event.mType = index;
+                index++;
+            }
         }
 
 
@@ -133,12 +150,35 @@ void AnimationCom::AnimEventWindow()
     int frameLength = static_cast<int>(anim.secondsLength * 60);
 
     // let's create the sequencer
-    static int selectedEntry = -1;
     static int firstFrame = 0;
     static bool expanded = true;
 
     ImGui::PushItemWidth(130);
 
+    //イベント追加,削除
+    if (ImGui::Button("Add"))
+    {
+        int index = 0;
+        while (1)
+        {
+            auto& it = mySequence.SequencerItemTypeNames.find(index);
+            if (it == mySequence.SequencerItemTypeNames.end())break;
+            index++;
+        }
+        mySequence.AddTypeName(index, std::string("NEW") + std::to_string(index));
+        mySequence.myItems.push_back(MySequence::MySequenceItem{ index, 0, 10, false });
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Delete"))
+    {
+        if (selectedEntry != -1)
+        {
+            int typeID = mySequence.Delete(selectedEntry);
+            mySequence.DeleteItem(typeID);
+            if (mySequence.GetItemCount() == 0)selectedEntry = -1;
+            if (mySequence.GetItemCount() == selectedEntry)selectedEntry -= 1;
+        }
+    }
 
     //再生情報
     ImGui::Checkbox("Loop", &isAnimLoop);
@@ -156,6 +196,34 @@ void AnimationCom::AnimEventWindow()
 
     ImGui::InputInt("Frame Max", &frameLength, 1, 100, ImGuiInputTextFlags_ReadOnly);
 
+    //イベント詳細
+    if (selectedEntry >= 0)
+    {
+        MySequence::MySequenceItem& nowItem = mySequence.myItems[selectedEntry];
+        if (ImGui::Button("Start"))
+        {
+            nowItem.mFrameStart = animationCurrentFrame;
+        }
+        ImGui::SameLine();
+        ImGui::DragInt("StartFrame", &nowItem.mFrameStart);
+        ImGui::SameLine();
+        if (ImGui::Button("End"))
+        {
+            nowItem.mFrameEnd = animationCurrentFrame;
+        }
+        ImGui::SameLine();
+        ImGui::DragInt("EndFrame", &nowItem.mFrameEnd);
+        ImGui::SameLine();
+
+
+        //名前
+        char name[256];
+        ::strcpy_s(name, sizeof(name), mySequence.GetItemLabel(selectedEntry));
+        if (ImGui::InputText("Name", name, ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            mySequence.SequencerItemTypeNames[selectedEntry] = name;
+        }
+    }
 
     ImGui::PopItemWidth();
 
@@ -175,28 +243,19 @@ void AnimationCom::AnimEventWindow()
 
     }
 
-    //イベント追加,削除
-    if (ImGui::Button("Add"))
+    //セーブ
+    if (ImGui::Button("Save"))
     {
-        int index = 0;
-        while(1)
+        ModelResource::Animation* selectionAnimation = GetSelectionAnimation();
+        selectionAnimation->animationevents.clear();
+        for (auto& item : mySequence.myItems)
         {
-            auto& it = mySequence.SequencerItemTypeNames.find(index);
-            if (it == mySequence.SequencerItemTypeNames.end())break;
-            index++;
+            auto& event = selectionAnimation->animationevents.emplace_back();
+            event.name = mySequence.GetItemLabel(item.mType);
+            event.endframe = item.mFrameEnd;
+            event.startframe = item.mFrameStart;
         }
-        mySequence.AddTypeName(index, std::string("NEW")+std::to_string(index));
-        mySequence.myItems.push_back(MySequence::MySequenceItem{ index, 0, 10, false });
-    }
-    if (ImGui::Button("Delete"))
-    {
-        if (selectedEntry != -1)
-        {
-            int typeID=mySequence.Delete(selectedEntry);
-            mySequence.DeleteItem(typeID);
-            if (mySequence.GetItemCount() == 0)selectedEntry = -1;
-            if (mySequence.GetItemCount() == selectedEntry)selectedEntry -= 1;
-        }
+        model->GetResource()->AnimSerialize();
     }
 
     ImGui::End();

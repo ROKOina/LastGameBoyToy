@@ -36,7 +36,7 @@
 #include "Components/GPUParticle.h"
 #include "Graphics/Sprite/Sprite.h"
 #include "Components/BulletHoleCom.h"
-#include  "Components/Enemy/NoobEnemy/NoobEnemyCom.h"
+#include "Components/StageEditorCom.h"
 #include "Components/SpawnCom.h"
 #include "Components/Enemy/Boss/BossCom.h"
 
@@ -74,6 +74,7 @@ void SceneGame::Initialize()
         obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
+        obj->AddComponent<StageEditorCom>();
     }
 
     //“–‚½‚è”»’è—p
