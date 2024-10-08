@@ -16,27 +16,30 @@ void Boss_IdleState::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
 }
-
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
-    // ランダムで行動を切り替える
-    int randomAction = owner->ComputeRandom();
-
-    if (!owner->Search(FLT_MAX) || owner->Search(FLT_MAX))
+    //距離判定
+    if (owner->Search(5.0f))
     {
-        // 見つけた場合でも、ランダムで行動を変更
+        // ランダムで行動を切り替える
+        int randomAction = owner->ComputeRandom();
+
         if (randomAction == 1)
-        {
-            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
-        }
-        else if (randomAction == 2)
-        {
-            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
-        }
-        else if (randomAction == 3)
         {
             bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
         }
+        else if (randomAction == 2)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::STOPTIME);
+        }
+        else if (randomAction == 3)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
+        }
+    }
+    else if (owner->Search(FLT_MAX))
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
     }
 
     //死亡処理
@@ -46,7 +49,46 @@ void Boss_IdleState::Execute(const float& elapsedTime)
         return;
     }
 }
+#pragma endregion
 
+#pragma region 待機行動長時間
+void Boss_IdleStopState::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+}
+
+void Boss_IdleStopState::Execute(const float& elapsedTime)
+{
+    idletime += elapsedTime;
+
+    //待機時間
+    if (idletime >= 2.0f)
+    {
+        // ランダムで行動を切り替える
+        int randomAction = owner->ComputeRandom();
+
+        if (randomAction == 1)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
+        }
+        else if (randomAction == 2)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+        }
+        else if (randomAction == 3)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
+        }
+    }
+}
+void Boss_IdleStopState::Exit()
+{
+    idletime = 0.0f;
+}
+void Boss_IdleStopState::ImGui()
+{
+    ImGui::DragFloat("idletime", &idletime);
+}
 #pragma endregion
 
 #pragma region 移動
@@ -54,30 +96,27 @@ void Boss_MoveState::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Running"), true);
 }
-
 void Boss_MoveState::Execute(const float& elapsedTime)
 {
-    // ランダムで行動を切り替える
-    int randomAction = owner->ComputeRandom();
+    owner->MoveToTarget(2.0f, 2.0f);
 
-    //移動
-    float speed = static_cast<float>(randomAction) * 0.5f + 1.0f;
-    owner->MoveToTarget(speed, 2.0f);
-
+    //距離判定
     if (owner->Search(5.0f))
     {
-        // 見つけた場合でも、ランダムで行動を変更
+        // ランダムで行動を切り替える
+        int randomAction = owner->ComputeRandom();
+
         if (randomAction == 1)
         {
-            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
         }
         else if (randomAction == 2)
         {
-            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::STOPTIME);
         }
         else if (randomAction == 3)
         {
-            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
         }
     }
 
@@ -96,7 +135,7 @@ void Boss_JumpState::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump"), false);
 
     //ジャンプ
-    owner->Jump(20.0f);
+    owner->Jump(10.0f);
 }
 void Boss_JumpState::Execute(const float& elapsedTime)
 {
@@ -144,7 +183,6 @@ void Boss_LandingState::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Landing"), false);
 }
-
 void Boss_LandingState::Execute(const float& elapsedTime)
 {
     //アニメーションが終われば
@@ -168,7 +206,6 @@ void Boss_AttackState::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Attack"), false);
 }
-
 void Boss_AttackState::Execute(const float& elapsedTime)
 {
     //アニメーションが終われば
@@ -190,9 +227,23 @@ void Boss_AttackState::Execute(const float& elapsedTime)
 #pragma region 範囲攻撃
 void Boss_RangeAttackState::Enter()
 {
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Attack"), false);
 }
 void Boss_RangeAttackState::Execute(const float& elapsedTime)
 {
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+        return;
+    }
+
+    //死亡処理
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
 }
 #pragma endregion
 
@@ -202,6 +253,12 @@ void Boss_BompAttackState::Enter()
 }
 void Boss_BompAttackState::Execute(const float& elapsedTime)
 {
+    //死亡処理
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
 }
 #pragma endregion
 
@@ -222,5 +279,11 @@ void Boss_DamageState::Enter()
 }
 void Boss_DamageState::Execute(const float& elapsedTime)
 {
+    //死亡処理
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
 }
 #pragma endregion

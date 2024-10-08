@@ -10,6 +10,7 @@ void BossCom::Start()
 
     //ÉXÉeÅ[Égìoò^
     state.AddState(BossState::IDLE, std::make_shared<Boss_IdleState>(this));
+    state.AddState(BossState::STOPTIME, std::make_shared<Boss_IdleStopState>(this));
     state.AddState(BossState::MOVE, std::make_shared<Boss_MoveState>(this));
     state.AddState(BossState::JUMP, std::make_shared <Boss_JumpState>(this));
     state.AddState(BossState::JUMPLOOP, std::make_shared <Boss_JumpLoopState>(this));

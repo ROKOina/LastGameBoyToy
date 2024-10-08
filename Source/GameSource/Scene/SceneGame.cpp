@@ -142,14 +142,7 @@ void SceneGame::Initialize()
         obj->AddComponent<BossCom>();
         obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         obj->AddComponent<CharaStatusCom>();
-    }
-
-    //ƒXƒ|[ƒ“
-    {
-        //auto& obj = GameObjectManager::Instance().Create();
-        //obj->SetName("SpawnTest");
-        //std::shared_ptr<SpawnCom>spawn = obj->AddComponent<SpawnCom>(nullptr);
-        //spawn->SetPrototype(roboobj);
+        obj->AddComponent<SpawnCom>();
     }
 
 #pragma endregion

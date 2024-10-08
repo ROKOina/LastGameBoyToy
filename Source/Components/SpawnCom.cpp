@@ -4,9 +4,12 @@
 #include "Components/AnimationCom.h"
 #include <cstdlib>
 #include <cmath>
+#include "Components/Enemy/NoobEnemy/NoobEnemyCom.h"
+#include "Components/AimIKCom.h"
+#include "Components/NodeCollsionCom.h"
 
 // 初期化
-SpawnCom::SpawnCom(const char* filename) : currentSpawnedCount(0)
+SpawnCom::SpawnCom() : currentSpawnedCount(0)
 {
 }
 
@@ -47,23 +50,17 @@ void SpawnCom::OnGUI()
 //ゲームオブジェクトを複製する処理
 void SpawnCom::SpawnGameObject()
 {
-    if (!prototype)
-    {
-        // プロトタイプが設定されていない場合は何もしない
-        return;
-    }
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    obj->SetName("NoobEnemy");
 
-    // GameObjectManagerを使って新しいゲームオブジェクトを作成
-    std::shared_ptr<GameObject> newObj = GameObjectManager::Instance().Create();
-
-    // 複製元の情報をコピー
-    newObj->transform_->SetScale(prototype->transform_->GetScale());
+    //スケール設定
+    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
 
     // オブジェクトに番号を付ける
-    std::string objectName = std::string(prototype->GetName()) + "_" + std::to_string(currentSpawnedCount);
-    newObj->SetName(objectName.c_str());
+    std::string objectName = std::string(obj->GetName()) + "_" + std::to_string(currentSpawnedCount);
+    obj->SetName(objectName.c_str());
 
-    // 元オブジェクトの位置
+    //親オブジェクトの位置
     DirectX::XMFLOAT3 originalPosition = GetGameObject()->transform_->GetWorldPosition();
 
     // 半径spawnRadiusメートル以内のランダムな位置を計算
@@ -80,15 +77,16 @@ void SpawnCom::SpawnGameObject()
         originalPosition.y,  // 高さを維持
         originalPosition.z + offsetZ
     };
-    newObj->transform_->SetWorldPosition(newPosition);
-
-    // RendererComや他のコンポーネントを複製
-    std::shared_ptr<RendererCom> renderer = newObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    renderer->LoadModel("Data/OneCoin/robot.mdl");
+    obj->transform_->SetWorldPosition(newPosition);
 
     // 他のコンポーネントも同様に追加
-    std::shared_ptr<AnimationCom> anim = newObj->AddComponent<AnimationCom>();
-    anim->PlayAnimation(0, true, false, 0.001f);
+    std::shared_ptr<RendererCom> renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+    renderer->LoadModel("Data/Jammo/jammo.mdl");
+    obj->AddComponent<MovementCom>();
+    obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+    obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+    obj->AddComponent<AnimationCom>();
+    obj->AddComponent<NoobEnemyCom>();
 
     // 現在の生成数をインクリメント
     currentSpawnedCount++;

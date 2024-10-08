@@ -49,6 +49,7 @@ public:
     enum class BossState
     {
         IDLE,
+        STOPTIME,
         MOVE,
         JUMP,
         JUMPLOOP,

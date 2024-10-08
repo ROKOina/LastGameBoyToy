@@ -33,6 +33,22 @@ public:
     virtual const char* GetName() const override { return "Idle"; }
 };
 
+//‘Ò‹@s“®’·ŠÔ
+class Boss_IdleStopState : public Boss_BaseState
+{
+public:
+    Boss_IdleStopState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    virtual void Exit();
+    void ImGui() override;
+    virtual const char* GetName() const override { return "IdleStop"; }
+
+private:
+    float idletime = 0.0f;
+};
+
 //ˆÚ“®
 class Boss_MoveState : public Boss_BaseState
 {
