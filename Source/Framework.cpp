@@ -9,7 +9,6 @@
 #include "GameSource\Scene\SceneDebugGame.h"
 #include "GameSource\Scene\SceneManager.h"
 #include "GameSource\Scene\SceneIKTest.h"
-#include "GameSource\Scene\SceneStageEditor.h"
 #include "ImGuiRender.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
