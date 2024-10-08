@@ -159,6 +159,10 @@ public:
     //シェーダー取得
     ModelShader* GetModelShader(SHADER_ID_MODEL mode)const { return m_modelshaders[static_cast<int>(mode)].get(); }
 
+    // リサイズ
+    void ResizeBackBuffer(UINT width, UINT height);
+    void ReleaseBackBuffer();
+
     // スクリーン幅取得
     float GetScreenWidth() const { return screenWidth_; }
 
@@ -204,6 +208,7 @@ public:
 
 private:
     static Graphics* instance_;
+    D3D11_VIEWPORT viewport;
 
     Microsoft::WRL::ComPtr<ID3D11Device>			device_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext>		immediateContext_;

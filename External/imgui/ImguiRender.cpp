@@ -165,6 +165,13 @@ namespace ImGuiCtrl
         }
     }
 
+    //imgui‚ÌResize
+    void Resize(float width, float height)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.DisplaySize = ImVec2(width, height);
+    }
+
     void Uninitialize()
     {
         ImGui_ImplDX11_Shutdown();

@@ -4,6 +4,7 @@
 #include <tchar.h>
 
 #include "Framework.h"
+#include "ImGuiRender.h"
 
 const LONG SCREEN_WIDTH = static_cast<LONG>(1920 * 0.8f);
 const LONG SCREEN_HEIGHT = static_cast<LONG>(1080 * 0.8f);
