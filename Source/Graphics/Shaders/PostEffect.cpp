@@ -6,15 +6,9 @@
 #include <imgui.h>
 #include "Shader.h"
 
-PostEffect* PostEffect::instance_ = nullptr;
-
 //コンストラクタ
 PostEffect::PostEffect()
 {
-    // インスタンス設定
-    _ASSERT_EXPR(instance_ == nullptr, "already instantiated");
-    instance_ = this;
-
     Graphics& Graphics = Graphics::Instance();
 
     //ブルームセット
@@ -41,10 +35,6 @@ PostEffect::PostEffect()
     //コンスタントバッファ
     m_posteffect = std::make_unique<ConstantBuffer<POSTEFFECT>>(Graphics.GetDevice());
     m_shadowparameter = std::make_unique<ConstantBuffer<SHADOWPARAMETER>>(Graphics.GetDevice());
-
-    // テクスチャ読み込み
-    D3D11_TEXTURE2D_DESC texture2d_desc{};
-    LoadTextureFromFile(Graphics.GetDevice(), "Data\\Texture\\odoroki.png", decal.ReleaseAndGetAddressOf(), &texture2d_desc);
 }
 
 //デファードの最初の処理
@@ -99,7 +89,6 @@ void PostEffect::PostEffectRender()
     m_offScreenBuffer[static_cast<int>(offscreen::offscreen)]->Deactivate(dc);
 
     //コンスタントバッファのアクティブ
-    TransforUpdate();
     m_posteffect->Activate(dc, (int)CB_INDEX::POST_EFFECT, true, true, false, false, false, false);
     m_shadowparameter->Activate(dc, (int)CB_INDEX::SHADOW_PAR, false, true, false, false, false, false);
 
@@ -112,7 +101,7 @@ void PostEffect::PostEffectRender()
 
     // 色調補正
     ID3D11ShaderResourceView* posteffect[]
-    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get(),m_gBuffer->GetShaderResources()[5],decal.Get(),m_gBuffer->GetShaderResources()[2] };
+    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get(),m_gBuffer->GetShaderResources()[5] };
     FullScreenQuad::Instance().Blit(dc, posteffect, 0, _countof(posteffect), m_pixelshaders[static_cast<int>(pixelshader::colorGrading)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
@@ -128,9 +117,14 @@ void PostEffect::PostEffectRender()
     m_bloomeffect->Blit(dc);
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
-    //特殊エフェクトのバッファー
-    m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->Clear(dc);
-    m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->Activate(dc);
+    // トーンマップ処理
+    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
+    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
+    dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
+    ID3D11ShaderResourceView* tone[] = {
+        m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->m_shaderresourceviews[0].Get()
+    };
+    FullScreenQuad::Instance().Blit(dc, tone, 0, _countof(tone), m_pixelshaders[static_cast<int>(pixelshader::tonemap)].Get());
 }
 
 //imgui描画
@@ -151,9 +145,6 @@ void PostEffect::PostEffectImGui()
         ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
         ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
-        ImGui::DragFloat3("position", &position.x);
-        ImGui::DragFloat3("scale", &scale.x);
-        ImGui::DragFloat3("rotation", &rotation.x);
     }
 
     //ライトのimgui
@@ -177,27 +168,9 @@ void PostEffect::PostEffectImGui()
     ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::Text("FinalPass");
-    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::specialeffect)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::posteffect)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::End();
-}
-
-//トーンマップ描画
-void PostEffect::ToneMapRender()
-{
-    Graphics& Graphics = Graphics::Instance();
-    ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
-    const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-    // トーンマップ処理の修正
-    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
-    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
-    dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
-    ID3D11ShaderResourceView* tone[] = {
-        m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->m_shaderresourceviews[0].Get()
-    };
-    FullScreenQuad::Instance().Blit(dc, tone, 0, _countof(tone), m_pixelshaders[static_cast<int>(pixelshader::tonemap)].Get());
-    m_offScreenBuffer[static_cast<int>(offscreen::specialeffect)]->Deactivate(dc);
 }
 
 void PostEffect::StartOffScreenRendering()
@@ -221,25 +194,4 @@ void PostEffect::DepthCopyAndBind(int registerIndex)
 
     dc->PSSetShaderResources(registerIndex, 1,
         m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->m_shaderresourceviews[0].GetAddressOf());
-}
-
-//行列更新
-void PostEffect::TransforUpdate()
-{
-    // デカールのトランスフォーム行列を計算
-    DirectX::XMMATRIX decalTranslation = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
-    DirectX::XMMATRIX decalRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
-    DirectX::XMMATRIX decalScale = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-
-    // ワールド空間でのデカールのトランスフォーム行列
-    DirectX::XMMATRIX decalTransform = decalScale * decalRotation * decalTranslation;
-
-    // デカールの逆行列を計算
-    DirectX::XMMATRIX inverseDecalTransform = DirectX::XMMatrixInverse(nullptr, decalTransform);
-
-    // 逆行列と元の行列を掛ける
-    DirectX::XMMATRIX finalTransform = decalTransform * inverseDecalTransform;
-
-    // 結果を格納
-    DirectX::XMStoreFloat4x4(&m_posteffect->data.DecalTransform, finalTransform);
 }

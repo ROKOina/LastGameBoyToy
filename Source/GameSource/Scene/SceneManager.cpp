@@ -9,7 +9,6 @@
 #include "SceneDebugGame.h"
 #include "SceneGame.h"
 #include "SceneIKTest.h"
-#include "SceneStageEditor.h"
 #include <GameSource/Math/Mathf.h>
 
 SceneManager::SceneManager()
@@ -113,7 +112,6 @@ void SceneManager::ImGui()
                     new SceneGame,
                     new SceneDebugGame,
                     new SceneIKTest,
-                    new SceneStageEditor
                 };
                 ChangeScene((scenes[scene_id]));
                 for (int i = 0; i < _countof(scenes); i++)

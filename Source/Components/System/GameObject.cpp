@@ -13,7 +13,6 @@
 #include "Components/GPUParticle.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
 #include "Graphics/Sprite/Sprite.h"
-#include "Components/BulletHoleCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -243,12 +242,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //ポストエフェクト
     m_posteffect->PostEffectRender();
 
-    //弾痕や特殊エフェクト描画
-    SpecialRender();
-
-    //トーンマップ描画
-    m_posteffect->ToneMapRender();
-
     //スプライト描画
     SpriteRender(view, projection);
 
@@ -438,13 +431,6 @@ void GameObjectManager::StartUpObjects()
             spriteobject.emplace_back(spritecomp);
         }
 
-        //特殊エフェクトがあれば入る
-        std::shared_ptr<BulletHole>bulletholecomp = obj->GetComponent<BulletHole>();
-        if (bulletholecomp)
-        {
-            m_bulletholeobject.emplace_back(bulletholecomp);
-        }
-
         obj->Start();
         updateGameObject_.emplace_back(obj);
 
@@ -554,16 +540,6 @@ void GameObjectManager::RemoveGameObjects()
         {
             gpuparticleobject.erase(gpuparticleobject.begin() + per);
             --per;
-        }
-    }
-
-    //m_bulletholeobject解放
-    for (int bull = 0; bull < m_bulletholeobject.size(); ++bull)
-    {
-        if (m_bulletholeobject[bull].expired())
-        {
-            m_bulletholeobject.erase(m_bulletholeobject.begin() + bull);
-            --bull;
         }
     }
 
@@ -770,20 +746,6 @@ void GameObjectManager::GPUParticleRender()
         if (!po.lock()->GetEnabled())continue;
 
         po.lock()->Render();
-    }
-}
-
-//弾痕や特殊エフェクト描画
-void GameObjectManager::SpecialRender()
-{
-    if (m_bulletholeobject.size() <= 0)return;
-
-    for (std::weak_ptr<BulletHole>& bu : m_bulletholeobject)
-    {
-        if (!bu.lock()->GetGameObject()->GetEnabled())continue;
-        if (!bu.lock()->GetEnabled())continue;
-
-        bu.lock()->Render();
     }
 }
 

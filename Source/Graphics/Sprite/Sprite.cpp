@@ -186,8 +186,6 @@ Sprite::Sprite(const char* filename, bool collsion)
 
     //コリジョンを使うか決める
     ontriiger = collsion;
-
-    
 }
 
 //更新処理
@@ -376,10 +374,10 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
         vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = { spc.color.x, spc.color.y, spc.color.z, spc.color.w };
 
         // テクスチャ座標
-        vertices[0].texcoord = { 1.0f / texture2ddesc_.Width, 1.0f / texture2ddesc_.Height };
-        vertices[1].texcoord = { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height };
-        vertices[2].texcoord = { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height };
-        vertices[3].texcoord = { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height };
+        vertices[0].texcoord = { 0.0f / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height };
+        vertices[1].texcoord = { (0.0f + texture2ddesc_.Width) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height };
+        vertices[2].texcoord = { 0.0f / texture2ddesc_.Width, (0.0f + texture2ddesc_.Height) / texture2ddesc_.Height };
+        vertices[3].texcoord = { (0.0f + texture2ddesc_.Width) / texture2ddesc_.Width, (0.0f + texture2ddesc_.Height) / texture2ddesc_.Height };
     }
     dc->Unmap(vertexBuffer_.Get(), 0);
 
@@ -563,7 +561,7 @@ void Sprite::EasingSprite()
     //当たり判定用の矩形を描画するための頂点
     Vertex easingVertices[]
     {
-        { { x0, y0, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 1.0f / texture2ddesc_.Width, 1.0f / texture2ddesc_.Height } },
+        { { x0, y0, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 0.0f / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
         { { x1, y1, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
         { { x2, y2, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
         { { x3, y3, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
