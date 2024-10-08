@@ -119,7 +119,7 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("UiTest");
-        obj->AddComponent<Sprite>(nullptr, true/*"Data\\UIData\\test.ui"*/);
+        obj->AddComponent<Sprite>("Data\\UIData\\test.ui",true);
     }
 
     //’e­ƒeƒXƒg
