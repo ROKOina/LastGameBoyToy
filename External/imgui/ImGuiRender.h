@@ -44,6 +44,9 @@ namespace ImGuiCtrl
     // ï`âÊåãâ ÇèoóÕ
     void Display();
 
+    //imguiÇÃResize
+    void Resize(float width, float height);
+
     void Uninitialize();
 }
 #endif // USE_IMGUI
@@ -56,6 +59,7 @@ if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam)) return true
 #define IMGUI_CTRL_CLEAR_FRAME() ImGuiCtrl::ClearFrame()
 #define IMGUI_CTRL_DISPLAY() ImGuiCtrl::Display()
 #define IMGUI_CTRL_UNINITIALZE() ImGuiCtrl::Uninitialize()
+#define IMGUI_CTRL_RESIZE(width,height)ImGuiCtrl::Resize(width,height)
 #else
 #define IMGUI_CTRL_WND_PRC_HANDLER(hwnd, msg, wParam, lParam)
 #define IMGUI_CTRL_INITIALIZE(hwnd, device, context)

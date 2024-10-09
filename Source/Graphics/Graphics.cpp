@@ -128,7 +128,6 @@ Graphics::Graphics(HWND hWnd)
     // ビューポートの設定
     {
         // 画面のどの領域にDirectXで描いた画を表示するかの設定。
-        D3D11_VIEWPORT viewport;
         viewport.TopLeftX = 0;
         viewport.TopLeftY = 0;
         viewport.Width = static_cast<float>(screenWidth);
@@ -674,6 +673,67 @@ Graphics::Graphics(HWND hWnd)
 // デストラクタ
 Graphics::~Graphics()
 {
+}
+
+void Graphics::ResizeBackBuffer(UINT width, UINT height)
+{
+    // スワップチェーンをリサイズする
+    DXGI_MODE_DESC dxgi_mode_desc = {};
+    dxgi_mode_desc.Width = width;
+    dxgi_mode_desc.Height = height;
+    dxgi_mode_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    dxgi_mode_desc.RefreshRate.Numerator = 60;
+    dxgi_mode_desc.RefreshRate.Denominator = 1;
+
+    //HRESULT hr = swapChain->ResizeTarget(&dxgi_mode_desc);
+    //_ASSERT_EXPR(SUCCEEDED(hr), "スワップチェーンのリサイズに失敗しました。\nhr=%08x", hr);
+
+    ID3D11RenderTargetView* nullViews[] = { nullptr };
+    immediateContext_->OMSetRenderTargets(ARRAYSIZE(nullViews), nullViews, nullptr);
+    ReleaseBackBuffer();
+
+    //immediateContext->ClearState();
+    immediateContext_->Flush();
+
+    DXGI_SWAP_CHAIN_DESC dxgi_sc_desc = {};
+    swapchain_->GetDesc(&dxgi_sc_desc);
+
+    HRESULT hr = swapchain_->ResizeBuffers(
+        dxgi_sc_desc.BufferCount,
+        dxgi_mode_desc.Width,
+        dxgi_mode_desc.Height,
+        dxgi_mode_desc.Format,
+        dxgi_sc_desc.Flags);
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+    // バックバッファ再取得
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+    hr = swapchain_->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+    // レンダーターゲットビュー再作成
+    hr = device_->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView_.ReleaseAndGetAddressOf());
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+    // ビューポートの再設定
+    viewport = {};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = static_cast<FLOAT>(width);
+    viewport.Height = static_cast<FLOAT>(height);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    immediateContext_->RSSetViewports(1, &viewport);
+
+    // スクリーン幅と高さを更新
+    screenWidth_ = width;
+    screenHeight_ = height;
+}
+
+void Graphics::ReleaseBackBuffer()
+{
+    // バックバッファ解放
+    renderTargetView_.Reset();
 }
 
 DirectX::XMFLOAT3 Graphics::WorldToScreenPos(DirectX::XMFLOAT3 worldPos, std::shared_ptr<CameraCom> camera)

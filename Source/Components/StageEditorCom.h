@@ -2,6 +2,9 @@
 #include "./System/Component.h"
 #include "./ColliderCom.h"
 #include <List>
+#include <map>
+
+struct PlaceObject;
 
 class StageEditorCom : public Component
 {
@@ -40,5 +43,14 @@ private:
     bool onImGui = false;//カーソルがGui上にあるかどうか
     bool nowEdit = false;//編集中フラグ
 
+    std::map<std::string, PlaceObject> placeObjcts;//オブジェクトの名前とModleのファイルパスを紐づけて保存
+    char registerObjName[256] = {};
+    std::string objType;
+    std::list<GameObj> objList;
+};
+
+struct PlaceObject
+{
+    std::string filePath;
     std::list<GameObj> objList;
 };

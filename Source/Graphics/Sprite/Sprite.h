@@ -67,7 +67,7 @@ public:
         DirectX::XMFLOAT2 collsionpositionoffset = { 0.0f,0.0f };
         float angle = { 0.0f };
         float easingangle = { 0.0f };
-        std::string	filename;
+        std::string	filename = {};
         int blend = 1;
         int depth = 1;
         float timescale = 0.0f;
@@ -76,7 +76,7 @@ public:
         bool loop = false;
         bool comback = false;
         bool easing = false;
-        std::string objectname;
+        std::string objectname = {};
         DirectX::XMFLOAT3 screenposoffset = { 0.0f,0.0f,0.0f };
         DirectX::XMFLOAT2 maxscale = { 0.0f,0.0f };
         DirectX::XMFLOAT2 minscale = { 0.0f,0.0f };
@@ -84,7 +84,7 @@ public:
         template<class Archive>
         void serialize(Archive& archive, int version);
     };
-    SaveParameterCPU spc;
+    SaveParameterCPU spc = {};
 
     //定数バッファの構造体
     struct SaveConstantsParameter

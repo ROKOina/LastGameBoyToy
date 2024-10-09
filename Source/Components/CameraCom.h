@@ -67,6 +67,9 @@ public:
     void ActiveCameraChange();
     bool GetIsActive() { return isActiveCamera; }
 
+    //Ui配置用のbool取得
+    bool GetIsUiCreate() { return isUiCreate; }
+
 private:
     //アクティブカメラ変更処理
     void ChangeActiveProcess();
@@ -103,4 +106,7 @@ private:
     DirectX::XMFLOAT3 right_ = { 1,0,0 };
 
     bool isLookAt_ = false;
+
+    //Uiを配置する時にマウスが固定されないようにする
+    bool isUiCreate = false;
 };

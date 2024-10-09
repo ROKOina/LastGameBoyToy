@@ -9,7 +9,6 @@
 
 #include "../../MovementCom.h"
 
-
 #define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
 
 class NoobEnemyCom : public Component
@@ -19,7 +18,7 @@ public:
     ~NoobEnemyCom() override;
 
     //名前取得
-    const char* GetName() const override { return "NoobEnemy";}
+    const char* GetName() const override { return "NoobEnemy"; }
 
     //GUI描画
     void OnGUI()override;
@@ -47,7 +46,7 @@ private:
     //ステート関連
 
     //遷移
-    
+
     //待機ステート
     void TransitionIdleState();
     //追跡ステート
@@ -76,12 +75,11 @@ private:
 
     State state = State::Idle;
 
-
 private:
     //雑魚敵のパラメーター
 
     //移動スピード
-    float speed = 0.2f;
+    float speed = 0.7f;
     //爆発するまでの距離
     float explosionDist = 1.0f;
     //爆発範囲
@@ -90,7 +88,4 @@ private:
     float explosionDamage = 10.0f;
     //爆発猶予
     float explosionGrace = 1.0f;
-
 };
-
-

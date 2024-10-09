@@ -9,7 +9,6 @@
 #include "SceneDebugGame.h"
 #include "SceneGame.h"
 #include "SceneIKTest.h"
-#include "SceneStageEditor.h"
 #include <GameSource/Math/Mathf.h>
 #include "ScenePVE/ScenePVE.h"
 #include "ScenePVP/ScenePVP.h"
@@ -123,7 +122,6 @@ void SceneManager::ImGui()
                     new SceneGame,
                     new SceneDebugGame,
                     new SceneIKTest,
-                    new SceneStageEditor,
                     new SceneTitle,
                     new SceneResult,
                     new ScenePVE,

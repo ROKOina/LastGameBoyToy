@@ -15,9 +15,6 @@ public:
     PostEffect();
     ~PostEffect() {}
 
-    // インスタンス取得
-    static PostEffect& Instance() { return *instance_; }
-
     // デファードのレンダーターゲットを設定
     void SetDeferredTarget();
 
@@ -30,13 +27,8 @@ public:
     // imgui描画
     void PostEffectImGui();
 
-    //トーンマップ
-    void ToneMapRender();
-
     // オフスクリーンバッファに描画していく
     void StartOffScreenRendering();
-
-    MultiRenderTarget* GetGeometryBuffer() { return m_gBuffer.get(); }
 
     // 深度マップをSRVにコピーして、GPUにバインドする
     void DepthCopyAndBind(int registerIndex);
@@ -49,7 +41,6 @@ public:
     float m_criticaldepthvalue = 300.0f;
 
 private:
-    static PostEffect* instance_;
 
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
@@ -78,8 +69,8 @@ private:
     };
     std::unique_ptr<ConstantBuffer<SHADOWPARAMETER>>m_shadowparameter;
 
-public:
-    enum class offscreen { offscreen, posteffect, specialeffect, depthCopy, max };
+private:
+    enum class offscreen { offscreen, posteffect, depthCopy, max };
     enum class pixelshader { deferred, colorGrading, tonemap, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];

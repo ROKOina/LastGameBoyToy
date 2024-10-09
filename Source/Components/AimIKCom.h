@@ -8,7 +8,7 @@ class AimIKCom : public Component
 {
     //コンポーネントオーバーライド
 public:
-    AimIKCom(const char* aimbonename);
+    AimIKCom(const char* playeraimbonename, const char* enemyaimbone);
     ~AimIKCom() {}
 
     // 名前取得
@@ -35,5 +35,7 @@ private:
 
     //AimIK用変数
     std::vector<int>AimBone;
-    const char* copyname = {};
+    const char* playercopyname = {};
+    const char* enemycopyname = {};
+    DirectX::XMFLOAT4 neckpos = { 0,0,0,1 };
 };
