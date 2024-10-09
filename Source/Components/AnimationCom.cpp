@@ -48,6 +48,7 @@ bool isAnimLoop;
 void AnimationCom::OnGUI()
 {
     ImGui::SameLine();
+
     ImGui::Checkbox("isEventWindow", &isEventWindow);
     if (isEventWindow)AnimEventWindow();
 
@@ -63,7 +64,7 @@ void AnimationCom::OnGUI()
     {
         index++;
     }
-
+    
     int animationIndex = 0;
     ModelResource::Animation* selectionAnimation = GetSelectionAnimation();
     std::vector<ModelResource::Animation>& animations1 = const_cast<std::vector<ModelResource::Animation>&>(model->GetResource()->GetAnimations());
@@ -133,6 +134,7 @@ ModelResource::Animation* AnimationCom::GetSelectionAnimation()
 
 void AnimationCom::AnimEventWindow()
 {
+    if (currentAnimation < 0)return;
     //モデルからリソースを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
@@ -280,8 +282,8 @@ void AnimationCom::AnimEventWindow()
         {
             auto& event = selectionAnimation->animationevents.emplace_back();
             event.name = mySequence.GetItemLabel(item.mType);
-            event.endframe = item.mFrameEnd;
-            event.startframe = item.mFrameStart;
+            event.endframe = item.mFrameEnd / 60.0f;
+            event.startframe = item.mFrameStart / 60.0f;
         }
         model->GetResource()->AnimSerialize();
     }
@@ -851,6 +853,24 @@ void AnimationCom::SetUpAnimationUpdate(int updateId)
     animaType = updateId;
 }
 
+bool AnimationCom::IsEventCalling(std::string eventName)
+{
+    if (currentAnimation < 0)return false;
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
+
+    for (auto& ev : anim.animationevents)
+    {
+        if (ev.name != eventName)continue;
+
+        if (ev.startframe <= currentSeconds && ev.endframe >= currentSeconds)
+            return true;
+    }
+    return false;
+}
+
 //アニメーション計算
 void AnimationCom::ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node& node)
 {
@@ -931,7 +951,8 @@ void AnimationCom::SeparateNode()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     for (auto& node : model->GetNodes())
     {
-        if (std::strcmp(node.name, "Hip") == 0)
+        if (std::string(node.name).find("Hip") != std::string::npos)
+        //if (std::strcmp(node.name, "Hip") == 0)
         {
             lowerNodes.emplace_back(&node);
             continue;
