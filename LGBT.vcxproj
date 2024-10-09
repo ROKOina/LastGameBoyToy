@@ -148,7 +148,6 @@
     <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\Components\AimIKCom.h" />
     <ClInclude Include="Source\Components\AnimationCom.h" />
-    <ClInclude Include="Source\Components\BulletHoleCom.h" />
     <ClInclude Include="Source\Components\Character\BarrierCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
@@ -200,7 +199,6 @@
     <ClInclude Include="Source\Components\CameraCom.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneDebugGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
-    <ClInclude Include="Source\GameSource\Scene\SceneStageEditor.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
@@ -274,7 +272,6 @@
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\Components\AimIKCom.cpp" />
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
-    <ClCompile Include="Source\Components\BulletHoleCom.cpp" />
     <ClCompile Include="Source\Components\Character\BarrierCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
@@ -323,7 +320,6 @@
     <ClCompile Include="Source\GameSource\Scene\Scene.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneDebugGame.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneIKTest.cpp" />
-    <ClCompile Include="Source\GameSource\Scene\SceneStageEditor.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
@@ -385,10 +381,6 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="HLSL\2D\BulletHolePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\DeferredPBR_PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -481,6 +473,7 @@
     </FxCompile>
     <FxCompile Include="HLSL\3D\SilhouettePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

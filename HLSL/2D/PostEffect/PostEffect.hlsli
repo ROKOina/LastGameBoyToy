@@ -11,5 +11,4 @@ cbuffer CbPostEffect : register(b3)
     float exposure;
     float vignettesize;
     float vignetteintensity;
-    float4x4 DecalTransform;
 };
