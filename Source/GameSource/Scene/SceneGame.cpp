@@ -35,7 +35,6 @@
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 #include "Graphics/Sprite/Sprite.h"
-#include "Components/BulletHoleCom.h"
 #include "Components/StageEditorCom.h"
 #include "Components/SpawnCom.h"
 #include "Components/Enemy/Boss/BossCom.h"
@@ -120,13 +119,6 @@ void SceneGame::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("UiTest");
         obj->AddComponent<Sprite>("Data\\UIData\\reticle.ui", true);
-    }
-
-    //’e­ƒeƒXƒg
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("BulletHoleTest");
-        obj->AddComponent<BulletHole>("Data\\Texture\\odoroki.png");
     }
 
     //BOSS
