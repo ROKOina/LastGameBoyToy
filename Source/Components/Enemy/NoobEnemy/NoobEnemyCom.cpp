@@ -6,7 +6,7 @@
 //コンストラクタ
 NoobEnemyCom::NoobEnemyCom()
 {
-}
+} 
 
 //デストラクタ
 NoobEnemyCom::~NoobEnemyCom()
@@ -21,6 +21,7 @@ void NoobEnemyCom::OnGUI()
 //スタート
 void NoobEnemyCom::Start()
 {
+    animationCom = GetGameObject()->GetComponent<AnimationCom>();
     TransitionPursuit();
 }
 
@@ -85,7 +86,10 @@ void NoobEnemyCom::TransitionIdleState()
 //追跡ステート
 void NoobEnemyCom::TransitionPursuit()
 {
+   
     state = State::Purstuit;
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Running"), true);
+
 }
 
 //爆発ステート
