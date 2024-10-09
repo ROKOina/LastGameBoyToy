@@ -1,5 +1,6 @@
 #include "Defalt.hlsli"
 #include "Shadow.hlsli"
+#include "NoInstance.hlsli"
 
 VS_OUT_CSM main(VS_IN vin, uint instance_id : SV_INSTANCEID)
 {

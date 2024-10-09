@@ -13,6 +13,7 @@
 #include "Components/GPUParticle.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
 #include "Graphics/Sprite/Sprite.h"
+#include "Components/InstanceRendererCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -206,6 +207,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     m_posteffect->GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, m_posteffect->m_criticaldepthvalue, [&]()
         {
             RenderShadow();
+            InstanceRenderShadow();
         });
 
     // オフスクリーンに描画開始
@@ -216,6 +218,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
 
     //3D描画
     RenderDeferred();
+    InstanceRenderDeferred();
 
     //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
     m_posteffect->EndDeferred();
@@ -228,6 +231,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
 
     // フォワードレンダリング
     RenderForward();
+    InstanceRenderForward();
 
     //デバッグレンダー
     Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
@@ -238,6 +242,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
 
     // 深度マップを使用するシェーダー
     RenderUseDepth();
+    InstanceRenderUseDepth();
 
     //ポストエフェクト
     m_posteffect->PostEffectRender();
@@ -431,6 +436,13 @@ void GameObjectManager::StartUpObjects()
             spriteobject.emplace_back(spritecomp);
         }
 
+        //インスタンスオブジェクトがあれば入る
+        std::shared_ptr<InstanceRenderer>instancecomp = obj->GetComponent<InstanceRenderer>();
+        if (instancecomp)
+        {
+            instanceobject.emplace_back(instancecomp);
+        }
+
         obj->Start();
         updateGameObject_.emplace_back(obj);
 
@@ -447,6 +459,7 @@ void GameObjectManager::StartUpObjects()
 
     // 描画オブジェクトのソート
     SortRenderObject();
+    SortInstanceRenderObject();
 }
 
 void GameObjectManager::CollideGameObjects()
@@ -553,7 +566,19 @@ void GameObjectManager::RemoveGameObjects()
         }
     }
 
+    //インスタンス解放
+    for (int ins = 0; ins < instanceobject.size(); ++ins)
+    {
+        if (instanceobject[ins].expired())
+        {
+            instanceobject.erase(instanceobject.begin() + ins);
+            --ins;
+        }
+    }
+
+    //ソート
     SortRenderObject();
+    SortInstanceRenderObject();
 }
 
 // リスター描画
@@ -597,6 +622,7 @@ void GameObjectManager::DrawDetail()
 
 void GameObjectManager::SortRenderObject()
 {
+    //普通のモデル描画
     std::sort(renderSortObject_.begin(), renderSortObject_.end(),
         [&](std::weak_ptr<RendererCom>& left, std::weak_ptr<RendererCom>& right) {
             return left.lock()->GetShaderMode() < right.lock()->GetShaderMode();
@@ -613,6 +639,25 @@ void GameObjectManager::SortRenderObject()
         });
 }
 
+//インスタンシングのソート
+void GameObjectManager::SortInstanceRenderObject()
+{
+    std::sort(instanceobject.begin(), instanceobject.end(),
+        [&](std::weak_ptr<InstanceRenderer>& left, std::weak_ptr<InstanceRenderer>& right) {
+            return left.lock()->GetShaderMode() < right.lock()->GetShaderMode();
+        });
+
+    instancedeferredCount = std::count_if(instanceobject.begin(), instanceobject.end(),
+        [&](std::weak_ptr<InstanceRenderer>& ren) {
+            return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::DEFERRED;
+        });
+
+    instanceuseDepthCount = std::count_if(instanceobject.begin(), instanceobject.end(),
+        [&](std::weak_ptr<InstanceRenderer>& ren) {
+            return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::USE_DEPTH_MAP;
+        });
+}
+
 //3D描画
 void GameObjectManager::RenderDeferred()
 {
@@ -624,6 +669,29 @@ void GameObjectManager::RenderDeferred()
     {
         // デファードレンダリングのモデルのみ描画する
         if (drawCount == deferredCount)return;
+        drawCount++;
+
+        if (!renderObj.lock()->GetGameObject()->GetEnabled())continue;
+        if (!renderObj.lock()->GetEnabled())continue;
+
+        Model* model = renderObj.lock()->GetModel();
+        if (model != nullptr)
+        {
+            renderObj.lock()->Render();
+        }
+    }
+}
+
+void GameObjectManager::InstanceRenderDeferred()
+{
+    if (instanceobject.size() <= 0)return;
+    if (instancedeferredCount == 0)return;
+
+    int drawCount = 0;
+    for (std::weak_ptr<InstanceRenderer>& renderObj : instanceobject)
+    {
+        // デファードレンダリングのモデルのみ描画する
+        if (drawCount == instancedeferredCount)return;
         drawCount++;
 
         if (!renderObj.lock()->GetGameObject()->GetEnabled())continue;
@@ -660,6 +728,29 @@ void GameObjectManager::RenderForward()
     }
 }
 
+void GameObjectManager::InstanceRenderForward()
+{
+    if (instanceobject.size() <= 0)return;
+
+    // フォワードレンダリングするオブジェクトの数
+    int drawVolume = instanceobject.size() - instancedeferredCount - instanceuseDepthCount;
+    if (drawVolume <= 0)return;
+
+    for (int i = 0; i < drawVolume; ++i)
+    {
+        int index = instancedeferredCount + i;
+
+        if (!instanceobject[index].lock()->GetGameObject()->GetEnabled())continue;
+        if (!instanceobject[index].lock()->GetEnabled())continue;
+
+        Model* model = instanceobject[index].lock()->GetModel();
+        if (model != nullptr)
+        {
+            instanceobject[index].lock()->Render();
+        }
+    }
+}
+
 //影描画
 void GameObjectManager::RenderShadow()
 {
@@ -679,13 +770,12 @@ void GameObjectManager::RenderShadow()
     }
 }
 
-//シルエット描画
-void GameObjectManager::RenderSilhoutte()
+void GameObjectManager::InstanceRenderShadow()
 {
-    if (renderSortObject_.size() <= 0)return;
+    if (instanceobject.size() <= 0)return;
 
-    //シルエット描画
-    for (std::weak_ptr<RendererCom>& modelrender : renderSortObject_)
+    //影描画
+    for (std::weak_ptr<InstanceRenderer>& modelrender : instanceobject)
     {
         if (!modelrender.lock()->GetGameObject()->GetEnabled())continue;
         if (!modelrender.lock()->GetEnabled())continue;
@@ -693,7 +783,7 @@ void GameObjectManager::RenderSilhoutte()
         Model* model = modelrender.lock()->GetModel();
         if (model != nullptr)
         {
-            modelrender.lock()->SilhoutteRender();
+            modelrender.lock()->ShadowRender();
         }
     }
 }
@@ -717,6 +807,29 @@ void GameObjectManager::RenderUseDepth()
         if (model != nullptr)
         {
             renderSortObject_[index].lock()->Render();
+        }
+    }
+}
+
+void GameObjectManager::InstanceRenderUseDepth()
+{
+    if (instanceobject.size() <= 0) return;
+
+    // フォワードレンダリングするオブジェクトの数
+    int drawVolume = instanceuseDepthCount;
+    if (drawVolume <= 0) return;
+
+    for (int i = 0; i < drawVolume; ++i)
+    {
+        int index = i + instanceobject.size() - instanceuseDepthCount;
+
+        if (!instanceobject[index].lock()->GetGameObject()->GetEnabled())continue;
+        if (!instanceobject[index].lock()->GetEnabled())continue;
+
+        Model* model = instanceobject[index].lock()->GetModel();
+        if (model != nullptr)
+        {
+            instanceobject[index].lock()->Render();
         }
     }
 }

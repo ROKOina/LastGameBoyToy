@@ -177,6 +177,7 @@
     <ClInclude Include="Source\Components\EventCom.h" />
     <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
+    <ClInclude Include="Source\Components\InstanceRendererCom.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\NodeCollsionCom.h" />
     <ClInclude Include="Source\Components\ProjectileCom.h" />
@@ -209,6 +210,7 @@
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\CascadedShadowMap.h" />
+    <ClInclude Include="Source\Graphics\Shaders\3D\InstanceModelShader.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\ModelShader.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\VariousShaderConstants.h" />
     <ClInclude Include="Source\Graphics\Shaders\Bloom.h" />
@@ -300,6 +302,7 @@
     <ClCompile Include="Source\Components\EventCom.cpp" />
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
+    <ClCompile Include="Source\Components\InstanceRendererCom.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
     <ClCompile Include="Source\Components\NodeCollsionCom.cpp" />
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
@@ -329,6 +332,7 @@
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\CascadedShadowMap.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders\3D\InstanceModelShader.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\ModelShader.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\3D\VariousShaderConstants.cpp" />
     <ClCompile Include="Source\Graphics\Shaders\Bloom.cpp" />
@@ -365,7 +369,9 @@
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
     <None Include="HLSL\3D\FakeDepth.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
+    <None Include="HLSL\3D\Instancing.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
+    <None Include="HLSL\3D\NoInstance.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
     <None Include="HLSL\3D\Shadow.hlsli" />
     <None Include="HLSL\Common.hlsli" />
@@ -452,6 +458,13 @@
     <FxCompile Include="HLSL\3D\DefaltVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\InstanceShadowVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\InstancingVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\PBR+IBL_Unity.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
