@@ -30,41 +30,44 @@ void StageEditorCom::Update(float elapsedTime)
         HitResult hit;
         if (MouseVsStage(hit))
         {
-           //登録されていたオブジェクトを配置
-           GameObj obj = GameObjectManager::Instance().Create();
-           std::string objName = objType + std::to_string(placeObjcts[objType.c_str()].objList.size());
-           obj->SetName(objName.c_str());
+            //登録されていたオブジェクトを配置
+            GameObj obj = GameObjectManager::Instance().Create();
+            std::string objName = objType + std::to_string(placeObjcts[objType.c_str()].objList.size());
+            obj->SetName(objName.c_str());
 
-           obj->transform_->SetWorldPosition(hit.position);
-           obj->transform_->SetScale({ 0.02f,0.02f,0.02f });
+            obj->transform_->SetWorldPosition(hit.position);
+            obj->transform_->SetScale({ 0.02f,0.02f,0.02f });
 
-           obj->AddComponent<NodeCollsionCom>(nullptr);
+            obj->AddComponent<NodeCollsionCom>(nullptr);
 
-           RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
-           render->LoadModel(placeObjcts[objType.c_str()].filePath.c_str());
+            RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
+            render->LoadModel(placeObjcts[objType.c_str()].filePath.c_str());
 
-           placeObjcts[objType.c_str()].objList.emplace_back(obj);
+            placeObjcts[objType.c_str()].objList.emplace_back(obj);
         }
     }
 }
 
 void StageEditorCom::OnGUI()
 {
-    static char* edit = (char*)u8"配置開始";
-
-    static ImVec4 gui_color = {};
-
-    nowEdit ? gui_color = { 0.7f,0.0f,0.0f,1.0f } : gui_color = { 0.0f,0.0f,0.7f,1.0f };
-    ImGui::PushStyleColor(ImGuiCol_Button, gui_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, gui_color);
-
-    onImGui = !ImGui::IsWindowHovered();
-    if (ImGui::Button(edit, { 400,50 }))
+    //配置開始ボタン
     {
-        nowEdit = !nowEdit;
-        nowEdit ? edit = (char*)u8"配置終了" : edit = (char*)u8"配置開始";
+        //ボタンに使う文字
+        static char* edit = (char*)u8"配置開始";
+        //ボタンの色
+        static ImVec4 gui_color = {};
+        nowEdit ? gui_color = { 0.7f,0.0f,0.0f,1.0f } : gui_color = { 0.0f,0.0f,0.7f,1.0f };
+        ImGui::PushStyleColor(ImGuiCol_Button, gui_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, gui_color);
+
+        onImGui = !ImGui::IsWindowHovered();
+        if (ImGui::Button(edit, { 400,50 }))
+        {
+            nowEdit = !nowEdit;
+            nowEdit ? edit = (char*)u8"配置終了" : edit = (char*)u8"配置開始";
+        }
+        ImGui::PopStyleColor(2);
     }
-    ImGui::PopStyleColor(2);
 
     if (ImGui::Button((char*)u8"保存"))
     {
@@ -90,7 +93,7 @@ void StageEditorCom::OnGUI()
             {
                 nowEdit ? ImGui::Button((char*)u8"配置中") : ImGui::Button((char*)u8"配置待機中");
             }
-            else 
+            else
             {
                 if (ImGui::Button((char*)u8"配置可能"))
                 {
@@ -114,23 +117,6 @@ void StageEditorCom::OnGUI()
             }
         }
     }
-}
-
-void StageEditorCom::StageSelect()
-{
-    //ボタンでオープン
-    //if (ImGui::Button("StageSelect"))
-    //{
-    //    //ステージモデルの設定
-    //    static const char* filter = "Model Files(*.fbx;*.mdl)\0*.fbx;*.mdl;\0All Files(*.*)\0*.*;\0\0";
-
-    //    char filename[256] = { 0 };
-    //    DialogResult result = Dialog::OpenFileName(filename, sizeof(filename), filter, nullptr, Framework::GetInstance()->GetHWND());
-    //    if (result == DialogResult::OK)
-    //    {
-    //        stageObj = ImportModel(filename);
-    //    }
-    //}
 }
 
 void StageEditorCom::ObjectRegister()
@@ -240,7 +226,7 @@ void StageEditorCom::ObjectSave()
         {
             j[placeObj.first]["Position"] += { {"x", obj->transform_->GetWorldPosition().x}, { "y", obj->transform_->GetWorldPosition().y }, { "z", obj->transform_->GetWorldPosition().z }};
             j[placeObj.first]["Scale"] += { {"x", obj->transform_->GetScale().x}, { "y", obj->transform_->GetScale().y }, { "z", obj->transform_->GetScale().z }};
-            j[placeObj.first]["Rotation"] += { {"x", obj->transform_->GetRotation().x}, { "y", obj->transform_->GetRotation().y }, { "z", obj->transform_->GetRotation().z } , { "w", obj->transform_->GetRotation().w }};
+            j[placeObj.first]["Rotation"] += { {"x", obj->transform_->GetRotation().x}, { "y", obj->transform_->GetRotation().y }, { "z", obj->transform_->GetRotation().z }, { "w", obj->transform_->GetRotation().w }};
 
             ++i;
         }
@@ -291,12 +277,12 @@ void StageEditorCom::ObjectLoad()
 
                 for (int index = 0; index < data["Position"].size(); ++index)
                 {
-                    DirectX::XMFLOAT3 pos      = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
-                    DirectX::XMFLOAT3 scale    = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
+                    DirectX::XMFLOAT3 pos = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
+                    DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
                     DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
 
                     GameObj obj = GameObjectManager::Instance().Create();
-                    
+
                     std::string objName = item.key() + std::to_string(placeObjcts[item.key().c_str()].objList.size());
                     obj->SetName(objName.c_str());
 
@@ -316,5 +302,5 @@ void StageEditorCom::ObjectLoad()
         }
     }
 
-    
+
 }

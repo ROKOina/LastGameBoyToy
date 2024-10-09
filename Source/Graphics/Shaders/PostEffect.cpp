@@ -2,6 +2,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
+#include "Graphics/Shaders/Texture.h"
 #include <imgui.h>
 #include "Shader.h"
 
@@ -40,6 +41,10 @@ PostEffect::PostEffect()
     //コンスタントバッファ
     m_posteffect = std::make_unique<ConstantBuffer<POSTEFFECT>>(Graphics.GetDevice());
     m_shadowparameter = std::make_unique<ConstantBuffer<SHADOWPARAMETER>>(Graphics.GetDevice());
+
+    // テクスチャ読み込み
+    D3D11_TEXTURE2D_DESC texture2d_desc{};
+    LoadTextureFromFile(Graphics.GetDevice(), "Data\\Texture\\odoroki.png", decal.ReleaseAndGetAddressOf(), &texture2d_desc);
 }
 
 //デファードの最初の処理
@@ -94,6 +99,7 @@ void PostEffect::PostEffectRender()
     m_offScreenBuffer[static_cast<int>(offscreen::offscreen)]->Deactivate(dc);
 
     //コンスタントバッファのアクティブ
+    TransforUpdate();
     m_posteffect->Activate(dc, (int)CB_INDEX::POST_EFFECT, true, true, false, false, false, false);
     m_shadowparameter->Activate(dc, (int)CB_INDEX::SHADOW_PAR, false, true, false, false, false, false);
 
@@ -106,7 +112,7 @@ void PostEffect::PostEffectRender()
 
     // 色調補正
     ID3D11ShaderResourceView* posteffect[]
-    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get(),m_gBuffer->GetShaderResources()[5] };
+    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get(),m_gBuffer->GetShaderResources()[5],decal.Get(),m_gBuffer->GetShaderResources()[2] };
     FullScreenQuad::Instance().Blit(dc, posteffect, 0, _countof(posteffect), m_pixelshaders[static_cast<int>(pixelshader::colorGrading)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
@@ -145,6 +151,9 @@ void PostEffect::PostEffectImGui()
         ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
         ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
+        ImGui::DragFloat3("position", &position.x);
+        ImGui::DragFloat3("scale", &scale.x);
+        ImGui::DragFloat3("rotation", &rotation.x);
     }
 
     //ライトのimgui
@@ -212,4 +221,25 @@ void PostEffect::DepthCopyAndBind(int registerIndex)
 
     dc->PSSetShaderResources(registerIndex, 1,
         m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->m_shaderresourceviews[0].GetAddressOf());
+}
+
+//行列更新
+void PostEffect::TransforUpdate()
+{
+    // デカールのトランスフォーム行列を計算
+    DirectX::XMMATRIX decalTranslation = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+    DirectX::XMMATRIX decalRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
+    DirectX::XMMATRIX decalScale = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+
+    // ワールド空間でのデカールのトランスフォーム行列
+    DirectX::XMMATRIX decalTransform = decalScale * decalRotation * decalTranslation;
+
+    // デカールの逆行列を計算
+    DirectX::XMMATRIX inverseDecalTransform = DirectX::XMMatrixInverse(nullptr, decalTransform);
+
+    // 逆行列と元の行列を掛ける
+    DirectX::XMMATRIX finalTransform = decalTransform * inverseDecalTransform;
+
+    // 結果を格納
+    DirectX::XMStoreFloat4x4(&m_posteffect->data.DecalTransform, finalTransform);
 }

@@ -19,7 +19,7 @@
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
-#include "Components/AimIKCom.h"
+#include "Components\AimIKCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
@@ -36,14 +36,16 @@
 #include "Components/GPUParticle.h"
 #include "Graphics/Sprite/Sprite.h"
 #include "Components/BulletHoleCom.h"
-#include  "Components/Enemy/NoobEnemy/NoobEnemyCom.h"
 #include "Components/StageEditorCom.h"
+#include "Components/SpawnCom.h"
+#include "Components/Enemy/Boss/BossCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
 #include "Netwark/Photon/StdIO_UIListener.h"
 
 #include "Netwark/Photon/StaticSendDataManager.h"
+#include <Components/Character/CharaStatusCom.h>
 
 // 初期化
 void SceneGame::Initialize()
@@ -76,32 +78,30 @@ void SceneGame::Initialize()
     }
 
     //当たり判定用
+    //std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("robo");
-        obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/OneCoin/robot.mdl");
-        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        a->PlayAnimation(0, true, false, 0.001f);
+        //roboobj->SetName("robo");
+        //roboobj->transform_->SetWorldPosition({ 0, 0, 0 });
+        //roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        //std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        //r->LoadModel("Data/OneCoin/robot.mdl");
+        //std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
+        //a->PlayAnimation(0, true, false, 0.001f);
 
-        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
-        sphere->SetRadius(2.0f);
-        sphere->SetMyTag(COLLIDER_TAG::Enemy);
-        sphere->SetJudgeTag(COLLIDER_TAG::Player);
+        //std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
+        //sphere->SetRadius(2.0f);
+        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
+        //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
-        obj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
+        //roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
 
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::UENO, obj);
     }
-
-    
 
     //カメラをプレイヤーの子どもにして制御する
     {
@@ -128,6 +128,23 @@ void SceneGame::Initialize()
         obj->SetName("BulletHoleTest");
         obj->AddComponent<BulletHole>("Data\\Texture\\odoroki.png");
     }
+
+    //BOSS
+   {
+       auto& obj = GameObjectManager::Instance().Create();
+       obj->SetName("BOSS");
+       std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+       r->LoadModel("Data/Jammo/jammo.mdl");
+       obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+       obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+       obj->AddComponent<MovementCom>();
+       obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+       obj->AddComponent<AnimationCom>();
+       obj->AddComponent<BossCom>();
+       obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+       obj->AddComponent<CharaStatusCom>();
+       obj->AddComponent<SpawnCom>();
+   }
 
 #pragma endregion
 
