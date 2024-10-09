@@ -1,4 +1,5 @@
-#include "../Source/GameSource/Scene/SceneTitle/SceneTitle.h"
+#include "../Source/GameSource/Scene/SceneLobby/SceneLobby.h"
+
 #include "Graphics/Graphics.h"
 
 #include "Graphics/Light/LightManager.h"
@@ -24,7 +25,8 @@
 
 #include "GameSource/GameScript/FreeCameraCom.h"
 
-void SceneTitle::Initialize()
+
+void SceneLobby::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -72,24 +74,21 @@ void SceneTitle::Initialize()
 
 }
 
-void SceneTitle::Finalize()
+void SceneLobby::Finalize()
 {
 
 }
 
-void SceneTitle::Update(float elapsedTime)
+void SceneLobby::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
-
-
-
 }
 
-void SceneTitle::Render(float elapsedTime)
+void SceneLobby::Render(float elapsedTime)
 {
     // 画面クリア＆レンダーターゲット設定
     Graphics& graphics = Graphics::Instance();

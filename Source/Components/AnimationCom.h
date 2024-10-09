@@ -103,6 +103,10 @@ public:
     void updateRootMotion(DirectX::XMFLOAT3& translation);
     //アニメーション更新切り替え
     void SetUpAnimationUpdate(int updateId);
+
+    //アニメーションイベント呼び出し（true:イベント中）
+    bool IsEventCalling(std::string eventName);
+
 private:
 
     //アニメーション計算

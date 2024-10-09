@@ -12,12 +12,12 @@
 
 #include "Netwark/Photon/BasicsApplication.h"
 
-//タイトルシーン
-class SceneTitle :public Scene
+//ロビーシーン
+class SceneLobby :public Scene
 {
 public:
-    SceneTitle() {};
-    ~SceneTitle()override {};
+    SceneLobby() {};
+    ~SceneLobby()override {};
 
     // 初期化
     void Initialize()override;
@@ -32,7 +32,9 @@ public:
     void Render(float elapsedTime)override;
 
     //名前取得
-    std::string GetName() const override { return "SceneTitle"; };
+    std::string GetName() const override { return "SceneLobby"; };
+
 private:
     Light* mainDirectionalLight = nullptr;
 };
+
