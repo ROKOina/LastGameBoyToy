@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;.\External\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -148,7 +148,6 @@
     <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\Components\AimIKCom.h" />
     <ClInclude Include="Source\Components\AnimationCom.h" />
-    <ClInclude Include="Source\Components\BulletHoleCom.h" />
     <ClInclude Include="Source\Components\Character\BarrierCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
@@ -162,6 +161,7 @@
     <ClInclude Include="Source\Components\Character\RegisterChara.h" />
     <ClInclude Include="Source\Components\Character\State\BaseCharacterState.h" />
     <ClInclude Include="Source\Components\Character\InazawaCharacterCom.h" />
+    <ClInclude Include="Source\Components\Character\State\BossState.h" />
     <ClInclude Include="Source\Components\Character\State\FaraState.h" />
     <ClInclude Include="Source\Components\Character\State\InazawaCharacterState.h" />
     <ClInclude Include="Source\Components\Character\State\NomuraCharacterState.h" />
@@ -172,6 +172,7 @@
     <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
+    <ClInclude Include="Source\Components\Enemy\Boss\BossCom.h" />
     <ClInclude Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.h" />
     <ClInclude Include="Source\Components\EventCom.h" />
     <ClInclude Include="Source\Components\FootIKcom.h" />
@@ -181,6 +182,8 @@
     <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
+    <ClInclude Include="Source\Components\SpawnCom.h" />
+    <ClInclude Include="Source\Components\StageEditorCom.h" />
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
@@ -196,6 +199,12 @@
     <ClInclude Include="Source\Components\CameraCom.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneDebugGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
+    <ClInclude Include="Source\GameSource\Scene\SceneLobby\SceneLobby.h" />
+    <ClInclude Include="Source\GameSource\Scene\ScenePVE\ScenePVE.h" />
+    <ClInclude Include="Source\GameSource\Scene\ScenePVP\ScenePVP.h" />
+    <ClInclude Include="Source\GameSource\Scene\SceneResult\SceneResult.h" />
+    <ClInclude Include="Source\GameSource\Scene\SceneTitle\SceneTitle.h" />
+    <ClInclude Include="Source\GameSource\Scene\SceneTraining\SceneTraining.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
@@ -269,10 +278,10 @@
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\Components\AimIKCom.cpp" />
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
-    <ClCompile Include="Source\Components\BulletHoleCom.cpp" />
     <ClCompile Include="Source\Components\Character\BarrierCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\CharaStatusCom.cpp" />
     <ClCompile Include="Source\Components\Character\Fara.cpp" />
     <ClCompile Include="Source\Components\Character\HaveAllAttackCharacter.cpp" />
     <ClCompile Include="Source\Components\Character\HitProcess\HitProcessCom.cpp" />
@@ -281,6 +290,7 @@
     <ClCompile Include="Source\Components\Character\RegisterChara.cpp" />
     <ClCompile Include="Source\Components\Character\State\BaseCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\InazawaCharacterCom.cpp" />
+    <ClCompile Include="Source\Components\Character\State\BossState.cpp" />
     <ClCompile Include="Source\Components\Character\State\FaraState.cpp" />
     <ClCompile Include="Source\Components\Character\State\InazawaCharacterState.cpp" />
     <ClCompile Include="Source\Components\Character\State\NomuraCharacterState.cpp" />
@@ -291,6 +301,7 @@
     <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\Enemy\Boss\BossCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.cpp" />
     <ClCompile Include="Source\Components\EventCom.cpp" />
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
@@ -300,6 +311,8 @@
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
     <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
+    <ClCompile Include="Source\Components\SpawnCom.cpp" />
+    <ClCompile Include="Source\Components\StageEditorCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FPSCameraCom.cpp" />
@@ -313,6 +326,12 @@
     <ClCompile Include="Source\GameSource\Scene\Scene.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneDebugGame.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneIKTest.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\SceneLobby\SceneLobby.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\ScenePVE\ScenePVE.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\ScenePVP\ScenePVP.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\SceneResult\SceneResult.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\SceneTitle\SceneTitle.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\SceneTraining\SceneTraining.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
@@ -374,10 +393,6 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="HLSL\2D\BulletHolePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\DeferredPBR_PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -470,6 +485,7 @@
     </FxCompile>
     <FxCompile Include="HLSL\3D\SilhouettePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

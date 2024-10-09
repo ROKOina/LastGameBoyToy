@@ -57,6 +57,8 @@ public:
   static DirectX::XMFLOAT3 TransformSampleRight(const DirectX::XMFLOAT4X4& trans);
   static DirectX::XMFLOAT3 TransformSampleUp(const DirectX::XMFLOAT4X4& trans);
   static DirectX::XMFLOAT3 TransformSampleFront(const DirectX::XMFLOAT4X4& trans);
+
+  //
 };
 
 

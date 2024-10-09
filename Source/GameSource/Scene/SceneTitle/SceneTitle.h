@@ -16,8 +16,8 @@
 class SceneTitle :public Scene
 {
 public:
-    SceneTitle() {}
-    ~SceneTitle() {}
+    SceneTitle() {};
+    ~SceneTitle()override {};
 
     // ‰Šú‰»
     void Initialize()override;
@@ -33,4 +33,6 @@ public:
 
     //–¼‘Oæ“¾
     std::string GetName() const override { return "SceneTitle"; };
+private:
+    Light* mainDirectionalLight = nullptr;
 };

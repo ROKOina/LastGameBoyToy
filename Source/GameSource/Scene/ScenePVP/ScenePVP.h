@@ -16,8 +16,8 @@
 class ScenePVP :public Scene
 {
 public:
-    ScenePVP() {}
-    ~ScenePVP() {}
+    ScenePVP() {};
+    ~ScenePVP()override {};
 
     // ‰Šú‰»
     void Initialize()override;
@@ -33,5 +33,7 @@ public:
 
     //–¼‘Oæ“¾
     std::string GetName() const override { return "ScenePVP"; };
+private:
+    Light* mainDirectionalLight = nullptr;
 };
 

@@ -20,17 +20,19 @@ private:
 
     void CalculateFrameStats();
 
+    void Resize(int width, int height);
+
 public:
     int Run();
     LRESULT CALLBACK HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #ifdef _DEBUG
     const HWND& GetHWND() {
-      return hWnd_;
+        return hWnd_;
     }
 
     static Framework* GetInstance() {
-      return instance;
+        return instance;
     }
 
 #endif // _DEBUG
@@ -43,6 +45,9 @@ private:
     Input					input_;
 
     float fps_;
+    bool resize;
+    int width;
+    int height;
 
     Microsoft::WRL::ComPtr<IDXGIDebug>				debugGI_;
     Microsoft::WRL::ComPtr<ID3D11Debug>				debugID_;

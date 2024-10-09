@@ -9,13 +9,14 @@
 #include "GameSource\Scene\SceneDebugGame.h"
 #include "GameSource\Scene\SceneManager.h"
 #include "GameSource\Scene\SceneIKTest.h"
+
+#include "GameSource\Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
 
 // 垂直同期間隔設定
 static const int syncInterval = 1;
-
 
 #ifdef _DEBUG
 Framework* Framework::instance = nullptr;
@@ -29,16 +30,16 @@ Framework::Framework(HWND hWnd)
     , graphics_(hWnd)
 {
     //sceneGame.Initialize();
-    SceneManager::Instance().ChangeScene(new SceneGame);
+    //SceneManager::Instance().ChangeScene(new SceneGame);
+    //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     //SceneManager::Instance().ChangeScene(new SceneDebugGame);
     //SceneManager::Instance().ChangeScene(new SceneTitle);
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
+    SceneManager::Instance().ChangeScene(new SceneTitle);
 
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
-
-
 
 #ifdef _DEBUG
     instance = this;
@@ -96,6 +97,13 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     // バックバッファに描画した画を画面に表示する。
     graphics_.GetSwapChain()->Present(syncInterval, 0);
+
+    // リサイズ
+    //if (resize)
+    //{
+    //    graphics_.ResizeBackBuffer(width, height);
+    //    resize = false;
+    //}
 }
 
 // フレームレート計算
@@ -128,12 +136,23 @@ void Framework::CalculateFrameStats()
     }
 }
 
+void Framework::Resize(int w, int h)
+{
+    width = (std::max)(16, w);
+    height = (std::max)(16, h);
+    resize = true;
+
+#ifdef USE_IMGUI
+    IMGUI_CTRL_RESIZE(width, height);
+#endif
+}
+
 // アプリケーションループ
 int Framework::Run()
 {
     MSG msg = {};
 
-    //終了コードならwhileぬける　
+    //終了コードならwhileぬける
     while (WM_QUIT != msg.message)
     {
         //PeekMessage = メッセージ受信
@@ -217,6 +236,12 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
     case WM_MOUSEWHEEL:
         Input::Instance().GetMouse().SetWheel(GET_WHEEL_DELTA_WPARAM(wParam));
         break;
+        //case WM_SIZE:
+        //{
+        //    // サイズ変更
+        //    Resize(LOWORD(lParam), HIWORD(lParam));
+        //    break;
+        //}
     default:
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }

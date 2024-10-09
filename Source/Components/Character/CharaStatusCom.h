@@ -5,7 +5,7 @@
 class CharaStatusCom : public Component
 {
 public:
-    CharaStatusCom(){};
+    CharaStatusCom() {};
     ~CharaStatusCom() override {};
 
     // 名前取得
@@ -14,22 +14,22 @@ public:
     // 開始処理
     void Start() override {};
 
-    // GUI描画
-    void OnGUI() override
-    {
-        float hp = hitPoint;
-        ImGui::DragFloat("HP", &hp);
-    }
+    // 更新処理
+    void Update(float elapsedTime) override;
 
-    //HP
+    // GUI描画
+    void OnGUI() override;
+
+public:
+
+    //HP取得
     void SetHitPoint(float value) { hitPoint = value; }
     float GetHitPoint() { return hitPoint; }
 
+    //HPの減少と増加
     void AddDamagePoint(float value) { hitPoint += value; }
     void AddHealPoint(float value) { hitPoint += value; }
 
 private:
-    int hitPoint=100;
-
+    int hitPoint = 100;
 };
-
