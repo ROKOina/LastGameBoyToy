@@ -74,7 +74,7 @@ void SpawnCom::SpawnGameObject()
     // 新しい位置を設定（高さは元の位置のY座標を維持）
     DirectX::XMFLOAT3 newPosition = {
         originalPosition.x + offsetX,
-        originalPosition.y,  // 高さを維持
+        originalPosition.y + 0.2f,  // 高さを維持
         originalPosition.z + offsetZ
     };
     obj->transform_->SetWorldPosition(newPosition);

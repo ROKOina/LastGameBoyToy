@@ -1,14 +1,3 @@
-struct VS_IN
-{
-    float4 position : POSITION;
-    float3 normal : NORMAL;
-    float3 tangent : TANGENT;
-    float2 texcoord : TEXCOORD;
-    float4 color : COLOR;
-    float4 boneWeights : WEIGHTS;
-    uint4 boneIndices : BONES;
-};
-
 struct VS_OUT
 {
     float4 position : SV_POSITION;
@@ -18,12 +7,6 @@ struct VS_OUT
     float3 binormal : BINORMAL;
     float2 texcoord : TEXCOORD;
     float4 color : COLOR;
-};
-
-#define MAX_BONES 256
-cbuffer CbMesh : register(b1)
-{
-    row_major float4x4 boneTransforms[MAX_BONES];
 };
 
 cbuffer MaterialInformation : register(b2)

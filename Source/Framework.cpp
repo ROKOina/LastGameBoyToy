@@ -236,12 +236,12 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
     case WM_MOUSEWHEEL:
         Input::Instance().GetMouse().SetWheel(GET_WHEEL_DELTA_WPARAM(wParam));
         break;
-        //case WM_SIZE:
-        //{
-        //    // サイズ変更
-        //    Resize(LOWORD(lParam), HIWORD(lParam));
-        //    break;
-        //}
+    case WM_SIZE:
+    {
+        // サイズ変更
+        Resize(LOWORD(lParam), HIWORD(lParam));
+        break;
+    }
     default:
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
