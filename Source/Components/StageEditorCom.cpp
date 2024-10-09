@@ -30,20 +30,14 @@ void StageEditorCom::Update(float elapsedTime)
         HitResult hit;
         if (MouseVsStage(hit))
         {
-            //登録されていたオブジェクトを配置
-            GameObj obj = GameObjectManager::Instance().Create();
-            std::string objName = objType + std::to_string(placeObjcts[objType.c_str()].objList.size());
-            obj->SetName(objName.c_str());
-
-            obj->transform_->SetWorldPosition(hit.position);
-            obj->transform_->SetScale({ 0.02f,0.02f,0.02f });
-
-            obj->AddComponent<NodeCollsionCom>(nullptr);
-
-            RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
-            render->LoadModel(placeObjcts[objType.c_str()].filePath.c_str());
-
-            placeObjcts[objType.c_str()].objList.emplace_back(obj);
+            ObjectPlace(
+                objType,              //選択中のオブジェクト
+                hit.position,         //位置
+                { 0.02f,0.02f,0.02f },//スケール
+                { 0,0,0,1 },          //回転値
+                placeObjcts[objType.c_str()].filePath.c_str(),    //modelのパス
+                placeObjcts[objType.c_str()].collisionPath.c_str()//nodeCollsionのパス
+            );
         }
     }
 }
@@ -84,9 +78,6 @@ void StageEditorCom::OnGUI()
     //配置するオブジェクト選択
     for (auto& objName : placeObjcts)
     {
-        ImGui::Text(objName.first.c_str());
-        ImGui::SameLine();
-
         if (!objName.second.filePath.empty())
         {
             if (objType == objName.first)
@@ -103,19 +94,24 @@ void StageEditorCom::OnGUI()
         }
         else
         {
-            if (ImGui::Button("None"))
+            if (ImGui::Button((char*)u8"モデル設定"))
             {
-                //ステージモデルの設定
-                static const char* filter = "Model Files(*.fbx;*.mdl)\0*.fbx;*.mdl;\0All Files(*.*)\0*.*;\0\0";
-
-                char filename[256] = { 0 };
-                DialogResult result = Dialog::OpenFileName(filename, sizeof(filename), filter, nullptr, Framework::GetInstance()->GetHWND());
-                if (result == DialogResult::OK)
-                {
-                    objName.second.filePath = filename;
-                }
+                FileRead(objName.second.filePath);
             }
         }
+        ImGui::SameLine();
+
+
+        if (ImGui::TreeNode(objName.first.c_str()))
+        {
+            ImGui::Checkbox("Static", &objName.second.staticFlag);
+            if (ImGui::Button((char*)u8"当たり判定設定"))
+            {
+                FileRead(objName.second.collisionPath);
+            }
+            ImGui::TreePop();
+        }
+
     }
 }
 
@@ -127,25 +123,42 @@ void StageEditorCom::ObjectRegister()
         copyname = registerObjName;
 
         placeObjcts[copyname].filePath = "";
+        placeObjcts[copyname].collisionPath = "";
         registerObjName[0] = '\0';
     }
     ImGui::SameLine();
     ImGui::InputText("ObjName", registerObjName, sizeof(registerObjName));
 }
 
-void StageEditorCom::ObjectPlace()
+void StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale, DirectX::XMFLOAT4 rotation, const char* model_filename, const char* collision_filename)
 {
-    //Mouse& mouse = Input::Instance().GetMouse();
-    //if (stageObj != nullptr && mouse.GetButtonDown() & Mouse::BTN_LEFT)
-    //{
-    //    HitResult result;
-    //    if (MouseVsStage(result))
-    //    {
-    //        //配置
-    //        GameObj obj = GameObjectManager::Instance().Create();
-    //        obj->transform_->SetWorldPosition(result.position);
-    //    }
-    //}
+    //オブジェクトを配置
+    GameObj obj = GameObjectManager::Instance().Create();
+    std::string objName = objType + std::to_string(placeObjcts[objType.c_str()].objList.size());
+    obj->SetName(objName.c_str());
+
+    obj->transform_->SetWorldPosition(position);
+    obj->transform_->SetRotation(rotation);
+    obj->transform_->SetScale(scale);
+
+    obj->AddComponent<NodeCollsionCom>(collision_filename);
+
+    RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
+    render->LoadModel(model_filename);
+
+    placeObjcts[objType.c_str()].objList.emplace_back(obj);
+}
+
+void StageEditorCom::FileRead(std::string& path)
+{
+    //ステージモデルの設定
+    const char* filter = "Model Files(*.mdl;*.nodecollsion;)\0*.mdl;*.nodecollsion;\0All Files(*.*)\0*.*;\0\0";
+    char filename[256] = { 0 };
+    DialogResult result = Dialog::OpenFileName(filename, sizeof(filename), filter, nullptr, Framework::GetInstance()->GetHWND());
+    if (result == DialogResult::OK)
+    {
+        path = filename;
+    }
 }
 
 bool StageEditorCom::MouseVsStage(HitResult& hit)
@@ -218,8 +231,9 @@ void StageEditorCom::ObjectSave()
 
     for (auto& placeObj : placeObjcts)
     {
-        j[placeObj.first]["TypeName"] = placeObj.first;
         j[placeObj.first]["FileName"] = placeObj.second.filePath;
+        j[placeObj.first]["CollsionFileName"] = placeObj.second.collisionPath;
+        j[placeObj.first]["StaticFlag"] = placeObj.second.staticFlag;
 
         int i = 0;
         for (auto& obj : placeObj.second.objList)
@@ -274,6 +288,9 @@ void StageEditorCom::ObjectLoad()
             {
                 //オブジェクトの内容にアクセス
                 const auto& data = item.value();
+                placeObjcts[item.key()].staticFlag = data["StaticFlag"];
+                placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
+                placeObjcts[item.key()].filePath = data["FileName"];
 
                 for (int index = 0; index < data["Position"].size(); ++index)
                 {
@@ -281,22 +298,14 @@ void StageEditorCom::ObjectLoad()
                     DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
                     DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
 
-                    GameObj obj = GameObjectManager::Instance().Create();
-
-                    std::string objName = item.key() + std::to_string(placeObjcts[item.key().c_str()].objList.size());
-                    obj->SetName(objName.c_str());
-
-                    obj->transform_->SetWorldPosition(pos);
-                    obj->transform_->SetRotation(rotation);
-                    obj->transform_->SetScale(scale);
-
-                    obj->AddComponent<NodeCollsionCom>(nullptr);
-
-                    RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
-                    std::string filename = data["FileName"];
-                    render->LoadModel(filename.c_str());
-
-                    placeObjcts[item.key()].objList.emplace_back(obj);
+                    ObjectPlace(
+                        item.key(),//選択中のオブジェクト
+                        pos,       //位置
+                        scale,     //スケール
+                        rotation,  //回転値
+                        placeObjcts[item.key()].filePath.c_str(),    //modelのパス
+                        placeObjcts[item.key()].collisionPath.c_str()//nodeCollsionのパス
+                    );
                 }
             }
         }

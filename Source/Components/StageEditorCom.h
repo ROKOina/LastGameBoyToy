@@ -30,7 +30,17 @@ private:
     void ObjectRegister();
 
     //ステージにオブジェクト配置
-    void ObjectPlace();
+    void ObjectPlace(
+        std::string objType, 
+        DirectX::XMFLOAT3 position, 
+        DirectX::XMFLOAT3 scale, 
+        DirectX::XMFLOAT4 rotation, 
+        const char* model_filename,
+        const char* collision_filename
+    );
+    
+    //ファイルパス取得
+    void FileRead(std::string& path);
     //マウスとステージの判定
     bool MouseVsStage(HitResult& hit);
 
@@ -49,6 +59,8 @@ private:
 
 struct PlaceObject
 {
+    bool staticFlag = false;
     std::string filePath;
+    std::string collisionPath;
     std::list<GameObj> objList;
 };
