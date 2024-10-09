@@ -114,11 +114,57 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
-    //UIテスト
+    //UI
     {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("UiTest");
-        obj->AddComponent<Sprite>("Data\\UIData\\reticle.ui", true);
+        //キャンバス(UIの親)
+        auto& canvasObj = GameObjectManager::Instance().Create();
+        canvasObj->SetName("Canvas");
+        canvasObj->AddComponent<Sprite>(nullptr, true);
+
+        //レティクル
+        {
+            std::shared_ptr<GameObject> reticle = canvasObj->AddChildObject();
+            reticle->SetName("reticle");
+            reticle->AddComponent<Sprite>("Data/UiData/reticle.ui", true);
+        }
+        //HPフレーム
+        {
+            std::shared_ptr<GameObject> hpFrame = canvasObj->AddChildObject();
+            hpFrame->SetName("hpFrame");
+            hpFrame->AddComponent<Sprite>("Data/UiData/HpFrame.ui", true);
+        }
+        //HPゲージ
+        {
+            std::shared_ptr<GameObject> hpGauge = canvasObj->AddChildObject();
+            hpGauge->SetName("hpGauge");
+            hpGauge->AddComponent<Sprite>("Data/UiData/HpGauge.ui", true);
+        }
+
+        //Boostフレーム
+        {
+            std::shared_ptr<GameObject> boostFrame = canvasObj->AddChildObject();
+            boostFrame->SetName("boostFrame");
+            boostFrame->AddComponent<Sprite>("Data/UiData/boostFrame.ui", true);
+        }
+        //Boostゲージ
+        {
+            std::shared_ptr<GameObject> boostGauge = canvasObj->AddChildObject();
+            boostGauge->SetName("boostGauge");
+            boostGauge->AddComponent<Sprite>("Data/UiData/boostGauge.ui", true);
+        }
+
+        //skill_1ゲージ
+        {
+            std::shared_ptr<GameObject> skillGauge = canvasObj->AddChildObject();
+            skillGauge->SetName("skill_01Gauge");
+            skillGauge->AddComponent<Sprite>("Data/UiData/skillGauge.ui", true);
+        }
+        //skill_2ゲージ
+        {
+            std::shared_ptr<GameObject> skillGauge = canvasObj->AddChildObject();
+            skillGauge->SetName("skill_02Gauge");
+            skillGauge->AddComponent<Sprite>("Data/UiData/skillGauge_02.ui", true);
+        }
     }
 
     //BOSS
