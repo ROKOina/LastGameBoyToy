@@ -48,6 +48,7 @@ namespace ImSequencer
     };
 
     // return true if selection is made
-    bool Sequencer(SequenceInterface* sequence, int* currentFrame, bool* expanded, int* selectedEntry, int* firstFrame, int sequenceOptions, bool& MovingCurrentFrame);
+    bool Sequencer(SequenceInterface* sequence, int* currentFrame, bool* expanded, int* selectedEntry, int* firstFrame, int sequenceOptions
+        , bool& MovingCurrentFrame, int& delID, int& addID);
 
 }

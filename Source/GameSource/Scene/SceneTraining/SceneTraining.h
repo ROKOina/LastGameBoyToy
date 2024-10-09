@@ -16,8 +16,8 @@
 class SceneTraining :public Scene
 {
 public:
-    SceneTraining() {}
-    ~SceneTraining() {}
+    SceneTraining() {};
+    ~SceneTraining() override {};
 
     // ‰Šú‰»
     void Initialize()override;
@@ -33,4 +33,7 @@ public:
 
     //–¼‘Oæ“¾
     std::string GetName() const override { return "SceneTraining"; };
+
+private:
+    Light* mainDirectionalLight = nullptr;
 };

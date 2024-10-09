@@ -38,6 +38,7 @@
 #include "Components/StageEditorCom.h"
 #include "Components/SpawnCom.h"
 #include "Components/Enemy/Boss/BossCom.h"
+#include "Components/InstanceRendererCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -114,75 +115,37 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
-    //UI
+    //UIテスト
     {
-        //キャンバス(UIの親)
-        auto& canvasObj = GameObjectManager::Instance().Create();
-        canvasObj->SetName("Canvas");
-        canvasObj->AddComponent<Sprite>(nullptr, true);
-
-        //レティクル
-        {
-            std::shared_ptr<GameObject> reticle = canvasObj->AddChildObject();
-            reticle->SetName("reticle");
-            reticle->AddComponent<Sprite>("Data/UiData/reticle.ui", true);
-        }
-        //HPフレーム
-        {
-            std::shared_ptr<GameObject> hpFrame = canvasObj->AddChildObject();
-            hpFrame->SetName("hpFrame");
-            hpFrame->AddComponent<Sprite>("Data/UiData/HpFrame.ui", true);
-        }
-        //HPゲージ
-        {
-            std::shared_ptr<GameObject> hpGauge = canvasObj->AddChildObject();
-            hpGauge->SetName("hpGauge");
-            hpGauge->AddComponent<Sprite>("Data/UiData/HpGauge.ui", true);
-        }
-
-        //Boostフレーム
-        {
-            std::shared_ptr<GameObject> boostFrame = canvasObj->AddChildObject();
-            boostFrame->SetName("boostFrame");
-            boostFrame->AddComponent<Sprite>("Data/UiData/boostFrame.ui", true);
-        }
-        //Boostゲージ
-        {
-            std::shared_ptr<GameObject> boostGauge = canvasObj->AddChildObject();
-            boostGauge->SetName("boostGauge");
-            boostGauge->AddComponent<Sprite>("Data/UiData/boostGauge.ui", true);
-        }
-
-        //skill_1ゲージ
-        {
-            std::shared_ptr<GameObject> skillGauge = canvasObj->AddChildObject();
-            skillGauge->SetName("skill_01Gauge");
-            skillGauge->AddComponent<Sprite>("Data/UiData/skillGauge.ui", true);
-        }
-        //skill_2ゲージ
-        {
-            std::shared_ptr<GameObject> skillGauge = canvasObj->AddChildObject();
-            skillGauge->SetName("skill_02Gauge");
-            skillGauge->AddComponent<Sprite>("Data/UiData/skillGauge_02.ui", true);
-        }
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("UiTest");
+        obj->AddComponent<Sprite>("Data\\Texture\\test.ui", true);
     }
 
     //BOSS
-   {
-      // auto& obj = GameObjectManager::Instance().Create();
-      // obj->SetName("BOSS");
-      // std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-      // r->LoadModel("Data/Jammo/jammo.mdl");
-      // obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-      // obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-      // obj->AddComponent<MovementCom>();
-      // obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
-      // obj->AddComponent<AnimationCom>();
-      // obj->AddComponent<BossCom>();
-      // obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
-      // obj->AddComponent<CharaStatusCom>();
-      // obj->AddComponent<SpawnCom>();
-   }
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("BOSS");
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Jammo/jammo.mdl");
+        obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+        obj->AddComponent<MovementCom>();
+        obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        obj->AddComponent<AnimationCom>();
+        obj->AddComponent<BossCom>();
+        obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        obj->AddComponent<CharaStatusCom>();
+        obj->AddComponent<SpawnCom>();
+    }
+
+    //インスタンシング描画
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("instance");
+        std::shared_ptr<InstanceRenderer> r = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Jammo/jammo.mdl");
+    }
 
 #pragma endregion
 

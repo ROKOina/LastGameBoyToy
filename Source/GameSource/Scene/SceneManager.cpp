@@ -10,6 +10,11 @@
 #include "SceneGame.h"
 #include "SceneIKTest.h"
 #include <GameSource/Math/Mathf.h>
+#include "ScenePVE/ScenePVE.h"
+#include "ScenePVP/ScenePVP.h"
+#include "SceneTitle/SceneTitle.h"
+#include "SceneResult/SceneResult.h"
+#include "SceneTraining/SceneTraining.h"
 
 SceneManager::SceneManager()
 {
@@ -96,6 +101,12 @@ void SceneManager::ImGui()
                 "SceneGame",
                 "SceneDebugGame",
                 "SceneIKTest",
+                "SceneStageSelect",
+                "SceneTitle",
+                "SceneResult",
+                "ScenePVE",
+                "ScenePVP",
+                "SceneTraining"
             };
             int scene_id = 0;
             int last_index = sizeof(scene_names) / sizeof(const char*);
@@ -111,6 +122,11 @@ void SceneManager::ImGui()
                     new SceneGame,
                     new SceneDebugGame,
                     new SceneIKTest,
+                    new SceneTitle,
+                    new SceneResult,
+                    new ScenePVE,
+                    new ScenePVP,
+                    new SceneTraining
                 };
                 ChangeScene((scenes[scene_id]));
                 for (int i = 0; i < _countof(scenes); i++)

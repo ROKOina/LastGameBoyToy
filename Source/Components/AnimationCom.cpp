@@ -48,6 +48,7 @@ bool isAnimLoop;
 void AnimationCom::OnGUI()
 {
     ImGui::SameLine();
+
     ImGui::Checkbox("isEventWindow", &isEventWindow);
     if (isEventWindow)AnimEventWindow();
 
@@ -63,7 +64,7 @@ void AnimationCom::OnGUI()
     {
         index++;
     }
-
+    
     int animationIndex = 0;
     ModelResource::Animation* selectionAnimation = GetSelectionAnimation();
     std::vector<ModelResource::Animation>& animations1 = const_cast<std::vector<ModelResource::Animation>&>(model->GetResource()->GetAnimations());
@@ -133,6 +134,7 @@ ModelResource::Animation* AnimationCom::GetSelectionAnimation()
 
 void AnimationCom::AnimEventWindow()
 {
+    if (currentAnimation < 0)return;
     //モデルからリソースを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
@@ -156,28 +158,45 @@ void AnimationCom::AnimEventWindow()
     ImGui::PushItemWidth(130);
 
     //イベント追加,削除
+    //アドラムダ
+    auto& addIDRam= [](int iD)
+        {
+            int index = 0;
+            while (1)
+            {
+                auto& it = mySequence.SequencerItemTypeNames.find(index);
+                if (it == mySequence.SequencerItemTypeNames.end())break;
+                index++;
+            }
+            mySequence.AddTypeName(index, std::string("NEW") + std::to_string(index));
+            int s = 0;
+            int e = 10;
+            if (iD >= 0)
+            {
+                s = mySequence.myItems[iD].mFrameStart;
+                e = mySequence.myItems[iD].mFrameEnd;
+            }
+            mySequence.myItems.push_back(MySequence::MySequenceItem{ index, s, e, false });
+        };
     if (ImGui::Button("Add"))
     {
-        int index = 0;
-        while (1)
-        {
-            auto& it = mySequence.SequencerItemTypeNames.find(index);
-            if (it == mySequence.SequencerItemTypeNames.end())break;
-            index++;
-        }
-        mySequence.AddTypeName(index, std::string("NEW") + std::to_string(index));
-        mySequence.myItems.push_back(MySequence::MySequenceItem{ index, 0, 10, false });
+        addIDRam(-1);
     }
     ImGui::SameLine();
+    //デリートラムダ
+    auto& deleteIDRam = [](int iD)
+        {
+            if (iD != -1)
+            {
+                int typeID = mySequence.Delete(iD);
+                mySequence.DeleteItem(typeID);
+                if (mySequence.GetItemCount() == selectedEntry)selectedEntry -= 1;
+                if (mySequence.GetItemCount() == 0)selectedEntry = -1;
+            }
+        };
     if (ImGui::Button("Delete"))
     {
-        if (selectedEntry != -1)
-        {
-            int typeID = mySequence.Delete(selectedEntry);
-            mySequence.DeleteItem(typeID);
-            if (mySequence.GetItemCount() == 0)selectedEntry = -1;
-            if (mySequence.GetItemCount() == selectedEntry)selectedEntry -= 1;
-        }
+        deleteIDRam(selectedEntry);
     }
 
     //再生情報
@@ -228,13 +247,24 @@ void AnimationCom::AnimEventWindow()
     ImGui::PopItemWidth();
 
     static bool moveFrame = false;
-    Sequencer(&mySequence, &animationCurrentFrame, &expanded, &selectedEntry, &firstFrame, ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_DEL | ImSequencer::SEQUENCER_CHANGE_FRAME,moveFrame);
+    int delID = -1;
+    int addID = -1;
+    Sequencer(&mySequence, &animationCurrentFrame, &expanded, &selectedEntry, &firstFrame, ImSequencer::SEQUENCER_EDIT_STARTEND | ImSequencer::SEQUENCER_DEL | ImSequencer::SEQUENCER_CHANGE_FRAME
+        , moveFrame, delID, addID);
     if (moveFrame)
     {
         PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
         SetAnimationSeconds(animationCurrentFrame/60.0f);
         StopOneTimeAnimation();
 
+    }
+    if (delID >= 0)
+    {
+        deleteIDRam(delID);
+    }
+    if (addID >= 0)
+    {
+        addIDRam(addID);
     }
     
     if (selectedEntry != -1)
@@ -252,8 +282,8 @@ void AnimationCom::AnimEventWindow()
         {
             auto& event = selectionAnimation->animationevents.emplace_back();
             event.name = mySequence.GetItemLabel(item.mType);
-            event.endframe = item.mFrameEnd;
-            event.startframe = item.mFrameStart;
+            event.endframe = item.mFrameEnd / 60.0f;
+            event.startframe = item.mFrameStart / 60.0f;
         }
         model->GetResource()->AnimSerialize();
     }
@@ -823,6 +853,24 @@ void AnimationCom::SetUpAnimationUpdate(int updateId)
     animaType = updateId;
 }
 
+bool AnimationCom::IsEventCalling(std::string eventName)
+{
+    if (currentAnimation < 0)return false;
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
+
+    for (auto& ev : anim.animationevents)
+    {
+        if (ev.name != eventName)continue;
+
+        if (ev.startframe <= currentSeconds && ev.endframe >= currentSeconds)
+            return true;
+    }
+    return false;
+}
+
 //アニメーション計算
 void AnimationCom::ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node& node)
 {
@@ -903,7 +951,8 @@ void AnimationCom::SeparateNode()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     for (auto& node : model->GetNodes())
     {
-        if (std::strcmp(node.name, "Hip") == 0)
+        if (std::string(node.name).find("Hip") != std::string::npos)
+        //if (std::strcmp(node.name, "Hip") == 0)
         {
             lowerNodes.emplace_back(&node);
             continue;

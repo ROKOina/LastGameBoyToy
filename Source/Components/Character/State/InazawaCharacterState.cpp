@@ -100,7 +100,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     {
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
         owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
-            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"),false
+            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
         );
 
 
