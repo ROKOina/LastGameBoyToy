@@ -26,8 +26,6 @@ public:
     void OnGUI();
 
 private:
-    //エディターでいじるステージを選択
-    void StageSelect();
     //配置するオブジェクトを登録
     void ObjectRegister();
 
