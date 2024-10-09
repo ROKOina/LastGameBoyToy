@@ -36,6 +36,8 @@ public:
     // ƒ‚ƒfƒ‹‚Ì“Ç‚İ‚İ
     void LoadModel(const char* filename);
 
+public:
+
     //idæ“¾
     SHADER_ID_MODEL GetShaderMode() { return shaderID; }
 
@@ -54,4 +56,5 @@ private:
     SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFAULT;
     bool m_shadowrender = true;
     bool m_silhoutterender = true;
+    int count = 1;
 };

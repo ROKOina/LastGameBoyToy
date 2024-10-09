@@ -44,6 +44,10 @@ public:
     void SetQuaternion(const DirectX::XMFLOAT4& quaternion, const int& index) { m_cpuinstancedata[index].quaternion = quaternion; }
     const DirectX::XMFLOAT4& GetQuaternion(int index) const { return m_cpuinstancedata[index].quaternion; }
 
+    //生成数
+    void SetCount(const int& index) { m_instancecount = index; }
+    const int& GetCount() const { return m_instancecount; }
+
 private:
 
     //インスタンシングの情報
@@ -91,5 +95,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_instancedata;
-    int m_instancecount = 5;
+    int m_instancecount = 1;
 };

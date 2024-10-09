@@ -58,6 +58,11 @@ void InstanceRenderer::Update(float elapsedTime)
         DirectX::XMFLOAT4X4 transform = GetGameObject()->GetComponent<TransformCom>()->GetWorldTransform();
         model_->UpdateTransform(DirectX::XMLoadFloat4x4(&transform));
     }
+
+    //インスタンシング数
+    m_instancemodelshader->SetCount(count);
+    m_shadow->SetCount(count);
+    m_silhoutte->SetCount(count);
 }
 
 //影描画
@@ -185,6 +190,8 @@ void InstanceRenderer::OnGUI()
     int rasMode = static_cast<int>(m_rasterizerState);
     ImGui::Combo("RasterizerMode", &rasMode, RasterizerName, static_cast<int>(RASTERIZERSTATE::MAX), static_cast<int>(RASTERIZERSTATE::MAX));
     m_rasterizerState = static_cast<RASTERIZERSTATE>(rasMode);
+
+    ImGui::DragInt((char*)u8"生成数", &count);
 }
 
 //モデル読み込み
