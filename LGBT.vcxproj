@@ -188,6 +188,8 @@
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
     <ClInclude Include="Source\Dialog.h" />
+    <ClInclude Include="Source\GameSource\GameScript\EventCameraCom.h" />
+    <ClInclude Include="Source\GameSource\GameScript\EventCameraManager.h" />
     <ClInclude Include="Source\GameSource\GameScript\FPSCameraCom.h" />
     <ClInclude Include="Source\GameSource\GameScript\FreeCameraCom.h" />
     <ClInclude Include="Source\GameSource\Math\easing.h" />
@@ -315,6 +317,8 @@
     <ClCompile Include="Source\Components\StageEditorCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
+    <ClCompile Include="Source\GameSource\GameScript\EventCameraCom.cpp" />
+    <ClCompile Include="Source\GameSource\GameScript\EventCameraManager.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FPSCameraCom.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FreeCameraCom.cpp" />
     <ClCompile Include="Source\GameSource\Math\easing.cpp" />

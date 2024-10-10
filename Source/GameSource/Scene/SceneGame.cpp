@@ -32,6 +32,7 @@
 #include "Components\FootIKcom.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
 #include "GameSource/GameScript/FPSCameraCom.h"
+#include "GameSource/GameScript/EventCameraCom.h"
 #include "Components/CPUParticle.h"
 #include "Components/GPUParticle.h"
 #include "Graphics/Sprite/Sprite.h"
@@ -43,6 +44,7 @@
 
 #include "Netwark/Photon/StdIO_UIListener.h"
 
+#include "GameSource/GameScript/EventCameraManager.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include <Components/Character/CharaStatusCom.h>
 
@@ -59,6 +61,14 @@ void SceneGame::Initialize()
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
+
+    //イベント用カメラ
+    {
+        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
+        eventCamera->SetName("eventcamera");
+        eventCamera->AddComponent<EventCameraCom>();
+        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
     //ステージ
@@ -186,6 +196,9 @@ void SceneGame::Update(float elapsedTime)
 
     photonNet->run(elapsedTime);
 
+    //イベントカメラ用
+    EventCameraManager::Instance().EventUpdate(elapsedTime);
+
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
@@ -252,6 +265,9 @@ void SceneGame::Render(float elapsedTime)
     }
 
     photonNet->ImGui();
+
+    //イベントカメラ用
+    EventCameraManager::Instance().EventCameraImGui();
 }
 
 void SceneGame::SetUserInputs()
