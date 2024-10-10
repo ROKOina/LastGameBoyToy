@@ -1,5 +1,6 @@
 #include "NodeCollsionCom.h"
 #include "RendererCom.h"
+#include "InstanceRendererCom.h"
 #include <SystemStruct/TransformUtils.h>
 
 //コンストラクタ
@@ -12,7 +13,7 @@ NodeCollsionCom::NodeCollsionCom(const char* filename)
 void NodeCollsionCom::Start()
 {
     // モデルからリソースを取得
-    model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    GetGameObject()->GetComponent<RendererCom>() != nullptr ? model = GetGameObject()->GetComponent<RendererCom>()->GetModel() : model = GetGameObject()->GetComponent<InstanceRenderer>()->GetModel();
 
     if (m_filename != nullptr && model != nullptr)
     {

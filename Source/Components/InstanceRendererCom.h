@@ -9,14 +9,14 @@ class InstanceRenderer :public Component
 {
     // コンポーネントオーバーライド
 public:
-    InstanceRenderer(SHADER_ID_MODEL id, BLENDSTATE blendmode, DEPTHSTATE depthmode = DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE rasterizermode = RASTERIZERSTATE::SOLID_CULL_BACK, bool shadowrender = true, bool silhoutterender = false);
+    InstanceRenderer(SHADER_ID_MODEL id, int maxinstance, BLENDSTATE blendmode, DEPTHSTATE depthmode = DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE rasterizermode = RASTERIZERSTATE::SOLID_CULL_BACK, bool shadowrender = true);
     ~InstanceRenderer() {}
 
     // 名前取得
     const char* GetName() const override { return "InstanceRenderer"; }
 
     // 開始処理
-    void Start() override;
+    void Start() override {};
 
     // 描画
     void Render();
@@ -26,9 +26,6 @@ public:
 
     //影描画
     void ShadowRender();
-
-    //シルエット描画
-    void SilhoutteRender();
 
     // GUI描画
     void OnGUI() override;
@@ -48,13 +45,10 @@ private:
 
     std::unique_ptr<Model>	model_;
     std::unique_ptr<InstanceModelShader>m_instancemodelshader;
-    std::unique_ptr<InstanceModelShader>m_shadow;
-    std::unique_ptr<InstanceModelShader>m_silhoutte;
     RASTERIZERSTATE m_rasterizerState = RASTERIZERSTATE::SOLID_CULL_BACK;
     BLENDSTATE m_blend = BLENDSTATE::MULTIPLERENDERTARGETS;
     DEPTHSTATE m_depth = DEPTHSTATE::ZT_ON_ZW_ON;
     SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFAULT;
     bool m_shadowrender = true;
-    bool m_silhoutterender = true;
-    int count = 1;
+    int count = 0;
 };

@@ -206,7 +206,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //‰e•`‰æ
     m_posteffect->GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, m_posteffect->m_criticaldepthvalue, [&]()
         {
-            RenderShadow();
+            //RenderShadow();
             InstanceRenderShadow();
         });
 

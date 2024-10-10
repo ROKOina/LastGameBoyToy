@@ -5,6 +5,7 @@ struct INSTANCE_VS_IN
     float4 tangent : TANGENT;
     float2 texcoord : TEXCOORD;
     float4 color : COLOR;
+
     float4 InstRotation : I_ROTATION;
     float3 InstPosition : I_POSITION;
     float3 InstScale : I_SCALE;

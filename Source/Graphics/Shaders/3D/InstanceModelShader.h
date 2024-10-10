@@ -8,7 +8,7 @@
 class InstanceModelShader
 {
 public:
-    InstanceModelShader(SHADER_ID_MODEL shader);
+    InstanceModelShader(SHADER_ID_MODEL shader, int count);
     ~InstanceModelShader() {};
 
     //描画初期設定
@@ -25,24 +25,16 @@ public:
     //描画終了処理
     void End(ID3D11DeviceContext* dc);
 
-private:
-
     //位置、姿勢、大きさをバッファに格納
     void ReplaceBufferContents(ID3D11Buffer* buffer, size_t bufferSize, const void* data);
 
+    //imgui
+    void ImGui();
+
+    //バッファー作成
+    void CreateBuffer();
+
 public:
-
-    //位置
-    void SetPosition(const DirectX::XMFLOAT3& position, const int& index) { m_cpuinstancedata[index].position = position; }
-    const DirectX::XMFLOAT3& GetPosition(int index) const { return m_cpuinstancedata[index].position; }
-
-    //大きさ
-    void SetScale(const DirectX::XMFLOAT3& scale, const int& index) { m_cpuinstancedata[index].scale = scale; }
-    const DirectX::XMFLOAT3& GetScale(int index) const { return m_cpuinstancedata[index].scale; }
-
-    //回転
-    void SetQuaternion(const DirectX::XMFLOAT4& quaternion, const int& index) { m_cpuinstancedata[index].quaternion = quaternion; }
-    const DirectX::XMFLOAT4& GetQuaternion(int index) const { return m_cpuinstancedata[index].quaternion; }
 
     //生成数
     void SetCount(const int& index) { m_instancecount = index; }
@@ -91,9 +83,13 @@ private:
     std::unique_ptr<ConstantBuffer<m_general>> m_generalconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshaderShadow;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
     Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshader;
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshaderShadow;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_instancedata;
-    int m_instancecount = 1;
+
+public:
+    int m_instancecount = 0;
 };

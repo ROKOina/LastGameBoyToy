@@ -1,7 +1,7 @@
 #include "InstanceModelShader.h"
 
 //コンストラクタ
-InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader)
+InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader, int count)
 {
     Graphics& Graphics = Graphics::Instance();
 
@@ -9,6 +9,9 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader)
     const char* VSPath = nullptr;
     const char* PSPath = nullptr;
     const char* GSPath = nullptr;
+
+    //オブジェクトをどれだけ出すかを決める
+    m_instancecount = count;
 
     //選択されたのが指定される
     switch (shader)
@@ -37,10 +40,6 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader)
         VSPath = { "Shader\\InstancingVS.cso" };
         PSPath = { "Shader\\SciFiGatePS.cso" };
         break;
-    case SHADER_ID_MODEL::SHADOW:
-        VSPath = { "Shader\\InstanceShadowVS.cso" };
-        GSPath = { "Shader\\ShadowGS.cso" };
-        break;
     case SHADER_ID_MODEL::SILHOUETTE:
         VSPath = { "Shader\\InstancingVS.cso" };
         PSPath = { "Shader\\SilhouettePS.cso" };
@@ -65,15 +64,17 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader)
         { "I_SCALE", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
     };
     CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshader.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
+    VSPath = { "Shader\\InstanceShadowVS.cso" };
+    CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshaderShadow.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
 
     // ピクセルシェーダーとジオメトリシェーダー
     if (shader != SHADER_ID_MODEL::SHADOW)
     {
         CreatePsFromCso(Graphics.GetDevice(), PSPath, m_pixelshader.GetAddressOf());
     }
-    else if (shader == SHADER_ID_MODEL::SHADOW)
     {
-        CreateGsFromCso(Graphics.GetDevice(), GSPath, m_geometryshader.GetAddressOf());
+        GSPath = { "Shader\\ShadowGS.cso" };
+        CreateGsFromCso(Graphics.GetDevice(), GSPath, m_geometryshaderShadow.GetAddressOf());
     }
 
     // 定数バッファ
@@ -85,15 +86,7 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader)
     }
 
     // インスタンシングのデータをバッファに格納
-    CD3D11_BUFFER_DESC bufferDesc(sizeof(Instance) * m_instancecount, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
-    bufferDesc.StructureByteStride = sizeof(Instance);
-    HRESULT hr = Graphics.GetDevice()->CreateBuffer(&bufferDesc, nullptr, m_instancedata.ReleaseAndGetAddressOf());
-    if (FAILED(hr))
-    {
-        // エラー処理
-        throw std::runtime_error("Failed to create instance buffer");
-    }
-    m_cpuinstancedata.reset(new Instance[m_instancecount]);
+    CreateBuffer();
 }
 
 //描画設定
@@ -118,8 +111,8 @@ void InstanceModelShader::Begin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, D
 void InstanceModelShader::ShadowBegin(ID3D11DeviceContext* dc, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode)
 {
     //シェーダーのセット
-    dc->VSSetShader(m_vertexshader.Get(), nullptr, 0);
-    dc->GSSetShader(m_geometryshader.Get(), nullptr, 0);
+    dc->VSSetShader(m_vertexshaderShadow.Get(), nullptr, 0);
+    dc->GSSetShader(m_geometryshaderShadow.Get(), nullptr, 0);
     dc->PSSetShader(NULL, NULL, 0);
     dc->IASetInputLayout(m_inputlayout.Get());
 
@@ -130,6 +123,9 @@ void InstanceModelShader::ShadowBegin(ID3D11DeviceContext* dc, BLENDSTATE blendm
     dc->OMSetBlendState(Graphics.GetBlendState(blendmode), blendFactor, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(depthmode), 1);
     dc->RSSetState(Graphics.GetRasterizerState(rasterizermode));
+
+    // インスタンシングのデータを格納
+    ReplaceBufferContents(m_instancedata.Get(), sizeof(Instance) * m_instancecount, m_cpuinstancedata.get());
 }
 
 void InstanceModelShader::SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh)
@@ -173,7 +169,7 @@ void InstanceModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource
 }
 void InstanceModelShader::ShadowSetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset)
 {
-    dc->DrawIndexedInstanced(subset.indexCount, 4, subset.startIndex, 0, 0);
+    dc->DrawIndexedInstanced(subset.indexCount, m_instancecount, subset.startIndex, 0, 0);
 }
 
 //描画終了処理
@@ -185,6 +181,51 @@ void InstanceModelShader::End(ID3D11DeviceContext* dc)
     dc->VSSetShader(NULL, NULL, 0);
     dc->PSSetShader(NULL, NULL, 0);
     dc->GSSetShader(NULL, NULL, 0);
+}
+
+//imgui
+void InstanceModelShader::ImGui()
+{
+    // インスタンスごとのデータを編集できるようにする
+    for (int i = 0; i < m_instancecount; ++i)
+    {
+        Instance& instance = m_cpuinstancedata[i]; // 各インスタンスへの参照
+
+        // インスタンスの編集用UIを作成
+        ImGui::PushID(i); // インスタンスごとにユニークIDを付ける
+        if (ImGui::CollapsingHeader(("Instance " + std::to_string(i)).c_str()))
+        {
+            // 位置 (Position) の編集
+            ImGui::DragFloat3("Position", &instance.position.x, 0.1f);
+
+            // 回転 (Rotation) の編集（クォータニオン）
+            ImGui::DragFloat4("Rotation", &instance.quaternion.x, 0.1f);
+
+            // スケール (Scale) の編集
+            ImGui::DragFloat3("Scale", &instance.scale.x, 0.1f);
+        }
+        ImGui::PopID();
+    }
+
+    // インスタンスバッファを更新するためのデータを再度バッファに送信
+    ReplaceBufferContents(m_instancedata.Get(), sizeof(Instance) * m_instancecount, m_cpuinstancedata.get());
+}
+
+// インスタンシングのデータをバッファに格納
+void InstanceModelShader::CreateBuffer()
+{
+    Graphics& Graphics = Graphics::Instance();
+
+    // インスタンシングのデータをバッファに格納
+    CD3D11_BUFFER_DESC bufferDesc(sizeof(Instance) * m_instancecount, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
+    bufferDesc.StructureByteStride = sizeof(Instance);
+    HRESULT hr = Graphics.GetDevice()->CreateBuffer(&bufferDesc, nullptr, m_instancedata.ReleaseAndGetAddressOf());
+    if (FAILED(hr))
+    {
+        // エラー処理
+        throw std::runtime_error("Failed to create instance buffer");
+    }
+    m_cpuinstancedata.reset(new Instance[m_instancecount]);
 }
 
 //位置、姿勢、大きさをバッファに格納
