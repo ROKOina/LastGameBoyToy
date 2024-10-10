@@ -19,7 +19,7 @@
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
-#include "Components/AimIKCom.h"
+#include "Components\AimIKCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
@@ -117,9 +117,9 @@ void SceneGame::Initialize()
 
     //UIƒeƒXƒg
     {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("UiTest");
-        obj->AddComponent<Sprite>("Data\\Texture\\test.ui", true);
+        //auto& obj = GameObjectManager::Instance().Create();
+        //obj->SetName("UiTest");
+        //obj->AddComponent<Sprite>("Data\\UIData\\test.ui",true);
     }
 
     //BOSS
