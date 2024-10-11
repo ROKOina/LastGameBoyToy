@@ -78,7 +78,7 @@ void SceneGame::Initialize()
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
         obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
@@ -108,19 +108,28 @@ void SceneGame::Initialize()
 
     //BOSS
     {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("BOSS");
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        auto& boss = GameObjectManager::Instance().Create();
+        boss->SetName("BOSS");
+        std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Jammo/jammo.mdl");
-        obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-        obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-        obj->AddComponent<MovementCom>();
-        obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
-        obj->AddComponent<AnimationCom>();
-        obj->AddComponent<BossCom>();
-        obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
-        obj->AddComponent<CharaStatusCom>();
-        obj->AddComponent<SpawnCom>();
+        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+        t = boss->transform_;
+        boss->AddComponent<MovementCom>();
+        boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        boss->AddComponent<AnimationCom>();
+        boss->AddComponent<BossCom>();
+        boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        boss->AddComponent<CharaStatusCom>();
+        boss->AddComponent<SpawnCom>();
+    }
+
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("Instance");
+        obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+        std::shared_ptr<InstanceRenderer> r = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 2, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true);
+        r->LoadModel("Data/Jammo/jammo.mdl");
     }
 
 #pragma endregion
@@ -173,6 +182,9 @@ void SceneGame::Update(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
+
+    //ボスの位置取得
+    sc->data.bossposiotn = t->GetWorldPosition();
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();

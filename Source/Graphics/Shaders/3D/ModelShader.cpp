@@ -18,6 +18,10 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DefaltPS.cso" };
         break;
+    case SHADER_ID_MODEL::STAGEDEFERRED:
+        VSPath = { "Shader\\StageVS.cso" };
+        PSPath = { "Shader\\DeferredSetupPS.cso" };
+        break;
     case SHADER_ID_MODEL::DEFERRED:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DeferredSetupPS.cso" };

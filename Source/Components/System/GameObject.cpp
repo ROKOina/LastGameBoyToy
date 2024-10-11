@@ -630,7 +630,7 @@ void GameObjectManager::SortRenderObject()
 
     deferredCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
         [&](std::weak_ptr<RendererCom>& ren) {
-            return ren.lock()->GetShaderMode() == SHADER_ID_MODEL::DEFERRED;
+            return ren.lock()->GetShaderMode() <= SHADER_ID_MODEL::DEFERRED;
         });
 
     useDepthCount = std::count_if(renderSortObject_.begin(), renderSortObject_.end(),
