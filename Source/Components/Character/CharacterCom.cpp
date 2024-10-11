@@ -6,11 +6,14 @@
 #include "Input\Input.h"
 #include "../../GameSource/Math/Mathf.h"
 
+
+
+
 void CharacterCom::Update(float elapsedTime)
 {
     StanUpdate(elapsedTime);
 
-    //ステックのアングル取得
+    //ステックの角度取得
     stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
 
     //ステックの角度制限
@@ -18,6 +21,10 @@ void CharacterCom::Update(float elapsedTime)
     {
         stickAngle += 360.0f;
     }
+
+    //現在のアニメーションに使用している角度
+    nowAngle = InterpolateAngle(nowAngle, stickAngle, elapsedTime, lerpSpeed);
+
 
     //ステート処理
     attackStateMachine.Update(elapsedTime);
@@ -135,6 +142,7 @@ void CharacterCom::OnGUI()
     attackStateMachine.ImGui();
 
     ImGui::InputFloat("StickAngle", &stickAngle);
+    ImGui::InputFloat("nowAngle", &nowAngle);
 
     int i = userInput;
     ImGui::InputInt("input", &i);
@@ -272,4 +280,43 @@ void CharacterCom::CoolUpdate(float elapsedTime)
     Rcool.timer += elapsedTime;
     LScool.timer += elapsedTime;
     Spacecool.timer += elapsedTime;
+}
+
+float CharacterCom::Lerp(float start, float end, float t)
+{
+    return start + t * (end - start);
+}
+
+float CharacterCom::InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed)
+{
+    // 角度の差を計算
+    float diff = targetAngle - currentAngle;
+
+    // 差が180度を超える場合、逆方向で計算する
+    if (diff > 180.0f) {
+        diff -= 360.0f;
+    }
+    else if (diff < -180.0f) {
+        diff += 360.0f;
+    }
+
+
+
+    // 少しずつ近づける（Lerp を用いる）
+    currentAngle = Lerp(currentAngle, currentAngle + diff, deltaTime * speed);
+
+    //ステックの角度制限
+    if (currentAngle < 0.0f)
+    {
+        currentAngle += 360.0f;
+    }
+
+    //ステックの角度制限
+    if (currentAngle > 360.0f)
+    {
+        currentAngle = 0.0f;
+    }
+
+
+    return currentAngle;
 }

@@ -125,10 +125,7 @@ void NoobEnemyCom::UpdateExplosion(float elapsedTime)
     explosionGrace -= elapsedTime;
     if (0 > explosionGrace)
     {
-        if (explosionRange > GetPlayerDist())
-        {
-            //GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->AddGiveDamage(explosionDamage);
-            GameObjectManager::Instance().Remove(this->GetGameObject());
-        }
+        //ˆê’èŽžŠÔ‚»‚Ìê‚ÉŽ~‚Ü‚Á‚Ä‚©‚ç”š”­
+        GameObjectManager::Instance().Remove(this->GetGameObject());
     }
 }
