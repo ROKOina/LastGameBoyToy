@@ -47,6 +47,9 @@ private:
     //リセット
     void Reset();
 
+    //ベジェ曲線
+    DirectX::XMVECTOR BezierCurve(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1, DirectX::XMVECTOR p2, float t);
+
 private:
 
     //頂点構造体
@@ -116,6 +119,7 @@ public:
         DirectX::XMFLOAT2 m_latesize = { 1,1 };
         DirectX::XMFLOAT4 m_particlecolor = { 1,1,1,1 };
         DirectX::XMFLOAT3 m_intensity = { 1,1,1 };
+        float collsionradius = 0.0f;
 
         template<class Archive>
         void serialize(Archive& archive, int version);

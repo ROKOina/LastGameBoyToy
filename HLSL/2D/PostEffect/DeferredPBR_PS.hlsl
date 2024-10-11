@@ -17,7 +17,6 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     // テクスチャからパラメーター取得
     float4 albedoColor = colorMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord);
-    clip(albedoColor.a - EPSILON);
 
     // ワールド空間の法線
     float3 N = normalMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).xyz;
@@ -51,11 +50,11 @@ float4 main(VS_OUT pin) : SV_TARGET
     // AOマップ適用
     color.rgb *= MRAO.z;
 
-    // トーンマップ
-    color.rgb = saturate(color.rgb); // クランプ
-
     // エミッション適用
     color.rgb += emissiveMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).rgb;
+
+    if (color.a < EPSILON)
+        discard;
 
     return color;
 }

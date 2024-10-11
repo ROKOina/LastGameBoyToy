@@ -178,7 +178,6 @@
     <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
     <ClInclude Include="Source\Components\InstanceRendererCom.h" />
-    <ClInclude Include="Source\Components\InstanceTransform.h" />
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\NodeCollsionCom.h" />
     <ClInclude Include="Source\Components\ProjectileCom.h" />
@@ -199,6 +198,7 @@
     <ClInclude Include="Source\GameSource\Math\Collision.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Components\CameraCom.h" />
+    <ClInclude Include="Source\GameSource\Math\FastNoiseLite.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneDebugGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneLobby\SceneLobby.h" />
@@ -310,7 +310,6 @@
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
     <ClCompile Include="Source\Components\InstanceRendererCom.cpp" />
-    <ClCompile Include="Source\Components\InstanceTransform.cpp" />
     <ClCompile Include="Source\Components\MovementCom.cpp" />
     <ClCompile Include="Source\Components\NodeCollsionCom.cpp" />
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
@@ -479,10 +478,6 @@
     </FxCompile>
     <FxCompile Include="HLSL\3D\InstancingVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\3D\PBR+IBL_Unity.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\SciFiGatePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

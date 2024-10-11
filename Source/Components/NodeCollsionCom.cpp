@@ -146,6 +146,13 @@ void NodeCollsionCom::OnGUI()
                         cp.collsiontype = static_cast<int>(collisionTypeIndex);
                     }
 
+                    const char* bodytypename[] = { "NONE", "BODY", "FACE" ,"RIGHTHAND","LEFTHAND","RIGHTLEG","LEFTLEG" };
+                    int bodyTypeIndex = static_cast<int>(cp.parttype);
+                    if (ImGui::Combo("Body Type", &bodyTypeIndex, bodytypename, IM_ARRAYSIZE(bodytypename)))
+                    {
+                        cp.parttype = static_cast<int>(bodyTypeIndex);
+                    }
+
                     switch (static_cast<CollsionType>(cp.collsiontype))
                     {
                     case NodeCollsionCom::CollsionType::SPHER:

@@ -39,7 +39,6 @@
 #include "Components/SpawnCom.h"
 #include "Components/Enemy/Boss/BossCom.h"
 #include "Components/InstanceRendererCom.h"
-#include "Components/InstanceTransform.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -99,30 +98,19 @@ void SceneGame::Initialize()
 
     //BOSS
     {
-        //auto& obj = GameObjectManager::Instance().Create();
-        //obj->SetName("BOSS");
-        //std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        //r->LoadModel("Data/Jammo/jammo.mdl");
-        //obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-        //obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-        //obj->AddComponent<MovementCom>();
-        //obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
-        //obj->AddComponent<AnimationCom>();
-        //obj->AddComponent<BossCom>();
-        //obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
-        //obj->AddComponent<CharaStatusCom>();
-        //obj->AddComponent<SpawnCom>();
-    }
-
-    //インスタンシング描画
-    {
         auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("instance");
-        obj->AddComponent<InstanceTransform>();
-        std::shared_ptr<InstanceRenderer> r = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 2, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true);
+        obj->SetName("BOSS");
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Jammo/jammo.mdl");
+        obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
         obj->AddComponent<MovementCom>();
-        obj->AddComponent<NodeCollsionCom>(nullptr);
+        obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        obj->AddComponent<AnimationCom>();
+        obj->AddComponent<BossCom>();
+        obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        obj->AddComponent<CharaStatusCom>();
+        obj->AddComponent<SpawnCom>();
     }
 
 #pragma endregion
