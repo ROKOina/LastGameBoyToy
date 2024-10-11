@@ -70,12 +70,13 @@ private:
     std::unique_ptr<ConstantBuffer<m_general>>       m_generalconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
-    Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshaderShadow;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
     Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshader;
-    Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshaderShadow;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer>             m_instancedata;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshaderShadow;
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshaderShadow;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayoutShadow;
 
     // バッチ描画するオブジェクトの姿勢 by杉
     std::vector<std::weak_ptr<TransformCom>> iModelTransforms;

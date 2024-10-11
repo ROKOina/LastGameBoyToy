@@ -94,6 +94,14 @@ void SceneGame::Initialize()
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::UENO, obj);
     }
 
+    //プレイヤー
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("Instance");
+        auto a = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED,1, BLENDSTATE::ALPHA);
+        a->LoadModel("Data/Jammo/jammo.mdl");
+    }
+
     //カメラをプレイヤーの子どもにして制御する
     {
         std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");

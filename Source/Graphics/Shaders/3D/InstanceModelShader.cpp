@@ -50,26 +50,48 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader, int count)
   }
 
   // 頂点シェーダー
-  //入力レイアウト
-  D3D11_INPUT_ELEMENT_DESC IED[] =
   {
-    // 入力要素の設定
-    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    //入力レイアウト
+    D3D11_INPUT_ELEMENT_DESC IED[] =
+    {
+      // 入力要素の設定
+      { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
-    // 各インスタンスの姿勢行列
-    // 4x4のワールド行列
-    { "TRANSFORM",0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-    { "TRANSFORM",1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-    { "TRANSFORM",2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-    { "TRANSFORM",3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-  };
-  CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshader.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
-  VSPath = { "Shader\\InstanceShadowVS.cso" };
-  CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshaderShadow.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
+      // 各インスタンスの姿勢行列
+      // 4x4のワールド行列
+      { "TRANSFORM",0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+      { "TRANSFORM",1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+      { "TRANSFORM",2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+      { "TRANSFORM",3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+    };
+    CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshader.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
+  }
+  // 頂点シェーダー ( 影用 )
+  {
+    //入力レイアウト
+    D3D11_INPUT_ELEMENT_DESC IED[] =
+    {
+      // 入力要素の設定
+      { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+      // 各インスタンスの姿勢行列
+      // 4x4のワールド行列
+      { "TRANSFORM",0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 4 },
+      { "TRANSFORM",1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 4 },
+      { "TRANSFORM",2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 4 },
+      { "TRANSFORM",3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 4 },
+    };
+    VSPath = { "Shader\\InstanceShadowVS.cso" };
+    CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshaderShadow.GetAddressOf(), m_inputlayoutShadow.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
+  }
 
   // ピクセルシェーダーとジオメトリシェーダー
   if (shader != SHADER_ID_MODEL::SHADOW)
@@ -117,7 +139,7 @@ void InstanceModelShader::ShadowBegin(ID3D11DeviceContext* dc, BLENDSTATE blendm
   dc->VSSetShader(m_vertexshaderShadow.Get(), nullptr, 0);
   dc->GSSetShader(m_geometryshaderShadow.Get(), nullptr, 0);
   dc->PSSetShader(NULL, NULL, 0);
-  dc->IASetInputLayout(m_inputlayout.Get());
+  dc->IASetInputLayout(m_inputlayoutShadow.Get());
 
   Graphics& Graphics = Graphics::Instance();
   const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -166,7 +188,7 @@ void InstanceModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource
 }
 void InstanceModelShader::ShadowSetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset)
 {
-  dc->DrawIndexedInstanced(subset.indexCount, iModelTransforms.size(), subset.startIndex, 0, 0);
+  dc->DrawIndexedInstanced(subset.indexCount, iModelTransforms.size() * 4, subset.startIndex, 0, 0);
 }
 
 //描画終了処理
