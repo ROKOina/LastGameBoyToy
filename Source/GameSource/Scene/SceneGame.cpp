@@ -123,19 +123,19 @@ void SceneGame::Initialize()
 
     //BOSS
    {
-       auto& obj = GameObjectManager::Instance().Create();
-       obj->SetName("BOSS");
-       std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-       r->LoadModel("Data/Jammo/jammo.mdl");
-       obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-       obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-       obj->AddComponent<MovementCom>();
-       obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
-       obj->AddComponent<AnimationCom>();
-       obj->AddComponent<BossCom>();
-       obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
-       obj->AddComponent<CharaStatusCom>();
-       obj->AddComponent<SpawnCom>();
+       //auto& obj = GameObjectManager::Instance().Create();
+       //obj->SetName("BOSS");
+       //std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+       //r->LoadModel("Data/Jammo/jammo.mdl");
+       //obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+       //obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+       //obj->AddComponent<MovementCom>();
+       //obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+       //obj->AddComponent<AnimationCom>();
+       //obj->AddComponent<BossCom>();
+       //obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+       //obj->AddComponent<CharaStatusCom>();
+       //obj->AddComponent<SpawnCom>();
    }
 
 #pragma endregion
