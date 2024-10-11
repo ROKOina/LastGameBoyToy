@@ -5,6 +5,8 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Model/Model.h"
 
+class TransformCom;
+
 class InstanceModelShader
 {
 public:
@@ -25,8 +27,8 @@ public:
     //描画終了処理
     void End(ID3D11DeviceContext* dc);
 
-    //位置、姿勢、大きさをバッファに格納
-    void ReplaceBufferContents(ID3D11Buffer* buffer, size_t bufferSize, const void* data);
+    // 姿勢をバッファに格納
+    void ReplaceBufferContents();
 
     //imgui
     void ImGui();
@@ -34,29 +36,15 @@ public:
     //バッファー作成
     void CreateBuffer();
 
-public:
+public: // by 杉
+  // バッチ描画に使用する姿勢の追加
+  void AddInstance(std::weak_ptr<TransformCom> transform) { iModelTransforms.push_back(transform); }
+  // バッチ描画に使用する姿勢の削除
+  void RemoveInstance(std::weak_ptr<TransformCom> transform);
 
-    //生成数
-    void SetCount(const int& index) { m_instancecount = index; }
-    const int& GetCount() const { return m_instancecount; }
+  const int& GetInstanceCount() const { return iModelTransforms.size(); }
 
 private:
-
-    //インスタンシングの情報
-    struct Instance
-    {
-        DirectX::XMFLOAT4 quaternion = { 0,0,0,1 };
-        DirectX::XMFLOAT3 position{ 0,0,0 };
-        DirectX::XMFLOAT3 scale{ 1.0f,1.0f,1.0f };
-    };
-    std::unique_ptr<Instance[]> m_cpuinstancedata;
-
-    //オブジェクトのコンスタントバッファ
-    struct objectconstants
-    {
-        DirectX::XMFLOAT4X4 transform = {};
-    };
-
     //サブセットのコンスタントバッファ
     struct subsetconstants
     {
@@ -78,9 +66,8 @@ private:
     };
 
 private:
-    std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
-    std::unique_ptr<ConstantBuffer<m_general>> m_generalconstants;
+    std::unique_ptr<ConstantBuffer<m_general>>       m_generalconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshaderShadow;
@@ -88,8 +75,9 @@ private:
     Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshader;
     Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshaderShadow;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
-    Microsoft::WRL::ComPtr<ID3D11Buffer>m_instancedata;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>             m_instancedata;
 
-public:
-    int m_instancecount = 0;
+    // バッチ描画するオブジェクトの姿勢 by杉
+    std::vector<std::weak_ptr<TransformCom>> iModelTransforms;
+
 };

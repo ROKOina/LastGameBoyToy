@@ -9,7 +9,6 @@ InstanceRenderer::InstanceRenderer(SHADER_ID_MODEL id, int maxinstance, BLENDSTA
 {
     m_blend = blendmode;
     m_instancemodelshader = std::make_unique<InstanceModelShader>(id, maxinstance);
-    count = maxinstance;
     m_shadowrender = shadowrender;
     shaderID = id;
 }
@@ -146,10 +145,9 @@ void InstanceRenderer::OnGUI()
     ImGui::Combo("RasterizerMode", &rasMode, RasterizerName, static_cast<int>(RASTERIZERSTATE::MAX), static_cast<int>(RASTERIZERSTATE::MAX));
     m_rasterizerState = static_cast<RASTERIZERSTATE>(rasMode);
 
-    if (ImGui::DragInt((char*)u8"生成数", &count, 1.0f, 1, 100))
+    if (ImGui::Button((char*)u8"インスタンス生成"))
     {
-        m_instancemodelshader->m_instancecount = count;
-        m_instancemodelshader->CreateBuffer();
+      CreateInstance(true);
     }
     m_instancemodelshader->ImGui();
 }
@@ -172,4 +170,23 @@ void InstanceRenderer::LoadModel(const char* filename)
     }
 
     model_ = std::make_unique<Model>(m);
+}
+
+GameObj InstanceRenderer::CreateInstance(bool isChildObject)
+{
+  GameObj newObj = nullptr;
+
+  // 子オブジェクトとして生成
+  if (isChildObject) {
+    newObj = GetGameObject()->AddChildObject();
+  }
+  // 親子関係なしで生成
+  else {
+    newObj = GameObjectManager::Instance().Create();
+  }
+
+  // バッチ描画に使用するので姿勢(ポインタ)を保持
+  m_instancemodelshader->AddInstance(newObj->transform_);
+
+  return newObj;
 }

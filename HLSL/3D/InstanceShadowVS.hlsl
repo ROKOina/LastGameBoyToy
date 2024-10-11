@@ -4,7 +4,7 @@
 VS_OUT_CSM main(INSTANCE_VS_IN vin, uint instance_id : SV_INSTANCEID)
 {
     // インスタンスのワールド変換行列を計算
-    float4x4 world = mul(global_transform, calc_world_transform(vin.InstScale, vin.InstRotation, vin.InstPosition));
+    float4x4 world = vin.transform;
 
     VS_OUT_CSM vout;
 
