@@ -39,7 +39,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 F0 = lerp(dot(_DielectricF0, Specular * Specular), albedoColor.rgb, MRAO.x);
 
     // ŠÔÚŒõ‚É‚æ‚éŠgU”½Ë
-    float3 indirectDiffuse = ShadeSHPerPixel(N, albedoColor, wPos.xyz).xyz;
+    float3 indirectDiffuse = ShadeSHPerPixel(N, albedoColor).xyz;
 
     // ŠÂ‹«Œõ‚É‚æ‚éŠgU”½Ë{‹¾–Ê”½Ë
     float3 envColor = IBL(lutGGX, diffuseIem, specularPmrem, sampler_states[BLACK_BORDER_ANISOTROPIC], diffuseReflectance, F0, MRAO.r, N, V);

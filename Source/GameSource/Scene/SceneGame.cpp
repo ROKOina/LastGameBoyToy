@@ -108,12 +108,12 @@ void SceneGame::Initialize()
 
     //BOSS
     {
-        //auto& boss = GameObjectManager::Instance().Create();
-        //boss->SetName("BOSS");
-        //std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        //r->LoadModel("Data/Jammo/jammo.mdl");
-        //boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-        //boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+        auto& boss = GameObjectManager::Instance().Create();
+        boss->SetName("BOSS");
+        std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Jammo/jammo.mdl");
+        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
         //t = boss->transform_;
         //boss->AddComponent<MovementCom>();
         //boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
