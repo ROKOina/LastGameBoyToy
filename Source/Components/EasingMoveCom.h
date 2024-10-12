@@ -23,6 +23,9 @@ public:
 
 private:
 
+    //イージング停止
+    void StopEasing();
+
     //シリアライズ
     void Serialize();
 
@@ -40,6 +43,10 @@ public:
         float timescale = 0.0f;
         int easingtype = 0;
         int easingmovetype = 0;
+        bool loop = false;
+        bool comback = false;
+        DirectX::XMFLOAT3 easingposition = {};
+        DirectX::XMFLOAT3 easingscale = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -50,4 +57,8 @@ private:
 
     float easingresult = 0.0f;
     float easingtime = 0.0f;
+    bool play = false;
+    bool loop = false;
+    DirectX::XMFLOAT3 savepos = {};
+    DirectX::XMFLOAT3 savescale = {};
 };

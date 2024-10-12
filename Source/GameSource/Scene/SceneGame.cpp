@@ -117,7 +117,7 @@ void SceneGame::Initialize()
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
         boss->AddComponent<EasingMoveCom>(nullptr);
         //t = boss->transform_;
-        //boss->AddComponent<MovementCom>();
+        boss->AddComponent<MovementCom>();
         //boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
         //boss->AddComponent<AnimationCom>();
         //boss->AddComponent<BossCom>();

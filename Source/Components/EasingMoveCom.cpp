@@ -11,6 +11,8 @@
 #include "Logger.h"
 #include "Graphics/Graphics.h"
 #include "GameSource/Math/easing.h"
+#include "GameSource/Math/Mathf.h"
+#include "Components\TransformCom.h"
 
 CEREAL_CLASS_VERSION(EasingMoveCom::EasingMoveParameter, 1)
 
@@ -78,7 +80,11 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
         CEREAL_NVP(filename),
         CEREAL_NVP(timescale),
         CEREAL_NVP(easingtype),
-        CEREAL_NVP(easingmovetype)
+        CEREAL_NVP(easingmovetype),
+        CEREAL_NVP(loop),
+        CEREAL_NVP(comback),
+        CEREAL_NVP(easingposition),
+        CEREAL_NVP(easingscale)
     );
 }
 
@@ -95,22 +101,95 @@ void EasingMoveCom::Start()
 //更新処理
 void EasingMoveCom::Update(float elapsedTime)
 {
+    // イージングが有効な場合
+    if (play)
+    {
+        //イージング更新
+        easingresult = EasingUpdate(EMP.easingtype, EMP.easingmovetype, easingtime);
+
+        // イージング計算
+        GetGameObject()->transform_->SetWorldPosition(Mathf::Lerp(savepos, EMP.easingposition, easingresult));
+        GetGameObject()->transform_->SetScale(Mathf::Lerp(savescale, EMP.easingscale, easingresult));
+
+        // イージング時間の更新
+        easingtime += (loop ? -1.0f : 1.0f) * elapsedTime * EMP.timescale;
+
+        // イージング時間の範囲チェック
+        if (easingtime > 1.0f)
+        {
+            // ループまたは戻り値が有効な場合
+            if (EMP.loop || EMP.comback)
+            {
+                loop = !loop;
+                easingtime = 1.0f;
+            }
+            else
+            {
+                StopEasing(); // イージングを停止
+            }
+        }
+        else if (easingtime < 0.0f)
+        {
+            // ループが有効な場合
+            if (EMP.loop)
+            {
+                loop = !loop;
+                easingtime = 0.0f;
+            }
+            else
+            {
+                StopEasing(); // イージングを停止
+            }
+        }
+    }
 }
 
 //imgui
 void EasingMoveCom::OnGUI()
 {
     ImGui::SameLine();
-    if (ImGui::Button("Save"))
+    if (ImGui::Button((char*)u8"保存"))
     {
         Serialize();
     }
     ImGui::SameLine();
-    if (ImGui::Button("Load"))
+    if (ImGui::Button((char*)u8"読み込み"))
     {
         LoadDeserialize();
     }
     easingresult = EasingImGui(EMP.easingtype, EMP.easingmovetype, easingtime);
+    if (ImGui::Button("Play") && !play)
+    {
+        savepos = GetGameObject()->transform_->GetWorldPosition();
+        savescale = GetGameObject()->transform_->GetScale();
+        play = true;
+    }
+    ImGui::SameLine();
+    ImGui::Checkbox((char*)u8"ループ再生", &EMP.loop);
+    ImGui::SameLine();
+    ImGui::Checkbox((char*)u8"ワンカット再生", &EMP.comback);
+
+    ImGui::DragFloat("timescale", &EMP.timescale, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat3("easingpostion", &EMP.easingposition.x, 0.1f);
+    ImGui::DragFloat3("easingscale", &EMP.easingscale.x, 0.1f);
+}
+
+//イージング停止
+void EasingMoveCom::StopEasing()
+{
+    play = false;
+    loop = false;
+    easingtime = 0.0f;
+
+    GetGameObject()->transform_->SetWorldPosition(savepos);
+    GetGameObject()->transform_->SetScale(savescale);
+
+    if (!EMP.loop && !EMP.comback)
+    {
+        //今の位置を保存した位置に代入する
+        GetGameObject()->transform_->SetWorldPosition(EMP.easingposition);
+        GetGameObject()->transform_->SetScale(EMP.easingscale);
+    }
 }
 
 //シリアライズ
