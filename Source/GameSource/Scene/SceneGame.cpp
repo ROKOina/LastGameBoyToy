@@ -40,6 +40,7 @@
 #include "Components/SpawnCom.h"
 #include "Components/Enemy/Boss/BossCom.h"
 #include "Components/InstanceRendererCom.h"
+#include "Components\EasingMoveCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -114,6 +115,7 @@ void SceneGame::Initialize()
         r->LoadModel("Data/Jammo/jammo.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+        boss->AddComponent<EasingMoveCom>(nullptr);
         //t = boss->transform_;
         //boss->AddComponent<MovementCom>();
         //boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");

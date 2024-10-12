@@ -172,6 +172,7 @@
     <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
+    <ClInclude Include="Source\Components\EasingMoveCom.h" />
     <ClInclude Include="Source\Components\Enemy\Boss\BossCom.h" />
     <ClInclude Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.h" />
     <ClInclude Include="Source\Components\EventCom.h" />
@@ -306,6 +307,7 @@
     <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\EasingMoveCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\Boss\BossCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.cpp" />
     <ClCompile Include="Source\Components\EventCom.cpp" />
