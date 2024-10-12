@@ -14,10 +14,6 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
     //選択されたのが指定される
     switch (shader)
     {
-    case SHADER_ID_MODEL::DEFAULT:
-        VSPath = { "Shader\\DefaltVS.cso" };
-        PSPath = { "Shader\\DefaltPS.cso" };
-        break;
     case SHADER_ID_MODEL::STAGEDEFERRED:
         VSPath = { "Shader\\StageVS.cso" };
         PSPath = { "Shader\\DeferredSetupPS.cso" };
@@ -25,10 +21,6 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
     case SHADER_ID_MODEL::DEFERRED:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DeferredSetupPS.cso" };
-        break;
-    case SHADER_ID_MODEL::BLACK:
-        VSPath = { "Shader\\DefaltVS.cso" };
-        PSPath = { "Shader\\BlackPS.cso" };
         break;
     case SHADER_ID_MODEL::AREA_EFFECT_CIRCLE:
         VSPath = { "Shader\\DefaltVS.cso" };
@@ -164,7 +156,6 @@ void ModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset
     //オブジェクト毎に使いたい定数バッファ
     m_generalconstants->data.outlineColor = subset.material->outlineColor;
     m_generalconstants->data.outlineintensity = subset.material->outlineintensity;
-    m_generalconstants->data.statictype = subset.material->statictype;
     m_generalconstants->Activate(dc, (int)CB_INDEX::GENERAL, false, true, false, false, false, false);
 
     //シェーダーリソースビュー設定

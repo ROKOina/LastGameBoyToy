@@ -50,8 +50,6 @@ public:
     {
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
-        int statictype = 0;
-        DirectX::XMFLOAT3 generaldummy = {};
     };
 
 private:

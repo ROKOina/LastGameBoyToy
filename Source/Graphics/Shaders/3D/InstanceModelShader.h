@@ -37,12 +37,12 @@ public:
     void CreateBuffer();
 
 public: // by 杉
-  // バッチ描画に使用する姿勢の追加
-  void AddInstance(std::weak_ptr<TransformCom> transform) { iModelTransforms.push_back(transform); }
-  // バッチ描画に使用する姿勢の削除
-  void RemoveInstance(std::weak_ptr<TransformCom> transform);
+    // バッチ描画に使用する姿勢の追加
+    void AddInstance(std::weak_ptr<TransformCom> transform) { iModelTransforms.push_back(transform); }
+    // バッチ描画に使用する姿勢の削除
+    void RemoveInstance(std::weak_ptr<TransformCom> transform);
 
-  const int& GetInstanceCount() const { return iModelTransforms.size(); }
+    const int& GetInstanceCount() const { return iModelTransforms.size(); }
 
 private:
     //サブセットのコンスタントバッファ
@@ -61,8 +61,6 @@ private:
     {
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
-        int statictype = 0;
-        DirectX::XMFLOAT3 generaldummy = {};
     };
 
 private:
@@ -80,5 +78,4 @@ private:
 
     // バッチ描画するオブジェクトの姿勢 by杉
     std::vector<std::weak_ptr<TransformCom>> iModelTransforms;
-
 };

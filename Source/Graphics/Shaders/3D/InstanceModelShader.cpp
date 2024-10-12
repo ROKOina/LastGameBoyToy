@@ -16,17 +16,9 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader, int count)
     //選択されたのが指定される
     switch (shader)
     {
-    case SHADER_ID_MODEL::DEFAULT:
-        VSPath = { "Shader\\InstancingVS.cso" };
-        PSPath = { "Shader\\DefaltPS.cso" };
-        break;
     case SHADER_ID_MODEL::DEFERRED:
         VSPath = { "Shader\\InstancingVS.cso" };
         PSPath = { "Shader\\DeferredSetupPS.cso" };
-        break;
-    case SHADER_ID_MODEL::BLACK:
-        VSPath = { "Shader\\InstancingVS.cso" };
-        PSPath = { "Shader\\BlackPS.cso" };
         break;
     case SHADER_ID_MODEL::AREA_EFFECT_CIRCLE:
         VSPath = { "Shader\\InstancingVS.cso" };
@@ -177,7 +169,6 @@ void InstanceModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource
     //オブジェクト毎に使いたい定数バッファ
     m_generalconstants->data.outlineColor = subset.material->outlineColor;
     m_generalconstants->data.outlineintensity = subset.material->outlineintensity;
-    m_generalconstants->data.statictype = subset.material->statictype;
     m_generalconstants->Activate(dc, (int)CB_INDEX::GENERAL, false, true, false, false, false, false);
 
     //シェーダーリソースビュー設定
