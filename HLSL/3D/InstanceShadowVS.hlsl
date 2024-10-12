@@ -12,7 +12,7 @@ VS_OUT_CSM main(INSTANCE_VS_IN vin, uint instance_id : SV_INSTANCEID)
     float3 p = mul(float4(vin.position, 1.0f), world).xyz;
 
     // ライトのビュープロジェクション行列を適用してクリップ空間座標を計算
-    vout.position = mul(float4(p, 1.0f), lightviewprojection[instance_id%4]);
+    vout.position = mul(float4(p, 1.0f), lightviewprojection[instance_id % 4]);
     vout.slice = instance_id;
 
     return vout;

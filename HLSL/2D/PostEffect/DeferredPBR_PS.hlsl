@@ -56,5 +56,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     if (color.a < EPSILON)
         discard;
 
+    color.rgb = clamp(color.rgb, 0.0f, color.rgb);
+
     return color;
 }
