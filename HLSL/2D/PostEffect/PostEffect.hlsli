@@ -11,4 +11,6 @@ cbuffer CbPostEffect : register(b3)
     float exposure;
     float vignettesize;
     float vignetteintensity;
+    float2 ssrparameter;
+    float2 posteffectdummy;
 };

@@ -56,6 +56,8 @@ private:
         float exposure = 1.8f;
         float vignettesize = 0.8f;
         float vignetteintensity = 0.7f;
+        DirectX::XMFLOAT2 ssrparameter = { 0.1f,0.7f };
+        DirectX::XMFLOAT2 dummy = {};
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 

@@ -28,7 +28,7 @@ float3 uncharted2_tonemapping(float3 color, float exposure)
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
-    float4 sampled_color = texture_map.Sample(sampler_states[POINT], pin.texcoord);
+    float4 sampled_color = texture_map.Sample(sampler_states[POINT], pin.texcoord.xy);
     float3 fragment_color = sampled_color.rgb;
     float alpha = sampled_color.a;
 

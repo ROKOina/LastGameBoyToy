@@ -16,17 +16,17 @@ Texture2D lutGGX : register(t13); // スカイボックスの色対応表
 float4 main(VS_OUT pin) : SV_TARGET
 {
     // テクスチャからパラメーター取得
-    float4 albedoColor = colorMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord);
+    float4 albedoColor = colorMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy);
 
     // ワールド空間の法線
-    float3 N = normalMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).xyz;
+    float3 N = normalMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy).xyz;
     N = normalize(N * 2 - 1); // -1 ~ 1 にスケール
 
     // ワールド座標
-    float4 wPos = positionMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord);
+    float4 wPos = positionMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy);
 
     // 金属度・粗さ・環境遮蔽
-    float3 MRAO = MRAO_Map.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).rgb;
+    float3 MRAO = MRAO_Map.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy).rgb;
 
     // ライトベクトル、カメラベクトルを正規化
     float3 L = normalize(directionalLight.direction.xyz);
@@ -51,7 +51,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     color.rgb *= MRAO.z;
 
     // エミッション適用
-    color.rgb += emissiveMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).rgb;
+    color.rgb += emissiveMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy).rgb;
 
     if (color.a < EPSILON)
         discard;
