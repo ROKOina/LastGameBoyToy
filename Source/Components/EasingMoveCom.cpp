@@ -84,7 +84,8 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
         CEREAL_NVP(loop),
         CEREAL_NVP(comback),
         CEREAL_NVP(easingposition),
-        CEREAL_NVP(easingscale)
+        CEREAL_NVP(easingscale),
+        CEREAL_NVP(objectname)
     );
 }
 
@@ -107,9 +108,20 @@ void EasingMoveCom::Update(float elapsedTime)
         //イージング更新
         easingresult = EasingUpdate(EMP.easingtype, EMP.easingmovetype, easingtime);
 
+        //オブジェクトがあれば
+        if (EMP.objectname.empty())
+        {
+            auto& gameObject = GameObjectManager::Instance().Find(EMP.objectname.c_str());
+
+            if (gameObject != nullptr)
+            {
+                EMP.easingposition = gameObject->transform_->GetWorldPosition();
+            }
+        }
+
         // イージング計算
         GetGameObject()->transform_->SetWorldPosition(Mathf::Lerp(savepos, EMP.easingposition, easingresult));
-        GetGameObject()->transform_->SetScale(Mathf::Lerp(savescale, EMP.easingscale, easingresult));
+        //GetGameObject()->transform_->SetScale(Mathf::Lerp(savescale, EMP.easingscale, easingresult));
 
         // イージング時間の更新
         easingtime += (loop ? -1.0f : 1.0f) * elapsedTime * EMP.timescale;
@@ -150,6 +162,7 @@ void EasingMoveCom::OnGUI()
     ImGui::SameLine();
     if (ImGui::Button((char*)u8"保存"))
     {
+        StopEasing();
         Serialize();
     }
     ImGui::SameLine();
@@ -165,9 +178,22 @@ void EasingMoveCom::OnGUI()
         play = true;
     }
     ImGui::SameLine();
+    if (ImGui::Button("Pause"))
+    {
+        StopEasing();
+    }
+    ImGui::SameLine();
     ImGui::Checkbox((char*)u8"ループ再生", &EMP.loop);
     ImGui::SameLine();
     ImGui::Checkbox((char*)u8"ワンカット再生", &EMP.comback);
+
+    //オブジェクトの名前をコピー
+    char name[256];
+    ::strncpy_s(name, sizeof(name), EMP.objectname.c_str(), sizeof(name));
+    if (ImGui::InputText((char*)u8"オブジェクトの名前", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        EMP.objectname = name;
+    }
 
     ImGui::DragFloat("timescale", &EMP.timescale, 0.1f, 0.0f, 10.0f);
     ImGui::DragFloat3("easingpostion", &EMP.easingposition.x, 0.1f);

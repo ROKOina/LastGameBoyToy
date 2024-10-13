@@ -47,6 +47,7 @@ public:
         bool comback = false;
         DirectX::XMFLOAT3 easingposition = {};
         DirectX::XMFLOAT3 easingscale = {};
+        std::string objectname = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
