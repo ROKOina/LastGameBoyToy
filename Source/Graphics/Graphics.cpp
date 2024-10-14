@@ -675,14 +675,10 @@ void Graphics::ResizeBackBuffer(UINT width, UINT height)
     dxgi_mode_desc.RefreshRate.Numerator = 60;
     dxgi_mode_desc.RefreshRate.Denominator = 1;
 
-    //HRESULT hr = swapChain->ResizeTarget(&dxgi_mode_desc);
-    //_ASSERT_EXPR(SUCCEEDED(hr), "スワップチェーンのリサイズに失敗しました。\nhr=%08x", hr);
-
     ID3D11RenderTargetView* nullViews[] = { nullptr };
     immediateContext_->OMSetRenderTargets(ARRAYSIZE(nullViews), nullViews, nullptr);
     ReleaseBackBuffer();
 
-    //immediateContext->ClearState();
     immediateContext_->Flush();
 
     DXGI_SWAP_CHAIN_DESC dxgi_sc_desc = {};

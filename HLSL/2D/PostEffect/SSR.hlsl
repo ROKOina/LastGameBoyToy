@@ -6,6 +6,7 @@
 Texture2D texturemaps : register(t0);
 Texture2D depth_map : register(t1);
 Texture2D normalmap : register(t2);
+Texture2D emissivemap : register(t3);
 
 // 深度からワールド空間の位置を求める
 float3 ComputeWorldPositionFromDepth(float4x4 inverse_view_projection, float depth, float2 texcoord)
@@ -37,9 +38,9 @@ float4 applySSR(float2 texcoord)
 
     float4 color = texturemaps.Sample(sampler_states[LINEAR], texcoord);
     float4 normal_smoothness = normalmap.Sample(sampler_states[LINEAR], texcoord);
-    //float4 emission_reflection = emission_reflection_map.Sample(linear_sampler, pin.texcoord);
+    float4 emission_reflection = emissivemap.Sample(sampler_states[LINEAR], texcoord);
     float3 normal = DecodeNormal(normal_smoothness.xyz);
-    float reflection = 1 /*emission_reflection.a*/;
+    float reflection = emission_reflection.a;
 
     float3 cam_dir = normalize(position - cameraposition);
     float3 ref_dir = normalize(reflect(cam_dir, normal));

@@ -44,5 +44,6 @@ cbuffer MaterialInformation : register(b2)
     float emissiveintensity;
     float Metalness;
     float Roughness;
-    float2 Mdummy;
+    float alpha;
+    float Mdummy;
 };

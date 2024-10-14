@@ -164,6 +164,7 @@ void InstanceModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource
     m_subsetconstants->data.emissiveintensity = subset.material->emissiveintensity;
     m_subsetconstants->data.Metalness = subset.material->Metalness;
     m_subsetconstants->data.Roughness = subset.material->Roughness;
+    m_subsetconstants->data.alpha = subset.material->alpha;
     m_subsetconstants->Activate(dc, (int)CB_INDEX::SUBSET, true, true, false, false, false, false);
 
     //オブジェクト毎に使いたい定数バッファ

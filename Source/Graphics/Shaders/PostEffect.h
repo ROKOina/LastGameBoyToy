@@ -33,6 +33,9 @@ public:
     // 深度マップをSRVにコピーして、GPUにバインドする
     void DepthCopyAndBind(int registerIndex);
 
+    //画面サイズ変更時にレンダーターゲットを作り直す
+    void ResizeBuffer();
+
 public:
 
     //取得
@@ -71,7 +74,7 @@ private:
     std::unique_ptr<ConstantBuffer<SHADOWPARAMETER>>m_shadowparameter;
 
 private:
-    enum class offscreen { offscreen, posteffect, cascadeshadow, ssr, depthCopy, max };
+    enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, ssr, depthCopy, max };
     enum class pixelshader { deferred, colorGrading, cascadeshadow, ssr, tonemap, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];

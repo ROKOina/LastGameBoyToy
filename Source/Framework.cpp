@@ -99,11 +99,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     graphics_.GetSwapChain()->Present(syncInterval, 0);
 
     // リサイズ
-    //if (resize)
-    //{
-    //    graphics_.ResizeBackBuffer(width, height);
-    //    resize = false;
-    //}
+    if (resize)
+    {
+        graphics_.ResizeBackBuffer(width, height);
+        resize = false;
+    }
 }
 
 // フレームレート計算

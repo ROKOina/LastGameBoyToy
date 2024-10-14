@@ -74,7 +74,7 @@ PS_OUT main(VS_OUT pin)
 
     // エミッション
     float3 emission = EmissionMap.Sample(sampler_states[LINEAR], pin.texcoord).rgb * emissivecolor.rgb * emissiveintensity;
-    pout.emission = float4(emission.rgb, 1.0f);
+    pout.emission = float4(emission.rgb, alpha);
 
     //アウトライン
     pout.outline = float4(outlineColor * outlineintensity, 1.0f);

@@ -101,7 +101,7 @@ void PostEffect::PostEffectRender()
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
     ID3D11ShaderResourceView* ssr[]
-    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_gBuffer->GetShaderResources()[1] };
+    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_gBuffer->GetShaderResources()[1],m_gBuffer->GetShaderResources()[4] };
     FullScreenQuad::Instance().Blit(dc, ssr, 0, _countof(ssr), m_pixelshaders[static_cast<int>(pixelshader::ssr)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::ssr)]->Deactivate(dc);
 
@@ -140,11 +140,14 @@ void PostEffect::PostEffectRender()
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
     // トーンマップ処理
+    //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Clear(dc);
+    //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Activate(dc);
     dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
     ID3D11ShaderResourceView* tone[] = { m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->m_shaderresourceviews[0].Get() };
     FullScreenQuad::Instance().Blit(dc, tone, 0, _countof(tone), m_pixelshaders[static_cast<int>(pixelshader::tonemap)].Get());
+    //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Deactivate(dc);
 }
 
 //imgui描画
@@ -189,7 +192,7 @@ void PostEffect::PostEffectImGui()
     ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::Text("FinalPass");
-    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::posteffect)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::tonemap)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::End();
 }
@@ -215,4 +218,24 @@ void PostEffect::DepthCopyAndBind(int registerIndex)
 
     dc->PSSetShaderResources(registerIndex, 1,
         m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->m_shaderresourceviews[0].GetAddressOf());
+}
+
+//画面サイズ変更時にレンダーターゲットを作り直す
+void PostEffect::ResizeBuffer()
+{
+    Graphics& Graphics = Graphics::Instance();
+    const UINT& width = Graphics.GetScreenWidth();
+    const UINT& height = Graphics.GetScreenHeight();
+
+    //ブルームセット
+    m_bloomeffect = std::make_unique<Bloom>(Graphics.GetDevice(), width, height);
+
+    //フレームバッファ生成
+    for (int i = 0; i < static_cast<int>(offscreen::max); ++i)
+    {
+        m_offScreenBuffer[i] = std::make_unique<FrameBuffer>(Graphics.GetDevice(), width, height, DXGI_FORMAT_R32G32B32A32_FLOAT, true);
+    }
+
+    //MultiRenderTarget作成
+    m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), width, height, 6);
 }

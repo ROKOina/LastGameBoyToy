@@ -53,7 +53,8 @@ private:
         float             emissiveintensity = 0;
         float             Metalness = 0;
         float             Roughness = 0;
-        DirectX::XMFLOAT2 dummy = {};
+        float             alpha = 0.0f;
+        float             dummy = {};
     };
 
     //汎用のコンスタントバッファ
