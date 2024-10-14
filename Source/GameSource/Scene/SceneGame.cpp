@@ -135,6 +135,13 @@ void SceneGame::Initialize()
         //r->LoadModel("Data/Jammo/jammo.mdl");
     }
 
+    //UIテスト
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("UiTest");
+        obj->AddComponent<Sprite>("Data\\Texture\\test.ui", true);
+    }
+
 #pragma endregion
 
 #pragma region グラフィック系の設定
