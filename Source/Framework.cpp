@@ -34,6 +34,9 @@ Framework::Framework(HWND hWnd)
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
 
+    // オーディオ初期化
+    Audio::Initialize();
+
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
 

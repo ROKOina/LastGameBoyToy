@@ -43,6 +43,8 @@
 
 #include "Netwark/Photon/StaticSendDataManager.h"
 
+#include "Audio/AudioSource.h"
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -146,6 +148,17 @@ void SceneGame::Initialize()
     ConstantBufferInitialize();
 
 #pragma endregion
+
+#pragma region オーディオ系の設定
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("Audio Test SE");
+    std::shared_ptr<AudioSource> audio = obj->AddComponent<AudioSource>();
+    audio->SetAudio(static_cast<int>(AUDIOID::SE));
+    audio->Play(false, 0.5f);
+    audio->SetAudioName("Test");
+
+#pragma endregion
+
 
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
