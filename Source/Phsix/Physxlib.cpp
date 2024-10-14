@@ -1,13 +1,13 @@
 #include "Physxlib.h"
-#pragma comment(lib, "PhysX_64.lib")
-#pragma comment(lib, "PhysXCommon_64.lib")
-#pragma comment(lib, "PhysXCooking_64.lib")
-#pragma comment(lib, "PhysXExtensions_static_64.lib")
-#pragma comment(lib, "PhysXFoundation_64.lib")
-#pragma comment(lib, "PhysXPvdSDK_static_64.lib")
-#pragma comment(lib, "PhysXTask_static_64.lib")
-#pragma comment(lib, "SceneQuery_static_64.lib")
-#pragma comment(lib, "SimulationController_static_64.lib")
+//#pragma comment(lib, "PhysX_64.lib")
+//#pragma comment(lib, "PhysXCommon_64.lib")
+//#pragma comment(lib, "PhysXCooking_64.lib")
+//#pragma comment(lib, "PhysXExtensions_static_64.lib")
+//#pragma comment(lib, "PhysXFoundation_64.lib")
+//#pragma comment(lib, "PhysXPvdSDK_static_64.lib")
+//#pragma comment(lib, "PhysXTask_static_64.lib")
+//#pragma comment(lib, "SceneQuery_static_64.lib")
+//#pragma comment(lib, "SimulationController_static_64.lib")
 
 void PhysXLib::Initialize()
 {
@@ -29,8 +29,8 @@ void PhysXLib::Initialize()
 
 void PhysXLib::Update(float elapsedTime)
 {
-    // シミュレーション速度を指定する
-    m_pScene->simulate(1.f / 60.f);
-    // PhysXの処理が終わるまで待つ
-    m_pScene->fetchResults(true);
+    //// シミュレーション速度を指定する
+    //m_pScene->simulate(1.f / 60.f);
+    //// PhysXの処理が終わるまで待つ
+    //m_pScene->fetchResults(true);
 }
