@@ -172,6 +172,7 @@
     <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
+    <ClInclude Include="Source\Components\EasingMoveCom.h" />
     <ClInclude Include="Source\Components\Enemy\Boss\BossCom.h" />
     <ClInclude Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.h" />
     <ClInclude Include="Source\Components\EventCom.h" />
@@ -189,6 +190,8 @@
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
     <ClInclude Include="Source\Dialog.h" />
+    <ClInclude Include="Source\GameSource\GameScript\EventCameraCom.h" />
+    <ClInclude Include="Source\GameSource\GameScript\EventCameraManager.h" />
     <ClInclude Include="Source\GameSource\GameScript\FPSCameraCom.h" />
     <ClInclude Include="Source\GameSource\GameScript\FreeCameraCom.h" />
     <ClInclude Include="Source\GameSource\Math\easing.h" />
@@ -198,6 +201,7 @@
     <ClInclude Include="Source\GameSource\Math\Collision.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Components\CameraCom.h" />
+    <ClInclude Include="Source\GameSource\Math\FastNoiseLite.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneDebugGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneLobby\SceneLobby.h" />
@@ -303,6 +307,7 @@
     <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\EasingMoveCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\Boss\BossCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.cpp" />
     <ClCompile Include="Source\Components\EventCom.cpp" />
@@ -318,6 +323,8 @@
     <ClCompile Include="Source\Components\StageEditorCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
+    <ClCompile Include="Source\GameSource\GameScript\EventCameraCom.cpp" />
+    <ClCompile Include="Source\GameSource\GameScript\EventCameraManager.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FPSCameraCom.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FreeCameraCom.cpp" />
     <ClCompile Include="Source\GameSource\Math\easing.cpp" />
@@ -381,9 +388,7 @@
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
     <None Include="HLSL\3D\FakeDepth.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
-    <None Include="HLSL\3D\Instancing.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
-    <None Include="HLSL\3D\NoInstance.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
     <None Include="HLSL\3D\Shadow.hlsli" />
     <None Include="HLSL\Common.hlsli" />
@@ -399,6 +404,10 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\2D\PostEffect\CascadeShadow.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\DeferredPBR_PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -439,15 +448,15 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\2D\PostEffect\SSR.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\ToneMapPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\AreaEffectCirclePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\3D\BlackPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
@@ -463,10 +472,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\3D\DefaltPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
     <FxCompile Include="HLSL\3D\DefaltVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
@@ -477,10 +482,7 @@
     </FxCompile>
     <FxCompile Include="HLSL\3D\InstancingVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\3D\PBR+IBL_Unity.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\SciFiGatePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -499,6 +501,10 @@
     <FxCompile Include="HLSL\3D\SilhouettePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\StageVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

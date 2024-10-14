@@ -105,14 +105,13 @@ enum SAMPLEMODE
 enum class SHADER_ID_MODEL
 {
     // デファード描画
+    STAGEDEFERRED,
     DEFERRED,
 
     // 以降、フォワード描画
-    BLACK,
     FAKE_DEPTH,
 
     // 以降、半透明オブジェクト
-    DEFAULT,
     AREA_EFFECT_CIRCLE,
 
     // 以降、深度マップを使用するシェーダー

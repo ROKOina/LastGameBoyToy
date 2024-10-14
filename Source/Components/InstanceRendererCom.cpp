@@ -1,23 +1,16 @@
 #include "InstanceRendererCom.h"
 #include "TransformCom.h"
 #include <Graphics/Model/ResourceManager.h>
+#include "GameSource/Math/Mathf.h"
+#include <random>
 
 //コンストラクタ
-InstanceRenderer::InstanceRenderer(SHADER_ID_MODEL id, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode, bool shadowrender, bool silhoutterender)
+InstanceRenderer::InstanceRenderer(SHADER_ID_MODEL id, int maxinstance, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode, bool shadowrender)
 {
     m_blend = blendmode;
-    m_instancemodelshader = std::make_unique<InstanceModelShader>(id);
-    m_shadow = std::make_unique<InstanceModelShader>(SHADER_ID_MODEL::SHADOW);
-    m_silhoutte = std::make_unique<InstanceModelShader>(SHADER_ID_MODEL::SILHOUETTE);
+    m_instancemodelshader = std::make_unique<InstanceModelShader>(id, maxinstance);
     m_shadowrender = shadowrender;
-    m_silhoutterender = silhoutterender;
-
     shaderID = id;
-}
-
-//初期化
-void InstanceRenderer::Start()
-{
 }
 
 //描画
@@ -25,9 +18,6 @@ void InstanceRenderer::Render()
 {
     Graphics& Graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
-
-    //シルエット描画
-    SilhoutteRender();
 
     //セット
     m_instancemodelshader->Begin(dc, m_blend, m_depth, m_rasterizerState);
@@ -70,7 +60,7 @@ void InstanceRenderer::ShadowRender()
     if (m_shadowrender)
     {
         //セット
-        m_shadow->ShadowBegin(dc, BLENDSTATE::REPLACE, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK);
+        m_instancemodelshader->ShadowBegin(dc, BLENDSTATE::REPLACE, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK);
 
         //モデルを描画
         for (auto& mesh : model_->GetResource()->GetMeshes())
@@ -78,44 +68,15 @@ void InstanceRenderer::ShadowRender()
             for (auto& subset : mesh.subsets)
             {
                 //頂点・インデックスバッファ等設定
-                m_shadow->SetBuffer(dc, model_->GetNodes(), mesh);
+                m_instancemodelshader->SetBuffer(dc, model_->GetNodes(), mesh);
 
                 //サブセット毎で描画
-                m_shadow->ShadowSetSubset(dc, subset);
+                m_instancemodelshader->ShadowSetSubset(dc, subset);
             }
         }
 
         //解放
-        m_shadow->End(dc);
-    }
-}
-
-//シルエット描画
-void InstanceRenderer::SilhoutteRender()
-{
-    Graphics& Graphics = Graphics::Instance();
-    ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
-
-    //シルエット描画をフラグで制御
-    if (m_silhoutterender)
-    {
-        m_silhoutte->Begin(dc, BLENDSTATE::ALPHA, DEPTHSTATE::SILHOUETTE, RASTERIZERSTATE::SOLID_CULL_BACK);
-
-        //シルエットを描画
-        for (auto& mesh : model_->GetResource()->GetMeshes())
-        {
-            for (auto& subset : mesh.subsets)
-            {
-                //頂点・インデックスバッファ等設定
-                m_silhoutte->SetBuffer(dc, model_->GetNodes(), mesh);
-
-                //サブセット毎で描画
-                m_silhoutte->SetSubset(dc, subset);
-            }
-        }
-
-        //解放
-        m_silhoutte->End(dc);
+        m_instancemodelshader->End(dc);
     }
 }
 
@@ -124,8 +85,6 @@ void InstanceRenderer::OnGUI()
 {
     ImGui::SameLine();
     ImGui::Checkbox("shadow", &m_shadowrender);
-    ImGui::SameLine();
-    ImGui::Checkbox("silhoutte", &m_silhoutterender);
 
     //デバッグ用にブレンドモード設定
     constexpr const char* BlendName[] =
@@ -185,6 +144,12 @@ void InstanceRenderer::OnGUI()
     int rasMode = static_cast<int>(m_rasterizerState);
     ImGui::Combo("RasterizerMode", &rasMode, RasterizerName, static_cast<int>(RASTERIZERSTATE::MAX), static_cast<int>(RASTERIZERSTATE::MAX));
     m_rasterizerState = static_cast<RASTERIZERSTATE>(rasMode);
+
+    if (ImGui::Button((char*)u8"インスタンス生成"))
+    {
+      CreateInstance(true);
+    }
+    m_instancemodelshader->ImGui();
 }
 
 //モデル読み込み
@@ -205,4 +170,23 @@ void InstanceRenderer::LoadModel(const char* filename)
     }
 
     model_ = std::make_unique<Model>(m);
+}
+
+GameObj InstanceRenderer::CreateInstance(bool isChildObject)
+{
+  GameObj newObj = nullptr;
+
+  // 子オブジェクトとして生成
+  if (isChildObject) {
+    newObj = GetGameObject()->AddChildObject();
+  }
+  // 親子関係なしで生成
+  else {
+    newObj = GameObjectManager::Instance().Create();
+  }
+
+  // バッチ描画に使用するので姿勢(ポインタ)を保持
+  m_instancemodelshader->AddInstance(newObj->transform_);
+
+  return newObj;
 }

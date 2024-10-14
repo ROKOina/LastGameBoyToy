@@ -5,10 +5,12 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Model/Model.h"
 
+class TransformCom;
+
 class InstanceModelShader
 {
 public:
-    InstanceModelShader(SHADER_ID_MODEL shader);
+    InstanceModelShader(SHADER_ID_MODEL shader, int count);
     ~InstanceModelShader() {};
 
     //描画初期設定
@@ -25,42 +27,24 @@ public:
     //描画終了処理
     void End(ID3D11DeviceContext* dc);
 
-private:
+    // 姿勢をバッファに格納
+    void ReplaceBufferContents();
 
-    //位置、姿勢、大きさをバッファに格納
-    void ReplaceBufferContents(ID3D11Buffer* buffer, size_t bufferSize, const void* data);
+    //imgui
+    void ImGui();
 
-public:
+    //バッファー作成
+    void CreateBuffer();
 
-    //位置
-    void SetPosition(const DirectX::XMFLOAT3& position, const int& index) { m_cpuinstancedata[index].position = position; }
-    const DirectX::XMFLOAT3& GetPosition(int index) const { return m_cpuinstancedata[index].position; }
+public: // by 杉
+    // バッチ描画に使用する姿勢の追加
+    void AddInstance(std::weak_ptr<TransformCom> transform) { iModelTransforms.push_back(transform); }
+    // バッチ描画に使用する姿勢の削除
+    void RemoveInstance(std::weak_ptr<TransformCom> transform);
 
-    //大きさ
-    void SetScale(const DirectX::XMFLOAT3& scale, const int& index) { m_cpuinstancedata[index].scale = scale; }
-    const DirectX::XMFLOAT3& GetScale(int index) const { return m_cpuinstancedata[index].scale; }
-
-    //回転
-    void SetQuaternion(const DirectX::XMFLOAT4& quaternion, const int& index) { m_cpuinstancedata[index].quaternion = quaternion; }
-    const DirectX::XMFLOAT4& GetQuaternion(int index) const { return m_cpuinstancedata[index].quaternion; }
+    const int& GetInstanceCount() const { return iModelTransforms.size(); }
 
 private:
-
-    //インスタンシングの情報
-    struct Instance
-    {
-        DirectX::XMFLOAT4 quaternion = { 0,0,0,1 };
-        DirectX::XMFLOAT3 position{ 0,0,0 };
-        DirectX::XMFLOAT3 scale{ 1.0f,1.0f,1.0f };
-    };
-    std::unique_ptr<Instance[]> m_cpuinstancedata;
-
-    //オブジェクトのコンスタントバッファ
-    struct objectconstants
-    {
-        DirectX::XMFLOAT4X4 transform = {};
-    };
-
     //サブセットのコンスタントバッファ
     struct subsetconstants
     {
@@ -69,7 +53,8 @@ private:
         float             emissiveintensity = 0;
         float             Metalness = 0;
         float             Roughness = 0;
-        DirectX::XMFLOAT2 dummy = {};
+        float             alpha = 0.0f;
+        float             dummy = {};
     };
 
     //汎用のコンスタントバッファ
@@ -77,19 +62,21 @@ private:
     {
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
-        int statictype = 0;
-        DirectX::XMFLOAT3 generaldummy = {};
     };
 
 private:
-    std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
-    std::unique_ptr<ConstantBuffer<m_general>> m_generalconstants;
+    std::unique_ptr<ConstantBuffer<m_general>>       m_generalconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
     Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
-    Microsoft::WRL::ComPtr<ID3D11Buffer>m_instancedata;
-    int m_instancecount = 5;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>             m_instancedata;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshaderShadow;
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshaderShadow;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayoutShadow;
+
+    // バッチ描画するオブジェクトの姿勢 by杉
+    std::vector<std::weak_ptr<TransformCom>> iModelTransforms;
 };

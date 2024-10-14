@@ -76,6 +76,9 @@ private:
     State state = State::Idle;
 
 private:
+
+    std::weak_ptr<AnimationCom> animationCom;
+
     //雑魚敵のパラメーター
 
     //移動スピード

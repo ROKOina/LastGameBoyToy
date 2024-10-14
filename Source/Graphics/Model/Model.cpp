@@ -78,6 +78,7 @@ void Model::CollsionParameter::serialize(Archive& archive, int version)
         CEREAL_NVP(nodeid),
         CEREAL_NVP(endnodeid),
         CEREAL_NVP(collsiontype),
+        CEREAL_NVP(parttype),
         CEREAL_NVP(radius),
         CEREAL_NVP(height),
         CEREAL_NVP(scale),

@@ -168,66 +168,10 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
     obj->AddComponent<AimIKCom>("Spine", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
-    obj->AddComponent<EventCom>(nullptr);
     obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
-        box->SetMyTag(COLLIDER_TAG::Player);
-    else
-        box->SetMyTag(COLLIDER_TAG::Enemy);
-
-    //攻撃レイキャスト
-    {
-        std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
-        rayChild->SetName("rayObj");
-
-        rayChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-
-        std::shared_ptr<RayColliderCom> rayCol = rayChild->AddComponent<RayColliderCom>();
-        if (std::strcmp(obj->GetName(), "player") == 0)
-        {
-            rayCol->SetMyTag(COLLIDER_TAG::Player);
-            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
-        }
-        else
-        {
-            rayCol->SetMyTag(COLLIDER_TAG::Enemy);
-            rayCol->SetJudgeTag(COLLIDER_TAG::Player);
-        }
-        rayCol->SetEnabled(false);
-
-        //ダメージ処理用
-        std::shared_ptr<HitProcessCom> hitDamage = rayChild->AddComponent<HitProcessCom>(obj);
-        hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    }
-
-    //回復カプセル
-    {
-        std::shared_ptr<GameObject> cupsuleChild = obj->AddChildObject();
-        cupsuleChild->SetName("capsuleObj");
-
-        cupsuleChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-
-        std::shared_ptr<CapsuleColliderCom> capsuleCol = cupsuleChild->AddComponent<CapsuleColliderCom>();
-        if (std::strcmp(obj->GetName(), "player") == 0)
-        {
-            capsuleCol->SetMyTag(COLLIDER_TAG::Player);
-            capsuleCol->SetJudgeTag(COLLIDER_TAG::Enemy);
-        }
-        else
-        {
-            capsuleCol->SetMyTag(COLLIDER_TAG::Enemy);
-            capsuleCol->SetJudgeTag(COLLIDER_TAG::Player);
-        }
-        capsuleCol->SetEnabled(false);
-
-        //ヒール処理用
-        std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>(obj);
-        hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
-        hitHeal->SetValue(2);
-    }
 }
 
 //ラインハルト

@@ -4,14 +4,14 @@
 void main(triangle VS_OUT_CSM input[3], inout TriangleStream<GS_OUTPUT_CSM> output)
 {
     GS_OUTPUT_CSM element;
-    element.slice = input[0].slice;
 
-    element.position = input[0].position;
-    output.Append(element);
-    element.position = input[1].position;
-    output.Append(element);
-    element.position = input[2].position;
-    output.Append(element);
+    // 各頂点を出力
+    for (int i = 0; i < 3; ++i)
+    {
+        element.slice = input[i].slice; // 各頂点のスライスを設定
+        element.position = input[i].position; // 各頂点の位置を設定
+        output.Append(element); // 頂点をストリームに追加
+    }
 
-    output.RestartStrip();
+    output.RestartStrip(); // ストリップの再起動
 }

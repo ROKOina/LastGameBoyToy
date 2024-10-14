@@ -1,5 +1,6 @@
 #include "NodeCollsionCom.h"
 #include "RendererCom.h"
+#include "InstanceRendererCom.h"
 #include <SystemStruct/TransformUtils.h>
 
 //コンストラクタ
@@ -12,7 +13,7 @@ NodeCollsionCom::NodeCollsionCom(const char* filename)
 void NodeCollsionCom::Start()
 {
     // モデルからリソースを取得
-    model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+    GetGameObject()->GetComponent<RendererCom>() != nullptr ? model = GetGameObject()->GetComponent<RendererCom>()->GetModel() : model = GetGameObject()->GetComponent<InstanceRenderer>()->GetModel();
 
     if (m_filename != nullptr && model != nullptr)
     {
@@ -143,6 +144,13 @@ void NodeCollsionCom::OnGUI()
                     if (ImGui::Combo("Collision Type", &collisionTypeIndex, collisionTypeNames, IM_ARRAYSIZE(collisionTypeNames)))
                     {
                         cp.collsiontype = static_cast<int>(collisionTypeIndex);
+                    }
+
+                    const char* bodytypename[] = { "NONE", "BODY", "FACE" ,"RIGHTHAND","LEFTHAND","RIGHTLEG","LEFTLEG" };
+                    int bodyTypeIndex = static_cast<int>(cp.parttype);
+                    if (ImGui::Combo("Body Type", &bodyTypeIndex, bodytypename, IM_ARRAYSIZE(bodytypename)))
+                    {
+                        cp.parttype = static_cast<int>(bodyTypeIndex);
                     }
 
                     switch (static_cast<CollsionType>(cp.collsiontype))
