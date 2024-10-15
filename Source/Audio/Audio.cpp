@@ -1,15 +1,9 @@
 #include "Misc.h"
 #include "Audio/Audio.h"
 
-Audio* Audio::instance = nullptr;
-
 // コンストラクタ
 Audio::Audio()
 {
-	// インスタンス設定
-	_ASSERT_EXPR(instance == nullptr, "already instantiated");
-	instance = this;
-
 	HRESULT hr;
 
 	// COMの初期化
@@ -28,6 +22,9 @@ Audio::Audio()
 	// マスタリングボイス生成
 	hr = xaudio_->CreateMasteringVoice(&masteringVoice_);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	// BGMとSEを一括登録
+	RegisterAudioSources();
 }
 
 // デストラクタ
@@ -51,9 +48,21 @@ Audio::~Audio()
 	CoUninitialize();
 }
 
-// オーディオソース読み込み
-std::unique_ptr<AudioSource> Audio::LoadAudioSource(const char* filename)
+// BGMとSEを一括登録
+void Audio::RegisterAudioSources()
 {
-	std::shared_ptr<AudioResource> resource = std::make_shared<AudioResource>(filename);
-	return std::make_unique<AudioSource>(xaudio_, resource);
+	audioResources[AUDIOID::BGM] = LoadAudioSource("Data/AudioData/TestAudio/BGM.wav");
+	audioResources[AUDIOID::SE] = LoadAudioSource("Data/AudioData/TestAudio/SE.wav");
+}
+
+// オーディオソース読み込み
+std::shared_ptr<AudioResource> Audio::LoadAudioSource(const char* filename)
+{
+	return std::make_shared<AudioResource>(filename);
+}
+
+// 登録されたオーディオソースを取得
+std::shared_ptr<AudioResource> Audio::GetAudioResource(AUDIOID id)
+{
+	return audioResources.at(id);
 }

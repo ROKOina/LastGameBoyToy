@@ -24,6 +24,7 @@ public:
     void OnGUI() override;
 
 public:
+
     //デバッグプリミティブの形状
     enum class CollsionType
     {
@@ -32,7 +33,22 @@ public:
         BOX,
         MAX
     };
+
+    //部位毎のenumclass
+    enum class BosyPartType
+    {
+        NONE,
+        BODY,
+        FACE,
+        RIGHTHAND,
+        LEFTHAND,
+        RIGHTLEG,
+        LEFTLEG,
+        MAX
+    };
+
 private:
+
     CollsionType m_collsiontype = CollsionType::SPHER;
 
 private:

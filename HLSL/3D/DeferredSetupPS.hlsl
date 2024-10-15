@@ -18,8 +18,6 @@ cbuffer General : register(b11)
 {
     float3 outlineColor;
     float outlineintensity;
-    int statictype;
-    float3 generaldummy;
 }
 
 // MRT対応
@@ -31,7 +29,6 @@ struct PS_OUT
     float4 MRO : SV_TARGET3;
     float4 emission : SV_TARGET4;
     float4 outline : SV_TARGET5;
-    float4 general : SV_TARGET6;
 };
 
 /*
@@ -77,13 +74,10 @@ PS_OUT main(VS_OUT pin)
 
     // エミッション
     float3 emission = EmissionMap.Sample(sampler_states[LINEAR], pin.texcoord).rgb * emissivecolor.rgb * emissiveintensity;
-    pout.emission = float4(emission.rgb, 1.0f);
+    pout.emission = float4(emission.rgb, alpha);
 
     //アウトライン
     pout.outline = float4(outlineColor * outlineintensity, 1.0f);
-
-    //汎用的に使いたいときのレンダーターゲット
-    pout.general = float4(statictype, 1.0f, 1.0f, 1.0f);
 
     return pout;
 }

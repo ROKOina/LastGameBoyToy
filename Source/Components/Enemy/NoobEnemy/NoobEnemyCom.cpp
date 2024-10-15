@@ -21,6 +21,7 @@ void NoobEnemyCom::OnGUI()
 //スタート
 void NoobEnemyCom::Start()
 {
+    animationCom = GetGameObject()->GetComponent<AnimationCom>();
     TransitionPursuit();
 }
 
@@ -86,6 +87,7 @@ void NoobEnemyCom::TransitionIdleState()
 void NoobEnemyCom::TransitionPursuit()
 {
     state = State::Purstuit;
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Running"), true);
 }
 
 //爆発ステート
@@ -121,10 +123,7 @@ void NoobEnemyCom::UpdateExplosion(float elapsedTime)
     explosionGrace -= elapsedTime;
     if (0 > explosionGrace)
     {
-        if (explosionRange > GetPlayerDist())
-        {
-            //GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->AddGiveDamage(explosionDamage);
-            GameObjectManager::Instance().Remove(this->GetGameObject());
-        }
+        //一定時間その場に止まってから爆発
+        GameObjectManager::Instance().Remove(this->GetGameObject());
     }
 }

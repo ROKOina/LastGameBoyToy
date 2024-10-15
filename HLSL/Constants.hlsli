@@ -9,16 +9,12 @@ cbuffer SceneConstants : register(b10)
     row_major float4x4 inverseview;
     row_major float4x4 inverseprojection;
     row_major float4x4 inverseviewprojection;
-
     float3 cameraposition;
     float time;
-    
+    float3 bossposiotn;
     float deltatime;
     float2 cameraScope;
-    float SCdummy;
-    
     float2 screenResolution;
-    float2 SCdummy2;
 }
 
 #endif

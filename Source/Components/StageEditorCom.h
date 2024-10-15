@@ -4,8 +4,6 @@
 #include <List>
 #include <map>
 
-struct PlaceObject;
-
 class StageEditorCom : public Component
 {
 public:
@@ -26,18 +24,36 @@ public:
     void OnGUI();
 
 private:
-    //エディターでいじるステージを選択
-    void StageSelect();
     //配置するオブジェクトを登録
     void ObjectRegister();
 
     //ステージにオブジェクト配置
-    void ObjectPlace();
+    void ObjectPlace(
+        std::string objType, 
+        DirectX::XMFLOAT3 position, 
+        DirectX::XMFLOAT3 scale, 
+        DirectX::XMFLOAT4 rotation, 
+        const char* model_filename,
+        const char* collision_filename
+    );
+    
+    //ファイルパス取得
+    void FileRead(std::string& path);
     //マウスとステージの判定
     bool MouseVsStage(HitResult& hit);
 
     void ObjectSave();
     void ObjectLoad();
+
+private:
+
+    struct PlaceObject
+    {
+        bool staticFlag = false;
+        std::string filePath;
+        std::string collisionPath;
+        std::list<GameObj> objList;
+    };
 
 private:
     bool onImGui = false;//カーソルがGui上にあるかどうか
@@ -46,11 +62,5 @@ private:
     std::map<std::string, PlaceObject> placeObjcts;//オブジェクトの名前とModleのファイルパスを紐づけて保存
     char registerObjName[256] = {};
     std::string objType;
-    std::list<GameObj> objList;
-};
-
-struct PlaceObject
-{
-    std::string filePath;
     std::list<GameObj> objList;
 };

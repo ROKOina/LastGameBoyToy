@@ -16,6 +16,7 @@ class TransformCom;
 class RendererCom;
 class CPUParticle;
 class GPUParticle;
+class InstanceRenderer;
 class Collider;
 class Sprite;
 
@@ -179,13 +180,17 @@ private:
     void DrawDetail();
 
     void SortRenderObject();
+    void SortInstanceRenderObject();
 
     //3D描画
     void RenderDeferred();
+    void InstanceRenderDeferred();
     void RenderForward();
+    void InstanceRenderForward();
     void RenderShadow();
-    void RenderSilhoutte();
+    void InstanceRenderShadow();
     void RenderUseDepth();
+    void InstanceRenderUseDepth();
 
     //CPUパーティクル描画
     void CPUParticleRender();
@@ -223,6 +228,13 @@ private:
 
     //GPUparticle描画
     std::vector<std::weak_ptr<GPUParticle>>gpuparticleobject;
+
+    //インスタンス描画
+    std::vector<std::weak_ptr<InstanceRenderer>>instanceobject;
+    // デファード描画オブジェクトの数
+    int instancedeferredCount = -1;
+    // 深度マップを使用する描画オブジェクトの数
+    int instanceuseDepthCount = -1;
 
     //スプライト描画
     std::vector<std::weak_ptr<Sprite>>spriteobject;

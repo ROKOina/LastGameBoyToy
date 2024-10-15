@@ -44,7 +44,7 @@ public:
         //オブジェクト毎の定数バッファをメッシュに入れておく(シリアライズは絶対する)
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
-        int statictype = 0;
+        float alpha = 1.0f;
 
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView[6];
 

@@ -1,3 +1,14 @@
+struct VS_OUT
+{
+    float4 position : SV_POSITION;
+    float3 world_position : POSITION;
+    float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float3 binormal : BINORMAL;
+    float2 texcoord : TEXCOORD;
+    float4 color : COLOR;
+};
+
 struct VS_IN
 {
     float4 position : POSITION;
@@ -9,15 +20,15 @@ struct VS_IN
     uint4 boneIndices : BONES;
 };
 
-struct VS_OUT
+struct INSTANCE_VS_IN
 {
-    float4 position : SV_POSITION;
-    float3 world_position : POSITION;
+    float3 position : POSITION;
     float3 normal : NORMAL;
-    float3 tangent : TANGENT;
-    float3 binormal : BINORMAL;
+    float4 tangent : TANGENT;
     float2 texcoord : TEXCOORD;
     float4 color : COLOR;
+
+    row_major float4x4 transform : TRANSFORM;
 };
 
 #define MAX_BONES 256
@@ -33,5 +44,6 @@ cbuffer MaterialInformation : register(b2)
     float emissiveintensity;
     float Metalness;
     float Roughness;
-    float2 Mdummy;
+    float alpha;
+    float Mdummy;
 };

@@ -20,7 +20,7 @@ void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, floa
     firePos.y += 1.0f;
     obj->transform_->SetWorldPosition(firePos);
 
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
+    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::FAKE_DEPTH), (BLENDSTATE::ALPHA));
     renderCom->LoadModel("Data/Ball/t.mdl");
 
     std::shared_ptr<SphereColliderCom> sphereCollider = obj->AddComponent<SphereColliderCom>();
@@ -29,7 +29,6 @@ void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, floa
     sphereCollider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyAttack);
 
     ///////////////////////////////
-
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
@@ -44,8 +43,6 @@ void BuletFire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, floa
     bulletCom->SetAliveTime(2.0f);
 }
 
-
-
 NomuraCharacter_BaseState::NomuraCharacter_BaseState(CharacterCom* owner) :State(owner)
 {
     //‰ŠúÝ’è
@@ -59,13 +56,10 @@ NomuraCharacter_BaseState::NomuraCharacter_BaseState(CharacterCom* owner) :State
 
 void NomuraCharacter_AttackState::Enter()
 {
-
 }
 
 void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
 {
-    
-
     MoveInputVec(owner->GetGameObject(), 0.5f);
 
     if (moveCom.lock()->OnGround())
@@ -76,7 +70,7 @@ void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
     if (attackPower > maxAttackPower) {
         attackPower = maxAttackPower;
     }
-    
+
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonDown())
     {
@@ -84,13 +78,11 @@ void NomuraCharacter_AttackState::Execute(const float& elapsedTime)
         BuletFire(owner->GetGameObject(), 30.0f, attackPower);
 
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-
     }
 }
 
 void NomuraCharacter_AttackState::ImGui()
 {
-  
 }
 
 #pragma endregion
@@ -99,13 +91,10 @@ void NomuraCharacter_AttackState::ImGui()
 
 void NomuraCharacter_SubAttackState::Enter()
 {
-
 }
 
 void NomuraCharacter_SubAttackState::Execute(const float& elapsedTime)
 {
-
-
     MoveInputVec(owner->GetGameObject(), 0.5f);
 
     if (moveCom.lock()->OnGround())
@@ -131,7 +120,7 @@ void NomuraCharacter_SubAttackState::Execute(const float& elapsedTime)
     }
 
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    if (charaCom.lock()->GetNowMagazin()==0)
+    if (charaCom.lock()->GetNowMagazin() == 0)
     {
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
@@ -139,37 +128,25 @@ void NomuraCharacter_SubAttackState::Execute(const float& elapsedTime)
 
 void NomuraCharacter_SubAttackState::ImGui()
 {
-
 }
 
-
-
 #pragma endregion
-
 
 #pragma region ESkill
 
 void NomuraCharacter_ESkillState::Enter()
 {
-
 }
 
 void NomuraCharacter_ESkillState::Execute(const float& elapsedTime)
 {
-    
-
-
-
-
 }
 
 void NomuraCharacter_ESkillState::ImGui()
 {
-
 }
 
 #pragma endregion
-
 
 #pragma region Reload
 
@@ -180,13 +157,12 @@ void NomuraCharacter_ReloadState::Enter()
 
 void NomuraCharacter_ReloadState::Execute(const float& elapsedTime)
 {
-
     if (animationCom.lock()->IsPlayUpperAnimation())
     {
-        DirectX::XMVECTOR VeloVec=DirectX::XMLoadFloat3(&moveCom.lock()->GetVelocity());
+        DirectX::XMVECTOR VeloVec = DirectX::XMLoadFloat3(&moveCom.lock()->GetVelocity());
 
         charaCom.lock()->Reload();
-       
+
         if (DirectX::XMVector3Length(VeloVec).m128_f32[0] > 0.1f)
         {
             ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
@@ -198,14 +174,10 @@ void NomuraCharacter_ReloadState::Execute(const float& elapsedTime)
             ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
         }
     }
-
-
-
 }
 
 void NomuraCharacter_ReloadState::ImGui()
 {
-
 }
 
 #pragma endregion

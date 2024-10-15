@@ -130,7 +130,7 @@ public:
 
         return false;
     }
-    float GetStickAngle() { return stickAngle; }
+    float GetStickAngle() { return nowAngle; }
     void  SetStickAngle(const float angle) {  stickAngle = angle; }
 
     DirectX::XMFLOAT3 GetFpsCameraDir() { return fpsCameraDir; }
@@ -162,6 +162,11 @@ private:
 
     void SetLSSkillCoolTime(float time) { LScool.time = time; }
     float GetLSSkillCoolTime() { return LScool.time; }
+
+    //アニメーションに使用する角度の補完
+    float InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed);
+    float Lerp(float start, float end, float t);
+
 
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
@@ -216,4 +221,8 @@ private:
 
     //野村追加  
     float stickAngle = 0.0f;
+    float nowAngle = 0.0f;
+    float lerpSpeed = 4.0f;
+
+    
 };

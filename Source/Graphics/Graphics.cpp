@@ -349,14 +349,6 @@ Graphics::Graphics(HWND hWnd)
             desc.RenderTarget[5].DestBlendAlpha = D3D11_BLEND_ZERO;
             desc.RenderTarget[5].BlendOpAlpha = D3D11_BLEND_OP_ADD;
             desc.RenderTarget[5].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-            desc.RenderTarget[6].BlendEnable = FALSE;
-            desc.RenderTarget[6].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-            desc.RenderTarget[6].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-            desc.RenderTarget[6].BlendOp = D3D11_BLEND_OP_ADD;
-            desc.RenderTarget[6].SrcBlendAlpha = D3D11_BLEND_ONE;
-            desc.RenderTarget[6].DestBlendAlpha = D3D11_BLEND_ZERO;
-            desc.RenderTarget[6].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-            desc.RenderTarget[6].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
             hr = device_->CreateBlendState(&desc, blendStates[static_cast<int>(BLENDSTATE::MULTIPLERENDERTARGETS)].GetAddressOf());
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
@@ -648,14 +640,12 @@ Graphics::Graphics(HWND hWnd)
 
     // シェーダー
     {
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::DEFAULT)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::DEFAULT);
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::DEFERRED)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::DEFERRED);
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::BLACK)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::BLACK);
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE);
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::FAKE_DEPTH)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::FAKE_DEPTH);
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SCI_FI_GATE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SCI_FI_GATE);
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SHADOW)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SHADOW);
-        m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SILHOUETTE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SILHOUETTE);
+        //m_modelshaders[static_cast<int>(SHADER_ID_MODEL::DEFERRED)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::DEFERRED);
+        //m_modelshaders[static_cast<int>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::AREA_EFFECT_CIRCLE);
+        //m_modelshaders[static_cast<int>(SHADER_ID_MODEL::FAKE_DEPTH)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::FAKE_DEPTH);
+        //m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SCI_FI_GATE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SCI_FI_GATE);
+        //m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SHADOW)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SHADOW);
+        //m_modelshaders[static_cast<int>(SHADER_ID_MODEL::SILHOUETTE)] = std::make_unique<ModelShader>(SHADER_ID_MODEL::SILHOUETTE);
     }
 
     // レンダラ
@@ -685,14 +675,10 @@ void Graphics::ResizeBackBuffer(UINT width, UINT height)
     dxgi_mode_desc.RefreshRate.Numerator = 60;
     dxgi_mode_desc.RefreshRate.Denominator = 1;
 
-    //HRESULT hr = swapChain->ResizeTarget(&dxgi_mode_desc);
-    //_ASSERT_EXPR(SUCCEEDED(hr), "スワップチェーンのリサイズに失敗しました。\nhr=%08x", hr);
-
     ID3D11RenderTargetView* nullViews[] = { nullptr };
     immediateContext_->OMSetRenderTargets(ARRAYSIZE(nullViews), nullViews, nullptr);
     ReleaseBackBuffer();
 
-    //immediateContext->ClearState();
     immediateContext_->Flush();
 
     DXGI_SWAP_CHAIN_DESC dxgi_sc_desc = {};

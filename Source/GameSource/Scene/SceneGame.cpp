@@ -19,7 +19,7 @@
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
 #include "Components\AnimationCom.h"
-#include "Components/AimIKCom.h"
+#include "Components\AimIKCom.h"
 #include "Components\MovementCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\TestCharacterCom.h"
@@ -39,6 +39,8 @@
 #include "Components/StageEditorCom.h"
 #include "Components/SpawnCom.h"
 #include "Components/Enemy/Boss/BossCom.h"
+#include "Components/InstanceRendererCom.h"
+#include "Components\EasingMoveCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -47,6 +49,8 @@
 #include "GameSource/GameScript/EventCameraManager.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include <Components/Character/CharaStatusCom.h>
+
+#include "Audio/AudioSource.h"
 
 // 初期化
 void SceneGame::Initialize()
@@ -77,32 +81,13 @@ void SceneGame::Initialize()
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
         obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
-    }
-
-    //当たり判定用
-    //std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
-    {
-        //roboobj->SetName("robo");
-        //roboobj->transform_->SetWorldPosition({ 0, 0, 0 });
-        //roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        //std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        //r->LoadModel("Data/OneCoin/robot.mdl");
-        //std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
-        //a->PlayAnimation(0, true, false, 0.001f);
-
-        //std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
-        //sphere->SetRadius(2.0f);
-        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
-        //sphere->SetJudgeTag(COLLIDER_TAG::Player);
-
-        //roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
     }
 
     //プレイヤー
@@ -124,29 +109,40 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
+    //BOSS
+    {
+        auto& boss = GameObjectManager::Instance().Create();
+        boss->SetName("BOSS");
+        std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Jammo/jammo.mdl");
+        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+        boss->AddComponent<EasingMoveCom>(nullptr);
+        //t = boss->transform_;
+        boss->AddComponent<MovementCom>();
+        //boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        //boss->AddComponent<AnimationCom>();
+        //boss->AddComponent<BossCom>();
+        //boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        //boss->AddComponent<CharaStatusCom>();
+        //boss->AddComponent<SpawnCom>();
+    }
+
+    //インスタンステスト
+    {
+        //auto& obj = GameObjectManager::Instance().Create();
+        //obj->SetName("Instance");
+        //obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+        //std::shared_ptr<InstanceRenderer> r = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 2, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true);
+        //r->LoadModel("Data/Jammo/jammo.mdl");
+    }
+
     //UIテスト
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("UiTest");
         obj->AddComponent<Sprite>("Data\\Texture\\test.ui", true);
     }
-
-    //BOSS
-   {
-       auto& obj = GameObjectManager::Instance().Create();
-       obj->SetName("BOSS");
-       std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-       r->LoadModel("Data/Jammo/jammo.mdl");
-       obj->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-       obj->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-       obj->AddComponent<MovementCom>();
-       obj->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
-       obj->AddComponent<AnimationCom>();
-       obj->AddComponent<BossCom>();
-       obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
-       obj->AddComponent<CharaStatusCom>();
-       obj->AddComponent<SpawnCom>();
-   }
 
 #pragma endregion
 
@@ -170,6 +166,17 @@ void SceneGame::Initialize()
     ConstantBufferInitialize();
 
 #pragma endregion
+
+#pragma region オーディオ系の設定
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("Audio Test SE");
+    std::shared_ptr<AudioSource> audio = obj->AddComponent<AudioSource>();
+    audio->SetAudio(static_cast<int>(AUDIOID::SE));
+    audio->Play(false, 0.5f);
+    audio->SetAudioName("Test");
+
+#pragma endregion
+
 
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
@@ -198,6 +205,9 @@ void SceneGame::Update(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
+
+    //ボスの位置取得
+    //sc->data.bossposiotn = t->GetWorldPosition();
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();

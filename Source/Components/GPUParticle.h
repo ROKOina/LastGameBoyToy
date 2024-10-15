@@ -5,7 +5,7 @@
 #include <d3d11.h>
 #include "Graphics/Shaders/ConstantBuffer.h"
 
-#define THREAD 512
+#define THREAD 1024
 
 class GPUParticle :public Component
 {
@@ -86,7 +86,7 @@ public:
         DirectX::XMFLOAT3 velocity = { 0,0,0 };
         float lifetime = 1.0f;
         DirectX::XMFLOAT3 luminance = { 1,1,1 };
-        float speed = 1.0f;
+        float speed = 0.0f;
         DirectX::XMFLOAT2 scale = { 0.2f,0.2f };
         float startsize = 1.0f;
         float endsize = 1.0f;

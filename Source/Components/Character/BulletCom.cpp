@@ -33,7 +33,7 @@ void BulletCom::Update(float elapsedTime)
     //    }
     //    GameObjectManager::Instance().Remove(this->GetGameObject());
     //}
-    
+
     //ヒットプロセスがあれば処理する
     auto& hitProcessCom = GetGameObject()->GetComponent<HitProcessCom>();
     if (hitProcessCom)
@@ -57,9 +57,6 @@ void BulletCom::EraseBullet(float elapsedTime)
     }
 }
 
-
-
-
 //ダメージ弾生成
 void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
 {
@@ -71,11 +68,10 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     firePos.y += 1.0f;
     obj->transform_->SetWorldPosition(firePos);
 
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
+    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::FAKE_DEPTH), (BLENDSTATE::ALPHA));
     renderCom->LoadModel("Data/Ball/t.mdl");
 
     ///////////////////////////////
-
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
@@ -103,7 +99,6 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     hit->SetValue(5);
 }
 
-
 //スタン弾生成
 void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
 {
@@ -115,11 +110,10 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
     firePos.y += 1.0f;
     obj->transform_->SetWorldPosition(firePos);
 
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
+    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::FAKE_DEPTH), (BLENDSTATE::ALPHA));
     renderCom->LoadModel("Data/Ball/t.mdl");
 
     ///////////////////////////////
-
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
@@ -142,7 +136,7 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
     bulletCom->SetAliveTime(2.0f);
 
     //判定用
-    std::shared_ptr<HitProcessCom> hit= obj->AddComponent<HitProcessCom>(objPoint);
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::STAN);
     hit->SetValue(5);
 }
@@ -158,11 +152,10 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     firePos.y += 1.0f;
     obj->transform_->SetWorldPosition(firePos);
 
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
+    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::FAKE_DEPTH), (BLENDSTATE::ALPHA));
     renderCom->LoadModel("Data/Ball/t.mdl");
 
     ///////////////////////////////
-
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
@@ -185,7 +178,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     bulletCom->SetAliveTime(2.0f);
 
     //判定用
-    std::shared_ptr<HitProcessCom> hit= obj->AddComponent<HitProcessCom>(objPoint);
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
     DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
     DirectX::XMFLOAT3 knockVec = { 0,2,0 };

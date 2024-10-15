@@ -162,8 +162,6 @@ void EventCameraManager::LoadDesirialize()
     }
 }
 
-
-
 void EventCameraManager::EventCameraImGui()
 {
     ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
@@ -310,7 +308,6 @@ void EventCameraManager::EventCameraImGui()
     }
 
     ImGui::End();
-
 }
 
 void EventCameraManager::EventUpdate(float elapsedTime)
@@ -362,15 +359,14 @@ void EventCameraManager::PlayEventCamera(std::string eventName)
 
 DirectX::XMFLOAT3 EventCameraManager::FocusFromCameraPos()
 {
-    if(!cameraObj.lock())return DirectX::XMFLOAT3(0,0,0);
-    if(!focusObj.lock())return DirectX::XMFLOAT3(0,0,0);
+    if (!cameraObj.lock())return DirectX::XMFLOAT3(0, 0, 0);
+    if (!focusObj.lock())return DirectX::XMFLOAT3(0, 0, 0);
 
     DirectX::XMFLOAT3 cameraPos;
     DirectX::XMFLOAT3 focusPos;
 
-    cameraPos= cameraObj.lock()->transform_->GetWorldPosition();
+    cameraPos = cameraObj.lock()->transform_->GetWorldPosition();
     focusPos = focusObj.lock()->transform_->GetWorldPosition();
-
 
     return focusPos - cameraPos;
 }

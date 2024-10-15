@@ -38,6 +38,9 @@ Framework::Framework(HWND hWnd)
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
     //SceneManager::Instance().ChangeScene(new SceneTitle);
 
+    // オーディオ初期化
+    Audio::Initialize();
+
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
 
@@ -99,11 +102,11 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     graphics_.GetSwapChain()->Present(syncInterval, 0);
 
     // リサイズ
-    //if (resize)
-    //{
-    //    graphics_.ResizeBackBuffer(width, height);
-    //    resize = false;
-    //}
+    if (resize)
+    {
+        graphics_.ResizeBackBuffer(width, height);
+        resize = false;
+    }
 }
 
 // フレームレート計算
@@ -236,12 +239,12 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
     case WM_MOUSEWHEEL:
         Input::Instance().GetMouse().SetWheel(GET_WHEEL_DELTA_WPARAM(wParam));
         break;
-        //case WM_SIZE:
-        //{
-        //    // サイズ変更
-        //    Resize(LOWORD(lParam), HIWORD(lParam));
-        //    break;
-        //}
+    case WM_SIZE:
+    {
+        // サイズ変更
+        Resize(LOWORD(lParam), HIWORD(lParam));
+        break;
+    }
     default:
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
