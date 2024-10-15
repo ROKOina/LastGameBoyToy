@@ -1,36 +1,58 @@
 #include "Physxlib.h"
-//#pragma comment(lib, "PhysX_64.lib")
-//#pragma comment(lib, "PhysXCommon_64.lib")
-//#pragma comment(lib, "PhysXCooking_64.lib")
-//#pragma comment(lib, "PhysXExtensions_static_64.lib")
-//#pragma comment(lib, "PhysXFoundation_64.lib")
-//#pragma comment(lib, "PhysXPvdSDK_static_64.lib")
-//#pragma comment(lib, "PhysXTask_static_64.lib")
-//#pragma comment(lib, "SceneQuery_static_64.lib")
-//#pragma comment(lib, "SimulationController_static_64.lib")
 
 void PhysXLib::Initialize()
 {
-    // Foundationのインスタンス化
-    //m_pFoundation.reset(PxCreateFoundation(PX_PHYSICS_VERSION, m_defaultAllocator, m_defaultErrorCallback));
-    //m_pPvd.reset(physx::PxCreatePvd(*m_pFoundation));
-    //m_pPhysics.reset(PxCreatePhysics(PX_PHYSICS_VERSION, *m_pFoundation, physx::PxTolerancesScale(), true, m_pPvd.get()));
+    gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
 
-    //// 処理に使うスレッドを指定する
-    //m_pDispatcher.reset(physx::PxDefaultCpuDispatcherCreate(8));
-    //// 空間の設定
-    //physx::PxSceneDesc scene_desc(m_pPhysics->getTolerancesScale());
-    //scene_desc.gravity = physx::PxVec3(0, -9, 0);
-    //scene_desc.filterShader = physx::PxDefaultSimulationFilterShader;
-    //scene_desc.cpuDispatcher = m_pDispatcher.get();
-    //// 空間のインスタンス化
-    //m_pScene.reset(m_pPhysics->createScene(scene_desc));
+    // Physicsオブジェクトの作成
+    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true);
+
+    // シーンの設定
+    PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+    sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f); // 重力設定
+    gDispatcher = PxDefaultCpuDispatcherCreate(2);  // 2スレッドでディスパッチャーを作成
+    sceneDesc.cpuDispatcher = gDispatcher;
+    sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+
+    // シーンの作成
+    gScene = gPhysics->createScene(sceneDesc);
 }
 
 void PhysXLib::Update(float elapsedTime)
 {
-    //// シミュレーション速度を指定する
-    //m_pScene->simulate(1.f / 60.f);
-    //// PhysXの処理が終わるまで待つ
-    //m_pScene->fetchResults(true);
+    // シミュレーション速度を指定する
+    gScene->simulate(elapsedTime);
+    // PhysXの処理が終わるまで待つ
+    gScene->fetchResults(true);
+}
+
+void PhysXLib::GenerateCollider(Model* model)
+{
+    for (auto& mesh : model->GetResource()->GetMeshes())
+    {
+        PxTriangleMeshDesc meshDesc;
+        meshDesc.points.count = mesh.vertices.size();
+        meshDesc.points.stride = sizeof(PxVec3);
+        meshDesc.points.data = vertices;  // FBXから抽出した頂点データ
+
+        for()
+    }
+
+    PxTriangleMeshDesc meshDesc;
+    meshDesc.points.count = numVertices;
+    meshDesc.points.stride = sizeof(PxVec3);
+    meshDesc.points.data = vertices;  // FBXから抽出した頂点データ
+
+    meshDesc.triangles.count = numTriangles;
+    meshDesc.triangles.stride = 3 * sizeof(PxU32);
+    meshDesc.triangles.data = indices;  // FBXから抽出したインデックスデータ
+
+    PxDefaultMemoryOutputStream writeBuffer;
+    PxTriangleMeshCookingResult::Enum result;
+    if (!cooking->cookTriangleMesh(meshDesc, writeBuffer, &result)) {
+        // メッシュの生成が失敗
+    }
+
+    PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+    PxTriangleMesh* triangleMesh = physics->createTriangleMesh(readBuffer);
 }
