@@ -11,9 +11,23 @@
 //ポストエフェクト
 class PostEffect
 {
-public:
+private:
+
     PostEffect();
     ~PostEffect() {}
+
+    // コピーコンストラクタと代入演算子を削除
+    PostEffect(const PostEffect&) = delete;
+    PostEffect& operator=(const PostEffect&) = delete;
+
+public:
+
+    //シングルトン
+    static PostEffect& Instance()
+    {
+        static PostEffect instance;
+        return instance;
+    }
 
     // デファードのレンダーターゲットを設定
     void SetDeferredTarget();
@@ -35,6 +49,9 @@ public:
 
     //画面サイズ変更時にレンダーターゲットを作り直す
     void ResizeBuffer();
+
+    //シーンのimgui
+    void SceneImGui();
 
 public:
 

@@ -204,24 +204,24 @@ void GameObjectManager::UpdateTransform()
 void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& lightdirection)
 {
     //影描画
-    m_posteffect->GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, m_posteffect->m_criticaldepthvalue, [&]()
+    PostEffect::Instance().GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, PostEffect::Instance().m_criticaldepthvalue, [&]()
         {
             RenderShadow();
             InstanceRenderShadow();
         });
 
     // オフスクリーンに描画開始
-    m_posteffect->StartOffScreenRendering();
+    PostEffect::Instance().StartOffScreenRendering();
 
     //デファードレンダリングの初期設定 ( レンダーターゲットをデファード用の物に変更 )
-    m_posteffect->SetDeferredTarget();
+    PostEffect::Instance().SetDeferredTarget();
 
     //3D描画
     RenderDeferred();
     InstanceRenderDeferred();
 
     //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
-    m_posteffect->EndDeferred();
+    PostEffect::Instance().EndDeferred();
 
     //CPUパーティクル描画
     CPUParticleRender();
@@ -238,7 +238,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
 
     // 深度マップをコピーしてGPUに設定
-    m_posteffect->DepthCopyAndBind(8);
+    PostEffect::Instance().DepthCopyAndBind(8);
 
     // 深度マップを使用するシェーダー
     RenderUseDepth();
@@ -248,7 +248,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     SpriteRender(view, projection);
 
     //ポストエフェクト
-    m_posteffect->PostEffectRender();
+    PostEffect::Instance().PostEffectRender();
 
 
     //debug
@@ -269,7 +269,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
         DrawDetail();
 
         //ポストエフェクトimgui
-        m_posteffect->PostEffectImGui();
+        PostEffect::Instance().PostEffectImGui();
     }
 
     DrawGuizmo(view, projection);
@@ -303,10 +303,10 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
 
         if (ImGui::IsMouseDoubleClicked(0))
         {
-            ImGuiIO& io = ImGui::GetIO();
+            //ImGuiIO& io = ImGui::GetIO();
 
             // ImGui上にマウスカーソルがある場合は処理しない
-            if (!io.WantCaptureMouse) return;
+            //if (!io.WantCaptureMouse) return;
 
             GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
             GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
