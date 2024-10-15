@@ -31,6 +31,7 @@ Graphics::Graphics(HWND hWnd)
     this->screenHeight_ = static_cast<float>(screenHeight);
 
     HRESULT hr = S_OK;
+    UINT qualityLevel = 0;
 
     // デバイス＆スワップチェーンの生成
     {
@@ -50,7 +51,7 @@ Graphics::Graphics(HWND hWnd)
 
         // デバイスが作成されているか確認してからマルチサンプルの品質レベルを確認
         if (device_ != nullptr) {
-            HRESULT hr = device_->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &qualityLevel);
+            hr = device_->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &qualityLevel);
 
             // HRESULT が成功したかどうか確認
             if (SUCCEEDED(hr)) {
@@ -572,7 +573,7 @@ Graphics::Graphics(HWND hWnd)
         desc.BorderColor[1] = 0;
         desc.BorderColor[2] = 0;
         desc.BorderColor[3] = 0;
-        desc.MinLOD = 0;    
+        desc.MinLOD = 0;
         desc.MaxLOD = D3D11_FLOAT32_MAX;
 
         // MIP_POINT

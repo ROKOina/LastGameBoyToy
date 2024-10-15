@@ -83,7 +83,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     float4 sampled_color = texturemaps.Sample(sampler_states[POINT], pin.texcoord.xy);
 
     // SSR (Screen Space Reflection)‚ð“K—p
-    sampled_color.rgb += applySSR(pin.texcoord.xy).rgb;
+    //sampled_color.rgb += applySSR(pin.texcoord.xy).rgb;
 
     return sampled_color;
 }

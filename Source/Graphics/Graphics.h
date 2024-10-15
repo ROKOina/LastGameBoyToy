@@ -208,7 +208,6 @@ public:
 private:
     static Graphics* instance_;
     D3D11_VIEWPORT viewport;
-    UINT qualityLevel;
 
     Microsoft::WRL::ComPtr<ID3D11Device>			device_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext>		immediateContext_;

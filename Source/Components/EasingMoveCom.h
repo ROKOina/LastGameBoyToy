@@ -60,6 +60,7 @@ private:
     float easingtime = 0.0f;
     bool play = false;
     bool loop = false;
+    bool one = false;
     DirectX::XMFLOAT3 savepos = {};
     DirectX::XMFLOAT3 savescale = {};
 };
