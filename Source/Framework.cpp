@@ -85,6 +85,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     ID3D11DeviceContext* dc = graphics_.GetDeviceContext();
 
+    //シーンだけ上に描画
+    PostEffect::Instance().SceneImGui();
+
     //imguiguizmo
     ImGuizmo::BeginFrame();
     ImGuizmo::SetOrthographic(false);
@@ -105,6 +108,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     if (resize)
     {
         graphics_.ResizeBackBuffer(width, height);
+        PostEffect::Instance().ResizeBuffer();
         resize = false;
     }
 }
@@ -185,6 +189,13 @@ int Framework::Run()
             endTime1 = clock();
             //Logger::Print((std::string("Frame Time : ") + std::to_string(endTime1 - startTime1) + "\n\n").c_str());
         }
+    }
+
+    BOOL fullscreen = 0;
+    graphics_.GetSwapChain()->GetFullscreenState(&fullscreen, 0);
+    if (fullscreen)
+    {
+        graphics_.GetSwapChain()->SetFullscreenState(FALSE, 0);
     }
 
     //// ComPtr用リーク型名表示　作成

@@ -239,3 +239,21 @@ void PostEffect::ResizeBuffer()
     //MultiRenderTarget作成
     m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), width, height, 6);
 }
+
+//シーンのimgui
+void PostEffect::SceneImGui()
+{
+    //ImGuiIO& io = ImGui::GetIO();
+
+    //// ImGui上にマウスカーソルがある場合は処理しない
+    //if (io.WantCaptureMouse) return;
+
+    ImGui::Begin("GameScene");
+    // ウィンドウの位置とサイズを取得
+    ImVec2 size = ImGui::GetContentRegionAvail();
+    // フレームバッファのシェーダーリソースビューを取得
+    ImTextureID texture_id = (ImTextureID)(m_offScreenBuffer[static_cast<size_t>(offscreen::tonemap)]->m_shaderresourceviews[0].Get());
+    // 画像を表示
+    ImGui::Image(texture_id, size);
+    ImGui::End();
+}
