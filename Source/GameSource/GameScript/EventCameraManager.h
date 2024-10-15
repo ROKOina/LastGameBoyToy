@@ -64,7 +64,7 @@ private:
     //フォーカスポジションから見たワールドポジションを返す
     DirectX::XMFLOAT3 FocusFromWorldPos(DirectX::XMFLOAT3 pos);
 
-    //再生関数
+    //再生関数(内部)
     void PlayCameraLerp();
 
 private:

@@ -26,4 +26,5 @@ public:
 
 private:
     std::string focusObjName;
+    std::weak_ptr<GameObject> cameraCopy;
 };
