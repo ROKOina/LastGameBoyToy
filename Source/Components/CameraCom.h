@@ -47,6 +47,9 @@ public:
     //ã•ûŒüŽæ“¾
     const DirectX::XMFLOAT3& GetUp()const { return up_; }
 
+    //ƒJƒƒ‰‚ÌêŠŽæ“¾
+    const DirectX::XMFLOAT3& GetEye()const { return eye_; }
+
     //‘O•ûŒüŽæ“¾
     const DirectX::XMFLOAT3& GetFront()const { return front_; }
     void SetFrontX(const float& x) { this->front_.x = x; }

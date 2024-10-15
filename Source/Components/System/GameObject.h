@@ -131,7 +131,7 @@ using GameObj = std::shared_ptr<GameObject>;
 class GameObjectManager
 {
 private:
-    GameObjectManager() { m_posteffect = std::make_unique<PostEffect>(); }
+    GameObjectManager() { }
     ~GameObjectManager() {}
 
 public:
@@ -238,9 +238,6 @@ private:
 
     //スプライト描画
     std::vector<std::weak_ptr<Sprite>>spriteobject;
-
-    //ポストエフェクト
-    std::unique_ptr<PostEffect>m_posteffect;
 
     bool					isHiddenLister_ = false;
     bool					isHiddenDetail_ = false;
