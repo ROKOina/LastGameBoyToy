@@ -137,13 +137,6 @@ void SceneGame::Initialize()
         //r->LoadModel("Data/Jammo/jammo.mdl");
     }
 
-    //UIテスト
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("UiTest");
-        obj->AddComponent<Sprite>("Data\\Texture\\test.ui", true);
-    }
-
 #pragma endregion
 
 #pragma region グラフィック系の設定
@@ -176,7 +169,6 @@ void SceneGame::Initialize()
     audio->SetAudioName("Test");
 
 #pragma endregion
-
 
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
@@ -222,6 +214,9 @@ void SceneGame::Render(float elapsedTime)
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
     ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
     ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
+    FLOAT color[] = { 0.0f, 0.0f, 0.5f, 1.0f };	// RGBA(0.0～1.0)
+    dc->ClearRenderTargetView(rtv, color);
+    dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     dc->OMSetRenderTargets(1, &rtv, dsv);
 
     //コンスタントバッファの更新
