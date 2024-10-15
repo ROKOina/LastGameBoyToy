@@ -77,6 +77,8 @@ private:
         float vignettesize = 0.8f;
         float vignetteintensity = 0.7f;
         DirectX::XMFLOAT4 ssrparameter = { 50.0f,10.0f,0.1f,1.0f };
+        float distance_to_sun = 17.301f;
+        DirectX::XMFLOAT3 posteffectdummy = {};
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
