@@ -244,11 +244,12 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     RenderUseDepth();
     InstanceRenderUseDepth();
 
+    //スプライト描画
+    SpriteRender(view, projection);
+
     //ポストエフェクト
     m_posteffect->PostEffectRender();
 
-    //スプライト描画
-    SpriteRender(view, projection);
 
     //debug
     if (Graphics::Instance().IsDebugGUI())

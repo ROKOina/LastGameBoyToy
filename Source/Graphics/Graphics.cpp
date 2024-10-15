@@ -548,7 +548,7 @@ Graphics::Graphics(HWND hWnd)
         desc.BorderColor[1] = 0;
         desc.BorderColor[2] = 0;
         desc.BorderColor[3] = 0;
-        desc.MinLOD = 0;
+        desc.MinLOD = 0;    
         desc.MaxLOD = D3D11_FLOAT32_MAX;
 
         // MIP_POINT
