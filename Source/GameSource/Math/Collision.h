@@ -114,5 +114,6 @@ public:
         const DirectX::XMVECTOR cap1EndPos,
         float cap1Radius,
         DirectX::XMMATRIX boxWorldTransform);
+
 };
 
