@@ -21,6 +21,25 @@ void EventCameraCom::Update(float elapsedTime)
 {
     //Šî’êƒNƒ‰ƒX‚ÌƒJƒƒ‰‚ðŒÄ‚Ô
     CameraCom::Update(elapsedTime);
+
+    static bool isEve = false;
+    if (GetIsPlayEvent())
+    {
+        if (!isEve)
+        {
+            cameraCopy = SceneManager::Instance().GetActiveCamera();
+            ActiveCameraChange();
+            isEve = true;
+        }
+    }
+    else
+    {
+        if (isEve)
+        {
+            cameraCopy.lock()->GetComponent<CameraCom>()->ActiveCameraChange();
+            isEve = false;
+        }
+    }
 }
 
 //imgui

@@ -329,6 +329,10 @@ void EventCameraManager::EventUpdate(float elapsedTime)
     if (timer >= ect[ect.size() - 1].frame)
     {
         isEventPlay = false;
+
+        //イベント再生をセット
+        auto& camera = cameraObj.lock()->GetComponent<CameraCom>();
+        if (camera)camera->SetIsPlayEvent(false);
     }
 }
 
@@ -341,10 +345,16 @@ void EventCameraManager::PlayEventCamera(std::string eventName)
         focusObj = GameObjectManager::Instance().Find(saveEventCameraBuff.focusObjName.c_str());
     }
 
-    //初期位置に移動
     if (cameraObj.lock())
+    {
+        //初期位置に移動
         if (saveEventCameraBuff.ECTra.size() >= 2)
             cameraObj.lock()->transform_->SetWorldPosition(FocusFromWorldPos(saveEventCameraBuff.ECTra[0].pos));
+
+        //イベント再生をセット
+        auto& camera = cameraObj.lock()->GetComponent<CameraCom>();
+        if (camera)camera->SetIsPlayEvent(true);
+    }
 
     timer = 0;
     isEventPlay = true;
