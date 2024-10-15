@@ -1,11 +1,10 @@
-#include "Instancing.hlsli"
 #include "Defalt.hlsli"
 #include "../Constants.hlsli"
 
 VS_OUT main(INSTANCE_VS_IN vin)
 {
     VS_OUT vout;
-    float4x4 world = mul(global_transform, calc_world_transform(vin.InstScale, vin.InstRotation, vin.InstPosition));
+    float4x4 world = vin.transform;
 
     // ƒ|ƒWƒVƒ‡ƒ“‚Ì•ÏŠ·
     vout.position = mul(float4(vin.position, 1.0f), mul(world, viewProjection));

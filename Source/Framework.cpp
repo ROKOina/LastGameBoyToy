@@ -38,6 +38,9 @@ Framework::Framework(HWND hWnd)
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
     //SceneManager::Instance().ChangeScene(new SceneTitle);
 
+    // オーディオ初期化
+    Audio::Initialize();
+
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
 
@@ -82,6 +85,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     ID3D11DeviceContext* dc = graphics_.GetDeviceContext();
 
+    //シーンだけ上に描画
+    PostEffect::Instance().SceneImGui();
+
     //imguiguizmo
     ImGuizmo::BeginFrame();
     ImGuizmo::SetOrthographic(false);
@@ -99,11 +105,12 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     graphics_.GetSwapChain()->Present(syncInterval, 0);
 
     // リサイズ
-    //if (resize)
-    //{
-    //    graphics_.ResizeBackBuffer(width, height);
-    //    resize = false;
-    //}
+    if (resize)
+    {
+        graphics_.ResizeBackBuffer(width, height);
+        PostEffect::Instance().ResizeBuffer();
+        resize = false;
+    }
 }
 
 // フレームレート計算
@@ -182,6 +189,13 @@ int Framework::Run()
             endTime1 = clock();
             //Logger::Print((std::string("Frame Time : ") + std::to_string(endTime1 - startTime1) + "\n\n").c_str());
         }
+    }
+
+    BOOL fullscreen = 0;
+    graphics_.GetSwapChain()->GetFullscreenState(&fullscreen, 0);
+    if (fullscreen)
+    {
+        graphics_.GetSwapChain()->SetFullscreenState(FALSE, 0);
     }
 
     //// ComPtr用リーク型名表示　作成

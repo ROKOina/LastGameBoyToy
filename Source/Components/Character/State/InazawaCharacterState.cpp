@@ -21,11 +21,10 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
     firePos.y += 1.0f;
     obj->transform_->SetWorldPosition(firePos);
 
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::BLACK), (BLENDSTATE::ALPHA));
+    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::FAKE_DEPTH), (BLENDSTATE::ALPHA));
     renderCom->LoadModel("Data/Ball/t.mdl");
 
     ///////////////////////////////
-
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
@@ -90,7 +89,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     moveCmp->SetSubMoveMaxSpeed(attackMaxMoveSpeed);
 
     //UŒ‚ˆÐ—Í
-    attackPower+=elapsedTime;
+    attackPower += elapsedTime;
     if (attackPower > maxAttackPower) {
         attackPower = maxAttackPower;
     }
@@ -103,7 +102,6 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
             owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
         );
 
-
         //UŒ‚ˆ—
         Fire(owner->GetGameObject(), arrowSpeed, attackPower);
         //RayFire(owner->GetGameObject());
@@ -112,7 +110,6 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
 
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
-
 }
 
 void InazawaCharacter_AttackState::ImGui()
@@ -121,8 +118,7 @@ void InazawaCharacter_AttackState::ImGui()
     ImGui::DragFloat("arrowSpeed", &arrowSpeed);
 }
 
-
-#pragma endregion 
+#pragma endregion
 
 #pragma region ESkill
 
@@ -165,8 +161,6 @@ void InazawaCharacter_ESkillState::ImGui()
     ImGui::DragInt("arrowCount", &arrowCount);
     ImGui::DragFloat("interval", &interval);
     ImGui::DragFloat("skillTimerEnd", &skillTimer);
-
 }
 
-
-#pragma endregion 
+#pragma endregion

@@ -35,6 +35,7 @@ public:
         int nodeid = {};
         int endnodeid = {};
         int collsiontype = {};
+        int parttype = {};
         float radius = 0.0f;
         float height = 0.0f;
         DirectX::XMFLOAT3 scale = { 0,0,0 };

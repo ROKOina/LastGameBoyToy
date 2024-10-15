@@ -89,7 +89,7 @@ private:
 
     std::shared_ptr<BaseConstants> variousConstant = nullptr;
 
-    SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFAULT;
+    SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFERRED;
 #ifdef _DEBUG
     int							selectionMaterialIndex = -1;
     bool						hiddenProperty = false;

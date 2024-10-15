@@ -65,13 +65,19 @@ public:
         shakeSec_ = seconds;
     }
 
+    //この関数でカメラをアクティブにする
+    void ActiveCameraChange();
+
     //アクティブカメラ最初のセット
     void SetActiveInitialize();
-    void ActiveCameraChange();
     bool GetIsActive() { return isActiveCamera; }
 
     //Ui配置用のbool取得
     bool GetIsUiCreate() { return isUiCreate; }
+
+    //カメライベント再生中か
+    void SetIsPlayEvent(bool flg) { isPlayEvent = flg; }
+    bool GetIsPlayEvent() { return isPlayEvent; }
 
 private:
     //アクティブカメラ変更処理
@@ -112,4 +118,7 @@ private:
 
     //Uiを配置する時にマウスが固定されないようにする
     bool isUiCreate = false;
+
+    //カメライベント中に勝手にtrueになる
+    bool isPlayEvent = false;
 };

@@ -1,4 +1,4 @@
-#define THREAD 512
+#define THREAD 1024
 
 struct VS_OUT
 {

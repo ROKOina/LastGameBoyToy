@@ -5,6 +5,7 @@
 #include "GameSource/Math/Mathf.h"
 #include "Logger.h"
 #include "Components/TransformCom.h"
+#include "GameSource\Math\Mathf.h"
 #include <fstream>
 #include <filesystem>
 #include <shlwapi.h>
@@ -100,7 +101,8 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
         CEREAL_NVP(m_scale),
         CEREAL_NVP(m_latesize),
         CEREAL_NVP(m_particlecolor),
-        CEREAL_NVP(m_intensity)
+        CEREAL_NVP(m_intensity),
+        CEREAL_NVP(collsionradius)
     );
 }
 
@@ -171,6 +173,8 @@ void CPUParticle::Update(float elapsedTime)
     {
         for (int i = 0; i < m_numparticle; i++)
         {
+            if (m_data[i].type == -1) continue; // 非表示のパーティクルをスキップ
+
             if (m_data[i].type < 0) continue;
 
             //寿命時間の割合を求める
@@ -278,6 +282,14 @@ void CPUParticle::Render()
     dc->VSSetShader(NULL, NULL, 0);
     dc->GSSetShader(NULL, NULL, 0);
     dc->PSSetShader(NULL, NULL, 0);
+
+    //当たり判定描画
+    for (int i = 0; i < m_numparticle; ++i)
+    {
+        if (m_data[i].type == -1) continue; // 非表示のパーティクルをスキップ
+
+        Graphics::Instance().GetDebugRenderer()->DrawSphere(m_v[i].Pos, m_scp.collsionradius, { 1,0,0,1 });
+    }
 }
 
 //セット
@@ -516,6 +528,7 @@ void CPUParticle::OnGUI()
     ImGui::SameLine();
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"パーティクルの最後の速さ"), &m_scp.m_stringlate.y, 0.01f, 1.0f, 10.0f);
+    ImGui::DragFloat(u8"当たり判定の半径", &m_scp.collsionradius);
 }
 
 //シリアライズ
@@ -609,4 +622,13 @@ void CPUParticle::Reset()
     m_scp.m_latesize = { 1,1 };
     m_scp.m_particlecolor = { 1,1,1,1 };
     m_scp.m_intensity = { 1,1,1 };
+    m_scp.collsionradius = { 0.0f };
 }
+
+//ベジェ曲線
+//DirectX::XMVECTOR CPUParticle::BezierCurve(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1, DirectX::XMVECTOR p2, float t)
+//{
+//    float u = 1 - t;
+//
+//    return u * u * p0 + 2 * u * t * p1 + t * t * p2;
+//}

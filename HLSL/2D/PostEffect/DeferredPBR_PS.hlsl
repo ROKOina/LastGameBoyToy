@@ -16,18 +16,17 @@ Texture2D lutGGX : register(t13); // スカイボックスの色対応表
 float4 main(VS_OUT pin) : SV_TARGET
 {
     // テクスチャからパラメーター取得
-    float4 albedoColor = colorMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord);
-    clip(albedoColor.a - EPSILON);
+    float4 albedoColor = colorMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy);
 
     // ワールド空間の法線
-    float3 N = normalMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).xyz;
+    float3 N = normalMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy).xyz;
     N = normalize(N * 2 - 1); // -1 ~ 1 にスケール
 
     // ワールド座標
-    float4 wPos = positionMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord);
+    float4 wPos = positionMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy);
 
     // 金属度・粗さ・環境遮蔽
-    float3 MRAO = MRAO_Map.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).rgb;
+    float3 MRAO = MRAO_Map.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy).rgb;
 
     // ライトベクトル、カメラベクトルを正規化
     float3 L = normalize(directionalLight.direction.xyz);
@@ -40,7 +39,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 F0 = lerp(dot(_DielectricF0, Specular * Specular), albedoColor.rgb, MRAO.x);
 
     // 間接光による拡散反射
-    float3 indirectDiffuse = ShadeSHPerPixel(N, albedoColor, wPos.xyz).xyz;
+    float3 indirectDiffuse = ShadeSHPerPixel(N, albedoColor).xyz;
 
     // 環境光による拡散反射＋鏡面反射
     float3 envColor = IBL(lutGGX, diffuseIem, specularPmrem, sampler_states[BLACK_BORDER_ANISOTROPIC], diffuseReflectance, F0, MRAO.r, N, V);
@@ -51,11 +50,13 @@ float4 main(VS_OUT pin) : SV_TARGET
     // AOマップ適用
     color.rgb *= MRAO.z;
 
-    // トーンマップ
-    color.rgb = saturate(color.rgb); // クランプ
-
     // エミッション適用
-    color.rgb += emissiveMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord).rgb;
+    color.rgb += emissiveMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy).rgb;
+
+    if (color.a < EPSILON)
+        discard;
+
+    color.rgb = clamp(color.rgb, 0.0f, color.rgb);
 
     return color;
 }

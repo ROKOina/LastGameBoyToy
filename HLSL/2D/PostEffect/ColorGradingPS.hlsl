@@ -2,20 +2,14 @@
 #include "PostEffect.hlsli"
 #include "../../Common.hlsli"
 #include "../../Constants.hlsli"
-#include "../../3D/Shadow.hlsli"
 
 Texture2D texturemaps : register(t0);
 Texture2D depth_map : register(t1);
-Texture2DArray shadow_map : register(t2);
-Texture2D outlinecolor : register(t3);
+Texture2D outlinecolor : register(t2);
 
 //明るさ(画面全体の)とコントラスト(画像の明暗)
 float3 brightness_contrast(float3 fragment_color, float brightness, float contrast)
 {
-	//Brightness - Contrast Effect
-	//The brightness - contrast effect allows you to modify the brightness and contrast of the rendered image.
-	//Brightness: The brighness of the image.Ranges from - 1 to 1 (-1 is solid black, 0 no change, 1 solid white).
-	//Contrast : The contrast of the image.Ranges from - 1 to 1 (-1 is solid gray, 0 no change, 1 maximum contrast).
     fragment_color += brightness;
     if (contrast > 0.0)
     {
@@ -31,10 +25,6 @@ float3 brightness_contrast(float3 fragment_color, float brightness, float contra
 //色相と彩度
 float3 hue_saturation(float3 fragment_color, float hue, float saturation)
 {
-	//Hue - Saturation Effect
-	//The hue - saturation effect allows you to modify the hue and saturation of the rendered image.
-	//Hue: The hue of the image.Ranges from - 1 to 1 (-1 is 180 degrees in the negative direction, 0 no change, 1 is 180 degrees in the postitive direction).
-	//Saturation : The saturation of the image.Ranges from - 1 to 1 (-1 is solid gray, 0 no change, 1 maximum saturation).
     float angle = hue * 3.14159265;
     float s = sin(angle), c = cos(angle);
     float3 weights = (float3(2.0 * c, -sqrt(3.0) * s - c, sqrt(3.0) * s - c) + 1.0) / 3.0;
@@ -57,13 +47,20 @@ float3 hue_saturation(float3 fragment_color, float hue, float saturation)
 #define FXAA_REDUCE_MUL (1.0/8.0)
 #define FXAA_SPAN_MAX 8.0
 #define FXAA_SUBPIX_SHIFT (1.0 / 4.0)
-float3 fxaa(Texture2D tex, float4 pos_pos, float2 rcp_frame)
+float3 fxaa(float2 texcoord)
 {
-    float3 sampled_nw = tex.Sample(sampler_states[LINEAR], pos_pos.zw).xyz;
-    float3 sampled_ne = tex.Sample(sampler_states[LINEAR], pos_pos.zw, int2(1, 0)).xyz;
-    float3 sampled_sw = tex.Sample(sampler_states[LINEAR], pos_pos.zw, int2(0, 1)).xyz;
-    float3 sampled_se = tex.Sample(sampler_states[LINEAR], pos_pos.zw, int2(1, 1)).xyz;
-    float3 sampled_m = tex.Sample(sampler_states[LINEAR], pos_pos.xy).xyz;
+    uint mip_level = 0, width, height, number_of_levels;
+    texturemaps.GetDimensions(mip_level, width, height, number_of_levels);
+    float2 rcp_frame = float2(1.0 / width, 1.0 / height);
+    float4 pos_pos;
+    pos_pos.xy = texcoord;
+    pos_pos.zw = texcoord - (rcp_frame * (0.5 + FXAA_SUBPIX_SHIFT));
+
+    float3 sampled_nw = texturemaps.Sample(sampler_states[LINEAR], pos_pos.zw).xyz;
+    float3 sampled_ne = texturemaps.Sample(sampler_states[LINEAR], pos_pos.zw, int2(1, 0)).xyz;
+    float3 sampled_sw = texturemaps.Sample(sampler_states[LINEAR], pos_pos.zw, int2(0, 1)).xyz;
+    float3 sampled_se = texturemaps.Sample(sampler_states[LINEAR], pos_pos.zw, int2(1, 1)).xyz;
+    float3 sampled_m = texturemaps.Sample(sampler_states[LINEAR], pos_pos.xy).xyz;
 
     float3 luma = float3(0.299, 0.587, 0.114);
     float luma_nw = dot(sampled_nw, luma);
@@ -84,145 +81,14 @@ float3 fxaa(Texture2D tex, float4 pos_pos, float2 rcp_frame)
     dir = min(float2(FXAA_SPAN_MAX, FXAA_SPAN_MAX), max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX), dir * rcp_dir_min)) * rcp_frame;
 
     float3 rgb_a = (1.0 / 2.0) * (
-		tex.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (1.0 / 3.0 - 0.5)).xyz +
-		tex.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (2.0 / 3.0 - 0.5)).xyz);
+		texturemaps.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (1.0 / 3.0 - 0.5)).xyz +
+		texturemaps.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (2.0 / 3.0 - 0.5)).xyz);
     float3 rgb_b = rgb_a * (1.0 / 2.0) + (1.0 / 4.0) * (
-		tex.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (0.0 / 3.0 - 0.5)).xyz +
-		tex.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (3.0 / 3.0 - 0.5)).xyz);
+		texturemaps.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (0.0 / 3.0 - 0.5)).xyz +
+		texturemaps.Sample(sampler_states[LINEAR], pos_pos.xy + dir * (3.0 / 3.0 - 0.5)).xyz);
     float luma_b = dot(rgb_b, luma);
 
     return ((luma_b < luma_min) || (luma_b > luma_max)) ? rgb_a : rgb_b;
-}
-
-// Poisson Disk PCF sampling
-#define MAX_POISSON_DISC_SAMPLES 64
-static const float2 poisson_samples[MAX_POISSON_DISC_SAMPLES] =
-{
-    float2(-0.5119625f, -0.4827938f),
-	float2(-0.2171264f, -0.4768726f),
-	float2(-0.7552931f, -0.2426507f),
-	float2(-0.7136765f, -0.4496614f),
-	float2(-0.5938849f, -0.6895654f),
-	float2(-0.3148003f, -0.7047654f),
-	float2(-0.42215f, -0.2024607f),
-	float2(-0.9466816f, -0.2014508f),
-	float2(-0.8409063f, -0.03465778f),
-	float2(-0.6517572f, -0.07476326f),
-	float2(-0.1041822f, -0.02521214f),
-	float2(-0.3042712f, -0.02195431f),
-	float2(-0.5082307f, 0.1079806f),
-	float2(-0.08429877f, -0.2316298f),
-	float2(-0.9879128f, 0.1113683f),
-	float2(-0.3859636f, 0.3363545f),
-	float2(-0.1925334f, 0.1787288f),
-	float2(0.003256182f, 0.138135f),
-	float2(-0.8706837f, 0.3010679f),
-	float2(-0.6982038f, 0.1904326f),
-	float2(0.1975043f, 0.2221317f),
-	float2(0.1507788f, 0.4204168f),
-	float2(0.3514056f, 0.09865579f),
-	float2(0.1558783f, -0.08460935f),
-	float2(-0.0684978f, 0.4461993f),
-	float2(0.3780522f, 0.3478679f),
-	float2(0.3956799f, -0.1469177f),
-	float2(0.5838975f, 0.1054943f),
-	float2(0.6155105f, 0.3245716f),
-	float2(0.3928624f, -0.4417621f),
-	float2(0.1749884f, -0.4202175f),
-	float2(0.6813727f, -0.2424808f),
-	float2(-0.6707711f, 0.4912741f),
-	float2(0.0005130528f, -0.8058334f),
-	float2(0.02703013f, -0.6010728f),
-	float2(-0.1658188f, -0.9695674f),
-	float2(0.4060591f, -0.7100726f),
-	float2(0.7713396f, -0.4713659f),
-	float2(0.573212f, -0.51544f),
-	float2(-0.3448896f, -0.9046497f),
-	float2(0.1268544f, -0.9874692f),
-	float2(0.7418533f, -0.6667366f),
-	float2(0.3492522f, 0.5924662f),
-	float2(0.5679897f, 0.5343465f),
-	float2(0.5663417f, 0.7708698f),
-	float2(0.7375497f, 0.6691415f),
-	float2(0.2271994f, -0.6163502f),
-	float2(0.2312844f, 0.8725659f),
-	float2(0.4216993f, 0.9002838f),
-	float2(0.4262091f, -0.9013284f),
-	float2(0.2001408f, -0.808381f),
-	float2(0.149394f, 0.6650763f),
-	float2(-0.09640376f, 0.9843736f),
-	float2(0.7682328f, -0.07273844f),
-	float2(0.04146584f, 0.8313184f),
-	float2(0.9705266f, -0.1143304f),
-	float2(0.9670017f, 0.1293385f),
-	float2(0.9015037f, -0.3306949f),
-	float2(-0.5085648f, 0.7534177f),
-	float2(0.9055501f, 0.3758393f),
-	float2(0.7599946f, 0.1809109f),
-	float2(-0.2483695f, 0.7942952f),
-	float2(-0.4241052f, 0.5581087f),
-	float2(-0.1020106f, 0.6724468f),
-};
-
-float4 shadow(float2 texcoord)
-{
-    float depth = depth_map.Sample(sampler_states[LINEAR], texcoord).x;
-
-    uint2 shadow_map_dimensions;
-    uint shadow_map_mip_level = 0, shadow_map_number_of_samples, levels;
-    shadow_map.GetDimensions(shadow_map_mip_level, shadow_map_dimensions.x, shadow_map_dimensions.y, shadow_map_number_of_samples, levels);
-
-    float4 position_ndc;
-    position_ndc.x = texcoord.x * 2 - 1;
-    position_ndc.y = texcoord.y * -2 + 1;
-    position_ndc.z = depth;
-    position_ndc.w = 1;
-
-    float4 position_world_space = mul(position_ndc, inverseviewprojection);
-    position_world_space /= position_world_space.w;
-
-    float4 position_view_space = mul(position_ndc, inverseprojection);
-    position_view_space /= position_view_space.w;
-
-    uint cascade_index = -1;
-    for (uint layer = 0; layer < 4; ++layer)
-    {
-        if (position_view_space.z < cascadedplanedistances[layer])
-        {
-            cascade_index = layer;
-            break;
-        }
-    }
-    if (cascade_index == -1)
-    {
-        return float4(1, 1, 1, 1);
-    }
-
-    float4 position_light_space = mul(position_world_space, lightviewprojection[cascade_index]);
-    position_light_space /= position_light_space.w;
-
-    position_light_space.x = position_light_space.x * 0.5 + 0.5;
-    position_light_space.y = position_light_space.y * -0.5 + 0.5;
-
-    float shadow_threshold = 0.0;
-    shadow_threshold = shadow_map.SampleCmpLevelZero(comparison_sampler_state, float3(position_light_space.xy, cascade_index), position_light_space.z - shadowdepthbias).x;
-
-    const float2 sample_scale = (0.5 * shadowfilterradius) / shadow_map_dimensions;
-
-    float amass = 0.0;
-    for (uint sample_index = 0; sample_index < shadowsamplecount; ++sample_index)
-    {
-        float2 sample_offset;
-        float4 seed = float4(position_ndc.zxz, sample_index);
-        uint random = (uint) (64.0 * frac(sin(dot(seed, float4(12.9898, 78.233, 45.164, 94.673))) * 43758.5453)) % 64;
-        sample_offset = poisson_samples[random] * sample_scale;
-
-        float2 sample_position = position_light_space.xy + sample_offset;
-        amass += shadow_map.SampleCmpLevelZero(comparison_sampler_state, float3(sample_position, cascade_index), position_light_space.z - shadowdepthbias).x;
-    }
-    shadow_threshold = amass / shadowsamplecount;
-
-    return lerp(float4(1, 1, 1, 1), shadowcolor, shadow_threshold);
 }
 
 // Vignetteの計算
@@ -237,86 +103,117 @@ float vignette(float2 uv)
     return vignette;
 }
 
-float4 main(VS_OUT pin) : SV_TARGET
+// エッジ検出関数
+float ComputeSobelEdge(float2 texcoord, float width, float height, Texture2D depth_map, SamplerState sampler_states)
 {
-    //シーンのテクスチャマップをサンプリングしている
-    float4 sampled_color = texturemaps.Sample(sampler_states[POINT], pin.texcoord);
-
-    //fxaa
-    uint mip_level = 0, width, height, number_of_levels;
-    texturemaps.GetDimensions(mip_level, width, height, number_of_levels);
-    float2 rcp_frame = float2(1.0 / width, 1.0 / height);
-    float4 pos_pos;
-    pos_pos.xy = pin.texcoord.xy;
-    pos_pos.zw = pin.texcoord.xy - (rcp_frame * (0.5 + FXAA_SUBPIX_SHIFT));
-    sampled_color.rgb = fxaa(texturemaps, pos_pos, rcp_frame);
-
-    //影
-    float4 shadow_color = shadow(pin.texcoord);
-    sampled_color.rgb *= shadow_color.rgb;
-
-    //ビネット
-    float vignette_factor = vignette(pin.texcoord);
-    sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette_factor);
-
-    //明るさ(画面全体の)とコントラスト(画面の明暗)、色相と彩度
-    sampled_color.rgb = hue_saturation(sampled_color.rgb, hue, saturation);
-    sampled_color.rgb = brightness_contrast(sampled_color.rgb, brightness, contrast);
-
-    //アウトライン
+    float2 uvDist = float2(1.0 / width, 1.0 / height);
+    float centerDepth = depth_map.Sample(sampler_states, texcoord); // Center
     float4 depthDiag;
     float4 depthAxis;
 
-    float2 texelSize = float2(width, height);
-    float2 uvDist = float2(1.0 / width, 1.0 / height);
-    float centerDepth = depth_map.Sample(sampler_states[LINEAR], pin.texcoord); // Center
-    depthDiag.x = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist); // TR
-    depthDiag.y = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist * float2(-1.0f, 1.0f)); // TL
-    depthDiag.z = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist * float2(-1.0f, 1.0f)); // BR
-    depthDiag.w = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist); // BL
-    depthAxis.x = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist * float2(0.0f, 1.0f)); // T
-    depthAxis.y = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist * float2(1.0f, 0.0f)); // L
-    depthAxis.z = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy + uvDist * float2(1.0f, 0.0f)); // R
-    depthAxis.w = depth_map.Sample(sampler_states[LINEAR], pin.texcoord.xy - uvDist * float2(0.0f, 1.0f)); // B
+    // Diagonal depths
+    depthDiag.x = depth_map.Sample(sampler_states, texcoord + uvDist); // TR
+    depthDiag.y = depth_map.Sample(sampler_states, texcoord + uvDist * float2(-1.0f, 1.0f)); // TL
+    depthDiag.z = depth_map.Sample(sampler_states, texcoord - uvDist * float2(-1.0f, 1.0f)); // BR
+    depthDiag.w = depth_map.Sample(sampler_states, texcoord - uvDist); // BL
 
+    // Axis depths
+    depthAxis.x = depth_map.Sample(sampler_states, texcoord + uvDist * float2(0.0f, 1.0f)); // T
+    depthAxis.y = depth_map.Sample(sampler_states, texcoord - uvDist * float2(1.0f, 0.0f)); // L
+    depthAxis.z = depth_map.Sample(sampler_states, texcoord + uvDist * float2(1.0f, 0.0f)); // R
+    depthAxis.w = depth_map.Sample(sampler_states, texcoord - uvDist * float2(0.0f, 1.0f)); // B
+
+    // Sobel coefficients
     const float4 vertDiagCoeff = float4(-1.0f, -1.0f, 1.0f, 1.0f); // TR, TL, BR, BL
     const float4 horizDiagCoeff = float4(1.0f, -1.0f, 1.0f, -1.0f);
     const float4 vertAxisCoeff = float4(-2.0f, 0.0f, 0.0f, 2.0f); // T, L, R, B
     const float4 horizAxisCoeff = float4(0.0f, -2.0f, 2.0f, 0.0f);
 
+    // Sobel horizontal and vertical calculations
     float4 sobelH = depthDiag * horizDiagCoeff + depthAxis * horizAxisCoeff;
     float4 sobelV = depthDiag * vertDiagCoeff + depthAxis * vertAxisCoeff;
     float sobelX = dot(sobelH, float4(1.0f, 1.0f, 1.0f, 1.0f));
     float sobelY = dot(sobelV, float4(1.0f, 1.0f, 1.0f, 1.0f));
 
-    float sobel = sqrt(sobelX * sobelX + sobelY * sobelY);
+    // Sobel edge magnitude
+    return sqrt(sobelX * sobelX + sobelY * sobelY);
+}
 
-    // ビュー空間の位置を計算
+// ビュー空間座標をワールド空間座標に変換
+float4 ConvertToWorldPosition(float2 texcoord, float centerDepth, float width, float height, float4x4 inverseviewprojection)
+{
     float3 viewPos;
-    viewPos.xy = (pin.texcoord.xy * 2.0f - 1.0f) * float2(width, height) * centerDepth;
+    viewPos.xy = (texcoord * 2.0f - 1.0f) * float2(width, height) * centerDepth;
     viewPos.z = centerDepth;
 
-    // ビュー空間座標をワールド座標に変換
     float4 clipPos = float4(viewPos, 1.0f);
     float4 worldPos = mul(clipPos, inverseviewprojection);
-    worldPos /= worldPos.w;
+    return worldPos / worldPos.w;
+}
 
+// 距離に基づいたアウトラインしきい値の計算
+float ComputeOutlineThreshold(float distance, float minThreshold, float maxThreshold)
+{
+    return lerp(maxThreshold, minThreshold, saturate(distance / 10.0f));
+}
+
+// 輪郭線描画ロジック
+float ComputeDepthEdge(float sobel, float distance, float minDistance, float threshold)
+{
+    bool drawOutline = distance > minDistance;
+    return (drawOutline && sobel > threshold) ? 1.0f : 0.0f;
+}
+
+// メイン処理関数
+float4 OutlineEffect(float2 texcoord, float width, float height, float4x4 inverseviewprojection, float3 cameraposition)
+{
+    // Sobel edge detection
+    float sobel = ComputeSobelEdge(texcoord, width, height, depth_map, sampler_states[LINEAR]);
+
+    // Center depth
+    float centerDepth = depth_map.Sample(sampler_states[LINEAR], texcoord);
+
+    // World position and distance
+    float4 worldPos = ConvertToWorldPosition(texcoord, centerDepth, width, height, inverseviewprojection);
     float distance = length(worldPos.xyz - cameraposition);
 
-    // 適応的なしきい値を設定
+    // Adaptive threshold
     float minThreshold = 0.001;
     float maxThreshold = 0.01;
-    float threshold = lerp(maxThreshold, minThreshold, saturate(distance / 10.0f)); // 距離に応じたしきい値の設定
+    float threshold = ComputeOutlineThreshold(distance, minThreshold, maxThreshold);
 
-    //カメラとの距離が非常に近い場合には輪郭線を描画しない
-    float minDistance = 1.0; // この距離以内ではアウトラインを描画しない
-    bool drawOutline = distance > minDistance;
+    // Edge detection and outline drawing
+    float minDistance = 1.0; // No outline if too close
+    float depthEdge = ComputeDepthEdge(sobel, distance, minDistance, threshold);
 
-    //Sobel演算に基づくエッジ検出
-    float depthEdge = (drawOutline && sobel > threshold) ? 1.0f : 0.0f;
+    // Final color calculation
+    return float4(depthEdge, depthEdge, depthEdge, 1.0f) * outlinecolor.Sample(sampler_states[LINEAR], texcoord);
+}
 
-    // 輪郭線を描画
-    sampled_color += float4(depthEdge, depthEdge, depthEdge, 1.0f) * outlinecolor.Sample(sampler_states[LINEAR], pin.texcoord);
+float4 main(VS_OUT pin) : SV_TARGET
+{
+    // テクスチャの大きさを取得
+    uint mip_level = 0, width, height, number_of_levels;
+    texturemaps.GetDimensions(mip_level, width, height, number_of_levels);
 
+    // シーンのテクスチャマップをサンプリング
+    float4 sampled_color = texturemaps.Sample(sampler_states[POINT], pin.texcoord.xy);
+
+    // 輪郭線効果の描画 (輪郭線をエッジ部分にのみ適用)
+    //sampled_color.rgb += OutlineEffect(pin.texcoord.xy, width, height, inverseviewprojection, cameraposition);
+
+    // ビネット効果の適用
+    //sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
+
+    // 明るさとコントラストの調整
+    sampled_color.rgb = brightness_contrast(sampled_color.rgb, brightness, contrast);
+
+    // 色相と彩度の調整
+    sampled_color.rgb = hue_saturation(sampled_color.rgb, hue, saturation);
+
+    // FXAA (Fast Approximate Anti-Aliasing)の適用
+    sampled_color.rgb = fxaa(pin.texcoord.xy);
+
+    // 最終的な色を返す
     return sampled_color;
 }

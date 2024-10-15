@@ -42,7 +42,8 @@ public:
         float             emissiveintensity = 0;
         float             Metalness = 0;
         float             Roughness = 0;
-        DirectX::XMFLOAT2 dummy = {};
+        float             alpha = 0.0f;
+        float             dummy = {};
     };
 
     //汎用のコンスタントバッファ
@@ -50,8 +51,6 @@ public:
     {
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
-        int statictype = 0;
-        DirectX::XMFLOAT3 generaldummy = {};
     };
 
 private:

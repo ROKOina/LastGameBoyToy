@@ -1,0 +1,39 @@
+#include "Defalt.hlsli"
+#include "../Constants.hlsli"
+
+VS_OUT main(VS_IN vin)
+{
+    //float h = (time * 20) % 120;
+    //float d = length(vin.position.xyz - float3(bossposiotn.x, 0.0f, bossposiotn.z));
+    //const float w = 10.0;
+    //if (d > h && d < h + w)
+    //{
+    //    // ƒTƒCƒ“”g‚Å”g‚Ì‚‚³‚ðŒvŽZ
+    //    float a = cos((d - h) / w * 3.14159265) * 2.0;
+
+    //    vin.position.xyz += a * vin.normal.xyz;
+    //}
+
+    float3 p = { 0, 0, 0 };
+    float3 n = { 0, 0, 0 };
+    float3 t = { 0, 0, 0 };
+
+    for (int i = 0; i < 4; i++)
+    {
+        p += (vin.boneWeights[i] * mul(vin.position, boneTransforms[vin.boneIndices[i]])).xyz;
+        n += (vin.boneWeights[i] * mul(float4(vin.normal.xyz, 0), boneTransforms[vin.boneIndices[i]])).xyz;
+        t += (vin.boneWeights[i] * mul(float4(vin.tangent.xyz, 0), boneTransforms[vin.boneIndices[i]])).xyz;
+    }
+
+    VS_OUT vout;
+    vout.position = mul(float4(p, 1.0f), viewProjection);
+    vout.world_position = p;
+    vout.normal = normalize(n);
+    vout.tangent = normalize(t);
+    vout.binormal = normalize(cross(vout.tangent, vout.normal));
+    vout.color.rgb = vin.color.rgb * materialcolor.rgb;
+    vout.color.a = vin.color.a * materialcolor.a;
+    vout.texcoord = vin.texcoord;
+
+    return vout;
+}

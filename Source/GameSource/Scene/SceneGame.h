@@ -50,4 +50,8 @@ private:
     std::unique_ptr<NetwarkPost> n;
     std::unique_ptr<BasicsApplication> photonNet;
     Light* mainDirectionalLight = nullptr;
+
+private:
+
+    std::shared_ptr<TransformCom>t;
 };

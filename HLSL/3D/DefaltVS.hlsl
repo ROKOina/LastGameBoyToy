@@ -1,5 +1,4 @@
 #include "Defalt.hlsli"
-#include "NoInstance.hlsli"
 #include "../Constants.hlsli"
 
 VS_OUT main(VS_IN vin)

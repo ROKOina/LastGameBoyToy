@@ -59,16 +59,12 @@ protected:
         DirectX::XMFLOAT4X4 inverseview = {};
         DirectX::XMFLOAT4X4 inverseprojection = {};
         DirectX::XMFLOAT4X4 inverseviewprojection = {};
-
         DirectX::XMFLOAT3 cameraposition = {};
         float time = {};
-
+        DirectX::XMFLOAT3 bossposiotn = {};
         float deltatime = {};
         DirectX::XMFLOAT2 cameraScope = {};
-        float SCdummy = {};
-
         DirectX::XMFLOAT2 screenResolution = {};
-        DirectX::XMFLOAT2 dummy = {};
     };
     std::unique_ptr<ConstantBuffer<SceneConstants>>sc;
 
