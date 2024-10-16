@@ -150,6 +150,8 @@ public:
 
     void SetMoveFlag(bool flag) { useMoveFlag = flag; }
 
+    void AddHitC() { hitDamage++; }
+
 private:
     //ƒJƒƒ‰‘€ì
     void CameraControl();
@@ -224,5 +226,5 @@ private:
     float nowAngle = 0.0f;
     float lerpSpeed = 4.0f;
 
-    
+    int hitDamage = 0;
 };

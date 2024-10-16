@@ -59,7 +59,4 @@ private:
 
     //“–‚½‚Á‚Ä‚¢‚é‚©
     bool isHit = false;
-
-    //‰¼“–‚Ä‚½”(damage)
-    int hitDamage = 0;
 };

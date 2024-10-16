@@ -122,6 +122,9 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
+    int h = hitDamage;
+    ImGui::DragInt("hitCount", &h);
+
     ImGui::DragFloat("jump", &jumpPower, 0.1f);
 
     ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);

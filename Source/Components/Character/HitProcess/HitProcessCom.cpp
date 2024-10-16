@@ -40,9 +40,6 @@ void HitProcessCom::OnGUI()
     ImGui::DragFloat("hitIntervalTimer", &hitT);
 
     ImGui::DragFloat("value", &value, 0.1f, 0, 100);
-
-    int d = hitDamage;
-    ImGui::DragInt("hitDamage", &d);
 }
 
 void HitProcessCom::HitProcess(int myID, int hitID)
@@ -51,7 +48,11 @@ void HitProcessCom::HitProcess(int myID, int hitID)
     {
     case HitProcessCom::HIT_TYPE::DAMAGE:
         StaticSendDataManager::Instance().SetSendDamage(myID, hitID, value);
-        hitDamage++;
+        {
+            auto& obj = GameObjectManager::Instance().Find("player");
+            if (obj->GetComponent<CharacterCom>()->GetNetID() == myID)
+                obj->GetComponent<CharacterCom>()->AddHitC();
+        }
         break;
     case HitProcessCom::HIT_TYPE::HEAL:
         StaticSendDataManager::Instance().SetSendHeal(myID, hitID, value);
