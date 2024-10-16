@@ -324,9 +324,11 @@ void PhotonLib::LobbyImGui()
         ImGui::End();
     }
 }
-
+std::vector<int> kazu;
 void PhotonLib::NetInputUpdate()
 {
+    auto& k = kazu.emplace_back();
+    k = 0;
     for (auto& s : saveInputPhoton)
     {
         int nowTime = GetServerTime();
@@ -341,6 +343,8 @@ void PhotonLib::NetInputUpdate()
             if (b.frame < s.nextInput.oldFrame)break;
             if (b.frame > nowTime - s.myDelay)continue;
 
+            std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
+            if (obj->GetComponent<CharacterCom>()->GetNetID() != s.id)k++;
             if (!isInputInit)	//Å‰‚É“ü‚Á‚½‚É“ü—Í‰Šú‰»
             {
                 s.nextInput.inputDown = 0;
