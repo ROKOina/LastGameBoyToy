@@ -104,8 +104,8 @@ void AnimationCom::OnGUI()
             {
                 mySequence.AddTypeName(index, animEve.name);
                 auto& event = mySequence.myItems.emplace_back();
-                event.mFrameStart = animEve.startframe;
-                event.mFrameEnd = animEve.endframe;
+                event.mFrameStart = animEve.startframe*60;
+                event.mFrameEnd = animEve.endframe * 60;
                 event.mType = index;
                 index++;
             }
