@@ -13,12 +13,16 @@ class Boss_BaseState : public State<BossCom>
 public:
     Boss_BaseState(BossCom* owner);
 
+    //アニメーション中の当たり判定
+    bool AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname);
+
 protected:
     std::weak_ptr<BossCom> bossCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
     std::weak_ptr<CharaStatusCom>characterstatas;
+    std::shared_ptr<GameObject>cachedobject;
 };
 
 //待機
@@ -105,11 +109,8 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void ImGui() override {};
+    void ImGui() override;
     virtual const char* GetName() const override { return "Attack"; }
-
-private:
-    DirectX::XMFLOAT3 nodepos = {};
 };
 
 //範囲攻撃

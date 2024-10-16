@@ -69,6 +69,7 @@ public:
 private:
     StateMachine<BossCom, BossState> state;
     DirectX::XMFLOAT3 targetposition = {};
+    DirectX::XMFLOAT3 righthandnodepos = {};
     std::vector<int> availableNumbers = { };
     std::mt19937 gen;
 };

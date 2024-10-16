@@ -64,18 +64,16 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
 
 void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
 {
-    obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/pico/pico.mdl");
     obj->AddComponent<AimIKCom>("Spine", nullptr);
-    std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
+    obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>(nullptr);
-    a->PlayAnimation(0, true, false, 0.001f);
-    std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+    obj->AddComponent<CharaStatusCom>();
+    obj->AddComponent<MovementCom>();
     std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
     c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
-    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
     //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));

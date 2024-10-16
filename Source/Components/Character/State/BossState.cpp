@@ -1,5 +1,6 @@
 #include "BossState.h"
 #include "Components/Enemy/Boss/BossCom.h"
+#include "Components\ColliderCom.h"
 
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 {
@@ -9,6 +10,58 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
     characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
+}
+
+//アニメーション中の当たり判定
+bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname)
+{
+    // アニメーションイベント時の当たり判定
+    DirectX::XMFLOAT3 nodepos = {};
+
+    auto animCom = animationCom.lock();
+    if (!animCom)
+    {
+        return false;
+    }
+
+    // 初回のみFindしてキャッシュ
+    if (!cachedobject || cachedobject->GetName() != objectname)
+    {
+        cachedobject = GameObjectManager::Instance().Find(objectname);
+        if (!cachedobject)
+        {
+            // オブジェクトが見つからない場合はfalseを返す
+            return false;
+        }
+    }
+
+    // イベントが呼び出されているか確認
+    if (animCom->IsEventCallingNodePos(eventname, nodename, nodepos))
+    {
+        cachedobject->transform_->SetWorldPosition(nodepos);
+
+        auto collider = cachedobject->GetComponent<SphereColliderCom>();
+        if (collider)
+        {
+            collider->SetEnabled(true);
+        }
+        return true;
+    }
+    else
+    {
+        auto collider = cachedobject->GetComponent<SphereColliderCom>();
+        if (collider)
+        {
+            collider->SetEnabled(false);
+        }
+        return false;
+    }
+
+    if (!cachedobject)
+    {
+        cachedobject.reset(); // キャッシュをリセット
+        return false;
+    }
 }
 
 #pragma region 待機
@@ -233,7 +286,11 @@ void Boss_AttackState::Execute(const float& elapsedTime)
         return;
     }
 
-    animationCom.lock()->IsEventCallingNodePos("ATTACK", "mixamorig:LeftHand", nodepos);
+    //アニメーションイベント時の当たり判定
+    AnimNodeCollsion("ATTACK", "mixamorig:LeftHand", "lefthandcollsion");
+}
+void Boss_AttackState::ImGui()
+{
 }
 #pragma endregion
 

@@ -6,7 +6,7 @@
 
 //　※　判定される側をNodeCollisionの判定だけに仕様変更　※
 //      判定する側で、BOXだけ大変なのと、使う場面が無いと思うので、実装しません
-// 
+//
 //判定する側
 //  COLLIDER_TYPEから形を選んで、その形のコンポーネントを追加する（例　： obj->AddComponent<SphereColliderCom>() ）
 //  SetMyTagとSetJudgeTagを設定
@@ -66,7 +66,6 @@ enum class COLLIDER_TYPE {
 static bool operator== (int L, COLLIDER_TYPE R)
 {
     return static_cast<int>(L) == static_cast<int>(R);
-
 }
 
 //当たった時用の構造体
@@ -142,8 +141,6 @@ protected:
     int colliderType_;
     //オフセット位置
     DirectX::XMFLOAT3 offsetButtonPos_ = { 0,0,0 };
-
-
 };
 
 class SphereColliderCom : public Collider

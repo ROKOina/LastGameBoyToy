@@ -120,11 +120,22 @@ void SceneGame::Initialize()
         //t = boss->transform_;
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
+        collider->SetJudgeTag(COLLIDER_TAG::Player);
         boss->AddComponent<AnimationCom>();
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         boss->AddComponent<CharaStatusCom>();
         boss->AddComponent<SpawnCom>();
+
+        //コリジョン
+        std::shared_ptr<GameObject> righthand = boss->AddChildObject();
+        righthand->SetName("lefthandcollsion");
+        std::shared_ptr<SphereColliderCom> leftcollider = righthand->AddComponent<SphereColliderCom>();
+        leftcollider->SetEnabled(false);
+        leftcollider->SetMyTag(COLLIDER_TAG::Enemy);
+        leftcollider->SetJudgeTag(COLLIDER_TAG::Player);
     }
 
     //インスタンステスト
@@ -134,13 +145,6 @@ void SceneGame::Initialize()
         //obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
         //std::shared_ptr<InstanceRenderer> r = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 2, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true);
         //r->LoadModel("Data/Jammo/jammo.mdl");
-    }
-
-    //UI
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("Canvas");
-        obj->AddComponent<Sprite>("Data/UIData/reticle.ui", false);
     }
 
 #pragma endregion
