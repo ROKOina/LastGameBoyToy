@@ -43,7 +43,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/pico/pico.mdl");
     obj->AddComponent<AimIKCom>("Spine", nullptr);
     obj->AddComponent<AnimationCom>();
@@ -66,7 +66,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/pico/pico.mdl");
     obj->AddComponent<AimIKCom>("Spine", nullptr);
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
@@ -160,7 +160,7 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.015f, 0.015f, 0.015f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/PicoLabo/picolabo.mdl");
     std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::UENO));
@@ -179,7 +179,7 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/pico/pico.mdl");
     obj->AddComponent<AimIKCom>("Spine", nullptr);
     std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();

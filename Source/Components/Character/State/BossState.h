@@ -107,6 +107,9 @@ public:
     void Execute(const float& elapsedTime) override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "Attack"; }
+
+private:
+    DirectX::XMFLOAT3 nodepos = {};
 };
 
 //”ÍˆÍUŒ‚

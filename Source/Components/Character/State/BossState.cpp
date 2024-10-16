@@ -232,6 +232,8 @@ void Boss_AttackState::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
         return;
     }
+
+    animationCom.lock()->IsEventCallingNodePos("ATTACK", "mixamorig:LeftHand", nodepos);
 }
 #pragma endregion
 
