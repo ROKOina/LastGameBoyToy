@@ -374,27 +374,42 @@ void PhotonLib::MyCharaInput()
     std::shared_ptr<CharacterCom> chara = obj->GetComponent<CharacterCom>();
     if (chara.use_count() == 0) return;
 
-    // 入力情報をプレイヤーキャラクターに送信
-    int myID = GetPlayerNum();
-    for (auto& s : saveInputPhoton)
-    {
-        if (s.id != myID)continue;
-
-        chara->SetUserInput(s.nextInput.input);
-        chara->SetUserInputDown(s.nextInput.inputDown);
-        chara->SetUserInputUp(s.nextInput.inputUp);
-
-        chara->SetLeftStick(s.nextInput.leftStick);
-        //カメラ情報
-        chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
-
-        s.nextInput.inputDown = 0;
-        s.nextInput.inputUp = 0;
-
-        break;
-    }
-
     GamePad& gamePad = Input::Instance().GetGamePad();
+
+    //オフライン時処理
+    if (!joinPermission)
+    {
+        chara->SetUserInput(gamePad.GetButton());
+        chara->SetUserInputDown(gamePad.GetButtonDown());
+        chara->SetUserInputUp(gamePad.GetButtonUp());
+
+        chara->SetLeftStick(gamePad.GetAxisL());
+        //カメラ情報
+        auto& fpsCamera = obj->GetChildFind("cameraPostPlayer");
+        chara->SetFpsCameraDir(fpsCamera->transform_->GetWorldFront());
+    }
+    else
+    {
+        // 入力情報をプレイヤーキャラクターに送信
+        int myID = GetPlayerNum();
+        for (auto& s : saveInputPhoton)
+        {
+            if (s.id != myID)continue;
+
+            chara->SetUserInput(s.nextInput.input);
+            chara->SetUserInputDown(s.nextInput.inputDown);
+            chara->SetUserInputUp(s.nextInput.inputUp);
+
+            chara->SetLeftStick(s.nextInput.leftStick);
+            //カメラ情報
+            chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
+
+            s.nextInput.inputDown = 0;
+            s.nextInput.inputUp = 0;
+
+            break;
+        }
+    }
 
     //chara->SetLeftStick(gamePad.GetAxisL());
     chara->SetRightStick(gamePad.GetAxisR());

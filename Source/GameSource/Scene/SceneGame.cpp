@@ -141,8 +141,9 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("Canvas");
-        obj->AddComponent<Sprite>("Data/UIData/reticle.ui",false);
+        obj->AddComponent<Sprite>("Data/UIData/reticle.ui", false);
     }
+
 #pragma endregion
 
 #pragma region グラフィック系の設定

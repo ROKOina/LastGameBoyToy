@@ -12,4 +12,6 @@ cbuffer CbPostEffect : register(b3)
     float vignettesize;
     float vignetteintensity;
     float4 ssrparameter;
+    float distance_to_sun;
+    float3 posteffectdummy;
 };

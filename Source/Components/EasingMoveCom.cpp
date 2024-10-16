@@ -109,13 +109,14 @@ void EasingMoveCom::Update(float elapsedTime)
         easingresult = EasingUpdate(EMP.easingtype, EMP.easingmovetype, easingtime);
 
         //オブジェクトがあれば
-        if (EMP.objectname.empty())
+        if (!EMP.objectname.empty())
         {
             auto& gameObject = GameObjectManager::Instance().Find(EMP.objectname.c_str());
 
-            if (gameObject != nullptr)
+            if (gameObject != nullptr && !one)
             {
                 EMP.easingposition = gameObject->transform_->GetWorldPosition();
+                one = true;
             }
         }
 
@@ -205,16 +206,17 @@ void EasingMoveCom::StopEasing()
 {
     play = false;
     loop = false;
+    one = false;
     easingtime = 0.0f;
 
     GetGameObject()->transform_->SetWorldPosition(savepos);
-    GetGameObject()->transform_->SetScale(savescale);
+    //GetGameObject()->transform_->SetScale(savescale);
 
     if (!EMP.loop && !EMP.comback)
     {
         //今の位置を保存した位置に代入する
         GetGameObject()->transform_->SetWorldPosition(EMP.easingposition);
-        GetGameObject()->transform_->SetScale(EMP.easingscale);
+        //GetGameObject()->transform_->SetScale(EMP.easingscale);
     }
 }
 

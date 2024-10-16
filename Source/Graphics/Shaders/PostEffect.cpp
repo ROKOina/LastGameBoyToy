@@ -27,6 +27,7 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\CascadeShadow.cso", m_pixelshaders[static_cast<int>(pixelshader::cascadeshadow)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\SSR.cso", m_pixelshaders[static_cast<int>(pixelshader::ssr)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
+    CreatePsFromCso(Graphics.GetDevice(), "Shader\\FXAA.cso", m_pixelshaders[static_cast<int>(pixelshader::fxaa)].GetAddressOf());
 
     //MultiRenderTarget作成
     m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 6);
@@ -139,15 +140,25 @@ void PostEffect::PostEffectRender()
     m_bloomeffect->Blit(dc);
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
+    //FXAA
+    m_offScreenBuffer[static_cast<int>(offscreen::fxaa)]->Clear(dc);
+    m_offScreenBuffer[static_cast<int>(offscreen::fxaa)]->Activate(dc);
+    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
+    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
+    dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
+    ID3D11ShaderResourceView* fxaa[] = { m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->m_shaderresourceviews[0].Get() };
+    FullScreenQuad::Instance().Blit(dc, fxaa, 0, _countof(fxaa), m_pixelshaders[static_cast<int>(pixelshader::fxaa)].Get());
+    m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
+
     // トーンマップ処理
     //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Clear(dc);
     //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Activate(dc);
     dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
-    ID3D11ShaderResourceView* tone[] = { m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->m_shaderresourceviews[0].Get() };
+    ID3D11ShaderResourceView* tone[] = { m_offScreenBuffer[static_cast<int>(offscreen::fxaa)]->m_shaderresourceviews[0].Get() };
     FullScreenQuad::Instance().Blit(dc, tone, 0, _countof(tone), m_pixelshaders[static_cast<int>(pixelshader::tonemap)].Get());
-    //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Deactivate(dc);
+    //m_offScreenBuffer[static_cast<int>(offscreen::fxaa)]->Deactivate(dc);
 }
 
 //imgui描画
@@ -168,6 +179,7 @@ void PostEffect::PostEffectImGui()
         ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
         ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
+        ImGui::SliderFloat("distance_to_sun", &m_posteffect->data.distance_to_sun, 0.0f, 1000.0f);
         ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
     }
 
