@@ -3,16 +3,16 @@
 
 VS_OUT main(VS_IN vin)
 {
-    //float h = (time * 20) % 120;
-    //float d = length(vin.position.xyz - float3(bossposiotn.x, 0.0f, bossposiotn.z));
-    //const float w = 10.0;
-    //if (d > h && d < h + w)
-    //{
-    //    // ƒTƒCƒ“”g‚Å”g‚Ì‚‚³‚ðŒvŽZ
-    //    float a = cos((d - h) / w * 3.14159265) * 2.0;
+    float h = (time * 20) % 120;
+    float d = length(vin.position.xyz - float3(0.0f, 0.0f, 0.0f));
+    const float w = 10.0;
+    if (d > h && d < h + w)
+    {
+        // smoothstep‚ÅŠŠ‚ç‚©‚É’¸“_‚ðŽ‚¿ã‚°‚é
+        float a = smoothstep(0.0, 1.0, (d - h) / w) * 3.0;
 
-    //    vin.position.xyz += a * vin.normal.xyz;
-    //}
+        vin.position.xyz += a * vin.normal.xyz;
+    }
 
     float3 p = { 0, 0, 0 };
     float3 n = { 0, 0, 0 };

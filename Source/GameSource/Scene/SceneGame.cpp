@@ -120,11 +120,11 @@ void SceneGame::Initialize()
         boss->AddComponent<EasingMoveCom>(nullptr);
         //t = boss->transform_;
         boss->AddComponent<MovementCom>();
-        //boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
-        //boss->AddComponent<AnimationCom>();
-        //boss->AddComponent<BossCom>();
-        //boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
-        //boss->AddComponent<CharaStatusCom>();
+        boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        boss->AddComponent<AnimationCom>();
+        boss->AddComponent<BossCom>();
+        boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        boss->AddComponent<CharaStatusCom>();
         //boss->AddComponent<SpawnCom>();
     }
 
