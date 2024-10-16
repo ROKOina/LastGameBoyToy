@@ -117,7 +117,6 @@ void SceneGame::Initialize()
         r->LoadModel("Data/Jammo/jammo.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-        boss->AddComponent<EasingMoveCom>(nullptr);
         //t = boss->transform_;
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
@@ -125,7 +124,7 @@ void SceneGame::Initialize()
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         boss->AddComponent<CharaStatusCom>();
-        //boss->AddComponent<SpawnCom>();
+        boss->AddComponent<SpawnCom>();
     }
 
     //インスタンステスト
