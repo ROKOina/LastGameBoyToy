@@ -137,6 +137,12 @@ void SceneGame::Initialize()
         //r->LoadModel("Data/Jammo/jammo.mdl");
     }
 
+    //UI
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("Canvas");
+        obj->AddComponent<Sprite>("Data/UIData/reticle.ui",false);
+    }
 #pragma endregion
 
 #pragma region グラフィック系の設定
