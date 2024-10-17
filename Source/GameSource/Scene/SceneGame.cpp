@@ -50,6 +50,9 @@
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include <Components/Character/CharaStatusCom.h>
 
+#include "Phsix\Physxlib.h"
+#include "Components\RigidBodyCom.h"
+
 #include "Audio/AudioSource.h"
 
 // 初期化
@@ -88,6 +91,27 @@ void SceneGame::Initialize()
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
+    }
+
+    //当たり判定用
+    PhysXLib::Instance().Initialize();
+    std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
+    {
+        roboobj->SetName("robo");
+        roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
+        roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        r->LoadModel("Data/OneCoin/robot.mdl");
+        std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
+        a->PlayAnimation(0, true, false, 0.001f);
+
+        //std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
+        //sphere->SetRadius(2.0f);
+        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
+        //sphere->SetJudgeTag(COLLIDER_TAG::Player);
+
+        roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
+        roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER);
     }
 
     //プレイヤー
@@ -209,6 +233,7 @@ void SceneGame::Update(float elapsedTime)
     //sc->data.bossposiotn = t->GetWorldPosition();
 
     // ゲームオブジェクトの更新
+    PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }
