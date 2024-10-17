@@ -1,6 +1,7 @@
 #pragma once
 #include "PxPhysicsAPI.h"
 #include "Components\RendererCom.h"
+#include "Components\NodeCollsionCom.h"
 #include <memory>
 
 using namespace physx;
@@ -29,7 +30,9 @@ public:
     void Update(float elapsedTime);
 
     //ModelÇÃå`ÇÃìñÇΩÇËîªíËçÏê¨
-    void GenerateCollider(Model* model);
+    physx::PxRigidActor* GenerateCollider(bool isStatic,Model* model);
+    physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj);
+
 
 private:
     PxDefaultAllocator gAllocator;

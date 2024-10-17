@@ -183,6 +183,7 @@
     <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
+    <ClInclude Include="Source\Components\RigidBodyCom.h" />
     <ClInclude Include="Source\Components\SpawnCom.h" />
     <ClInclude Include="Source\Components\StageEditorCom.h" />
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
@@ -375,6 +376,7 @@
     <ClCompile Include="Source\Netwark\Photon\StdIO_UIListener.cpp" />
     <ClCompile Include="Source\Netwark\Server.cpp" />
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
+    <ClCompile Include="Source\Components\RigidBodyCom.cpp" />
     <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
