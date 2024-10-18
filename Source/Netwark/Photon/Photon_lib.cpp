@@ -351,6 +351,12 @@ void PhotonLib::NetInputUpdate()
         std::vector<SaveBuffer> saveB;
         saveB = s.inputBuf->GetHeadFromSize(100);
 
+        std::vector<DirectX::XMFLOAT3>p;
+        for (auto& b : saveB)
+        {
+            p.emplace_back(b.pos);
+        }
+
         bool isInputInit = false;
         for (auto& b : saveB)
         {
@@ -451,15 +457,56 @@ void PhotonLib::NetCharaInput()
         chara->SetUserInputDown(s.nextInput.inputDown);
         chara->SetUserInputUp(s.nextInput.inputUp);
 
+        static bool upHokan = false;
+        static DirectX::XMFLOAT3 hoknaPos = {};
+        static DirectX::XMFLOAT3 nowPos = {};
+        static int saveFrameHokan = 0;
+        int frameHokan =3; //•âŠ®‚·‚éƒtƒŒ[ƒ€
+
         //ˆÚ“®
         if (s.isInputUpdate)
         {
-            netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
-            //netPlayer->GetComponent<MovementCom>()->SetVelocity()
+            static bool o = false;
+            static int oi = 0;
+            int frameAki = 3;
+
+            oi++;
+            if (o)
+            {
+                //netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
+                o = false;
+
+                hoknaPos = s.nextInput.pos;
+                nowPos = netPlayer->transform_->GetWorldPosition();
+                if (Mathf::Length(nowPos - hoknaPos) > 0.1f)
+                {
+                    saveFrameHokan = 1;
+                    upHokan = true;
+                }
+            }
+            if (oi > frameAki)
+            {
+                o = true;
+                oi = 0;
+            }
         }
         else
         {
             //netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
+        }
+
+        if (upHokan)
+        {
+            float w = float(saveFrameHokan) / float(frameHokan);
+            DirectX::XMFLOAT3 Hpos = Mathf::Lerp(nowPos, hoknaPos, w);
+            netPlayer->transform_->SetWorldPosition(Hpos);
+            saveFrameHokan++;
+            if (Mathf::Length(Hpos) <= 0.1f)
+            {
+                netPlayer->transform_->SetWorldPosition(hoknaPos);
+                upHokan = false;
+            }
+            if (saveFrameHokan > frameHokan)upHokan = false;
         }
 
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
