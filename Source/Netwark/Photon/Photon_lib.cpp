@@ -453,9 +453,14 @@ void PhotonLib::NetCharaInput()
 
         //ˆÚ“®
         if (s.isInputUpdate)
+        {
             netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
+            //netPlayer->GetComponent<MovementCom>()->SetVelocity()
+        }
         else
-            netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
+        {
+            //netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
+        }
 
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
         chara->SetLeftStick(s.nextInput.leftStick);
