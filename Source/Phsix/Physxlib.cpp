@@ -1,5 +1,4 @@
 #include "Physxlib.h"
-#include "pxC"
 #include "Components\TransformCom.h"
 
 void PhysXLib::Initialize()
@@ -69,48 +68,48 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
             indices.emplace_back(ver);
         }
 
-        physx::PxTriangleMeshDesc meshDesc;
-        meshDesc.setToDefault();
-        meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
-        meshDesc.points.stride = sizeof(PxVec3);
-        meshDesc.points.data = &vertices[0];
+        //physx::PxTriangleMeshDesc meshDesc;
+        //meshDesc.setToDefault();
+        //meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
+        //meshDesc.points.stride = sizeof(PxVec3);
+        //meshDesc.points.data = &vertices[0];
 
-        meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size());
-        meshDesc.triangles.stride = sizeof(PxU32)*3;
-        meshDesc.triangles.data = &indices[0];
+        //meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size());
+        //meshDesc.triangles.stride = sizeof(PxU32)*3;
+        //meshDesc.triangles.data = &indices[0];
 
-        physx::PxTolerancesScale tolerances_scale;
-        PxCookingParams cooking_params(tolerances_scale);
-        cooking_params.convexMeshCookingType = physx::PxConvexMeshCookingType::Enum::eQUICKHULL;
-        cooking_params.gaussMapLimit = 256;
+        //physx::PxTolerancesScale tolerances_scale;
+        //PxCookingParams cooking_params(tolerances_scale);
+        //cooking_params.convexMeshCookingType = physx::PxConvexMeshCookingType::Enum::eQUICKHULL;
+        //cooking_params.gaussMapLimit = 256;
 
-        physx::PxTriangleMesh* triangle_mesh = nullptr;
-        physx::PxDefaultMemoryOutputStream write_buffer;
-        if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
-            assert(0 && "PxCookTriangleMesh failed.");
-        }
+        //physx::PxTriangleMesh* triangle_mesh = nullptr;
+        //physx::PxDefaultMemoryOutputStream write_buffer;
+        //if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
+        //    assert(0 && "PxCookTriangleMesh failed.");
+        //}
 
-        PxDefaultMemoryOutputStream writeBuffer;
-        PxTriangleMeshCookingResult::Enum result;
+        //PxDefaultMemoryOutputStream writeBuffer;
+        //PxTriangleMeshCookingResult::Enum result;
 
-        physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
-        triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
+        //physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+        //triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
 
 
-        physx::PxRigidActor* rigidObj = nullptr;
-        if (isStatic) {
-            //動かない(静的)剛体を作成
-            rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
-        }
-        else {
-            // 動かすことのできる(動的)剛体を作成
-            rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
-        }
-        PxTriangleMeshGeometry meshGeometry(triangle_mesh);
-        ;
-        PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
-        rigidObj->attachShape(*shape);
-        shape->release();
+        //physx::PxRigidActor* rigidObj = nullptr;
+        //if (isStatic) {
+        //    //動かない(静的)剛体を作成
+        //    rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+        //}
+        //else {
+        //    // 動かすことのできる(動的)剛体を作成
+        //    rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
+        //}
+        //PxTriangleMeshGeometry meshGeometry(triangle_mesh);
+        //;
+        //PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
+        //rigidObj->attachShape(*shape);
+        //shape->release();
     }
 
     return nullptr;
