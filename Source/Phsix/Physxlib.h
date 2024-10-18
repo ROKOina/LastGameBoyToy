@@ -3,6 +3,8 @@
 #include "Components\RendererCom.h"
 #include "Components\NodeCollsionCom.h"
 #include <memory>
+#include <map>
+#include <vector>
 
 using namespace physx;
 
@@ -29,12 +31,23 @@ public:
     //更新処理
     void Update(float elapsedTime);
 
+    bool RayCast_PhysX(
+        const PxVec3& origin,
+        const PxVec3& unitDir,
+        const PxReal maxDistance,
+        PxRaycastBuffer& hitBuffer);
+
+
     //Modelの形の当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic,Model* model);
+    physx::PxRigidActor* GenerateCollider(bool isStatic,ModelResource* model);
+    //矩形、球、カプセルの当たり判定作成
     physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj);
 
 
 private:
+    //meshColliderの保存場所
+
+
     PxDefaultAllocator gAllocator;
     PxDefaultErrorCallback gErrorCallback;
 

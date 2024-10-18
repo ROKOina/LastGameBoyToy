@@ -46,35 +46,71 @@ void PhysXLib::Update(float elapsedTime)
     gScene->fetchResults(true);
 }
 
-physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, Model* model)
+bool PhysXLib::RayCast_PhysX(const PxVec3& origin, const PxVec3& unitDir, const PxReal maxDistance, PxRaycastBuffer& hitBuffer)
 {
-    //for (auto& mesh : model->GetResource()->GetMeshes())
-    //{
-    //    PxTriangleMeshDesc meshDesc;
-    //    meshDesc.points.count = mesh.vertices.size();
-    //    meshDesc.points.stride = sizeof(PxVec3);
-    //    meshDesc.points.data = vertices;  // FBXから抽出した頂点データ
+    return gScene->raycast(origin, unitDir, maxDistance, hitBuffer);
+}
 
-    //    for()
-    //}
+physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* model)
+{
+    for (auto& mesh : model->GetMeshes())
+    {
+        //頂点情報をDirectXからPhysXに置き換え
+        std::vector<PxVec3> vertices;
+        for (auto& ver : mesh.vertices)
+        {
+            PxVec3 pos = { ver.position.x,ver.position.y,ver.position.z };
+            vertices.emplace_back(pos);
+        }
+        std::vector<PxU32> indices;
+        for (auto& ver : mesh.indices)
+        {
+            indices.emplace_back(ver);
+        }
 
-    //PxTriangleMeshDesc meshDesc;
-    //meshDesc.points.count = numVertices;
-    //meshDesc.points.stride = sizeof(PxVec3);
-    //meshDesc.points.data = vertices;  // FBXから抽出した頂点データ
+        //physx::PxTriangleMeshDesc meshDesc;
+        //meshDesc.setToDefault();
+        //meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
+        //meshDesc.points.stride = sizeof(PxVec3);
+        //meshDesc.points.data = &vertices[0];
 
-    //meshDesc.triangles.count = numTriangles;
-    //meshDesc.triangles.stride = 3 * sizeof(PxU32);
-    //meshDesc.triangles.data = indices;  // FBXから抽出したインデックスデータ
+        //meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size());
+        //meshDesc.triangles.stride = sizeof(PxU32)*3;
+        //meshDesc.triangles.data = &indices[0];
 
-    //PxDefaultMemoryOutputStream writeBuffer;
-    //PxTriangleMeshCookingResult::Enum result;
-    //if (!cooking->cookTriangleMesh(meshDesc, writeBuffer, &result)) {
-    //    // メッシュの生成が失敗
-    //}
+        //physx::PxTolerancesScale tolerances_scale;
+        //PxCookingParams cooking_params(tolerances_scale);
+        //cooking_params.convexMeshCookingType = physx::PxConvexMeshCookingType::Enum::eQUICKHULL;
+        //cooking_params.gaussMapLimit = 256;
 
-    //PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-    //PxTriangleMesh* triangleMesh = physics->createTriangleMesh(readBuffer);
+        //physx::PxTriangleMesh* triangle_mesh = nullptr;
+        //physx::PxDefaultMemoryOutputStream write_buffer;
+        //if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
+        //    assert(0 && "PxCookTriangleMesh failed.");
+        //}
+
+        //PxDefaultMemoryOutputStream writeBuffer;
+        //PxTriangleMeshCookingResult::Enum result;
+
+        //physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+        //triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
+
+
+        //physx::PxRigidActor* rigidObj = nullptr;
+        //if (isStatic) {
+        //    //動かない(静的)剛体を作成
+        //    rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+        //}
+        //else {
+        //    // 動かすことのできる(動的)剛体を作成
+        //    rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
+        //}
+        //PxTriangleMeshGeometry meshGeometry(triangle_mesh);
+        //;
+        //PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
+        //rigidObj->attachShape(*shape);
+        //shape->release();
+    }
 
     return nullptr;
 }
