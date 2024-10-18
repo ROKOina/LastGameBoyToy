@@ -137,12 +137,8 @@ void SceneGame::Initialize()
         //r->LoadModel("Data/Jammo/jammo.mdl");
     }
 
-    //UI
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("Canvas");
-        obj->AddComponent<Sprite>("Data/UIData/reticle.ui", false);
-    }
+    //UIゲームオブジェクト生成
+    CreateUiObject();
 
 #pragma endregion
 
@@ -331,4 +327,99 @@ void SceneGame::SetOnlineInput()
 void SceneGame::DelayOnlineInput()
 {
     if (!n)return;
+}
+
+void SceneGame::CreateUiObject()
+{
+    //UI
+    {
+        //キャンバス
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("Canvas");
+
+        //レティクル
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
+            reticle->SetName("reticle");
+            reticle->AddComponent<Sprite>("Data/UIData/Reticle.ui", false);
+        }
+        //HpFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
+            hpFrame->SetName("HpFrame");
+            hpFrame->AddComponent<Sprite>("Data/UIData/HpFrame.ui", false);
+        }
+        //HpGauge
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
+            hpGauge->SetName("HpGauge");
+            hpGauge->AddComponent<Sprite>("Data/UIData/HpGauge.ui", false);
+        }
+        //HpMemori
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("HpMemori");
+            hpMemori->AddComponent<Sprite>("Data/UIData/HpMemori.ui", false);
+        }
+
+        //BoostFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("BoostFrame");
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_01.ui", false);
+        }
+
+        //BoostFrame2
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("BoostFrame2");
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_02.ui", false);
+        }
+
+        //BoostGauge
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("BoostGauge");
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostGauge.ui", false);
+        }
+
+        //UltFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("UltFrame");
+            hpMemori->AddComponent<Sprite>("Data/UIData/UltFrame.ui", false);
+        }
+
+        //UltGauge
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("UltGauge");
+            hpMemori->AddComponent<Sprite>(nullptr, false);
+        }
+
+        //SkillFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("SkillFrame");
+            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_01.ui", false);
+        }
+
+        //SkillGauge
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("SkillGauge");
+            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_02.ui", false);
+        }
+    }
 }
