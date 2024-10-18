@@ -108,6 +108,7 @@ static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>&
         out << v.pos << " ";
         out << v.rotato << " ";
         out << v.fpsDir << " ";
+        out << v.velo << " ";
     }
 }
 static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& vec)
@@ -122,6 +123,7 @@ static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& v
         in >> s.pos;
         in >> s.rotato;
         in >> s.fpsDir;
+        in >> s.velo;
         vec.emplace_back(s);
     }
 }
