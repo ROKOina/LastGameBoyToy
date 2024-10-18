@@ -26,9 +26,7 @@ void RigidBodyCom::OnGUI()
     ImGui::Text("pos");
     ImGui::SameLine();
     ImGui::DragFloat("x", &rigidTransform.p.x);
-    ImGui::SameLine();
     ImGui::DragFloat("y", &rigidTransform.p.y);
-    ImGui::SameLine();
     ImGui::DragFloat("z", &rigidTransform.p.z);
 
     if(ImGui::Button("TransformSet"))
