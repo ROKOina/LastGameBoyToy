@@ -254,7 +254,8 @@ void BaseCharacter_CapsuleState::ImGui()
 
 void BaseCharacter_StanBallState::Enter()
 {
-    BulletCreate::StanFire(owner->GetGameObject(), speed, power);
+    BulletCreate::DamageFire(owner->GetGameObject(), speed, power);
+    //BulletCreate::StanFire(owner->GetGameObject(), speed, power);
 }
 
 void BaseCharacter_StanBallState::Execute(const float& elapsedTime)

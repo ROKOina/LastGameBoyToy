@@ -18,12 +18,12 @@ void Boss_IdleState::Enter()
 }
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
+    // ランダムで行動を切り替える
+    int randomAction = owner->ComputeRandom();
+
     //距離判定
     if (owner->Search(5.0f))
     {
-        // ランダムで行動を切り替える
-        int randomAction = owner->ComputeRandom();
-
         if (randomAction == 1)
         {
             bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::ATTACK);
@@ -39,7 +39,18 @@ void Boss_IdleState::Execute(const float& elapsedTime)
     }
     else if (owner->Search(FLT_MAX))
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
+        if (randomAction == 1)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
+        }
+        else if (randomAction == 2)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::STOPTIME);
+        }
+        else if (randomAction == 3)
+        {
+            bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
+        }
     }
 
     //死亡処理

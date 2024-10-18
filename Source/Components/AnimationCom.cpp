@@ -104,8 +104,8 @@ void AnimationCom::OnGUI()
             {
                 mySequence.AddTypeName(index, animEve.name);
                 auto& event = mySequence.myItems.emplace_back();
-                event.mFrameStart = animEve.startframe;
-                event.mFrameEnd = animEve.endframe;
+                event.mFrameStart = animEve.startframe*60;
+                event.mFrameEnd = animEve.endframe * 60;
                 event.mType = index;
                 index++;
             }
@@ -867,6 +867,32 @@ bool AnimationCom::IsEventCalling(std::string eventName)
 
         if (ev.startframe <= currentSeconds && ev.endframe >= currentSeconds)
             return true;
+    }
+    return false;
+}
+
+bool AnimationCom::IsEventCallingNodePos(std::string eventName, std::string nodeName, DirectX::XMFLOAT3& pos)
+{
+    if (currentAnimation < 0)return false;
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
+
+    for (auto& ev : anim.animationevents)
+    {
+        if (ev.name != eventName)continue;
+
+        if (ev.startframe <= currentSeconds && ev.endframe >= currentSeconds)
+        {
+            //ノードのワールド位置を割り出す
+            auto node = model->FindNode(nodeName.c_str());
+            pos.x = node->worldTransform._41;
+            pos.y = node->worldTransform._42;
+            pos.z = node->worldTransform._43;
+
+            return true;
+        }
     }
     return false;
 }

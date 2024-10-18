@@ -106,6 +106,8 @@ public:
 
     //アニメーションイベント呼び出し（true:イベント中）
     bool IsEventCalling(std::string eventName);
+    //イベント中に指定されたノードのワールド位置を送る
+    bool IsEventCallingNodePos(std::string eventName, std::string nodeName, DirectX::XMFLOAT3& pos);
 
 private:
 

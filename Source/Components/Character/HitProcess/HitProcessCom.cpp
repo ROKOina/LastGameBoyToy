@@ -48,6 +48,11 @@ void HitProcessCom::HitProcess(int myID, int hitID)
     {
     case HitProcessCom::HIT_TYPE::DAMAGE:
         StaticSendDataManager::Instance().SetSendDamage(myID, hitID, value);
+        {
+            auto& obj = GameObjectManager::Instance().Find("player");
+            if (obj->GetComponent<CharacterCom>()->GetNetID() == myID)
+                obj->GetComponent<CharacterCom>()->AddHitC();
+        }
         break;
     case HitProcessCom::HIT_TYPE::HEAL:
         StaticSendDataManager::Instance().SetSendHeal(myID, hitID, value);
