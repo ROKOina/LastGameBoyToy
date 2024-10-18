@@ -72,6 +72,10 @@ void PhotonLib::update(float elapsedTime)
         auto& fpsCamera = myPlayer->GetChildFind("cameraPostPlayer");
         save.fpsDir = fpsCamera->transform_->GetWorldFront();
 
+        //速力
+        DirectX::XMFLOAT3 velo = myPlayer->GetComponent<MovementCom>()->GetVelocity();
+        save.velo = velo;
+
         s.inputBuf->Enqueue(save);
 
         //ちーむID保存
@@ -213,6 +217,16 @@ void PhotonLib::ImGui()
     int sendMs = SendMs();
     ImGui::InputInt("sendMS", &sendMs);
 
+    int Delay = 0;
+    int myID = GetPlayerNum();
+    int netcount = 0;
+    for (auto& s : saveInputPhoton)
+    {
+        Delay = s.myDelay;
+        ImGui::InputInt(("Delay" + std::to_string(netcount)).c_str(), &Delay);
+        netcount++;
+    }
+
     ImGui::End();
 
     LobbyImGui();
@@ -324,13 +338,14 @@ void PhotonLib::LobbyImGui()
         ImGui::End();
     }
 }
-std::vector<int> kazu;
+
 void PhotonLib::NetInputUpdate()
 {
-    auto& k = kazu.emplace_back();
-    k = 0;
     for (auto& s : saveInputPhoton)
     {
+        //更新フラグ
+        s.isInputUpdate = false;
+
         int nowTime = GetServerTime();
 
         std::vector<SaveBuffer> saveB;
@@ -343,8 +358,6 @@ void PhotonLib::NetInputUpdate()
             if (b.frame < s.nextInput.oldFrame)break;
             if (b.frame > nowTime - s.myDelay)continue;
 
-            std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-            if (obj->GetComponent<CharacterCom>()->GetNetID() != s.id)k++;
             if (!isInputInit)	//最初に入った時に入力初期化
             {
                 s.nextInput.inputDown = 0;
@@ -357,6 +370,8 @@ void PhotonLib::NetInputUpdate()
                 s.nextInput.rotato = b.rotato;
                 //カメラ情報
                 s.nextInput.fpsCameraDir = b.fpsDir;
+                //速力
+                s.nextInput.velocity = b.velo;
 
                 isInputInit = true;
             }
@@ -364,6 +379,8 @@ void PhotonLib::NetInputUpdate()
             s.nextInput.inputDown |= b.inputDown;
             s.nextInput.input |= b.input;
             s.nextInput.inputUp |= b.inputUp;
+
+            s.isInputUpdate = true;
         }
 
         s.nextInput.oldFrame = nowTime - s.myDelay;
@@ -433,12 +450,20 @@ void PhotonLib::NetCharaInput()
         chara->SetUserInput(s.nextInput.input);
         chara->SetUserInputDown(s.nextInput.inputDown);
         chara->SetUserInputUp(s.nextInput.inputUp);
+
         //移動
-        netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
+        if (s.isInputUpdate)
+            netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
+        else
+            netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
+
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
         chara->SetLeftStick(s.nextInput.leftStick);
         //カメラ情報
         chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
+
+        //速力
+        netPlayer->GetComponent<MovementCom>()->SetVelocity(s.nextInput.velocity);
 
         s.nextInput.inputDown = 0;
         s.nextInput.inputUp = 0;
@@ -680,6 +705,8 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             //仮オブジェ
             std::string name = "netPlayer" + std::to_string(playerNr);
             GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+
+            //プレイヤー追加
             if (!net1)
             {
                 //netプレイヤー
