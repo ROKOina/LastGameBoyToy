@@ -59,6 +59,7 @@
 void SceneGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
+    PhysXLib::Instance().Initialize();
 
 #pragma region ゲームオブジェクトの設定
 
@@ -82,8 +83,8 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        //obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
@@ -91,10 +92,11 @@ void SceneGame::Initialize()
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
+        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+        rigid->GenerateCollider(r->GetModel()->GetResource());
     }
 
     //当たり判定用
-    PhysXLib::Instance().Initialize();
     std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
         roboobj->SetName("robo");
@@ -111,7 +113,8 @@ void SceneGame::Initialize()
         //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
         roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER);
+        RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER).get();
+        rigid->GenerateCollider(NodeCollsionCom::CollsionType::SPHER);
     }
 
     //プレイヤー

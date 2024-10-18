@@ -1,5 +1,6 @@
 #include "Physxlib.h"
 #include "Components\TransformCom.h"
+#include <list>
 
 void PhysXLib::Initialize()
 {
@@ -15,27 +16,30 @@ void PhysXLib::Initialize()
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 
+
+
     // シーンの作成
     gScene = gPhysics->createScene(sceneDesc);
+    gScene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
+    gScene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
-
-    //静的オブジェクトの追加
-    physx::PxRigidStatic* rigid_static
-        = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
-    // 形状(Box)を作成
-    physx::PxShape* box_shape
-        = gPhysics->createShape(
-            // Boxの大きさ
-            physx::PxBoxGeometry(5.f, 1.f, 5.f),
-            // 摩擦係数と反発係数の設定
-            *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
-        );
-    // 形状のローカル座標を設定
-    box_shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
-    // 形状を紐づけ
-    rigid_static->attachShape(*box_shape);
-    // 剛体を空間に追加
-    gScene->addActor(*rigid_static);
+    ////静的オブジェクトの追加
+    //physx::PxRigidStatic* rigid_static
+    //    = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+    //// 形状(Box)を作成
+    //physx::PxShape* box_shape
+    //    = gPhysics->createShape(
+    //        // Boxの大きさ
+    //        physx::PxBoxGeometry(5.f, 0.5f, 5.f),
+    //        // 摩擦係数と反発係数の設定
+    //        *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
+    //    );
+    //// 形状のローカル座標を設定
+    //box_shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
+    //// 形状を紐づけ
+    //rigid_static->attachShape(*box_shape);
+    //// 剛体を空間に追加
+    //gScene->addActor(*rigid_static);
 }
 
 void PhysXLib::Update(float elapsedTime)
@@ -68,48 +72,54 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
             indices.emplace_back(ver);
         }
 
-        //physx::PxTriangleMeshDesc meshDesc;
-        //meshDesc.setToDefault();
-        //meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
-        //meshDesc.points.stride = sizeof(PxVec3);
-        //meshDesc.points.data = &vertices[0];
+        physx::PxTriangleMeshDesc meshDesc;
+        meshDesc.setToDefault();
+        meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
+        meshDesc.points.stride = sizeof(PxVec3);
+        meshDesc.points.data = vertices.data();
 
-        //meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size());
-        //meshDesc.triangles.stride = sizeof(PxU32)*3;
-        //meshDesc.triangles.data = &indices[0];
+        meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size()) / 3;
+        meshDesc.triangles.stride = sizeof(PxU32) * 3;
+        meshDesc.triangles.data = indices.data();
 
-        //physx::PxTolerancesScale tolerances_scale;
-        //PxCookingParams cooking_params(tolerances_scale);
-        //cooking_params.convexMeshCookingType = physx::PxConvexMeshCookingType::Enum::eQUICKHULL;
-        //cooking_params.gaussMapLimit = 256;
+        physx::PxTolerancesScale tolerances_scale;
+        PxCookingParams cooking_params(tolerances_scale);
+        cooking_params.convexMeshCookingType = physx::PxConvexMeshCookingType::Enum::eQUICKHULL;
+        cooking_params.gaussMapLimit = 256;
 
-        //physx::PxTriangleMesh* triangle_mesh = nullptr;
-        //physx::PxDefaultMemoryOutputStream write_buffer;
-        //if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
-        //    assert(0 && "PxCookTriangleMesh failed.");
-        //}
+        physx::PxTriangleMesh* triangle_mesh = nullptr;
+        physx::PxDefaultMemoryOutputStream write_buffer;
+        if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
+            assert(0 && "PxCookTriangleMesh failed.");
+        }
 
-        //PxDefaultMemoryOutputStream writeBuffer;
-        //PxTriangleMeshCookingResult::Enum result;
+        PxDefaultMemoryOutputStream writeBuffer;
+        PxTriangleMeshCookingResult::Enum result;
 
-        //physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
-        //triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
+        physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+        triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
 
 
-        //physx::PxRigidActor* rigidObj = nullptr;
-        //if (isStatic) {
-        //    //動かない(静的)剛体を作成
-        //    rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
-        //}
-        //else {
-        //    // 動かすことのできる(動的)剛体を作成
-        //    rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
-        //}
-        //PxTriangleMeshGeometry meshGeometry(triangle_mesh);
-        //;
-        //PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
-        //rigidObj->attachShape(*shape);
-        //shape->release();
+        physx::PxRigidActor* rigidObj = nullptr;
+        if (isStatic) {
+            //動かない(静的)剛体を作成
+            rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+        }
+        else {
+            // 動かすことのできる(動的)剛体を作成
+            rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
+        }
+        physx::PxMeshScale scale(PxVec3(100.0f, 0.01f, 100.0f));
+        PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
+
+        PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
+        rigidObj->attachShape(*shape);
+        shape->release();
+
+        // 剛体を空間に追加
+        gScene->addActor(*rigidObj);
+
+        return rigidObj;
     }
 
     return nullptr;
@@ -118,14 +128,16 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
 physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, GameObj obj)
 {
     physx::PxRigidActor* rigidObj = nullptr;
+    physx::PxTransform transform(physx::PxIdentity);
+    transform.p = { obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y,obj->transform_->GetWorldPosition().z };
 
     if (isStatic) {
         //動かない(静的)剛体を作成
         rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
     }
-    else{
+    else {
         // 動かすことのできる(動的)剛体を作成
-        rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
+        rigidObj = gPhysics->createRigidDynamic(transform);
     }
 
     // 形状(Box)を作成
@@ -154,7 +166,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     case NodeCollsionCom::CollsionType::CYLINDER:
         shape = gPhysics->createShape(
             // Boxの大きさ
-            physx::PxCapsuleGeometry(1.f,1.f),
+            physx::PxCapsuleGeometry(1.f, 1.f),
             // 摩擦係数と反発係数の設定
             *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
         );
@@ -169,9 +181,9 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
     rigidObj->attachShape(*shape);
 
-    physx::PxTransform transform;
-    transform.p = { obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y,obj->transform_->GetWorldPosition().z };
-    rigidObj->setGlobalPose(transform);
+    //physx::PxTransform transform;
+    //transform.p = { obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y,obj->transform_->GetWorldPosition().z };
+    //rigidObj->setGlobalPose(transform);
 
     // 剛体を空間に追加
     gScene->addActor(*rigidObj);
