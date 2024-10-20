@@ -166,7 +166,6 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
 
     //コンスタントバッファの定義と更新
     m_gpu = std::make_unique<ConstantBuffer<GPUParticleConstants>>(device);
-    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
 
     //コンスタントバッファのバッファ作成、更新
     buffer_desc.ByteWidth = sizeof(GPUparticleSaveConstants);
@@ -177,17 +176,6 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     buffer_desc.StructureByteStride = 0;
     hr = device->CreateBuffer(&buffer_desc, nullptr, m_constantbuffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-
-    //初期化のピクセルシェーダーをセット
-    dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
-    dc->CSSetShader(m_initialzecomputeshader.Get(), NULL, 0);
-    const UINT thread_group_count_x = align(static_cast<UINT>(maxparticle), THREAD) / THREAD;
-    dc->Dispatch(thread_group_count_x, 1, 1);
-    ID3D11UnorderedAccessView* null_unordered_access_view{};
-    dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
 
     //ファイル読み込み処理
     if (filename)
@@ -196,6 +184,8 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
         D3D11_TEXTURE2D_DESC texture2d_desc{};
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_filename.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
     }
+
+    //fileVelocity = m_GSC.velocity;
 }
 
 //更新処理
@@ -203,6 +193,12 @@ void GPUParticle::Update(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+    //DirectX::XMMATRIX transf = DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform());
+
+    //DirectX::XMVECTOR velo = DirectX::XMLoadFloat3(&fileVelocity);
+    //velo = DirectX::XMVector3TransformNormal(velo, transf);
+    //DirectX::XMStoreFloat3(&m_GSC.velocity, velo);
 
     //コンスタントバッファの更新
     m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
@@ -219,12 +215,6 @@ void GPUParticle::Update(float elapsedTime)
     dc->Dispatch(thread_group_count_x, 1, 1);
     ID3D11UnorderedAccessView* null_unordered_access_view{};
     dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
-
-    //パラメータ初期化
-    if (m_gpu->data.loop == 0)
-    {
-        //Reset();
-    }
 }
 
 //描画
@@ -254,6 +244,14 @@ void GPUParticle::Render()
     dc->PSSetShader(m_pixelshader.Get(), NULL, 0);
     dc->GSSetShader(m_geometryshader.Get(), NULL, 0);
     dc->GSSetShaderResources(0, 1, m_particlesrv.GetAddressOf());
+
+    //コンスタントバッファの更新
+    m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
+    m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
+    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
 
     //解放
     dc->IASetInputLayout(NULL);
@@ -292,7 +290,6 @@ void GPUParticle::OnGUI()
     {
         //リセット関数
         Reset();
-        m_gpu->data.loop = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("ParameterReset"))
@@ -376,7 +373,7 @@ void GPUParticle::OnGUI()
     ImGui::ColorEdit4(J(u8"始めの色"), &m_GSC.startcolor.x);
     ImGui::ColorEdit4(J(u8"最後の色"), &m_GSC.endcolor.x);
     ImGui::DragFloat3(J(u8"輝度"), &m_GSC.luminance.x, 0.1f);
-    ImGui::DragFloat3(J(u8"速力"), &m_GSC.velocity.x, 0.1f);
+    ImGui::DragFloat3(J(u8"速力"), &fileVelocity.x, 0.1f);
     ImGui::DragFloat3(J(u8"回転係数"), &m_GSC.orbitalvelocity.x, 0.1f);
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"生成角度"), &m_GSC.shape.w, 0.1f, 0.0f, 1.0f);
@@ -426,6 +423,8 @@ void GPUParticle::Reset()
     dc->Dispatch(thread_group_count_x, 1, 1);
     ID3D11UnorderedAccessView* null_unordered_access_view{};
     dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
+
+    m_gpu->data.loop = true;
 }
 
 //シリアライズ

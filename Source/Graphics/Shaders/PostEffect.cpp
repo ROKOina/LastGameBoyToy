@@ -28,6 +28,7 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\SSR.cso", m_pixelshaders[static_cast<int>(pixelshader::ssr)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\FXAA.cso", m_pixelshaders[static_cast<int>(pixelshader::fxaa)].GetAddressOf());
+    CreatePsFromCso(Graphics.GetDevice(), "Shader\\DecalPS.cso", m_pixelshaders[static_cast<int>(pixelshader::decal)].GetAddressOf());
 
     //MultiRenderTarget作成
     m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 6);
@@ -117,6 +118,17 @@ void PostEffect::PostEffectRender()
     FullScreenQuad::Instance().Blit(dc, shadow, 0, _countof(shadow), m_pixelshaders[static_cast<int>(pixelshader::cascadeshadow)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::cascadeshadow)]->Deactivate(dc);
 
+    //デカール
+    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Clear(dc);
+    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Activate(dc);
+    //dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::ALPHA), nullptr, 0xFFFFFFFF);
+    //dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
+    //dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
+    //ID3D11ShaderResourceView* decal[]
+    //{ m_offScreenBuffer[static_cast<size_t>(offscreen::ssr)]->m_shaderresourceviews[0].Get() ,m_gBuffer->GetShaderResources()[2] };
+    //FullScreenQuad::Instance().Blit(dc, decal, 0, _countof(decal), m_pixelshaders[static_cast<int>(pixelshader::decal)].Get());
+    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Deactivate(dc);
+
     //ポストエフェクト
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Clear(dc);
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Activate(dc);
@@ -181,6 +193,9 @@ void PostEffect::PostEffectImGui()
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
         ImGui::SliderFloat("distance_to_sun", &m_posteffect->data.distance_to_sun, 0.0f, 1000.0f);
         ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
+        ImGui::SliderFloat("blurstrength", &m_posteffect->data.blurstrength, +0.0f, +1.0f);
+        ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
+        ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
     }
 
     //ライトのimgui

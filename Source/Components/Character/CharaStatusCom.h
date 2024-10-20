@@ -20,6 +20,11 @@ public:
     // GUI•`‰æ
     void OnGUI() override;
 
+private:
+
+    //–³“GŠÔXV
+    void UpdateInvincibleTime(float elapsedTime);
+
 public:
 
     //HPæ“¾
@@ -29,7 +34,10 @@ public:
     //HP‚ÌŒ¸­‚Æ‘‰Á
     void AddDamagePoint(float value) { hitPoint += value; }
     void AddHealPoint(float value) { hitPoint += value; }
+    void AddDamageAndInvincibleTime(int damage);
 
 private:
     int hitPoint = 100;
+    float invincibletimer = 1.0f;
+    bool hit = false;
 };

@@ -76,6 +76,9 @@ public:
     };
     std::unique_ptr<ConstantBuffer<GPUParticleConstants>>m_gpu;
 
+    //アクティブ化
+    void SetLoop(const bool& loop) { m_gpu->data.loop = loop; }
+
     //保存するコンスタントバッファ
     struct GPUparticleSaveConstants
     {
@@ -118,6 +121,8 @@ public:
     SaveParameter m_p;
 
 private:
+    DirectX::XMFLOAT3 fileVelocity = {};
+
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_particlebuffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_particlesrv;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView>m_particleuav;

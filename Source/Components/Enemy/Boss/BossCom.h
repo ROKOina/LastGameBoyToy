@@ -54,11 +54,13 @@ public:
         JUMP,
         JUMPLOOP,
         LANDINGATTACK,
-        ATTACK,
+        PUNCH,
+        KICK,
         RANGEATTACK,
         BOMPATTTACK,
         HIT,
         DEATH,
+
         MAX
     };
 

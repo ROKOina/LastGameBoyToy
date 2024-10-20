@@ -15,7 +15,8 @@ void BossCom::Start()
     state.AddState(BossState::JUMP, std::make_shared <Boss_JumpState>(this));
     state.AddState(BossState::JUMPLOOP, std::make_shared <Boss_JumpLoopState>(this));
     state.AddState(BossState::LANDINGATTACK, std::make_shared <Boss_LandingState>(this));
-    state.AddState(BossState::ATTACK, std::make_shared <Boss_AttackState>(this));
+    state.AddState(BossState::PUNCH, std::make_shared <Boss_PunchState>(this));
+    state.AddState(BossState::KICK, std::make_shared <Boss_KickState>(this));
     state.AddState(BossState::RANGEATTACK, std::make_shared <Boss_RangeAttackState>(this));
     state.AddState(BossState::BOMPATTTACK, std::make_shared <Boss_BompAttackState>(this));
     state.AddState(BossState::HIT, std::make_shared <Boss_DamageState>(this));
@@ -105,7 +106,7 @@ int BossCom::ComputeRandom()
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
     {
-        availableNumbers = { 1,2,3 };
+        availableNumbers = { 1,2,3,4,5,6,7 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成

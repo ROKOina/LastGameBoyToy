@@ -4,6 +4,7 @@
 #include "../../TransformCom.h"
 #include "../../AnimationCom.h"
 #include "Components/Character/CharaStatusCom.h"
+#include "Components\CPUParticle.h"
 
 class BossCom;
 
@@ -16,6 +17,15 @@ public:
     //アニメーション中の当たり判定
     bool AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname);
 
+    //CPUエフェクトの検索
+    void CPUEffect(const char* objectname, bool posflag);
+
+    //GPUエフェクトの検索と消去
+    void GPUEffect(const char* objectname);
+
+    //乱数で選択された行動を選択する関数
+    void RandamBehavior(int one, int two);
+
 protected:
     std::weak_ptr<BossCom> bossCom;
     std::weak_ptr<MovementCom> moveCom;
@@ -23,6 +33,12 @@ protected:
     std::weak_ptr<AnimationCom> animationCom;
     std::weak_ptr<CharaStatusCom>characterstatas;
     std::shared_ptr<GameObject>cachedobject;
+    std::shared_ptr<GameObject>cpuparticle;
+    std::shared_ptr<GameObject>gpuparticle;
+
+private:
+    // アニメーションイベント時の当たり判定
+    DirectX::XMFLOAT3 nodepos = {};
 };
 
 //待機
@@ -98,19 +114,32 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void ImGui() override {};
+    virtual void Exit() {};
     virtual const char* GetName() const override { return "Landing"; }
 };
 
-//攻撃
-class Boss_AttackState : public Boss_BaseState
+//パンチ
+class Boss_PunchState : public Boss_BaseState
 {
 public:
-    Boss_AttackState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_PunchState(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void ImGui() override;
-    virtual const char* GetName() const override { return "Attack"; }
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Punch"; }
+};
+
+//キック
+class Boss_KickState : public Boss_BaseState
+{
+public:
+    Boss_KickState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Kick"; }
 };
 
 //範囲攻撃

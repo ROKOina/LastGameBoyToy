@@ -9,41 +9,19 @@ void main(uint3 dtid : SV_DispatchThreadID)
     uint id = dtid.x;
     MainParticle p;
 
-    //ランダム生成
-    const float noiseScale = 1.0;
-    float f0 = rand(float2((id + time) * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
-    float f1 = rand(float2(f0 * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
-    float f2 = rand(float2(f1 * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
+    // 各フィールドを個別に初期化
+    p.position = position;
+    p.scale = scale;
+    p.color = color;
+    p.rotation = rotation;
+    p.velocity = velocity;
+    p.strechvelocity = 0; // ここはデフォルト値を設定
+    p.direction = direction;
+    p.isalive = isalive;
+    p.isstart = startflag;
+    p.lifetime = lifetime;
+    p.age = lifetime; // ageもlifetimeで初期化
 
-    //全ての情報を初期化
-    if (loop == 1)
-    {
-        p.position = position;
-        p.scale = scale;
-        p.color = color;
-        p.rotation = rotation;
-        p.velocity = velocity * f2;
-        p.strechvelocity = 0;
-        p.direction = direction;
-        p.isalive = isalive;
-        p.isstart = startflag;
-        p.lifetime = lifetime;
-        p.age = lifetime * f2;
-    }
-    else
-    {
-        p.position = position;
-        p.scale = scale * f2;
-        p.color = color;
-        p.rotation = rotation;
-        p.velocity = velocity * f2;
-        p.strechvelocity = 0;
-        p.direction = direction;
-        p.isalive = isalive;
-        p.isstart = startflag;
-        p.lifetime = lifetime;
-        p.age = lifetime * f2;
-    }
-    
+    // パーティクルをバッファに書き込む
     particlebuffer[id] = p;
 }

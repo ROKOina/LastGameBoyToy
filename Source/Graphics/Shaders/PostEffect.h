@@ -78,7 +78,9 @@ private:
         float vignetteintensity = 0.7f;
         DirectX::XMFLOAT4 ssrparameter = { 50.0f,10.0f,0.1f,1.0f };
         float distance_to_sun = 17.301f;
-        DirectX::XMFLOAT3 posteffectdummy = {};
+        float blurstrength = {};
+        float blurradius = { 1.0f };
+        float blurdecay = {};
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
@@ -93,8 +95,8 @@ private:
     std::unique_ptr<ConstantBuffer<SHADOWPARAMETER>>m_shadowparameter;
 
 private:
-    enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, ssr, fxaa, depthCopy, max };
-    enum class pixelshader { deferred, colorGrading, cascadeshadow, ssr, fxaa, tonemap, max };
+    enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, ssr, fxaa, decal, depthCopy, max };
+    enum class pixelshader { deferred, colorGrading, cascadeshadow, ssr, fxaa, decal, tonemap, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];
 

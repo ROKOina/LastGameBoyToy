@@ -37,7 +37,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     };
 
     //簡易的なライティング計算
-    float3 n = float3(0, 0, 1); // パーティクルの面法線
+    float3 n = float3(1, 1, 1); // パーティクルの面法線
     float3 N = normalize(n);
     float3 L = normalize(-directionalLight.direction.xyz);
     float d = dot(L, N);
@@ -48,7 +48,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
 
     //座標変換(速力と位置)
     float4 viewpos = mul(float4(p.position.xyz, 1.0), view);
-    float4 viewvelo = mul(float4(p.strechvelocity, 0.0), view);
+    float4 viewvelo = float4(p.strechvelocity, 1.0f);
 
     //回転
     p.rotation = rotation;

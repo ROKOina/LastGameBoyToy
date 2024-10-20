@@ -127,24 +127,68 @@ void SceneGame::Initialize()
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         boss->AddComponent<CharaStatusCom>();
-        boss->AddComponent<SpawnCom>();
+        //boss->AddComponent<SpawnCom>();
 
-        //コリジョン
-        std::shared_ptr<GameObject> righthand = boss->AddChildObject();
-        righthand->SetName("lefthandcollsion");
-        std::shared_ptr<SphereColliderCom> leftcollider = righthand->AddComponent<SphereColliderCom>();
-        leftcollider->SetEnabled(false);
-        leftcollider->SetMyTag(COLLIDER_TAG::Enemy);
-        leftcollider->SetJudgeTag(COLLIDER_TAG::Player);
-    }
+        //左手コリジョン
+        {
+            std::shared_ptr<GameObject> lefthand = boss->AddChildObject();
+            lefthand->SetName("lefthandcollsion");
+            std::shared_ptr<SphereColliderCom> lefthandcollider = lefthand->AddComponent<SphereColliderCom>();
+            lefthandcollider->SetEnabled(false);
+            lefthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
+            lefthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
+        }
 
-    //インスタンステスト
-    {
-        //auto& obj = GameObjectManager::Instance().Create();
-        //obj->SetName("Instance");
-        //obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
-        //std::shared_ptr<InstanceRenderer> r = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 2, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true);
-        //r->LoadModel("Data/Jammo/jammo.mdl");
+        //右足コリジョン
+        {
+            std::shared_ptr<GameObject> rightlegs = boss->AddChildObject();
+            rightlegs->SetName("rightlegscollsion");
+            std::shared_ptr<SphereColliderCom> rightlegscollider = rightlegs->AddComponent<SphereColliderCom>();
+            rightlegscollider->SetEnabled(false);
+            rightlegscollider->SetMyTag(COLLIDER_TAG::Enemy);
+            rightlegscollider->SetJudgeTag(COLLIDER_TAG::Player);
+        }
+
+        //手に付ける火のエフェクト
+        {
+            std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
+            cpufireeffect->SetName("cpufireeffect");
+            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fire.cpuparticle", 1000);
+            cpufire->SetActive(false);
+        }
+
+        //gpuの炎
+        {
+            std::shared_ptr<GameObject>gpufireeffect = boss->AddChildObject();
+            gpufireeffect->SetName("gpufireeffect");
+            std::shared_ptr<GPUParticle>gpufire = gpufireeffect->AddComponent<GPUParticle>("Data/Effect/fire.gpuparticle", 10000);
+            gpufire->SetLoop(false);
+        }
+
+        //着地時の煙エフェクト
+        {
+            std::shared_ptr<GameObject>landsmokeeffect = boss->AddChildObject();
+            landsmokeeffect->SetName("cpulandsmokeeffect");
+            landsmokeeffect->transform_->SetWorldPosition({ 0,1.7f,0 });
+            std::shared_ptr<CPUParticle>landsmoke = landsmokeeffect->AddComponent<CPUParticle>("Data/Effect/landsmoke.cpuparticle", 1000);
+            landsmoke->SetActive(false);
+        }
+
+        //竜巻のエフェクト
+        {
+            std::shared_ptr<GameObject>cycloneffect = boss->AddChildObject();
+            cycloneffect->SetName("cycloncpueffect");
+            std::shared_ptr<CPUParticle>cpuparticle = cycloneffect->AddComponent<CPUParticle>("Data/Effect/cyclon.cpuparticle", 1000);
+            cpuparticle->SetActive(false);
+        }
+
+        //gpuの竜巻のエフェクト
+        {
+            std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
+            gpucycloneffect->SetName("cyclongpueffect");
+            std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
+            gpufire->SetLoop(false);
+        }
     }
 
 #pragma endregion
@@ -283,6 +327,28 @@ void SceneGame::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
+
+    ImGui::Begin("Effect");
+    EffectNew();
+    ImGui::End();
+}
+
+//エフェクト生成
+void SceneGame::EffectNew()
+{
+    if (ImGui::Button("cpuparticlenew"))
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("testcpueffect");
+        obj->AddComponent<CPUParticle>(nullptr, 1000);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("gpuparticlenew"))
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("testgpueffect");
+        obj->AddComponent<GPUParticle>(nullptr, 10000);
+    }
 }
 
 void SceneGame::SetUserInputs()

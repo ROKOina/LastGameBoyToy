@@ -15,6 +15,7 @@
 #include "Components/Character/UenoCharacterCom.h"
 #include "Components/EventCom.h"
 #include "Components/Character/Picohard.h"
+#include "Components/CPUParticle.h"
 #include "HitProcess/HitProcessCom.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject> obj)
@@ -74,6 +75,14 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
     obj->AddComponent<MovementCom>();
     std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
     c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
+
+    //煙のエフェクト
+    {
+        std::shared_ptr<GameObject> smoke = obj->AddChildObject();
+        smoke->SetName("smokeeffect");
+        std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/Effect/smoke.cpuparticle", 100);
+        smokeeffct->SetActive(false);
+    }
 
     //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));

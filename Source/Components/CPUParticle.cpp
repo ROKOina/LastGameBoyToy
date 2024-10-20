@@ -102,6 +102,8 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
         CEREAL_NVP(m_latesize),
         CEREAL_NVP(m_particlecolor),
         CEREAL_NVP(m_intensity),
+        CEREAL_NVP(usetime),
+        CEREAL_NVP(limitime),
         CEREAL_NVP(collsionradius)
     );
 }
@@ -110,7 +112,7 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
 #define J(x) reinterpret_cast<const char*>(x)
 
 //コンストラクタ
-CPUParticle::CPUParticle(const char* filename, int num)
+CPUParticle::CPUParticle(const char* filename, int num, bool col)
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -163,6 +165,9 @@ CPUParticle::CPUParticle(const char* filename, int num)
         D3D11_TEXTURE2D_DESC texture2d_desc{};
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_scp.m_filename.c_str(), m_shaderresourceview.GetAddressOf(), &texture2d_desc);
     }
+
+    //コライダーフラグ
+    col = collider;
 }
 
 //更新処理
@@ -171,6 +176,16 @@ void CPUParticle::Update(float elapsedTime)
     // パーティクル更新
     if (m_pause)
     {
+        if (m_active && m_scp.usetime)
+        {
+            timer += elapsedTime;
+        }
+        if (timer > m_scp.limitime)
+        {
+            m_active = false;
+            timer = 0.0f;
+        }
+
         for (int i = 0; i < m_numparticle; i++)
         {
             if (m_data[i].type == -1) continue; // 非表示のパーティクルをスキップ
@@ -284,11 +299,14 @@ void CPUParticle::Render()
     dc->PSSetShader(NULL, NULL, 0);
 
     //当たり判定描画
-    for (int i = 0; i < m_numparticle; ++i)
+    if (collider)
     {
-        if (m_data[i].type == -1) continue; // 非表示のパーティクルをスキップ
+        for (int i = 0; i < m_numparticle; ++i)
+        {
+            if (m_data[i].type == -1) continue; // 非表示のパーティクルをスキップ
 
-        Graphics::Instance().GetDebugRenderer()->DrawSphere(m_v[i].Pos, m_scp.collsionradius, { 1,0,0,1 });
+            Graphics::Instance().GetDebugRenderer()->DrawSphere(m_v[i].Pos, m_scp.collsionradius, { 1,0,0,1 });
+        }
     }
 }
 
@@ -495,6 +513,9 @@ void CPUParticle::OnGUI()
     ImGui::ColorEdit4(J(u8"色"), &m_scp.m_particlecolor.x);
     ImGui::DragFloat3(J(u8"輝度"), &m_scp.m_intensity.x, 0.1f, 0.0f, 300.0f);
     ImGui::DragFloat(J(u8"生存時間"), &m_scp.m_lifetime, 0.1f);
+    ImGui::Checkbox(J(u8"制限時間を使う"), &m_scp.usetime);
+    ImGui::DragFloat(J(u8"時間"), &timer, 0.1f);
+    ImGui::DragFloat(J(u8"制限時間"), &m_scp.limitime, 0.1f, 0.0f, 100.0f);
     ImGui::DragFloat3(J(u8"重力方向"), &m_scp.m_velocity.x, 0.1f);
     ImGui::DragFloat3(J(u8"重力ランダム"), &m_scp.m_randomvelocity.x, 0.1f, 0.0f);
     ImGui::DragFloat3(J(u8"浮力"), &m_scp.m_buoyancy.x, 0.1f);
@@ -624,11 +645,3 @@ void CPUParticle::Reset()
     m_scp.m_intensity = { 1,1,1 };
     m_scp.collsionradius = { 0.0f };
 }
-
-//ベジェ曲線
-//DirectX::XMVECTOR CPUParticle::BezierCurve(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1, DirectX::XMVECTOR p2, float t)
-//{
-//    float u = 1 - t;
-//
-//    return u * u * p0 + 2 * u * t * p1 + t * t * p2;
-//}
