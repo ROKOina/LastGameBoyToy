@@ -55,7 +55,7 @@ void CharacterCom::Update(float elapsedTime)
 #else
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
-        MainAttack();
+        //MainAttack();
     }
 
 #endif // _DEBUG

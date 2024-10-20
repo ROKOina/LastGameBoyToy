@@ -244,6 +244,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     RenderUseDepth();
     InstanceRenderUseDepth();
 
+
     //ポストエフェクト
     PostEffect::Instance().PostEffectRender();
 

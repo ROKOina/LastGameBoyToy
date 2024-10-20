@@ -49,6 +49,9 @@ private:
 
     //ディレイ方式用入力
     void DelayOnlineInput();
+
+    //UIのゲームオブジェクト生成
+    void CreateUiObject();
 private:
     std::unique_ptr<NetwarkPost> n;
     std::unique_ptr<BasicsApplication> photonNet;
