@@ -3,61 +3,33 @@
 // 更新処理
 void CharaStatusCom::Update(float elapsedTime)
 {
-    //無敵時間更新
-    UpdateInvincibleTime(elapsedTime);
+    // 無敵時間の減少処理
+    if (currentInvincibleTime > 0.0f)
+    {
+        currentInvincibleTime -= elapsedTime;
+        if (currentInvincibleTime < 0.0f)
+        {
+            currentInvincibleTime = 0.0f; // 無敵時間が0を下回らないようにする
+        }
+    }
+}
+
+// HPの減少処理（無敵時間を考慮）
+void CharaStatusCom::AddDamagePoint(float value)
+{
+    if (!IsInvincible())
+    {
+        hitPoint += value;
+
+        // ダメージを受けたら無敵時間をリセット
+        currentInvincibleTime = invincibleTime;
+    }
 }
 
 //GUI
 void CharaStatusCom::OnGUI()
 {
     ImGui::DragInt("HP", &hitPoint);
-    ImGui::DragFloat("INVISIBLETIMER", &invincibletimer);
-    ImGui::Checkbox("hit", &hit);
-}
-
-//無敵時間更新
-void CharaStatusCom::UpdateInvincibleTime(float elapsedTime)
-{
-    if (invincibletimer > 0.0f)
-    {
-        invincibletimer -= elapsedTime;
-    }
-}
-
-//ダメージと無敵時間の更新
-void CharaStatusCom::AddDamageAndInvincibleTime(int damage)
-{
-    // ダメージ前のHPを保持
-    int previousHitPoint = hitPoint;
-
-    ////健康状態変更なし
-    //if (damage == 0)
-    //{
-    //    hit = true;
-    //}
-
-    ////死亡してる時も変えない
-    //if (damage <= 0)
-    //{
-    //    hit = true;
-    //}
-
-    ////無敵時間中も変えない
-    //if (invincibletimer > 0.0f)
-    //{
-    //    hit = true;
-    //}
-
-    // ダメージ適用
-    //if (hit)
-    {
-        hitPoint += damage;
-    }
-
-    // HPが変動した場合、hitフラグをtrueに設定
-    if (hitPoint != previousHitPoint)
-    {
-        hit = true;
-        //invincibletimer = 1.0f; // 無敵時間をリセット
-    }
+    ImGui::DragFloat("Invincible Time", &invincibleTime, 0.1f, 0.0f, 10.0f);
+    ImGui::Text("Current Invincible Time: %.2f", currentInvincibleTime);
 }

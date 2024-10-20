@@ -20,24 +20,22 @@ public:
     // GUI•`‰æ
     void OnGUI() override;
 
-private:
-
-    //–³“GŠÔXV
-    void UpdateInvincibleTime(float elapsedTime);
-
 public:
 
     //HPæ“¾
     void SetHitPoint(float value) { hitPoint = value; }
     float GetHitPoint() { return hitPoint; }
 
-    //HP‚ÌŒ¸­‚Æ‘‰Á
-    void AddDamagePoint(float value) { hitPoint += value; }
+    // HP‚ÌŒ¸­‚Æ‘‰Á
+    void AddDamagePoint(float value);
     void AddHealPoint(float value) { hitPoint += value; }
-    void AddDamageAndInvincibleTime(int damage);
+
+    // –³“GŠÔ‚ğİ’è
+    void SetInvincibleTime(float time) { invincibleTime = time; }
+    bool IsInvincible() const { return currentInvincibleTime > 0.0f; }
 
 private:
     int hitPoint = 100;
-    float invincibletimer = 1.0f;
-    bool hit = false;
+    float invincibleTime = 3.0f;        // –³“GŠÔ‚Ì’·‚³i•bj
+    float currentInvincibleTime = 0.0f; // c‚è‚Ì–³“GŠÔ
 };

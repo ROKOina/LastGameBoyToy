@@ -3,6 +3,7 @@
 #include "Components\ColliderCom.h"
 #include "Components\Character\CharaStatusCom.h"
 #include "Components\GPUParticle.h"
+#include "Components\SpawnCom.h"
 
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 {
@@ -133,6 +134,10 @@ void Boss_BaseState::RandamBehavior(int one, int two)
     else if (randomAction == 7)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
+    }
+    else if (randomAction == 8)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::FIREBALL);
     }
 }
 
@@ -304,12 +309,12 @@ void Boss_PunchState::Execute(const float& elapsedTime)
         CPUEffect("cpufireeffect", true);
     }
 
-    ////ヒット時の処理
-    //auto collider = cachedobject->GetComponent<SphereColliderCom>();
-    //for (auto& hit : collider->OnHitGameObject())
-    //{
-    //    hit.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamageAndInvincibleTime(-1);
-    //}
+    //ヒット時の処理
+    auto collider = cachedobject->GetComponent<SphereColliderCom>();
+    for (auto& hit : collider->OnHitGameObject())
+    {
+        hit.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
+    }
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
@@ -393,6 +398,39 @@ void Boss_BompAttackState::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Stand"), false);
 }
 void Boss_BompAttackState::Execute(const float& elapsedTime)
+{
+    //アニメーションイベント中にボンプを生成
+    if (animationCom.lock()->IsEventCalling("SPAWNENEMY"))
+    {
+        GameObjectManager::Instance().Find("bomp")->GetComponent<SpawnCom>()->SetOnTrigger(true);
+    }
+    else
+    {
+        GameObjectManager::Instance().Find("bomp")->GetComponent<SpawnCom>()->SetOnTrigger(false);
+    }
+
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+        return;
+    }
+
+    //死亡処理
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma region ファイヤーボール
+void Boss_FireBallState::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("FireBall"), false);
+}
+void Boss_FireBallState::Execute(const float& elapsedTime)
 {
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())

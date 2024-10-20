@@ -254,7 +254,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     //sampled_color.rgb += OutlineEffect(pin.texcoord.xy, width, height, inverseviewprojection, cameraposition);
 
     // ビネット効果の適用
-    //sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
+    sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
 
     //レンズフレアとグローライトのエフェクト
     float4 ndc_sun_position = mul(float4(-normalize(directionalLight.direction.xyz) * distance_to_sun, 1), viewProjection);

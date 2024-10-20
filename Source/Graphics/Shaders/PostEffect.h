@@ -22,6 +22,27 @@ private:
 
 public:
 
+    // パラメータの種類を識別するための列挙型
+    enum class PostEffectParameter
+    {
+        VignetteColor,
+        Brightness,
+        Contrast,
+        Hue,
+        Saturation,
+        BloomExtractionThreshold,
+        BlurConvolutionIntensity,
+        Exposure,
+        VignetteSize,
+        VignetteIntensity,
+        DistanceToSun,
+        BlurStrength,
+        BlurRadius,
+        BlurDecay
+    };
+
+public:
+
     //シングルトン
     static PostEffect& Instance()
     {
@@ -53,12 +74,8 @@ public:
     //シーンのimgui
     void SceneImGui();
 
-public:
-
-    //取得
-    CascadedShadowMap* GetCascadedShadow() const { return m_cascadedshadowmap.get(); }
-    MultiRenderTarget* GetMultiRenderTarget() const { return m_gBuffer.get(); }
-    float m_criticaldepthvalue = 300.0f;
+    //ポストエフェクトのパラメータを制御する関数
+    void ParameterMove(float elapsedTime, float parameterIn, bool update, PostEffectParameter parameter);
 
 private:
 
@@ -75,12 +92,12 @@ private:
         float blurconvolutionintensity = 0.200f;
         float exposure = 1.4f;
         float vignettesize = 0.8f;
-        float vignetteintensity = 0.7f;
+        float vignetteintensity = 0.01f;
         DirectX::XMFLOAT4 ssrparameter = { 50.0f,10.0f,0.1f,1.0f };
         float distance_to_sun = 17.301f;
         float blurstrength = {};
         float blurradius = { 1.0f };
-        float blurdecay = {};
+        float blurdecay = { 0.999f };
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
@@ -93,6 +110,13 @@ private:
         int shadowsamplecount = 32;
     };
     std::unique_ptr<ConstantBuffer<SHADOWPARAMETER>>m_shadowparameter;
+
+public:
+
+    //取得
+    CascadedShadowMap* GetCascadedShadow() const { return m_cascadedshadowmap.get(); }
+    MultiRenderTarget* GetMultiRenderTarget() const { return m_gBuffer.get(); }
+    float m_criticaldepthvalue = 300.0f;
 
 private:
     enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, ssr, fxaa, decal, depthCopy, max };

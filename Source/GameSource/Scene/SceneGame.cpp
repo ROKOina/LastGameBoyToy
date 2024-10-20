@@ -84,9 +84,6 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-        obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
-        obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
-        //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
     }
 
@@ -117,7 +114,7 @@ void SceneGame::Initialize()
         r->LoadModel("Data/Jammo/jammo.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-        //t = boss->transform_;
+        t = boss->transform_;
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
@@ -127,7 +124,13 @@ void SceneGame::Initialize()
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         boss->AddComponent<CharaStatusCom>();
-        //boss->AddComponent<SpawnCom>();
+
+        //ボンプ君
+        {
+            std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
+            bompspawn->SetName("bomp");
+            bompspawn->AddComponent<SpawnCom>();
+        }
 
         //左手コリジョン
         {
@@ -253,7 +256,7 @@ void SceneGame::Update(float elapsedTime)
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
     //ボスの位置取得
-    //sc->data.bossposiotn = t->GetWorldPosition();
+    sc->data.bossposiotn = t->GetLocalPosition();
 
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();

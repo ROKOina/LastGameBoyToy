@@ -166,6 +166,18 @@ public:
     virtual const char* GetName() const override { return "BompAttack"; }
 };
 
+//ファイヤーボール
+class Boss_FireBallState : public Boss_BaseState
+{
+public:
+    Boss_FireBallState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "FireBall"; }
+};
+
 //ダメージ
 class Boss_DamageState : public Boss_BaseState
 {

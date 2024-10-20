@@ -86,7 +86,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     ID3D11DeviceContext* dc = graphics_.GetDeviceContext();
 
     //ÉVÅ[ÉìÇæÇØè„Ç…ï`âÊ
-    PostEffect::Instance().SceneImGui();
+    //PostEffect::Instance().SceneImGui();
 
     //imguiguizmo
     ImGuizmo::BeginFrame();

@@ -284,3 +284,107 @@ void PostEffect::SceneImGui()
     ImGui::Image(texture_id, size);
     ImGui::End();
 }
+
+//ポストエフェクトのパラメータを制御する関数
+void PostEffect::ParameterMove(float elapsedTime, float parameterIn, bool update, PostEffectParameter parameter)
+{
+    if (!m_posteffect) return;  // m_posteffectが無効な場合は処理しない
+    POSTEFFECT& data = m_posteffect->data;
+
+    if (update)
+    {
+        // 更新が必要な場合
+        switch (parameter)
+        {
+        case PostEffectParameter::Brightness:
+            data.brightness = parameterIn;
+            break;
+        case PostEffectParameter::Contrast:
+            data.contrast = parameterIn;
+            break;
+        case PostEffectParameter::Hue:
+            data.hue = parameterIn;
+            break;
+        case PostEffectParameter::Saturation:
+            data.saturation = parameterIn;
+            break;
+        case PostEffectParameter::BloomExtractionThreshold:
+            data.bloomextractionthreshold = parameterIn;
+            break;
+        case PostEffectParameter::BlurConvolutionIntensity:
+            data.blurconvolutionintensity = parameterIn;
+            break;
+        case PostEffectParameter::Exposure:
+            data.exposure = parameterIn;
+            break;
+        case PostEffectParameter::VignetteSize:
+            data.vignettesize = parameterIn;
+            break;
+        case PostEffectParameter::VignetteIntensity:
+            data.vignetteintensity = parameterIn;
+            break;
+        case PostEffectParameter::DistanceToSun:
+            data.distance_to_sun = parameterIn;
+            break;
+        case PostEffectParameter::BlurStrength:
+            data.blurstrength = parameterIn;
+            break;
+        case PostEffectParameter::BlurRadius:
+            data.blurradius = parameterIn;
+            break;
+        case PostEffectParameter::BlurDecay:
+            data.blurdecay = parameterIn;
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        // 時間に応じて減少させる場合
+        switch (parameter)
+        {
+        case PostEffectParameter::Brightness:
+            data.brightness = (std::max)(0.0f, data.brightness - elapsedTime);
+            break;
+        case PostEffectParameter::Contrast:
+            data.contrast = (std::max)(0.0f, data.contrast - elapsedTime);
+            break;
+        case PostEffectParameter::Hue:
+            data.hue = (std::max)(0.0f, data.hue - elapsedTime);
+            break;
+        case PostEffectParameter::Saturation:
+            data.saturation = (std::max)(0.0f, data.saturation - elapsedTime);
+            break;
+        case PostEffectParameter::BloomExtractionThreshold:
+            data.bloomextractionthreshold = (std::max)(0.0f, data.bloomextractionthreshold - elapsedTime);
+            break;
+        case PostEffectParameter::BlurConvolutionIntensity:
+            data.blurconvolutionintensity = (std::max)(0.0f, data.blurconvolutionintensity - elapsedTime);
+            break;
+        case PostEffectParameter::Exposure:
+            data.exposure = (std::max)(0.0f, data.exposure - elapsedTime);
+            break;
+        case PostEffectParameter::VignetteSize:
+            data.vignettesize = (std::max)(0.0f, data.vignettesize - elapsedTime);
+            break;
+        case PostEffectParameter::VignetteIntensity:
+            data.vignetteintensity = (std::max)(0.01f, data.vignetteintensity - elapsedTime);
+            break;
+        case PostEffectParameter::DistanceToSun:
+            data.distance_to_sun = (std::max)(0.0f, data.distance_to_sun - elapsedTime);
+            break;
+        case PostEffectParameter::BlurStrength:
+            data.blurstrength = (std::max)(0.0f, data.blurstrength - elapsedTime);
+            break;
+        case PostEffectParameter::BlurRadius:
+            data.blurradius = (std::max)(0.0f, data.blurradius - elapsedTime);
+            break;
+        case PostEffectParameter::BlurDecay:
+            data.blurdecay = (std::max)(0.0f, data.blurdecay - elapsedTime);
+            break;
+        default:
+            break;
+        }
+    }
+}

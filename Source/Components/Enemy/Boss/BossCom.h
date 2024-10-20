@@ -58,6 +58,7 @@ public:
         KICK,
         RANGEATTACK,
         BOMPATTTACK,
+        FIREBALL,
         HIT,
         DEATH,
 

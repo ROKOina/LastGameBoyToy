@@ -24,10 +24,16 @@ public:
     //複製機能
     void SpawnGameObject();
 
+public:
+
+    //更新するか否か
+    const bool OnTrigger() { return spwntrigger; }
+    void SetOnTrigger(bool flag) { spwntrigger = flag; }
+
 private:
 
     //生成間隔
-    float spawnInterval = 5.0f;
+    float spawnInterval = 0.6f;
     float spawnRadius = 5.0f;
 
     // 生成個数
@@ -38,4 +44,7 @@ private:
 
     // 現在生成されたオブジェクトのカウント
     int currentSpawnedCount = 0; // 生成されたオブジェクトの数を追跡
+
+    //生成フラグ
+    bool spwntrigger = false;
 };
