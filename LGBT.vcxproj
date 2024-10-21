@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;.\External\json-develop\include;.\External\PhysX\lib\debug;.\External\PhysX\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;.\External\json-develop\include;.\External\PhysX\include;.\External\PhysX\lib\debug;.\External\PhysX\include\foundation;%(AdditionalIncludeDirectories);.\External\json-develop</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -69,8 +69,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;Common-cpp_vc17_debug_windows_mt_x64.lib;LoadBalancing-cpp_vc17_debug_windows_mt_x64.lib;Photon-cpp_vc17_debug_windows_mt_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);.\External\photon-windows-sdk_v5-0-11-0\Common-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp\lib;.\External\PhysX\lib\debug;.\External\PhysX\include;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;Common-cpp_vc17_debug_windows_mt_x64.lib;LoadBalancing-cpp_vc17_debug_windows_mt_x64.lib;Photon-cpp_vc17_debug_windows_mt_x64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);.\External\photon-windows-sdk_v5-0-11-0\Common-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp\lib;.\External\PhysX\include;.\External\PhysX\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -92,7 +92,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;.\External\PhysX\lib\release;.\External\PhysX\include;.\External\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Source;.\External\DirectXTex;.\External\imgui;.\External\cereal-1.3.0\include;.\External\stb;.\External\ImGuizmo;.\External\photon-windows-sdk_v5-0-11-0;.\External\PhysX\lib\release;.\External\PhysX\include;.\External\json-develop\include;%(AdditionalIncludeDirectories);.\External\json-develop\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -102,7 +102,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;Common-cpp_vc17_release_windows_mt_x64.lib;LoadBalancing-cpp_vc17_release_windows_mt_x64.lib;Photon-cpp_vc17_release_windows_mt_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;xinput.lib;xaudio2.lib;winmm.lib;Shlwapi.lib;Common-cpp_vc17_release_windows_mt_x64.lib;LoadBalancing-cpp_vc17_release_windows_mt_x64.lib;Photon-cpp_vc17_release_windows_mt_x64.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>.\External\Effekseer162a\lib\vs2019\MT\$(PlatformTarget)\$(Configuration);.\External\FBX SDK\2019.0\lib\vs2015\$(PlatformTarget)\$(Configuration);.\External\photon-windows-sdk_v5-0-11-0\Common-cpp;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp;.\External\photon-windows-sdk_v5-0-11-0\Common-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\LoadBalancing-cpp\lib;.\External\photon-windows-sdk_v5-0-11-0\Photon-cpp\lib;.\External\PhysX\lib\release;.\External\PhysX\include;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Components\ProjectileCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
+    <ClInclude Include="Source\Components\RigidBodyCom.h" />
     <ClInclude Include="Source\Components\SpawnCom.h" />
     <ClInclude Include="Source\Components\StageEditorCom.h" />
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
@@ -384,6 +385,7 @@
     <ClCompile Include="Source\Netwark\Photon\StdIO_UIListener.cpp" />
     <ClCompile Include="Source\Netwark\Server.cpp" />
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
+    <ClCompile Include="Source\Components\RigidBodyCom.cpp" />
     <ClCompile Include="Source\SystemStruct\TransformUtils.cpp" />
   </ItemGroup>
   <ItemGroup>

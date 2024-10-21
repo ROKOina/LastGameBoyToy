@@ -18,10 +18,8 @@
 // 垂直同期間隔設定
 static const int syncInterval = 1;
 
-//#ifdef _DEBUG
 Framework* Framework::instance = nullptr;
 
-//#endif // _DEBUG
 
 // コンストラクタ
 Framework::Framework(HWND hWnd)
@@ -44,10 +42,7 @@ Framework::Framework(HWND hWnd)
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
 
-//#ifdef _DEBUG
     instance = this;
-
-//#endif // _DEBUG
 }
 
 // デストラクタ
