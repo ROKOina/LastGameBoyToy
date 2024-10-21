@@ -92,7 +92,7 @@ private:
         float blurconvolutionintensity = 0.200f;
         float exposure = 1.4f;
         float vignettesize = 0.8f;
-        float vignetteintensity = 0.01f;
+        float vignetteintensity = 0.05f;
         DirectX::XMFLOAT4 ssrparameter = { 50.0f,10.0f,0.1f,1.0f };
         float distance_to_sun = 17.301f;
         float blurstrength = {};
