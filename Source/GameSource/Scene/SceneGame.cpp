@@ -109,6 +109,7 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
+#if(0)
     //BOSS
     {
         auto& boss = GameObjectManager::Instance().Create();
@@ -190,6 +191,7 @@ void SceneGame::Initialize()
             gpufire->SetLoop(false);
         }
     }
+#endif
 
 #pragma endregion
 
