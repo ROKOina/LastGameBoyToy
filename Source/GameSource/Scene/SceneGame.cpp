@@ -140,7 +140,7 @@ void SceneGame::Initialize()
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
         t = boss->transform_;
         boss->AddComponent<MovementCom>();
-        auto& col=boss->AddComponent<SphereColliderCom>();
+        auto& col = boss->AddComponent<SphereColliderCom>();
         col->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
