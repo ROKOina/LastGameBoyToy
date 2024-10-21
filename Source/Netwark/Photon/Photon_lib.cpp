@@ -72,6 +72,10 @@ void PhotonLib::update(float elapsedTime)
         auto& fpsCamera = myPlayer->GetChildFind("cameraPostPlayer");
         save.fpsDir = fpsCamera->transform_->GetWorldFront();
 
+        //速力
+        DirectX::XMFLOAT3 velo = myPlayer->GetComponent<MovementCom>()->GetVelocity();
+        save.velo = velo;
+
         s.inputBuf->Enqueue(save);
 
         //ちーむID保存
@@ -213,6 +217,16 @@ void PhotonLib::ImGui()
     int sendMs = SendMs();
     ImGui::InputInt("sendMS", &sendMs);
 
+    int Delay = 0;
+    int myID = GetPlayerNum();
+    int netcount = 0;
+    for (auto& s : saveInputPhoton)
+    {
+        Delay = s.myDelay;
+        ImGui::InputInt(("Delay" + std::to_string(netcount)).c_str(), &Delay);
+        netcount++;
+    }
+
     ImGui::End();
 
     LobbyImGui();
@@ -329,10 +343,19 @@ void PhotonLib::NetInputUpdate()
 {
     for (auto& s : saveInputPhoton)
     {
+        //更新フラグ
+        s.isInputUpdate = false;
+
         int nowTime = GetServerTime();
 
         std::vector<SaveBuffer> saveB;
         saveB = s.inputBuf->GetHeadFromSize(100);
+
+        std::vector<DirectX::XMFLOAT3>p;
+        for (auto& b : saveB)
+        {
+            p.emplace_back(b.pos);
+        }
 
         bool isInputInit = false;
         for (auto& b : saveB)
@@ -353,6 +376,8 @@ void PhotonLib::NetInputUpdate()
                 s.nextInput.rotato = b.rotato;
                 //カメラ情報
                 s.nextInput.fpsCameraDir = b.fpsDir;
+                //速力
+                s.nextInput.velocity = b.velo;
 
                 isInputInit = true;
             }
@@ -360,6 +385,8 @@ void PhotonLib::NetInputUpdate()
             s.nextInput.inputDown |= b.inputDown;
             s.nextInput.input |= b.input;
             s.nextInput.inputUp |= b.inputUp;
+
+            s.isInputUpdate = true;
         }
 
         s.nextInput.oldFrame = nowTime - s.myDelay;
@@ -429,12 +456,65 @@ void PhotonLib::NetCharaInput()
         chara->SetUserInput(s.nextInput.input);
         chara->SetUserInputDown(s.nextInput.inputDown);
         chara->SetUserInputUp(s.nextInput.inputUp);
+
+        static bool upHokan = false;
+        static DirectX::XMFLOAT3 hoknaPos = {};
+        static DirectX::XMFLOAT3 nowPos = {};
+        static int saveFrameHokan = 0;
+        int frameHokan =3; //補完するフレーム
+
         //移動
-        netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
+        if (s.isInputUpdate)
+        {
+            static bool o = false;
+            static int oi = 0;
+            int frameAki = 3;
+
+            oi++;
+            if (o)
+            {
+                o = false;
+
+                hoknaPos = s.nextInput.pos;
+                nowPos = netPlayer->transform_->GetWorldPosition();
+                if (Mathf::Length(nowPos - hoknaPos) > 0.1f)
+                {
+                    saveFrameHokan = 1;
+                    upHokan = true;
+                }
+            }
+            if (oi > frameAki)
+            {
+                o = true;
+                oi = 0;
+            }
+        }
+        else
+        {
+            //netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
+        }
+
+        if (upHokan)
+        {
+            float w = float(saveFrameHokan) / float(frameHokan);
+            DirectX::XMFLOAT3 Hpos = Mathf::Lerp(nowPos, hoknaPos, w);
+            netPlayer->transform_->SetWorldPosition(Hpos);
+            saveFrameHokan++;
+            if (Mathf::Length(Hpos) <= 0.1f)
+            {
+                netPlayer->transform_->SetWorldPosition(hoknaPos);
+                upHokan = false;
+            }
+            if (saveFrameHokan > frameHokan)upHokan = false;
+        }
+
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
         chara->SetLeftStick(s.nextInput.leftStick);
         //カメラ情報
         chara->SetFpsCameraDir(s.nextInput.fpsCameraDir);
+
+        //速力
+        netPlayer->GetComponent<MovementCom>()->SetVelocity(s.nextInput.velocity);
 
         s.nextInput.inputDown = 0;
         s.nextInput.inputUp = 0;
@@ -676,6 +756,8 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             //仮オブジェ
             std::string name = "netPlayer" + std::to_string(playerNr);
             GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+
+            //プレイヤー追加
             if (!net1)
             {
                 //netプレイヤー

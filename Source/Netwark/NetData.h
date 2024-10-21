@@ -93,6 +93,8 @@ struct SaveBuffer
     DirectX::XMFLOAT4 rotato = { 0,0,0,1 };       //‰ñ“]
 
     DirectX::XMFLOAT3 fpsDir = { 0,0,1 };       //FPSŽ‹“_‚Ì•ûŒü
+
+    DirectX::XMFLOAT3 velo = { 0,0,0 };       //‘¬—Í
 };
 //SaveBuffer
 static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>& vec)
@@ -106,6 +108,7 @@ static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>&
         out << v.pos << " ";
         out << v.rotato << " ";
         out << v.fpsDir << " ";
+        out << v.velo << " ";
     }
 }
 static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& vec)
@@ -120,6 +123,7 @@ static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& v
         in >> s.pos;
         in >> s.rotato;
         in >> s.fpsDir;
+        in >> s.velo;
         vec.emplace_back(s);
     }
 }
