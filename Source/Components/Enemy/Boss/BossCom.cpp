@@ -20,6 +20,7 @@ void BossCom::Start()
     state.AddState(BossState::RANGEATTACK, std::make_shared <Boss_RangeAttackState>(this));
     state.AddState(BossState::BOMPATTTACK, std::make_shared <Boss_BompAttackState>(this));
     state.AddState(BossState::FIREBALL, std::make_shared <Boss_FireBallState>(this));
+    state.AddState(BossState::MISSILE, std::make_shared <Boss_MissileAttackState>(this));
     state.AddState(BossState::HIT, std::make_shared <Boss_DamageState>(this));
     state.AddState(BossState::DEATH, std::make_shared <Boss_DeathState>(this));
 

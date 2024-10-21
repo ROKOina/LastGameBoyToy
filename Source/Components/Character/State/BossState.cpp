@@ -17,7 +17,7 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 }
 
 //アニメーション中の当たり判定
-bool Boss_BaseState::AnimNodeCollsion(float elapsedTime, std::string eventname, std::string nodename, const char* objectname)
+bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname)
 {
     // 初回のみFindしてキャッシュ
     if (!cachedobject || cachedobject->GetName() != objectname)
@@ -38,10 +38,9 @@ bool Boss_BaseState::AnimNodeCollsion(float elapsedTime, std::string eventname, 
         {
             collider->SetEnabled(true);
 
-            //ヒット時体力と画面効果を付与する
+            //ヒット時体力を減らす
             for (auto& hitgameobject : collider->OnHitGameObject())
             {
-                PostEffect::Instance().ParameterMove(elapsedTime, 4.0f, true, PostEffect::PostEffectParameter::VignetteIntensity);
                 hitgameobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
             }
         }
@@ -211,7 +210,7 @@ void Boss_MoveState::Enter()
 }
 void Boss_MoveState::Execute(const float& elapsedTime)
 {
-    owner->MoveToTarget(2.0f, 2.0f);
+    owner->MoveToTarget(2.0f, 0.4f);
 
     //距離判定
     if (owner->Search(5.0f))
@@ -311,7 +310,7 @@ void Boss_PunchState::Enter()
 void Boss_PunchState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion(elapsedTime, "ATTACK", "mixamorig:LeftHand", "lefthandcollsion"))
+    if (AnimNodeCollsion("ATTACK", "mixamorig:LeftHand", "lefthandcollsion"))
     {
         GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
@@ -341,7 +340,7 @@ void Boss_KickState::Enter()
 void Boss_KickState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion(elapsedTime, "ATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
+    if (AnimNodeCollsion("ATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
     {
         GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
@@ -371,7 +370,7 @@ void Boss_RangeAttackState::Enter()
 void Boss_RangeAttackState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion(elapsedTime, "ATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
+    if (AnimNodeCollsion("ATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
     {
         GPUEffect("cyclongpueffect");
         CPUEffect("cycloncpueffect", false);
@@ -430,8 +429,34 @@ void Boss_BompAttackState::Execute(const float& elapsedTime)
 void Boss_FireBallState::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("FireBall"), false);
+
+    //プレイヤーを見ながら放って欲しいので旋回だけ適用
+    owner->MoveToTarget(0.0f, 1.0f);
 }
 void Boss_FireBallState::Execute(const float& elapsedTime)
+{
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+        return;
+    }
+
+    //死亡処理
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma region ミサイル攻撃
+void Boss_MissileAttackState::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Stand"), false);
+}
+void Boss_MissileAttackState::Execute(const float& elapsedTime)
 {
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())

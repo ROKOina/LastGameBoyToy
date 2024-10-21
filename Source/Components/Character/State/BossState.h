@@ -15,7 +15,7 @@ public:
     Boss_BaseState(BossCom* owner);
 
     //アニメーション中の当たり判定
-    bool AnimNodeCollsion(float elapsedTime, std::string eventname, std::string nodename, const char* objectname);
+    bool AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname);
 
     //CPUエフェクトの検索
     void CPUEffect(const char* objectname, bool posflag);
@@ -176,6 +176,18 @@ public:
     void Execute(const float& elapsedTime) override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "FireBall"; }
+};
+
+//ミサイル攻撃
+class Boss_MissileAttackState : public Boss_BaseState
+{
+public:
+    Boss_MissileAttackState(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "MissileAttack"; }
 };
 
 //ダメージ

@@ -164,6 +164,7 @@ void SceneGame::Initialize()
             lefthandcollider->SetEnabled(false);
             lefthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
             lefthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
+            lefthandcollider->SetRadius(1.0f);
         }
 
         //右足コリジョン
@@ -174,6 +175,7 @@ void SceneGame::Initialize()
             rightlegscollider->SetEnabled(false);
             rightlegscollider->SetMyTag(COLLIDER_TAG::Enemy);
             rightlegscollider->SetJudgeTag(COLLIDER_TAG::Player);
+            rightlegscollider->SetRadius(1.0f);
         }
 
         //手に付ける火のエフェクト
@@ -215,6 +217,20 @@ void SceneGame::Initialize()
             gpucycloneffect->SetName("cyclongpueffect");
             std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
             gpufire->SetLoop(false);
+        }
+
+        //手に付ける火のエフェクト
+        {
+            std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
+            cpufireeffect->SetName("fireball");
+            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fire.cpuparticle", 1000);
+            cpufireeffect->AddComponent<EasingMoveCom>(nullptr);
+            cpufire->SetActive(false);
+            std::shared_ptr<SphereColliderCom> fireballcollider = cpufireeffect->AddComponent<SphereColliderCom>();
+            fireballcollider->SetEnabled(false);
+            fireballcollider->SetMyTag(COLLIDER_TAG::Enemy);
+            fireballcollider->SetJudgeTag(COLLIDER_TAG::Player);
+            fireballcollider->SetRadius(1.0f);
         }
     }
     //UIゲームオブジェクト生成

@@ -59,6 +59,7 @@ public:
         RANGEATTACK,
         BOMPATTTACK,
         FIREBALL,
+        MISSILE,
         HIT,
         DEATH,
 
