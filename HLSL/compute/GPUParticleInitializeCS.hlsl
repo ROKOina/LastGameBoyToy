@@ -12,14 +12,13 @@ void main(uint3 dtid : SV_DispatchThreadID)
     // 各フィールドを個別に初期化
     p.position = position;
     p.scale = scale;
-    p.color = color;
+    p.color = baseColor;
     p.rotation = rotation;
     p.velocity = velocity;
     p.direction = direction;
     p.isalive = isalive;
-    p.isstart = startflag;
-    p.lifetime = lifetime;
-    p.age = lifetime; // ageもlifetimeで初期化
+    p.lifetime = lifeTime;
+    p.age = lifeTime; // ageもlifetimeで初期化
 
     // パーティクルをバッファに書き込む
     particlebuffer[id] = p;

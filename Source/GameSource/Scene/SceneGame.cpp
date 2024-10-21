@@ -131,6 +131,7 @@ void SceneGame::Initialize()
     }
 
     //BOSS
+#if(0)
     {
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
@@ -256,6 +257,8 @@ void SceneGame::Initialize()
             gpufire->SetLoop(true);
         }
     }
+#endif
+
     //UIゲームオブジェクト生成
     CreateUiObject();
 

@@ -53,9 +53,6 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     //âÒì]
     p.rotation = rotation;
 
-    //ï˚å¸Çë„ì¸
-    p.direction = direction;
-
     //ê∂ë∂ÉtÉâÉOÇ™falseÇ»ÇÁê∂ê¨ÇµÇ»Ç¢
     p.isalive = isalive;
     if (p.isalive == 0)
@@ -90,9 +87,9 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         }
         cornerPos = QuaternionRotate(cornerPos, p.rotation);
         element.position = mul(float4(viewpos.xyz + cornerPos, 1.0f), projection);
-        element.color.rgb = p.color.rgb * power * color.rgb;
-        element.color.a = p.color.a * color.a;
-        element.color.rgb *= luminance;
+        element.color.rgb = p.color.rgb * power * baseColor.rgb;
+        element.color.a = p.color.a * baseColor.a;
+        element.color.rgb *= colorScale;
         element.texcoord = TEXCOORD[i];
         output.Append(element);
     }
