@@ -219,13 +219,13 @@ void SceneGame::Initialize()
             gpufire->SetLoop(false);
         }
 
-        //手に付ける火のエフェクト
+        //火球
         {
             std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
             cpufireeffect->SetName("fireball");
-            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fire.cpuparticle", 1000);
-            cpufireeffect->AddComponent<EasingMoveCom>(nullptr);
+            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fireball.cpuparticle", 1000);
             cpufire->SetActive(false);
+            cpufireeffect->AddComponent<EasingMoveCom>(nullptr);
             std::shared_ptr<SphereColliderCom> fireballcollider = cpufireeffect->AddComponent<SphereColliderCom>();
             fireballcollider->SetEnabled(false);
             fireballcollider->SetMyTag(COLLIDER_TAG::Enemy);
