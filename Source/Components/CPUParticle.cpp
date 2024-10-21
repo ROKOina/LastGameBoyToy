@@ -170,6 +170,13 @@ CPUParticle::CPUParticle(const char* filename, int num, bool col)
     col = collider;
 }
 
+//デストラクタ
+CPUParticle::~CPUParticle()
+{
+    delete[] m_data;
+    delete[] m_v;
+}
+
 //更新処理
 void CPUParticle::Update(float elapsedTime)
 {

@@ -15,7 +15,7 @@ public:
     Boss_BaseState(BossCom* owner);
 
     //アニメーション中の当たり判定
-    bool AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname);
+    bool AnimNodeCollsion(float elapsedTime, std::string eventname, std::string nodename, const char* objectname);
 
     //CPUエフェクトの検索
     void CPUEffect(const char* objectname, bool posflag);

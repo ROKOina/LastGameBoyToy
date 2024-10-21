@@ -108,7 +108,7 @@ void SceneGame::Initialize()
         //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
         roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER);
+        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);
     }
 
     //プレイヤー
@@ -282,7 +282,7 @@ void SceneGame::Update(float elapsedTime)
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
     //ボスの位置取得
-    sc->data.bossposiotn = t->GetLocalPosition();
+    //sc->data.bossposiotn = t->GetLocalPosition();
 
     // ゲームオブジェクトの更新
     PhysXLib::Instance().Update(elapsedTime);

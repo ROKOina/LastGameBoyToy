@@ -10,7 +10,7 @@ class CPUParticle :public Component
 public:
 
     CPUParticle(const char* filename, int num, bool col = false);
-    ~CPUParticle() { delete[] m_data; delete[] m_v; }
+    ~CPUParticle();
 
     //‰Šúİ’è
     void Start()override {};

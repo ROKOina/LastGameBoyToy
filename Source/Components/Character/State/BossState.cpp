@@ -4,6 +4,7 @@
 #include "Components\Character\CharaStatusCom.h"
 #include "Components\GPUParticle.h"
 #include "Components\SpawnCom.h"
+#include "Graphics\Shaders\PostEffect.h"
 
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 {
@@ -16,7 +17,7 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 }
 
 //アニメーション中の当たり判定
-bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname)
+bool Boss_BaseState::AnimNodeCollsion(float elapsedTime, std::string eventname, std::string nodename, const char* objectname)
 {
     // 初回のみFindしてキャッシュ
     if (!cachedobject || cachedobject->GetName() != objectname)
@@ -36,6 +37,13 @@ bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodenam
         if (collider)
         {
             collider->SetEnabled(true);
+
+            //ヒット時体力と画面効果を付与する
+            for (auto& hitgameobject : collider->OnHitGameObject())
+            {
+                PostEffect::Instance().ParameterMove(elapsedTime, 4.0f, true, PostEffect::PostEffectParameter::VignetteIntensity);
+                hitgameobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
+            }
         }
 
         cachedobject->transform_->SetWorldPosition(nodepos);
@@ -303,17 +311,10 @@ void Boss_PunchState::Enter()
 void Boss_PunchState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("ATTACK", "mixamorig:LeftHand", "lefthandcollsion"))
+    if (AnimNodeCollsion(elapsedTime, "ATTACK", "mixamorig:LeftHand", "lefthandcollsion"))
     {
         GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
-    }
-
-    //ヒット時の処理
-    auto collider = cachedobject->GetComponent<SphereColliderCom>();
-    for (auto& hit : collider->OnHitGameObject())
-    {
-        hit.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
     }
 
     //アニメーションが終われば
@@ -340,7 +341,7 @@ void Boss_KickState::Enter()
 void Boss_KickState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("ATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
+    if (AnimNodeCollsion(elapsedTime, "ATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
     {
         GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
@@ -370,7 +371,7 @@ void Boss_RangeAttackState::Enter()
 void Boss_RangeAttackState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("ATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
+    if (AnimNodeCollsion(elapsedTime, "ATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
     {
         GPUEffect("cyclongpueffect");
         CPUEffect("cycloncpueffect", false);
