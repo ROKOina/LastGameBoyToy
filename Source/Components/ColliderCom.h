@@ -90,7 +90,7 @@ public:
     virtual void Update(float elapsedTime) {}
 
     // GUI•`‰æ
-    virtual void OnGUI() {}
+    virtual void OnGUI();
 
     // debug•`‰æ
     virtual void DebugRender() {}
@@ -136,6 +136,9 @@ private:
 
     //¡‚ÌƒtƒŒ[ƒ€‚Å“–‚½‚Á‚Ä‚¢‚é‚à‚Ì‚ğ•Û‘¶
     std::vector<HitObj> hitObj_;
+
+    //“–‚½‚Á‚Ä‚¢‚é‚©
+    bool isHit = false;
 
 protected:
     //Œ`‚ğ•Û‘¶

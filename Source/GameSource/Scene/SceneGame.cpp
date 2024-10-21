@@ -120,6 +120,8 @@ void SceneGame::Initialize()
         boss->AddComponent<EasingMoveCom>(nullptr);
         //t = boss->transform_;
         boss->AddComponent<MovementCom>();
+        auto& col=boss->AddComponent<SphereColliderCom>();
+        col->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
         boss->AddComponent<AnimationCom>();
         boss->AddComponent<BossCom>();

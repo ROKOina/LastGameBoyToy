@@ -473,7 +473,6 @@ void PhotonLib::NetCharaInput()
             oi++;
             if (o)
             {
-                //netPlayer->transform_->SetWorldPosition(s.nextInput.pos);
                 o = false;
 
                 hoknaPos = s.nextInput.pos;
