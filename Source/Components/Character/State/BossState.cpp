@@ -98,7 +98,7 @@ void Boss_BaseState::GPUEffect(const char* objectname)
     if (!gpuparticle || gpuparticle->GetName() != objectname)
     {
         gpuparticle = GameObjectManager::Instance().Find(objectname);
-        gpuparticle->GetComponent<GPUParticle>()->Reset();
+        gpuparticle->GetComponent<GPUParticle>()->Play();
         gpuparticle->transform_->SetWorldPosition(nodepos);
     }
 

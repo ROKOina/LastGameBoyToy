@@ -53,9 +53,6 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     //回転
     p.rotation = rotation;
 
-    //方向を代入
-    p.direction = direction;
-
     //生存フラグがfalseなら生成しない
     p.isalive = isalive;
     if (p.isalive == 0)
@@ -70,7 +67,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     {
         float3 cornerPos = 0;
         //ストレッチビルボードを使用するか否かのフラグ
-        if (strechflag == 0)
+        if (stretchFlag == 0)
         {
             cornerPos = BILLBOARD[i] * float3(p.scale, 1.0f);
         }
@@ -80,9 +77,9 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         }
         cornerPos = QuaternionRotate(cornerPos, p.rotation);
         element.position = mul(float4(viewpos.xyz + cornerPos, 1.0f), projection);
-        element.color.rgb = p.color.rgb * power * color.rgb;
-        element.color.a = p.color.a * color.a;
-        element.color.rgb *= luminance;
+        element.color.rgb = p.color.rgb * power * baseColor.rgb;
+        element.color.a = p.color.a * baseColor.a;
+        element.color.rgb *= colorScale;
         element.texcoord = TEXCOORD[i];
         output.Append(element);
     }

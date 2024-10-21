@@ -10,13 +10,8 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 {
     uint id = dtid.x;
     MainParticle p = particlebuffer[id];
-
-    //フラグを代入
-    p.isstart = startflag;
-    p.isalive = isalive;
-
-    //生存フラグ
-    if (p.isstart == 1)
+    
+    // パーティクルの移動制御
     {
         //falseの場合強制的に生成する
         if (p.isalive == 0)
@@ -28,10 +23,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         p.lifetime -= deltatime;
 
         //寿命時間から割合を計算
-        float lerprate = 1 - (p.lifetime / lifetime);
-
-        //速力を代入
-        p.velocity = velocity;
+        float lerprate = 1 - (p.lifetime / lifeTime);
 
         //パーティクル方向のノーマルベクトル
         float3 normVec = normalize(position - p.position);
@@ -40,42 +32,37 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float3 orbZ = cross(normVec, float3(0, 1, 0));
         float3 orbX = cross(normVec, float3(1, 0, 0));
         float3 orbY = cross(normVec, float3(0, 0, 1));
-        float3 orbVelo = orbZ * orbitalvelocity.z + orbX * orbitalvelocity.x + orbY * orbitalvelocity.y;
+        float3 orbVelo = orbZ * orbitalVelocity.z + orbX * orbitalVelocity.x + orbY * orbitalVelocity.y;
 
         //中心方向に動く
         float3 radialVec = -normVec * radial;
 
-        //浮力
-        p.velocity += buoyancy * deltatime;
-
-        //方向の正規化
-        float3 normDir = normalize(direction);
-        p.direction = direction;
-
         //ランダム成分を計算
         float3 randomVel = float3(
-            ((random(p.position.x * time + id) * 2) - 1) * velorandscale,
-            ((random(p.position.y * time + id) * 2) - 1) * velorandscale,
-            ((random(p.position.z * time + id) * 2) - 1) * velorandscale
+            ((random(p.position.x * time + id) * 2) - 1) * veloRandScale,
+            ((random(p.position.y * time + id) * 2) - 1) * veloRandScale,
+            ((random(p.position.z * time + id) * 2) - 1) * veloRandScale
         );
 
         //トータルの速力
-        float3 totalVelocity = velocity + p.direction * speed + randomVel + orbVelo + radialVec;
+        float3 totalVelocity = currentEmitVec * speed + randomVel + orbVelo + radialVec;
 
         //重力適量
-        p.position.yz -= lerp(startgravity, endgravity, lerprate) * deltatime;
+        p.position.y -= lerp(emitStartGravity, emitEndGravity, lerprate) * deltatime;
+        //浮力
+        p.position.y += buoyancy * deltatime;
 
         //速力更新
-        p.position += totalVelocity * lerp(startspeed, endspeed, lerprate) * deltatime;
-        p.strechvelocity = totalVelocity * lerp(startspeed, endspeed, lerprate) * deltatime;
+        p.position += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
+        p.strechvelocity = totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
     }
 
-    //パーティクルの動き更新処理
+    // パーティクルの再生成
     p.age += deltatime;
-    if (p.age > lifetime && p.isstart == 1)
+    if (p.age > lifeTime && isEmitFlg == 1)
     {
          //寿命時間から割合を計算
-        float lerprate = 1 - (p.lifetime / lifetime);
+        float lerprate = 1 - (p.lifetime / lifeTime);
 
         //ランダム生成
         const float noiseScale = 1.0;
@@ -92,10 +79,10 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         p.position = position.xyz;
 
         //大きさをラープで制御
-        p.scale = scale * lerp(startsize, endsize, lerprate);
+        p.scale = scale * lerp(emitStartSize, emitEndSize, lerprate);
 
         //色をラープで制御
-        p.color = color * lerp(startcolor, endcolor, lerprate);
+        p.color = baseColor * lerp(emitStartColor, emitEndColor, lerprate);
 
         //半径のボリューム
         float tick = shape.z * 0.9f; //オフセット値　0.9f
@@ -113,29 +100,15 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 
         //セットCPUで制御できるようにする
         p.isalive = 0;
-        p.isstart = 1;
-        p.lifetime = lifetime;
-        p.age = lifetime * f0;
+        p.lifetime = lifeTime;
+        p.age = lifeTime * f0;
     }
 
-    //ループを終わらす
-    if (loop == 0)
-    {
-        p.age = 0;
-    }
-
-    //寿命時間が切れたら生成しない
+    // 寿命時間が切れたら生成しない
     if (p.lifetime < 0.0f)
     {
         // 生存フラグをオフ
         p.isalive = 0;
-
-         //ループ終了
-        if (loop == 0)
-        {
-            p.scale = 0;
-            p.age = 0;
-        }
     }
 
     particlebuffer[id] = p;

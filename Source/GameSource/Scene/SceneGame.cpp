@@ -131,6 +131,7 @@ void SceneGame::Initialize()
     }
 
     //BOSS
+#if(0)
     {
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
@@ -232,6 +233,8 @@ void SceneGame::Initialize()
             fireballcollider->SetRadius(1.0f);
         }
     }
+#endif
+
     //UIゲームオブジェクト生成
     CreateUiObject();
 
