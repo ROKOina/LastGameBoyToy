@@ -18,7 +18,6 @@ struct MainParticle
     float2 scale;
     float4 rotation;
     float3 velocity;
-    float3 strechvelocity;
     float3 direction;
     float4 color;
     float lifetime;

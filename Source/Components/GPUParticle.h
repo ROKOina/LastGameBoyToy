@@ -54,7 +54,6 @@ public:
         DirectX::XMFLOAT2 scale = { 0.0f,0.0f };
         DirectX::XMFLOAT4 rotation = { 0,0,0,1 };
         DirectX::XMFLOAT3 velocity = { 0,0,0 };
-        DirectX::XMFLOAT3 strechvelocity = { 0,0,0 };
         DirectX::XMFLOAT3 direction = { 0,0,0 };
         DirectX::XMFLOAT4 color = { 1,1,1,1 };
         float lifetime = 0.0f;

@@ -67,7 +67,6 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 
         //速力更新
         p.position += totalVelocity * lerp(startspeed, endspeed, lerprate) * deltatime;
-        p.strechvelocity = totalVelocity * lerp(startspeed, endspeed, lerprate) * deltatime;
     }
 
     //パーティクルの動き更新処理

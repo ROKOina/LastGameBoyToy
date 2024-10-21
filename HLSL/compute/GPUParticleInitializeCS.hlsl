@@ -15,7 +15,6 @@ void main(uint3 dtid : SV_DispatchThreadID)
     p.color = color;
     p.rotation = rotation;
     p.velocity = velocity;
-    p.strechvelocity = 0; // ここはデフォルト値を設定
     p.direction = direction;
     p.isalive = isalive;
     p.isstart = startflag;
