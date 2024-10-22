@@ -1,5 +1,7 @@
 #include "BossCom.h"
 #include "GameSource/Math/Mathf.h"
+#include "Graphics/Graphics.h"
+#include "Components/RendererCom.h"
 
 //初期設定
 void BossCom::Start()
@@ -33,6 +35,8 @@ void BossCom::Update(float elapsedTime)
 
     //ターゲット位置は常にプレイヤー
     targetposition = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+
+    
 }
 
 //imgui

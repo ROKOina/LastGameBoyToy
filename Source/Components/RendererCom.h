@@ -89,6 +89,11 @@ private:
 
     std::shared_ptr<BaseConstants> variousConstant = nullptr;
 
+
+    DirectX::XMFLOAT3       BoundsMin;
+    DirectX::XMFLOAT3       BoundsMax;
+
+
     SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFERRED;
 #ifdef _DEBUG
     int							selectionMaterialIndex = -1;

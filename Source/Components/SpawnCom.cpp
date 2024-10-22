@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cmath>
 #include "Components/Enemy/NoobEnemy/NoobEnemyCom.h"
+#include "Components/FrustumCom.h"
 #include "Components/AimIKCom.h"
 #include "Components/NodeCollsionCom.h"
 
@@ -87,6 +88,7 @@ void SpawnCom::SpawnGameObject()
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
     obj->AddComponent<NoobEnemyCom>();
+    //obj->AddComponent<FrustumCom>();
 
     // Œ»İ‚Ì¶¬”‚ğƒCƒ“ƒNƒŠƒƒ“ƒg
     currentSpawnedCount++;

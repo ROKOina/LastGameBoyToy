@@ -8,6 +8,7 @@
 #include <WICTextureLoader.h>
 #include <DDSTextureLoader.h>
 #include <filesystem>
+#include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

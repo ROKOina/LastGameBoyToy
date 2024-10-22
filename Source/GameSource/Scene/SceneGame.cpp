@@ -109,6 +109,7 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
+
     //BOSS
     {
         auto& boss = GameObjectManager::Instance().Create();

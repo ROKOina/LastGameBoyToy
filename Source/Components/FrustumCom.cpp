@@ -1,6 +1,7 @@
 #include "FrustumCom.h"
 #include "Components/TransformCom.h"
 #include "Components/RendererCom.h"
+#include "GameSource/Scene/SceneManager.h"
 
 FrustumCom::FrustumCom()
 {
@@ -9,7 +10,7 @@ FrustumCom::FrustumCom()
 //初期化
 void FrustumCom::Start()
 {
-    cameraCom = GetGameObject()->GetComponent<CameraCom>();
+    
 }
 
 //更新処理  
@@ -32,14 +33,14 @@ void FrustumCom::OnGUI()
 //描画判定    
 void FrustumCom::DrawJudgement()
 {
-    if (IntersectFrustumVsAABB(GetGameObject()->transform_->GetWorldPosition(), { 1.0f,1.0f,1.0f }))
+  /*  if (IntersectFrustumVsAABB(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetBoundsMax()))
     {
        GetGameObject()->GetComponent<RendererCom>()->SetEnabled(true);
     }
     else
     {
         GetGameObject()->GetComponent<RendererCom>()->SetEnabled(false);
-    }
+    }*/
     
 }
 
@@ -123,7 +124,7 @@ void FrustumCom::CalcurateFrustum()
 {
     Graphics& graphics = Graphics::Instance();
 
-    cameraPos = cameraCom.lock()->GetEye();
+    //cameraPos = ;
 
     //ビュープロジェクション行列を取得する
     DirectX::XMMATRIX matrix = {};
