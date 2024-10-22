@@ -312,7 +312,7 @@ void Boss_PunchState::Execute(const float& elapsedTime)
     //アニメーションイベント時の当たり判定
     if (AnimNodeCollsion("ATTACK", "mixamorig:LeftHand", "lefthandcollsion"))
     {
-        GPUEffect("gpufireeffect");
+        //GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
     }
 
@@ -342,7 +342,7 @@ void Boss_KickState::Execute(const float& elapsedTime)
     //アニメーションイベント時の当たり判定
     if (AnimNodeCollsion("ATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
     {
-        GPUEffect("gpufireeffect");
+        //GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
     }
 
@@ -372,7 +372,7 @@ void Boss_RangeAttackState::Execute(const float& elapsedTime)
     //アニメーションイベント時の当たり判定
     if (AnimNodeCollsion("ATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
     {
-        GPUEffect("cyclongpueffect");
+        //GPUEffect("cyclongpueffect");
         CPUEffect("cycloncpueffect", false);
     }
 

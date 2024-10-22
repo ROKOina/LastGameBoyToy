@@ -10,7 +10,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 {
     uint id = dtid.x;
     MainParticle p = particlebuffer[id];
-    
+
     // パーティクルの移動制御
     {
         //falseの場合強制的に生成する
@@ -53,7 +53,8 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         p.position.y += buoyancy * deltatime;
 
         //速力更新
-        p.position += totalVelocity * lerp(startspeed, endspeed, lerprate) * deltatime;
+        p.position += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
+        p.velocity = totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
     }
 
     // パーティクルの再生成

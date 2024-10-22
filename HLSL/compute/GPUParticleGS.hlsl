@@ -67,7 +67,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     {
         float3 cornerPos = 0;
         //ストレッチビルボードを使用するか否かのフラグ
-        if (strechflag == 1 && length(p.velocity.xyz) > 0.001f)
+        if (stretchFlag == 1 && length(p.velocity.xyz) > 0.001f)
         {
            // パーティクルの速度方向に基づいて伸ばす
             float3 stretchDirection = normalize(viewvelo.xyz);

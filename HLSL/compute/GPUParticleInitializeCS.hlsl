@@ -14,8 +14,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     p.scale = scale;
     p.color = baseColor;
     p.rotation = rotation;
-    p.velocity = velocity;
-    p.direction = direction;
+    p.velocity = 0;
     p.isalive = isalive;
     p.lifetime = lifeTime;
     p.age = lifeTime; // age‚àlifetime‚Å‰Šú‰»
