@@ -54,11 +54,15 @@ public:
         JUMP,
         JUMPLOOP,
         LANDINGATTACK,
-        ATTACK,
+        PUNCH,
+        KICK,
         RANGEATTACK,
         BOMPATTTACK,
+        FIREBALL,
+        MISSILE,
         HIT,
         DEATH,
+
         MAX
     };
 
@@ -69,6 +73,7 @@ public:
 private:
     StateMachine<BossCom, BossState> state;
     DirectX::XMFLOAT3 targetposition = {};
+    DirectX::XMFLOAT3 righthandnodepos = {};
     std::vector<int> availableNumbers = { };
     std::mt19937 gen;
 };

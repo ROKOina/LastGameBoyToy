@@ -28,6 +28,7 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\SSR.cso", m_pixelshaders[static_cast<int>(pixelshader::ssr)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\FXAA.cso", m_pixelshaders[static_cast<int>(pixelshader::fxaa)].GetAddressOf());
+    CreatePsFromCso(Graphics.GetDevice(), "Shader\\DecalPS.cso", m_pixelshaders[static_cast<int>(pixelshader::decal)].GetAddressOf());
 
     //MultiRenderTarget作成
     m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 6);
@@ -117,6 +118,17 @@ void PostEffect::PostEffectRender()
     FullScreenQuad::Instance().Blit(dc, shadow, 0, _countof(shadow), m_pixelshaders[static_cast<int>(pixelshader::cascadeshadow)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::cascadeshadow)]->Deactivate(dc);
 
+    //デカール
+    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Clear(dc);
+    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Activate(dc);
+    //dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::ALPHA), nullptr, 0xFFFFFFFF);
+    //dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
+    //dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
+    //ID3D11ShaderResourceView* decal[]
+    //{ m_offScreenBuffer[static_cast<size_t>(offscreen::ssr)]->m_shaderresourceviews[0].Get() ,m_gBuffer->GetShaderResources()[2] };
+    //FullScreenQuad::Instance().Blit(dc, decal, 0, _countof(decal), m_pixelshaders[static_cast<int>(pixelshader::decal)].Get());
+    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Deactivate(dc);
+
     //ポストエフェクト
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Clear(dc);
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Activate(dc);
@@ -181,6 +193,9 @@ void PostEffect::PostEffectImGui()
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
         ImGui::SliderFloat("distance_to_sun", &m_posteffect->data.distance_to_sun, 0.0f, 1000.0f);
         ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
+        ImGui::SliderFloat("blurstrength", &m_posteffect->data.blurstrength, +0.0f, +1.0f);
+        ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
+        ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
     }
 
     //ライトのimgui
@@ -268,4 +283,108 @@ void PostEffect::SceneImGui()
     // 画像を表示
     ImGui::Image(texture_id, size);
     ImGui::End();
+}
+
+//ポストエフェクトのパラメータを制御する関数
+void PostEffect::ParameterMove(float elapsedTime, float parameterIn, bool update, PostEffectParameter parameter)
+{
+    if (!m_posteffect) return;  // m_posteffectが無効な場合は処理しない
+    POSTEFFECT& data = m_posteffect->data;
+
+    if (update)
+    {
+        // 更新が必要な場合
+        switch (parameter)
+        {
+        case PostEffectParameter::Brightness:
+            data.brightness = parameterIn;
+            break;
+        case PostEffectParameter::Contrast:
+            data.contrast = parameterIn;
+            break;
+        case PostEffectParameter::Hue:
+            data.hue = parameterIn;
+            break;
+        case PostEffectParameter::Saturation:
+            data.saturation = parameterIn;
+            break;
+        case PostEffectParameter::BloomExtractionThreshold:
+            data.bloomextractionthreshold = parameterIn;
+            break;
+        case PostEffectParameter::BlurConvolutionIntensity:
+            data.blurconvolutionintensity = parameterIn;
+            break;
+        case PostEffectParameter::Exposure:
+            data.exposure = parameterIn;
+            break;
+        case PostEffectParameter::VignetteSize:
+            data.vignettesize = parameterIn;
+            break;
+        case PostEffectParameter::VignetteIntensity:
+            data.vignetteintensity = parameterIn;
+            break;
+        case PostEffectParameter::DistanceToSun:
+            data.distance_to_sun = parameterIn;
+            break;
+        case PostEffectParameter::BlurStrength:
+            data.blurstrength = parameterIn;
+            break;
+        case PostEffectParameter::BlurRadius:
+            data.blurradius = parameterIn;
+            break;
+        case PostEffectParameter::BlurDecay:
+            data.blurdecay = parameterIn;
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        // 時間に応じて減少させる場合
+        switch (parameter)
+        {
+        case PostEffectParameter::Brightness:
+            data.brightness = (std::max)(0.0f, data.brightness - elapsedTime);
+            break;
+        case PostEffectParameter::Contrast:
+            data.contrast = (std::max)(0.0f, data.contrast - elapsedTime);
+            break;
+        case PostEffectParameter::Hue:
+            data.hue = (std::max)(0.0f, data.hue - elapsedTime);
+            break;
+        case PostEffectParameter::Saturation:
+            data.saturation = (std::max)(0.0f, data.saturation - elapsedTime);
+            break;
+        case PostEffectParameter::BloomExtractionThreshold:
+            data.bloomextractionthreshold = (std::max)(0.0f, data.bloomextractionthreshold - elapsedTime);
+            break;
+        case PostEffectParameter::BlurConvolutionIntensity:
+            data.blurconvolutionintensity = (std::max)(0.0f, data.blurconvolutionintensity - elapsedTime);
+            break;
+        case PostEffectParameter::Exposure:
+            data.exposure = (std::max)(0.0f, data.exposure - elapsedTime);
+            break;
+        case PostEffectParameter::VignetteSize:
+            data.vignettesize = (std::max)(0.0f, data.vignettesize - elapsedTime);
+            break;
+        case PostEffectParameter::VignetteIntensity:
+            data.vignetteintensity = (std::max)(0.01f, data.vignetteintensity - elapsedTime);
+            break;
+        case PostEffectParameter::DistanceToSun:
+            data.distance_to_sun = (std::max)(0.0f, data.distance_to_sun - elapsedTime);
+            break;
+        case PostEffectParameter::BlurStrength:
+            data.blurstrength = (std::max)(0.0f, data.blurstrength - elapsedTime);
+            break;
+        case PostEffectParameter::BlurRadius:
+            data.blurradius = (std::max)(0.0f, data.blurradius - elapsedTime);
+            break;
+        case PostEffectParameter::BlurDecay:
+            data.blurdecay = (std::max)(0.0f, data.blurdecay - elapsedTime);
+            break;
+        default:
+            break;
+        }
+    }
 }

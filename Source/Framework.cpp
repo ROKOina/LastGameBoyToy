@@ -8,7 +8,7 @@
 #include "GameSource\Scene\SceneGame.h"
 #include "GameSource\Scene\SceneDebugGame.h"
 #include "GameSource\Scene\SceneManager.h"
-#include "GameSource\Scene\SceneIKTest.h"
+#include "GameSource\Scene\SceneUI\SceneUI.h"
 
 #include "GameSource\Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
@@ -18,10 +18,8 @@
 // 垂直同期間隔設定
 static const int syncInterval = 1;
 
-#ifdef _DEBUG
 Framework* Framework::instance = nullptr;
 
-#endif // _DEBUG
 
 // コンストラクタ
 Framework::Framework(HWND hWnd)
@@ -37,6 +35,7 @@ Framework::Framework(HWND hWnd)
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
     //SceneManager::Instance().ChangeScene(new SceneTitle);
+    // SceneManager::Instance().ChangeScene(new SceneUI);
 
     // オーディオ初期化
     Audio::Initialize();
@@ -44,10 +43,7 @@ Framework::Framework(HWND hWnd)
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
 
-#ifdef _DEBUG
     instance = this;
-
-#endif // _DEBUG
 }
 
 // デストラクタ
@@ -86,7 +82,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     ID3D11DeviceContext* dc = graphics_.GetDeviceContext();
 
     //シーンだけ上に描画
-    PostEffect::Instance().SceneImGui();
+    //PostEffect::Instance().SceneImGui();
 
     //imguiguizmo
     ImGuizmo::BeginFrame();

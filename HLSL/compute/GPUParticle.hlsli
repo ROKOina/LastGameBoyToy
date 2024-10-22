@@ -18,13 +18,10 @@ struct MainParticle
     float2 scale;
     float4 rotation;
     float3 velocity;
-    float3 strechvelocity;
-    float3 direction;
     float4 color;
     float lifetime;
     float age;
     int isalive;
-    int isstart;
 };
 
 //保存しないものを入れておく
@@ -33,36 +30,57 @@ cbuffer GPUParticleConstants : register(b6)
     float4 rotation;
     float3 position;
     int isalive;
-    float3 direction;
-    int loop;
-    int startflag;
-    float3 Gdummy;
+    float3 currentEmitVec;
+    int isEmitFlg;
 }
 
-//保存するものを入れておく
+// 保存するものを入れておく
 cbuffer GPUparticleSaveConstants : register(b7)
 {
-    float4 color;
-    float4 startcolor;
-    float4 endcolor;
+    float emitTime;
+    float lifeTime;
+    int stretchFlag;
+    int isLoopFlg;
+
+    //ｘ：生成場所ランダム、ｙ：半径、ｚ：半径のボリューム、ｗ：円形にするパラ
     float4 shape;
-    float3 velocity;
-    float lifetime;
-    float3 luminance;
+
+    float4 baseColor; // ベースとなる色
+
+    float4 lifeStartColor; // パーティクルの生成時の色
+    float4 lifeEndColor; // パーティクルの消滅時の色
+    // -------------------  ↑↓ どちらかのみ  ----------------------
+    float4 emitStartColor; // エフェクトの再生開始時の色
+    float4 emitEndColor; // エフェクト再生後の最終的な色
+
+    int colorVariateByLife; // 色の変化の基準を管理 ( TRUE : 寿命によって変化 )
+    float3 colorScale; // 色を更に明るくするなどで使用
+
+    float3 emitVec;
+    float padding3;
+
+    float3 orbitalVelocity;
+    float padding4;
+
+    float veloRandScale;
     float speed;
+    float emitStartSpeed; //  エフェクトの再生開始時の速度
+    float emitEndSpeed; //  エフェクト再生後の最終的な速度
+
     float2 scale;
-    float startsize;
-    float endsize;
-    float3 orbitalvelocity;
+    int scaleVariateByLife; // 大きさの変化の基準を管理 ( TRUE : 寿命によって変化 )
+    float padding6; // 大きさの変化の基準を管理 ( TRUE : 寿命によって変化 )
+
+    float lifeStartSize; // パーティクルの生成時の速度
+    float lifeEndSize; // パーティクルの消滅時の速度
+    // -------------------  ↑↓ どちらかのみ  ----------------------
+    float emitStartSize; // エフェクトの再生開始時の速度
+    float emitEndSize; // エフェクト再生後の最終的な速度
+
     float radial;
-    float startspeed;
-    float endspeed;
-    float velorandscale;
-    int strechflag;
-    float3 buoyancy;
-    float startgravity;
-    float endgravity;
-    float3 savedummy;
+    float buoyancy;
+    float emitStartGravity;
+    float emitEndGravity;
 }
 
 //ランダム関数

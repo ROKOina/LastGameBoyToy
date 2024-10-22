@@ -13,5 +13,7 @@ cbuffer CbPostEffect : register(b3)
     float vignetteintensity;
     float4 ssrparameter;
     float distance_to_sun;
-    float3 posteffectdummy;
+    float blurstrength;
+    float blurradius;
+    float blurdecay;
 };

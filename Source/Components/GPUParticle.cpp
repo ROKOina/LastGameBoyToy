@@ -3,6 +3,7 @@
 #include "Misc.h"
 #include "Graphics/Shaders/Shader.h"
 #include "Graphics/Shaders/Texture.h"
+#include "GameSource/Math/Mathf.h"
 #include "Dialog.h"
 #include "Logger.h"
 #include "Components/TransformCom.h"
@@ -77,27 +78,39 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
 {
     archive
     (
-        CEREAL_NVP(color),
-        CEREAL_NVP(startcolor),
-        CEREAL_NVP(endcolor),
+        CEREAL_NVP(emitTime),
+        CEREAL_NVP(lifeTime),
+        CEREAL_NVP(stretchFlag),
+        CEREAL_NVP(isLoopFlg),
+
         CEREAL_NVP(shape),
-        CEREAL_NVP(velocity),
-        CEREAL_NVP(lifetime),
-        CEREAL_NVP(luminance),
+
+        CEREAL_NVP(baseColor),
+        CEREAL_NVP(lifeStartColor),
+        CEREAL_NVP(lifeEndColor),
+        CEREAL_NVP(emitStartColor),
+        CEREAL_NVP(emitEndColor),
+        CEREAL_NVP(colorVariateByLife),
+        CEREAL_NVP(colorScale),
+
+        CEREAL_NVP(emitVec),
+        CEREAL_NVP(orbitalVelocity),
+        CEREAL_NVP(veloRandScale),
         CEREAL_NVP(speed),
+        CEREAL_NVP(emitStartSpeed),
+        CEREAL_NVP(emitEndSpeed),
+
         CEREAL_NVP(scale),
-        CEREAL_NVP(startsize),
-        CEREAL_NVP(endsize),
-        CEREAL_NVP(orbitalvelocity),
+        CEREAL_NVP(scaleVariateByLife),
+        CEREAL_NVP(lifeStartSize),
+        CEREAL_NVP(lifeEndSize),
+        CEREAL_NVP(emitStartSize),
+        CEREAL_NVP(emitEndSize),
+
         CEREAL_NVP(radial),
-        CEREAL_NVP(startspeed),
-        CEREAL_NVP(endspeed),
-        CEREAL_NVP(velorandscale),
-        CEREAL_NVP(strechflag),
         CEREAL_NVP(buoyancy),
-        CEREAL_NVP(startgravity),
-        CEREAL_NVP(endgravity),
-        CEREAL_NVP(savedummy)
+        CEREAL_NVP(emitStartGravity),
+        CEREAL_NVP(emitEndGravity)
     );
 }
 
@@ -107,7 +120,8 @@ void GPUParticle::SaveParameter::serialize(Archive& archive, int version)
     archive
     (
         CEREAL_NVP(m_blend),
-        CEREAL_NVP(m_filename)
+        CEREAL_NVP(m_depthS),
+        CEREAL_NVP(m_textureName)
     );
 }
 
@@ -166,7 +180,6 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
 
     //コンスタントバッファの定義と更新
     m_gpu = std::make_unique<ConstantBuffer<GPUParticleConstants>>(device);
-    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
 
     //コンスタントバッファのバッファ作成、更新
     buffer_desc.ByteWidth = sizeof(GPUparticleSaveConstants);
@@ -177,25 +190,16 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     buffer_desc.StructureByteStride = 0;
     hr = device->CreateBuffer(&buffer_desc, nullptr, m_constantbuffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-
-    //初期化のピクセルシェーダーをセット
-    dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
-    dc->CSSetShader(m_initialzecomputeshader.Get(), NULL, 0);
-    const UINT thread_group_count_x = align(static_cast<UINT>(maxparticle), THREAD) / THREAD;
-    dc->Dispatch(thread_group_count_x, 1, 1);
-    ID3D11UnorderedAccessView* null_unordered_access_view{};
-    dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
 
     //ファイル読み込み処理
     if (filename)
     {
         Desirialize(filename);
         D3D11_TEXTURE2D_DESC texture2d_desc{};
-        LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_filename.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
     }
+
+    //fileVelocity = m_GSC.velocity;
 }
 
 //更新処理
@@ -203,6 +207,23 @@ void GPUParticle::Update(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+    // オブジェクトの回転に合わせてエフェクトも回転させる処理
+    DirectX::XMMATRIX transf = DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform());
+    DirectX::XMVECTOR velo = DirectX::XMLoadFloat3(&m_GSC.emitVec);
+    velo = DirectX::XMVector3TransformNormal(velo, transf);
+    DirectX::XMStoreFloat3(&m_gpu->data.currentEmitVec, velo);
+
+    if (stopFlg == true)return;
+
+    // 単発再生
+    if (m_GSC.isLoopFlg == false) {
+        emitTimer += elapsedTime;
+
+        if (emitTimer > m_GSC.emitTime) {
+            m_gpu->data.isEmitFlg = false;
+        }
+    }
 
     //コンスタントバッファの更新
     m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
@@ -219,12 +240,6 @@ void GPUParticle::Update(float elapsedTime)
     dc->Dispatch(thread_group_count_x, 1, 1);
     ID3D11UnorderedAccessView* null_unordered_access_view{};
     dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
-
-    //パラメータ初期化
-    if (m_gpu->data.loop == 0)
-    {
-        //Reset();
-    }
 }
 
 //描画
@@ -244,7 +259,7 @@ void GPUParticle::Render()
     dc->PSSetShaderResources(20, 1, m_colormap.GetAddressOf());
 
     //デプスステンシルステート設定
-    dc->OMSetDepthStencilState(graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 0);
+    dc->OMSetDepthStencilState(graphics.GetDepthStencilState(static_cast<DEPTHSTATE>(m_p.m_depthS)), 0);
 
     //プリミティブトポロジー設定
     dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
@@ -254,6 +269,14 @@ void GPUParticle::Render()
     dc->PSSetShader(m_pixelshader.Get(), NULL, 0);
     dc->GSSetShader(m_geometryshader.Get(), NULL, 0);
     dc->GSSetShaderResources(0, 1, m_particlesrv.GetAddressOf());
+
+    //コンスタントバッファの更新
+    m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
+    m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
+    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
 
     //解放
     dc->IASetInputLayout(NULL);
@@ -276,35 +299,12 @@ void GPUParticle::Render()
 //imgui
 void GPUParticle::OnGUI()
 {
-    if (ImGui::Button("Save"))
-    {
-        Serialize();
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Load"))
-    {
-        LoadDesirialize();
-        D3D11_TEXTURE2D_DESC texture2d_desc{};
-        LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_filename.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Reset"))
-    {
-        //リセット関数
-        Reset();
-        m_gpu->data.loop = true;
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("ParameterReset"))
-    {
-        //パラメータリセット関数
-        ParameterReset();
-    }
+    SystemGUI();
 
     //テクスチャロード
     char textureFile[256];
     ZeroMemory(textureFile, sizeof(textureFile));
-    ::strncpy_s(textureFile, sizeof(textureFile), m_p.m_filename.c_str(), sizeof(textureFile));
+    ::strncpy_s(textureFile, sizeof(textureFile), m_p.m_textureName.c_str(), sizeof(textureFile));
     if (ImGui::Button("..."))
     {
         const char* filter = "Texture Files(*.DDS;*.dds;*.png;*.jpg;)\0*.DDS;*.dds;*.png;*.jpg;\0All Files(*.*)\0*.*;\0\0";
@@ -322,25 +322,63 @@ void GPUParticle::OnGUI()
             PathRelativePathToA(relativeTextureFile, dirname, FILE_ATTRIBUTE_DIRECTORY, textureFile, FILE_ATTRIBUTE_ARCHIVE);
 
             // 読み込み
-            m_p.m_filename = relativeTextureFile;
+            m_p.m_textureName = relativeTextureFile;
             D3D11_TEXTURE2D_DESC texture2d_desc{};
-            LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_filename.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
+            LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
         }
     }
     ImGui::SameLine();
-    ::strncpy_s(textureFile, sizeof(textureFile), m_p.m_filename.c_str(), sizeof(textureFile));
+    ::strncpy_s(textureFile, sizeof(textureFile), m_p.m_textureName.c_str(), sizeof(textureFile));
     if (ImGui::InputText("texture", textureFile, sizeof(textureFile), ImGuiInputTextFlags_EnterReturnsTrue))
     {
-        m_p.m_filename = textureFile;
+        m_p.m_textureName = textureFile;
 
         char drive[32], dir[256], fullPath[256];
         ::_splitpath_s(textureFile, drive, sizeof(drive), dir, sizeof(dir), nullptr, 0, nullptr, 0);
         ::_makepath_s(fullPath, sizeof(fullPath), drive, dir, textureFile, nullptr);
         D3D11_TEXTURE2D_DESC texture2d_desc{};
-        LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_filename.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
+        LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
     }
     ImGui::Text(J(u8"リソース"));
     ImGui::Image(m_colormap.Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+
+    ParameterGUI();
+}
+
+void GPUParticle::SystemGUI()
+{
+    if (ImGui::Button("Save"))
+    {
+        Serialize();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Load"))
+    {
+        LoadDesirialize();
+        D3D11_TEXTURE2D_DESC texture2d_desc{};
+        LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("PLAY"))
+    {
+        //リセット関数
+        Play();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("ParameterReset"))
+    {
+        //パラメータリセット関数
+        ParameterReset();
+    }
+
+    ImGui::Checkbox(J(u8"生存フラグ"), reinterpret_cast<bool*>(&m_gpu->data.isalive));
+    ImGui::SameLine();
+    ImGui::Checkbox(J(u8"ループ"), reinterpret_cast<bool*>(&m_GSC.isLoopFlg));
+    ImGui::SameLine();
+    ImGui::Checkbox(J(u8"停止"), &stopFlg);
+    ImGui::SameLine();
+    ImGui::Checkbox(J(u8"ストレッチビルボードON"), reinterpret_cast<bool*>(&m_GSC.stretchFlag));
+
     //デバッグ用にブレンドモード設定
     constexpr const char* BlendName[] =
     {
@@ -359,63 +397,143 @@ void GPUParticle::OnGUI()
     static_assert(ARRAYSIZE(BlendName) != static_cast<int>(BLENDSTATE::MAX) - 1, "BlendName Size Error!");
     //ブレンドモード設定
     ImGui::Combo("BlendMode", &m_p.m_blend, BlendName, static_cast<int>(BLENDSTATE::MAX), 10);
-    ImGui::Checkbox(J(u8"生存フラグ"), reinterpret_cast<bool*>(&m_gpu->data.isalive));
-    ImGui::SameLine();
-    ImGui::Checkbox(J(u8"ループ"), reinterpret_cast<bool*>(&m_gpu->data.loop));
-    ImGui::SameLine();
-    ImGui::Checkbox(J(u8"スタート"), reinterpret_cast<bool*>(&m_gpu->data.startflag));
-    ImGui::SameLine();
-    ImGui::Checkbox(J(u8"ストレッチビルボードON"), reinterpret_cast<bool*>(&m_GSC.strechflag));
-    ImGui::DragFloat(J(u8"寿命時間"), &m_GSC.lifetime, 0.1f, 0.0f, 5.0f);
-    ImGui::DragFloat2(J(u8"スケール"), &m_GSC.scale.x, 0.01f, 0);
-    if (ImGui::DragFloat(J(u8"全部のスケール"), &m_GSC.scale.x, 0.01f, 0))
+
+    //デバッグ用に深度ステート設定
+    constexpr const char* dsName[] =
     {
-        m_GSC.scale.y = m_GSC.scale.x;
+      "NONE",
+      "ZT_ON_ZW_ON",
+      "ZT_ON_ZW_OFF",
+      "ZT_OFF_ZW_ON",
+      "ZT_OFF_ZW_OFF",
+      "SILHOUETTE",
+      "MASK",
+      "APPLY_MASK",
+      "EXCLUSIVE",
+    };
+    //ブレンドモード設定リストとのサイズが違うとエラーを出す
+    static_assert(ARRAYSIZE(dsName) != static_cast<int>(DEPTHSTATE::MAX) - 1, "DEPTHSTATE Size Error!");
+    //ブレンドモード設定
+    ImGui::Combo("DepthState", &m_p.m_depthS, dsName, static_cast<int>(DEPTHSTATE::MAX), ARRAYSIZE(dsName));
+}
+
+void GPUParticle::ParameterGUI()
+{
+    ImGui::DragFloat(J(u8"エフェクトの再生時間"), &m_GSC.emitTime, 0.1f);
+    ImGui::DragFloat(J(u8"パーティクルの寿命"), &m_GSC.lifeTime, 0.1f, 0.0f, 5.0f);
+    EmitGUI();
+    SpeedGUI();
+    ScaleGUI();
+    ColorGUI();
+}
+
+void GPUParticle::ColorGUI()
+{
+    if (ImGui::TreeNode(J(u8"カラー関係"))) {
+        ImGui::ColorEdit4(J(u8"ベースの色"), &m_GSC.baseColor.x);
+        ImGui::DragFloat3(J(u8"カラースケール"), &m_GSC.colorScale.x, 0.1f);
+
+        ImGui::Checkbox(J(u8"パーティクルの寿命によって変化"), (bool*)&m_GSC.colorVariateByLife);
+
+        if (m_GSC.scaleVariateByLife) {
+            ImGui::ColorEdit4(J(u8"始めの色 "), &m_GSC.lifeStartColor.x);
+            ImGui::ColorEdit4(J(u8"最後の色 "), &m_GSC.lifeEndColor.x);
+        }
+        else {
+            ImGui::ColorEdit4(J(u8"始めの色"), &m_GSC.emitStartColor.x);
+            ImGui::ColorEdit4(J(u8"最後の色"), &m_GSC.emitEndColor.x);
+        }
+
+        ImGui::TreePop();
     }
-    ImGui::ColorEdit4(J(u8"色"), &m_GSC.color.x);
-    ImGui::ColorEdit4(J(u8"始めの色"), &m_GSC.startcolor.x);
-    ImGui::ColorEdit4(J(u8"最後の色"), &m_GSC.endcolor.x);
-    ImGui::DragFloat3(J(u8"輝度"), &m_GSC.luminance.x, 0.1f);
-    ImGui::DragFloat3(J(u8"速力"), &m_GSC.velocity.x, 0.1f);
-    ImGui::DragFloat3(J(u8"回転係数"), &m_GSC.orbitalvelocity.x, 0.1f);
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"生成角度"), &m_GSC.shape.w, 0.1f, 0.0f, 1.0f);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"球の大きさ"), &m_GSC.shape.y, 0.1f, 0.0f, 360.0f);
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"球の集まり具合"), &m_GSC.shape.z, 0.1f, 0.0f, 1.0f);
-    ImGui::SetNextItemWidth(90);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"弾け飛ぶ係数"), &m_GSC.radial, 0.1f, 0.0f, 10.0f);
-    ImGui::DragFloat(J(u8"スピード"), &m_GSC.speed, 0.1f, 0.0f, 100.0f);
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"最初のスピード"), &m_GSC.startspeed, 0.1f, 0.01f, 100.0f);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"最後のスピード"), &m_GSC.endspeed, 0.1f, 0.01f, 100.0f);
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"最初の大きさ"), &m_GSC.startsize, 0.01f, 0.01f, 1.0f);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"最後の大きさ"), &m_GSC.endsize, 0.01f, 0.01f, 1.0f);
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"生成場所ランダム"), &m_GSC.shape.x, 0.1f, 0.0f, 100.0f);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"速力ランダム"), &m_GSC.velorandscale, 0.1f, 0.0f, 100.0f);
-    ImGui::DragFloat3(J(u8"浮力"), &m_GSC.buoyancy.x, 0.1f, -100.0f, 100.0f);
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"最初の重力"), &m_GSC.startgravity, 0.01f, 0.0f, 100.0f);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(90);
-    ImGui::DragFloat(J(u8"最後の重力"), &m_GSC.endgravity, 0.01f, 0.0f, 100.0f);
+}
+
+void GPUParticle::ScaleGUI()
+{
+    if (ImGui::TreeNode(J(u8"スケール関係"))) {
+        ImGui::DragFloat2(J(u8"スケールXY"), &m_GSC.scale.x, 0.01f, 0);
+        if (ImGui::DragFloat(J(u8"スケール"), &m_GSC.scale.x, 0.01f, 0))
+        {
+            m_GSC.scale.y = m_GSC.scale.x;
+        }
+
+        ImGui::Checkbox(J(u8"パーティクルの寿命によって変化 "), (bool*)&m_GSC.scaleVariateByLife);
+
+        if (m_GSC.scaleVariateByLife) {
+            ImGui::SetNextItemWidth(90);
+            ImGui::DragFloat(J(u8"最初の大きさ "), &m_GSC.lifeStartSize, 0.01f, 0.01f, 1.0f);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(90);
+            ImGui::DragFloat(J(u8"最後の大きさ "), &m_GSC.lifeEndSize, 0.01f, 0.01f, 1.0f);
+        }
+        else {
+            ImGui::SetNextItemWidth(90);
+            ImGui::DragFloat(J(u8"最初の大きさ"), &m_GSC.emitStartSize, 0.01f, 0.01f, 1.0f);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(90);
+            ImGui::DragFloat(J(u8"最後の大きさ"), &m_GSC.emitEndSize, 0.01f, 0.01f, 1.0f);
+        }
+
+        ImGui::TreePop();
+    }
+}
+
+void GPUParticle::SpeedGUI()
+{
+    if (ImGui::TreeNode(J(u8"スピード関係"))) {
+        ImGui::DragFloat(J(u8"スピード"), &m_GSC.speed, 0.1f, 0.0f, 100.0f);
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"最初のスピード"), &m_GSC.emitStartSpeed, 0.1f, 0.01f, 100.0f);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"最後のスピード"), &m_GSC.emitEndSpeed, 0.1f, 0.01f, 100.0f);
+
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"速力ランダム"), &m_GSC.veloRandScale, 0.1f, 0.0f, 100.0f);
+        ImGui::DragFloat(J(u8"浮力"), &m_GSC.buoyancy, 0.1f, -100.0f, 100.0f);
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"最初の重力"), &m_GSC.emitStartGravity, 0.01f, 0.0f, 100.0f);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"最後の重力"), &m_GSC.emitEndGravity, 0.01f, 0.0f, 100.0f);
+
+        ImGui::TreePop();
+    }
+}
+
+void GPUParticle::EmitGUI()
+{
+    if (ImGui::TreeNode(J(u8"パーティクルの飛ばし方 関係"))) {
+        if (ImGui::DragFloat3(J(u8"放射ベクトル"), &m_GSC.emitVec.x, 0.1f)) {
+            m_GSC.emitVec = Mathf::Normalize(m_GSC.emitVec);
+        }
+
+        ImGui::DragFloat3(J(u8"回転係数"), &m_GSC.orbitalVelocity.x, 0.1f);
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"生成場所ランダム"), &m_GSC.shape.x, 0.1f, 0.0f, 100.0f);
+
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"生成角度"), &m_GSC.shape.w, 0.1f, 0.0f, 1.0f);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"球の大きさ"), &m_GSC.shape.y, 0.1f, 0.0f, 360.0f);
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"球の集まり具合"), &m_GSC.shape.z, 0.1f, 0.0f, 1.0f);
+        ImGui::SetNextItemWidth(90);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"弾け飛ぶ係数"), &m_GSC.radial, 0.1f, 0.0f, 10.0f);
+
+        ImGui::TreePop();
+    }
 }
 
 //リセット関数
-void GPUParticle::Reset()
+void GPUParticle::Play()
 {
+    m_gpu->data.isEmitFlg = true;
+    emitTimer = 0.0f;
+
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
@@ -499,23 +617,31 @@ void GPUParticle::LoadDesirialize()
 //パラメータリセット
 void GPUParticle::ParameterReset()
 {
-    m_GSC.color = { 1,1,1,1 };
-    m_GSC.startcolor = { 1,1,1,1 };
-    m_GSC.endcolor = { 1,1,1,1 };
+    m_GSC.lifeTime = 1.0f;
     m_GSC.shape = { 0.0f,0.0f,0.0f,0.0f };
-    m_GSC.velocity = { 0,0,0 };
-    m_GSC.lifetime = 1.0f;
-    m_GSC.luminance = { 1,1,1 };
+
+    m_GSC.baseColor = { 1,1,1,1 };
+    m_GSC.lifeStartColor = { 1,1,1,1 };
+    m_GSC.lifeEndColor = { 1,1,1,1 };
+    m_GSC.emitStartColor = { 1,1,1,1 };
+    m_GSC.emitEndColor = { 1,1,1,1 };
+    m_GSC.colorScale = { 1,1,1 };
+
+    m_GSC.emitVec = { 0,0,0 };
+    m_GSC.orbitalVelocity = { 0,0,0 };
+    m_GSC.veloRandScale = 0.0f;
     m_GSC.speed = 1.0f;
+    m_GSC.emitStartSpeed = 1.0f;
+    m_GSC.emitEndSpeed = 1.0f;
+
     m_GSC.scale = { 0.2f,0.2f };
-    m_GSC.startsize = 1.0f;
-    m_GSC.endsize = 1.0f;
-    m_GSC.orbitalvelocity = { 0,0,0 };
+    m_GSC.lifeStartSize = 1.0f;
+    m_GSC.lifeEndSize = 1.0f;
+    m_GSC.emitStartSize = 1.0f;
+    m_GSC.emitEndSize = 1.0f;
+
     m_GSC.radial = { 0 };
-    m_GSC.startspeed = 1.0f;
-    m_GSC.endspeed = 1.0f;
-    m_GSC.velorandscale = 0.0f;
     m_GSC.buoyancy = {};
-    m_GSC.startgravity = 0.0f;
-    m_GSC.endgravity = 0.0f;
+    m_GSC.emitStartGravity = 0.0f;
+    m_GSC.emitEndGravity = 0.0f;
 }

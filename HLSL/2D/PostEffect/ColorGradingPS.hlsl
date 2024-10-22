@@ -200,6 +200,26 @@ float3 cc(float3 color, float factor, float factor2) // color modifier
     return lerp(color, w * factor, w * factor2);
 }
 
+//ラジアルブラー
+float3 radialblur(float2 texcoord)
+{
+    const int sample = 16;
+    float2 centerposition = texcoord - float2(0.5f, 0.5f);
+    float distance = length(centerposition);
+    float factor = blurstrength / float(sample) * distance;
+    factor *= smoothstep(blurradius, blurradius * blurdecay, distance);
+
+    float3 color = float3(0.0f, 0.0f, 0.0f);
+    for (int i = 0; i < sample; ++i)
+    {
+        float sampleoffset = 1.0f - factor * i;
+        color += texturemaps.Sample(sampler_states[LINEAR], float2(0.5f, 0.5f) + (centerposition * sampleoffset)).rgb;
+    }
+
+    color /= float(sample); // 色の平均を取る
+    return color;
+}
+
 float4 main(VS_OUT pin) : SV_TARGET
 {
     //指定されたミップマップレベルのテクスチャマップの次元情報を取得し、アスペクト比を計算
@@ -227,13 +247,16 @@ float4 main(VS_OUT pin) : SV_TARGET
     // シーンのテクスチャマップをサンプリング
     float4 sampled_color = texturemaps.Sample(sampler_states[POINT], pin.texcoord.xy);
 
+    //ラジアルブラー
+    sampled_color.rgb = lerp(sampled_color.rgb, radialblur(pin.texcoord).rgb, blurstrength);
+
     // 輪郭線効果の描画 (輪郭線をエッジ部分にのみ適用)
     //sampled_color.rgb += OutlineEffect(pin.texcoord.xy, width, height, inverseviewprojection, cameraposition);
 
     // ビネット効果の適用
-    //sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
+    sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
 
-        //レンズフレアとグローライトのエフェクト
+    //レンズフレアとグローライトのエフェクト
     float4 ndc_sun_position = mul(float4(-normalize(directionalLight.direction.xyz) * distance_to_sun, 1), viewProjection);
     ndc_sun_position /= ndc_sun_position.w;
     if (saturate(ndc_sun_position.z) == ndc_sun_position.z)

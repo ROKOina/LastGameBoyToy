@@ -47,6 +47,8 @@ public:
         MAX
     };
 
+    CollsionType GetColiisionType() { return m_collsiontype; }
+
 private:
 
     CollsionType m_collsiontype = CollsionType::SPHER;

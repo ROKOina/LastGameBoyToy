@@ -180,6 +180,9 @@ private:
 
         int teamID = 0;
 
+        //î•ñ‚ªXV‚³‚ê‚½‚©
+        bool isInputUpdate = false;
+
         //Ÿ‚Ì“ü—Íî•ñ‚ğŠi”[
         struct NextInput
         {
@@ -193,6 +196,8 @@ private:
             DirectX::XMFLOAT4 rotato = { 0,0,0,1 };
 
             DirectX::XMFLOAT3 fpsCameraDir = { 0,0,1 };
+
+            DirectX::XMFLOAT3 velocity = { 0,0,0 };
         };
         NextInput nextInput;
     };

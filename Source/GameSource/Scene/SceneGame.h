@@ -31,6 +31,9 @@ public:
     // 描画処理
     void Render(float elapsedTime)override;
 
+    //エフェクト生成
+    void EffectNew();
+
     //名前取得
     std::string GetName() const override { return "SceneGame"; };
 
@@ -46,6 +49,9 @@ private:
 
     //ディレイ方式用入力
     void DelayOnlineInput();
+
+    //UIのゲームオブジェクト生成
+    void CreateUiObject();
 private:
     std::unique_ptr<NetwarkPost> n;
     std::unique_ptr<BasicsApplication> photonNet;

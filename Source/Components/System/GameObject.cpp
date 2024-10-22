@@ -245,6 +245,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     RenderUseDepth();
     InstanceRenderUseDepth();
 
+
     //ポストエフェクト
     PostEffect::Instance().PostEffectRender();
 
@@ -303,10 +304,10 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
 
         if (ImGui::IsMouseDoubleClicked(0))
         {
-            //ImGuiIO& io = ImGui::GetIO();
+            ImGuiIO& io = ImGui::GetIO();
 
             // ImGui上にマウスカーソルがある場合は処理しない
-            //if (!io.WantCaptureMouse) return;
+            if (!io.WantCaptureMouse) return;
 
             GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
             GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);

@@ -5,9 +5,7 @@
 
 #include "Input\Input.h"
 #include "../../GameSource/Math/Mathf.h"
-
-
-
+#include "Graphics\Shaders\PostEffect.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -24,7 +22,6 @@ void CharacterCom::Update(float elapsedTime)
 
     //現在のアニメーションに使用している角度
     nowAngle = InterpolateAngle(nowAngle, stickAngle, elapsedTime, lerpSpeed);
-
 
     //ステート処理
     attackStateMachine.Update(elapsedTime);
@@ -58,12 +55,12 @@ void CharacterCom::Update(float elapsedTime)
 #else
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
-        MainAttack();
+        //MainAttack();
     }
 
 #endif // _DEBUG
 
-    if (CharacterInput::MainSkillButton_Q & GetButtonDown() 
+    if (CharacterInput::MainSkillButton_Q & GetButtonDown()
         && Qcool.timer >= Qcool.time)
     {
         Qcool.timer = 0;
@@ -98,6 +95,9 @@ void CharacterCom::Update(float elapsedTime)
             dashGauge = dashGaugeMax;
         }
     }
+
+    //ブラー
+    PostEffect::Instance().ParameterMove(elapsedTime, 0.5f, dashFlag, PostEffect::PostEffectParameter::BlurStrength);
 
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
@@ -187,7 +187,6 @@ void CharacterCom::LeftShiftSkill()
     moveCmp->SetAddMoveMaxSpeed(maxSpeed);
 }
 
-
 void CharacterCom::CameraControl()
 {
     if (!cameraObj)return;
@@ -205,42 +204,41 @@ void CharacterCom::CameraControl()
         }
 
         //UI配置中はマウスを固定しない
-       if (!cameraObj->GetComponent<CameraCom>()->GetIsUiCreate())
-       {
-
-        //マウスカーソルを取得
-        POINT cursor;
-        ::GetCursorPos(&cursor);
-        DirectX::XMFLOAT2 newCursor = DirectX::XMFLOAT2(static_cast<float>(cursor.x), static_cast<float>(cursor.y));
-        ::SetCursorPos(500, 500);
-
-        //動かす速度(感度)
-        float moveX = (newCursor.x - 500) * 0.02f;
-        float moveY = (newCursor.y - 500) * 0.02f;
-
-        //Y軸回転(ここでオブジェクトの回転)
-        DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
-        euler.y += moveX * 8.0f;
-        GetGameObject()->transform_->SetEulerRotation(euler);
-
-        //X軸回転(カメラのTransformを回転)
-        std::shared_ptr<GameObject> cameraplayer = GameObjectManager::Instance().Find("cameraPostPlayer");
-        DirectX::XMFLOAT3 cameraeuler = cameraplayer->transform_->GetEulerRotation();
-        cameraeuler.x += moveY * 5.0f;
-        cameraplayer->transform_->SetEulerRotation(cameraeuler);
-
-        //回転制御
-        if (cameraeuler.x > 70)
+        if (!cameraObj->GetComponent<CameraCom>()->GetIsUiCreate())
         {
-            cameraeuler.x = 70;
+            //マウスカーソルを取得
+            POINT cursor;
+            ::GetCursorPos(&cursor);
+            DirectX::XMFLOAT2 newCursor = DirectX::XMFLOAT2(static_cast<float>(cursor.x), static_cast<float>(cursor.y));
+            ::SetCursorPos(500, 500);
+
+            //動かす速度(感度)
+            float moveX = (newCursor.x - 500) * 0.02f;
+            float moveY = (newCursor.y - 500) * 0.02f;
+
+            //Y軸回転(ここでオブジェクトの回転)
+            DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
+            euler.y += moveX * 8.0f;
+            GetGameObject()->transform_->SetEulerRotation(euler);
+
+            //X軸回転(カメラのTransformを回転)
+            std::shared_ptr<GameObject> cameraplayer = GameObjectManager::Instance().Find("cameraPostPlayer");
+            DirectX::XMFLOAT3 cameraeuler = cameraplayer->transform_->GetEulerRotation();
+            cameraeuler.x += moveY * 5.0f;
             cameraplayer->transform_->SetEulerRotation(cameraeuler);
+
+            //回転制御
+            if (cameraeuler.x > 70)
+            {
+                cameraeuler.x = 70;
+                cameraplayer->transform_->SetEulerRotation(cameraeuler);
+            }
+            if (cameraeuler.x < -70)
+            {
+                cameraeuler.x = -70;
+                cameraplayer->transform_->SetEulerRotation(cameraeuler);
+            }
         }
-        if (cameraeuler.x < -70)
-        {
-            cameraeuler.x = -70;
-            cameraplayer->transform_->SetEulerRotation(cameraeuler);
-        }
-       }
     }
     else
     {
@@ -303,8 +301,6 @@ float CharacterCom::InterpolateAngle(float currentAngle, float targetAngle, floa
         diff += 360.0f;
     }
 
-
-
     // 少しずつ近づける（Lerp を用いる）
     currentAngle = Lerp(currentAngle, currentAngle + diff, deltaTime * speed);
 
@@ -319,7 +315,6 @@ float CharacterCom::InterpolateAngle(float currentAngle, float targetAngle, floa
     {
         currentAngle = 0.0f;
     }
-
 
     return currentAngle;
 }
