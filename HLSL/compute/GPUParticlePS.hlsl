@@ -2,7 +2,6 @@
 #include "../Common.hlsli"
 
 Texture2D colortexture : register(t20);
-Texture2D depthMap : register(t8);
 
 float4 main(GS_OUT pin) : SV_TARGET
 {
@@ -20,8 +19,5 @@ float4 main(GS_OUT pin) : SV_TARGET
     if (color.a < EPSILON)
         discard;
 
-    //最終的な色にガンマ補正を適用 (逆ガンマの 1 / 2.2 = 約 0.4545)
-    color.rgb = pow(color.rgb, 1.0 / GAMMA);
-
-    return color;
+    return max(0, color);
 }

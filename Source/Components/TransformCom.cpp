@@ -5,7 +5,6 @@
 // 開始処理
 void TransformCom::Start()
 {
-
 }
 
 // 更新処理
@@ -16,103 +15,102 @@ void TransformCom::Update(float elapsedTime)
 // GUI描画
 void TransformCom::OnGUI()
 {
-	//ローカルポジション
-	ImGui::DragFloat3("Position", &localPosition_.x, 0.1f);
+    //ローカルポジション
+    ImGui::DragFloat3("Position", &localPosition_.x, 0.1f);
 
-	//ワールドポジション
-	DirectX::XMFLOAT3 worldPosition = worldPosition_;
-	if (ImGui::DragFloat3("WorldPosition", &worldPosition.x, 0.1f))
-	{
-		SetWorldPosition(worldPosition);
-	}
+    //ワールドポジション
+    DirectX::XMFLOAT3 worldPosition = worldPosition_;
+    if (ImGui::DragFloat3("WorldPosition", &worldPosition.x, 0.1f))
+    {
+        SetWorldPosition(worldPosition);
+    }
 
-	//クォータニオン
-	ImGui::Text("Rotation : %.2f, %.2f, %.2f, %.2f", &rotation_.x, &rotation_.y, &rotation_.z, &rotation_.w);
+    //クォータニオン
+    ImGui::Text("Rotation : %.2f, %.2f, %.2f, %.2f", &rotation_.x, &rotation_.y, &rotation_.z, &rotation_.w);
 
-	//オイラー角
-	DirectX::XMFLOAT3 euler = eulerRotation_;
-	if (ImGui::DragFloat3("EulerRotato", &euler.x)) {
-		SetEulerRotation(euler);
-	}
+    //オイラー角
+    DirectX::XMFLOAT3 euler = eulerRotation_;
+    if (ImGui::DragFloat3("EulerRotato", &euler.x)) {
+        SetEulerRotation(euler);
+    }
 
-	ImGui::DragFloat3("Scale", &scale_.x, 0.001f);
+    ImGui::DragFloat3("Scale", &scale_.x, 0.001f);
 }
 
 //行列更新
 void TransformCom::UpdateTransform()
 {
-	// ワールド行列の更新
-	DirectX::XMVECTOR Q = DirectX::XMLoadFloat4(&rotation_.dxFloat4);
-	DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale_.x, scale_.y, scale_.z);
-	DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(Q);
-	DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(localPosition_.x, localPosition_.y, localPosition_.z);
+    // ワールド行列の更新
+    DirectX::XMVECTOR Q = DirectX::XMLoadFloat4(&rotation_.dxFloat4);
+    DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale_.x, scale_.y, scale_.z);
+    DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(Q);
+    DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(localPosition_.x, localPosition_.y, localPosition_.z);
 
-	DirectX::XMStoreFloat4x4(&localTransform_, S * R * T);
-	DirectX::XMMATRIX L = DirectX::XMLoadFloat4x4(&parentTransform_);
-	DirectX::XMMATRIX W = S * R * T * L;
+    DirectX::XMStoreFloat4x4(&localTransform_, S * R * T);
+    DirectX::XMMATRIX L = DirectX::XMLoadFloat4x4(&parentTransform_);
+    DirectX::XMMATRIX W = S * R * T * L;
 
-	DirectX::XMStoreFloat4x4(&worldTransform_, W);
+    DirectX::XMStoreFloat4x4(&worldTransform_, W);
 
-	worldPosition_ = { worldTransform_._41,worldTransform_._42,worldTransform_._43 };
+    worldPosition_ = { worldTransform_._41,worldTransform_._42,worldTransform_._43 };
 }
 
 //指定地点を向く
 void TransformCom::LookAtTransform(const DirectX::XMFLOAT3& focus, const DirectX::XMFLOAT3& up)
 {
-	//位置、注視点、上方向からビュー行列を作成
-	DirectX::XMVECTOR Eye = DirectX::XMLoadFloat3(&worldPosition_);
-	DirectX::XMVECTOR Focus = DirectX::XMLoadFloat3(&focus);
-	DirectX::XMVECTOR Up = DirectX::XMLoadFloat3(&up);
+    //位置、注視点、上方向からビュー行列を作成
+    DirectX::XMVECTOR Eye = DirectX::XMLoadFloat3(&worldPosition_);
+    DirectX::XMVECTOR Focus = DirectX::XMLoadFloat3(&focus);
+    DirectX::XMVECTOR Up = DirectX::XMLoadFloat3(&up);
 
-	DirectX::XMFLOAT3 direction;
-	DirectX::XMStoreFloat3(&direction, DirectX::XMVectorSubtract(Focus, Eye));
-	
-	rotation_ = QuaternionStruct::LookRotation(direction, up);
+    DirectX::XMFLOAT3 direction;
+    DirectX::XMStoreFloat3(&direction, DirectX::XMVectorSubtract(Focus, Eye));
 
-	UpdateTransform();
+    rotation_ = QuaternionStruct::LookRotation(direction, up);
+
+    UpdateTransform();
 }
 
 //指定のUpに合わせる
 void TransformCom::SetUpTransform(const DirectX::XMFLOAT3& up)
 {
-	DirectX::XMFLOAT3 front = GetWorldFront();
-	DirectX::XMFLOAT3 right;
-	DirectX::XMVECTOR Up = DirectX::XMLoadFloat3(&up);
-	DirectX::XMVECTOR Front = DirectX::XMLoadFloat3(&front);
-	DirectX::XMVECTOR Right;
+    DirectX::XMFLOAT3 front = GetWorldFront();
+    DirectX::XMFLOAT3 right;
+    DirectX::XMVECTOR Up = DirectX::XMLoadFloat3(&up);
+    DirectX::XMVECTOR Front = DirectX::XMLoadFloat3(&front);
+    DirectX::XMVECTOR Right;
 
-	//upを基準に
-	Right = DirectX::XMVector3Cross(Up, Front);
-	Front = DirectX::XMVector3Cross(Right, Up);
-	
-	DirectX::XMStoreFloat3(&DirectX::XMFLOAT3(up), Up);
-	DirectX::XMStoreFloat3(&front, Front);
-	DirectX::XMStoreFloat3(&right, Right);
+    //upを基準に
+    Right = DirectX::XMVector3Cross(Up, Front);
+    Front = DirectX::XMVector3Cross(Right, Up);
 
-	//upを基準に行列を作る
-	DirectX::XMFLOAT4X4 matrixUp = {
-		right.x, right.y, right.z, 0,
-		up.x, up.y, up.z, 0,
-		front.x, front.y, front.z, 0,
-		0, 0, 0, 1 };
-	DirectX::XMMATRIX M = DirectX::XMLoadFloat4x4(&matrixUp);
+    DirectX::XMStoreFloat3(&DirectX::XMFLOAT3(up), Up);
+    DirectX::XMStoreFloat3(&front, Front);
+    DirectX::XMStoreFloat3(&right, Right);
 
-	//回転を適用
-	DirectX::XMStoreFloat4(&rotation_.dxFloat4, DirectX::XMQuaternionRotationMatrix(M));
+    //upを基準に行列を作る
+    DirectX::XMFLOAT4X4 matrixUp = {
+        right.x, right.y, right.z, 0,
+        up.x, up.y, up.z, 0,
+        front.x, front.y, front.z, 0,
+        0, 0, 0, 1 };
+    DirectX::XMMATRIX M = DirectX::XMLoadFloat4x4(&matrixUp);
 
-	UpdateTransform();
+    //回転を適用
+    DirectX::XMStoreFloat4(&rotation_.dxFloat4, DirectX::XMQuaternionRotationMatrix(M));
+
+    UpdateTransform();
 }
 
 void TransformCom::Turn(DirectX::XMFLOAT3& moveVec, float turnSpeed)
 {
-	//旋回処理
-	DirectX::XMVECTOR currentRot = DirectX::XMLoadFloat4(&rotation_.dxFloat4);
-	DirectX::XMVECTOR goalRot = DirectX::XMLoadFloat4(&rotation_.LookRotation(moveVec).dxFloat4);
+    // 旋回処理
+    DirectX::XMVECTOR currentRot = DirectX::XMLoadFloat4(&rotation_.dxFloat4);
+    DirectX::XMVECTOR goalRot = DirectX::XMLoadFloat4(&rotation_.LookRotation(moveVec).dxFloat4);
 
-	DirectX::XMFLOAT4 rot = {};
-	DirectX::XMStoreFloat4(&rot, DirectX::XMQuaternionNormalize(DirectX::XMQuaternionSlerp(currentRot, goalRot, 0.1f)));
+    // turnSpeed を使用して回転速度を調整
+    DirectX::XMFLOAT4 rot = {};
+    DirectX::XMStoreFloat4(&rot, DirectX::XMQuaternionNormalize(DirectX::XMQuaternionSlerp(currentRot, goalRot, turnSpeed)));
 
-	rotation_ = rot;
+    rotation_ = rot;
 }
-
-

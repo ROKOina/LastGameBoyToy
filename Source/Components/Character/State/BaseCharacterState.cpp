@@ -3,9 +3,9 @@
 #include "BaseCharacterState.h"
 #include "Components/ColliderCom.h"
 #include "Components/RendererCom.h"
-
+#include "Components\CPUParticle.h"
+//#include "Components\System\GameObject.h"
 #include "Components\Character\BulletCom.h"
-
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -30,7 +30,7 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //ˆÚ“®
-    if(owner->IsPushLeftStick())
+    if (owner->IsPushLeftStick())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
@@ -61,11 +61,11 @@ void BaseCharacter_MoveState::Enter()
         param.blendType = 2,
         param.animeChangeRate = 0.5f,
         param.animeBlendRate = 0.0f
-
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), false, 0.3f);
+    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
@@ -76,8 +76,7 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //‘Ò‹@
-    if(!owner->IsPushLeftStick())
-    //if (moveVec == 0)
+    if (!owner->IsPushLeftStick())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
@@ -86,6 +85,11 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
+}
+
+void BaseCharacter_MoveState::Exit()
+{
+    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
 }
 
 #pragma endregion
@@ -156,7 +160,7 @@ void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
             rayCol->SetEnabled(true);
 
             DirectX::XMFLOAT3 pos = ray->transform_->GetWorldPosition();
-             
+
             //Ž©•ª‚©”»’f‚·‚é
             DirectX::XMFLOAT3 front;
             int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
@@ -164,7 +168,7 @@ void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
                 front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
             else
                 front = charaCom.lock()->GetFpsCameraDir();
-            
+
             rayCol->SetStart(pos);
             rayCol->SetEnd(pos + front * rayLength);
         }
@@ -305,4 +309,3 @@ void BaseCharacter_NoneAttack::Enter()
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }
-

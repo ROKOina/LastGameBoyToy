@@ -31,6 +31,9 @@ public:
     // 描画処理
     void Render(float elapsedTime)override;
 
+    //エフェクト生成
+    void EffectNew();
+
     //名前取得
     std::string GetName() const override { return "SceneGame"; };
 

@@ -13,7 +13,7 @@ float4 QuaternionRotate(float3 position, float4 q)
 [maxvertexcount(4)]
 void main(point GS_IN In[1], inout TriangleStream<PS_IN> ParticleStream)
 {
-// 座標変換 (ワールド座標系 → ビュー座標系)
+    // 座標変換 (ワールド座標系 → ビュー座標系)
     float4 pos = mul(float4(In[0].Position, 1.0), view);
 
     // クォータニオンの定義
@@ -41,14 +41,14 @@ void main(point GS_IN In[1], inout TriangleStream<PS_IN> ParticleStream)
     float w = 1.0 / komax;
     float h = 1.0 / komay;
     float2 uv = float2((type % komax) * w, (type / komax) * h);
-    
+
     // 左上の点の位置(射影座標系)・UV・色を計算して出力
     PS_IN Out = (PS_IN) 0;
     Out.Color = In[0].Color;
     Out.Position = mul(pos_left_top, projection);
     Out.Size = uv + float2(0, 0); // テクスチャ左上
     ParticleStream.Append(Out);
-    
+
     // 右上の点の位置(射影座標系) とテクスチャ座標の計算をして出力
     Out.Color = In[0].Color;
     Out.Position = mul(pos_right_top, projection);
@@ -66,6 +66,6 @@ void main(point GS_IN In[1], inout TriangleStream<PS_IN> ParticleStream)
     Out.Position = mul(pos_right_bottom, projection);
     Out.Size = uv + float2(w, h); // テクスチャ
     ParticleStream.Append(Out);
-    
+
     ParticleStream.RestartStrip();
 }

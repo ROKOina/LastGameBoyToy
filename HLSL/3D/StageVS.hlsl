@@ -4,7 +4,7 @@
 VS_OUT main(VS_IN vin)
 {
     float h = (time * 20) % 120;
-    float d = length(vin.position.xyz - float3(0.0f, 0.0f, 0.0f));
+    float d = length(vin.position.xyz - bossposiotn);
     const float w = 10.0;
     if (d > h && d < h + w)
     {

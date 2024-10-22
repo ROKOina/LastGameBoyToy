@@ -92,6 +92,11 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
 //コンストラクタ
 EasingMoveCom::EasingMoveCom(const char* filename)
 {
+    //ファイルの名前があれば読み込む
+    if (filename)
+    {
+        Deserialize(filename);
+    }
 }
 
 //初期設定

@@ -37,7 +37,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     };
 
     //簡易的なライティング計算
-    float3 n = float3(0, 0, 1); // パーティクルの面法線
+    float3 n = float3(1, 1, 1); // パーティクルの面法線
     float3 N = normalize(n);
     float3 L = normalize(-directionalLight.direction.xyz);
     float d = dot(L, N);
@@ -48,13 +48,10 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
 
     //座標変換(速力と位置)
     float4 viewpos = mul(float4(p.position.xyz, 1.0), view);
-    float4 viewvelo = mul(float4(p.strechvelocity, 0.0), view);
+    float4 viewvelo = float4(p.velocity.xyz, 0.0);
 
     //回転
     p.rotation = rotation;
-
-    //方向を代入
-    p.direction = direction;
 
     //生存フラグがfalseなら生成しない
     p.isalive = isalive;
@@ -70,19 +67,29 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     {
         float3 cornerPos = 0;
         //ストレッチビルボードを使用するか否かのフラグ
-        if (strechflag == 0)
+        if (stretchFlag == 1 && length(p.velocity.xyz) > 0.001f)
         {
-            cornerPos = BILLBOARD[i] * float3(p.scale, 1.0f);
+           // パーティクルの速度方向に基づいて伸ばす
+            float3 stretchDirection = normalize(viewvelo.xyz);
+            float stretchAmount = length(viewvelo.xyz) * 0.5f; // ストレッチの強度は速度に基づく
+
+            // 伸ばす軸に沿ってビルボードの一部を伸ばす
+            float3 stretchedBillboard = BILLBOARD[i];
+            stretchedBillboard.x += stretchDirection.x * stretchAmount * (BILLBOARD[i].x > 0 ? 1 : -1);
+            stretchedBillboard.y += stretchDirection.y * stretchAmount * (BILLBOARD[i].y > 0 ? 1 : -1);
+            stretchedBillboard.z += stretchDirection.z * stretchAmount * (BILLBOARD[i].z > 0 ? 1 : -1);
+
+            cornerPos = stretchedBillboard * float3(p.scale, 1.0f);
         }
         else
         {
-            cornerPos = BILLBOARD[i] * viewvelo.xyz * float3(p.scale, 1.0f);
+            cornerPos = BILLBOARD[i] * float3(p.scale, 1.0f);
         }
         cornerPos = QuaternionRotate(cornerPos, p.rotation);
         element.position = mul(float4(viewpos.xyz + cornerPos, 1.0f), projection);
-        element.color.rgb = p.color.rgb * power * color.rgb;
-        element.color.a = p.color.a * color.a;
-        element.color.rgb *= luminance;
+        element.color.rgb = p.color.rgb * power * baseColor.rgb;
+        element.color.a = p.color.a * baseColor.a;
+        element.color.rgb *= colorScale;
         element.texcoord = TEXCOORD[i];
         output.Append(element);
     }

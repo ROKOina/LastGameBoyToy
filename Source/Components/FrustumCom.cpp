@@ -12,7 +12,7 @@ void FrustumCom::Start()
     cameraCom = GetGameObject()->GetComponent<CameraCom>();
 }
 
-//XVˆ—  
+//XVˆ—
 void FrustumCom::Update(float elapsedTime)
 {
     //‹‘äŒvZ
@@ -25,22 +25,19 @@ void FrustumCom::Update(float elapsedTime)
 //GUI•`‰æ
 void FrustumCom::OnGUI()
 {
-
 }
 
-
-//•`‰æ”»’è    
+//•`‰æ”»’è
 void FrustumCom::DrawJudgement()
 {
     if (IntersectFrustumVsAABB(GetGameObject()->transform_->GetWorldPosition(), { 1.0f,1.0f,1.0f }))
     {
-       GetGameObject()->GetComponent<RendererCom>()->SetEnabled(true);
+        GetGameObject()->GetComponent<RendererCom>()->SetEnabled(true);
     }
     else
     {
         GetGameObject()->GetComponent<RendererCom>()->SetEnabled(false);
     }
-    
 }
 
 //‹‘ä‚ÆAABB‚Ì“–‚½‚è”»’èŒvZ
@@ -117,7 +114,6 @@ bool FrustumCom::IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, c
     else return true;
 }
 
-
 //‹‘äŒvZ
 void FrustumCom::CalcurateFrustum()
 {
@@ -159,7 +155,6 @@ void FrustumCom::CalcurateFrustum()
     for (int i = 0; i < 4; ++i)
     {
         DirectX::XMStoreFloat3(&farP[i], DirectX::XMVector3TransformCoord(verts[i + 4], inv_matrix));
-
     }
 
     //‹‘äiƒtƒ‰ƒXƒ^ƒ€j‚ğ\¬‚·‚é‚U•½–Ê‚ğZo‚·‚é
@@ -220,5 +215,4 @@ void FrustumCom::CalcurateFrustum()
     DirectX::XMStoreFloat3(&outLineNorm[2], DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&plane[1].normal), DirectX::XMLoadFloat3(&plane[3].normal))));
     //¶ã‹«ŠEü
     DirectX::XMStoreFloat3(&outLineNorm[3], DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&plane[3].normal), DirectX::XMLoadFloat3(&plane[0].normal))));
-
 }

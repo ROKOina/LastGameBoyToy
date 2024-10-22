@@ -8,9 +8,16 @@
 //“–‚½‚è”»’è
 #pragma region Collider
 
+void Collider::OnGUI()
+{
+    bool hit = isHit;
+    ImGui::Checkbox("isHit", &hit);
+}
+
 //”»’è‘O‚ÌƒNƒŠƒA
 void Collider::ColliderStartClear()
 {
+    isHit = false;
     hitObj_.clear();
 }
 
@@ -70,6 +77,7 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
             h.hitPos = rayResult.position;
             h.gameObject = otherSide->GetGameObject();
             hitObj_.emplace_back(h);
+            isHit = true;
         }
     }
     if (isJudgeOther)
@@ -79,6 +87,7 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
             h.hitPos = otherRayResult.position;
             h.gameObject = GetGameObject();
             otherSide->hitObj_.emplace_back(h);
+            otherSide->isHit = true;
         }
     }
 }
@@ -427,6 +436,8 @@ bool Collider::RayVsNodeCollision(std::shared_ptr<Collider> otherSide, HitResult
 // GUI•`‰æ
 void SphereColliderCom::OnGUI()
 {
+    Collider::OnGUI();
+
     ImGui::DragFloat("radius", &radius_, 0.1f);
     ImGui::DragFloat3("offsetPos", &offsetButtonPos_.x, 0.1f);
     if (isPushBack_)
@@ -452,6 +463,8 @@ void SphereColliderCom::DebugRender()
 // GUI•`‰æ
 void BoxColliderCom::OnGUI()
 {
+    Collider::OnGUI();
+
     ImGui::DragFloat3("size", &size_.x, 0.1f);
     ImGui::DragFloat3("offsetPos", &offsetButtonPos_.x, 0.1f);
 }
@@ -472,6 +485,8 @@ void BoxColliderCom::DebugRender()
 // GUI•`‰æ
 void CapsuleColliderCom::OnGUI()
 {
+    Collider::OnGUI();
+
     ImGui::DragFloat3("p0", &capsule_.p0.x, 0.1f);
     ImGui::DragFloat3("p1", &capsule_.p1.x, 0.1f);
     ImGui::DragFloat("radius", &capsule_.radius, 0.01f);
@@ -501,6 +516,8 @@ void CapsuleColliderCom::DebugRender()
 
 void RayColliderCom::OnGUI()
 {
+    Collider::OnGUI();
+
     ImGui::DragFloat3("start", &start.x, 0.1f);
     ImGui::DragFloat3("end", &end.x, 0.1f);
     ImGui::Checkbox("hitDraw", &hitDraw);

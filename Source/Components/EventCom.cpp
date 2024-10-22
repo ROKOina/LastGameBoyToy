@@ -21,7 +21,8 @@ void EventCom::Update(float elapsedTime)
             if (event.totaltime < event.starttime) continue;
 
             // イベント進行中
-            event.totaltime += elapsedTime; for (auto& event : eventList)
+            event.totaltime += elapsedTime;
+            for (auto& event : eventList)
             {
                 if (!event.active)continue;// イベントが無効または終了している場合は更新しない
 

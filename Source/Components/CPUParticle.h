@@ -9,8 +9,8 @@ class CPUParticle :public Component
 {
 public:
 
-    CPUParticle(const char* filename, int num);
-    ~CPUParticle() { delete[] m_data; delete[] m_v; }
+    CPUParticle(const char* filename, int num, bool col = false);
+    ~CPUParticle();
 
     //初期設定
     void Start()override {};
@@ -46,9 +46,6 @@ private:
 
     //リセット
     void Reset();
-
-    //ベジェ曲線
-    DirectX::XMVECTOR BezierCurve(DirectX::XMVECTOR p0, DirectX::XMVECTOR p1, DirectX::XMVECTOR p2, float t);
 
 private:
 
@@ -119,6 +116,8 @@ public:
         DirectX::XMFLOAT2 m_latesize = { 1,1 };
         DirectX::XMFLOAT4 m_particlecolor = { 1,1,1,1 };
         DirectX::XMFLOAT3 m_intensity = { 1,1,1 };
+        bool usetime = false;
+        float limitime = 0.0f;
         float collsionradius = 0.0f;
 
         template<class Archive>
@@ -128,13 +127,18 @@ public:
     //方向ベクトルを代入
     void SetDirection(const DirectX::XMFLOAT3& direction) { this->m_direction = direction; }
 
+    //アクティブ化
+    void SetActive(const bool& active) { this->m_active = active; }
+
 private:
 
     int m_numparticle = 0;
+    float timer = 0.0f;
     bool m_active = true;
     bool m_pause = true;
     SerializeCPUParticle m_scp;
     DirectX::XMFLOAT3 m_direction = { 1.0f,1.0f,1.0f };
+    bool collider = false;
 
 private:
 

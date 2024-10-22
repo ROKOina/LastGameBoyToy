@@ -63,6 +63,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit() override;
     virtual const char* GetName() const override { return "Move"; }
 };
 
@@ -133,8 +134,8 @@ public:
     virtual const char* GetName() const override { return "StanBall"; }
 
 private:
-    float speed=40;
-    float power=1;
+    float speed = 40;
+    float power = 1;
 };
 
 class BaseCharacter_KnockbackBallState : public BaseCharacter_BaseState

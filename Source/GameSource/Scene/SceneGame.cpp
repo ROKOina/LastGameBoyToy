@@ -87,9 +87,6 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-        obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
-        obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
-        //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
     }
 
@@ -111,7 +108,7 @@ void SceneGame::Initialize()
         //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
         roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER);
+        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);
     }
 
     //プレイヤー
@@ -134,6 +131,7 @@ void SceneGame::Initialize()
     }
 
     //BOSS
+#if(1)
     {
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
@@ -141,25 +139,125 @@ void SceneGame::Initialize()
         r->LoadModel("Data/Jammo/jammo.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
-        boss->AddComponent<EasingMoveCom>(nullptr);
-        //t = boss->transform_;
+        t = boss->transform_;
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         boss->AddComponent<CharaStatusCom>();
-        //boss->AddComponent<SpawnCom>();
-    }
 
-    //インスタンステスト
-    {
-        //auto& obj = GameObjectManager::Instance().Create();
-        //obj->SetName("Instance");
-        //obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
-        //std::shared_ptr<InstanceRenderer> r = obj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 2, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true);
-        //r->LoadModel("Data/Jammo/jammo.mdl");
+        //ボンプ君
+        {
+            std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
+            bompspawn->SetName("bomp");
+            bompspawn->AddComponent<SpawnCom>();
+        }
+
+        //左手コリジョン
+        {
+            std::shared_ptr<GameObject> lefthand = boss->AddChildObject();
+            lefthand->SetName("lefthandcollsion");
+            std::shared_ptr<SphereColliderCom> lefthandcollider = lefthand->AddComponent<SphereColliderCom>();
+            lefthandcollider->SetEnabled(false);
+            lefthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
+            lefthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
+            lefthandcollider->SetRadius(1.0f);
+        }
+
+        //右足コリジョン
+        {
+            std::shared_ptr<GameObject> rightlegs = boss->AddChildObject();
+            rightlegs->SetName("rightlegscollsion");
+            std::shared_ptr<SphereColliderCom> rightlegscollider = rightlegs->AddComponent<SphereColliderCom>();
+            rightlegscollider->SetEnabled(false);
+            rightlegscollider->SetMyTag(COLLIDER_TAG::Enemy);
+            rightlegscollider->SetJudgeTag(COLLIDER_TAG::Player);
+            rightlegscollider->SetRadius(1.0f);
+        }
+
+        //手に付ける火のエフェクト
+        {
+            std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
+            cpufireeffect->SetName("cpufireeffect");
+            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fire.cpuparticle", 1000);
+            cpufire->SetActive(false);
+        }
+
+        ////gpuの炎
+        //{
+        //    std::shared_ptr<GameObject>gpufireeffect = boss->AddChildObject();
+        //    gpufireeffect->SetName("gpufireeffect");
+        //    std::shared_ptr<GPUParticle>gpufire = gpufireeffect->AddComponent<GPUParticle>("Data/Effect/fire.gpuparticle", 10000);
+        //    gpufire->SetLoop(false);
+        //}
+
+        //着地時の煙エフェクト
+        {
+            std::shared_ptr<GameObject>landsmokeeffect = boss->AddChildObject();
+            landsmokeeffect->SetName("cpulandsmokeeffect");
+            landsmokeeffect->transform_->SetWorldPosition({ 0,1.7f,0 });
+            std::shared_ptr<CPUParticle>landsmoke = landsmokeeffect->AddComponent<CPUParticle>("Data/Effect/landsmoke.cpuparticle", 1000);
+            landsmoke->SetActive(false);
+        }
+
+        //竜巻のエフェクト
+        {
+            std::shared_ptr<GameObject>cycloneffect = boss->AddChildObject();
+            cycloneffect->SetName("cycloncpueffect");
+            std::shared_ptr<CPUParticle>cpuparticle = cycloneffect->AddComponent<CPUParticle>("Data/Effect/cyclon.cpuparticle", 1000);
+            cpuparticle->SetActive(false);
+        }
+
+        ////gpuの竜巻のエフェクト
+        //{
+        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
+        //    gpucycloneffect->SetName("cyclongpueffect");
+        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
+        //    gpufire->SetLoop(false);
+        //}
+
+        //火球
+        {
+            std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
+            cpufireeffect->SetName("fireball");
+            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fireball.cpuparticle", 1000);
+            cpufire->SetActive(false);
+            cpufireeffect->AddComponent<EasingMoveCom>(nullptr);
+            std::shared_ptr<SphereColliderCom> fireballcollider = cpufireeffect->AddComponent<SphereColliderCom>();
+            fireballcollider->SetEnabled(false);
+            fireballcollider->SetMyTag(COLLIDER_TAG::Enemy);
+            fireballcollider->SetJudgeTag(COLLIDER_TAG::Player);
+            fireballcollider->SetRadius(1.0f);
+        }
+
+        ////gpuの竜巻のエフェクト
+        //{
+        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
+        //    gpucycloneffect->SetName("cyclongpueffect2");
+        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
+        //    gpufire->SetLoop(true);
+        //}
+
+        ////gpuの炎
+        //{
+        //    std::shared_ptr<GameObject>gpufireeffect = boss->AddChildObject();
+        //    gpufireeffect->SetName("gpufireeffect4");
+        //    std::shared_ptr<GPUParticle>gpufire = gpufireeffect->AddComponent<GPUParticle>("Data/Effect/fire.gpuparticle", 10000);
+        //    gpufire->SetLoop(true);
+        //}
+
+        ////gpuの竜巻のエフェクト
+        //{
+        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
+        //    gpucycloneffect->SetName("cyclongpueffect3");
+        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
+        //    gpufire->SetLoop(true);
+        //}
     }
+#endif
 
     //UIゲームオブジェクト生成
     CreateUiObject();
@@ -226,7 +324,7 @@ void SceneGame::Update(float elapsedTime)
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
     //ボスの位置取得
-    //sc->data.bossposiotn = t->GetWorldPosition();
+    //sc->data.bossposiotn = t->GetLocalPosition();
 
     // ゲームオブジェクトの更新
     PhysXLib::Instance().Update(elapsedTime);
@@ -301,6 +399,28 @@ void SceneGame::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
+
+    ImGui::Begin("Effect");
+    EffectNew();
+    ImGui::End();
+}
+
+//エフェクト生成
+void SceneGame::EffectNew()
+{
+    if (ImGui::Button("cpuparticlenew"))
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("testcpueffect");
+        obj->AddComponent<CPUParticle>(nullptr, 1000);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("gpuparticlenew"))
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("testgpueffect");
+        obj->AddComponent<GPUParticle>(nullptr, 10000);
+    }
 }
 
 void SceneGame::SetUserInputs()

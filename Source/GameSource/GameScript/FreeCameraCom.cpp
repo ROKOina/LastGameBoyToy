@@ -73,8 +73,8 @@ void FreeCameraCom::Update(float elapsedTime)
         {
             ImGuiIO& io = ImGui::GetIO();
 
-            //// ImGui上にマウスカーソルがある場合は処理しない
-            //if (io.WantCaptureMouse) return;
+            // ImGui上にマウスカーソルがある場合は処理しない
+            if (io.WantCaptureMouse) return;
 
             // ズーム
             distance -= static_cast<float>(mouse.GetWheel()) * distance * 0.001f;

@@ -26,10 +26,16 @@ public:
     void SetHitPoint(float value) { hitPoint = value; }
     float GetHitPoint() { return hitPoint; }
 
-    //HP‚ÌŒ¸­‚Æ‘‰Á
-    void AddDamagePoint(float value) { hitPoint += value; }
+    // HP‚ÌŒ¸­‚Æ‘‰Á
+    void AddDamagePoint(float value);
     void AddHealPoint(float value) { hitPoint += value; }
+
+    // –³“GŠÔ‚ğİ’è
+    void SetInvincibleTime(float time) { invincibleTime = time; }
+    bool IsInvincible() const { return currentInvincibleTime > 0.0f; }
 
 private:
     int hitPoint = 100;
+    float invincibleTime = 3.0f;        // –³“GŠÔ‚Ì’·‚³i•bj
+    float currentInvincibleTime = 0.0f; // c‚è‚Ì–³“GŠÔ
 };

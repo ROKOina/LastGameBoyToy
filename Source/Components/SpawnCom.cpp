@@ -21,8 +21,15 @@ void SpawnCom::Start()
 // 更新処理
 void SpawnCom::Update(float elapsedTime)
 {
-    // 時間更新
-    lastSpawnTime += elapsedTime;
+    if (spwntrigger)
+    {
+        // 時間更新
+        lastSpawnTime += elapsedTime;
+    }
+    else
+    {
+        lastSpawnTime = 0.0f;
+    }
 
     // 生成間隔を超えた場合にオブジェクトを生成
     if (lastSpawnTime >= spawnInterval)
@@ -42,9 +49,11 @@ void SpawnCom::Update(float elapsedTime)
 void SpawnCom::OnGUI()
 {
     ImGui::Text("Spawn Settings");
-    ImGui::SliderFloat("Spawn Interval", &spawnInterval, 1.0f, 10.0f);
-    ImGui::SliderFloat("Spawn Radius", &spawnRadius, 1.0f, 10.0f);
-    ImGui::SliderInt("Spawn Count", &spawnCount, 1, 100);
+    ImGui::SliderFloat("SpawnInterval", &spawnInterval, 1.0f, 10.0f);
+    ImGui::SliderFloat("lastSpawnTime", &lastSpawnTime, 1.0f, 10.0f);
+    ImGui::SliderFloat("SpawnRadius", &spawnRadius, 1.0f, 10.0f);
+    ImGui::SliderInt("SpawnCount", &spawnCount, 1, 100);
+    ImGui::Checkbox("spwntrigger", &spwntrigger);
 }
 
 //ゲームオブジェクトを複製する処理
@@ -74,7 +83,7 @@ void SpawnCom::SpawnGameObject()
     // 新しい位置を設定（高さは元の位置のY座標を維持）
     DirectX::XMFLOAT3 newPosition = {
         originalPosition.x + offsetX,
-        originalPosition.y + 0.2f,  // 高さを維持
+        originalPosition.y + 0.4f,  // 高さを維持
         originalPosition.z + offsetZ
     };
     obj->transform_->SetWorldPosition(newPosition);
