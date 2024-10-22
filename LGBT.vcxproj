@@ -212,6 +212,7 @@
     <ClInclude Include="Source\GameSource\Scene\SceneResult\SceneResult.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneTraining\SceneTraining.h" />
+    <ClInclude Include="Source\GameSource\Scene\SceneUI\SceneUI.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Encoding.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
@@ -346,6 +347,7 @@
     <ClCompile Include="Source\GameSource\Scene\SceneResult\SceneResult.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneTraining\SceneTraining.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\SceneUI\SceneUI.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Encoding.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />

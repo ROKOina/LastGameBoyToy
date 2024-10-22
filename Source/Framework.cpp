@@ -8,7 +8,7 @@
 #include "GameSource\Scene\SceneGame.h"
 #include "GameSource\Scene\SceneDebugGame.h"
 #include "GameSource\Scene\SceneManager.h"
-#include "GameSource\Scene\SceneIKTest.h"
+#include "GameSource\Scene\SceneUI\SceneUI.h"
 
 #include "GameSource\Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
@@ -35,6 +35,7 @@ Framework::Framework(HWND hWnd)
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
     //SceneManager::Instance().ChangeScene(new SceneTitle);
+    // SceneManager::Instance().ChangeScene(new SceneUI);
 
     // オーディオ初期化
     Audio::Initialize();
