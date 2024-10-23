@@ -196,6 +196,7 @@
     <ClInclude Include="Source\GameSource\GameScript\EventCameraManager.h" />
     <ClInclude Include="Source\GameSource\GameScript\FPSCameraCom.h" />
     <ClInclude Include="Source\GameSource\GameScript\FreeCameraCom.h" />
+    <ClInclude Include="Source\GameSource\Math\AnimationCalculation.h" />
     <ClInclude Include="Source\GameSource\Math\easing.h" />
     <ClInclude Include="Source\Components\System\Component.h" />
     <ClInclude Include="Source\Components\System\GameObject.h" />
@@ -332,6 +333,7 @@
     <ClCompile Include="Source\GameSource\GameScript\EventCameraManager.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FPSCameraCom.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\FreeCameraCom.cpp" />
+    <ClCompile Include="Source\GameSource\Math\AnimationCalculation.cpp" />
     <ClCompile Include="Source\GameSource\Math\easing.cpp" />
     <ClCompile Include="Source\Components\System\GameObject.cpp" />
     <ClCompile Include="Source\Components\TransformCom.cpp" />

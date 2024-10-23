@@ -4,6 +4,7 @@
 #include "../GameSource/Math/Mathf.h"
 #include "Character/CharacterCom.h"
 #include "Components/AimIKCom.h"
+#include "GameSource/Math/AnimationCalculation.h"
 #include <imgui.h>
 #include <cassert>
 
@@ -342,12 +343,12 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                 if (blendRate < 1.0f)
                 {
                     //アニメーション切り替え時の計算
-                    ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
+                    AnimationCalculation::Instance().ComputeSwitchAnimation(key1, blendRate, model->GetNodes()[nodeIndex]);
                 }
                 else
                 {
                     //アニメーション計算
-                    ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
+                    AnimationCalculation::Instance().ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                 }
 
                 //AimIKの更新
@@ -456,7 +457,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                     if (upperIsPlayAnimation)
                     {
                         //現在の姿勢と次のキーフレームとの姿勢の補完
-                        ComputeSwitchAnimation(key1, blendRate, *upperNodes[upperNodeIndex]);
+                        AnimationCalculation::Instance().ComputeSwitchAnimation(key1, blendRate, *upperNodes[upperNodeIndex]);
                     }
                 }
                 //通常の計算
@@ -464,7 +465,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                 {
                     if (upperIsPlayAnimation)
                     {
-                        ComputeAnimation(key0, key1, rate, *upperNodes[upperNodeIndex]);
+                        AnimationCalculation::Instance().ComputeAnimation(key0, key1, rate, *upperNodes[upperNodeIndex]);
                     }
                 }
 
@@ -573,7 +574,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         if (lowerIsPlayAnimation)
                         {
                             //現在の姿勢と次のキーフレームとの姿勢の補完
-                            ComputeSwitchAnimation(key1, blendRate, *lowerNodes[lowerNodeIndex]);
+                            AnimationCalculation::Instance().ComputeSwitchAnimation(key1, blendRate, *lowerNodes[lowerNodeIndex]);
                         }
                     }
                     //通常の計算
@@ -581,7 +582,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                     {
                         if (lowerIsPlayAnimation)
                         {
-                            ComputeAnimation(key0, key1, rate, *lowerNodes[lowerNodeIndex]);
+                           AnimationCalculation::Instance().ComputeAnimation(key0, key1, rate, *lowerNodes[lowerNodeIndex]);
                         }
                     }
                 }
@@ -595,7 +596,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         if (lowerIsPlayAnimation)
                         {
                             //現在の姿勢と次のキーフレームとの姿勢の補完
-                            ComputeSwitchAnimation(key1, blendRate, *lowerNodes[lowerNodeIndex]);
+                            AnimationCalculation::Instance().ComputeSwitchAnimation(key1, blendRate, *lowerNodes[lowerNodeIndex]);
                         }
                     }
                     //通常の計算
@@ -603,10 +604,11 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                     {
                         if (lowerIsPlayAnimation)
                         {
-                            ComputeAnimation(key0, key1, lowerRate, *lowerNodes[lowerNodeIndex]);
+                            AnimationCalculation::Instance().ComputeAnimation(key0, key1, lowerRate, *lowerNodes[lowerNodeIndex]);
                         }
                     }
                 }
+                //歩きモーション用
                 else if (lowerBlendType == 2)
                 {
                     float walkBlendRate = 0.0f;
@@ -621,21 +623,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         const ModelResource::NodeKeyData& key0 = walkRight.nodeKeys.at(nodeIndex);
                         const ModelResource::NodeKeyData& key1 = walkFront.nodeKeys.at(nodeIndex);
 
-                        if (blendRate < 1.0f)
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                //前回のアニメーションとのブレンド
-                                ComputeWalkIdleAnimation(key0, key1, blendRate, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
-                        else
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                ComputeAnimation(key0, key1, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
                     else if (stickAngle >= 90.0f && stickAngle < 180.0f)
                     {
@@ -644,21 +632,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
 
                         walkBlendRate = (stickAngle - 90.0f) / 90.0f;
 
-                        if (blendRate < 1.0f)
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                //前回のアニメーションとのブレンド
-                                ComputeWalkIdleAnimation(key0, key1, blendRate, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
-                        else
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                ComputeAnimation(key0, key1, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
                     else if (stickAngle >= 180.0f && stickAngle < 270.0f)
                     {
@@ -667,21 +641,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
 
                         walkBlendRate = (stickAngle - 180.0f) / 90.0f;
 
-                        if (blendRate < 1.0f)
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                //前回のアニメーションとのブレンド
-                                ComputeWalkIdleAnimation(key0, key1, blendRate, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
-                        else
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                ComputeAnimation(key0, key1, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
                     else if (stickAngle >= 270.0f && stickAngle < 360.0f)
                     {
@@ -690,21 +650,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
 
                         walkBlendRate = (stickAngle - 270.0f) / 90.0f;
 
-                        if (blendRate < 1.0f)
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                //前回のアニメーションとのブレンド
-                                ComputeWalkIdleAnimation(key0, key1, blendRate, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
-                        else
-                        {
-                            if (lowerIsPlayAnimation)
-                            {
-                                ComputeAnimation(key0, key1, walkBlendRate, *lowerNodes[lowerNodeIndex]);
-                            }
-                        }
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
                 }
                 lowerNodeIndex++;
@@ -897,67 +843,25 @@ bool AnimationCom::IsEventCallingNodePos(std::string eventName, std::string node
     return false;
 }
 
-//アニメーション計算
-void AnimationCom::ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node& node)
+
+//下半身別アニメーション計算
+void AnimationCom::ComputeLowerAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, float blendRate, float walkBlend, int index)
 {
-    DirectX::XMVECTOR S0 = DirectX::XMLoadFloat3(&key0.scale);
-    DirectX::XMVECTOR S1 = DirectX::XMLoadFloat3(&key1.scale);
-    DirectX::XMVECTOR R0 = DirectX::XMLoadFloat4(&key0.rotate);
-    DirectX::XMVECTOR R1 = DirectX::XMLoadFloat4(&key1.rotate);
-    DirectX::XMVECTOR T0 = DirectX::XMLoadFloat3(&key0.translate);
-    DirectX::XMVECTOR T1 = DirectX::XMLoadFloat3(&key1.translate);
-
-    DirectX::XMVECTOR S = DirectX::XMVectorLerp(S0, S1, rate);
-    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(R0, R1, rate);
-    DirectX::XMVECTOR T = DirectX::XMVectorLerp(T0, T1, rate);
-
-    DirectX::XMStoreFloat3(&node.scale, S);
-    DirectX::XMStoreFloat4(&node.rotate, R);
-    DirectX::XMStoreFloat3(&node.translate, T);
-}
-
-//アニメーション切り替え時の計算
-void AnimationCom::ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node)
-{
-    DirectX::XMVECTOR S1 = DirectX::XMLoadFloat3(&key1.scale);
-    DirectX::XMVECTOR R1 = DirectX::XMLoadFloat4(&key1.rotate);
-    DirectX::XMVECTOR T1 = DirectX::XMLoadFloat3(&key1.translate);
-    DirectX::XMVECTOR MS1 = DirectX::XMLoadFloat3(&node.scale);
-    DirectX::XMVECTOR MR1 = DirectX::XMLoadFloat4(&node.rotate);
-    DirectX::XMVECTOR MT1 = DirectX::XMLoadFloat3(&node.translate);
-
-    DirectX::XMVECTOR S = DirectX::XMVectorLerp(MS1, S1, blendRate);
-    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(MR1, R1, blendRate);
-    DirectX::XMVECTOR T = DirectX::XMVectorLerp(MT1, T1, blendRate);
-
-    DirectX::XMStoreFloat3(&node.scale, S);
-    DirectX::XMStoreFloat4(&node.rotate, R);
-    DirectX::XMStoreFloat3(&node.translate, T);
-}
-
-void AnimationCom::ComputeWalkIdleAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, float blendRate, float walkRate, Model::Node& node)
-{
-    DirectX::XMVECTOR S0 = DirectX::XMLoadFloat3(&key0.scale);
-    DirectX::XMVECTOR S1 = DirectX::XMLoadFloat3(&key1.scale);
-    DirectX::XMVECTOR R0 = DirectX::XMLoadFloat4(&key0.rotate);
-    DirectX::XMVECTOR R1 = DirectX::XMLoadFloat4(&key1.rotate);
-    DirectX::XMVECTOR T0 = DirectX::XMLoadFloat3(&key0.translate);
-    DirectX::XMVECTOR T1 = DirectX::XMLoadFloat3(&key1.translate);
-    DirectX::XMVECTOR NS = DirectX::XMLoadFloat3(&node.scale);
-    DirectX::XMVECTOR NR = DirectX::XMLoadFloat4(&node.rotate);
-    DirectX::XMVECTOR NT = DirectX::XMLoadFloat3(&node.translate);
-
-    DirectX::XMVECTOR S = DirectX::XMVectorLerp(S0, S1, walkRate);
-    DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(R0, R1, walkRate);
-    DirectX::XMVECTOR T = DirectX::XMVectorLerp(T0, T1, walkRate);
-
-    S = DirectX::XMVectorLerp(NS, S, blendRate);
-    R = DirectX::XMQuaternionSlerp(NR, R, blendRate);
-    T = DirectX::XMVectorLerp(NT, T, blendRate);
-
-    DirectX::XMStoreFloat3(&node.scale, S);
-    DirectX::XMStoreFloat4(&node.rotate, R);
-    DirectX::XMStoreFloat3(&node.translate, T);
+    if (blendRate < 1.0f)
+    {
+        if (lowerIsPlayAnimation)
+        {
+            //前回のアニメーションとのブレンド
+            AnimationCalculation::Instance().ComputeWalkIdleAnimation(key0, key1, blendRate, walkBlend, *lowerNodes[index]);
+        }
+    }
+    else
+    {
+        if (lowerIsPlayAnimation)
+        {
+            AnimationCalculation::Instance().ComputeAnimation(key0, key1, walkBlend, *lowerNodes[index]);
+        }
+    }
 }
 
 //子供をすべて保存
@@ -998,19 +902,6 @@ void AnimationCom::SeparateNode()
     }
 }
 
-//ルートモーションの値を取るノードを検索
-void AnimationCom::SetupRootMotion(const char* rootMotionNodeIndex)
-{
-    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
-    this->rootMotionNodeIndex = model->FindNodeIndex(rootMotionNodeIndex);
-}
-
-//ルートモーションの腰を取るノードを検索
-void AnimationCom::SetupRootMotionHip(const char* rootMotionNodeName)
-{
-    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
-    this->rootMotionHipNodeIndex = model->FindNodeIndex(rootMotionNodeName);
-}
 
 //ルートモーションの移動値を計算
 void AnimationCom::ComputeRootMotion()
@@ -1042,33 +933,3 @@ void AnimationCom::ComputeRootMotion()
     rootMotionFlag = false;
 }
 
-//ルートモーション更新
-void AnimationCom::updateRootMotion(DirectX::XMFLOAT3& translation)
-{
-    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
-
-    if (rootMotionNodeIndex < 0)
-    {
-        return;
-    }
-
-    DirectX::XMMATRIX transform;
-
-    DirectX::XMVECTOR tranlation = DirectX::XMLoadFloat3(&rootMotionTranslation);
-
-    if (rootMotionNodeIndex == 0)
-    {
-        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].worldTransform);
-    }
-    else
-    {
-        transform = DirectX::XMLoadFloat4x4(&model->GetNodes()[rootMotionNodeIndex].worldTransform);
-
-        DirectX::XMVECTOR position = DirectX::XMVector3TransformCoord(tranlation, transform);
-        DirectX::XMStoreFloat3(&translation, position);
-
-        GetGameObject()->transform_->SetWorldPosition(translation);
-
-        rootMotionTranslation = { 0,0,0 };
-    }
-}
