@@ -52,6 +52,9 @@ private:
 
     //UIのゲームオブジェクト生成
     void CreateUiObject();
+
+    //PVEゲームからリザルトに遷移
+    void TransitionPVEFromResult();
 private:
     std::unique_ptr<NetwarkPost> n;
     std::unique_ptr<BasicsApplication> photonNet;

@@ -1,4 +1,5 @@
 #include "../Source/GameSource/Scene/SceneResult/SceneResult.h"
+#include "../Source/GameSource/Scene/SceneTitle/SceneTitle.h"
 
 #include "Graphics/Light/LightManager.h"
 #include "Input\Input.h"
@@ -22,6 +23,8 @@
 #include "Components\RayCollisionCom.h"
 
 #include "GameSource/GameScript/FreeCameraCom.h"
+
+#include "Graphics/Sprite/Sprite.h"
 
 void SceneResult::Initialize()
 {
@@ -63,6 +66,19 @@ void SceneResult::Initialize()
         obj->AddComponent<RayCollisionCom>("Data/IKTestStage/ExampleStage.collision");
     }
 
+    //キャンバス
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("Canvas");
+
+        {
+            auto& modoru = obj->AddChildObject();
+            modoru->SetName("modoru");
+            modoru->AddComponent<Sprite>("Data/resultScene/UI/modoru.ui", true);
+        }
+    }
+
+
     //平行光源を追加
     mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
@@ -81,10 +97,10 @@ void SceneResult::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
+    UIUpdate(elapsedTime);
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-
 }
 
 void SceneResult::Render(float elapsedTime)
@@ -109,4 +125,24 @@ void SceneResult::Render(float elapsedTime)
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
 
 
+}
+
+void SceneResult::UIUpdate(float elapsedTime)
+{
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+    if (!canvas)return;
+
+    //戻る
+    {
+        auto& modoru = canvas->GetChildFind("modoru");
+        auto& sprite = modoru->GetComponent<Sprite>();
+        if (sprite->GetHitSprite())
+        {
+            GamePad& gamePad = Input::Instance().GetGamePad();
+            if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+            {
+                SceneManager::Instance().ChangeScene(new SceneTitle);
+            }
+        }
+    }
 }

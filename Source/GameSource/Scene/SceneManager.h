@@ -31,6 +31,8 @@ public:
 
     //シーン切り替え
     void ChangeScene(Scene* scene);
+    //シーン切り替え(遅延)
+    void ChangeSceneDelay(Scene* scene,float time);
 
     //imgui
     void ImGui();
@@ -56,6 +58,8 @@ public:
     bool GetParticleUpdate() { return isParticleUpdate_; }
     void SetParticleUpdate(bool particleUpdate) { isParticleUpdate_ = particleUpdate; }
 
+    bool GetTransitionFlag() { return transitionFlag; }
+
 private:
     Scene* currentScene_ = nullptr;
     Scene* nextScene_ = nullptr;
@@ -68,4 +72,13 @@ private:
     std::weak_ptr<GameObject> activeCamera;
     int cameraActiveCount = 0;
     bool isChangeCamera = false;
+
+    //遷移処理用
+    bool transitionAllRemoveFlag = false;   //遷移時にオブジェクトを消す時にtrueになる
+
+    //遷移遅延用変数
+    bool transitionFlag = false;
+    float transitionTime = 0;
+    float transitionTimer = 0;
+    Scene* transitionScene_ = nullptr;
 };

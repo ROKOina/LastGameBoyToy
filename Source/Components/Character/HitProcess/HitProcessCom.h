@@ -38,6 +38,10 @@ public:
     void SetValue3(DirectX::XMFLOAT3 value3) { this->value3 = value3; }
 
     bool IsHit() { return isHit; }
+    bool IsHitNonChara(std::shared_ptr<GameObject>& hitObj) { 
+        hitObj=nonCharaObj.lock();
+        return isHitNonChara; 
+    }
 
 private:
     void HitProcess(int myID, int hitID);
@@ -59,4 +63,8 @@ private:
 
     //当たっているか
     bool isHit = false;
+
+    //キャラがない敵に当たった
+    bool isHitNonChara = false;
+    std::weak_ptr<GameObject> nonCharaObj;  //オブジェクトを保存
 };

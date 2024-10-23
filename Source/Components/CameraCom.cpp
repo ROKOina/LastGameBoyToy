@@ -147,11 +147,6 @@ void CameraCom::SetPerspectiveFov(float fovY, float aspect, float nearZ, float f
     scope_ = DirectX::XMFLOAT2(nearZ, farZ);
 }
 
-void CameraCom::SetActiveInitialize()
-{
-    isActiveCamera = true;
-}
-
 void CameraCom::ActiveCameraChange()
 {
     isNextCamera = true;

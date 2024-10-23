@@ -68,8 +68,6 @@ public:
     //この関数でカメラをアクティブにする
     void ActiveCameraChange();
 
-    //アクティブカメラ最初のセット
-    void SetActiveInitialize();
     bool GetIsActive() { return isActiveCamera; }
 
     //Ui配置用のbool取得

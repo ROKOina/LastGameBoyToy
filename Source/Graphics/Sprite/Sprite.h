@@ -97,6 +97,9 @@ public:
     };
     SaveConstantsParameter constants;
 
+    //カーソルがスプライトに当たっているか
+    bool GetHitSprite() { return hit; }
+
 private:
 
     //頂点構造体

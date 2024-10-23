@@ -55,6 +55,8 @@
 
 #include "Audio/AudioSource.h"
 
+#include "GameSource\Scene\SceneResult\SceneResult.h"
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -115,7 +117,7 @@ void SceneGame::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -326,10 +328,14 @@ void SceneGame::Update(float elapsedTime)
     //ボスの位置取得
     //sc->data.bossposiotn = t->GetLocalPosition();
 
+    //遷移関係
+    TransitionPVEFromResult();
+
     // ゲームオブジェクトの更新
     PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
 }
 
 // 描画処理
@@ -566,5 +572,19 @@ void SceneGame::CreateUiObject()
             hpMemori->SetName("SkillGauge");
             hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_02.ui", false);
         }
+    }
+}
+
+void SceneGame::TransitionPVEFromResult()
+{
+    auto& boss = GameObjectManager::Instance().Find("BOSS");
+    if (!boss)return;
+
+    float hp = boss->GetComponent<CharaStatusCom>()->GetHitPoint();
+
+    if (hp <= 0)
+    {
+        if (!SceneManager::Instance().GetTransitionFlag())
+            SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
     }
 }
