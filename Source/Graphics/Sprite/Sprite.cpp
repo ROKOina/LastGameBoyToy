@@ -314,16 +314,23 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
             }
         }
     }
+  
+    // 座標とピボットの処理
+    float pivotX = (spc.scale.x /texture2ddesc_.Width)  *spc.pivot.x;
+    float pivotY = (spc.scale.y / texture2ddesc_.Height) * spc.pivot.y;
+
+    float posX = spc.position.x - pivotX;
+    float posY = spc.position.y - pivotY;
 
     // スプライトの頂点座標の計算
-    float x0 = spc.position.x - spc.scale.x * 0.5f;
-    float y0 = spc.position.y - spc.scale.y * 0.5f;
-    float x1 = spc.position.x + spc.scale.x * 0.5f;
-    float y1 = spc.position.y - spc.scale.y * 0.5f;
-    float x2 = spc.position.x - spc.scale.x * 0.5f;
-    float y2 = spc.position.y + spc.scale.y * 0.5f;
-    float x3 = spc.position.x + spc.scale.x * 0.5f;
-    float y3 = spc.position.y + spc.scale.y * 0.5f;
+    float x0 = posX - spc.scale.x * 0.5f;
+    float y0 = posY - spc.scale.y * 0.5f;
+    float x1 = posX + spc.scale.x * 0.5f;
+    float y1 = posY - spc.scale.y * 0.5f;
+    float x2 = posX - spc.scale.x * 0.5f;
+    float y2 = posY + spc.scale.y * 0.5f;
+    float x3 = posX + spc.scale.x * 0.5f;
+    float y3 = posY + spc.scale.y * 0.5f;
 
     // スプライトの回転
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)
@@ -744,6 +751,7 @@ void Sprite::OnGUI()
         ImGui::DragFloat2((char*)u8"イージング大きさ", &spc.easingscale.x);
         ImGui::DragFloat((char*)u8"回転", &spc.angle);
         ImGui::DragFloat((char*)u8"イージング回転", &spc.easingangle);
+        ImGui::DragFloat2((char*)u8"中心位置", &spc.pivot.x);
         ImGui::DragFloat((char*)u8"再生速度", &spc.timescale, 0.1f, 0.0f, 5.0f);
         ImGui::TreePop();
     }
