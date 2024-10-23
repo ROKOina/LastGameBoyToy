@@ -33,6 +33,12 @@ bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodenam
     // イベントが呼び出されているか確認
     if (animationCom.lock()->IsEventCallingNodePos(eventname, nodename, nodepos))
     {
+        //ここで一回だけ更新しておく
+        if (gpuparticle != nullptr)
+        {
+            gpuparticle->GetComponent<GPUParticle>()->SetStop(false);
+        }
+
         auto collider = cachedobject->GetComponent<SphereColliderCom>();
         if (collider)
         {
@@ -69,6 +75,11 @@ bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodenam
         }
         return false;
     }
+
+    if (!cachedobject)
+    {
+        cachedobject.reset(); // キャッシュをリセット
+    }
 }
 
 //CPUエフェクトの検索
@@ -92,19 +103,44 @@ void Boss_BaseState::CPUEffect(const char* objectname, bool posflag)
 }
 
 //GPUエフェクトの検索
-void Boss_BaseState::GPUEffect(const char* objectname)
+void Boss_BaseState::GPUEffect(const char* objectname, bool posflag)
 {
     // 初回のみFindしてキャッシュ
     if (!gpuparticle || gpuparticle->GetName() != objectname)
     {
         gpuparticle = GameObjectManager::Instance().Find(objectname);
-        gpuparticle->GetComponent<GPUParticle>()->Play();
-        gpuparticle->transform_->SetWorldPosition(nodepos);
+
+        //この更新中一回しか更新してほしくないのでフラグで制御する
+        if (owner->GetGpuFlag())
+        {
+            gpuparticle->GetComponent<GPUParticle>()->Play();
+        }
+
+        //ノードに付けない時
+        if (posflag)
+        {
+            gpuparticle->transform_->SetWorldPosition(nodepos);
+        }
     }
 
     if (!gpuparticle)
     {
         gpuparticle.reset(); // キャッシュをリセット
+    }
+}
+
+//エフェクト発生関数
+bool Boss_BaseState::EffectSpawn(const char* eventname)
+{
+    if (animationCom.lock()->IsEventCalling(eventname))
+    {
+        owner->SetGpuFlag(true);
+        return true;
+    }
+    else
+    {
+        owner->SetGpuFlag(false);
+        return false;
     }
 }
 
@@ -312,8 +348,13 @@ void Boss_PunchState::Execute(const float& elapsedTime)
     //アニメーションイベント時の当たり判定
     if (AnimNodeCollsion("ATTACK", "mixamorig:LeftHand", "lefthandcollsion"))
     {
-        //GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
+    }
+
+    //エフェクト生成
+    if (EffectSpawn("EFFECT"))
+    {
+        //GPUEffect("cyclongpueffect", false);
     }
 
     //アニメーションが終われば
@@ -340,10 +381,15 @@ void Boss_KickState::Enter()
 void Boss_KickState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("ATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
+    if (AnimNodeCollsion("KICKATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
     {
-        //GPUEffect("gpufireeffect");
         CPUEffect("cpufireeffect", true);
+    }
+
+    //エフェクト再生
+    if (EffectSpawn("EFFECT"))
+    {
+        //GPUEffect("cyclongpueffect", false);
     }
 
     //アニメーションが終われば
@@ -370,10 +416,15 @@ void Boss_RangeAttackState::Enter()
 void Boss_RangeAttackState::Execute(const float& elapsedTime)
 {
     //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("ATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
+    if (AnimNodeCollsion("TATUMAKIATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
     {
-        //GPUEffect("cyclongpueffect");
         CPUEffect("cycloncpueffect", false);
+    }
+
+    //エフェクト再生
+    if (EffectSpawn("EFFECT"))
+    {
+        //GPUEffect("cyclongpueffect", false);
     }
 
     //アニメーションが終われば

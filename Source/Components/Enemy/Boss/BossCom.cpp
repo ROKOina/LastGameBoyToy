@@ -46,6 +46,7 @@ void BossCom::OnGUI()
     {
         ImGui::Text("%d", availableNumbers[i]);
     }
+    ImGui::Checkbox("gpuflag", &gpuflag);
     state.ImGui();
 }
 

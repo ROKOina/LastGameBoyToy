@@ -64,7 +64,7 @@ void AnimationCom::OnGUI()
     {
         index++;
     }
-    
+
     int animationIndex = 0;
     ModelResource::Animation* selectionAnimation = GetSelectionAnimation();
     std::vector<ModelResource::Animation>& animations1 = const_cast<std::vector<ModelResource::Animation>&>(model->GetResource()->GetAnimations());
@@ -104,13 +104,12 @@ void AnimationCom::OnGUI()
             {
                 mySequence.AddTypeName(index, animEve.name);
                 auto& event = mySequence.myItems.emplace_back();
-                event.mFrameStart = animEve.startframe*60;
+                event.mFrameStart = animEve.startframe * 60;
                 event.mFrameEnd = animEve.endframe * 60;
                 event.mType = index;
                 index++;
             }
         }
-
 
         ImGui::TreePop();
         ++animationIndex;
@@ -139,13 +138,10 @@ void AnimationCom::AnimEventWindow()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
 
-
     ImGui::SetNextWindowPos(ImVec2(320, 600), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(630, 100), ImGuiCond_FirstUseEver);
 
     ImGui::Begin("AnimEvent", nullptr, ImGuiWindowFlags_None);
-
-
 
     float animationCurrentSeconds = GetAnimationSeconds();
     int animationCurrentFrame = static_cast<int>(animationCurrentSeconds * 60.0f);
@@ -159,7 +155,7 @@ void AnimationCom::AnimEventWindow()
 
     //イベント追加,削除
     //アドラムダ
-    auto& addIDRam= [](int iD)
+    auto& addIDRam = [](int iD)
         {
             int index = 0;
             while (1)
@@ -234,7 +230,6 @@ void AnimationCom::AnimEventWindow()
         ImGui::DragInt("EndFrame", &nowItem.mFrameEnd);
         ImGui::SameLine();
 
-
         //名前
         char name[256];
         ::strcpy_s(name, sizeof(name), mySequence.GetItemLabel(selectedEntry));
@@ -254,9 +249,8 @@ void AnimationCom::AnimEventWindow()
     if (moveFrame)
     {
         PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
-        SetAnimationSeconds(animationCurrentFrame/60.0f);
+        SetAnimationSeconds(animationCurrentFrame / 60.0f);
         StopOneTimeAnimation();
-
     }
     if (delID >= 0)
     {
@@ -266,11 +260,10 @@ void AnimationCom::AnimEventWindow()
     {
         addIDRam(addID);
     }
-    
+
     if (selectedEntry != -1)
     {
         const MySequence::MySequenceItem& item = mySequence.myItems[selectedEntry];
-
     }
 
     //セーブ
@@ -897,6 +890,25 @@ bool AnimationCom::IsEventCallingNodePos(std::string eventName, std::string node
     return false;
 }
 
+//最初のアニメーションイベントを取得
+bool AnimationCom::IsStartEventCalling(std::string eventname)
+{
+    if (currentAnimation < 0)return false;
+    //モデルからリソースを取得
+    Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
+
+    auto& anim = model->GetResource()->GetAnimations()[currentAnimation];
+
+    for (auto& ev : anim.animationevents)
+    {
+        if (ev.name != eventname)continue;
+
+        if (ev.startframe >= currentSeconds)
+            return true;
+    }
+    return false;
+}
+
 //アニメーション計算
 void AnimationCom::ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node& node)
 {
@@ -978,7 +990,7 @@ void AnimationCom::SeparateNode()
     for (auto& node : model->GetNodes())
     {
         if (std::string(node.name).find("Hip") != std::string::npos)
-        //if (std::strcmp(node.name, "Hip") == 0)
+            //if (std::strcmp(node.name, "Hip") == 0)
         {
             lowerNodes.emplace_back(&node);
             continue;

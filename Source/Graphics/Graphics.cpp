@@ -782,6 +782,7 @@ DirectX::XMFLOAT3 Graphics::WorldToScreenPos(DirectX::XMFLOAT3 worldPos, std::sh
 //サンプラーステートの設定
 void Graphics::SetSamplerState()
 {
+    //ピクセルシェーダのサンプラーステート設定
     immediateContext_->PSSetSamplers(0, 1, samplerStates[SAMPLEMODE::WRAP_POINT].GetAddressOf());
     immediateContext_->PSSetSamplers(1, 1, samplerStates[SAMPLEMODE::WRAP_LINEAR].GetAddressOf());
     immediateContext_->PSSetSamplers(2, 1, samplerStates[SAMPLEMODE::WRAP_ANISOTROPIC].GetAddressOf());
@@ -792,4 +793,16 @@ void Graphics::SetSamplerState()
     immediateContext_->PSSetSamplers(7, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_LINEAR].GetAddressOf());
     immediateContext_->PSSetSamplers(8, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_ANISOTROPIC].GetAddressOf());
     immediateContext_->PSSetSamplers(9, 1, samplerStates[SAMPLEMODE::SHADOW].GetAddressOf());
+
+    //ジオメトリシェーダのサンプラーステート設定
+    immediateContext_->GSSetSamplers(0, 1, samplerStates[SAMPLEMODE::WRAP_POINT].GetAddressOf());
+    immediateContext_->GSSetSamplers(1, 1, samplerStates[SAMPLEMODE::WRAP_LINEAR].GetAddressOf());
+    immediateContext_->GSSetSamplers(2, 1, samplerStates[SAMPLEMODE::WRAP_ANISOTROPIC].GetAddressOf());
+    immediateContext_->GSSetSamplers(3, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_POINT].GetAddressOf());
+    immediateContext_->GSSetSamplers(4, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_LINEAR].GetAddressOf());
+    immediateContext_->GSSetSamplers(5, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_ANISOTROPIC].GetAddressOf());
+    immediateContext_->GSSetSamplers(6, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_POINT].GetAddressOf());
+    immediateContext_->GSSetSamplers(7, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_LINEAR].GetAddressOf());
+    immediateContext_->GSSetSamplers(8, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_ANISOTROPIC].GetAddressOf());
+    immediateContext_->GSSetSamplers(9, 1, samplerStates[SAMPLEMODE::SHADOW].GetAddressOf());
 }
