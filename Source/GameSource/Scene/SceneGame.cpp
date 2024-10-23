@@ -55,6 +55,12 @@
 
 #include "Audio/AudioSource.h"
 
+SceneGame::~SceneGame()
+{
+    GameObjectManager::Instance().AllRemove();
+    GameObjectManager::Instance().RemoveGameObjects();
+}
+
 // ‰Šú‰»
 void SceneGame::Initialize()
 {
@@ -217,6 +223,8 @@ void SceneGame::Finalize()
 // XVˆ—
 void SceneGame::Update(float elapsedTime)
 {
+    PhysXLib& p1 = PhysXLib::Instance();
+
     if (n)
     {
         n->Update();
@@ -239,6 +247,8 @@ void SceneGame::Update(float elapsedTime)
     PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
+    PhysXLib& p = PhysXLib::Instance();
 }
 
 // •`‰æˆ—

@@ -169,12 +169,12 @@ public:
     //imguiguizmo
     void DrawGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    void RemoveGameObjects();
 private:
     void StartUpObjects();
 
     void CollideGameObjects();
 
-    void RemoveGameObjects();
 
     void DrawLister();
     void DrawDetail();

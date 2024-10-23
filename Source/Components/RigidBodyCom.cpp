@@ -8,6 +8,12 @@ RigidBodyCom::RigidBodyCom(bool isStatic, NodeCollsionCom::CollsionType type)
     this->type = type;
 }
 
+RigidBodyCom::~RigidBodyCom()
+{
+    PhysXLib& p = PhysXLib::Instance();// .GetScene()->removeActor(*rigidActor);
+    rigidActor->release();
+}
+
 void RigidBodyCom::Start()
 {
     //NodeCollisionCom‚ð‚à‚Æ‚ÉColliderì¬
@@ -16,6 +22,7 @@ void RigidBodyCom::Start()
 
 void RigidBodyCom::Update(float elapsedTime)
 {
+    //transform‚ð•¨—‚ÌŒ‹‰Ê‚Éã‘‚«
     physx::PxTransform transform = rigidActor->getGlobalPose();
     GetGameObject()->transform_->SetWorldPosition({transform.p.x,transform.p.y,transform.p.z});
     GetGameObject()->transform_->SetRotation({ transform.q.x,transform.q.y,transform.q.z,transform.q.w });

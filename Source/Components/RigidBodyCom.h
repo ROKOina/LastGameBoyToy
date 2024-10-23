@@ -9,7 +9,7 @@ class RigidBodyCom : public Component
 {
 public:
     RigidBodyCom(bool isStatic, NodeCollsionCom::CollsionType type);
-    ~RigidBodyCom() {}
+    ~RigidBodyCom();
 
     // –¼‘OŽæ“¾
     const char* GetName() const override { return "RigidBody"; }

@@ -42,6 +42,25 @@ void PhysXLib::Initialize()
     //gScene->addActor(*rigid_static);
 }
 
+#define SAFE_RELEASE(p) {if (p) { (p)->release(); (p) = nullptr; }}
+void PhysXLib::Finalize()
+{
+    //終了処理する前にシミュレーションを終わらす必要あり
+//m_scene->simulate(m_simurationUpdateTimeStep);
+    gScene->simulate(0.001f);
+    gScene->fetchResults(true);
+
+    /*
+    終了処理として開放する順番は、PxCloseExtensions()※関数, PxControllerManager, PxScene, PxPhysics, PxPvd, PxDefaultCpuDispatcher, PxPvdTransport, PxFoundation の順
+    */
+
+    PxCloseExtensions();
+    SAFE_RELEASE(gScene);
+    SAFE_RELEASE(gPhysics);
+    SAFE_RELEASE(gDispatcher);
+    SAFE_RELEASE(gFoundation);
+}
+
 void PhysXLib::Update(float elapsedTime)
 {
     // シミュレーション速度を指定する
@@ -57,6 +76,8 @@ bool PhysXLib::RayCast_PhysX(const PxVec3& origin, const PxVec3& unitDir, const 
 
 physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* model)
 {
+    ModelResource::Node rootNode = *model->GetNodes().data();
+
     for (auto& mesh : model->GetMeshes())
     {
         //頂点情報をDirectXからPhysXに置き換え
@@ -72,6 +93,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
             indices.emplace_back(ver);
         }
 
+        //メッシュデータの作成
         physx::PxTriangleMeshDesc meshDesc;
         meshDesc.setToDefault();
         meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
@@ -92,6 +114,8 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
         if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
             assert(0 && "PxCookTriangleMesh failed.");
         }
+        //作成に成功したmeshDescを保存
+        meshStlege[model->GetFileName()] = meshDesc;
 
         PxDefaultMemoryOutputStream writeBuffer;
         PxTriangleMeshCookingResult::Enum result;
@@ -104,12 +128,17 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
         if (isStatic) {
             //動かない(静的)剛体を作成
             rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+            PxTransform& pos = rigidObj->getGlobalPose();
+            pos.p = { 0,0,0 };
+            rigidObj->setGlobalPose(pos);
         }
         else {
             // 動かすことのできる(動的)剛体を作成
             rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
         }
-        physx::PxMeshScale scale(PxVec3(100.0f, 0.01f, 100.0f));
+
+
+        physx::PxMeshScale scale(PxVec3(1.0f, 1.0f, 1.0f));
         PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
 
         PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
@@ -157,9 +186,9 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     case NodeCollsionCom::CollsionType::SPHER:
         shape = gPhysics->createShape(
             // Boxの大きさ
-            physx::PxSphereGeometry(1.f),
+            physx::PxSphereGeometry(0.01f),
             // 摩擦係数と反発係数の設定
-            *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
+            *gPhysics->createMaterial(0.5f, 0.5f, 0.f)
         );
         break;
 
@@ -180,6 +209,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     // 形状を紐づけ
     shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
     rigidObj->attachShape(*shape);
+    shape->release();
 
     //physx::PxTransform transform;
     //transform.p = { obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y,obj->transform_->GetWorldPosition().z };
