@@ -42,6 +42,7 @@ void RigidBodyCom::OnGUI()
     {
         PxRigidDynamic* dynamicActor = rigidActor->is<PxRigidDynamic>();
         dynamicActor->addForce(rigidTransform.p, physx::PxForceMode::eIMPULSE);
+        dynamicActor->release();
     }
 }
 

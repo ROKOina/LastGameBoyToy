@@ -7,27 +7,26 @@ void PhysXLib::Initialize()
     gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
 
     // Physicsオブジェクトの作成
-    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true);
-
+    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), false);
     // シーンの設定
     PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
     sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f); // 重力設定
     gDispatcher = PxDefaultCpuDispatcherCreate(2);  // 2スレッドでディスパッチャーを作成
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-
+    PxInitExtensions(*gPhysics, nullptr);
 
 
     // シーンの作成
     gScene = gPhysics->createScene(sceneDesc);
-    gScene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
-    gScene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+    //gScene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
+    //gScene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
     ////静的オブジェクトの追加
-    //physx::PxRigidStatic* rigid_static
+    //rigid_static
     //    = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
     //// 形状(Box)を作成
-    //physx::PxShape* box_shape
+    //box_shape
     //    = gPhysics->createShape(
     //        // Boxの大きさ
     //        physx::PxBoxGeometry(5.f, 0.5f, 5.f),
@@ -45,6 +44,7 @@ void PhysXLib::Initialize()
 #define SAFE_RELEASE(p) {if (p) { (p)->release(); (p) = nullptr; }}
 void PhysXLib::Finalize()
 {
+
     //終了処理する前にシミュレーションを終わらす必要あり
 //m_scene->simulate(m_simurationUpdateTimeStep);
     gScene->simulate(0.001f);
@@ -56,8 +56,8 @@ void PhysXLib::Finalize()
 
     PxCloseExtensions();
     SAFE_RELEASE(gScene);
-    SAFE_RELEASE(gPhysics);
     SAFE_RELEASE(gDispatcher);
+    SAFE_RELEASE(gPhysics);
     SAFE_RELEASE(gFoundation);
 }
 
@@ -143,7 +143,6 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
 
         PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
         rigidObj->attachShape(*shape);
-        shape->release();
 
         // 剛体を空間に追加
         gScene->addActor(*rigidObj);

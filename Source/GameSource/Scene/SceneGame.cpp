@@ -98,8 +98,8 @@ void SceneGame::Initialize()
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
-        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-        rigid->GenerateCollider(r->GetModel()->GetResource());
+        //RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+        //rigid->GenerateCollider(r->GetModel()->GetResource());
     }
 
     //当たり判定用
@@ -119,8 +119,8 @@ void SceneGame::Initialize()
         //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
         roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER).get();
-        rigid->GenerateCollider(NodeCollsionCom::CollsionType::SPHER);
+        //RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER).get();
+        //rigid->GenerateCollider(NodeCollsionCom::CollsionType::SPHER);
     }
 
     //プレイヤー
@@ -223,8 +223,6 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-    PhysXLib& p1 = PhysXLib::Instance();
-
     if (n)
     {
         n->Update();
@@ -247,8 +245,6 @@ void SceneGame::Update(float elapsedTime)
     PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-    PhysXLib& p = PhysXLib::Instance();
 }
 
 // 描画処理

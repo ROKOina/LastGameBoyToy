@@ -27,7 +27,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
     //ƒƒ‚ƒŠƒŠ[ƒNŒŸõ
     //_CrtSetBreakAlloc(257);
     //_CrtSetBreakAlloc(258);
-    _CrtSetBreakAlloc(259);
+    //_CrtSetBreakAlloc(264);
     //_CrtSetBreakAlloc(260);
 #endif
 

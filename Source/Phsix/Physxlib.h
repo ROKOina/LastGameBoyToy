@@ -12,8 +12,10 @@ class PhysXLib
 {
 private:
     PhysXLib() {};
-    ~PhysXLib() { PhysXLib::Instance().Finalize(); };
+    ~PhysXLib() { Finalize(); };
 
+private:
+    void Finalize();
 public:
     // インスタンス取得
     static PhysXLib& Instance()
@@ -26,7 +28,6 @@ public:
     void Initialize();
 
     //終了化
-    void Finalize();
 
     //更新処理
     void Update(float elapsedTime);
