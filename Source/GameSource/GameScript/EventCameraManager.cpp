@@ -167,146 +167,150 @@ void EventCameraManager::EventCameraImGui()
     ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin("EventCameraManager", nullptr, ImGuiWindowFlags_None);
-
-    //シリアライズ
+    if (ImGui::Begin("EventCameraManager", nullptr, ImGuiWindowFlags_None))
     {
-        if (ImGui::Button("Save"))
+
+        //シリアライズ
         {
-            Serialize();
+            if (ImGui::Button("Save"))
+            {
+                Serialize();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Load"))
+            {
+                LoadDesirialize();
+                cameraObj = GameObjectManager::Instance().Find(saveEventCameraBuff.cameraName.c_str());
+                focusObj = GameObjectManager::Instance().Find(saveEventCameraBuff.focusObjName.c_str());
+            }
         }
+
+        ImGui::Separator();
+
+        //再生
+        if (ImGui::Button("Play"))
+            PlayEventCamera("debugSaisei");
         ImGui::SameLine();
-        if (ImGui::Button("Load"))
+        ImGui::Checkbox("isPlay", &isEventPlay);
+        ImGui::SameLine();
+        if (ImGui::DragFloat("timer", &timer, 0.01f, 0))
         {
-            LoadDesirialize();
-            cameraObj = GameObjectManager::Instance().Find(saveEventCameraBuff.cameraName.c_str());
-            focusObj = GameObjectManager::Instance().Find(saveEventCameraBuff.focusObjName.c_str());
+            PlayCameraLerp();
         }
-    }
 
-    ImGui::Separator();
+        ImGui::Separator();
 
-    //再生
-    if (ImGui::Button("Play"))
-        PlayEventCamera("debugSaisei");
-    ImGui::SameLine();
-    ImGui::Checkbox("isPlay", &isEventPlay);
-    ImGui::SameLine();
-    if (ImGui::DragFloat("timer", &timer, 0.01f, 0))
-    {
-        PlayCameraLerp();
-    }
-
-    ImGui::Separator();
-
-    //カメラの名前保存
-    {
-        char name[256];
-        ::strcpy_s(name, sizeof(name), saveEventCameraBuff.cameraName.c_str());
-        if (ImGui::InputText("cameraName", name, ImGuiInputTextFlags_EnterReturnsTrue))
+        //カメラの名前保存
         {
-            saveEventCameraBuff.cameraName = name;
-            //カメラオブジェ保存
-            cameraObj = GameObjectManager::Instance().Find(saveEventCameraBuff.cameraName.c_str());
-        }
-        //存在しているか確認
-        if (cameraObj.lock())
-            if (cameraObj.lock()->GetComponent<CameraCom>())
+            char name[256];
+            ::strcpy_s(name, sizeof(name), saveEventCameraBuff.cameraName.c_str());
+            if (ImGui::InputText("cameraName", name, ImGuiInputTextFlags_EnterReturnsTrue))
+            {
+                saveEventCameraBuff.cameraName = name;
+                //カメラオブジェ保存
+                cameraObj = GameObjectManager::Instance().Find(saveEventCameraBuff.cameraName.c_str());
+            }
+            //存在しているか確認
+            if (cameraObj.lock())
+                if (cameraObj.lock()->GetComponent<CameraCom>())
+                    ImGui::TextColored(ImVec4(0.0f, 0.6f, 1.0f, 1.0f), "FindObj");
+                else
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "NullCameraCom");
+            else
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "NullObj");
+
+            //注視オブジェの名前
+            ::strcpy_s(name, sizeof(name), saveEventCameraBuff.focusObjName.c_str());
+            if (ImGui::InputText("focusObjName", name, ImGuiInputTextFlags_EnterReturnsTrue))
+            {
+                saveEventCameraBuff.focusObjName = name;
+                //注視オブジェ保存
+                focusObj = GameObjectManager::Instance().Find(saveEventCameraBuff.focusObjName.c_str());
+            }
+            //存在しているか確認
+            if (focusObj.lock())
                 ImGui::TextColored(ImVec4(0.0f, 0.6f, 1.0f, 1.0f), "FindObj");
             else
-                ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "NullCameraCom");
-        else
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "NullObj");
-
-        //注視オブジェの名前
-        ::strcpy_s(name, sizeof(name), saveEventCameraBuff.focusObjName.c_str());
-        if (ImGui::InputText("focusObjName", name, ImGuiInputTextFlags_EnterReturnsTrue))
-        {
-            saveEventCameraBuff.focusObjName = name;
-            //注視オブジェ保存
-            focusObj = GameObjectManager::Instance().Find(saveEventCameraBuff.focusObjName.c_str());
-        }
-        //存在しているか確認
-        if (focusObj.lock())
-            ImGui::TextColored(ImVec4(0.0f, 0.6f, 1.0f, 1.0f), "FindObj");
-        else
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "NullObj");
-    }
-
-    ImGui::Separator();
-
-    //フレーム保存
-    {
-        auto& ecVec = saveEventCameraBuff.ECTra;
-
-        //追加
-        if (ImGui::Button("Add"))
-        {
-            auto& ec = ecVec.emplace_back();
-
-            if (ecVec.size() > 1)
-            {
-                const auto oneEc = ecVec[ecVec.size() - 2];  //一つ前のフレーム取得
-                ec.frame = oneEc.frame + 0.1f;
-            }
-            else
-            {
-                ec.frame = 0.0f;
-            }
-
-            ec.pos = FocusFromCameraPos();
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "NullObj");
         }
 
-        //ポス移動
-        int index = 0;
-        int deleteID = -1;
-        for (auto& ec : ecVec)
+        ImGui::Separator();
+
+        //フレーム保存
         {
-            //フレーム移動
-            ImGui::SetNextItemWidth(60);
-            if (ImGui::DragFloat(("frame" + std::to_string(index)).c_str(), &ec.frame, 0.1f, 0))
+            auto& ecVec = saveEventCameraBuff.ECTra;
+
+            //追加
+            if (ImGui::Button("Add"))
             {
-                if (index == 0)
-                    ec.frame = 0;
+                auto& ec = ecVec.emplace_back();
+
+                if (ecVec.size() > 1)
+                {
+                    const auto oneEc = ecVec[ecVec.size() - 2];  //一つ前のフレーム取得
+                    ec.frame = oneEc.frame + 0.1f;
+                }
                 else
                 {
-                    //フレームが並ぶように
-                    int oneID = index - 1;
-                    if (oneID >= 0)
-                    {
-                        if (ecVec[oneID].frame >= ec.frame)
-                            ec.frame = ecVec[oneID].frame + 0.1f;
-                    }
-                    int nextID = index + 1;
-                    if (nextID < ecVec.size())
-                    {
-                        if (ecVec[nextID].frame <= ec.frame)
-                            ec.frame = ecVec[nextID].frame - 0.1f;
-                    }
+                    ec.frame = 0.0f;
                 }
+
+                ec.pos = FocusFromCameraPos();
             }
 
-            ImGui::SameLine();
+            //ポス移動
+            int index = 0;
+            int deleteID = -1;
+            for (auto& ec : ecVec)
+            {
+                //フレーム移動
+                ImGui::SetNextItemWidth(60);
+                if (ImGui::DragFloat(("frame" + std::to_string(index)).c_str(), &ec.frame, 0.1f, 0))
+                {
+                    if (index == 0)
+                        ec.frame = 0;
+                    else
+                    {
+                        //フレームが並ぶように
+                        int oneID = index - 1;
+                        if (oneID >= 0)
+                        {
+                            if (ecVec[oneID].frame >= ec.frame)
+                                ec.frame = ecVec[oneID].frame + 0.1f;
+                        }
+                        int nextID = index + 1;
+                        if (nextID < ecVec.size())
+                        {
+                            if (ecVec[nextID].frame <= ec.frame)
+                                ec.frame = ecVec[nextID].frame - 0.1f;
+                        }
+                    }
+                }
 
-            //ポジション
-            ImGui::SetNextItemWidth(60 * 3);
-            ImGui::DragFloat3(("pos" + std::to_string(index)).c_str(), &ec.pos.x, 0.1f);
+                ImGui::SameLine();
 
-            ImGui::SameLine();
+                //ポジション
+                ImGui::SetNextItemWidth(60 * 3);
+                ImGui::DragFloat3(("pos" + std::to_string(index)).c_str(), &ec.pos.x, 0.1f);
 
-            //デリート
-            if (ImGui::Button(("delete" + std::to_string(index)).c_str()))
-                deleteID = index;
+                ImGui::SameLine();
 
-            index++;
-        }
+                //デリート
+                if (ImGui::Button(("delete" + std::to_string(index)).c_str()))
+                    deleteID = index;
 
-        if (deleteID >= 0)
-        {
-            ecVec.erase(ecVec.begin() + deleteID);
+                //位置表示
+                Graphics::Instance().GetDebugRenderer()->DrawSphere(ec.pos, 0.5f, { 0,0,1,1 });
+
+                index++;
+            }
+
+            if (deleteID >= 0)
+            {
+                ecVec.erase(ecVec.begin() + deleteID);
+            }
         }
     }
-
     ImGui::End();
 }
 
