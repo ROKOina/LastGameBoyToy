@@ -42,8 +42,6 @@ public:
     Scene* GetNextScene() { return nextScene_; }
 
     //カメラ
-    void AddCameraActiveCount() { cameraActiveCount++; }
-    const bool& GetCameraChange() const { return isChangeCamera; }
     void SetActiveCamera(std::shared_ptr<GameObject> camera) { activeCamera = camera; }
     std::shared_ptr<GameObject> GetActiveCamera() { return activeCamera.lock(); }
 
@@ -70,8 +68,6 @@ private:
 
     //カメラアクティブ制御
     std::weak_ptr<GameObject> activeCamera;
-    int cameraActiveCount = 0;
-    bool isChangeCamera = false;
 
     //遷移処理用
     bool transitionAllRemoveFlag = false;   //遷移時にオブジェクトを消す時にtrueになる

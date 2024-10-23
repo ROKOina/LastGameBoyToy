@@ -50,14 +50,6 @@ void SceneManager::Update(float elapsedTime)
     if (currentScene_ != nullptr)
     {
         currentScene_->Update(elapsedTime);
-
-        //カメラチェンジ処理用
-        isChangeCamera = false;
-        if (cameraActiveCount >= 2)
-        {
-            isChangeCamera = true;
-        }
-        cameraActiveCount = 0;
     }
 
     //遅延遷移

@@ -84,8 +84,7 @@ void CameraCom::OnGUI()
     ImGui::Checkbox("isUiCreate", &isUiCreate);
     if (ImGui::Button("Active"))
     {
-        if (!isActiveCamera)
-            isNextCamera = true;
+        ActiveCameraChange();
     }
 
 }
@@ -149,26 +148,19 @@ void CameraCom::SetPerspectiveFov(float fovY, float aspect, float nearZ, float f
 
 void CameraCom::ActiveCameraChange()
 {
-    isNextCamera = true;
+    SceneManager::Instance().SetActiveCamera(GetGameObject());
 }
 
 //アクティブカメラ変更処理
 void CameraCom::ChangeActiveProcess()
 {
-    //変更処理
-    if (SceneManager::Instance().GetCameraChange() &&
-        (isActiveCamera || isNextCamera))
+    isActiveCamera = false;
+
+    auto& activeCamera = SceneManager::Instance().GetActiveCamera();
+    if (!activeCamera)return;
+
+    if (activeCamera->GetName() == GetGameObject()->GetName())
     {
-        isActiveCamera = false;
-        if (isNextCamera)
-        {
-            isActiveCamera = true;
-            isNextCamera = false;
-        }
+        isActiveCamera = true;
     }
-
-    if (isActiveCamera)
-        SceneManager::Instance().SetActiveCamera(GetGameObject());
-
-    if (isActiveCamera || isNextCamera)SceneManager::Instance().AddCameraActiveCount();
 }

@@ -85,7 +85,6 @@ protected:
 
     //現在使うカメラ（カメラ複数あれば、一つしかONにならない）
     bool isActiveCamera = false;
-    bool isNextCamera = false;
 
     //カメラ継承したら使いたいのでここで書く
     DirectX::XMFLOAT3 focus_ = { 0,0,0 };
