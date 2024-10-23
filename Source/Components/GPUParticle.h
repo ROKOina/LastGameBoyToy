@@ -85,6 +85,7 @@ public:
 
     //アクティブ化
     void SetLoop(const bool& loop) { m_GSC.isLoopFlg = loop; }
+    void SetStop(const bool& stop) { stopFlg = stop; }
 
     //保存するコンスタントバッファ
     struct GPUparticleSaveConstants
@@ -108,10 +109,10 @@ public:
         DirectX::XMFLOAT3 colorScale = { 1,1,1 }; // 色を更に明るくするなどで使用
 
         DirectX::XMFLOAT3 emitVec = { 0,0,0 };
-        float padding3 = 0;
+        float spiralSpeed = 0;
 
         DirectX::XMFLOAT3 orbitalVelocity = { 0,0,0 };
-        float padding4 = 0;
+        float spiralstrong = 0;
 
         float veloRandScale = 0.0f;
         float speed = 0.0f;
@@ -132,6 +133,9 @@ public:
         float buoyancy = {};
         float emitStartGravity = 0.0f;
         float emitEndGravity = 0.0f;
+
+        float strechscale = { 1.0f };    //ストレッチビルボードの強度(伸びる時の大きさ)
+        DirectX::XMFLOAT3 padding = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);

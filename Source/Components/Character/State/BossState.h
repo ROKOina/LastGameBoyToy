@@ -21,7 +21,10 @@ public:
     void CPUEffect(const char* objectname, bool posflag);
 
     //GPUエフェクトの検索と消去
-    void GPUEffect(const char* objectname);
+    void GPUEffect(const char* objectname, bool posflag);
+
+    //エフェクト発生関数
+    bool EffectSpawn(const char* eventname);
 
     //乱数で選択された行動を選択する関数
     void RandamBehavior(int one, int two);
