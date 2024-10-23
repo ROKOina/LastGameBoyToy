@@ -29,6 +29,16 @@ void SceneTitle::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
 
+    //tes
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("tes");
+        obj->transform_->SetScale({ 0.1f,0.1f,0.1f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/pico/pico.mdl");
+        //r->LoadModel("Data/tes/tesJammo/tesJ.mdl");
+    }
+
     //ƒtƒŠ[ƒJƒƒ‰
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
