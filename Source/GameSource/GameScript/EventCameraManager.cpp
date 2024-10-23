@@ -300,7 +300,11 @@ void EventCameraManager::EventCameraImGui()
                     deleteID = index;
 
                 //ˆÊ’u•\Ž¦
-                Graphics::Instance().GetDebugRenderer()->DrawSphere(FocusFromWorldPos(ec.pos), 0.5f, { 0,0,1,1 });
+                if (index == 0 || index == ecVec.size() - 1)
+                    Graphics::Instance().GetDebugRenderer()->DrawSphere(FocusFromWorldPos(ec.pos), 0.5f, { 0,1,1,1 });
+                else
+                    Graphics::Instance().GetDebugRenderer()->DrawSphere(FocusFromWorldPos(ec.pos), 0.5f, { 0,0,1,1 });
+
 
                 index++;
             }
