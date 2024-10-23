@@ -36,6 +36,7 @@ void GameObject::Update(float elapsedTime)
         if (!component->GetEnabled())continue;
         component->Update(elapsedTime);
     }
+
 }
 
 void GameObject::OnDestroy()

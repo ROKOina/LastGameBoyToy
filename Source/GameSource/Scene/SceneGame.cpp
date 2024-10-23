@@ -132,6 +132,7 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
+
     //BOSS
 #if(1)
     {
@@ -213,13 +214,13 @@ void SceneGame::Initialize()
             cpuparticle->SetActive(false);
         }
 
-        ////gpuの竜巻のエフェクト
-        //{
-        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
-        //    gpucycloneffect->SetName("cyclongpueffect");
-        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
-        //    gpufire->SetLoop(false);
-        //}
+        //gpuの竜巻のエフェクト
+        {
+            //std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
+            //gpucycloneffect->SetName("cyclongpueffect");
+            //std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
+            //gpufire->SetStop(true);
+        }
 
         //火球
         {
@@ -234,30 +235,6 @@ void SceneGame::Initialize()
             fireballcollider->SetJudgeTag(COLLIDER_TAG::Player);
             fireballcollider->SetRadius(1.0f);
         }
-
-        ////gpuの竜巻のエフェクト
-        //{
-        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
-        //    gpucycloneffect->SetName("cyclongpueffect2");
-        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
-        //    gpufire->SetLoop(true);
-        //}
-
-        ////gpuの炎
-        //{
-        //    std::shared_ptr<GameObject>gpufireeffect = boss->AddChildObject();
-        //    gpufireeffect->SetName("gpufireeffect4");
-        //    std::shared_ptr<GPUParticle>gpufire = gpufireeffect->AddComponent<GPUParticle>("Data/Effect/fire.gpuparticle", 10000);
-        //    gpufire->SetLoop(true);
-        //}
-
-        ////gpuの竜巻のエフェクト
-        //{
-        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
-        //    gpucycloneffect->SetName("cyclongpueffect3");
-        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
-        //    gpufire->SetLoop(true);
-        //}
     }
 #endif
 

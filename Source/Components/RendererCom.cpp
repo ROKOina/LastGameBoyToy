@@ -73,6 +73,65 @@ void RendererCom::Update(float elapsedTime)
             variousConstant->Update(elapsedTime);
         }
     }
+
+    BoundsMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+    BoundsMin = { FLT_MAX, FLT_MAX, FLT_MAX };
+
+    for (const ModelResource::Mesh& mesh : GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetMeshesEdit())
+    {
+        // メッシュのローカル座標系での境界
+        DirectX::XMFLOAT3 localBoundsMin = mesh.boundsMin;
+        DirectX::XMFLOAT3 localBoundsMax = mesh.boundsMax;
+
+        // メッシュのワールド行列（仮にworldMatrixというメンバ変数があると仮定）
+        DirectX::XMMATRIX worldMatrix = DirectX::XMLoadFloat4x4(&GetGameObject()->GetComponent<TransformCom>()->GetWorldTransform());
+
+        // boundsMin と boundsMax をワールド座標に変換
+        DirectX::XMVECTOR minVec = DirectX::XMVector3Transform(XMLoadFloat3(&localBoundsMin), worldMatrix);
+        DirectX::XMVECTOR maxVec = DirectX::XMVector3Transform(XMLoadFloat3(&localBoundsMax), worldMatrix);
+
+        // ワールド座標に変換された結果をXMFLOAT3に保存
+        DirectX::XMFLOAT3 worldBoundsMin, worldBoundsMax;
+        DirectX::XMStoreFloat3(&worldBoundsMin, minVec);
+        DirectX::XMStoreFloat3(&worldBoundsMax, maxVec);
+
+        
+        // シーン全体の最小座標と最大座標を更新
+        BoundsMin.x = (std::min)(BoundsMin.x, worldBoundsMin.x);
+        BoundsMin.y = (std::min)(BoundsMin.y, worldBoundsMin.y);
+        BoundsMin.z = (std::min)(BoundsMin.z, worldBoundsMin.z);
+
+        BoundsMax.x = (std::max)(BoundsMax.x, worldBoundsMax.x);
+        BoundsMax.y = (std::max)(BoundsMax.y, worldBoundsMax.y);
+        BoundsMax.z = (std::max)(BoundsMax.z, worldBoundsMax.z);
+
+        //if (std::string(GetGameObject()->GetName()) == "player")
+        //{
+        //   // mesh.offsetTransforms
+        //    //auto& boneDate = m_modelshader->GetObjConstansts()->data;
+        //    auto s = GetGameObject()->transform_->GetScale();
+        //    DirectX::XMFLOAT3 a = (mesh.boundsMax - mesh.boundsMin) * s;
+        //    DirectX::XMFLOAT3 b = { 0,0,0 };
+        //    b = (a / 2) + mesh.boundsMin * s;
+        //    Graphics::Instance().GetDebugRenderer()->DrawBox(b+GetGameObject()->transform_->GetWorldPosition(), a, {1.0f,1.0f,0.0f,1.0f});
+        //}
+    }
+
+
+    DirectX::XMFLOAT3 boundsMax= BoundsMax;
+    DirectX::XMFLOAT3 boundsMin= BoundsMin;
+    DirectX::XMFLOAT3 bounds;
+
+    bounds.x = (boundsMax.x - boundsMin.x)/2.0f;  // GetGameObject()->transform_->GetScale().x;
+    bounds.y = (boundsMax.y - boundsMin.y)/2.0f;                           //GetGameObject()->transform_->GetScale().y;
+    bounds.z = (boundsMax.z - boundsMin.z)/2.0f;                           //GetGameObject()->transform_->GetScale().z;
+
+    DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
+   
+    pos.y = BoundsMax.y / 2.0f;
+   
+
+    //Graphics::Instance().GetDebugRenderer()->DrawBox(pos, bounds, {1.0f,1.0f,0.0f,1.0f}, GetGameObject()->transform_->GetRotation());
 }
 
 //影描画

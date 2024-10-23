@@ -34,21 +34,29 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float3 orbY = cross(normVec, float3(0, 0, 1));
         float3 orbVelo = orbZ * orbitalVelocity.z + orbX * orbitalVelocity.x + orbY * orbitalVelocity.y;
 
+         // ランダム成分の強化
+        float3 randomVel = float3(
+            ((random(p.position.x * time + id) * 2) - 1) * veloRandScale * random(lerprate * 2.0f),
+            ((random(p.position.y * time + id) * 2) - 1) * veloRandScale * random(lerprate * 3.0f),
+            ((random(p.position.z * time + id) * 2) - 1) * veloRandScale * random(lerprate * 2.5f)
+        );
+
         //中心方向に動く
         float3 radialVec = -normVec * radial;
 
-        //ランダム成分を計算
-        float3 randomVel = float3(
-            ((random(p.position.x * time + id) * 2) - 1) * veloRandScale,
-            ((random(p.position.y * time + id) * 2) - 1) * veloRandScale,
-            ((random(p.position.z * time + id) * 2) - 1) * veloRandScale
-        );
+        // スパイラル運動の追加
+        float3 spiralVec = float3(
+            sin(time * spiralSpeed + id),
+            cos(time * spiralSpeed + id),
+            sin(time * spiralSpeed + id)
+        ) * spiralstrong; // スパイラルの強さ
 
         //トータルの速力
-        float3 totalVelocity = currentEmitVec * speed + randomVel + orbVelo + radialVec;
+        float3 totalVelocity = currentEmitVec * speed + randomVel + orbVelo + radialVec + spiralVec;
 
         //重力適量
         p.position.y -= lerp(emitStartGravity, emitEndGravity, lerprate) * deltatime;
+
         //浮力
         p.position.y += buoyancy * deltatime;
 
@@ -64,7 +72,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
          //寿命時間から割合を計算
         float lerprate = 1 - (p.lifetime / lifeTime);
 
-        //ランダム生成
+        // ランダム生成
         const float noiseScale = 1.0;
         float f0 = rand(float2((id + time) * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
         float f1 = rand(float2(f0 * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
@@ -79,10 +87,10 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         p.position = position.xyz;
 
         //大きさをラープで制御
-        p.scale = scale * lerp(emitStartSize, emitEndSize, lerprate);
+        p.scale = scale * lerp(emitStartSize, emitEndSize, lerprate) * random(f0);
 
         //色をラープで制御
-        p.color = baseColor * lerp(emitStartColor, emitEndColor, lerprate);
+        p.color = baseColor * lerp(emitStartColor, emitEndColor, lerprate) * random(f2);
 
         //半径のボリューム
         float tick = shape.z * 0.9f; //オフセット値　0.9f
@@ -109,6 +117,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
     {
         // 生存フラグをオフ
         p.isalive = 0;
+        p.scale = 0;
     }
 
     particlebuffer[id] = p;

@@ -95,12 +95,8 @@ public:
     int GetCurrentUpperAnimationIndex()const { return currentUpperAnimation; }
     int GetCurrentLowerAnimationIndex()const { return currentLowerAnimation; }
 
-    //ルートモーションの値を取るノードを検索
-    void SetupRootMotion(const char* rootMotionNodeName);
-    //ルートモーションの腰を取るノードを検索
-    void SetupRootMotionHip(const char* rootMotionNodeName);
-    //ルートモーション更新
-    void updateRootMotion(DirectX::XMFLOAT3& translation);
+   
+   
     //アニメーション更新切り替え
     void SetUpAnimationUpdate(int updateId);
 
@@ -108,16 +104,13 @@ public:
     bool IsEventCalling(std::string eventName);
     //イベント中に指定されたノードのワールド位置を送る
     bool IsEventCallingNodePos(std::string eventName, std::string nodeName, DirectX::XMFLOAT3& pos);
+    //最初のアニメーションイベントを取得
+    bool IsStartEventCalling(std::string eventname);
 
 private:
 
-    //アニメーション計算
-    void ComputeAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, const float rate, Model::Node& node);
-    //アニメーション切り替え時の計算
-    void ComputeSwitchAnimation(const ModelResource::NodeKeyData& key1, const float blendRate, Model::Node& node);
-    //前回のアニメーションとのブレンド歩き専用
-    void ComputeWalkIdleAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, float blendRate, float walkRate, Model::Node& node);
-
+    //下半身別アニメーション計算
+    void ComputeLowerAnimation(const ModelResource::NodeKeyData& key0, const ModelResource::NodeKeyData& key1, float blendRate,float walkBlend,int index);
     //上半身と下半身のノードを分ける
     void SeparateNode();
 
@@ -233,6 +226,12 @@ private:
     std::vector<Model::Node*> upperNodes;
     //下半身アニメーション
     std::vector<Model::Node*> lowerNodes;
+
+
+
+
+    //////分離/////////////
+
 
     //アニメーションイベント関連
     void AnimEventWindow();

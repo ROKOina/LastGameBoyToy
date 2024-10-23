@@ -2,6 +2,8 @@
 #include "Components/TransformCom.h"
 #include"../../Character/CharacterCom.h"
 #include"../../Character/CharaStatusCom.h"
+#include "Graphics/Graphics.h"
+#include "Components/RendererCom.h"
 
 //コンストラクタ
 NoobEnemyCom::NoobEnemyCom()
@@ -29,6 +31,8 @@ void NoobEnemyCom::Start()
 void NoobEnemyCom::Update(float elapsedTime)
 {
     StateUpdate(elapsedTime);
+
+   
 }
 
 //エネミーからプレイヤーへのベクトル

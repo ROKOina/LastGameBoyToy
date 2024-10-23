@@ -2,6 +2,7 @@
 #include "TransformCom.h"
 #include <cmath>
 
+
 // ŠJnˆ—
 void TransformCom::Start()
 {

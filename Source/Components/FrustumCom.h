@@ -5,6 +5,8 @@
 #include "Components/System/Component.h"
 #include"Components/CameraCom.h"
 
+#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
+
 class FrustumCom :public Component
 {
 public:

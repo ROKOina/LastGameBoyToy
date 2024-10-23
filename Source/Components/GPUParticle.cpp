@@ -94,7 +94,9 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
         CEREAL_NVP(colorScale),
 
         CEREAL_NVP(emitVec),
+        CEREAL_NVP(spiralSpeed),
         CEREAL_NVP(orbitalVelocity),
+        CEREAL_NVP(spiralstrong),
         CEREAL_NVP(veloRandScale),
         CEREAL_NVP(speed),
         CEREAL_NVP(emitStartSpeed),
@@ -110,7 +112,10 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
         CEREAL_NVP(radial),
         CEREAL_NVP(buoyancy),
         CEREAL_NVP(emitStartGravity),
-        CEREAL_NVP(emitEndGravity)
+        CEREAL_NVP(emitEndGravity),
+
+        CEREAL_NVP(strechscale),
+        CEREAL_NVP(padding)
     );
 }
 
@@ -192,14 +197,12 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
     //ファイル読み込み処理
+    D3D11_TEXTURE2D_DESC texture2d_desc{};
     if (filename)
     {
         Desirialize(filename);
-        D3D11_TEXTURE2D_DESC texture2d_desc{};
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
     }
-
-    //fileVelocity = m_GSC.velocity;
 }
 
 //更新処理
@@ -217,7 +220,8 @@ void GPUParticle::Update(float elapsedTime)
     if (stopFlg == true)return;
 
     // 単発再生
-    if (m_GSC.isLoopFlg == false) {
+    if (m_GSC.isLoopFlg == false)
+    {
         emitTimer += elapsedTime;
 
         if (emitTimer > m_GSC.emitTime) {
@@ -378,6 +382,7 @@ void GPUParticle::SystemGUI()
     ImGui::Checkbox(J(u8"停止"), &stopFlg);
     ImGui::SameLine();
     ImGui::Checkbox(J(u8"ストレッチビルボードON"), reinterpret_cast<bool*>(&m_GSC.stretchFlag));
+    ImGui::DragFloat(J(u8"ストレッチビルボードの伸ばす係数"), &m_GSC.strechscale, 0.1f, 1.0f, 100.0f);
 
     //デバッグ用にブレンドモード設定
     constexpr const char* BlendName[] =
@@ -522,7 +527,12 @@ void GPUParticle::EmitGUI()
         ImGui::SetNextItemWidth(90);
         ImGui::SameLine();
         ImGui::SetNextItemWidth(90);
-        ImGui::DragFloat(J(u8"弾け飛ぶ係数"), &m_GSC.radial, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat(J(u8"弾け飛ぶ係数"), &m_GSC.radial, 0.1f, -10.0f, 10.0f);
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"スパイラル速度"), &m_GSC.spiralSpeed, 0.1f, 0.0f, 20.0f);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(90);
+        ImGui::DragFloat(J(u8"スパイラル強度"), &m_GSC.spiralstrong, 0.1f, 0.0f, 20.0f);
 
         ImGui::TreePop();
     }
@@ -628,6 +638,7 @@ void GPUParticle::ParameterReset()
     m_GSC.colorScale = { 1,1,1 };
 
     m_GSC.emitVec = { 0,0,0 };
+    m_GSC.spiralSpeed = { 0 };
     m_GSC.orbitalVelocity = { 0,0,0 };
     m_GSC.veloRandScale = 0.0f;
     m_GSC.speed = 1.0f;
@@ -644,4 +655,5 @@ void GPUParticle::ParameterReset()
     m_GSC.buoyancy = {};
     m_GSC.emitStartGravity = 0.0f;
     m_GSC.emitEndGravity = 0.0f;
+    m_GSC.strechscale = 1.0f;
 }
