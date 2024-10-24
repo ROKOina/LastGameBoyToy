@@ -68,7 +68,6 @@ SceneGame::~SceneGame()
 void SceneGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
-    PhysXLib::Instance().Initialize();
 
 #pragma region ゲームオブジェクトの設定
 
@@ -98,28 +97,28 @@ void SceneGame::Initialize()
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<StageEditorCom>();
-        //RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-        //rigid->GenerateCollider(r->GetModel()->GetResource());
+        /*      RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+              rigid->GenerateCollider(r->GetModel()->GetResource());*/
     }
 
     //当たり判定用
     std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
-        roboobj->SetName("robo");
-        roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
-        roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/OneCoin/robot.mdl");
-        std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
-        a->PlayAnimation(0, true, false, 0.001f);
+        //roboobj->SetName("robo");
+        //roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
+        //roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        //std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        //r->LoadModel("Data/OneCoin/robot.mdl");
+        //std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
+        //a->PlayAnimation(0, true, false, 0.001f);
 
         //std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
         //sphere->SetRadius(2.0f);
         //sphere->SetMyTag(COLLIDER_TAG::Enemy);
         //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
-        roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);
+  /*      roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
+        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);*/
     }
 
     //プレイヤー
@@ -197,14 +196,6 @@ void SceneGame::Initialize()
             cpufire->SetActive(false);
         }
 
-        ////gpuの炎
-        //{
-        //    std::shared_ptr<GameObject>gpufireeffect = boss->AddChildObject();
-        //    gpufireeffect->SetName("gpufireeffect");
-        //    std::shared_ptr<GPUParticle>gpufire = gpufireeffect->AddComponent<GPUParticle>("Data/Effect/fire.gpuparticle", 10000);
-        //    gpufire->SetLoop(false);
-        //}
-
         //着地時の煙エフェクト
         {
             std::shared_ptr<GameObject>landsmokeeffect = boss->AddChildObject();
@@ -220,14 +211,6 @@ void SceneGame::Initialize()
             cycloneffect->SetName("cycloncpueffect");
             std::shared_ptr<CPUParticle>cpuparticle = cycloneffect->AddComponent<CPUParticle>("Data/Effect/cyclon.cpuparticle", 1000);
             cpuparticle->SetActive(false);
-        }
-
-        //gpuの竜巻のエフェクト
-        {
-            //std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
-            //gpucycloneffect->SetName("cyclongpueffect");
-            //std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
-            //gpufire->SetStop(true);
         }
 
         //火球
@@ -317,7 +300,6 @@ void SceneGame::Update(float elapsedTime)
     TransitionPVEFromResult();
 
     // ゲームオブジェクトの更新
-    PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }

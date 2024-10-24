@@ -48,10 +48,12 @@ void BulletCom::Update(float elapsedTime)
         {
             //ヒットエフェクト生成
             hiteffectobject = GameObjectManager::Instance().Create();
+            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
             hiteffectobject->SetName("HitEffect");
             std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/Effect/hanabi.gpuparticle", 500);
             hiteffct->Play();
-            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+            hiteffct->SetDeleteTime(0.3f);
+            hiteffct->SetDeleteFlag(true);
 
             auto& stats = nonCharaObj->GetComponent<CharaStatusCom>();
             stats->AddDamagePoint(-50);

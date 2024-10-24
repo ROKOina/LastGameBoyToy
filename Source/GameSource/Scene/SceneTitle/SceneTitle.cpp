@@ -83,7 +83,6 @@ void SceneTitle::Initialize()
             next->SetName("next");
             next->AddComponent<Sprite>("Data/titleScene/UI/play.ui", true);
         }
-
     }
 
     //平行光源を追加
@@ -91,12 +90,10 @@ void SceneTitle::Initialize()
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
-
 }
 
 void SceneTitle::Finalize()
 {
-
 }
 
 void SceneTitle::Update(float elapsedTime)
@@ -129,7 +126,6 @@ void SceneTitle::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
 }
 
 void SceneTitle::UIUpdate(float elapsedTime)

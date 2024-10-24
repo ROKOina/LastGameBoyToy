@@ -231,6 +231,12 @@ void GPUParticle::Update(float elapsedTime)
         }
     }
 
+    //自身を消す関数
+    if (m_deleteflag)
+    {
+        DeleteMe(elapsedTime);
+    }
+
     //コンスタントバッファの更新
     m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
@@ -385,7 +391,6 @@ void GPUParticle::SystemGUI()
     ImGui::SameLine();
     ImGui::Checkbox(J(u8"ストレッチビルボードON"), reinterpret_cast<bool*>(&m_GSC.stretchFlag));
     ImGui::DragFloat(J(u8"ストレッチビルボードの伸ばす係数"), &m_GSC.strechscale, 0.1f, 1.0f, 100.0f);
-    ImGui::Checkbox(J(u8"削除フラグ"), &deleteflag);
 
     //デバッグ用にブレンドモード設定
     constexpr const char* BlendName[] =
@@ -547,7 +552,6 @@ void GPUParticle::Play()
 {
     m_gpu->data.isEmitFlg = true;
     emitTimer = 0.0f;
-    deleteflag = true;
 
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
@@ -570,14 +574,12 @@ void GPUParticle::Play()
 }
 
 //自身を消す関数
-void GPUParticle::DeleteMe(float deletetime)
+void GPUParticle::DeleteMe(float elapsedTime)
 {
-    if (deleteflag)
+    time += elapsedTime;
+    if (time > deletetime)
     {
-        if (emitTimer > deletetime)
-        {
-            GameObjectManager::Instance().Remove(GetGameObject());
-        }
+        GameObjectManager::Instance().Remove(GetGameObject());
     }
 }
 

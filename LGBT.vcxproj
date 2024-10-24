@@ -148,7 +148,6 @@
     <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\Components\AimIKCom.h" />
     <ClInclude Include="Source\Components\AnimationCom.h" />
-    <ClInclude Include="Source\Components\Character\BarrierCom.h" />
     <ClInclude Include="Source\Components\Character\BulletCom.h" />
     <ClInclude Include="Source\Components\Character\CharacterCom.h" />
     <ClInclude Include="Source\Components\Character\CharaStatusCom.h" />
@@ -289,7 +288,6 @@
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\Components\AimIKCom.cpp" />
     <ClCompile Include="Source\Components\AnimationCom.cpp" />
-    <ClCompile Include="Source\Components\Character\BarrierCom.cpp" />
     <ClCompile Include="Source\Components\Character\BulletCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Components\Character\CharaStatusCom.cpp" />

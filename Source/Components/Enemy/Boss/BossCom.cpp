@@ -39,7 +39,6 @@ void BossCom::Update(float elapsedTime)
 //imgui
 void BossCom::OnGUI()
 {
-    ImGui::Checkbox("gpuflag", &gpuflag);
     state.ImGui();
 }
 

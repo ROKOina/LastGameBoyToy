@@ -66,13 +66,8 @@ public:
 
     StateMachine<BossCom, BossState>& GetStateMachine() { return state; }
 
-    //gpu‚Ìƒtƒ‰ƒO
-    void SetGpuFlag(const bool& gpuf) { gpuflag = gpuf; }
-    float GetGpuFlag() const { return gpuflag; }
-
 private:
     StateMachine<BossCom, BossState> state;
     DirectX::XMFLOAT3 targetposition = {};
     DirectX::XMFLOAT3 righthandnodepos = {};
-    bool gpuflag = false;
 };

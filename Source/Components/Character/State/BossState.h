@@ -21,12 +21,6 @@ public:
     //CPUエフェクトの検索
     void CPUEffect(const char* objectname, bool posflag);
 
-    //GPUエフェクトの検索と消去
-    void GPUEffect(const char* objectname, bool posflag);
-
-    //エフェクト発生関数
-    bool EffectSpawn(const char* eventname);
-
     //乱数で選択された行動を選択する関数
     void RandamBehavior(int one, int two);
 
@@ -41,15 +35,15 @@ protected:
     std::weak_ptr<CharaStatusCom>characterstatas;
     std::shared_ptr<GameObject>cachedobject;
     std::shared_ptr<GameObject>cpuparticle;
-    std::shared_ptr<GameObject>gpuparticle;
 
 private:
-    // アニメーションイベント時の当たり判定
-    DirectX::XMFLOAT3 nodepos = {};
 
     //乱数
     std::vector<int> availableNumbers = { };
     std::mt19937 gen;
+
+    // アニメーションイベント時の当たり判定
+    DirectX::XMFLOAT3 nodepos = {};
 };
 
 //待機

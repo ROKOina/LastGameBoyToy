@@ -25,7 +25,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 #if defined(DEBUG) | defined(_DEBUG)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     //ÉÅÉÇÉäÉäÅ[ÉNåüçı
-    //_CrtSetBreakAlloc(257);
+    //_CrtSetBreakAlloc(212925);
     //_CrtSetBreakAlloc(258);
     //_CrtSetBreakAlloc(264);
     //_CrtSetBreakAlloc(260);

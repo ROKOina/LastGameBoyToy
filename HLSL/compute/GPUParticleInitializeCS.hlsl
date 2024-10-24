@@ -23,7 +23,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     p.velocity = 0;
     p.isalive = isalive;
     p.lifetime = lifeTime;
-    p.age = emitTime - (random(f2) * emitTime); // ageもlifetimeで初期化
+    p.age = emitTime * (1 - random(f2)); // ageもlifetimeで初期化
 
     // パーティクルをバッファに書き込む
     particlebuffer[id] = p;
