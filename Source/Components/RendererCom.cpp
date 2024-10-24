@@ -121,7 +121,7 @@ void RendererCom::Update(float elapsedTime)
 
     DirectX::XMFLOAT3 boundsMax = BoundsMax;
     DirectX::XMFLOAT3 boundsMin = BoundsMin;
-    DirectX::XMFLOAT3 bounds;
+    
 
     bounds.x = (boundsMax.x - boundsMin.x) / 2.0f;  // GetGameObject()->transform_->GetScale().x;
     bounds.y = (boundsMax.y - boundsMin.y) / 2.0f;                           //GetGameObject()->transform_->GetScale().y;
@@ -132,7 +132,7 @@ void RendererCom::Update(float elapsedTime)
     pos += boundsMin + bounds;
 
 
-    if (std::string(GetGameObject()->GetName()) == "tes")
+    if (std::string(GetGameObject()->GetName()) == "test")
         Graphics::Instance().GetDebugRenderer()->DrawBox(pos, bounds, { 1.0f,0.0f,0.0f,1.0f }, GetGameObject()->transform_->GetRotation());
 }
 

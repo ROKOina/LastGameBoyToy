@@ -56,6 +56,7 @@
 #include "Audio/AudioSource.h"
 
 #include "GameSource\Scene\SceneResult\SceneResult.h"
+#include "Components/FrustumCom.h"
 
 // ‰Šú‰»
 void SceneGame::Initialize()
@@ -131,7 +132,6 @@ void SceneGame::Initialize()
         cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
-
 
     //BOSS
 #if(1)
