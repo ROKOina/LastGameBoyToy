@@ -424,6 +424,9 @@ void GameObjectManager::StartUpObjects()
         std::shared_ptr<RendererCom> rendererComponent = obj->GetComponent<RendererCom>();
         if (rendererComponent)
         {
+            //モデルをスレッド読み込み
+            rendererComponent->JoinThred();
+
             renderSortObject_.emplace_back(rendererComponent);
         }
 
