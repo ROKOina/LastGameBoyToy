@@ -8,6 +8,7 @@
 #include "Components/FrustumCom.h"
 #include "Components/AimIKCom.h"
 #include "Components/NodeCollsionCom.h"
+#include "Components/PushBackCom.h"
 
 // ‰Šú‰»
 SpawnCom::SpawnCom() : currentSpawnedCount(0)
@@ -98,6 +99,10 @@ void SpawnCom::SpawnGameObject()
     obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
     obj->AddComponent<NoobEnemyCom>();
     //obj->AddComponent<FrustumCom>();
+
+    auto& pushBack = obj->AddComponent<PushBackCom>();
+    pushBack->SetRadius(1);
+    pushBack->SetWeight(0.5f);
 
     // Œ»İ‚Ì¶¬”‚ğƒCƒ“ƒNƒŠƒƒ“ƒg
     currentSpawnedCount++;

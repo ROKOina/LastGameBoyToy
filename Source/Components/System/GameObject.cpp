@@ -6,6 +6,7 @@
 #include "../TransformCom.h"
 #include "../CameraCom.h"
 #include "../ColliderCom.h"
+#include "../PushBackCom.h"
 #include "GameSource/Math/Collision.h"
 #include "Graphics/Shaders/3D/ModelShader.h"
 #include "SystemStruct/TransformUtils.h"
@@ -181,6 +182,8 @@ void GameObjectManager::Update(float elapsedTime)
 
     //当たり判定
     CollideGameObjects();
+    //押し出し判定
+    PushBackGameObjects();
 
     //更新
     for (std::shared_ptr<GameObject>& obj : updateGameObject_)
@@ -261,6 +264,13 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
             if (!col.lock()->GetEnabled())continue;
             if (!col.lock()->GetGameObject()->GetEnabled())continue;
             col.lock()->DebugRender();
+        }
+        //押し出し判定用デバッグ描画
+        for (auto& pb : pushBackObject_)
+        {
+            if (!pb.lock()->GetEnabled())continue;
+            if (!pb.lock()->GetGameObject()->GetEnabled())continue;
+            pb.lock()->DebugRender();
         }
 
         // リスター描画
@@ -455,6 +465,14 @@ void GameObjectManager::StartUpObjects()
             colliderObject_.emplace_back(colliderComponent);
         }
 
+        //押し出し判定コンポーネント追加
+        std::shared_ptr<PushBackCom> pushBackComponent = obj->GetComponent<PushBackCom>();
+        if (pushBackComponent)
+        {
+            pushBackObject_.emplace_back(pushBackComponent);
+        }
+
+
         obj->UpdateTransform();
     }
     startGameObject_.clear();
@@ -480,6 +498,26 @@ void GameObjectManager::CollideGameObjects()
         {
             if (!colliderObject_[col2].lock()->GetGameObject()->GetEnabled())continue;
             colliderObject_[col1].lock()->ColliderVSOther(colliderObject_[col2].lock());
+        }
+    }
+}
+
+void GameObjectManager::PushBackGameObjects()
+{
+    // 判定前のクリア
+    for (auto& pb : pushBackObject_)
+    {
+        pb.lock()->ResetHitFlg();
+    }
+
+    // 判定
+    for (int pb1 = 0; pb1 < pushBackObject_.size(); ++pb1)
+    {
+        if (!pushBackObject_[pb1].lock()->GetGameObject()->GetEnabled())continue;
+        for (int pb2 = pb1 + 1; pb2 < pushBackObject_.size(); ++pb2)
+        {
+            if (!pushBackObject_[pb2].lock()->GetGameObject()->GetEnabled())continue;
+            pushBackObject_[pb1].lock()->PushBackUpdate(pushBackObject_[pb2].lock());
         }
     }
 }
@@ -526,6 +564,15 @@ void GameObjectManager::RemoveGameObjects()
         {
             colliderObject_.erase(colliderObject_.begin() + col);
             --col;
+        }
+    }
+      //pushback解放
+    for (int pb = 0; pb < pushBackObject_.size(); ++pb)
+    {
+        if (pushBackObject_[pb].expired())
+        {
+            pushBackObject_.erase(pushBackObject_.begin() + pb);
+            --pb;
         }
     }
     //renderObject解放

@@ -41,6 +41,7 @@
 #include "Components/Enemy/Boss/BossCom.h"
 #include "Components/InstanceRendererCom.h"
 #include "Components\EasingMoveCom.h"
+#include "Components\PushBackCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -151,6 +152,10 @@ void SceneGame::Initialize()
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         boss->AddComponent<CharaStatusCom>();
+
+        auto& pushBack = boss->AddComponent<PushBackCom>();
+        pushBack->SetRadius(3);
+        pushBack->SetWeight(5);
 
         //ƒ{ƒ“ƒvŒN
         {

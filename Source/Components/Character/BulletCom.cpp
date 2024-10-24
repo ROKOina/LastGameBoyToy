@@ -47,7 +47,7 @@ void BulletCom::Update(float elapsedTime)
         else if(GetGameObject()->GetComponent<HitProcessCom>()->IsHitNonChara(nonCharaObj))
         {
             auto& stats = nonCharaObj->GetComponent<CharaStatusCom>();
-            stats->AddDamagePoint(-50);
+            stats->AddDamagePoint(damageValue);
             GameObjectManager::Instance().Remove(this->GetGameObject());
         }
     }
@@ -66,7 +66,7 @@ void BulletCom::EraseBullet(float elapsedTime)
 }
 
 //ダメージ弾生成
-void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
+void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power, int damageValue)
 {
     //弾丸オブジェクトを生成///////
     GameObj obj = GameObjectManager::Instance().Create();
@@ -103,15 +103,16 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(2.0f);
+    bulletCom->SetDamageValue(-damageValue);
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    hit->SetValue(5);
+    hit->SetValue(damageValue);
 }
 
 //スタン弾生成
-void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
+void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power, int stanValue)
 {
     //弾丸オブジェクトを生成///////
     GameObj obj = GameObjectManager::Instance().Create();
@@ -148,11 +149,12 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(2.0f);
+    bulletCom->SetDamageValue(0);
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::STAN);
-    hit->SetValue(5);
+    hit->SetValue(stanValue);
 }
 
 //ノックバック弾生成
@@ -193,6 +195,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(2.0f);
+    bulletCom->SetDamageValue(0);
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(objPoint);
