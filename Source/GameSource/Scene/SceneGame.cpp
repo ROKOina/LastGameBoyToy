@@ -56,6 +56,7 @@
 #include "Audio/AudioSource.h"
 
 #include "GameSource\Scene\SceneResult\SceneResult.h"
+#include "Components/FrustumCom.h"
 
 // ‰Šú‰»
 void SceneGame::Initialize()
