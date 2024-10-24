@@ -87,11 +87,11 @@ private:
 
         UINT points_count;
         UINT point_stride;
-        std::vector<DirectX::XMFLOAT3> points_data;
+        void* points_data;
 
         UINT triangles_count;
         UINT triangles_stride;
-        std::vector<DirectX::XMFLOAT3> triangles_data;
+        void* triangles_data;
     };
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>			sphereVertexBuffer_;

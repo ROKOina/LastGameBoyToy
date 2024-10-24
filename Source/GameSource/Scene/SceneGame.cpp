@@ -98,8 +98,8 @@ void SceneGame::Initialize()
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
-        //RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-        //rigid->GenerateCollider(r->GetModel()->GetResource());
+        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+        rigid->GenerateCollider(r->GetModel()->GetResource());
     }
 
     //当たり判定用
@@ -119,8 +119,8 @@ void SceneGame::Initialize()
         //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
         roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        //RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER).get();
-        //rigid->GenerateCollider(NodeCollsionCom::CollsionType::SPHER);
+        RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER).get();
+        rigid->GenerateCollider(NodeCollsionCom::CollsionType::SPHER);
     }
 
     //プレイヤー

@@ -46,7 +46,6 @@ void PhysXLib::Finalize()
 {
 
     //終了処理する前にシミュレーションを終わらす必要あり
-//m_scene->simulate(m_simurationUpdateTimeStep);
     gScene->simulate(0.001f);
     gScene->fetchResults(true);
 
