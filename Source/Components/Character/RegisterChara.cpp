@@ -62,7 +62,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
-
     //煙のエフェクト
     {
         std::shared_ptr<GameObject> smoke = obj->AddChildObject();

@@ -14,6 +14,29 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
     characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
+
+    // 乱数エンジンのシードを設定
+    std::random_device rd;
+    gen = std::mt19937(rd());
+}
+
+//乱数計算
+int Boss_BaseState::ComputeRandom()
+{
+    //ランダムしたい数を増やす程下記の値が増えていく
+    if (availableNumbers.empty())
+    {
+        availableNumbers = { 1,2,3,4,5,6,7,8 };
+    }
+
+    // 乱数生成エンジンを使ってランダムにインデックスを生成
+    std::uniform_int_distribution<int> dis(0, availableNumbers.size() - 1);
+    int index = dis(gen);
+    int randomValue = availableNumbers[index];
+
+    availableNumbers.erase(availableNumbers.begin() + index);
+
+    return randomValue;
 }
 
 //アニメーション中の当たり判定
@@ -148,7 +171,7 @@ bool Boss_BaseState::EffectSpawn(const char* eventname)
 void Boss_BaseState::RandamBehavior(int one, int two)
 {
     // ランダムで行動を切り替える
-    int randomAction = owner->ComputeRandom();
+    int randomAction = ComputeRandom();
 
     if (randomAction == 1)
     {
@@ -191,9 +214,6 @@ void Boss_IdleState::Enter()
 }
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
-    // ランダムで行動を切り替える
-    int randomAction = owner->ComputeRandom();
-
     //距離判定
     if (owner->Search(5.0f))
     {

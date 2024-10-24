@@ -3,7 +3,6 @@
 #include "Components/System/Component.h"
 #include "Components/Character/State/BossState.h"
 #include "Components/System/StateMachine.h"
-#include <random>
 
 class BossCom :public Component
 {
@@ -31,9 +30,6 @@ public:
 
     // 目標地点へ移動
     void MoveToTarget(float movespeed, float turnspeed);
-
-    //乱数計算
-    int ComputeRandom();
 
     //ジャンプ
     void Jump(float power);
@@ -78,7 +74,5 @@ private:
     StateMachine<BossCom, BossState> state;
     DirectX::XMFLOAT3 targetposition = {};
     DirectX::XMFLOAT3 righthandnodepos = {};
-    std::vector<int> availableNumbers = { };
-    std::mt19937 gen;
     bool gpuflag = false;
 };

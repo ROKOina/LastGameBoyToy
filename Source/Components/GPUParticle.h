@@ -31,6 +31,9 @@ public:
     // エフェクト再生関数
     void Play();
 
+    //自身を消す関数
+    void DeleteMe(float deletetime);
+
 private:
     //シリアライズ
     void Serialize();
@@ -157,6 +160,7 @@ public:
 private:
     float emitTimer = 0.0f;
     bool stopFlg = false;
+    bool deleteflag = false;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_particlebuffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_particlesrv;

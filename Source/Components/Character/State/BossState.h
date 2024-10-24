@@ -5,6 +5,7 @@
 #include "../../AnimationCom.h"
 #include "Components/Character/CharaStatusCom.h"
 #include "Components\CPUParticle.h"
+#include <random>
 
 class BossCom;
 
@@ -29,6 +30,9 @@ public:
     //乱数で選択された行動を選択する関数
     void RandamBehavior(int one, int two);
 
+    //乱数計算
+    int ComputeRandom();
+
 protected:
     std::weak_ptr<BossCom> bossCom;
     std::weak_ptr<MovementCom> moveCom;
@@ -42,6 +46,10 @@ protected:
 private:
     // アニメーションイベント時の当たり判定
     DirectX::XMFLOAT3 nodepos = {};
+
+    //乱数
+    std::vector<int> availableNumbers = { };
+    std::mt19937 gen;
 };
 
 //待機

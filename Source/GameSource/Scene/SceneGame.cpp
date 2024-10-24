@@ -132,7 +132,6 @@ void SceneGame::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
-
     //BOSS
 #if(1)
     {
@@ -312,7 +311,6 @@ void SceneGame::Update(float elapsedTime)
     PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
 }
 
 // •`‰æˆ—

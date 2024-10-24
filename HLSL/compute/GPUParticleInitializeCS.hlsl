@@ -9,15 +9,21 @@ void main(uint3 dtid : SV_DispatchThreadID)
     uint id = dtid.x;
     MainParticle p;
 
+    // ランダム生成
+    const float noiseScale = 1.0;
+    float f0 = rand(float2((id + time) * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
+    float f1 = rand(float2(f0 * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
+    float f2 = rand(float2(f1 * noiseScale, rand(float2((id + time) * noiseScale, (id + time) * noiseScale))));
+
     // 各フィールドを個別に初期化
     p.position = position;
-    p.scale = scale;
-    p.color = baseColor;
+    p.scale = scale * random(f0);
+    p.color = baseColor * random(f2);
     p.rotation = rotation;
     p.velocity = 0;
     p.isalive = isalive;
     p.lifetime = lifeTime;
-    p.age = lifeTime; // ageもlifetimeで初期化
+    p.age = emitTime - (random(f2) * emitTime); // ageもlifetimeで初期化
 
     // パーティクルをバッファに書き込む
     particlebuffer[id] = p;

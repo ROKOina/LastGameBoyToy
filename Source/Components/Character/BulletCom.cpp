@@ -44,8 +44,15 @@ void BulletCom::Update(float elapsedTime)
         {
             GameObjectManager::Instance().Remove(this->GetGameObject());
         }
-        else if(GetGameObject()->GetComponent<HitProcessCom>()->IsHitNonChara(nonCharaObj))
+        else if (GetGameObject()->GetComponent<HitProcessCom>()->IsHitNonChara(nonCharaObj))
         {
+            //ヒットエフェクト生成
+            hiteffectobject = GameObjectManager::Instance().Create();
+            hiteffectobject->SetName("HitEffect");
+            std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/Effect/hanabi.gpuparticle", 500);
+            hiteffct->Play();
+            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+
             auto& stats = nonCharaObj->GetComponent<CharaStatusCom>();
             stats->AddDamagePoint(-50);
             GameObjectManager::Instance().Remove(this->GetGameObject());
