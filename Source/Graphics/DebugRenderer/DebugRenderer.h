@@ -87,11 +87,13 @@ private:
 
         UINT points_count;
         UINT point_stride;
-        void* points_data;
+        void* points_data = nullptr;
 
         UINT triangles_count;
         UINT triangles_stride;
-        void* triangles_data;
+        void* triangles_data = nullptr;
+
+        Microsoft::WRL::ComPtr<ID3D11Buffer> meshVertexBuffer_;
     };
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>			sphereVertexBuffer_;

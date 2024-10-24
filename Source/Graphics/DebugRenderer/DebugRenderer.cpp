@@ -147,41 +147,30 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     cylinders_.clear();
 
     // メッシュ描画
-    for (const Cylinder& cylinder : cylinders_)
+    for (const Mesh& mesh : meshs_)
     {
+        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+        context->IASetVertexBuffers(0, 1, cylinderVertexBuffer_.GetAddressOf(), &stride, &offset);
         // PxRenderBufferからデバッグ描画用データを取得
-        const PxRenderBuffer& rb = scene->getRenderBuffer();
-
-        // 線を描画する
-        for (PxU32 i = 0; i < rb.getNbLines(); i++) {
-            const PxDebugLine& line = rb.getLines()[i];
-            // line.pos0, line.pos1 を使ってDirectXで線を描画
-            // 頂点バッファに送るデータを準備
-            Mesh vertices[2] = {
-            };
-            DirectX::XMFLOAT3 pos0 = { line.pos0.x, line.pos0.y, line.pos0.z };
-            DirectX::XMFLOAT4 color0 = { 1,1,1,1 };
-            DirectX::XMFLOAT3 pos1 = { line.pos1.x, line.pos1.y, line.pos1.z };
-            DirectX::XMFLOAT4 color1 = { 1,1,1,1 };
-
-            // DirectXの頂点バッファにデータをアップロード（マップ/アンマップなど）
-            D3D11_MAPPED_SUBRESOURCE mappedResource;
-            context->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-            memcpy(mappedResource.pData, vertices, sizeof(vertices));
-            deviceContext->Unmap(vertexBuffer, 0);
-
-            // プリミティブトポロジを設定 (線リスト)
-            deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-
-            // 描画実行
-            deviceContext->Draw(2, 0);
-        }
+        const PxRenderBuffer& rb = PhysXLib::Instance().GetScene()->getRenderBuffer();
 
         // トライアングルを描画する（必要に応じて）
         for (PxU32 i = 0; i < rb.getNbTriangles(); i++) {
             const PxDebugTriangle& triangle = rb.getTriangles()[i];
             // triangle.pos0, triangle.pos1, triangle.pos2 を使ってトライアングルを描画
-            drawDebugTriangleDirectX(triangle);
+            
+
+            // 頂点バッファにデータをアップロード
+            D3D11_MAPPED_SUBRESOURCE mappedResource;
+            deviceContext->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+            memcpy(mappedResource.pData, vertices, sizeof(vertices));
+            deviceContext->Unmap(vertexBuffer, 0);
+
+            // プリミティブトポロジを設定 (三角形リスト)
+            deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+            // 描画実行
+            deviceContext->Draw(3, 0);
         }
     }
 }
