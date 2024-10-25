@@ -520,7 +520,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("HideUltGauge");
-            hpMemori->AddComponent<Sprite>("Data/UIData/UltGauge.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //UltGauge
@@ -528,7 +528,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("UltGauge");
-            hpMemori->AddComponent<Sprite>("Data/UIData/UltGauge.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/UltGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //SkillFrame

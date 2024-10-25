@@ -463,15 +463,34 @@ void Sprite::DrawCollsionBox()
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
 
+   //
+   // // スプライトの頂点座標の計算
+   // //左上
+   // float x0 = spc.position.x;
+   // float y0 = spc.position.y;
+   // //右上
+   // float x1 = spc.position.x + spc.texSize.x * spc.scale.x;
+   // float y1 = spc.position.y;
+   // //左下
+   // float x2 = spc.position.x;
+   // float y2 = spc.position.y + spc.texSize.y * spc.scale.y;
+   // //右下
+   // float x3 = spc.position.x + spc.texSize.x * spc.scale.x;
+   // float y3 = spc.position.y + spc.texSize.y * spc.scale.y;
+
     // スプライトの位置とスケールにオフセット値を加算
-    float x0{ spc.position.x + spc.collsionpositionoffset.x - (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f };
-    float y0{ spc.position.y + spc.collsionpositionoffset.y - (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f };
-    float x1{ spc.position.x + spc.collsionpositionoffset.x + (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f };
-    float y1{ spc.position.y + spc.collsionpositionoffset.y - (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f };
-    float x2{ spc.position.x + spc.collsionpositionoffset.x - (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f };
-    float y2{ spc.position.y + spc.collsionpositionoffset.y + (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f };
-    float x3{ spc.position.x + spc.collsionpositionoffset.x + (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f };
-    float y3{ spc.position.y + spc.collsionpositionoffset.y + (spc.scale.y + spc.collsionscaleoffset.y) * 0.5f };
+      //左上
+    float x0 = spc.position.x ;
+    float y0 = spc.position.y ;
+    //
+    float x1 = spc.position.x + spc.texSize.x * (spc.scale.x + spc.collsionscaleoffset.x) + spc.collsionpositionoffset.x;
+    float y1 = spc.position.y;
+    //左下
+    float x2 = spc.position.x ;
+    float y2 = spc.position.y + (spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) + spc.collsionpositionoffset.y;
+    //右下
+    float x3 = spc.position.x + (spc.texSize.x * spc.scale.x + spc.collsionscaleoffset.x) + spc.collsionpositionoffset.x;
+    float y3 = spc.position.y + (spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) +  spc.collsionpositionoffset.y;
 
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)
         {
@@ -906,7 +925,7 @@ bool Sprite::cursorVsCollsionBox()
 
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = { spc.position.x + spc.collsionpositionoffset.x ,spc.position.y + spc.collsionpositionoffset.y };
+    DirectX::XMFLOAT2 pos = { spc.position.x  + (spc.texSize.x/2) + spc.collsionpositionoffset.x,spc.position.y  + (spc.texSize.y / 2) + spc.collsionpositionoffset.y};
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 
@@ -915,7 +934,7 @@ bool Sprite::cursorVsCollsionBox()
     float rightLen = Mathf::Dot(normalRight, curVecPos);
 
     //判定
-    DirectX::XMFLOAT2 scale = { (spc.scale.x + spc.collsionscaleoffset.x) * 0.5f ,(spc.scale.y + spc.collsionscaleoffset.y) * 0.5f };
+    DirectX::XMFLOAT2 scale = { (spc.texSize.x * spc.scale.x + spc.collsionscaleoffset.x),(spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) };
     if (upLen * upLen > scale.y * scale.y)return false;
     if (rightLen * rightLen > scale.x * scale.x)return false;
 
