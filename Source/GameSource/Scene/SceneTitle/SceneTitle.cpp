@@ -74,14 +74,14 @@ void SceneTitle::Initialize()
         {
             auto& title = obj->AddChildObject();
             title->SetName("title");
-            title->AddComponent<Sprite>("Data/titleScene/UI/title.ui", false);
+            title->AddComponent<Sprite>("Data/titleScene/UI/title.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //ƒvƒŒƒC
         {
             auto& next = obj->AddChildObject();
             next->SetName("next");
-            next->AddComponent<Sprite>("Data/titleScene/UI/play.ui", true);
+            next->AddComponent<Sprite>("Data/titleScene/UI/play.ui", Sprite::SpriteShader::DEFALT, true);
         }
     }
 

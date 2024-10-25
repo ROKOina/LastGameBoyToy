@@ -459,28 +459,28 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
             reticle->SetName("reticle");
-            reticle->AddComponent<Sprite>("Data/UIData/Reticle.ui", false);
+            reticle->AddComponent<Sprite>("Data/UIData/Reticle.ui", Sprite::SpriteShader::DEFALT, false);
         }
         //HpFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
             hpFrame->SetName("HpFrame");
-            hpFrame->AddComponent<Sprite>("Data/UIData/HpFrame.ui", false);
+            hpFrame->AddComponent<Sprite>("Data/UIData/HpFrame.ui", Sprite::SpriteShader::DEFALT, false);
         }
         //HpGauge
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
             hpGauge->SetName("HpGauge");
-            hpGauge->AddComponent<Sprite>("Data/UIData/HpGauge.ui", false);
+            hpGauge->AddComponent<Sprite>("Data/UIData/HpGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
         //HpMemori
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("HpMemori");
-            hpMemori->AddComponent<Sprite>("Data/UIData/HpMemori.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/HpMemori.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostFrame
@@ -488,7 +488,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("BoostFrame");
-            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_01.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostFrame2
@@ -496,7 +496,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("BoostFrame2");
-            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_02.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostGauge
@@ -504,7 +504,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("BoostGauge");
-            hpMemori->AddComponent<Sprite>("Data/UIData/BoostGauge.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //UltFrame
@@ -512,7 +512,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("UltFrame");
-            hpMemori->AddComponent<Sprite>("Data/UIData/UltFrame.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //UltGauge
@@ -520,7 +520,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("UltGauge");
-            hpMemori->AddComponent<Sprite>(nullptr, false);
+            hpMemori->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, false);
         }
 
         //SkillFrame
@@ -528,7 +528,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("SkillFrame");
-            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_01.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //SkillGauge
@@ -536,7 +536,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("SkillGauge");
-            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_02.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
         }
     }
 }

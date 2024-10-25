@@ -39,7 +39,6 @@ void SceneUI::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-
     //UI
     {
         //キャンバス
@@ -51,30 +50,29 @@ void SceneUI::Initialize()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
             reticle->SetName("BlueCircle1");
-            reticle->AddComponent<Sprite>(nullptr, false);
+            reticle->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, false);
         }
         //HpFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
             hpFrame->SetName("WhiteCircle1");
-            hpFrame->AddComponent<Sprite>(nullptr, false);
+            hpFrame->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, false);
         }
         //HpGauge
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
             hpGauge->SetName("BlueCircle2");
-            hpGauge->AddComponent<Sprite>(nullptr, false);
+            hpGauge->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, false);
         }
         //HpMemori
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("WhiteCircle12");
-            hpMemori->AddComponent<Sprite>(nullptr, false);
+            hpMemori->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, false);
         }
-
     }
 
     //平行光源を追加
@@ -82,12 +80,10 @@ void SceneUI::Initialize()
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
-
 }
 
 void SceneUI::Finalize()
 {
-
 }
 
 void SceneUI::Update(float elapsedTime)
@@ -96,10 +92,6 @@ void SceneUI::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-
-
-
 }
 
 void SceneUI::Render(float elapsedTime)
@@ -122,5 +114,4 @@ void SceneUI::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
 }

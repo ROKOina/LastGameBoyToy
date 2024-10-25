@@ -11,7 +11,16 @@ class Sprite :public Component
 {
 public:
 
-    Sprite(const char* filename, bool collsion);
+    //シェーダーコードを変更する
+    enum class SpriteShader
+    {
+        DEFALT,
+        DISSOLVE
+    };
+
+public:
+
+    Sprite(const char* filename, SpriteShader spriteshader, bool collsion);
     ~Sprite() {}
 
     //初期設定
