@@ -66,6 +66,7 @@ public:
         DirectX::XMFLOAT2 collsionscaleoffset = { 0.0f,0.0f };
         DirectX::XMFLOAT2 collsionpositionoffset = { 0.0f,0.0f };
         DirectX::XMFLOAT2 pivot = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 texSize{ 0.0f,0.0f };
         float angle = { 0.0f };
         float easingangle = { 0.0f };
         std::string	filename = {};

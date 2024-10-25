@@ -19,7 +19,7 @@
 #include "Components/TransformCom.h"
 #include <Input/Input.h>
 
-CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 1)
+CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 2)
 
 // シリアライズ
 namespace DirectX
@@ -106,6 +106,18 @@ void Sprite::SaveParameterCPU::serialize(Archive& archive, int version)
         CEREAL_NVP(maxscale),
         CEREAL_NVP(minscale)
     );
+    // バージョン1には存在しないフィールドにはデフォルト値を与える
+    if (version == 1) {
+        pivot = { 0.0f,0.0f };  // デフォルト値を設定
+        texSize = { 0.0f,0.0f };  // デフォルト値を設定
+    }
+    if (version >= 2) {
+        archive(
+            CEREAL_NVP(pivot),
+            CEREAL_NVP(texSize)
+        );
+    }
+
 }
 
 // コンストラクタ
@@ -181,8 +193,11 @@ Sprite::Sprite(const char* filename, bool collsion)
     }
 
     //Dissolveデータ読み込み
-    LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
+    //LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
+    //LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
+
+    spc.texSize.x = texture2ddesc_.Width;
+    spc.texSize.y = texture2ddesc_.Height;
 
     //コリジョンを使うか決める
     ontriiger = collsion;
@@ -316,21 +331,24 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     }
   
     // 座標とピボットの処理
-    float pivotX = (spc.scale.x /texture2ddesc_.Width)  *spc.pivot.x;
-    float pivotY = (spc.scale.y / texture2ddesc_.Height) * spc.pivot.y;
+    float pivotX = (texture2ddesc_.Width /spc.texSize.x)  *spc.pivot.x;
+    float pivotY = (texture2ddesc_.Height / spc.texSize.y) * spc.pivot.y;
 
-    float posX = spc.position.x - pivotX;
-    float posY = spc.position.y - pivotY;
+       
 
     // スプライトの頂点座標の計算
-    float x0 = posX - spc.scale.x * 0.5f;
-    float y0 = posY - spc.scale.y * 0.5f;
-    float x1 = posX + spc.scale.x * 0.5f;
-    float y1 = posY - spc.scale.y * 0.5f;
-    float x2 = posX - spc.scale.x * 0.5f;
-    float y2 = posY + spc.scale.y * 0.5f;
-    float x3 = posX + spc.scale.x * 0.5f;
-    float y3 = posY + spc.scale.y * 0.5f;
+    //左上
+    float x0 = spc.position.x;
+    float y0 = spc.position.y;
+    //右上
+    float x1 = spc.position.x + spc.texSize.x * spc.scale.x;
+    float y1 = spc.position.y;
+    //左下
+    float x2 = spc.position.x;
+    float y2 = spc.position.y + spc.texSize.y * spc.scale.y;
+    //右下
+    float x3 = spc.position.x + spc.texSize.x * spc.scale.x;
+    float y3 = spc.position.y + spc.texSize.y * spc.scale.y;
 
     // スプライトの回転
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)
@@ -348,8 +366,8 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
             y += cy;
         };
 
-    float cx = spc.position.x;
-    float cy = spc.position.y;
+    float cx = spc.position.x + spc.pivot.x;
+    float cy = spc.position.y + spc.pivot.y;
     rotate(x0, y0, cx, cy, spc.angle);
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);
@@ -381,10 +399,10 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
         vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = { spc.color.x, spc.color.y, spc.color.z, spc.color.w };
 
         // テクスチャ座標
-        vertices[0].texcoord = { 0.0f / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height };
-        vertices[1].texcoord = { (0.0f + texture2ddesc_.Width) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height };
-        vertices[2].texcoord = { 0.0f / texture2ddesc_.Width, (0.0f + texture2ddesc_.Height) / texture2ddesc_.Height };
-        vertices[3].texcoord = { (0.0f + texture2ddesc_.Width) / texture2ddesc_.Width, (0.0f + texture2ddesc_.Height) / texture2ddesc_.Height };
+        vertices[0].texcoord = {  0.0f/spc.texSize.x,0.0f/ spc.texSize.y };
+        vertices[1].texcoord = { ( spc.texSize.x) / texture2ddesc_.Width,0.0f/ spc.texSize.y };
+        vertices[2].texcoord = {  0.0f/spc.texSize.x, ( spc.texSize.y) / texture2ddesc_.Height };
+        vertices[3].texcoord = { ( spc.texSize.x) / texture2ddesc_.Width, (spc.texSize.y) / texture2ddesc_.Height};
     }
     dc->Unmap(vertexBuffer_.Get(), 0);
 
@@ -621,6 +639,8 @@ void Sprite::OnGUI()
     {
         LoadDeserialize();
         LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
+        spc.texSize.x = texture2ddesc_.Width;
+        spc.texSize.y = texture2ddesc_.Height;
     }
 
     // テクスチャの選択
@@ -647,6 +667,10 @@ void Sprite::OnGUI()
             // 読み込み
             spc.filename = relativeTextureFile;
             LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
+            spc.texSize.x = texture2ddesc_.Width;
+            spc.texSize.y = texture2ddesc_.Height;
+            spc.scale = { 1.0f,1.0f };
+            spc.pivot = { texture2ddesc_.Width / 2.0f,texture2ddesc_.Height / 2.0f };
         }
     }
     ImGui::SameLine();
@@ -747,11 +771,12 @@ void Sprite::OnGUI()
         ImGui::ColorEdit4((char*)u8"イージング色", &spc.easingcolor.x);
         ImGui::DragFloat2((char*)u8"位置", &spc.position.x);
         ImGui::DragFloat2((char*)u8"イージング位置", &spc.easingposition.x);
-        ImGui::DragFloat2((char*)u8"大きさ", &spc.scale.x);
-        ImGui::DragFloat2((char*)u8"イージング大きさ", &spc.easingscale.x);
+        ImGui::DragFloat2((char*)u8"大きさ", &spc.scale.x,0.01f);
+        ImGui::DragFloat2((char*)u8"イージング大きさ", &spc.easingscale.x,0.01f);
         ImGui::DragFloat((char*)u8"回転", &spc.angle);
         ImGui::DragFloat((char*)u8"イージング回転", &spc.easingangle);
         ImGui::DragFloat2((char*)u8"中心位置", &spc.pivot.x);
+        ImGui::DragFloat2((char*)u8"テクスチャサイズ", &spc.texSize.x);
         ImGui::DragFloat((char*)u8"再生速度", &spc.timescale, 0.1f, 0.0f, 5.0f);
         ImGui::TreePop();
     }
