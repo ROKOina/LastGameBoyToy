@@ -10,7 +10,7 @@ public:
     ~EasingMoveCom() {};
 
     //èâä˙ê›íË
-    void Start()override;
+    void Start()override {};
 
     //çXêVèàóù
     void Update(float elapsedTime)override;
@@ -40,13 +40,12 @@ public:
     struct EasingMoveParameter
     {
         std::string	filename = {};
-        float timescale = 0.0f;
-        int easingtype = 0;
-        int easingmovetype = 0;
+        std::vector<float> timescale = {};
+        std::vector<int> easingtype = {};
+        std::vector<int> easingmovetype = {};
         bool loop = false;
         bool comback = false;
-        DirectX::XMFLOAT3 easingposition = {};
-        DirectX::XMFLOAT3 easingscale = {};
+        std::vector<DirectX::XMFLOAT3> easingposition = {};
         std::string objectname = {};
 
         template<class Archive>
@@ -62,5 +61,5 @@ private:
     bool loop = false;
     bool one = false;
     DirectX::XMFLOAT3 savepos = {};
-    DirectX::XMFLOAT3 savescale = {};
+    int point = {};
 };

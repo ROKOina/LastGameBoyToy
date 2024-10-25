@@ -1,5 +1,4 @@
 #include "EasingMoveCom.h"
-
 #include <imgui.h>
 #include <fstream>
 #include <filesystem>
@@ -7,6 +6,7 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
+#include <cereal\types\vector.hpp>
 #include "Dialog.h"
 #include "Logger.h"
 #include "Graphics/Graphics.h"
@@ -84,7 +84,6 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
         CEREAL_NVP(loop),
         CEREAL_NVP(comback),
         CEREAL_NVP(easingposition),
-        CEREAL_NVP(easingscale),
         CEREAL_NVP(objectname)
     );
 }
@@ -99,11 +98,6 @@ EasingMoveCom::EasingMoveCom(const char* filename)
     }
 }
 
-//初期設定
-void EasingMoveCom::Start()
-{
-}
-
 //更新処理
 void EasingMoveCom::Update(float elapsedTime)
 {
@@ -111,7 +105,7 @@ void EasingMoveCom::Update(float elapsedTime)
     if (play)
     {
         //イージング更新
-        easingresult = EasingUpdate(EMP.easingtype, EMP.easingmovetype, easingtime);
+        easingresult = EasingUpdate(EMP.easingtype[point], EMP.easingmovetype[point], easingtime);
 
         //オブジェクトがあれば
         if (!EMP.objectname.empty())
@@ -120,17 +114,16 @@ void EasingMoveCom::Update(float elapsedTime)
 
             if (gameObject != nullptr && !one)
             {
-                EMP.easingposition = gameObject->transform_->GetWorldPosition();
+                EMP.easingposition[point] = gameObject->transform_->GetWorldPosition();
                 one = true;
             }
         }
 
         // イージング計算
-        GetGameObject()->transform_->SetWorldPosition(Mathf::Lerp(savepos, EMP.easingposition, easingresult));
-        //GetGameObject()->transform_->SetScale(Mathf::Lerp(savescale, EMP.easingscale, easingresult));
+        GetGameObject()->transform_->SetWorldPosition(Mathf::Lerp(savepos, EMP.easingposition[point], easingresult));
 
         // イージング時間の更新
-        easingtime += (loop ? -1.0f : 1.0f) * elapsedTime * EMP.timescale;
+        easingtime += (loop ? -1.0f : 1.0f) * elapsedTime * EMP.timescale[point];
 
         // イージング時間の範囲チェック
         if (easingtime > 1.0f)
@@ -176,11 +169,13 @@ void EasingMoveCom::OnGUI()
     {
         LoadDeserialize();
     }
-    easingresult = EasingImGui(EMP.easingtype, EMP.easingmovetype, easingtime);
+
+    //イージングのimgui
+    easingresult = EasingImGui(EMP.easingtype[point], EMP.easingmovetype[point], easingtime);
+
     if (ImGui::Button("Play") && !play)
     {
         savepos = GetGameObject()->transform_->GetWorldPosition();
-        savescale = GetGameObject()->transform_->GetScale();
         play = true;
     }
     ImGui::SameLine();
@@ -201,9 +196,8 @@ void EasingMoveCom::OnGUI()
         EMP.objectname = name;
     }
 
-    ImGui::DragFloat("timescale", &EMP.timescale, 0.1f, 0.0f, 10.0f);
-    ImGui::DragFloat3("easingpostion", &EMP.easingposition.x, 0.1f);
-    ImGui::DragFloat3("easingscale", &EMP.easingscale.x, 0.1f);
+    ImGui::DragFloat("timescale", &EMP.timescale[point], 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat3("easingpostion", &EMP.easingposition[point].x, 0.1f);
 }
 
 //イージング停止
@@ -215,13 +209,11 @@ void EasingMoveCom::StopEasing()
     easingtime = 0.0f;
 
     GetGameObject()->transform_->SetWorldPosition(savepos);
-    //GetGameObject()->transform_->SetScale(savescale);
 
     if (!EMP.loop && !EMP.comback)
     {
         //今の位置を保存した位置に代入する
-        GetGameObject()->transform_->SetWorldPosition(EMP.easingposition);
-        //GetGameObject()->transform_->SetScale(EMP.easingscale);
+        GetGameObject()->transform_->SetWorldPosition(EMP.easingposition[point]);
     }
 }
 

@@ -77,7 +77,7 @@ public:
     //ポストエフェクトのパラメータを制御する関数
     void ParameterMove(float elapsedTime, float parameterIn, bool update, PostEffectParameter parameter);
 
-private:
+public:
 
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
@@ -100,6 +100,8 @@ private:
         float blurdecay = { 0.999f };
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
+
+private:
 
     //影のパラメータのコンスタントバッファ
     struct SHADOWPARAMETER

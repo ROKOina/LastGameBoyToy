@@ -32,7 +32,7 @@ public:
     //シーン切り替え
     void ChangeScene(Scene* scene);
     //シーン切り替え(遅延)
-    void ChangeSceneDelay(Scene* scene,float time);
+    void ChangeSceneDelay(Scene* scene, float time);
 
     //imgui
     void ImGui();
@@ -74,6 +74,7 @@ private:
 
     //遷移遅延用変数
     bool transitionFlag = false;
+    bool exposetransiotnflag = true;
     float transitionTime = 0;
     float transitionTimer = 0;
     Scene* transitionScene_ = nullptr;
