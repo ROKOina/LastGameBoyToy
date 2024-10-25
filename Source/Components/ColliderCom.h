@@ -118,6 +118,9 @@ public:
     void SetOffsetPosition(DirectX::XMFLOAT3& offsetPos) { offsetButtonPos_ = offsetPos; }
     DirectX::XMFLOAT3 const GetOffsetPosition() { return offsetButtonPos_; }
 
+    //ヒットを知らせるフラグ
+    bool GetIsHit() { return isHit; }
+
 private:
     //当たり判定をする(当たっていたらtrue)
     //球vノードコリジョン

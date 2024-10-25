@@ -8,6 +8,8 @@
 #include "Components/FrustumCom.h"
 #include "Components/AimIKCom.h"
 #include "Components/NodeCollsionCom.h"
+#include "Components\ColliderCom.h"
+#include "Components\Character\CharaStatusCom.h"
 #include "Components/PushBackCom.h"
 
 // ‰Šú‰»
@@ -98,6 +100,9 @@ void SpawnCom::SpawnGameObject()
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
     obj->AddComponent<NoobEnemyCom>();
+    obj->AddComponent<CharaStatusCom>();
+    std::shared_ptr<SphereColliderCom> collider = obj->AddComponent<SphereColliderCom>();
+    collider->SetMyTag(COLLIDER_TAG::Enemy);
     //obj->AddComponent<FrustumCom>();
 
     auto& pushBack = obj->AddComponent<PushBackCom>();

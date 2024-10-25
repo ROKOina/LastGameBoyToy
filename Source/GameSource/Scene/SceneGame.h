@@ -17,7 +17,7 @@ class SceneGame :public Scene
 {
 public:
     SceneGame() {}
-    ~SceneGame()override {}
+    ~SceneGame()override;
 
     // ‰Šú‰»
     void Initialize()override;

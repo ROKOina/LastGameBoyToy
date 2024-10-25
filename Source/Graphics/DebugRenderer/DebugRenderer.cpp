@@ -4,6 +4,7 @@
 #include "DebugRenderer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Shaders/Shader.h"
+#include "./Phsix/Physxlib.h"
 
 DebugRenderer::DebugRenderer(ID3D11Device* device)
 {
@@ -144,6 +145,8 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         context->Draw(cylinderVertexCount_, 0);
     }
     cylinders_.clear();
+
+
 }
 
 // 球描画
@@ -177,6 +180,19 @@ void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position1, const Direc
     cylinder.height = height;
     cylinder.color = color;
     cylinders_.emplace_back(cylinder);
+}
+
+void DebugRenderer::DrawRigidMesh(std::string filename, const physx::PxRigidActor* actor)
+{
+    using namespace physx;
+
+    //メッシュデスクを取得
+    physx::PxTriangleMeshDesc& meshDesc = PhysXLib::Instance().GetStlegeInMeshDesc(filename);
+    //トランスフォーム
+    physx::PxTransform transform = actor->getGlobalPose();
+
+    Mesh mesh;
+    mesh.position += transform.p;
 }
 
 // 球メッシュ作成

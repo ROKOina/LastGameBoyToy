@@ -57,7 +57,7 @@ float4 main(VS_OUT pin) : SV_TARGET
         discard;
 
     //ïâÇÃílÇ…Ç»ÇÁÇ»Ç¢ÇÊÇ§Ç…êßå‰
-    color.rgb = max(0, color.rgb);
+    color.rgb = max(color.rgb, 0);
 
     return color;
 }

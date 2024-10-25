@@ -46,6 +46,9 @@ public:
     // ƒ‚ƒfƒ‹‚ÌŽæ“¾
     Model* GetModel() const { return model_.get(); }
 
+    DirectX::XMFLOAT3 GetBounds() { return bounds;}
+    DirectX::XMFLOAT3 GetBoundsMin() { return BoundsMin;}
+
     template<class T>
     std::shared_ptr<T> SetVariousConstant() {
         std::shared_ptr<T> p = std::make_shared<T>();
@@ -93,10 +96,12 @@ private:
 
     std::shared_ptr<BaseConstants> variousConstant = nullptr;
 
+    
 
     DirectX::XMFLOAT3       BoundsMin;
     DirectX::XMFLOAT3       BoundsMax;
 
+    DirectX::XMFLOAT3 bounds;
 
     SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFERRED;
 #ifdef _DEBUG

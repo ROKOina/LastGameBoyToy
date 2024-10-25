@@ -19,5 +19,8 @@ float4 main(GS_OUT pin) : SV_TARGET
     if (color.a < EPSILON)
         discard;
 
-    return max(0, color);
+    //0ˆÈ‰º‚É‚µ‚È‚¢‚æ‚¤‚É‚·‚é
+    color.rgb = max(color.rgb, 0);
+
+    return color;
 }

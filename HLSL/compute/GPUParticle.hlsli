@@ -69,7 +69,7 @@ cbuffer GPUparticleSaveConstants : register(b7)
 
     float2 scale;
     int scaleVariateByLife; // 大きさの変化の基準を管理 ( TRUE : 寿命によって変化 )
-    float padding6; // 大きさの変化の基準を管理 ( TRUE : 寿命によって変化 )
+    float padding6;
 
     float lifeStartSize; // パーティクルの生成時の速度
     float lifeEndSize; // パーティクルの消滅時の速度

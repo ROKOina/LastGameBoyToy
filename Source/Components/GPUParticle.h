@@ -31,6 +31,9 @@ public:
     // エフェクト再生関数
     void Play();
 
+    //自身を消す関数
+    void DeleteMe(float elapsedTime);
+
 private:
     //シリアライズ
     void Serialize();
@@ -86,6 +89,10 @@ public:
     //アクティブ化
     void SetLoop(const bool& loop) { m_GSC.isLoopFlg = loop; }
     void SetStop(const bool& stop) { stopFlg = stop; }
+    void SetDeleteFlag(const bool& deleteflag) { m_deleteflag = deleteflag; }
+
+    //Delete時間
+    void SetDeleteTime(const float& time) { deletetime = time; }
 
     //保存するコンスタントバッファ
     struct GPUparticleSaveConstants
@@ -157,6 +164,7 @@ public:
 private:
     float emitTimer = 0.0f;
     bool stopFlg = false;
+    bool m_deleteflag = false;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_particlebuffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_particlesrv;
@@ -169,4 +177,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_colormap;
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_constantbuffer;
     const size_t m_maxparticle = 0;
+    float time = 0.0f;
+    float deletetime = 0.0f;
 };

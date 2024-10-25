@@ -217,6 +217,7 @@ void GPUParticle::Update(float elapsedTime)
     velo = DirectX::XMVector3TransformNormal(velo, transf);
     DirectX::XMStoreFloat3(&m_gpu->data.currentEmitVec, velo);
 
+    //停止処理
     if (stopFlg == true)return;
 
     // 単発再生
@@ -224,9 +225,16 @@ void GPUParticle::Update(float elapsedTime)
     {
         emitTimer += elapsedTime;
 
-        if (emitTimer > m_GSC.emitTime) {
+        if (emitTimer > m_GSC.emitTime)
+        {
             m_gpu->data.isEmitFlg = false;
         }
+    }
+
+    //自身を消す関数
+    if (m_deleteflag)
+    {
+        DeleteMe(elapsedTime);
     }
 
     //コンスタントバッファの更新
@@ -425,6 +433,7 @@ void GPUParticle::SystemGUI()
 void GPUParticle::ParameterGUI()
 {
     ImGui::DragFloat(J(u8"エフェクトの再生時間"), &m_GSC.emitTime, 0.1f);
+    ImGui::DragFloat(J(u8"エフェクトの生存時間"), &emitTimer, 0.1f);
     ImGui::DragFloat(J(u8"パーティクルの寿命"), &m_GSC.lifeTime, 0.1f, 0.0f, 5.0f);
     EmitGUI();
     SpeedGUI();
@@ -547,6 +556,14 @@ void GPUParticle::Play()
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
+    //コンスタントバッファの更新
+    m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
+    m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
+    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
+
     //初期化のピクセルシェーダーをセット
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
     dc->CSSetShader(m_initialzecomputeshader.Get(), NULL, 0);
@@ -554,6 +571,16 @@ void GPUParticle::Play()
     dc->Dispatch(thread_group_count_x, 1, 1);
     ID3D11UnorderedAccessView* null_unordered_access_view{};
     dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
+}
+
+//自身を消す関数
+void GPUParticle::DeleteMe(float elapsedTime)
+{
+    time += elapsedTime;
+    if (time > deletetime)
+    {
+        GameObjectManager::Instance().Remove(GetGameObject());
+    }
 }
 
 //シリアライズ

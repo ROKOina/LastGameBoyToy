@@ -14,6 +14,29 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
     characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
+
+    // 乱数エンジンのシードを設定
+    std::random_device rd;
+    gen = std::mt19937(rd());
+}
+
+//乱数計算
+int Boss_BaseState::ComputeRandom()
+{
+    //ランダムしたい数を増やす程下記の値が増えていく
+    if (availableNumbers.empty())
+    {
+        availableNumbers = { 1,2,3,4,5,6,7,8 };
+    }
+
+    // 乱数生成エンジンを使ってランダムにインデックスを生成
+    std::uniform_int_distribution<int> dis(0, availableNumbers.size() - 1);
+    int index = dis(gen);
+    int randomValue = availableNumbers[index];
+
+    availableNumbers.erase(availableNumbers.begin() + index);
+
+    return randomValue;
 }
 
 //アニメーション中の当たり判定
@@ -33,12 +56,6 @@ bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodenam
     // イベントが呼び出されているか確認
     if (animationCom.lock()->IsEventCallingNodePos(eventname, nodename, nodepos))
     {
-        //ここで一回だけ更新しておく
-        if (gpuparticle != nullptr)
-        {
-            gpuparticle->GetComponent<GPUParticle>()->SetStop(false);
-        }
-
         auto collider = cachedobject->GetComponent<SphereColliderCom>();
         if (collider)
         {
@@ -61,11 +78,6 @@ bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodenam
         if (cpuparticle != nullptr)
         {
             cpuparticle->GetComponent<CPUParticle>()->SetActive(false);
-        }
-
-        if (gpuparticle != nullptr)
-        {
-            gpuparticle->GetComponent<GPUParticle>()->SetLoop(false);
         }
 
         auto collider = cachedobject->GetComponent<SphereColliderCom>();
@@ -102,53 +114,11 @@ void Boss_BaseState::CPUEffect(const char* objectname, bool posflag)
     }
 }
 
-//GPUエフェクトの検索
-void Boss_BaseState::GPUEffect(const char* objectname, bool posflag)
-{
-    // 初回のみFindしてキャッシュ
-    if (!gpuparticle || gpuparticle->GetName() != objectname)
-    {
-        gpuparticle = GameObjectManager::Instance().Find(objectname);
-
-        //この更新中一回しか更新してほしくないのでフラグで制御する
-        if (owner->GetGpuFlag())
-        {
-            gpuparticle->GetComponent<GPUParticle>()->Play();
-        }
-
-        //ノードに付けない時
-        if (posflag)
-        {
-            gpuparticle->transform_->SetWorldPosition(nodepos);
-        }
-    }
-
-    if (!gpuparticle)
-    {
-        gpuparticle.reset(); // キャッシュをリセット
-    }
-}
-
-//エフェクト発生関数
-bool Boss_BaseState::EffectSpawn(const char* eventname)
-{
-    if (animationCom.lock()->IsEventCalling(eventname))
-    {
-        owner->SetGpuFlag(true);
-        return true;
-    }
-    else
-    {
-        owner->SetGpuFlag(false);
-        return false;
-    }
-}
-
 //乱数で選択された行動を選択する関数
 void Boss_BaseState::RandamBehavior(int one, int two)
 {
     // ランダムで行動を切り替える
-    int randomAction = owner->ComputeRandom();
+    int randomAction = ComputeRandom();
 
     if (randomAction == 1)
     {
@@ -191,9 +161,6 @@ void Boss_IdleState::Enter()
 }
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
-    // ランダムで行動を切り替える
-    int randomAction = owner->ComputeRandom();
-
     //距離判定
     if (owner->Search(5.0f))
     {
@@ -351,10 +318,18 @@ void Boss_PunchState::Execute(const float& elapsedTime)
         CPUEffect("cpufireeffect", true);
     }
 
-    //エフェクト生成
-    if (EffectSpawn("EFFECT"))
+    //GPUエフェクト生成
+    DirectX::XMFLOAT3 pos = {};
+    if (animationCom.lock()->IsEventCallingNodePos("EFFECT", "mixamorig:LeftHand", pos))
     {
-        //GPUEffect("cyclongpueffect", false);
+        GameObj sparkobject = GameObjectManager::Instance().Create();
+        sparkobject->transform_->SetWorldPosition(pos);
+        sparkobject->transform_->SetRotation(owner->GetGameObject()->transform_->GetRotation());
+        sparkobject->SetName("sparkeffect");
+        std::shared_ptr<GPUParticle>sparkeffect = sparkobject->AddComponent<GPUParticle>("Data/Effect/sparks.gpuparticle", 10000);
+        sparkeffect->Play();
+        sparkeffect->SetDeleteTime(1.2f);
+        sparkeffect->SetDeleteFlag(true);
     }
 
     //アニメーションが終われば
@@ -386,10 +361,18 @@ void Boss_KickState::Execute(const float& elapsedTime)
         CPUEffect("cpufireeffect", true);
     }
 
-    //エフェクト再生
-    if (EffectSpawn("EFFECT"))
+    //GPUエフェクト生成
+    DirectX::XMFLOAT3 pos = {};
+    if (animationCom.lock()->IsEventCallingNodePos("EFFECT", "mixamorig:RightToeBase", pos))
     {
-        //GPUEffect("cyclongpueffect", false);
+        GameObj sparkobject = GameObjectManager::Instance().Create();
+        sparkobject->transform_->SetWorldPosition(pos);
+        sparkobject->transform_->SetRotation(owner->GetGameObject()->transform_->GetRotation());
+        sparkobject->SetName("sparkeffect");
+        std::shared_ptr<GPUParticle>sparkeffect = sparkobject->AddComponent<GPUParticle>("Data/Effect/sparks.gpuparticle", 10000);
+        sparkeffect->Play();
+        sparkeffect->SetDeleteTime(1.2f);
+        sparkeffect->SetDeleteFlag(true);
     }
 
     //アニメーションが終われば
@@ -421,10 +404,17 @@ void Boss_RangeAttackState::Execute(const float& elapsedTime)
         CPUEffect("cycloncpueffect", false);
     }
 
-    //エフェクト再生
-    if (EffectSpawn("EFFECT"))
+    //GPUエフェクト再生
+    if (animationCom.lock()->IsEventCalling("EFFECT"))
     {
-        //GPUEffect("cyclongpueffect", false);
+        //竜巻のエフェクト
+        GameObj toru = GameObjectManager::Instance().Create();
+        toru->transform_->SetWorldPosition(owner->GetGameObject()->transform_->GetWorldPosition());
+        toru->SetName("torunedeffect");
+        std::shared_ptr<GPUParticle>torunedeffect = toru->AddComponent<GPUParticle>("Data/Effect/tornado.gpuparticle", 10000);
+        torunedeffect->Play();
+        torunedeffect->SetDeleteTime(2.6f);
+        torunedeffect->SetDeleteFlag(true);
     }
 
     //アニメーションが終われば
@@ -486,6 +476,43 @@ void Boss_FireBallState::Enter()
 }
 void Boss_FireBallState::Execute(const float& elapsedTime)
 {
+    //アニメーションイベント中にノードの位置を取得
+    DirectX::XMFLOAT3 pos = {};
+    if (animationCom.lock()->IsEventCallingNodePos("EFFECT", "mixamorig:RightHand", pos))
+    {
+        //ビーム作成
+        {
+            //ビームの手からの放射
+            GameObj beemhand = GameObjectManager::Instance().Create();
+            beemhand->transform_->SetWorldPosition(pos);
+            beemhand->SetName("beemhandeffct");
+            std::shared_ptr<GPUParticle>beemhandeffct = beemhand->AddComponent<GPUParticle>("Data/Effect/beemhand.gpuparticle", 10000);
+            beemhandeffct->Play();
+            beemhandeffct->SetDeleteTime(1.6f);
+            beemhandeffct->SetDeleteFlag(true);
+
+            //ビームの真ん中
+            GameObj beem = GameObjectManager::Instance().Create();
+            beem->transform_->SetWorldPosition(pos);
+            beem->transform_->SetRotation(owner->GetGameObject()->transform_->GetRotation());
+            beem->SetName("beemeffct");
+            std::shared_ptr<GPUParticle>beemeffct = beem->AddComponent<GPUParticle>("Data/Effect/beem.gpuparticle", 10000);
+            beemeffct->Play();
+            beemeffct->SetDeleteTime(1.6f);
+            beemeffct->SetDeleteFlag(true);
+
+            //ビームの回り
+            GameObj beemaround = GameObjectManager::Instance().Create();
+            beemaround->transform_->SetWorldPosition(pos);
+            beemaround->transform_->SetRotation(owner->GetGameObject()->transform_->GetRotation());
+            beemaround->SetName("beemaroundeffct");
+            std::shared_ptr<GPUParticle>beemaroundeffct = beemaround->AddComponent<GPUParticle>("Data/Effect/beemaround.gpuparticle", 10000);
+            beemaroundeffct->Play();
+            beemaroundeffct->SetDeleteTime(1.6f);
+            beemaroundeffct->SetDeleteFlag(true);
+        }
+    }
+
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {

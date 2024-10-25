@@ -7,7 +7,7 @@
 #include "ImGuiRender.h"
 
 const LONG SCREEN_WIDTH = static_cast<LONG>(1920);
-const LONG SCREEN_HEIGHT = static_cast<LONG>(900);
+const LONG SCREEN_HEIGHT = static_cast<LONG>(1080);
 const LPCWSTR TITLE = L"Game";
 //const LONG SCREEN_WIDTH = 1280;
 //const LONG SCREEN_HEIGHT = 720;
@@ -24,7 +24,11 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 
 #if defined(DEBUG) | defined(_DEBUG)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    //_CrtSetBreakAlloc(751984);
+    //メモリリーク検索
+    //_CrtSetBreakAlloc(212925);
+    //_CrtSetBreakAlloc(258);
+    //_CrtSetBreakAlloc(264);
+    //_CrtSetBreakAlloc(260);
 #endif
 
     // サイズ調整

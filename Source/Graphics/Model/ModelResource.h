@@ -167,6 +167,8 @@ public:
     const std::vector<Material>& GetMaterials() const { return materials_; }
     std::vector<Mesh>& GetMeshesEdit() { return meshes_; }
     std::vector<Material>& GetMaterialsEdit() { return materials_; }
+    std::string GetFileName() { return fileName; }
+
     // “Ç‚İ‚İ
     void Load(ID3D11Device* device, const char* filename);
     // ƒ}ƒeƒŠƒAƒ‹î•ñ‚Ì‚İ“Ç‚İ‚Ş

@@ -74,23 +74,19 @@ void SceneResult::Initialize()
         {
             auto& modoru = obj->AddChildObject();
             modoru->SetName("modoru");
-            modoru->AddComponent<Sprite>("Data/resultScene/UI/modoru.ui", true);
+            modoru->AddComponent<Sprite>("Data/resultScene/UI/modoru.ui", Sprite::SpriteShader::DEFALT, true);
         }
     }
-
 
     //平行光源を追加
     mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
-
-
 }
 
 void SceneResult::Finalize()
 {
-
 }
 
 void SceneResult::Update(float elapsedTime)
@@ -123,8 +119,6 @@ void SceneResult::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
-
 }
 
 void SceneResult::UIUpdate(float elapsedTime)
