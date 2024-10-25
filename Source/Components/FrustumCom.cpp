@@ -1,15 +1,17 @@
 #include "FrustumCom.h"
 #include "Components/TransformCom.h"
 #include "Components/RendererCom.h"
-
-FrustumCom::FrustumCom()
-{
-}
+#include "GameSource/Scene/SceneManager.h"
+#include "Components/CameraCom.h"
+#include "GameSource/GameScript/FreeCameraCom.h"
+#include "GameSource/GameScript/FPSCameraCom.h"
+#include "GameSource/GameScript/EventCameraCom.h"
+#include "Graphics\Graphics.h"
 
 //初期化
 void FrustumCom::Start()
 {
-    cameraCom = GetGameObject()->GetComponent<CameraCom>();
+    
 }
 
 //更新処理
@@ -25,19 +27,48 @@ void FrustumCom::Update(float elapsedTime)
 //GUI描画
 void FrustumCom::OnGUI()
 {
+    ImGui::Checkbox("Draw", &check);
+
+    for (int i = 0; i < 4; i++)
+    {
+        Graphics::Instance().GetDebugRenderer()->DrawSphere(
+            nearP[i], 0.01f, {1,0,0,1});
+        Graphics::Instance().GetDebugRenderer()->DrawSphere(
+            farP[i], 1.0f, { 1,1,0,1 });
+
+    }
+    ImGui::InputFloat3("nearP0", &nearP[0].x);
+    ImGui::InputFloat3("nearP1", &nearP[1].x);
+    ImGui::InputFloat3("nearP2", &nearP[2].x);
+    ImGui::InputFloat3("nearP3", &nearP[3].x);
+
+    ImGui::InputFloat3("farP0", &farP[0].x);
+    ImGui::InputFloat3("farP1", &farP[1].x);
+    ImGui::InputFloat3("farP2", &farP[2].x);
+    ImGui::InputFloat3("farP3", &farP[3].x);
 }
 
 //描画判定
 void FrustumCom::DrawJudgement()
 {
-    if (IntersectFrustumVsAABB(GetGameObject()->transform_->GetWorldPosition(), { 1.0f,1.0f,1.0f }))
+
+    DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
+
+    pos += GetGameObject()->GetComponent<RendererCom>()->GetBoundsMin() + GetGameObject()->GetComponent<RendererCom>()->GetBounds();
+
+    if (IntersectFrustumVsAABB(pos, GetGameObject()->GetComponent<RendererCom>()->GetBounds()))
     {
         GetGameObject()->GetComponent<RendererCom>()->SetEnabled(true);
+
+        check = true;
     }
     else
     {
         GetGameObject()->GetComponent<RendererCom>()->SetEnabled(false);
+
+        check = false;
     }
+    
 }
 
 //視錐台とAABBの当たり判定計算
@@ -119,12 +150,12 @@ void FrustumCom::CalcurateFrustum()
 {
     Graphics& graphics = Graphics::Instance();
 
-    cameraPos = cameraCom.lock()->GetEye();
+    //cameraPos = ;
 
     //ビュープロジェクション行列を取得する
     DirectX::XMMATRIX matrix = {};
-    DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(&cameraCom.lock()->GetView());
-    DirectX::XMMATRIX projMat = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45), 1920.0f / 1080.0f, 0.1f, 1000.0f);
+    DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<FPSCameraCom>()->GetView());
+    DirectX::XMMATRIX projMat = DirectX::XMMatrixPerspectiveFovLH(45, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.1f, 1000.0f);
 
     matrix = viewMat * projMat;
 

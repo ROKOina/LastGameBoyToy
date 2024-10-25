@@ -3,6 +3,7 @@
 #include "Components\TransformCom.h"
 #include "Components\RendererCom.h"
 #include "Components\Character\CharacterCom.h"
+#include "Components\Character\CharaStatusCom.h"
 #include "Components\System\GameObject.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "HitProcess/HitProcessCom.h"
@@ -38,8 +39,24 @@ void BulletCom::Update(float elapsedTime)
     auto& hitProcessCom = GetGameObject()->GetComponent<HitProcessCom>();
     if (hitProcessCom)
     {
+        std::shared_ptr<GameObject> nonCharaObj;
         if (GetGameObject()->GetComponent<HitProcessCom>()->IsHit())
         {
+            GameObjectManager::Instance().Remove(this->GetGameObject());
+        }
+        else if (GetGameObject()->GetComponent<HitProcessCom>()->IsHitNonChara(nonCharaObj))
+        {
+            //ƒqƒbƒgƒGƒtƒFƒNƒg¶¬
+            hiteffectobject = GameObjectManager::Instance().Create();
+            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+            hiteffectobject->SetName("HitEffect");
+            std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/Effect/hanabi.gpuparticle", 500);
+            hiteffct->Play();
+            hiteffct->SetDeleteTime(0.3f);
+            hiteffct->SetDeleteFlag(true);
+
+            auto& stats = nonCharaObj->GetComponent<CharaStatusCom>();
+            stats->AddDamagePoint(-50);
             GameObjectManager::Instance().Remove(this->GetGameObject());
         }
     }
@@ -75,10 +92,13 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = -0.1 * power;
-    moveCom->SetGravity(-gravity);
+    float gravity = 0.98f - 0.95f * power;
+    moveCom->SetGravity(gravity);
     moveCom->SetFriction(0.0f);
-    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
+
+    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
+
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
@@ -117,10 +137,13 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = -0.1 * power;
-    moveCom->SetGravity(-gravity);
+    float gravity = 0.98f - 0.95f * power;
+    moveCom->SetGravity(gravity);
     moveCom->SetFriction(0.0f);
-    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
+
+    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
+
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
@@ -159,10 +182,13 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = -0.1 * power;
-    moveCom->SetGravity(-gravity);
+    float gravity = 0.98f - 0.95f * power;
+    moveCom->SetGravity(gravity);
     moveCom->SetFriction(0.0f);
-    moveCom->AddNonMaxSpeedForce(objPoint->transform_->GetWorldFront() * (20.0f + bulletSpeed));
+
+    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
+
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();

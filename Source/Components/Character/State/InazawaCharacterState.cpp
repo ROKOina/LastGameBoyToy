@@ -35,6 +35,7 @@ void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float pow
     DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
 
     moveCom->SetNonMaxSpeedVelocity(fpsDir * arrowSpeed);
+    moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
@@ -103,7 +104,8 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         );
 
         //UŒ‚ˆ—
-        Fire(owner->GetGameObject(), arrowSpeed, attackPower);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower);
+        //Fire(owner->GetGameObject(), arrowSpeed, attackPower);
         //RayFire(owner->GetGameObject());
 
         auto& chara = GetComp(CharacterCom);
@@ -149,7 +151,8 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
     {
         //UŒ‚ˆ—
-        Fire(owner->GetGameObject(), arrowSpeed);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed);
+        //Fire(owner->GetGameObject(), arrowSpeed);
         arrowCount--;
         intervalTimer = 0;
     }

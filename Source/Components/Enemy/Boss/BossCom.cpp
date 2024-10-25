@@ -1,13 +1,11 @@
 #include "BossCom.h"
 #include "GameSource/Math/Mathf.h"
+#include "Graphics/Graphics.h"
+#include "Components/RendererCom.h"
 
 //初期設定
 void BossCom::Start()
 {
-    // 乱数エンジンのシードを設定
-    std::random_device rd;
-    gen = std::mt19937(rd());
-
     //ステート登録
     state.AddState(BossState::IDLE, std::make_shared<Boss_IdleState>(this));
     state.AddState(BossState::STOPTIME, std::make_shared<Boss_IdleStopState>(this));
@@ -41,11 +39,6 @@ void BossCom::Update(float elapsedTime)
 //imgui
 void BossCom::OnGUI()
 {
-    ImGui::Text("Available Numbers:");
-    for (size_t i = 0; i < availableNumbers.size(); ++i)
-    {
-        ImGui::Text("%d", availableNumbers[i]);
-    }
     state.ImGui();
 }
 
@@ -100,25 +93,6 @@ void BossCom::MoveToTarget(float movespeed, float turnspeed)
 
     // 回転処理
     GetGameObject()->transform_->Turn(vec, turnspeed);
-}
-
-//乱数計算
-int BossCom::ComputeRandom()
-{
-    //ランダムしたい数を増やす程下記の値が増えていく
-    if (availableNumbers.empty())
-    {
-        availableNumbers = { 1,2,3,4,5,6,7,8 };
-    }
-
-    // 乱数生成エンジンを使ってランダムにインデックスを生成
-    std::uniform_int_distribution<int> dis(0, availableNumbers.size() - 1);
-    int index = dis(gen);
-    int randomValue = availableNumbers[index];
-
-    availableNumbers.erase(availableNumbers.begin() + index);
-
-    return randomValue;
 }
 
 //ジャンプ

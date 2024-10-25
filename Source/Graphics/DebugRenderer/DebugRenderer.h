@@ -1,11 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <wrl.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "Graphics/Shaders/ConstantBuffer.h"
 #include "SystemStruct\QuaternionStruct.h"
+#include "PxPhysicsAPI.h"
 
 class DebugRenderer
 {
@@ -25,6 +27,9 @@ public:
 
     // â~íåï`âÊ
     void DrawCylinder(const DirectX::XMFLOAT3& position1, const DirectX::XMFLOAT3& position2, float radius, float height, const DirectX::XMFLOAT4& color);
+
+    //RigidbodyÇÃÉÅÉbÉVÉÖï`âÊ
+    void DrawRigidMesh(std::string filename, const physx::PxRigidActor* actor);
 
 private:
     // ãÖÉÅÉbÉVÉÖçÏê¨
@@ -73,6 +78,22 @@ private:
         float				height;
     };
 
+    struct Mesh
+    {
+        DirectX::XMFLOAT4	color = { 0,0,0,1 };
+        DirectX::XMFLOAT3	position = {};
+        DirectX::XMFLOAT4	rotation = {};
+        DirectX::XMFLOAT3   scale = {};
+
+        UINT points_count;
+        UINT point_stride;
+        std::vector<DirectX::XMFLOAT3> points_data;
+
+        UINT triangles_count;
+        UINT triangles_stride;
+        std::vector<DirectX::XMFLOAT3> triangles_data;
+    };
+
     Microsoft::WRL::ComPtr<ID3D11Buffer>			sphereVertexBuffer_;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			boxVertexBuffer_;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			boxIndexBuffer_;
@@ -86,6 +107,7 @@ private:
     std::vector<Sphere>		spheres_;
     std::vector<Box>		boxes_;
     std::vector<Cylinder>	cylinders_;
+    std::vector<Mesh>       meshs_;
 
     UINT	sphereVertexCount_ = 0;
     UINT	boxVertexCount_ = 0;

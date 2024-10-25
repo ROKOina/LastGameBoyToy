@@ -18,7 +18,7 @@
 #include "Components/CPUParticle.h"
 #include "HitProcess/HitProcessCom.h"
 
-void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject> obj)
+void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
 {
     switch (list)
     {
@@ -40,7 +40,7 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     }
 }
 
-void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
+void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
@@ -61,9 +61,17 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject> obj)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
+
+    //煙のエフェクト
+    {
+        std::shared_ptr<GameObject> smoke = obj->AddChildObject();
+        smoke->SetName("smokeeffect");
+        std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/Effect/smoke.cpuparticle", 100);
+        smokeeffct->SetActive(false);
+    }
 }
 
-void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
+void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
@@ -163,7 +171,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject> obj)
 }
 
 //上野キャラ
-void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
+void RegisterChara::UenoChara(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.015f, 0.015f, 0.015f });
@@ -182,7 +190,7 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject> obj)
 }
 
 //ラインハルト
-void RegisterChara::PicohardChara(std::shared_ptr<GameObject> obj)
+void RegisterChara::PicohardChara(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });

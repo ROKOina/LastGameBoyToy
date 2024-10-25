@@ -3,12 +3,13 @@
 #include "System\GameObject.h"
 #include "System\Component.h"
 #include "Components\NodeCollsionCom.h"
+#include "Graphics\Model\ModelResource.h"
 
 class RigidBodyCom : public Component
 {
 public:
     RigidBodyCom(bool isStatic, NodeCollsionCom::CollsionType type);
-    ~RigidBodyCom() {}
+    ~RigidBodyCom();
 
     // –¼‘OŽæ“¾
     const char* GetName() const override { return "RigidBody"; }
@@ -22,12 +23,14 @@ public:
     // GUI•`‰æ
     void OnGUI() override;
 
+    void GenerateCollider(NodeCollsionCom::CollsionType type);
+    void GenerateCollider(ModelResource* rc);
+
 private:
     bool isStatic = false;
     NodeCollsionCom::CollsionType type = NodeCollsionCom::CollsionType::MAX;
 
     physx::PxRigidActor* rigidActor = nullptr;
-
     physx::PxTransform rigidTransform = {};
 };
 

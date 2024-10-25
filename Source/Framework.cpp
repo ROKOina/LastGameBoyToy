@@ -9,6 +9,7 @@
 #include "GameSource\Scene\SceneDebugGame.h"
 #include "GameSource\Scene\SceneManager.h"
 #include "GameSource\Scene\SceneUI\SceneUI.h"
+#include "GameSource\Scene\SceneResult\SceneResult.h"
 
 #include "GameSource\Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
@@ -28,10 +29,10 @@ Framework::Framework(HWND hWnd)
     , graphics_(hWnd)
 {
     //sceneGame.Initialize();
-    SceneManager::Instance().ChangeScene(new SceneGame);
+    //SceneManager::Instance().ChangeScene(new SceneGame);
     //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     //SceneManager::Instance().ChangeScene(new SceneDebugGame);
-    //SceneManager::Instance().ChangeScene(new SceneTitle);
+    SceneManager::Instance().ChangeScene(new SceneTitle);
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
     //SceneManager::Instance().ChangeScene(new SceneTitle);

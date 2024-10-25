@@ -25,7 +25,6 @@
 
 #include "GameSource/GameScript/FreeCameraCom.h"
 
-
 void SceneLobby::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -71,12 +70,10 @@ void SceneLobby::Initialize()
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
-
 }
 
 void SceneLobby::Finalize()
 {
-
 }
 
 void SceneLobby::Update(float elapsedTime)
@@ -85,7 +82,6 @@ void SceneLobby::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
 }
 
 void SceneLobby::Render(float elapsedTime)
@@ -108,5 +104,4 @@ void SceneLobby::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
 }

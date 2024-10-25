@@ -121,7 +121,7 @@ void Sprite::SaveParameterCPU::serialize(Archive& archive, int version)
 }
 
 // コンストラクタ
-Sprite::Sprite(const char* filename, bool collsion)
+Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
 {
     HRESULT hr = S_OK;
 
@@ -162,6 +162,22 @@ Sprite::Sprite(const char* filename, bool collsion)
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 
+    //ファイル名
+    const char* PSPath = nullptr;
+
+    //増やしたいシェーダーがあればスイッチ文で複製していく
+    switch (spriteshader)
+    {
+    case SpriteShader::DEFALT:
+        PSPath = { "Shader\\SpritePS.cso" };
+        break;
+    case SpriteShader::DISSOLVE:
+        PSPath = { "Shader\\DeferredSetupPS.cso" };
+        break;
+    default:
+        assert(!"ピクセルシェーダがありません");
+    }
+
     // 頂点シェーダー
     {
         //入力レイアウト
@@ -176,7 +192,7 @@ Sprite::Sprite(const char* filename, bool collsion)
 
     // ピクセルシェーダー
     {
-        CreatePsFromCso(device, "Shader\\SpritePS.cso", pixelShader_.GetAddressOf());
+        CreatePsFromCso(device, PSPath, pixelShader_.GetAddressOf());
     }
 
     //ファイル読み込み処理

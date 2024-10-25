@@ -55,6 +55,15 @@
 
 #include "Audio/AudioSource.h"
 
+#include "GameSource\Scene\SceneResult\SceneResult.h"
+#include "Components/FrustumCom.h"
+
+SceneGame::~SceneGame()
+{
+    GameObjectManager::Instance().AllRemove();
+    GameObjectManager::Instance().RemoveGameObjects();
+}
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -82,40 +91,41 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        //obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<StageEditorCom>();
+        /*      RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+              rigid->GenerateCollider(r->GetModel()->GetResource());*/
     }
 
     //当たり判定用
-    PhysXLib::Instance().Initialize();
     std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
-        roboobj->SetName("robo");
-        roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
-        roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/OneCoin/robot.mdl");
-        std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
-        a->PlayAnimation(0, true, false, 0.001f);
+        //roboobj->SetName("robo");
+        //roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
+        //roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        //std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+        //r->LoadModel("Data/OneCoin/robot.mdl");
+        //std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
+        //a->PlayAnimation(0, true, false, 0.001f);
 
         //std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
         //sphere->SetRadius(2.0f);
         //sphere->SetMyTag(COLLIDER_TAG::Enemy);
         //sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
-        roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);
+  /*      roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
+        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);*/
     }
 
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -186,14 +196,6 @@ void SceneGame::Initialize()
             cpufire->SetActive(false);
         }
 
-        ////gpuの炎
-        //{
-        //    std::shared_ptr<GameObject>gpufireeffect = boss->AddChildObject();
-        //    gpufireeffect->SetName("gpufireeffect");
-        //    std::shared_ptr<GPUParticle>gpufire = gpufireeffect->AddComponent<GPUParticle>("Data/Effect/fire.gpuparticle", 10000);
-        //    gpufire->SetLoop(false);
-        //}
-
         //着地時の煙エフェクト
         {
             std::shared_ptr<GameObject>landsmokeeffect = boss->AddChildObject();
@@ -211,14 +213,6 @@ void SceneGame::Initialize()
             cpuparticle->SetActive(false);
         }
 
-        ////gpuの竜巻のエフェクト
-        //{
-        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
-        //    gpucycloneffect->SetName("cyclongpueffect");
-        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
-        //    gpufire->SetLoop(false);
-        //}
-
         //火球
         {
             std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
@@ -232,30 +226,6 @@ void SceneGame::Initialize()
             fireballcollider->SetJudgeTag(COLLIDER_TAG::Player);
             fireballcollider->SetRadius(1.0f);
         }
-
-        ////gpuの竜巻のエフェクト
-        //{
-        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
-        //    gpucycloneffect->SetName("cyclongpueffect2");
-        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
-        //    gpufire->SetLoop(true);
-        //}
-
-        ////gpuの炎
-        //{
-        //    std::shared_ptr<GameObject>gpufireeffect = boss->AddChildObject();
-        //    gpufireeffect->SetName("gpufireeffect4");
-        //    std::shared_ptr<GPUParticle>gpufire = gpufireeffect->AddComponent<GPUParticle>("Data/Effect/fire.gpuparticle", 10000);
-        //    gpufire->SetLoop(true);
-        //}
-
-        ////gpuの竜巻のエフェクト
-        //{
-        //    std::shared_ptr<GameObject>gpucycloneffect = boss->AddChildObject();
-        //    gpucycloneffect->SetName("cyclongpueffect3");
-        //    std::shared_ptr<GPUParticle>gpufire = gpucycloneffect->AddComponent<GPUParticle>("Data/Effect/cyclon.gpuparticle", 10000);
-        //    gpufire->SetLoop(true);
-        //}
     }
 #endif
 
@@ -326,8 +296,10 @@ void SceneGame::Update(float elapsedTime)
     //ボスの位置取得
     //sc->data.bossposiotn = t->GetLocalPosition();
 
+    //遷移関係
+    TransitionPVEFromResult();
+
     // ゲームオブジェクトの更新
-    PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }
@@ -487,28 +459,28 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
             reticle->SetName("reticle");
-            reticle->AddComponent<Sprite>("Data/UIData/Reticle.ui", false);
+            reticle->AddComponent<Sprite>("Data/UIData/Reticle.ui", Sprite::SpriteShader::DEFALT, false);
         }
         //HpFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
             hpFrame->SetName("HpFrame");
-            hpFrame->AddComponent<Sprite>("Data/UIData/HpFrame.ui", false);
+            hpFrame->AddComponent<Sprite>("Data/UIData/HpFrame.ui", Sprite::SpriteShader::DEFALT, false);
         }
         //HpGauge
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
             hpGauge->SetName("HpGauge");
-            hpGauge->AddComponent<Sprite>("Data/UIData/HpGauge.ui", false);
+            hpGauge->AddComponent<Sprite>("Data/UIData/HpGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
         //HpMemori
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("HpMemori");
-            hpMemori->AddComponent<Sprite>("Data/UIData/HpMemori.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/HpMemori.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostFrame
@@ -516,7 +488,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("BoostFrame");
-            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_01.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostFrame2
@@ -524,7 +496,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("BoostFrame2");
-            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_02.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostGauge
@@ -532,7 +504,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("BoostGauge");
-            hpMemori->AddComponent<Sprite>("Data/UIData/BoostGauge.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //UltFrame
@@ -540,7 +512,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("UltFrame");
-            hpMemori->AddComponent<Sprite>("Data/UIData/UltFrame.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //HideUltGauge
@@ -564,7 +536,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("SkillFrame");
-            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_01.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //SkillGauge
@@ -572,7 +544,21 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("SkillGauge");
-            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_02.ui", false);
+            hpMemori->AddComponent<Sprite>("Data/UIData/SkillFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
         }
+    }
+}
+
+void SceneGame::TransitionPVEFromResult()
+{
+    auto& boss = GameObjectManager::Instance().Find("BOSS");
+    if (!boss)return;
+
+    float hp = boss->GetComponent<CharaStatusCom>()->GetHitPoint();
+
+    if (hp <= 0)
+    {
+        if (!SceneManager::Instance().GetTransitionFlag())
+            SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
     }
 }

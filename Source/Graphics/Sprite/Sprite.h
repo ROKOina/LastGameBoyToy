@@ -11,7 +11,16 @@ class Sprite :public Component
 {
 public:
 
-    Sprite(const char* filename, bool collsion);
+    //シェーダーコードを変更する
+    enum class SpriteShader
+    {
+        DEFALT,
+        DISSOLVE
+    };
+
+public:
+
+    Sprite(const char* filename, SpriteShader spriteshader, bool collsion);
     ~Sprite() {}
 
     //初期設定
@@ -98,6 +107,9 @@ public:
         DirectX::XMFLOAT3 edgecolor = { 1,1,1 };
     };
     SaveConstantsParameter constants;
+
+    //カーソルがスプライトに当たっているか
+    bool GetHitSprite() { return hit; }
 
 private:
 

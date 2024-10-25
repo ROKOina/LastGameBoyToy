@@ -53,6 +53,7 @@ public:
         float outlineintensity = 1.0f;
     };
 
+
 private:
     std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;

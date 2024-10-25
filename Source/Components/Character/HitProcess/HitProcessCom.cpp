@@ -8,6 +8,7 @@
 void HitProcessCom::Update(float elapsedTime)
 {
     isHit = false;
+    isHitNonChara = false;
 
     //ƒqƒbƒgŠÔŠu
     hitIntervalTimer += elapsedTime;
@@ -22,7 +23,12 @@ void HitProcessCom::Update(float elapsedTime)
     for (auto& hit : col->OnHitGameObject())
     {
         auto& hitChara = hit.gameObject.lock()->GetComponent<CharacterCom>();
-        if (!hitChara)continue;
+        if (!hitChara)
+        {
+            isHitNonChara = true;
+            nonCharaObj = hit.gameObject;
+            continue;
+        }
 
         //ƒqƒbƒgˆ—
         HitProcess(parentChara->GetNetID(), hitChara->GetNetID());

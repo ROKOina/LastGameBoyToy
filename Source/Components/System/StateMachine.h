@@ -35,6 +35,12 @@ public:
 
         for (const auto& [key, state] : stateList)
         {
+            //‚±‚±‚ç•Ó‚Ìimgui‚ÍC³‚ª•K—p
+            if (ImGui::Button(state->GetName()))
+            {
+                ChangeState(key);
+            }
+
             if (ImGui::TreeNode(state->GetName()))
             {
                 state->ImGui();

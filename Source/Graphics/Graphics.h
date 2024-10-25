@@ -249,5 +249,4 @@ public:
 
 private:
     float worldSpeed_ = 1.0f;
-
 };

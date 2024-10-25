@@ -27,6 +27,13 @@ SceneManager::~SceneManager()
 //更新処理
 void SceneManager::Update(float elapsedTime)
 {
+    if (transitionAllRemoveFlag)
+    {
+        transitionAllRemoveFlag = false;
+        GameObjectManager::Instance().AllRemove();
+        GameObjectManager::Instance().Update(elapsedTime);
+    }
+
     if (nextScene_ != nullptr)
     {
         //古いシーンを終了処理
@@ -43,14 +50,17 @@ void SceneManager::Update(float elapsedTime)
     if (currentScene_ != nullptr)
     {
         currentScene_->Update(elapsedTime);
+    }
 
-        //カメラチェンジ処理用
-        isChangeCamera = false;
-        if (cameraActiveCount >= 2)
+    //遅延遷移
+    if (transitionFlag)
+    {
+        transitionTimer += elapsedTime;
+        if (transitionTime < transitionTimer)
         {
-            isChangeCamera = true;
+            ChangeScene(transitionScene_);
+            transitionFlag = false;
         }
-        cameraActiveCount = 0;
     }
 }
 
@@ -83,8 +93,15 @@ void SceneManager::ChangeScene(Scene* scene)
     //新しいシーンを設定
     nextScene_ = scene;
 
-    //危険かも
-    GameObjectManager::Instance().AllRemove();
+    transitionAllRemoveFlag = true;
+}
+
+void SceneManager::ChangeSceneDelay(Scene* scene, float time)
+{
+    transitionFlag = true;
+    transitionScene_ = scene;
+    transitionTime = time;
+    transitionTimer = 0;
 }
 
 //imgui

@@ -5,11 +5,11 @@
 #include "Components/System/Component.h"
 #include"Components/CameraCom.h"
 
+#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
+
 class FrustumCom :public Component
 {
 public:
-    //コンストラクタ
-    FrustumCom();
 
     //初期化
     void Start() override;
@@ -20,6 +20,8 @@ public:
     // GUI描画
     void OnGUI() override;
 
+    //名前設定
+    const char* GetName() const override { return "Frustum"; }
 private:
     //視錐台生成
     void CalcurateFrustum();
@@ -30,7 +32,7 @@ private:
     //視錐台とAABBの当たり判定計算
     bool IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, const DirectX::XMFLOAT3 radius);
 
-
+    bool check = false;
 
     struct  Plane
     {

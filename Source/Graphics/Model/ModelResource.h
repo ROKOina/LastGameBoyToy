@@ -91,6 +91,7 @@ public:
 
         int										nodeIndex;
         std::vector<int>						nodeIndices;
+
         std::vector<DirectX::XMFLOAT4X4>		offsetTransforms;
 
         DirectX::XMFLOAT3						boundsMin;
@@ -166,6 +167,7 @@ public:
     const std::vector<Material>& GetMaterials() const { return materials_; }
     std::vector<Mesh>& GetMeshesEdit() { return meshes_; }
     std::vector<Material>& GetMaterialsEdit() { return materials_; }
+    std::string GetFileName() { return fileName; }
 
     // ì«Ç›çûÇ›
     void Load(ID3D11Device* device, const char* filename);

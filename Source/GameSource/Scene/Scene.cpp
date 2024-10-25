@@ -15,7 +15,9 @@ void Scene::ConstantBufferInitialize()
 void Scene::ConstantBufferUpdate(float elapsedTime)
 {
     //ƒJƒƒ‰‚Ìî•ñ‚ğ‚Á‚Ä‚­‚é
-    std::shared_ptr<CameraCom> c = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>();
+    auto& camera = SceneManager::Instance().GetActiveCamera();
+    if (!camera)return;
+    auto& c = camera->GetComponent<CameraCom>();
 
     Graphics& graphics = Graphics::Instance();
 

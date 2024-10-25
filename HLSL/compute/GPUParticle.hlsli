@@ -57,10 +57,10 @@ cbuffer GPUparticleSaveConstants : register(b7)
     float3 colorScale; // 色を更に明るくするなどで使用
 
     float3 emitVec;
-    float padding3;
+    float spiralSpeed;
 
     float3 orbitalVelocity;
-    float padding4;
+    float spiralstrong;
 
     float veloRandScale;
     float speed;
@@ -69,7 +69,7 @@ cbuffer GPUparticleSaveConstants : register(b7)
 
     float2 scale;
     int scaleVariateByLife; // 大きさの変化の基準を管理 ( TRUE : 寿命によって変化 )
-    float padding6; // 大きさの変化の基準を管理 ( TRUE : 寿命によって変化 )
+    float padding6;
 
     float lifeStartSize; // パーティクルの生成時の速度
     float lifeEndSize; // パーティクルの消滅時の速度
@@ -81,6 +81,9 @@ cbuffer GPUparticleSaveConstants : register(b7)
     float buoyancy;
     float emitStartGravity;
     float emitEndGravity;
+
+    float strechscale;   //ストレッチビルボードの強度(伸びる時の大きさ)
+    float3 padding;
 }
 
 //ランダム関数

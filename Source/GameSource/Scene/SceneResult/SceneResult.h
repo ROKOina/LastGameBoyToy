@@ -33,6 +33,10 @@ public:
 
     //–¼‘OŽæ“¾
     std::string GetName() const override { return "SceneResult"; };
+
+private:
+    void UIUpdate(float elapsedTime);
+
 private:
     Light* mainDirectionalLight = nullptr;
 };

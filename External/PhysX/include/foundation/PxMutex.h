@@ -120,6 +120,7 @@ class PxMutexT : protected Alloc
 	{
 		mImpl->~PxMutexImpl();
 		Alloc::deallocate(mImpl);
+		delete mImpl;
 	}
 
 	/**

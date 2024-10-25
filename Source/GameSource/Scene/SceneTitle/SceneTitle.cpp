@@ -1,4 +1,5 @@
 #include "../Source/GameSource/Scene/SceneTitle/SceneTitle.h"
+#include "../Source/GameSource/Scene/SceneGame.h"
 #include "Graphics/Graphics.h"
 
 #include "Graphics/Light/LightManager.h"
@@ -64,29 +65,45 @@ void SceneTitle::Initialize()
         obj->AddComponent<RayCollisionCom>("Data/IKTestStage/ExampleStage.collision");
     }
 
+    //キャンバス
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("Canvas");
+
+        //タイトル
+        {
+            auto& title = obj->AddChildObject();
+            title->SetName("title");
+            title->AddComponent<Sprite>("Data/titleScene/UI/title.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //プレイ
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("next");
+            next->AddComponent<Sprite>("Data/titleScene/UI/play.ui", Sprite::SpriteShader::DEFALT, true);
+        }
+    }
+
     //平行光源を追加
     mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
     mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
     LightManager::Instance().Register(mainDirectionalLight);
-
 }
 
 void SceneTitle::Finalize()
 {
-
 }
 
 void SceneTitle::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
+    UIUpdate(elapsedTime);
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-
-
-
 }
 
 void SceneTitle::Render(float elapsedTime)
@@ -109,5 +126,24 @@ void SceneTitle::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+}
 
+void SceneTitle::UIUpdate(float elapsedTime)
+{
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+    if (!canvas)return;
+
+    //ゲームシーンへ
+    {
+        auto& next = canvas->GetChildFind("next");
+        auto& sprite = next->GetComponent<Sprite>();
+        if (sprite->GetHitSprite())
+        {
+            GamePad& gamePad = Input::Instance().GetGamePad();
+            if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+            {
+                SceneManager::Instance().ChangeScene(new SceneGame);
+            }
+        }
+    }
 }
