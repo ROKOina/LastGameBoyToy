@@ -205,7 +205,7 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     //コリジョンデータ読み込み
     if (collsion)
     {
-        LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &texture2ddesc_);
+        LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &collisionTexture2ddesc_);
     }
 
     //Dissolveデータ読み込み
@@ -463,21 +463,6 @@ void Sprite::DrawCollsionBox()
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
 
-   //
-   // // スプライトの頂点座標の計算
-   // //左上
-   // float x0 = spc.position.x;
-   // float y0 = spc.position.y;
-   // //右上
-   // float x1 = spc.position.x + spc.texSize.x * spc.scale.x;
-   // float y1 = spc.position.y;
-   // //左下
-   // float x2 = spc.position.x;
-   // float y2 = spc.position.y + spc.texSize.y * spc.scale.y;
-   // //右下
-   // float x3 = spc.position.x + spc.texSize.x * spc.scale.x;
-   // float y3 = spc.position.y + spc.texSize.y * spc.scale.y;
-
     // スプライトの位置とスケールにオフセット値を加算
       //左上
     float x0 = spc.position.x ;
@@ -507,8 +492,8 @@ void Sprite::DrawCollsionBox()
             y += cy;
         };
 
-    float cx = spc.position.x + spc.collsionpositionoffset.x;
-    float cy = spc.position.y + spc.collsionpositionoffset.y;
+    float cx = spc.position.x +  spc.pivot.x + spc.collsionpositionoffset.x;
+    float cy = spc.position.y +  spc.pivot.y + spc.collsionpositionoffset.y;
     rotate(x0, y0, cx, cy, spc.angle);
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);
@@ -925,7 +910,7 @@ bool Sprite::cursorVsCollsionBox()
 
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = { spc.position.x  + (spc.texSize.x/2) + spc.collsionpositionoffset.x,spc.position.y  + (spc.texSize.y / 2) + spc.collsionpositionoffset.y};
+    DirectX::XMFLOAT2 pos = { spc.position.x  + (spc.texSize.x /2) + spc.collsionpositionoffset.x,spc.position.y  + (spc.texSize.y  / 2) + spc.collsionpositionoffset.y};
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 
@@ -934,7 +919,7 @@ bool Sprite::cursorVsCollsionBox()
     float rightLen = Mathf::Dot(normalRight, curVecPos);
 
     //判定
-    DirectX::XMFLOAT2 scale = { (spc.texSize.x * spc.scale.x + spc.collsionscaleoffset.x),(spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) };
+    DirectX::XMFLOAT2 scale = { (spc.texSize.x / 2 + spc.collsionscaleoffset.x),(spc.texSize.y / 2 + spc.collsionscaleoffset.y) };
     if (upLen * upLen > scale.y * scale.y)return false;
     if (rightLen * rightLen > scale.x * scale.x)return false;
 

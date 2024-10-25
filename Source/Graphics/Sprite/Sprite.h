@@ -134,6 +134,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	easingshaderresourceview_;
     Microsoft::WRL::ComPtr<ID3D11Buffer>                m_constantbuffer;
     D3D11_TEXTURE2D_DESC texture2ddesc_ = {};
+    D3D11_TEXTURE2D_DESC collisionTexture2ddesc_ = {};
     DirectX::XMFLOAT2 savepos = {};
     DirectX::XMFLOAT4 savecolor = { 1,1,1,1 };
     DirectX::XMFLOAT2 savescale = {};
