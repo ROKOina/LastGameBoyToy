@@ -74,6 +74,8 @@ public:
         DirectX::XMFLOAT2 easingscale = { 0.0f,0.0f };
         DirectX::XMFLOAT2 collsionscaleoffset = { 0.0f,0.0f };
         DirectX::XMFLOAT2 collsionpositionoffset = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 pivot = { 0.0f,0.0f };
+        DirectX::XMFLOAT2 texSize{ 0.0f,0.0f };
         float angle = { 0.0f };
         float easingangle = { 0.0f };
         std::string	filename = {};
@@ -132,6 +134,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	easingshaderresourceview_;
     Microsoft::WRL::ComPtr<ID3D11Buffer>                m_constantbuffer;
     D3D11_TEXTURE2D_DESC texture2ddesc_ = {};
+    D3D11_TEXTURE2D_DESC collisionTexture2ddesc_ = {};
     DirectX::XMFLOAT2 savepos = {};
     DirectX::XMFLOAT4 savecolor = { 1,1,1,1 };
     DirectX::XMFLOAT2 savescale = {};

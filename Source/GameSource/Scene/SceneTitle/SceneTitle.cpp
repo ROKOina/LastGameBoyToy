@@ -81,7 +81,7 @@ void SceneTitle::Initialize()
         {
             auto& next = obj->AddChildObject();
             next->SetName("next");
-            next->AddComponent<Sprite>("Data/titleScene/UI/play.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/titleScene/UI/next.ui", Sprite::SpriteShader::DEFALT, true);
         }
     }
 

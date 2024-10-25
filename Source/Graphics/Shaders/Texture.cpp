@@ -41,13 +41,13 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const char* filename, ID3D11Sh
         }
         resources.insert(make_pair(wideFilename, *shader_resource_view));
     }
-
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2d;
     hr = resource.Get()->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     texture2d->GetDesc(texture2d_desc);
 
     return hr;
+
 }
 
 //‰ğ•úˆ—
