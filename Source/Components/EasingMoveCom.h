@@ -21,10 +21,16 @@ public:
     //名前設定
     const char* GetName() const override { return "EasingMove"; }
 
+    // 終了時のコールバック関数
+    std::function<void()> onFinishCallback = nullptr;
+
 private:
 
     //イージング停止
     void StopEasing();
+
+    //オブジェクトがあれば
+    void Object();
 
     //シリアライズ
     void Serialize();
@@ -43,7 +49,6 @@ public:
         std::vector<float> timescale = {};
         std::vector<int> easingtype = {};
         std::vector<int> easingmovetype = {};
-        bool loop = false;
         std::vector<DirectX::XMFLOAT3> easingposition = {};
         std::string objectname = {};
 
@@ -57,7 +62,6 @@ private:
     float easingresult = 0.0f;
     float easingtime = 0.0f;
     bool play = false;
-    bool loop = false;
     bool one = false;
     DirectX::XMFLOAT3 savepos = {};
     size_t currentTargetIndex = 0; // 現在の目標ポイントのインデックス
