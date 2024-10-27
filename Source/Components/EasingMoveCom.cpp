@@ -82,7 +82,6 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
         CEREAL_NVP(easingtype),
         CEREAL_NVP(easingmovetype),
         CEREAL_NVP(loop),
-        CEREAL_NVP(comback),
         CEREAL_NVP(easingposition),
         CEREAL_NVP(objectname)
     );
@@ -102,10 +101,10 @@ EasingMoveCom::EasingMoveCom(const char* filename)
 void EasingMoveCom::Update(float elapsedTime)
 {
     // イージングが有効な場合
-    if (play)
+    if (play && !EMP.easingposition.empty())
     {
         //イージング更新
-        easingresult = EasingUpdate(EMP.easingtype[point], EMP.easingmovetype[point], easingtime);
+        easingresult = EasingUpdate(EMP.easingtype[currentTargetIndex], EMP.easingmovetype[currentTargetIndex], easingtime);
 
         //オブジェクトがあれば
         if (!EMP.objectname.empty())
@@ -114,42 +113,49 @@ void EasingMoveCom::Update(float elapsedTime)
 
             if (gameObject != nullptr && !one)
             {
-                EMP.easingposition[point] = gameObject->transform_->GetWorldPosition();
-                one = true;
+                if (EMP.easingposition.empty())
+                {
+                    EMP.easingposition.push_back(gameObject->transform_->GetWorldPosition());
+                }
+                else
+                {
+                    EMP.easingposition.back() = gameObject->transform_->GetWorldPosition();
+                }
+
+                //最終地点の位置保存てきなフラグ
+                if (currentTargetIndex == EMP.easingposition.size() - 1)
+                {
+                    one = true;
+                }
             }
         }
+
+        // 現在の目標位置
+        DirectX::XMFLOAT3 targetPos = EMP.easingposition[currentTargetIndex];
 
         // イージング計算
-        GetGameObject()->transform_->SetWorldPosition(Mathf::Lerp(savepos, EMP.easingposition[point], easingresult));
+        GetGameObject()->transform_->SetWorldPosition(Mathf::Lerp(savepos, targetPos, easingresult));
 
         // イージング時間の更新
-        easingtime += (loop ? -1.0f : 1.0f) * elapsedTime * EMP.timescale[point];
+        easingtime += (loop ? -1.0f : 1.0f) * elapsedTime * EMP.timescale[currentTargetIndex];
 
-        // イージング時間の範囲チェック
-        if (easingtime > 1.0f)
+        //イージング完了時のチェック
+        if (easingtime >= 1.0f)
         {
-            // ループまたは戻り値が有効な場合
-            if (EMP.loop || EMP.comback)
+            easingtime = 0.0f;
+            savepos = targetPos;
+
+            //次のポイントへ移行
+            if (++currentTargetIndex >= EMP.easingposition.size())
             {
-                loop = !loop;
-                easingtime = 1.0f;
-            }
-            else
-            {
-                StopEasing(); // イージングを停止
-            }
-        }
-        else if (easingtime < 0.0f)
-        {
-            // ループが有効な場合
-            if (EMP.loop)
-            {
-                loop = !loop;
-                easingtime = 0.0f;
-            }
-            else
-            {
-                StopEasing(); // イージングを停止
+                if (EMP.loop)
+                {
+                    currentTargetIndex = 0;
+                }
+                else
+                {
+                    StopEasing();
+                }
             }
         }
     }
@@ -170,25 +176,19 @@ void EasingMoveCom::OnGUI()
         LoadDeserialize();
     }
 
-    //イージングのimgui
-    easingresult = EasingImGui(EMP.easingtype[point], EMP.easingmovetype[point], easingtime);
-
-    if (ImGui::Button("Play") && !play)
+    if (ImGui::Button((char*)u8"プレイ") && !play)
     {
         savepos = GetGameObject()->transform_->GetWorldPosition();
         play = true;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Pause"))
+    if (ImGui::Button((char*)u8"停止"))
     {
         StopEasing();
     }
     ImGui::SameLine();
     ImGui::Checkbox((char*)u8"ループ再生", &EMP.loop);
-    ImGui::SameLine();
-    ImGui::Checkbox((char*)u8"ワンカット再生", &EMP.comback);
 
-    //オブジェクトの名前をコピー
     char name[256];
     ::strncpy_s(name, sizeof(name), EMP.objectname.c_str(), sizeof(name));
     if (ImGui::InputText((char*)u8"オブジェクトの名前", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
@@ -196,8 +196,41 @@ void EasingMoveCom::OnGUI()
         EMP.objectname = name;
     }
 
-    ImGui::DragFloat("timescale", &EMP.timescale[point], 0.1f, 0.0f, 10.0f);
-    ImGui::DragFloat3("easingpostion", &EMP.easingposition[point].x, 0.1f);
+    // timescaleとeasingpositionの追加・削除UI
+    for (size_t i = 0; i < EMP.timescale.size(); ++i)
+    {
+        ImGui::PushID(i);
+
+        //イージングも同様です
+        easingresult = EasingImGui(EMP.easingtype[i], EMP.easingmovetype[i], easingtime);
+
+        // timescale の UI
+        ImGui::DragFloat((char*)u8"イージングの早さ", &EMP.timescale[i], 0.1f, 0.0f, 10.0f);
+
+        // easingposition の UI
+        ImGui::DragFloat3((char*)u8"イージング位置", &EMP.easingposition[i].x, 0.1f);
+
+        // 削除ボタン
+        if (ImGui::Button((char*)u8"削除"))
+        {
+            EMP.timescale.erase(EMP.timescale.begin() + i);
+            EMP.easingposition.erase(EMP.easingposition.begin() + i);
+            EMP.easingtype.erase(EMP.easingtype.begin() + i);
+            EMP.easingmovetype.erase(EMP.easingmovetype.begin() + i);
+            i--;
+        }
+
+        ImGui::PopID();
+    }
+
+    // Add ボタン
+    if (ImGui::Button((char*)u8"追加"))
+    {
+        EMP.timescale.push_back(0.0f);
+        EMP.easingposition.push_back({ 0.0f, 0.0f, 0.0f });
+        EMP.easingtype.push_back(static_cast<int>(EaseType::Linear));
+        EMP.easingmovetype.push_back(static_cast<int>(EaseInOutType::In));
+    }
 }
 
 //イージング停止
@@ -207,14 +240,9 @@ void EasingMoveCom::StopEasing()
     loop = false;
     one = false;
     easingtime = 0.0f;
+    currentTargetIndex = 0;
 
     GetGameObject()->transform_->SetWorldPosition(savepos);
-
-    if (!EMP.loop && !EMP.comback)
-    {
-        //今の位置を保存した位置に代入する
-        GetGameObject()->transform_->SetWorldPosition(EMP.easingposition[point]);
-    }
 }
 
 //シリアライズ

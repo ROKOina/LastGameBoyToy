@@ -21,7 +21,6 @@ static const int syncInterval = 1;
 
 Framework* Framework::instance = nullptr;
 
-
 // コンストラクタ
 Framework::Framework(HWND hWnd)
     : hWnd_(hWnd)
@@ -156,6 +155,13 @@ int Framework::Run()
 {
     MSG msg = {};
 
+    BOOL fullscreen = 0;
+    graphics_.GetSwapChain()->GetFullscreenState(&fullscreen, 0);
+    if (fullscreen)
+    {
+        graphics_.GetSwapChain()->SetFullscreenState(TRUE, 0);
+    }
+
     //終了コードならwhileぬける
     while (WM_QUIT != msg.message)
     {
@@ -186,13 +192,6 @@ int Framework::Run()
             endTime1 = clock();
             //Logger::Print((std::string("Frame Time : ") + std::to_string(endTime1 - startTime1) + "\n\n").c_str());
         }
-    }
-
-    BOOL fullscreen = 0;
-    graphics_.GetSwapChain()->GetFullscreenState(&fullscreen, 0);
-    if (fullscreen)
-    {
-        graphics_.GetSwapChain()->SetFullscreenState(FALSE, 0);
     }
 
     //// ComPtr用リーク型名表示　作成

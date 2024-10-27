@@ -44,7 +44,6 @@ public:
         std::vector<int> easingtype = {};
         std::vector<int> easingmovetype = {};
         bool loop = false;
-        bool comback = false;
         std::vector<DirectX::XMFLOAT3> easingposition = {};
         std::string objectname = {};
 
@@ -61,5 +60,5 @@ private:
     bool loop = false;
     bool one = false;
     DirectX::XMFLOAT3 savepos = {};
-    int point = {};
+    size_t currentTargetIndex = 0; // 現在の目標ポイントのインデックス
 };

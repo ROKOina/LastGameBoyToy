@@ -147,7 +147,7 @@ void InstanceRenderer::OnGUI()
 
     if (ImGui::Button((char*)u8"インスタンス生成"))
     {
-      CreateInstance(true);
+        CreateInstance(true);
     }
     m_instancemodelshader->ImGui();
 }
@@ -174,19 +174,19 @@ void InstanceRenderer::LoadModel(const char* filename)
 
 GameObj InstanceRenderer::CreateInstance(bool isChildObject)
 {
-  GameObj newObj = nullptr;
+    GameObj newObj = nullptr;
 
-  // 子オブジェクトとして生成
-  if (isChildObject) {
-    newObj = GetGameObject()->AddChildObject();
-  }
-  // 親子関係なしで生成
-  else {
-    newObj = GameObjectManager::Instance().Create();
-  }
+    // 子オブジェクトとして生成
+    if (isChildObject) {
+        newObj = GetGameObject()->AddChildObject();
+    }
+    // 親子関係なしで生成
+    else {
+        newObj = GameObjectManager::Instance().Create();
+    }
 
-  // バッチ描画に使用するので姿勢(ポインタ)を保持
-  m_instancemodelshader->AddInstance(newObj->transform_);
+    // バッチ描画に使用するので姿勢(ポインタ)を保持
+    m_instancemodelshader->AddInstance(newObj->transform_);
 
-  return newObj;
+    return newObj;
 }

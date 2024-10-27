@@ -8,9 +8,9 @@ cbuffer EffectCircleConstants : register(b0)
     float simulateTime2;
     float simulateTime3;
     float waveEffectRange;
-    
+
     float4 waveEffectColor;
-    
+
     float waveEffectIntensity;
     float3 ECdummy;
 }
@@ -35,25 +35,25 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     // 外側のサークル
     float4 color = OuterCircle.Sample(sampler_states[LINEAR], pin.texcoord);
-    
+
     // 中間のサークル
     half2 midUV = RotateUV(simulateTime1, pin.texcoord);
     color += MiddleCircle.Sample(sampler_states[LINEAR], midUV);
-    
+
     // 中心のサークル
     half2 centerUV = RotateUV(simulateTime2, pin.texcoord);
     color += CenterCircle.Sample(sampler_states[LINEAR], centerUV);
-    
+
     // エミッシブを反映
     color.rgb *= emissivecolor * emissiveintensity;
-    
+
     // 周期的に現れるオーラ
     half centerDist = length(pin.texcoord * 2.0 - 1.0);
     float wave = EffectRamp.Sample(sampler_states[LINEAR], float2(abs(centerDist) - simulateTime3, 0));
     color += wave * waveEffectColor * waveEffectIntensity * step(centerDist, waveEffectRange) * step(color.a, 0);
-    
+
     // 限りなく透明に近いピクセルは破棄する
     clip(color.a - EPSILON);
-    
+
     return color;
 }

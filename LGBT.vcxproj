@@ -171,10 +171,10 @@
     <ClInclude Include="Source\Components\Character\UenoCharacterCom.h" />
     <ClInclude Include="Source\Components\ColliderCom.h" />
     <ClInclude Include="Source\Components\CPUParticle.h" />
+    <ClInclude Include="Source\Components\DecalCom.h" />
     <ClInclude Include="Source\Components\EasingMoveCom.h" />
     <ClInclude Include="Source\Components\Enemy\Boss\BossCom.h" />
     <ClInclude Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.h" />
-    <ClInclude Include="Source\Components\EventCom.h" />
     <ClInclude Include="Source\Components\FootIKcom.h" />
     <ClInclude Include="Source\Components\FrustumCom.h" />
     <ClInclude Include="Source\Components\GPUParticle.h" />
@@ -310,10 +310,10 @@
     <ClCompile Include="Source\Components\Character\UenoCharacterCom.cpp" />
     <ClCompile Include="Source\Components\ColliderCom.cpp" />
     <ClCompile Include="Source\Components\CPUParticle.cpp" />
+    <ClCompile Include="Source\Components\DecalCom.cpp" />
     <ClCompile Include="Source\Components\EasingMoveCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\Boss\BossCom.cpp" />
     <ClCompile Include="Source\Components\Enemy\NoobEnemy\NoobEnemyCom.cpp" />
-    <ClCompile Include="Source\Components\EventCom.cpp" />
     <ClCompile Include="Source\Components\FootIKCom.cpp" />
     <ClCompile Include="Source\Components\FrustumCom.cpp" />
     <ClCompile Include="Source\Components\GPUParticle.cpp" />
@@ -394,6 +394,7 @@
     <None Include="HLSL\2D\PostEffect\FilterFunctions.hlsli" />
     <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
+    <None Include="HLSL\3D\Decal.hlsli" />
     <None Include="HLSL\3D\FakeDepth.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
@@ -413,10 +414,6 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\2D\PostEffect\CascadeShadow.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\DecalPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
@@ -475,6 +472,14 @@
     <FxCompile Include="HLSL\3D\AreaEffectCirclePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\DecalPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\DecalVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\DeferredSetupPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

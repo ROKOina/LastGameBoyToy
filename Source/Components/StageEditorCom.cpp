@@ -101,7 +101,6 @@ void StageEditorCom::OnGUI()
         }
         ImGui::SameLine();
 
-
         if (ImGui::TreeNode(objName.first.c_str()))
         {
             ImGui::Checkbox("Static", &objName.second.staticFlag);
@@ -111,7 +110,6 @@ void StageEditorCom::OnGUI()
             }
             ImGui::TreePop();
         }
-
     }
 }
 
@@ -309,6 +307,4 @@ void StageEditorCom::ObjectLoad()
             }
         }
     }
-
-
 }

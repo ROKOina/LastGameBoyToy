@@ -13,7 +13,6 @@
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\HaveAllAttackCharacter.h"
 #include "Components/Character/UenoCharacterCom.h"
-#include "Components/EventCom.h"
 #include "Components/Character/Picohard.h"
 #include "Components/CPUParticle.h"
 #include "HitProcess/HitProcessCom.h"

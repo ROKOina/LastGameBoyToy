@@ -121,8 +121,8 @@ public:
     float m_criticaldepthvalue = 300.0f;
 
 private:
-    enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, ssr, fxaa, decal, depthCopy, max };
-    enum class pixelshader { deferred, colorGrading, cascadeshadow, ssr, fxaa, decal, tonemap, max };
+    enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, ssr, fxaa, depthCopy, max };
+    enum class pixelshader { deferred, colorGrading, cascadeshadow, ssr, fxaa, tonemap, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];
 
