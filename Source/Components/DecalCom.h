@@ -25,6 +25,12 @@ public:
     //ñºëOê›íË
     const char* GetName() const override { return "Decal"; }
 
+    //ê∂ê¨ä÷êî
+    void Add(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 normal, float scale)
+    {
+        spots.push_back({ position, normal, scale });
+    }
+
 private:
 
     //ê∂ê¨èÓïÒ

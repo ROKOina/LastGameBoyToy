@@ -41,6 +41,7 @@
 #include "Components/Enemy/Boss/BossCom.h"
 #include "Components/InstanceRendererCom.h"
 #include "Components\EasingMoveCom.h"
+#include "Components\DecalCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -138,6 +139,13 @@ void SceneGame::Initialize()
         //pico位置
         cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    }
+
+    //デカールテスト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("decal");
+        std::shared_ptr<Decal> shared = obj->AddComponent<Decal>("Data/Texture/odoroki.png");
     }
 
     //BOSS

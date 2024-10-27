@@ -19,6 +19,7 @@ class GPUParticle;
 class InstanceRenderer;
 class Collider;
 class Sprite;
+class Decal;
 
 // ゲームオブジェクト
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -175,7 +176,6 @@ private:
 
     void CollideGameObjects();
 
-
     void DrawLister();
     void DrawDetail();
 
@@ -197,6 +197,9 @@ private:
 
     //GPUパーティクル描画
     void GPUParticleRender();
+
+    //デカール描画
+    void DecalRender();
 
     //スプライト描画
     void SpriteRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
@@ -228,6 +231,9 @@ private:
 
     //GPUparticle描画
     std::vector<std::weak_ptr<GPUParticle>>gpuparticleobject;
+
+    //デカール描画
+    std::vector<std::weak_ptr<Decal>> decalobject;
 
     //インスタンス描画
     std::vector<std::weak_ptr<InstanceRenderer>>instanceobject;

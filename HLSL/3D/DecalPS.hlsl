@@ -18,6 +18,7 @@ float4 main(float4 sv_position : SV_POSITION) : SV_TARGET
     position /= position.w;
     float2 decaltexcoord = float2(position.x * +0.5f + 0.5f, position.y * -0.5f + 0.5f);
     float4 color = DecalMap.Sample(sampler_states[BLACK_BORDER_LINEAR], decaltexcoord);
+    color.rgb = pow(color.rgb, GAMMA);
     clip(color.a - 0.5);
 
     return float4(color.rgb, color.a);
