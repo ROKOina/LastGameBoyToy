@@ -6,6 +6,8 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
+#include <future>
+
 class ModelResource
 {
 public:
@@ -174,6 +176,14 @@ public:
     // マテリアル情報のみ読み込む
     void LoadMaterial(ID3D11Device* device, const char* filename);
 
+    void JoinTexTH() {
+        for (auto t : f)
+        {
+            t->get();
+        }
+        f.clear();
+    }
+
 #ifdef _DEBUG
     //マテリアルシリアライズ
     void ModelResource::MaterialSerialize(const char* filename);
@@ -211,4 +221,7 @@ protected:
     std::vector<Mesh>		meshes_;
     std::vector<Animation>	animations_;
     std::string fileName;
+
+private:
+    std::vector<std::shared_ptr<std::future<void>>> f;
 };
