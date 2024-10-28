@@ -182,6 +182,7 @@
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\NodeCollsionCom.h" />
     <ClInclude Include="Source\Components\ProjectileCom.h" />
+    <ClInclude Include="Source\Components\PushBackCom.h" />
     <ClInclude Include="Source\Components\RayCollisionCom.h" />
     <ClInclude Include="Source\Components\RendererCom.h" />
     <ClInclude Include="Source\Components\RigidBodyCom.h" />
@@ -321,6 +322,7 @@
     <ClCompile Include="Source\Components\MovementCom.cpp" />
     <ClCompile Include="Source\Components\NodeCollsionCom.cpp" />
     <ClCompile Include="Source\Components\ProjectileCom.cpp" />
+    <ClCompile Include="Source\Components\PushBackCom.cpp" />
     <ClCompile Include="Source\Components\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Components\RendererCom.cpp" />
     <ClCompile Include="Source\Components\SpawnCom.cpp" />

@@ -10,6 +10,7 @@
 #include "Components/NodeCollsionCom.h"
 #include "Components\ColliderCom.h"
 #include "Components\Character\CharaStatusCom.h"
+#include "Components/PushBackCom.h"
 
 // ‰Šú‰»
 SpawnCom::SpawnCom() : currentSpawnedCount(0)
@@ -103,6 +104,10 @@ void SpawnCom::SpawnGameObject()
     std::shared_ptr<SphereColliderCom> collider = obj->AddComponent<SphereColliderCom>();
     collider->SetMyTag(COLLIDER_TAG::Enemy);
     //obj->AddComponent<FrustumCom>();
+
+    auto& pushBack = obj->AddComponent<PushBackCom>();
+    pushBack->SetRadius(1);
+    pushBack->SetWeight(0.5f);
 
     // Œ»İ‚Ì¶¬”‚ğƒCƒ“ƒNƒŠƒƒ“ƒg
     currentSpawnedCount++;

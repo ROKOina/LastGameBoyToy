@@ -18,6 +18,7 @@ class CPUParticle;
 class GPUParticle;
 class InstanceRenderer;
 class Collider;
+class PushBackCom;
 class Sprite;
 
 // ゲームオブジェクト
@@ -173,7 +174,8 @@ public:
 private:
     void StartUpObjects();
 
-    void CollideGameObjects();
+    void CollideGameObjects();  //当たり
+    void PushBackGameObjects(); //押し出し
 
 
     void DrawLister();
@@ -215,6 +217,7 @@ private:
     ImGuizmo::MODE m_guizmoMode = ImGuizmo::LOCAL;
 
     std::vector<std::weak_ptr<Collider>>	colliderObject_;
+    std::vector<std::weak_ptr<PushBackCom>>	pushBackObject_;
 
     //描画順に格納する
     std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;

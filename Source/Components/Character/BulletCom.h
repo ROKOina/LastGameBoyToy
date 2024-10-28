@@ -34,21 +34,25 @@ public:
 
     void SetOwnerID(int id) { ownerID = id; }
 
+    void SetDamageValue(int value) { damageValue = value; }
+    int GetDamageValue() { return damageValue; }
+
 private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
     GameObj hiteffectobject;
     int ownerID;
+    int damageValue = 10;
 };
 
 class BulletCreate
 {
 public:
     //ダメージ弾生成
-    static void DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
+    static void DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = -10);
 
     //スタン弾生成
-    static void StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
+    static void StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int stanValue = -3);
 
     //ノックバック弾生成
     static void KnockbackFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
