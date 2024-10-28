@@ -426,6 +426,7 @@ void GameObjectManager::StartUpObjects()
         {
             //モデルをスレッド読み込み
             rendererComponent->JoinThred();
+            rendererComponent->GetModel()->GetResource()->JoinTexTH();
 
             renderSortObject_.emplace_back(rendererComponent);
         }
