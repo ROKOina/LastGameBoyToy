@@ -63,10 +63,8 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
     auto& pushBack = obj->AddComponent<PushBackCom>();
-    pushBack->SetRadius(1);
+    pushBack->SetRadius(0.5f);
     pushBack->SetWeight(1);
-
-
 
     //煙のエフェクト
     {

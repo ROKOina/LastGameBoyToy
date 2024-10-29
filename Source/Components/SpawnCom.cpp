@@ -34,10 +34,6 @@ void SpawnCom::SpawnParameter::serialize(Archive& archive, int version)
 // 初期化
 SpawnCom::SpawnCom(const char* filename) : currentSpawnedCount(0)
 {
-    collider = nullptr;
-    renderer = nullptr;
-    cpuparticle = nullptr;
-
     //読み込み
     if (filename)
     {
@@ -90,6 +86,11 @@ void SpawnCom::OnGUI()
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
+        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE" };
+        static_assert(ARRAYSIZE(objectTypeItems) == static_cast<int>(ObjectType::MAX), "objectTypeItems Size Error!");
+        ImGui::Combo((char*)u8"オブジェクトタイプ", &sp.objecttype, objectTypeItems, static_cast<int>(ObjectType::MAX));
+        objtype = static_cast<ObjectType>(sp.objecttype);
+        sp.objecttype = static_cast<int>(objtype);
         ImGui::DragFloat((char*)u8"合計時間", &lastSpawnTime);
         ImGui::DragFloat((char*)u8"生成間隔", &sp.spawnInterval, 0.1f, 0.0f, 10.0f);
         ImGui::DragFloat((char*)u8"生成半径", &sp.spawnRadius, 0.0f, 0.0f, 50.0f);
@@ -103,6 +104,10 @@ void SpawnCom::OnGUI()
 void SpawnCom::SpawnGameObject()
 {
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    std::shared_ptr<SphereColliderCom> collider;
+    std::shared_ptr<RendererCom> renderer;
+    std::shared_ptr<CPUParticle>cpuparticle;
+    std::shared_ptr<PushBackCom>pushback;
 
     //どのオブジェクトを生成するか決定する
     switch (objtype)
@@ -121,10 +126,9 @@ void SpawnCom::SpawnGameObject()
         obj->AddComponent<CharaStatusCom>();
         collider = obj->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
-
-        //auto& pushBack = obj->AddComponent<PushBackCom>();
-        //pushBack->SetRadius(1);
-        //pushBack->SetWeight(0.5f);
+        pushback = obj->AddComponent<PushBackCom>();
+        pushback->SetRadius(0.5f);
+        pushback->SetWeight(0.5f);
 
         break;
 

@@ -79,9 +79,4 @@ private:
 
     //¶¬ƒtƒ‰ƒO
     bool spwntrigger = false;
-
-    //ƒƒ“ƒo•Ï”‚Æ‚µ‚Ä•Û‚µ‚Ä‚¨‚­
-    std::shared_ptr<SphereColliderCom> collider;
-    std::shared_ptr<RendererCom> renderer;
-    std::shared_ptr<CPUParticle>cpuparticle;
 };
