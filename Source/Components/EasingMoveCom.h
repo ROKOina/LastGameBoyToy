@@ -10,7 +10,7 @@ public:
     ~EasingMoveCom() {};
 
     //初期設定
-    void Start()override;
+    void Start()override {};
 
     //更新処理
     void Update(float elapsedTime)override;
@@ -21,10 +21,16 @@ public:
     //名前設定
     const char* GetName() const override { return "EasingMove"; }
 
+    // 終了時のコールバック関数
+    std::function<void()> onFinishCallback = nullptr;
+
 private:
 
     //イージング停止
     void StopEasing();
+
+    //オブジェクトがあれば
+    void Object();
 
     //シリアライズ
     void Serialize();
@@ -40,13 +46,12 @@ public:
     struct EasingMoveParameter
     {
         std::string	filename = {};
-        float timescale = 0.0f;
-        int easingtype = 0;
-        int easingmovetype = 0;
-        bool loop = false;
-        bool comback = false;
-        DirectX::XMFLOAT3 easingposition = {};
-        DirectX::XMFLOAT3 easingscale = {};
+        float delaytime = {};
+        bool delatimeuse = false;
+        std::vector<float> timescale = {};
+        std::vector<int> easingtype = {};
+        std::vector<int> easingmovetype = {};
+        std::vector<DirectX::XMFLOAT3> easingposition = {};
         std::string objectname = {};
 
         template<class Archive>
@@ -58,9 +63,9 @@ private:
 
     float easingresult = 0.0f;
     float easingtime = 0.0f;
+    float time = 0.0f;
     bool play = false;
-    bool loop = false;
     bool one = false;
     DirectX::XMFLOAT3 savepos = {};
-    DirectX::XMFLOAT3 savescale = {};
+    size_t currentTargetIndex = 0; // 現在の目標ポイントのインデックス
 };

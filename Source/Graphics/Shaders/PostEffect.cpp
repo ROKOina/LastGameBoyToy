@@ -28,7 +28,6 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\SSR.cso", m_pixelshaders[static_cast<int>(pixelshader::ssr)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\FXAA.cso", m_pixelshaders[static_cast<int>(pixelshader::fxaa)].GetAddressOf());
-    CreatePsFromCso(Graphics.GetDevice(), "Shader\\DecalPS.cso", m_pixelshaders[static_cast<int>(pixelshader::decal)].GetAddressOf());
 
     //MultiRenderTarget作成
     m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 6);
@@ -117,17 +116,6 @@ void PostEffect::PostEffectRender()
     { m_offScreenBuffer[static_cast<size_t>(offscreen::ssr)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get() };
     FullScreenQuad::Instance().Blit(dc, shadow, 0, _countof(shadow), m_pixelshaders[static_cast<int>(pixelshader::cascadeshadow)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::cascadeshadow)]->Deactivate(dc);
-
-    //デカール
-    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Clear(dc);
-    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Activate(dc);
-    //dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::ALPHA), nullptr, 0xFFFFFFFF);
-    //dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
-    //dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
-    //ID3D11ShaderResourceView* decal[]
-    //{ m_offScreenBuffer[static_cast<size_t>(offscreen::ssr)]->m_shaderresourceviews[0].Get() ,m_gBuffer->GetShaderResources()[2] };
-    //FullScreenQuad::Instance().Blit(dc, decal, 0, _countof(decal), m_pixelshaders[static_cast<int>(pixelshader::decal)].Get());
-    //m_offScreenBuffer[static_cast<int>(offscreen::decal)]->Deactivate(dc);
 
     //ポストエフェクト
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Clear(dc);
@@ -219,7 +207,7 @@ void PostEffect::PostEffectImGui()
     ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::Text("FinalPass");
-    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::tonemap)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::fxaa)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
     ImGui::End();
 }

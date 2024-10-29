@@ -15,6 +15,7 @@
 #include "GameSource/GameScript/FreeCameraCom.h"
 #include "Graphics/Sprite/Sprite.h"
 #include "Components/InstanceRendererCom.h"
+#include "Components\DecalCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -37,7 +38,6 @@ void GameObject::Update(float elapsedTime)
         if (!component->GetEnabled())continue;
         component->Update(elapsedTime);
     }
-
 }
 
 void GameObject::OnDestroy()
@@ -248,6 +248,8 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     RenderUseDepth();
     InstanceRenderUseDepth();
 
+    //デカール描画
+    DecalRender();
 
     //ポストエフェクト
     PostEffect::Instance().PostEffectRender();
@@ -459,6 +461,13 @@ void GameObjectManager::StartUpObjects()
             instanceobject.emplace_back(instancecomp);
         }
 
+        //デカールオブジェクトがあれば入る
+        std::shared_ptr<Decal>decalcomp = obj->GetComponent<Decal>();
+        if (decalcomp)
+        {
+            decalobject.emplace_back(decalcomp);
+        }
+
         obj->Start();
         updateGameObject_.emplace_back(obj);
 
@@ -626,6 +635,16 @@ void GameObjectManager::RemoveGameObjects()
         {
             instanceobject.erase(instanceobject.begin() + ins);
             --ins;
+        }
+    }
+
+    //デカール解放
+    for (int d = 0; d < decalobject.size(); ++d)
+    {
+        if (decalobject[d].expired())
+        {
+            decalobject.erase(decalobject.begin() + d);
+            --d;
         }
     }
 
@@ -912,6 +931,20 @@ void GameObjectManager::GPUParticleRender()
         if (!po.lock()->GetEnabled())continue;
 
         po.lock()->Render();
+    }
+}
+
+//デカール描画
+void GameObjectManager::DecalRender()
+{
+    if (decalobject.size() <= 0)return;
+
+    for (std::weak_ptr<Decal>& d : decalobject)
+    {
+        if (!d.lock()->GetGameObject()->GetEnabled())continue;
+        if (!d.lock()->GetEnabled())continue;
+
+        d.lock()->Render();
     }
 }
 

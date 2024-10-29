@@ -13,7 +13,6 @@
 #include "Components\Character\InazawaCharacterCom.h"
 #include "Components\Character\HaveAllAttackCharacter.h"
 #include "Components/Character/UenoCharacterCom.h"
-#include "Components/EventCom.h"
 #include "Components/Character/Picohard.h"
 #include "Components/CPUParticle.h"
 #include "Components/PushBackCom.h"
@@ -67,10 +66,8 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
     auto& pushBack = obj->AddComponent<PushBackCom>();
-    pushBack->SetRadius(1);
+    pushBack->SetRadius(0.5f);
     pushBack->SetWeight(1);
-
-
 
     //煙のエフェクト
     {

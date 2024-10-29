@@ -22,7 +22,7 @@ float3 RGB2HSV(float3 rgb)
 	// H（色相） RGBのうち最大値と最小値の差から求める
     if (hsv.y > 0.0f)
     {
-		
+
         if (Vmax == rgb.r)
         {
             hsv.x = 60 * ((rgb.g - rgb.b) / delta);

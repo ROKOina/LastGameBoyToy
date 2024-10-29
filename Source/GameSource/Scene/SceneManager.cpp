@@ -15,6 +15,7 @@
 #include "SceneTitle/SceneTitle.h"
 #include "SceneResult/SceneResult.h"
 #include "SceneTraining/SceneTraining.h"
+#include "Graphics\Shaders\PostEffect.h"
 
 SceneManager::SceneManager()
 {
@@ -56,12 +57,16 @@ void SceneManager::Update(float elapsedTime)
     if (transitionFlag)
     {
         transitionTimer += elapsedTime;
+        exposetransiotnflag = false;
         if (transitionTime < transitionTimer)
         {
             ChangeScene(transitionScene_);
             transitionFlag = false;
         }
     }
+
+    //‚±‚±‚Å‰æ–ÊˆÃ“]‚µ‚Ä‚¢‚é‚æIIbyã–ì
+    PostEffect::Instance().ParameterMove(elapsedTime / 1.3f, 1.4f, exposetransiotnflag, PostEffect::PostEffectParameter::Exposure);
 }
 
 //•`‰æˆ—
@@ -70,6 +75,7 @@ void SceneManager::Render(float elapsedTime)
     if (currentScene_ != nullptr)
     {
         currentScene_->Render(elapsedTime);
+        exposetransiotnflag = true;
     }
 
     //imgui

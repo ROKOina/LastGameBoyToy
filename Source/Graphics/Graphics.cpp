@@ -400,7 +400,7 @@ Graphics::Graphics(HWND hWnd)
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
 
-        // TEST_ON & WRITE_ON
+        // TEST_ON & WRITE_OFF
         {
             desc.DepthEnable = TRUE;
             desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -409,7 +409,7 @@ Graphics::Graphics(HWND hWnd)
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
 
-        // TEST_ON & WRITE_ON
+        // TEST_OFF & WRITE_ON
         {
             desc.DepthEnable = FALSE;
             desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -418,7 +418,7 @@ Graphics::Graphics(HWND hWnd)
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
 
-        // TEST_ON & WRITE_ON
+        // TEST_OFF & WRITE_OFF
         {
             desc.DepthEnable = FALSE;
             desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;

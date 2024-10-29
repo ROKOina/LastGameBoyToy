@@ -29,7 +29,7 @@ enum class CB_INDEX
     SHADOW_PAR = 9,
     SCENE = 10,
     GENERAL = 11,
-    PROJECTIONMAPPING = 12,
+    DECAL = 12,
 
     MAX
 };

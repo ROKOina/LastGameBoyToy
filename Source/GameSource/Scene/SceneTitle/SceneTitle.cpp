@@ -128,10 +128,13 @@ void SceneTitle::Render(float elapsedTime)
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
 }
 
+//bool t = true;
 void SceneTitle::UIUpdate(float elapsedTime)
 {
     auto& canvas = GameObjectManager::Instance().Find("Canvas");
     if (!canvas)return;
+
+    GamePad& gamePad = Input::Instance().GetGamePad();
 
     //ゲームシーンへ
     {
@@ -139,11 +142,21 @@ void SceneTitle::UIUpdate(float elapsedTime)
         auto& sprite = next->GetComponent<Sprite>();
         if (sprite->GetHitSprite())
         {
-            GamePad& gamePad = Input::Instance().GetGamePad();
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
-                SceneManager::Instance().ChangeScene(new SceneGame);
+                //t = false;
+                if (!SceneManager::Instance().GetTransitionFlag())
+                {
+                    SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
+                }
             }
         }
+
+        //ここで暗転しているよ！！by上野
+
+        //if (!t)
+        //{
+        //    PostEffect::Instance().ParameterMove(elapsedTime, 1.4f, t, PostEffect::PostEffectParameter::Exposure);
+        //}
     }
 }

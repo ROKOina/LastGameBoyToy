@@ -41,6 +41,7 @@
 #include "Components/Enemy/Boss/BossCom.h"
 #include "Components/InstanceRendererCom.h"
 #include "Components\EasingMoveCom.h"
+#include "Components\DecalCom.h"
 #include "Components\PushBackCom.h"
 #include "Components\UI\UiSystem.h"
 #include "Components\UI\UiGauge.h"
@@ -163,14 +164,14 @@ void SceneGame::Initialize()
         boss->AddComponent<CharaStatusCom>();
 
         auto& pushBack = boss->AddComponent<PushBackCom>();
-        pushBack->SetRadius(3);
-        pushBack->SetWeight(5);
+        pushBack->SetRadius(2);
+        pushBack->SetWeight(10);
 
         //ボンプ君
         {
             std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
             bompspawn->SetName("bomp");
-            bompspawn->AddComponent<SpawnCom>();
+            bompspawn->AddComponent<SpawnCom>(nullptr);
         }
 
         //左手コリジョン
@@ -219,21 +220,15 @@ void SceneGame::Initialize()
             std::shared_ptr<CPUParticle>cpuparticle = cycloneffect->AddComponent<CPUParticle>("Data/Effect/cyclon.cpuparticle", 1000);
             cpuparticle->SetActive(false);
         }
-
-        //火球
-        {
-            std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
-            cpufireeffect->SetName("fireball");
-            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fireball.cpuparticle", 1000);
-            cpufire->SetActive(false);
-            cpufireeffect->AddComponent<EasingMoveCom>(nullptr);
-            std::shared_ptr<SphereColliderCom> fireballcollider = cpufireeffect->AddComponent<SphereColliderCom>();
-            fireballcollider->SetEnabled(false);
-            fireballcollider->SetMyTag(COLLIDER_TAG::Enemy);
-            fireballcollider->SetJudgeTag(COLLIDER_TAG::Player);
-            fireballcollider->SetRadius(1.0f);
-        }
     }
+
+    //デカールテスト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("decal");
+        std::shared_ptr<Decal> shared = obj->AddComponent<Decal>("Data/Texture/odoroki.png");
+    }
+
 #endif
 
     //UIゲームオブジェクト生成
