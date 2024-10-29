@@ -4,6 +4,7 @@
 #include"../../Character/CharaStatusCom.h"
 #include "Graphics/Graphics.h"
 #include "Components/RendererCom.h"
+#include <cmath>
 
 //コンストラクタ
 NoobEnemyCom::NoobEnemyCom()
@@ -24,7 +25,7 @@ void NoobEnemyCom::OnGUI()
 void NoobEnemyCom::Start()
 {
     animationCom = GetGameObject()->GetComponent<AnimationCom>();
-    TransitionPursuit();
+    TransitionIdleState();
 }
 
 //更新処理
@@ -85,6 +86,8 @@ void NoobEnemyCom::StateUpdate(float elapsedTime)
 void NoobEnemyCom::TransitionIdleState()
 {
     state = State::Idle;
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+    firstIdleTime = static_cast<float>(rand()) / RAND_MAX * 1.5f;
 }
 
 //追跡ステート
@@ -103,7 +106,13 @@ void NoobEnemyCom::TransitionExplosion()
 //待機ステート更新処理
 void NoobEnemyCom::UpdateIdle(float elapsedTime)
 {
-    //今は何もしない
+    firstIdleTimer += elapsedTime;
+    //ランダムで待機
+    if (firstIdleTime < firstIdleTimer)
+    {
+        TransitionPursuit();
+        firstIdleTime = 0.0f;
+    }
 }
 
 //追跡ステート更新処理
