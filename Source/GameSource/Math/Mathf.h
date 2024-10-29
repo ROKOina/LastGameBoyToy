@@ -17,6 +17,8 @@ public:
   // 球面補間
   static DirectX::XMFLOAT4 Slerp(const DirectX::XMFLOAT4& start, const DirectX::XMFLOAT4& end, const  float& time);
 
+  static float Clamp(float value, float min, float max);
+
   // SourceからTargetに向くクォータニオンを算出
   static DirectX::XMFLOAT4 LookAt(const DirectX::XMFLOAT3& source, const DirectX::XMFLOAT3& target);
 

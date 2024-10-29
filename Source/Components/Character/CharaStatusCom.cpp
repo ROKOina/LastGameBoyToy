@@ -29,7 +29,7 @@ void CharaStatusCom::AddDamagePoint(float value)
 //GUI
 void CharaStatusCom::OnGUI()
 {
-    ImGui::DragInt("HP", &hitPoint);
+    ImGui::DragFloat("HP", &hitPoint);
     ImGui::DragFloat("Invincible Time", &invincibleTime, 0.1f, 0.0f, 10.0f);
     ImGui::Text("Current Invincible Time: %.2f", currentInvincibleTime);
 }
