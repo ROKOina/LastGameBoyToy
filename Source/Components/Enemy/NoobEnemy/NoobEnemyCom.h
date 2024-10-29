@@ -84,11 +84,15 @@ private:
     //移動スピード
     float speed = 0.7f;
     //爆発するまでの距離
-    float explosionDist = 1.0f;
+    float explosionDist = 3.0f;
     //爆発範囲
     float explosionRange = 1.5f;
     //爆発で与えるダメージ
     float explosionDamage = 10.0f;
     //爆発猶予
     float explosionGrace = 1.0f;
+    //最初の待機時間
+    float firstIdleTime = 0.0f;
+    //待機時間を進める時間
+    float firstIdleTimer = 0.0f;
 };
