@@ -14,6 +14,7 @@
 #include "Logger.h"
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
+#include "Components/PushBackCom.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -120,6 +121,10 @@ void SpawnCom::SpawnGameObject()
         obj->AddComponent<CharaStatusCom>();
         collider = obj->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
+
+        //auto& pushBack = obj->AddComponent<PushBackCom>();
+        //pushBack->SetRadius(1);
+        //pushBack->SetWeight(0.5f);
 
         break;
 

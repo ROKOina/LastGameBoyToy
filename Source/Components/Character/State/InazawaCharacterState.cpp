@@ -104,7 +104,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         );
 
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, 50);
         //Fire(owner->GetGameObject(), arrowSpeed, attackPower);
         //RayFire(owner->GetGameObject());
 
@@ -151,7 +151,7 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
     {
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, 1, 20);
         //Fire(owner->GetGameObject(), arrowSpeed);
         arrowCount--;
         intervalTimer = 0;

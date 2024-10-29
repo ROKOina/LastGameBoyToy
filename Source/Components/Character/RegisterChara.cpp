@@ -15,6 +15,7 @@
 #include "Components/Character/UenoCharacterCom.h"
 #include "Components/Character/Picohard.h"
 #include "Components/CPUParticle.h"
+#include "Components/PushBackCom.h"
 #include "HitProcess/HitProcessCom.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
@@ -60,6 +61,12 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
+
+    auto& pushBack = obj->AddComponent<PushBackCom>();
+    pushBack->SetRadius(1);
+    pushBack->SetWeight(1);
+
+
 
     //煙のエフェクト
     {

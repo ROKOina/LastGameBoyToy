@@ -65,7 +65,11 @@ public:
 
     SHADER_ID_MODEL GetShaderMode() { return shaderID; }
 
+    void JoinThred() { future.get(); }
+
 private:
+    void ModelInitialize(const char* filename);
+
 #ifdef _DEBUG
     // マテリアルを選択するImGui
     void MaterialSelector();
@@ -107,4 +111,7 @@ private:
     std::string					filePathDriveToModel = "";
 
 #endif // _DEBUG
+
+    //モデル読み込みをスレッド化
+    std::future<void> future;
 };

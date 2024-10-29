@@ -28,10 +28,10 @@ Framework::Framework(HWND hWnd)
     , graphics_(hWnd)
 {
     //sceneGame.Initialize();
-    //SceneManager::Instance().ChangeScene(new SceneGame);
+    SceneManager::Instance().ChangeScene(new SceneGame);
     //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     //SceneManager::Instance().ChangeScene(new SceneDebugGame);
-    SceneManager::Instance().ChangeScene(new SceneTitle);
+    //SceneManager::Instance().ChangeScene(new SceneTitle);
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
     //SceneManager::Instance().ChangeScene(new SceneTitle);

@@ -18,6 +18,7 @@ class CPUParticle;
 class GPUParticle;
 class InstanceRenderer;
 class Collider;
+class PushBackCom;
 class Sprite;
 class Decal;
 
@@ -174,7 +175,8 @@ public:
 private:
     void StartUpObjects();
 
-    void CollideGameObjects();
+    void CollideGameObjects();  //ìñÇΩÇË
+    void PushBackGameObjects(); //âüÇµèoÇµ
 
     void DrawLister();
     void DrawDetail();
@@ -218,6 +220,7 @@ private:
     ImGuizmo::MODE m_guizmoMode = ImGuizmo::LOCAL;
 
     std::vector<std::weak_ptr<Collider>>	colliderObject_;
+    std::vector<std::weak_ptr<PushBackCom>>	pushBackObject_;
 
     //ï`âÊèáÇ…äiî[Ç∑ÇÈ
     std::vector<std::weak_ptr<RendererCom>>   renderSortObject_;
