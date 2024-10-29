@@ -233,6 +233,9 @@ void Decal::Render()
 DirectX::XMFLOAT3 pos = {};
 void Decal::OnGUI()
 {
+    ImGui::Text((char*)u8"ÉäÉ\Å[ÉX");
+    ImGui::Image(decalmap.Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+
     if (ImGui::Button("Create"))
     {
         pos.x += 0.5f;

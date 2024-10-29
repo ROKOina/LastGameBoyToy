@@ -78,6 +78,7 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
     archive
     (
         CEREAL_NVP(filename),
+        CEREAL_NVP(delaytime),
         CEREAL_NVP(timescale),
         CEREAL_NVP(easingtype),
         CEREAL_NVP(easingmovetype),
@@ -99,6 +100,19 @@ EasingMoveCom::EasingMoveCom(const char* filename)
 //更新処理
 void EasingMoveCom::Update(float elapsedTime)
 {
+    //遅延を有効にしている場合
+    if (EMP.delatimeuse)
+    {
+        time += elapsedTime;
+
+        // 遅延時間を超えた場合にイージングを開始
+        if (time >= EMP.delaytime && !play)
+        {
+            play = true;
+            savepos = GetGameObject()->transform_->GetWorldPosition();
+        }
+    }
+
     // イージングが有効な場合
     if (play && !EMP.easingposition.empty())
     {
@@ -164,6 +178,10 @@ void EasingMoveCom::OnGUI()
     ImGui::Text((char*)u8"現在のインデックス: %d", currentTargetIndex);
     ImGui::ProgressBar(easingresult, ImVec2(0.0f, 0.0f), (char*)u8"進行状況");  // 進捗バーを追加
 
+    ImGui::Checkbox((char*)u8"開始時間の遅延", &EMP.delatimeuse);
+    ImGui::DragFloat((char*)u8"経過時間", &time);
+    ImGui::DragFloat((char*)u8"遅延時間", &EMP.delaytime, 0.1f, 0.0f, 10.0f);
+
     // timescaleとeasingpositionの追加・削除UI
     for (size_t i = 0; i < EMP.timescale.size(); ++i)
     {
@@ -218,6 +236,7 @@ void EasingMoveCom::StopEasing()
     one = false;
     easingtime = 0.0f;
     currentTargetIndex = 0;
+    time = 0.0f;
 
     GetGameObject()->transform_->SetWorldPosition(savepos);
 

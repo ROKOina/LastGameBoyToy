@@ -171,7 +171,7 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
             bompspawn->SetName("bomp");
-            bompspawn->AddComponent<SpawnCom>();
+            bompspawn->AddComponent<SpawnCom>(nullptr);
         }
 
         //¶èƒRƒŠƒWƒ‡ƒ“

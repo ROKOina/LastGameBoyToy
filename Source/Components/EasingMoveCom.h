@@ -46,6 +46,8 @@ public:
     struct EasingMoveParameter
     {
         std::string	filename = {};
+        float delaytime = {};
+        bool delatimeuse = false;
         std::vector<float> timescale = {};
         std::vector<int> easingtype = {};
         std::vector<int> easingmovetype = {};
@@ -61,6 +63,7 @@ private:
 
     float easingresult = 0.0f;
     float easingtime = 0.0f;
+    float time = 0.0f;
     bool play = false;
     bool one = false;
     DirectX::XMFLOAT3 savepos = {};
