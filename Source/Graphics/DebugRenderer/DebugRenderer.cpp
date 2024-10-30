@@ -149,29 +149,27 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     // メッシュ描画
     for (const Mesh& mesh : meshs_)
     {
-        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-        context->IASetVertexBuffers(0, 1, cylinderVertexBuffer_.GetAddressOf(), &stride, &offset);
+        //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+        //context->IASetVertexBuffers(0, 1, mesh.meshVertexBuffer_.GetAddressOf(), &stride, &offset);
+
         // PxRenderBufferからデバッグ描画用データを取得
-        const PxRenderBuffer& rb = PhysXLib::Instance().GetScene()->getRenderBuffer();
+        //const PxRenderBuffer& rb = PhysXLib::Instance().GetScene()->getRenderBuffer();
 
         // トライアングルを描画する（必要に応じて）
-        for (PxU32 i = 0; i < rb.getNbTriangles(); i++) {
-            const PxDebugTriangle& triangle = rb.getTriangles()[i];
-            // triangle.pos0, triangle.pos1, triangle.pos2 を使ってトライアングルを描画
-            
+        //for (PxU32 i = 0; i < rb.getNbTriangles(); i++) {
+        //    const PxDebugTriangle& triangle = rb.getTriangles()[i];
+        //     triangle.pos0, triangle.pos1, triangle.pos2 を使ってトライアングルを描画
+        //    
 
-            // 頂点バッファにデータをアップロード
-            D3D11_MAPPED_SUBRESOURCE mappedResource;
-            deviceContext->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-            memcpy(mappedResource.pData, vertices, sizeof(vertices));
-            deviceContext->Unmap(vertexBuffer, 0);
+        //     頂点バッファにデータをアップロード
+        //    D3D11_MAPPED_SUBRESOURCE mappedResource;
+        //    deviceContext->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        //    memcpy(mappedResource.pData, vertices, sizeof(vertices));
+        //    deviceContext->Unmap(vertexBuffer, 0);
 
-            // プリミティブトポロジを設定 (三角形リスト)
-            deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-            // 描画実行
-            deviceContext->Draw(3, 0);
-        }
+        //     描画実行
+        //    context->Draw(3, 0);
+        //}
     }
 }
 
@@ -221,6 +219,11 @@ void DebugRenderer::DrawRigidMesh(std::string filename, const physx::PxRigidActo
 
     Mesh mesh;
     mesh.position += transform.p;
+
+    mesh.rotation.x = transform.q.x;
+    mesh.rotation.y = transform.q.y;
+    mesh.rotation.z = transform.q.z;
+    mesh.rotation.w = transform.q.w;
 }
 
 // 球メッシュ作成

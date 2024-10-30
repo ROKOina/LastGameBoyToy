@@ -39,7 +39,7 @@ public:
         PxRaycastBuffer& hitBuffer);
 
     //Modelの形の当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic,ModelResource* model);
+    physx::PxRigidActor* GenerateCollider(bool isStatic,ModelResource* model, GameObj obj);
     //矩形、球、カプセルの当たり判定作成
     physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj);
 
@@ -61,6 +61,15 @@ private:
     PxFoundation* gFoundation = nullptr;
     PxDefaultCpuDispatcher* gDispatcher = nullptr;
     PxScene* gScene = nullptr;
+
+
+    static constexpr auto HostID = "127.0.0.1";
+    static constexpr auto PostID = 5425;
+    static constexpr auto TimeoutMilliSecounds = 10;
+
+    physx::PxPvd* m_device = nullptr;
+    physx::PxPvdTransport* m_transport = nullptr;
+    physx::PxPvdSceneClient* m_cliant = nullptr;
 };
 
 namespace physx

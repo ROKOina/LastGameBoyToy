@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include "Components\NodeCollsionCom.h"
+#include "Phsix\Physxlib.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -33,6 +34,92 @@ void StageEditorCom::Update(float elapsedTime)
             ObjectPlace(
                 objType,              //選択中のオブジェクト
                 hit.position,         //位置
+                { 0.02f,0.02f,0.02f },//スケール
+                { 0,0,0,1 },          //回転値
+                placeObjcts[objType.c_str()].filePath.c_str(),    //modelのパス
+                placeObjcts[objType.c_str()].collisionPath.c_str()//nodeCollsionのパス
+            );
+        }
+    }
+
+    if (Mouse::BTN_RIGHT & mouse.GetButtonDown() && nowEdit && onImGui)
+    {
+        Graphics& graphics = Graphics::Instance();
+        ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+        CameraCom* cameraCom = SceneManager::Instance().GetActiveCamera()->GetComponent<CameraCom>().get();
+
+        // ビューポート
+        D3D11_VIEWPORT view_port;
+        UINT numViewports = 1;
+        dc->RSGetViewports(&numViewports, &view_port);
+
+        // 変換行列
+        DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&cameraCom->GetView());
+        DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&cameraCom->GetProjection());
+        DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+
+        Mouse& mouse = Input::Instance().GetMouse();
+
+        // マウスカーソル座標を取得
+        DirectX::XMFLOAT3 screen_position;
+        screen_position.x = static_cast<float>(mouse.GetPositionX());
+        screen_position.y = static_cast<float>(mouse.GetPositionY());
+        screen_position.z = 0;
+
+        // レイの始点
+        DirectX::XMFLOAT3 world_start;
+        DirectX::XMStoreFloat3(&world_start,
+            DirectX::XMVector3Unproject(
+                DirectX::XMLoadFloat3(&screen_position),
+                view_port.TopLeftX,	//	ビューポート左上X座標
+                view_port.TopLeftY,	//	ビューポート左上Y座標
+                view_port.Width,	//	ビューポート幅
+                view_port.Height,	//	ビューポート高さ
+                0.0f,	// 深度値の最小値
+                1.0f,	// 深度値の最大値
+                Projection,	//	プロジェクション行列
+                View,	//	ビュー行列
+                World	//	ワールド行列
+            )
+        );
+
+        screen_position.z = 1;
+
+        // レイの終点
+        DirectX::XMFLOAT3 world_end;
+        DirectX::XMStoreFloat3(&world_end,
+            DirectX::XMVector3Unproject(
+                DirectX::XMLoadFloat3(&screen_position),
+                view_port.TopLeftX,	//	ビューポート左上X座標
+                view_port.TopLeftY,	//	ビューポート左上Y座標
+                view_port.Width,	//	ビューポート幅
+                view_port.Height,	//	ビューポート高さ
+                0.0f,	// 深度値の最小値
+                1.0f,	// 深度値の最大値
+                Projection,	//	プロジェクション行列
+                View,	//	ビュー行列
+                World	//	ワールド行列
+            )
+        );
+
+        //マウスとステージの当たり判定
+        HitResult hit;
+        PxVec3 pos;
+        pos += world_start;
+
+        PxVec3 dir;
+        dir += world_end - world_start;
+
+        physx::PxRaycastBuffer Buf;
+
+        if (PhysXLib::Instance().RayCast_PhysX(pos, dir, 1000, Buf))
+        {
+            DirectX::XMFLOAT3 p;
+            p += Buf.block.position;
+
+            ObjectPlace(
+                objType,              //選択中のオブジェクト
+                p,         //位置
                 { 0.02f,0.02f,0.02f },//スケール
                 { 0,0,0,1 },          //回転値
                 placeObjcts[objType.c_str()].filePath.c_str(),    //modelのパス

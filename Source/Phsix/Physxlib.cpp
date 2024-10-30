@@ -6,27 +6,42 @@ void PhysXLib::Initialize()
 {
     gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
 
+    // PVDと接続する設定
+    m_device = physx::PxCreatePvd(*gFoundation);
+    //m_transport = PxDefaultPvdFileTransportCreate("PHYSX_TEST");
+    m_transport = physx::PxDefaultPvdSocketTransportCreate(HostID, PostID, TimeoutMilliSecounds);
+    bool result = m_device->connect(*m_transport, physx::PxPvdInstrumentationFlag::eALL);
+
     // Physicsオブジェクトの作成
-    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), false);
+    gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, m_device);
     // シーンの設定
     PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
     sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f); // 重力設定
+    sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
     gDispatcher = PxDefaultCpuDispatcherCreate(2);  // 2スレッドでディスパッチャーを作成
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-    PxInitExtensions(*gPhysics, nullptr);
-
+    PxInitExtensions(*gPhysics, m_device);
 
     // シーンの作成
     gScene = gPhysics->createScene(sceneDesc);
-    //gScene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
-    //gScene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+    gScene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
+    gScene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
-    ////静的オブジェクトの追加
-    //rigid_static
+    m_cliant = gScene->getScenePvdClient();
+    if (m_cliant)
+    {
+        m_cliant->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
+        m_cliant->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
+        m_cliant->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+    }
+
+
+    //////静的オブジェクトの追加
+    //auto rigid_static
     //    = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
     //// 形状(Box)を作成
-    //box_shape
+    //auto box_shape
     //    = gPhysics->createShape(
     //        // Boxの大きさ
     //        physx::PxBoxGeometry(5.f, 0.5f, 5.f),
@@ -57,6 +72,10 @@ void PhysXLib::Finalize()
     SAFE_RELEASE(gScene);
     SAFE_RELEASE(gDispatcher);
     SAFE_RELEASE(gPhysics);
+
+    m_transport->disconnect();
+    SAFE_RELEASE(m_device);
+    SAFE_RELEASE(m_transport);
     SAFE_RELEASE(gFoundation);
 }
 
@@ -73,7 +92,7 @@ bool PhysXLib::RayCast_PhysX(const PxVec3& origin, const PxVec3& unitDir, const 
     return gScene->raycast(origin, unitDir, maxDistance, hitBuffer);
 }
 
-physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* model)
+physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* model, GameObj obj)
 {
     ModelResource::Node rootNode = *model->GetNodes().data();
 
@@ -86,6 +105,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
             PxVec3 pos = { ver.position.x,ver.position.y,ver.position.z };
             vertices.emplace_back(pos);
         }
+
         std::vector<PxU32> indices;
         for (auto& ver : mesh.indices)
         {
@@ -105,11 +125,15 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
 
         physx::PxTolerancesScale tolerances_scale;
         PxCookingParams cooking_params(tolerances_scale);
-        cooking_params.convexMeshCookingType = physx::PxConvexMeshCookingType::Enum::eQUICKHULL;
-        cooking_params.gaussMapLimit = 256;
+
+        
+        cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
+        cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
 
         physx::PxTriangleMesh* triangle_mesh = nullptr;
         physx::PxDefaultMemoryOutputStream write_buffer;
+        
+
         if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
             assert(0 && "PxCookTriangleMesh failed.");
         }
@@ -128,7 +152,14 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
             //動かない(静的)剛体を作成
             rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
             PxTransform& pos = rigidObj->getGlobalPose();
-            pos.p = { 0,0,0 };
+            pos.p.x = obj->transform_->GetWorldPosition().x;
+            pos.p.y = obj->transform_->GetWorldPosition().y;
+            pos.p.z = obj->transform_->GetWorldPosition().z;
+
+            auto quat = DirectX::XMQuaternionRotationRollPitchYaw(DirectX::XMConvertToRadians(-90), 0, 0);
+            DirectX::XMFLOAT4 quatF(quat.m128_f32);
+            pos.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+
             rigidObj->setGlobalPose(pos);
         }
         else {
@@ -136,10 +167,14 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
             rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
         }
 
+        //当たり判定とモデルのスケールを合わせる
+        DirectX::XMFLOAT3 sV = obj->transform_->GetScale();
+        float modelDefaultScale = 100.0f;//モデルエディターの１をこのプロジェクトサイズにする値
+        physx::PxMeshScale scale(PxVec3(sV.x * 100.0f, sV.y * 100.0f,sV.z * 100.0f));
+        
 
-        physx::PxMeshScale scale(PxVec3(1.0f, 1.0f, 1.0f));
+        //メッシュを当たり判定にセット
         PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
-
         PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
         rigidObj->attachShape(*shape);
 
@@ -164,7 +199,10 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     }
     else {
         // 動かすことのできる(動的)剛体を作成
-        rigidObj = gPhysics->createRigidDynamic(transform);
+        auto dynamic = gPhysics->createRigidDynamic(transform);
+        dynamic->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+
+        rigidObj = dynamic;
     }
 
     // 形状(Box)を作成

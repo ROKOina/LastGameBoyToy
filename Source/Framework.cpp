@@ -255,7 +255,7 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
     case WM_SIZE:
     {
         // サイズ変更
-        Resize(LOWORD(lParam), HIWORD(lParam));
+        //Resize(LOWORD(lParam), HIWORD(lParam));
         break;
     }
     default:

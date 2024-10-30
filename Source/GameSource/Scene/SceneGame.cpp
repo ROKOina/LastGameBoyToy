@@ -65,7 +65,6 @@ SceneGame::~SceneGame()
 void SceneGame::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
-    PhysXLib::Instance().Initialize();
 
 #pragma region ゲームオブジェクトの設定
 
@@ -89,10 +88,11 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        //obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        obj->transform_->SetScale({ 0.5f, 0.5f, 0.5f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/canyon/stage.mdl");
+        //r->LoadModel("Data/canyon/stage.mdl");
+        r->LoadModel("Data/aaaaa.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
@@ -106,7 +106,7 @@ void SceneGame::Initialize()
     std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
         roboobj->SetName("robo");
-        roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
+        roboobj->transform_->SetWorldPosition({ 0, 46.3f, 0 });
         roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
         std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/OneCoin/robot.mdl");
@@ -242,7 +242,6 @@ void SceneGame::Update(float elapsedTime)
     //sc->data.bossposiotn = t->GetWorldPosition();
 
     // ゲームオブジェクトの更新
-    PhysXLib::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }
