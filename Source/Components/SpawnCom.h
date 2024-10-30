@@ -63,6 +63,7 @@ public:
         int spawnCount = 0;        //生成個数
         int objecttype = 0;        //オブジェクトのタイプ
         float Yoffset = 0.0f;      //Y軸のオフセット
+        DirectX::XMFLOAT2 distanceXY = { 0.0f ,0.0f }; //距離
 
         template<class Archive>
         void serialize(Archive& archive, int version);

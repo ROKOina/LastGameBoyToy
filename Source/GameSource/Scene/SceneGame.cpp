@@ -171,7 +171,7 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
             bompspawn->SetName("bomp");
-            bompspawn->AddComponent<SpawnCom>(nullptr);
+            bompspawn->AddComponent<SpawnCom>("Data/SpawnData/missile.spawn");
         }
 
         //¶ŽèƒRƒŠƒWƒ‡ƒ“
@@ -479,8 +479,6 @@ void SceneGame::CreateUiObject()
             gauge->SetMaxValue(200);
             float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
             gauge->SetVariableValue(i);
-
-          
         }
         //HpMemori
         {
