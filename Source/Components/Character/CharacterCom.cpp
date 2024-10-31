@@ -125,10 +125,11 @@ void CharacterCom::Update(float elapsedTime)
 
     //野村追加 Rキー
     if (CharacterInput::UltimetButton_R & GetButtonDown()
-        && Rcool.timer >= Rcool.time)
+        /*&& Rcool.timer >= Rcool.time*/)
     {
-        Rcool.timer = 0;
-        UltSkill();
+        //Rcool.timer = 0;
+        //UltSkill();
+        //if()
     }
 
     //クールダウン更新
@@ -140,9 +141,7 @@ void CharacterCom::Update(float elapsedTime)
 
 void CharacterCom::OnGUI()
 {
-    int h = hitDamage;
-    ImGui::DragInt("hitCount", &h);
-
+    ImGui::Checkbox("isHitAttack", &isHitAttack);
     ImGui::DragFloat("jump", &jumpPower, 0.1f);
 
     ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);
