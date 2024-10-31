@@ -45,6 +45,11 @@ DirectX::XMFLOAT4 Mathf::Slerp(const DirectX::XMFLOAT4& start, const DirectX::XM
     return result;
 }
 
+float Mathf::Clamp(float value, float min, float max)
+{
+    return std::max(min, std::min(max, value));
+}
+
 DirectX::XMFLOAT4 Mathf::LookAt(const DirectX::XMFLOAT3& source, const DirectX::XMFLOAT3& target)
 {
     // LookPosition‚ÉŒü‚­‚½‚ß‚Ì‰ñ“]Ž²‚Æ‰ñ“]—Ê‚ðŒvŽZ

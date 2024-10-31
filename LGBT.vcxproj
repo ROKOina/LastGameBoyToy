@@ -191,6 +191,8 @@
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
+    <ClInclude Include="Source\Components\UI\UiGauge.h" />
+    <ClInclude Include="Source\Components\UI\UiSystem.h" />
     <ClInclude Include="Source\Dialog.h" />
     <ClInclude Include="Source\GameSource\GameScript\EventCameraCom.h" />
     <ClInclude Include="Source\GameSource\GameScript\EventCameraManager.h" />
@@ -328,6 +330,8 @@
     <ClCompile Include="Source\Components\SpawnCom.cpp" />
     <ClCompile Include="Source\Components\StageEditorCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
+    <ClCompile Include="Source\Components\UI\UiGauge.cpp" />
+    <ClCompile Include="Source\Components\UI\UiSystem.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\EventCameraCom.cpp" />
     <ClCompile Include="Source\GameSource\GameScript\EventCameraManager.cpp" />

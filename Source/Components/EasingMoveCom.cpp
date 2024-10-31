@@ -79,10 +79,14 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
     (
         CEREAL_NVP(filename),
         CEREAL_NVP(delaytime),
+        CEREAL_NVP(delatimeuse),
         CEREAL_NVP(timescale),
         CEREAL_NVP(easingtype),
         CEREAL_NVP(easingmovetype),
         CEREAL_NVP(easingposition),
+        CEREAL_NVP(FlagX),
+        CEREAL_NVP(FlagY),
+        CEREAL_NVP(FlagZ),
         CEREAL_NVP(objectname)
     );
 }
@@ -100,7 +104,7 @@ EasingMoveCom::EasingMoveCom(const char* filename)
 //更新処理
 void EasingMoveCom::Update(float elapsedTime)
 {
-    //遅延を有効にしている場合
+    // 遅延を有効にしている場合
     if (EMP.delatimeuse)
     {
         time += elapsedTime;
@@ -116,17 +120,34 @@ void EasingMoveCom::Update(float elapsedTime)
     // イージングが有効な場合
     if (play && !EMP.easingposition.empty())
     {
-        //イージング更新
-        easingresult = EasingUpdate(EMP.easingtype[currentTargetIndex], EMP.easingmovetype[currentTargetIndex], easingtime);
-
-        //オブジェクトがあれば
+        // オブジェクトの位置更新
         Object();
+
+        // イージング更新
+        easingresult = EasingUpdate(EMP.easingtype[currentTargetIndex], EMP.easingmovetype[currentTargetIndex], easingtime);
 
         // 現在の目標位置
         DirectX::XMFLOAT3 targetPos = EMP.easingposition[currentTargetIndex];
 
+        // 現在の位置を取得
+        DirectX::XMFLOAT3 currentPosition = GetGameObject()->transform_->GetWorldPosition();
+
         // イージング計算
-        GetGameObject()->transform_->SetWorldPosition(Mathf::Lerp(savepos, targetPos, easingresult));
+        if (EMP.FlagX[currentTargetIndex] == 1)
+        {
+            currentPosition.x = Mathf::Lerp(savepos.x, targetPos.x, easingresult);
+        }
+        if (EMP.FlagY[currentTargetIndex] == 1)
+        {
+            currentPosition.y = Mathf::Lerp(savepos.y, targetPos.y, easingresult);
+        }
+        if (EMP.FlagZ[currentTargetIndex] == 1)
+        {
+            currentPosition.z = Mathf::Lerp(savepos.z, targetPos.z, easingresult);
+        }
+
+        // 計算結果を反映
+        GetGameObject()->transform_->SetWorldPosition(currentPosition);
 
         // イージング時間の更新
         easingtime += elapsedTime * EMP.timescale[currentTargetIndex];
@@ -134,15 +155,28 @@ void EasingMoveCom::Update(float elapsedTime)
         // 目標位置到達時のチェック
         if (easingtime >= 1.0f)
         {
-            savepos = targetPos;
+            // 現在位置を次のイージング開始位置として保存
+            savepos = GetGameObject()->transform_->GetWorldPosition();
+
             currentTargetIndex++;
 
+            // 目標位置リストを超えた場合、イージング停止
             if (currentTargetIndex >= EMP.easingposition.size())
             {
-                StopEasing(); //停止
-                return; // これ以上の処理をしない
+                StopEasing();
+                return;
             }
             easingtime = 0.0f; // 次のポイントへの移行
+        }
+    }
+
+    //削除
+    if (stop)
+    {
+        deletetime += elapsedTime;
+        if (deletetime > 1.0f)
+        {
+            GameObjectManager::Instance().Remove(GetGameObject());
         }
     }
 }
@@ -196,6 +230,13 @@ void EasingMoveCom::OnGUI()
         // easingposition の UI
         ImGui::DragFloat3((char*)u8"イージング位置", &EMP.easingposition[i].x, 0.1f);
 
+        //フラグ関係
+        ImGui::Checkbox((char*)u8"X有効", reinterpret_cast<bool*>(&EMP.FlagX[i]));
+        ImGui::SameLine();
+        ImGui::Checkbox((char*)u8"Y有効", reinterpret_cast<bool*>(&EMP.FlagY[i]));
+        ImGui::SameLine();
+        ImGui::Checkbox((char*)u8"Z有効", reinterpret_cast<bool*>(&EMP.FlagZ[i]));
+
         // 削除ボタン
         if (ImGui::Button((char*)u8"削除"))
         {
@@ -203,6 +244,9 @@ void EasingMoveCom::OnGUI()
             EMP.easingposition.erase(EMP.easingposition.begin() + i);
             EMP.easingtype.erase(EMP.easingtype.begin() + i);
             EMP.easingmovetype.erase(EMP.easingmovetype.begin() + i);
+            EMP.FlagX.erase(EMP.FlagX.begin() + i);
+            EMP.FlagY.erase(EMP.FlagY.begin() + i);
+            EMP.FlagZ.erase(EMP.FlagZ.begin() + i);
             i--;
         }
 
@@ -216,6 +260,9 @@ void EasingMoveCom::OnGUI()
         EMP.easingposition.push_back({ 0.0f, 0.0f, 0.0f });
         EMP.easingtype.push_back(static_cast<int>(EaseType::Linear));
         EMP.easingmovetype.push_back(static_cast<int>(EaseInOutType::In));
+        EMP.FlagX.push_back(true);
+        EMP.FlagY.push_back(true);
+        EMP.FlagZ.push_back(true);
     }
 
     ImGui::SameLine();
@@ -226,6 +273,9 @@ void EasingMoveCom::OnGUI()
         EMP.easingposition.clear();
         EMP.easingtype.clear();
         EMP.easingmovetype.clear();
+        EMP.FlagX.clear();
+        EMP.FlagY.clear();
+        EMP.FlagZ.clear();
     }
 }
 
@@ -234,28 +284,53 @@ void EasingMoveCom::StopEasing()
 {
     play = false;
     one = false;
+    stop = true;
     easingtime = 0.0f;
     currentTargetIndex = 0;
     time = 0.0f;
 
-    GetGameObject()->transform_->SetWorldPosition(savepos);
+    // 現在の位置を取得
+    DirectX::XMFLOAT3 currentPosition = GetGameObject()->transform_->GetWorldPosition();
 
-    // 終了コールバックを呼び出し
+    // フラグに基づき位置を最終位置でリセット
+    if (EMP.FlagX[currentTargetIndex] == 1)
+    {
+        currentPosition.x = savepos.x;
+    }
+    if (EMP.FlagY[currentTargetIndex] == 1)
+    {
+        currentPosition.y = savepos.y;
+    }
+    if (EMP.FlagZ[currentTargetIndex] == 1)
+    {
+        currentPosition.z = savepos.z;
+    }
+
+    // 更新後の位置を反映
+    GetGameObject()->transform_->SetWorldPosition(currentPosition);
+
+    // 終了コールバックの実行
     if (onFinishCallback) onFinishCallback();
 }
 
 //オブジェクトがあれば
 void EasingMoveCom::Object()
 {
-    //オブジェクトがあれば
+    // オブジェクト名が指定されている場合
     if (!EMP.objectname.empty())
     {
         auto& gameObject = GameObjectManager::Instance().Find(EMP.objectname.c_str());
 
         if (gameObject != nullptr && !one)
         {
-            EMP.easingposition.back() = gameObject->transform_->GetWorldPosition();
-            if (currentTargetIndex == EMP.easingposition.size() - 1) one = true;
+            // ターゲットオブジェクトの位置を取得して目標位置に設定
+            DirectX::XMFLOAT3 targetPosition = gameObject->transform_->GetWorldPosition();
+
+            if (currentTargetIndex == EMP.easingposition.size() - 1)
+            {
+                EMP.easingposition[currentTargetIndex] = targetPosition;
+                one = true;
+            }
         }
     }
 }

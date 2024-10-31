@@ -53,6 +53,9 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+    //HP‚Ì‰ŠúÝ’è
+    status->SetMaxHitPoint(200);
+    status->SetHitPoint(status->GetMaxHitpoint());
 
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
@@ -184,6 +187,10 @@ void RegisterChara::UenoChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<UenoCharacterCom> c = obj->AddComponent<UenoCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::UENO));
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+    //HP‚Ì‰ŠúÝ’è
+    status->SetMaxHitPoint(200);
+    status->SetHitPoint(status->GetMaxHitpoint());
+
     obj->AddComponent<AimIKCom>("Spine", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<MovementCom>();
