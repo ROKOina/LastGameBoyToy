@@ -2,6 +2,7 @@
 #include "../Common.hlsli"
 
 Texture2D colortexture : register(t20);
+Texture2D depthmap : register(t8); // 深度テクスチャ（ソフトパーティクル用）
 
 float4 main(GS_OUT pin) : SV_TARGET
 {
@@ -14,6 +15,17 @@ float4 main(GS_OUT pin) : SV_TARGET
     //ピンの色とアルファを掛け算
     color.a *= pin.color.a;
     color.rgb *= pin.color.rgb;
+
+    // ソフトパーティクル処理
+    float particleDepth = pin.position.z / pin.position.w; // パーティクルの深度
+    float sceneDepth = depthmap.Sample(sampler_states[LINEAR], pin.texcoord).r; // シーンの深度
+
+     // パーティクルとシーンの深度差を計算
+    float depthDifference = sceneDepth - particleDepth;
+
+    // フェード範囲の調整（0.1～0.5の範囲でフェードを行う）
+    float fadeFactor = saturate((depthDifference - 0.1) / (0.5 - 0.1));
+    color.a *= fadeFactor;
 
     //アルファが低い場合は破棄
     if (color.a < EPSILON)

@@ -74,7 +74,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     {
         std::shared_ptr<GameObject> spawnbomber = obj->AddChildObject();
         spawnbomber->SetName("spawnbomber");
-        //spawnbomber->AddComponent<SpawnCom>("Data/SpawnData/missile.spawn");
+        spawnbomber->AddComponent<SpawnCom>("Data/SpawnData/explosion.spawn");
     }
 
     //煙のエフェクト
