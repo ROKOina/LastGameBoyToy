@@ -14,6 +14,7 @@ void InazawaCharacterCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<InazawaCharacter_AttackState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<InazawaCharacter_ESkillState>(this));
     SetESkillCoolTime(5);
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::ULT, std::make_shared<Ult_Attack_State>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
 
@@ -64,10 +65,8 @@ void InazawaCharacterCom::SpaceSkill()
     auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
     if (!moveCom->OnGround() && !isDashJump && airTimer > 0.1f)
     {
-        GamePad gamePad = Input::Instance().GetGamePad();
-
         //“ü—Í’lŽæ“¾
-        DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
+        DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec(GetGameObject());
 
         //•à‚­
         DirectX::XMFLOAT3 v = moveVec * 50.0f;
@@ -80,4 +79,8 @@ void InazawaCharacterCom::SpaceSkill()
         JumpInput(GetGameObject());
         isDashJump = true;
     }
+}
+
+void InazawaCharacterCom::UltSkill()
+{
 }

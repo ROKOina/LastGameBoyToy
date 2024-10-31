@@ -3,6 +3,7 @@
 #include "Components/System/GameObject.h"
 #include "Components\TransformCom.h"
 #include "Components\CameraCom.h"
+#include "Components\Character\CharacterCom.h"
 #include "Graphics/Graphics.h"
 #include "Input\Input.h"
 
@@ -162,17 +163,20 @@ void SceneManager::ImGui()
     }
 }
 
-DirectX::XMFLOAT3 SceneManager::InputVec() const
+DirectX::XMFLOAT3 SceneManager::InputVec(std::shared_ptr<GameObject> obj) const
 {
     std::shared_ptr<GameObject> cameraObj = SceneManager::Instance().GetActiveCamera();
     CameraCom* cameraCom = cameraObj->GetComponent<CameraCom>().get();
 
-    // 入力情報を取得
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    //// 入力情報を取得
+    //GamePad& gamePad = Input::Instance().GetGamePad();
 
     //ステックのXY取得
-    float ax = gamePad.GetAxisLX();
-    float ay = gamePad.GetAxisLY();
+    DirectX::XMFLOAT2 leftStick = obj->GetComponent<CharacterCom>()->GetLeftStick();
+    float ax = leftStick.x;
+    float ay = leftStick.y;
+    //float ax = gamePad.GetAxisLX();
+    //float ay = gamePad.GetAxisLY();
 
     // カメラ方向とスティックの入力値によって進行方向を計算する
     const DirectX::XMFLOAT3& rightVec = cameraCom->GetRight();

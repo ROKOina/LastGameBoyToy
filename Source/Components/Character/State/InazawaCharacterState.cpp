@@ -11,62 +11,6 @@
 
 #include "GameSource/Math/Collision.h"
 
-void Fire(std::shared_ptr<GameObject> objPoint, float arrowSpeed = 40, float power = 1)
-{
-    //弾丸オブジェクトを生成///////
-    GameObj obj = GameObjectManager::Instance().Create();
-    obj->SetName("blackball");
-
-    DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    firePos.y += 1.0f;
-    obj->transform_->SetWorldPosition(firePos);
-
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::FAKE_DEPTH), (BLENDSTATE::ALPHA));
-    renderCom->LoadModel("Data/Ball/t.mdl");
-
-    ///////////////////////////////
-
-    //弾発射
-    std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = 0.98f - 0.95f * power;
-    moveCom->SetGravity(gravity);
-    moveCom->SetFriction(0.0f);
-
-    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
-
-    moveCom->SetNonMaxSpeedVelocity(fpsDir * arrowSpeed);
-    moveCom->SetIsRaycast(false);
-
-    std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
-    coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(objPoint->GetName(), "player") == 0)
-        coll->SetJudgeTag(COLLIDER_TAG::Enemy);
-    else
-        coll->SetJudgeTag(COLLIDER_TAG::Player);
-
-    //弾
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
-    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
-    bulletCom->SetAliveTime(2.0f);
-}
-
-void RayFire(std::shared_ptr<GameObject> objPoint)
-{
-    DirectX::XMFLOAT3 start;
-    DirectX::XMFLOAT3 end;
-
-    auto& rayPoint = objPoint->GetChildFind("rayObj");
-
-    if (!rayPoint)return;
-
-    start = rayPoint->transform_->GetWorldPosition();
-    end = start + (objPoint->transform_->GetWorldFront() * 100);
-
-    //レイ
-    rayPoint->GetComponent<RayColliderCom>()->SetStart(start);
-    rayPoint->GetComponent<RayColliderCom>()->SetEnd(end);
-}
-
 InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定

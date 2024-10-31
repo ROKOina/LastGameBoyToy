@@ -71,7 +71,9 @@ static bool operator== (int L, COLLIDER_TYPE R)
 //当たった時用の構造体
 struct HitObj {
     std::weak_ptr<GameObject> gameObject;
-    DirectX::XMFLOAT3 hitPos;//レイ専用
+    //レイ専用
+    DirectX::XMFLOAT3 hitPos;
+    DirectX::XMFLOAT3 hitNormal;
 };
 
 //継承して一つの配列に落とし込む
@@ -305,4 +307,5 @@ private:
     DirectX::XMFLOAT3 end = { 0,0,0 };
     bool hitDraw = false;
     DirectX::XMFLOAT3 hitPos = { FLT_MAX,FLT_MAX,FLT_MAX };
+    DirectX::XMFLOAT3 hitNormal = { };
 };
