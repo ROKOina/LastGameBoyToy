@@ -219,6 +219,17 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     }
 }
 
+//‰Šúİ’è
+void GPUParticle::Start()
+{
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+    m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
+    m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+}
+
 //XVˆ—
 void GPUParticle::Update(float elapsedTime)
 {

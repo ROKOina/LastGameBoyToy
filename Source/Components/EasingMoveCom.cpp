@@ -186,7 +186,7 @@ void EasingMoveCom::Update(float elapsedTime)
     if (stop)
     {
         deletetime += elapsedTime;
-        if (deletetime > 1.0f)
+        if (deletetime > 0.7f)
         {
             GameObjectManager::Instance().Remove(GetGameObject());
         }
