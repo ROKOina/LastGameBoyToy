@@ -395,6 +395,15 @@ void SceneGame::EffectNew()
         obj->SetName("testgpueffect");
         obj->AddComponent<GPUParticle>(nullptr, 10000);
     }
+
+    if (ImGui::Button("EasingMoveObject"))
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("testeasingobject");
+        std::shared_ptr<CPUParticle>cpuparticle = obj->AddComponent<CPUParticle>("Data/Effect/fireball.cpuparticle", 1000);
+        cpuparticle->SetActive(true);
+        obj->AddComponent<EasingMoveCom>(nullptr);
+    }
 }
 
 void SceneGame::SetUserInputs()

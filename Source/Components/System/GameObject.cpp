@@ -227,6 +227,9 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
     PostEffect::Instance().EndDeferred();
 
+    // 深度マップをコピーしてGPUに設定
+    PostEffect::Instance().DepthCopyAndBind(8);
+
     //CPUパーティクル描画
     CPUParticleRender();
 
@@ -240,9 +243,6 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     //デバッグレンダー
     Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
     Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
-
-    // 深度マップをコピーしてGPUに設定
-    PostEffect::Instance().DepthCopyAndBind(8);
 
     // 深度マップを使用するシェーダー
     RenderUseDepth();
@@ -485,7 +485,6 @@ void GameObjectManager::StartUpObjects()
             pushBackObject_.emplace_back(pushBackComponent);
         }
 
-
         obj->UpdateTransform();
     }
     startGameObject_.clear();
@@ -579,7 +578,7 @@ void GameObjectManager::RemoveGameObjects()
             --col;
         }
     }
-      //pushback解放
+    //pushback解放
     for (int pb = 0; pb < pushBackObject_.size(); ++pb)
     {
         if (pushBackObject_[pb].expired())

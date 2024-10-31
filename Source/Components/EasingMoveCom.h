@@ -56,6 +56,7 @@ public:
         std::vector<int>FlagY = {};
         std::vector<int>FlagZ = {};
         std::string objectname = {};
+        float trackingtime = 0.0f;
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -69,7 +70,6 @@ private:
     float time = 0.0f;
     float deletetime = 0.0f;
     bool play = false;
-    bool one = false;
     bool stop = false;
     DirectX::XMFLOAT3 savepos = {};
     size_t currentTargetIndex = 0; // 現在の目標ポイントのインデックス

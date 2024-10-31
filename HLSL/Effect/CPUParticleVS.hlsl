@@ -5,18 +5,20 @@ GS_IN main(VS_IN input)
 {
     GS_IN output = (GS_IN) 0;
 
-    // 簡易的なライティング計算
+    // 法線と光方向の正規化
     float3 N = normalize(input.Normal);
     float3 L = normalize(-directionalLight.direction.xyz);
+
+    // ディフューズ計算
     float d = dot(L, N);
-    float power = max(0.0f, d) * 0.5f + 0.5f; // dが0未満の場合を考慮してmax関数を使用
+    float diffusePower = max(0.0f, d) * 0.5f + 0.5f;
 
     // output構造体の各フィールドを入力からコピー
     output.Position = input.Position;
     output.Rotate = input.Rotate;
 
     // カラーのrgb成分にライティングの影響を適用
-    output.Color.rgb = input.Color.rgb * power;
+    output.Color.rgb = input.Color.rgb * diffusePower;
     output.Color.a = input.Color.a;
 
     output.Size = input.Size;

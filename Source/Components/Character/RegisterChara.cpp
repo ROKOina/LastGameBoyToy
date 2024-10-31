@@ -17,6 +17,7 @@
 #include "Components/CPUParticle.h"
 #include "Components/PushBackCom.h"
 #include "HitProcess/HitProcessCom.h"
+#include <Components\SpawnCom.h>
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
 {
@@ -68,6 +69,13 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     auto& pushBack = obj->AddComponent<PushBackCom>();
     pushBack->SetRadius(0.5f);
     pushBack->SetWeight(1);
+
+    //生成コンポーネント君
+    {
+        std::shared_ptr<GameObject> spawnbomber = obj->AddChildObject();
+        spawnbomber->SetName("spawnbomber");
+        //spawnbomber->AddComponent<SpawnCom>("Data/SpawnData/missile.spawn");
+    }
 
     //煙のエフェクト
     {

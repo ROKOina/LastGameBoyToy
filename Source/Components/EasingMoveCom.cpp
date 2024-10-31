@@ -14,7 +14,7 @@
 #include "GameSource/Math/Mathf.h"
 #include "Components\TransformCom.h"
 
-CEREAL_CLASS_VERSION(EasingMoveCom::EasingMoveParameter, 1)
+CEREAL_CLASS_VERSION(EasingMoveCom::EasingMoveParameter, 2)
 
 // シリアライズ
 namespace DirectX
@@ -89,6 +89,18 @@ void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version
         CEREAL_NVP(FlagZ),
         CEREAL_NVP(objectname)
     );
+    // バージョン1には存在しないフィールドにはデフォルト値を与える
+    if (version == 1)
+    {
+        trackingtime = 0.0f;
+    }
+    if (version >= 2)
+    {
+        archive
+        (
+            CEREAL_NVP(trackingtime)
+        );
+    }
 }
 
 //コンストラクタ
@@ -215,6 +227,7 @@ void EasingMoveCom::OnGUI()
     ImGui::Checkbox((char*)u8"開始時間の遅延", &EMP.delatimeuse);
     ImGui::DragFloat((char*)u8"経過時間", &time);
     ImGui::DragFloat((char*)u8"遅延時間", &EMP.delaytime, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat((char*)u8"追尾時間", &EMP.trackingtime, 0.1f, 0.0f, 1.0f);
 
     // timescaleとeasingpositionの追加・削除UI
     for (size_t i = 0; i < EMP.timescale.size(); ++i)
@@ -283,7 +296,6 @@ void EasingMoveCom::OnGUI()
 void EasingMoveCom::StopEasing()
 {
     play = false;
-    one = false;
     stop = true;
     easingtime = 0.0f;
     currentTargetIndex = 0;
@@ -321,15 +333,14 @@ void EasingMoveCom::Object()
     {
         auto& gameObject = GameObjectManager::Instance().Find(EMP.objectname.c_str());
 
-        if (gameObject != nullptr && !one)
+        if (gameObject != nullptr)
         {
             // ターゲットオブジェクトの位置を取得して目標位置に設定
             DirectX::XMFLOAT3 targetPosition = gameObject->transform_->GetWorldPosition();
 
-            if (currentTargetIndex == EMP.easingposition.size() - 1)
+            if (currentTargetIndex == EMP.easingposition.size() - 1 && easingtime <= EMP.trackingtime)
             {
                 EMP.easingposition[currentTargetIndex] = targetPosition;
-                one = true;
             }
         }
     }

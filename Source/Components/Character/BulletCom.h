@@ -40,7 +40,6 @@ public:
 private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
-    GameObj hiteffectobject;
     int ownerID;
     int damageValue = 10;
 };
