@@ -45,6 +45,7 @@
 #include "Components\PushBackCom.h"
 #include "Components\UI\UiSystem.h"
 #include "Components\UI\UiGauge.h"
+#include "Components\Character\HitProcess\HitProcessCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
