@@ -45,6 +45,7 @@
 #include "Components\PushBackCom.h"
 #include "Components\UI\UiSystem.h"
 #include "Components\UI\UiGauge.h"
+#include "Components\Character\HitProcess\HitProcessCom.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -130,6 +131,24 @@ void SceneGame::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+
+        //ウルト関係Obj追加
+        {
+            //アタック系ウルト
+            std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
+            ultAttckChild->SetName("UltAttackChild");
+            //位置をカメラと一緒にする
+            ultAttckChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+            
+            std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
+            rayCol->SetMyTag(COLLIDER_TAG::Player);
+            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
+            rayCol->SetEnabled(false);
+
+            //ダメージ処理用
+            std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
+            hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+        }
     }
 
     //カメラをプレイヤーの子どもにして制御する

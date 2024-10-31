@@ -6,14 +6,15 @@
 #include "../../AnimationCom.h"
 
 //入力値方向に移動と旋回
-static void MoveInputVec(std::shared_ptr<GameObject> obj, float speed = 1)
+static void MoveInputVec(std::shared_ptr<GameObject> obj, float speed = 100)
 {
     auto& moveCom = obj->GetComponent<MovementCom>();
 
-    GamePad gamePad = Input::Instance().GetGamePad();
+    //GamePad gamePad = Input::Instance().GetGamePad();
 
     //入力値取得
-    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
+    //obj->GetComponent<CharacterCom>()->GetLeftStick()
+    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec(obj);
 
     //歩く
     DirectX::XMFLOAT3 v = moveVec * speed;
@@ -152,6 +153,21 @@ public:
 private:
     float speed = 40;
     float power = 1;
+};
+
+class Ult_Attack_State : public BaseCharacter_BaseState
+{
+public:
+    Ult_Attack_State(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    void ImGui() override;
+    virtual const char* GetName() const override { return "Ult_Attack"; }
+
+private:
+    std::shared_ptr<GameObject> obj;    //ウルト用オブジェクトを保存
 };
 
 class BaseCharacter_NoneAttack : public BaseCharacter_BaseState

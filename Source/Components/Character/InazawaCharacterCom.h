@@ -19,6 +19,8 @@ public:
 
     void SpaceSkill() override;
 
+    void UltSkill() override;
+
 
 private:
     //ジャンプダッシュ

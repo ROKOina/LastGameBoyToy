@@ -26,9 +26,6 @@ void BaseCharacter_IdleState::Enter()
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 {
-    //入力値取得
-    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
-
     //移動
     if (owner->IsPushLeftStick())
     {
@@ -69,11 +66,9 @@ void BaseCharacter_MoveState::Enter()
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
-{
+{    
+    //移動
     MoveInputVec(owner->GetGameObject());
-
-    //入力値取得
-    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
 
     //待機
     if (!owner->IsPushLeftStick())
@@ -103,7 +98,7 @@ void BaseCharacter_JumpState::Enter()
         return;
 
     JumpInput(owner->GetGameObject());
-    moveVec = SceneManager::Instance().InputVec();
+    moveVec = SceneManager::Instance().InputVec(owner->GetGameObject());
     moveCom.lock()->SetOnGround(false);
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
@@ -113,7 +108,7 @@ void BaseCharacter_JumpState::Enter()
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 {
     //空中制御
-    DirectX::XMFLOAT3 inputVec = SceneManager::Instance().InputVec();
+    DirectX::XMFLOAT3 inputVec = SceneManager::Instance().InputVec(owner->GetGameObject());
     moveVec = Mathf::Lerp(moveVec, inputVec, 0.1f);
 
     if (moveCom.lock()->GetVelocity().y < 0.05f && HoveringTimer < HoveringTime)
@@ -303,9 +298,51 @@ void BaseCharacter_KnockbackBallState::ImGui()
 
 #pragma endregion
 
+
+#pragma region ULT_ATTACK
+
+void Ult_Attack_State::Enter()
+{
+    obj = owner->GetGameObject()->GetChildFind("UltAttackChild");
+    if (!obj)return;
+
+    //レイ設定
+    auto& ray = obj->GetComponent<RayColliderCom>();
+    DirectX::XMFLOAT3 start = obj->transform_->GetWorldPosition();
+
+    DirectX::XMFLOAT3 front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
+    DirectX::XMFLOAT3 end = start + front * 100;
+
+    ray->SetStart(start);
+    ray->SetEnd(end);
+    ray->SetEnabled(true);
+}
+
+void Ult_Attack_State::Execute(const float& elapsedTime)
+{
+    if (!obj)return;
+
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+void Ult_Attack_State::Exit()
+{
+    auto& ray = obj->GetComponent<RayColliderCom>();
+    ray->SetEnabled(false);
+
+    obj.reset();
+}
+
+void Ult_Attack_State::ImGui()
+{
+}
+
+#pragma endregion
+
 void BaseCharacter_NoneAttack::Enter()
 {
     ////歩きアニメーション再生開始
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }
+

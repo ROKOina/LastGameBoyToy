@@ -72,23 +72,41 @@ void CharacterCom::Update(float elapsedTime)
         Ecool.timer = 0;
         SubSkill();
     }
+
     //ダッシュスキル
     SetLSSkillCoolTime(dashRecast);
     if (CharacterInput::LeftShiftButton & GetButton()
-        && LScool.timer >= LScool.time && dashGauge > 0)
+        && LScool.timer >= LScool.time && dashGauge >= 0 && IsPushLeftStick())
     {
+        //ゲージ減らす
         dashGauge -= dashGaugeMinus * elapsedTime;
-        LeftShiftSkill();
-        dashFlag = true;
+        //ダッシュ処理
+        LeftShiftSkill(elapsedTime);
+
+        //ダッシュ時一回だけ入る
+        if (!dashFlag)
+        {
+            dashFlag = true;
+            dashGauge -= 2; //最初は一気に減らす
+        }
+
+        //ゲージがなくなったらタイマーをセット
+        if (dashGauge <= 0)
+        {
+            LScool.timer = 0;
+        }
     }
     else
     {
+        //ダッシュ終了時に一度入る
         if (dashFlag)
         {
-            LScool.timer = 0;
             dashFlag = false;
+            dashSpeed = dashSpeedFirst; //初速を設定
+            dashFirstTimer = dashFirstTime; //初速タイマーを初期化
         }
 
+        //ゲージ増やす
         dashGauge += dashGaugePlus * elapsedTime;
         if (dashGauge > dashGaugeMax)
         {
@@ -132,6 +150,10 @@ void CharacterCom::OnGUI()
     ImGui::DragFloat("dashGaugeMax", &dashGaugeMax, 0.1f);
     ImGui::DragFloat("dashGaugeMinus", &dashGaugeMinus, 0.1f);
     ImGui::DragFloat("dashGaugePlus", &dashGaugePlus, 0.1f);
+
+    ImGui::DragFloat("dashSpeedFirst", &dashSpeedFirst, 0.1f);
+    ImGui::DragFloat("dashSpeedNormal", &dashSpeedNormal, 0.1f);
+    ImGui::DragFloat("dashFirstTime", &dashFirstTime, 0.1f);
 
     bool stan = isStan;
     ImGui::Checkbox("isStan", &stan);
@@ -179,12 +201,21 @@ void CharacterCom::OnGUI()
 }
 
 //ダッシュ
-void CharacterCom::LeftShiftSkill()
+void CharacterCom::LeftShiftSkill(float elapsedTime)
 {
+    //最大速度で速さを変える
     auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
     float maxSpeed = moveCmp->GetMoveMaxSpeed();
     maxSpeed += dashSpeed;
     moveCmp->SetAddMoveMaxSpeed(maxSpeed);
+
+    //初速減衰
+    dashFirstTimer -= elapsedTime;
+    if (dashFirstTimer < 0)
+    {
+        //速度を普通に
+        dashSpeed = dashSpeedNormal;
+    }
 }
 
 void CharacterCom::CameraControl()
