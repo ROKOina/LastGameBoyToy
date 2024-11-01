@@ -7,18 +7,27 @@
 #include "MultiRenderTarget.h"
 #include "Graphics/Shaders/3D/CascadedShadowMap.h"
 #include <DirectXMath.h>
+#include "Components\System\Component.h"
 
 //ポストエフェクト
-class PostEffect
+class PostEffect :public Component
 {
-private:
+public:
 
     PostEffect();
-    ~PostEffect() {}
+    ~PostEffect() {};
 
-    // コピーコンストラクタと代入演算子を削除
-    PostEffect(const PostEffect&) = delete;
-    PostEffect& operator=(const PostEffect&) = delete;
+    //初期設定
+    void Start()override {};
+
+    //更新処理
+    void Update(float elapsedTime)override {};
+
+    //imgui
+    void OnGUI()override;
+
+    //名前設定
+    const char* GetName()const override { return "PostEffect"; }
 
 public:
 
@@ -41,15 +50,6 @@ public:
         BlurDecay
     };
 
-public:
-
-    //シングルトン
-    static PostEffect& Instance()
-    {
-        static PostEffect instance;
-        return instance;
-    }
-
     // デファードのレンダーターゲットを設定
     void SetDeferredTarget();
 
@@ -59,25 +59,16 @@ public:
     // ポストエフェクト描画
     void PostEffectRender();
 
-    // imgui描画
-    void PostEffectImGui();
-
     // オフスクリーンバッファに描画していく
     void StartOffScreenRendering();
 
     // 深度マップをSRVにコピーして、GPUにバインドする
     void DepthCopyAndBind(int registerIndex);
 
-    //画面サイズ変更時にレンダーターゲットを作り直す
-    void ResizeBuffer();
-
-    //シーンのimgui
-    void SceneImGui();
-
     //ポストエフェクトのパラメータを制御する関数
     void ParameterMove(float elapsedTime, float parameterIn, bool update, PostEffectParameter parameter);
 
-public:
+private:
 
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
@@ -100,8 +91,6 @@ public:
         float blurdecay = { 0.999f };
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
-
-private:
 
     //影のパラメータのコンスタントバッファ
     struct SHADOWPARAMETER

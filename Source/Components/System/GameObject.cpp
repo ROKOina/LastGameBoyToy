@@ -16,6 +16,7 @@
 #include "Graphics/Sprite/Sprite.h"
 #include "Components/InstanceRendererCom.h"
 #include "Components\DecalCom.h"
+#include "Graphics\Shaders\PostEffect.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -207,84 +208,107 @@ void GameObjectManager::UpdateTransform()
 // 描画
 void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection, const DirectX::XMFLOAT3& lightdirection)
 {
-    //影描画
-    PostEffect::Instance().GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, PostEffect::Instance().m_criticaldepthvalue, [&]()
-        {
-            RenderShadow();
-            InstanceRenderShadow();
-        });
+    // 有効なポストエフェクトを収集
+    auto activeEffects = GetActivePostEffects();
 
-    // オフスクリーンに描画開始
-    PostEffect::Instance().StartOffScreenRendering();
+    // 影描画
+    for (auto& effect : activeEffects)
+    {
+        effect->GetCascadedShadow()->Make(Graphics::Instance().GetDeviceContext(), view, projection, lightdirection, effect->m_criticaldepthvalue, [&]()
+            {
+                RenderShadow();
+                InstanceRenderShadow();
+            });
+    }
 
-    //デファードレンダリングの初期設定 ( レンダーターゲットをデファード用の物に変更 )
-    PostEffect::Instance().SetDeferredTarget();
+    // オフスクリーン描画開始
+    for (auto& effect : activeEffects)
+    {
+        effect->StartOffScreenRendering();
+    }
 
-    //3D描画
+    // デファードレンダリングの初期設定
+    for (auto& effect : activeEffects)
+    {
+        effect->SetDeferredTarget();
+    }
+
+    // 3D描画
     RenderDeferred();
     InstanceRenderDeferred();
 
-    //デファードレンダリング終了 ( レンダーターゲットをオフスクリーンに変更 )
-    PostEffect::Instance().EndDeferred();
+    // デファードレンダリング終了
+    for (auto& effect : activeEffects)
+    {
+        effect->EndDeferred();
+    }
 
     // 深度マップをコピーしてGPUに設定
-    PostEffect::Instance().DepthCopyAndBind(8);
+    for (auto& effect : activeEffects)
+    {
+        effect->DepthCopyAndBind(8);
+    }
 
-    //CPUパーティクル描画
+    // 各種パーティクルとフォワードレンダリング
     CPUParticleRender();
-
-    //GPUパーティクル描画
     GPUParticleRender();
-
-    // フォワードレンダリング
     RenderForward();
     InstanceRenderForward();
 
-    //デバッグレンダー
-    Graphics::Instance().GetDebugRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
-    Graphics::Instance().GetLineRenderer()->Render(Graphics::Instance().GetDeviceContext(), view, projection);
+    // デバッグレンダー
+    auto& graphics = Graphics::Instance();
+    graphics.GetDebugRenderer()->Render(graphics.GetDeviceContext(), view, projection);
+    graphics.GetLineRenderer()->Render(graphics.GetDeviceContext(), view, projection);
 
-    // 深度マップを使用するシェーダー
+    // 深度マップを使用するシェーダー描画
     RenderUseDepth();
     InstanceRenderUseDepth();
 
-    //デカール描画
+    // デカール描画
     DecalRender();
 
-    //ポストエフェクト
-    PostEffect::Instance().PostEffectRender();
-
-    //スプライト描画
-    SpriteRender(view, projection);
-
-    //debug
-    if (Graphics::Instance().IsDebugGUI())
+    // ポストエフェクト描画
+    for (auto& effect : activeEffects)
     {
-        //当たり判定用デバッグ描画
-        for (auto& col : colliderObject_)
-        {
-            if (!col.lock()->GetEnabled())continue;
-            if (!col.lock()->GetGameObject()->GetEnabled())continue;
-            col.lock()->DebugRender();
-        }
-        //押し出し判定用デバッグ描画
-        for (auto& pb : pushBackObject_)
-        {
-            if (!pb.lock()->GetEnabled())continue;
-            if (!pb.lock()->GetGameObject()->GetEnabled())continue;
-            pb.lock()->DebugRender();
-        }
-
-        // リスター描画
-        DrawLister();
-
-        // 詳細描画
-        DrawDetail();
-
-        //ポストエフェクトimgui
-        PostEffect::Instance().PostEffectImGui();
+        effect->PostEffectRender();
     }
 
+    // スプライト描画
+    SpriteRender(view, projection);
+
+    // デバッグ情報の描画
+    if (graphics.IsDebugGUI())
+    {
+        // 当たり判定用デバッグ描画
+        for (auto& col : colliderObject_)
+        {
+            if (auto collider = col.lock())
+            {
+                if (collider->GetEnabled() && collider->GetGameObject()->GetEnabled())
+                {
+                    collider->DebugRender();
+                }
+            }
+        }
+
+        // 押し出し判定用デバッグ描画
+        for (auto& pb : pushBackObject_)
+        {
+            if (auto pushBack = pb.lock())
+            {
+                if (pushBack->GetEnabled() && pushBack->GetGameObject()->GetEnabled())
+                {
+                    pushBack->DebugRender();
+                }
+            }
+        }
+
+        // リスターと詳細の描画
+        DrawLister();
+        DrawDetail();
+    }
+
+    // ギズモの描画
     DrawGuizmo(view, projection);
 }
 
@@ -421,6 +445,13 @@ void GameObjectManager::StartUpObjects()
     for (std::shared_ptr<GameObject>& obj : startGameObject_)
     {
         if (!obj)continue;
+
+        //ポストエフェクトがあれば入る
+        std::shared_ptr<PostEffect>posteffectcomp = obj->GetComponent<PostEffect>();
+        if (posteffectcomp)
+        {
+            posteffectobject.emplace_back(posteffectcomp);
+        }
 
         //レンダラーコンポーネントがあればレンダーオブジェに入れる
         std::shared_ptr<RendererCom> rendererComponent = obj->GetComponent<RendererCom>();
@@ -594,6 +625,16 @@ void GameObjectManager::RemoveGameObjects()
         {
             renderSortObject_.erase(renderSortObject_.begin() + ren);
             --ren;
+        }
+    }
+
+    //posteffect解放
+    for (int pos = 0; pos < posteffectobject.size(); ++pos)
+    {
+        if (posteffectobject[pos].expired())
+        {
+            posteffectobject.erase(posteffectobject.begin() + pos);
+            --pos;
         }
     }
 
@@ -903,6 +944,23 @@ void GameObjectManager::InstanceRenderUseDepth()
             instanceobject[index].lock()->Render();
         }
     }
+}
+
+//ポストエフェクトの情報取得
+std::vector<std::shared_ptr<PostEffect>> GameObjectManager::GetActivePostEffects()
+{
+    std::vector<std::shared_ptr<PostEffect>> activeEffects;
+    for (auto& po : posteffectobject)
+    {
+        if (auto effect = po.lock())
+        {
+            if (effect->GetGameObject()->GetEnabled() && effect->GetEnabled())
+            {
+                activeEffects.push_back(effect);
+            }
+        }
+    }
+    return activeEffects;
 }
 
 //CPUパーティクル描画

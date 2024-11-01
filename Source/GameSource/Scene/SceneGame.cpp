@@ -63,6 +63,7 @@
 
 #include "GameSource\Scene\SceneResult\SceneResult.h"
 #include "Components/FrustumCom.h"
+#include "Graphics\Shaders\PostEffect.h"
 
 SceneGame::~SceneGame()
 {
@@ -76,6 +77,13 @@ void SceneGame::Initialize()
     Graphics& graphics = Graphics::Instance();
 
 #pragma region ゲームオブジェクトの設定
+
+    //ポストエフェクト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("posteffect");
+        obj->AddComponent<PostEffect>();
+    }
 
     //フリーカメラ
     {
@@ -140,7 +148,7 @@ void SceneGame::Initialize()
             ultAttckChild->SetName("UltAttackChild");
             //位置をカメラと一緒にする
             ultAttckChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-            
+
             std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
             rayCol->SetMyTag(COLLIDER_TAG::Player);
             rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
