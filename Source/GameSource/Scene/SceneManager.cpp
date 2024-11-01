@@ -67,7 +67,7 @@ void SceneManager::Update(float elapsedTime)
     }
 
     //‚±‚±‚Å‰æ–ÊˆÃ“]‚µ‚Ä‚¢‚é‚æIIbyã–ì
-    PostEffect::Instance().ParameterMove(elapsedTime / 1.3f, 1.4f, exposetransiotnflag, PostEffect::PostEffectParameter::Exposure);
+    //PostEffect::Instance().ParameterMove(elapsedTime / 1.3f, 1.4f, exposetransiotnflag, PostEffect::PostEffectParameter::Exposure);
 }
 
 //•`‰æˆ—
