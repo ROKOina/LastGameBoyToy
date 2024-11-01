@@ -14,6 +14,7 @@ void InazawaCharacterCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<InazawaCharacter_AttackState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<InazawaCharacter_ESkillState>(this));
     SetESkillCoolTime(5);
+    //ƒEƒ‹ƒg’Ç‰Á
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::ULT, std::make_shared<Ult_Attack_State>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
@@ -83,4 +84,5 @@ void InazawaCharacterCom::SpaceSkill()
 
 void InazawaCharacterCom::UltSkill()
 {
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }

@@ -29,6 +29,13 @@ public:
 class CharacterCom : public Component
 {
 public:
+    enum class CHARACTER_ULT {
+        ATTACK,
+        HEAL,
+        POWER,
+        MAX,
+    };
+
     enum class CHARACTER_MOVE_ACTIONS {
         IDLE,
         MOVE,
@@ -154,6 +161,8 @@ public:
     bool GetIsHitAttack() { return isHitAttack; }
     void SetIsHitAttack(bool flg) { isHitAttack = flg; }
 
+    void SetULTID(CHARACTER_ULT ult) { ultID = ult; }
+
 private:
     //カメラ操作
     void CameraControl();
@@ -199,6 +208,8 @@ protected:
   SkillCoolTime LScool;
   SkillCoolTime Spacecool;
 
+  CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
+
 private:
 
     // キャラクターの操作入力情報
@@ -226,12 +237,11 @@ private:
     float dashFirstTime = 0.1f; //初速長さ
 
     //ウルト関係
-    int ultID = 0;  //ウルトの種類　0:attack 1:heal 2:power
     bool isMaxUlt = false;  //ウルトが溜まっているか
     bool isUseUlt = false;  //ウルト使用中か
     float ultGauge = 0;
     float ultGaugeMax = 100;
-    //アタック
+    //アタックULT
     int attackUltCountMax = 5;  //ウルトを打てる数
     int attackUltCounter;
 
