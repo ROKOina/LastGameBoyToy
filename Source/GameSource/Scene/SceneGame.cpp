@@ -45,6 +45,7 @@
 #include "Components\PushBackCom.h"
 #include "Components\UI\UiSystem.h"
 #include "Components\UI\UiGauge.h"
+#include "Components\UI\UiFlag.h"
 
 #include "Components\Character\Generate\TestCharacterGenerate.h"
 
@@ -519,7 +520,10 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("UltFrame");
-            hpMemori->AddComponent<UiSystem>("Data/UIData/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
+         
+            std::shared_ptr<UiSystem> fade = hpMemori->AddComponent<UiSystem>("Data/UIData/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
+            fade->SetFadeInFlag(true);
+            fade->SetFadeTimer(10.0f);
         }
 
         //HideUltGauge
@@ -552,6 +556,16 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("SkillGauge");
             hpMemori->AddComponent<UiSystem>("Data/UIData/SkillFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //HitEffect
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("HitEffect");
+
+            bool flag = true;
+            hpMemori->AddComponent<UiFlag>(nullptr, Sprite::SpriteShader::DEFALT, false,&flag);
         }
     }
 }

@@ -24,7 +24,7 @@ public:
 
     //HPŽæ“¾
     void   SetHitPoint(float value) { hitPoint = value; }
-    float*  GetHitPoint() { return &hitPoint; }
+    float*  GetHitPoint() { return &hitPoint;}
     void   SetMaxHitPoint(float value) { maxHitPoint = value; }
     float  GetMaxHitpoint() { return maxHitPoint; }
 

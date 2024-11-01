@@ -191,6 +191,7 @@
     <ClInclude Include="Source\Components\System\RayCastManager.h" />
     <ClInclude Include="Source\Components\System\State.h" />
     <ClInclude Include="Source\Components\System\StateMachine.h" />
+    <ClInclude Include="Source\Components\UI\UiFlag.h" />
     <ClInclude Include="Source\Components\UI\UiGauge.h" />
     <ClInclude Include="Source\Components\UI\UiSystem.h" />
     <ClInclude Include="Source\Dialog.h" />
@@ -330,6 +331,7 @@
     <ClCompile Include="Source\Components\SpawnCom.cpp" />
     <ClCompile Include="Source\Components\StageEditorCom.cpp" />
     <ClCompile Include="Source\Components\System\RayCastManager.cpp" />
+    <ClCompile Include="Source\Components\UI\UiFlag.cpp" />
     <ClCompile Include="Source\Components\UI\UiGauge.cpp" />
     <ClCompile Include="Source\Components\UI\UiSystem.cpp" />
     <ClCompile Include="Source\Dialog.cpp" />

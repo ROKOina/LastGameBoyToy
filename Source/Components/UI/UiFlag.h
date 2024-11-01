@@ -1,15 +1,15 @@
 #pragma once
 #include "Components\UI\UiSystem.h"
 
-class UiGauge : public UiSystem
+class UiFlag : public UiSystem
 {
     //コンポーネントオーバーライド
 public:
-    UiGauge(const char* filename, SpriteShader spriteshader, bool collsion);
-    ~UiGauge() {}
+    UiFlag(const char* filename, SpriteShader spriteshader, bool collsion, bool* flag);
+    ~UiFlag() {}
 
     // 名前取得
-    const char* GetName() const override { return "UiGauge"; }
+    const char* GetName() const override { return "UiFlag"; }
 
     // 開始処理
     void Start() override {};
@@ -18,7 +18,6 @@ public:
     void Update(float elapsedTime) override;
 
 private:
-   
+    bool* flag; //参照するフラグ
 
 };
-
