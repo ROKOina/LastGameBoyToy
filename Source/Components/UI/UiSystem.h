@@ -39,16 +39,25 @@ public:
 
 protected:
     float* variableValue;    //参照する値
-    float  maxValue;         //最大値
-    float  valueRate;        //割合
+    float  maxValue = 0.0f;         //最大値
+    float  valueRate = 0.0f;        //割合
 
     float timer;            //汎用タイマー
 
-    float fadeTimer;        //フェード用タイマー
-    float originalFadeTime; //最大値を保持しておく変数
-    bool  fadeInFlag;       //フェードイン用フラグ
-    bool  fadeOutFlag;       //フェードアウト用フラグ
+    float fadeTimer = 0.0f;        //フェード用タイマー
+    float originalFadeTime = 0.0f; //最大値を保持しておく変数
+    bool  fadeInFlag = false;       //フェードイン用フラグ
+    bool  fadeOutFlag = false;       //フェードアウト用フラグ
 
 
     DirectX::XMFLOAT2 originalTexSize = {};    //元のテクスチャサイズ
+
+ 
+public:
+    //変更する値を決めるenum
+    enum ChangeValue {
+        X_ONLY,
+        Y_ONLY,
+        X_AND_Y
+    };
 };

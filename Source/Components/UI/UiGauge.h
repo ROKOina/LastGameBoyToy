@@ -5,7 +5,7 @@ class UiGauge : public UiSystem
 {
     //コンポーネントオーバーライド
 public:
-    UiGauge(const char* filename, SpriteShader spriteshader, bool collsion);
+    UiGauge(const char* filename, SpriteShader spriteshader, bool collsion,int cahngeValue);
     ~UiGauge() {}
 
     // 名前取得
@@ -17,8 +17,9 @@ public:
     // 更新処理
     void Update(float elapsedTime) override;
 
+
 private:
    
-
+    int changeValue = -1; //変更する値がXかYか両方かを判別
 };
 

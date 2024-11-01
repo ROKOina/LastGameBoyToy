@@ -151,7 +151,7 @@ public:
 
     void SetMoveFlag(bool flag) { useMoveFlag = flag; }
 
-    bool GetIsHitAttack() { return isHitAttack; }
+    bool* GetIsHitAttack() { return &isHitAttack; }
     void SetIsHitAttack(bool flg) { isHitAttack = flg; }
 
 private:

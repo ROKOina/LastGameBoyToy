@@ -2,6 +2,8 @@
 #include "GameSource\Math\Mathf.h"
 UiSystem::UiSystem(const char* filename, SpriteShader spriteshader, bool collsion) :Sprite(filename, spriteshader, collsion)
 {
+    fadeInFlag = false;
+    fadeOutFlag = false;
 }
 
 void UiSystem::Update(float elapsedTime)
@@ -35,10 +37,8 @@ void UiSystem::OnGUI()
 
 void UiSystem::FadeIn(float elapsedTime)
 {
- 
-
     if (fadeInFlag) {
-        fadeTimer -=  0.1f* elapsedTime;
+        fadeTimer -=  elapsedTime;
         spc.color.w = 1.0f - fadeTimer / originalFadeTime;
         if (fadeTimer <= 0.0f) {
             fadeInFlag = false;
@@ -49,7 +49,7 @@ void UiSystem::FadeIn(float elapsedTime)
 void UiSystem::FadeOut(float elapsedTime)
 {
     if (fadeOutFlag) {
-        fadeTimer -= 1 * elapsedTime;
+        fadeTimer -=  elapsedTime;
         spc.color.w = fadeTimer / originalFadeTime;
         if (fadeTimer <= 0.0f) {
             fadeOutFlag = false;

@@ -17,6 +17,8 @@ public:
     // 更新処理
     void Update(float elapsedTime) override;
 
+    void OnGUI()override;
+
 private:
     bool* flag; //参照するフラグ
 
