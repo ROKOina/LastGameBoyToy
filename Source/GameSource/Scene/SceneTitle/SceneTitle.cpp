@@ -22,7 +22,7 @@
 #include "Components\FootIKcom.h"
 #include "Components/CPUParticle.h"
 #include "Components\RayCollisionCom.h"
-
+#include "Graphics\Shaders\PostEffect.h"
 #include "GameSource/GameScript/FreeCameraCom.h"
 
 void SceneTitle::Initialize()
@@ -85,6 +85,13 @@ void SceneTitle::Initialize()
         }
     }
 
+    //ポストエフェクト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("posteffect");
+        obj->AddComponent<PostEffect>();
+    }
+
     //平行光源を追加
     mainDirectionalLight = new Light(LightType::Directional);
     mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
@@ -128,7 +135,6 @@ void SceneTitle::Render(float elapsedTime)
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
 }
 
-//bool t = true;
 void SceneTitle::UIUpdate(float elapsedTime)
 {
     auto& canvas = GameObjectManager::Instance().Find("Canvas");
@@ -144,19 +150,11 @@ void SceneTitle::UIUpdate(float elapsedTime)
         {
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
-                //t = false;
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
                     SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
                 }
             }
         }
-
-        //ここで暗転しているよ！！by上野
-
-        //if (!t)
-        //{
-        //    PostEffect::Instance().ParameterMove(elapsedTime, 1.4f, t, PostEffect::PostEffectParameter::Exposure);
-        //}
     }
 }

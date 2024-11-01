@@ -15,7 +15,8 @@ PostEffect::PostEffect()
     m_bloomeffect = std::make_unique<Bloom>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight());
 
     //フレームバッファ生成
-    for (int i = 0; i < static_cast<int>(offscreen::max); ++i) {
+    for (int i = 0; i < static_cast<int>(offscreen::max); ++i)
+    {
         m_offScreenBuffer[i] = std::make_unique<FrameBuffer>(Graphics.GetDevice(),
             static_cast<uint32_t>(Graphics.GetScreenWidth()), static_cast<uint32_t>(Graphics.GetScreenHeight()),
             DXGI_FORMAT_R32G32B32A32_FLOAT, true);
@@ -38,6 +39,54 @@ PostEffect::PostEffect()
     //コンスタントバッファ
     m_posteffect = std::make_unique<ConstantBuffer<POSTEFFECT>>(Graphics.GetDevice());
     m_shadowparameter = std::make_unique<ConstantBuffer<SHADOWPARAMETER>>(Graphics.GetDevice());
+}
+
+//imgui
+void PostEffect::OnGUI()
+{
+    //ポストエフェクト
+    if (ImGui::CollapsingHeader("PostEffect", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::ColorEdit3("colorize", m_posteffect->data.colorize);
+        ImGui::SliderFloat("exposure", &m_posteffect->data.exposure, +0.0f, +10.0f);
+        ImGui::SliderFloat("brightness", &m_posteffect->data.brightness, -1.0f, +1.0f);
+        ImGui::SliderFloat("contrast", &m_posteffect->data.contrast, -1.0f, +1.0f);
+        ImGui::SliderFloat("hue", &m_posteffect->data.hue, -1.0f, +1.0f);
+        ImGui::SliderFloat("saturation", &m_posteffect->data.saturation, -1.0f, +1.0f);
+        ImGui::SliderFloat("bloomextractionthreshold", &m_posteffect->data.bloomextractionthreshold, +0.0f, +10.0f);
+        ImGui::SliderFloat("blurconvolutionintensity", &m_posteffect->data.blurconvolutionintensity, +0.0f, +10.0f);
+        ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
+        ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
+        ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
+        ImGui::SliderFloat("distance_to_sun", &m_posteffect->data.distance_to_sun, 0.0f, 1000.0f);
+        ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
+        ImGui::SliderFloat("blurstrength", &m_posteffect->data.blurstrength, +0.0f, +1.0f);
+        ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
+        ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
+    }
+
+    //ライトのimgui
+    LightManager::Instance().DrawDebugGUI();
+
+    if (ImGui::TreeNode("shadow"))
+    {
+        ImGui::DragFloat("split_scheme_weight", &m_cascadedshadowmap->m_splitschemeweight, 0.01f, 0.0f, 1.0f);
+        ImGui::DragFloat("critical_depth_value", &m_criticaldepthvalue, 1.0f, 0.0f, 1000.0f);
+        ImGui::SliderFloat("shadow_color", &m_shadowparameter->data.shadowcolor, 0.0f, 1.0f);
+        ImGui::SliderFloat("shadow_depth_bias", &m_shadowparameter->data.shadowdepthbias, 0.0f, 0.005f, "%.8f");
+        ImGui::SliderFloat("shadow_filter_radius", &m_shadowparameter->data.shadowfilterradius, 0.0f, 64.0f);
+        ImGui::SliderInt("shadow_sample_count", reinterpret_cast<int*>(&m_shadowparameter->data.shadowsamplecount), 0, 64);
+        ImGui::Image(m_cascadedshadowmap->m_shaderresourceview.Get(), { 256, 256 });
+        ImGui::TreePop();
+    }
+
+    m_gBuffer->DrawImGui();
+
+    ImGui::Text("OffScreen");
+    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+
+    ImGui::Text("FinalPass");
+    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::fxaa)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 }
 
 //デファードの最初の処理
@@ -151,67 +200,14 @@ void PostEffect::PostEffectRender()
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 
     // トーンマップ処理
-    //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Clear(dc);
-    //m_offScreenBuffer[static_cast<int>(offscreen::tonemap)]->Activate(dc);
     dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
     ID3D11ShaderResourceView* tone[] = { m_offScreenBuffer[static_cast<int>(offscreen::fxaa)]->m_shaderresourceviews[0].Get() };
     FullScreenQuad::Instance().Blit(dc, tone, 0, _countof(tone), m_pixelshaders[static_cast<int>(pixelshader::tonemap)].Get());
-    //m_offScreenBuffer[static_cast<int>(offscreen::fxaa)]->Deactivate(dc);
 }
 
-//imgui描画
-void PostEffect::PostEffectImGui()
-{
-    ImGui::Begin("PostEffect");
-    //ポストエフェクト
-    if (ImGui::CollapsingHeader("PostEffect", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        ImGui::ColorEdit3("colorize", m_posteffect->data.colorize);
-        ImGui::SliderFloat("exposure", &m_posteffect->data.exposure, +0.0f, +10.0f);
-        ImGui::SliderFloat("brightness", &m_posteffect->data.brightness, -1.0f, +1.0f);
-        ImGui::SliderFloat("contrast", &m_posteffect->data.contrast, -1.0f, +1.0f);
-        ImGui::SliderFloat("hue", &m_posteffect->data.hue, -1.0f, +1.0f);
-        ImGui::SliderFloat("saturation", &m_posteffect->data.saturation, -1.0f, +1.0f);
-        ImGui::SliderFloat("bloomextractionthreshold", &m_posteffect->data.bloomextractionthreshold, +0.0f, +10.0f);
-        ImGui::SliderFloat("blurconvolutionintensity", &m_posteffect->data.blurconvolutionintensity, +0.0f, +10.0f);
-        ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
-        ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
-        ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
-        ImGui::SliderFloat("distance_to_sun", &m_posteffect->data.distance_to_sun, 0.0f, 1000.0f);
-        ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
-        ImGui::SliderFloat("blurstrength", &m_posteffect->data.blurstrength, +0.0f, +1.0f);
-        ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
-        ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
-    }
-
-    //ライトのimgui
-    LightManager::Instance().DrawDebugGUI();
-
-    if (ImGui::TreeNode("shadow"))
-    {
-        ImGui::DragFloat("split_scheme_weight", &m_cascadedshadowmap->m_splitschemeweight, 0.01f, 0.0f, 1.0f);
-        ImGui::DragFloat("critical_depth_value", &m_criticaldepthvalue, 1.0f, 0.0f, 1000.0f);
-        ImGui::SliderFloat("shadow_color", &m_shadowparameter->data.shadowcolor, 0.0f, 1.0f);
-        ImGui::SliderFloat("shadow_depth_bias", &m_shadowparameter->data.shadowdepthbias, 0.0f, 0.005f, "%.8f");
-        ImGui::SliderFloat("shadow_filter_radius", &m_shadowparameter->data.shadowfilterradius, 0.0f, 64.0f);
-        ImGui::SliderInt("shadow_sample_count", reinterpret_cast<int*>(&m_shadowparameter->data.shadowsamplecount), 0, 64);
-        ImGui::Image(m_cascadedshadowmap->m_shaderresourceview.Get(), { 256, 256 });
-        ImGui::TreePop();
-    }
-
-    m_gBuffer->DrawImGui();
-
-    ImGui::Text("OffScreen");
-    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
-
-    ImGui::Text("FinalPass");
-    ImGui::Image(m_offScreenBuffer[static_cast<size_t>(offscreen::fxaa)]->m_shaderresourceviews[0].Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
-
-    ImGui::End();
-}
-
+// オフスクリーンバッファに描画していく
 void PostEffect::StartOffScreenRendering()
 {
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
@@ -220,6 +216,7 @@ void PostEffect::StartOffScreenRendering()
     m_offScreenBuffer[static_cast<int>(offscreen::offscreen)]->Activate(dc);
 }
 
+// 深度マップをSRVにコピーして、GPUにバインドする
 void PostEffect::DepthCopyAndBind(int registerIndex)
 {
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
@@ -233,44 +230,6 @@ void PostEffect::DepthCopyAndBind(int registerIndex)
 
     dc->PSSetShaderResources(registerIndex, 1,
         m_offScreenBuffer[static_cast<int>(offscreen::depthCopy)]->m_shaderresourceviews[0].GetAddressOf());
-}
-
-//画面サイズ変更時にレンダーターゲットを作り直す
-void PostEffect::ResizeBuffer()
-{
-    Graphics& Graphics = Graphics::Instance();
-    const UINT& width = Graphics.GetScreenWidth();
-    const UINT& height = Graphics.GetScreenHeight();
-
-    //ブルームセット
-    m_bloomeffect = std::make_unique<Bloom>(Graphics.GetDevice(), width, height);
-
-    //フレームバッファ生成
-    for (int i = 0; i < static_cast<int>(offscreen::max); ++i)
-    {
-        m_offScreenBuffer[i] = std::make_unique<FrameBuffer>(Graphics.GetDevice(), width, height, DXGI_FORMAT_R32G32B32A32_FLOAT, true);
-    }
-
-    //MultiRenderTarget作成
-    m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), width, height, 6);
-}
-
-//シーンのimgui
-void PostEffect::SceneImGui()
-{
-    //ImGuiIO& io = ImGui::GetIO();
-
-    //// ImGui上にマウスカーソルがある場合は処理しない
-    //if (io.WantCaptureMouse) return;
-
-    ImGui::Begin("GameScene");
-    // ウィンドウの位置とサイズを取得
-    ImVec2 size = ImGui::GetContentRegionAvail();
-    // フレームバッファのシェーダーリソースビューを取得
-    ImTextureID texture_id = (ImTextureID)(m_offScreenBuffer[static_cast<size_t>(offscreen::tonemap)]->m_shaderresourceviews[0].Get());
-    // 画像を表示
-    ImGui::Image(texture_id, size);
-    ImGui::End();
 }
 
 //ポストエフェクトのパラメータを制御する関数

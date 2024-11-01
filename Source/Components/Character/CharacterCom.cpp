@@ -115,7 +115,7 @@ void CharacterCom::Update(float elapsedTime)
     }
 
     //ÉuÉâÅ[
-    PostEffect::Instance().ParameterMove(elapsedTime, 0.5f, dashFlag, PostEffect::PostEffectParameter::BlurStrength);
+    //PostEffect::Instance().ParameterMove(elapsedTime, 0.5f, dashFlag, PostEffect::PostEffectParameter::BlurStrength);
 
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {

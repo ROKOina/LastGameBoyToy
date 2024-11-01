@@ -8,7 +8,6 @@
 #include <future>
 #include <imgui.h>
 #include <ImGuizmo.h>
-#include "Graphics/Shaders/PostEffect.h"
 
 // 前方宣言
 class Component;
@@ -21,6 +20,7 @@ class Collider;
 class PushBackCom;
 class Sprite;
 class Decal;
+class PostEffect;
 
 // ゲームオブジェクト
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -194,6 +194,9 @@ private:
     void RenderUseDepth();
     void InstanceRenderUseDepth();
 
+    //ポストエフェクトの情報取得
+    std::vector<std::shared_ptr<PostEffect>> GetActivePostEffects();
+
     //CPUパーティクル描画
     void CPUParticleRender();
 
@@ -237,6 +240,9 @@ private:
 
     //デカール描画
     std::vector<std::weak_ptr<Decal>> decalobject;
+
+    //ポストエフェクト描画
+    std::vector<std::weak_ptr<PostEffect>>posteffectobject;
 
     //インスタンス描画
     std::vector<std::weak_ptr<InstanceRenderer>>instanceobject;

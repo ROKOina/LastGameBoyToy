@@ -104,7 +104,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     if (resize)
     {
         graphics_.ResizeBackBuffer(width, height);
-        PostEffect::Instance().ResizeBuffer();
+        //PostEffect::Instance().ResizeBuffer();
         resize = false;
     }
 }
