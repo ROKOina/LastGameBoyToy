@@ -35,4 +35,6 @@ public:
     std::string GetName() const override { return "ScenePVE"; };
 private:
     Light* mainDirectionalLight = nullptr;
+    std::unique_ptr<BasicsApplication> photonNet;
+    std::shared_ptr<TransformCom>t;
 };

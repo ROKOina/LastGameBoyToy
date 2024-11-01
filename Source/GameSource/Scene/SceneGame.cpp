@@ -92,7 +92,7 @@ void SceneGame::Initialize()
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
-
+    GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
     //イベント用カメラ
     {
         std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
@@ -292,6 +292,8 @@ void SceneGame::Initialize()
     audio->SetAudio(static_cast<int>(AUDIOID::SE));
     audio->Play(false, 0.5f);
     audio->SetAudioName("Test");
+
+
 
 #pragma endregion
 
