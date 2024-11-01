@@ -14,7 +14,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 
-CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 1)
+CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 2)
 CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 1)
 
 // シリアライズ
@@ -128,6 +128,20 @@ void GPUParticle::SaveParameter::serialize(Archive& archive, int version)
         CEREAL_NVP(m_depthS),
         CEREAL_NVP(m_textureName)
     );
+    // バージョン1には存在しないフィールドにはデフォルト値を与える
+    if (version == 1)
+    {
+        m_deleteflag = false;
+        deletetime = 0.0f;
+    }
+    if (version >= 2)
+    {
+        archive
+        (
+            CEREAL_NVP(m_deleteflag),
+            CEREAL_NVP(deletetime)
+        );
+    }
 }
 
 //日本語にするマクロ
@@ -205,6 +219,17 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     }
 }
 
+//初期設定
+void GPUParticle::Start()
+{
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+    m_gpu->data.position = GetGameObject()->transform_->GetWorldPosition();
+    m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
+    m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+}
+
 //更新処理
 void GPUParticle::Update(float elapsedTime)
 {
@@ -232,7 +257,7 @@ void GPUParticle::Update(float elapsedTime)
     }
 
     //自身を消す関数
-    if (m_deleteflag)
+    if (m_p.m_deleteflag)
     {
         DeleteMe(elapsedTime);
     }
@@ -391,6 +416,8 @@ void GPUParticle::SystemGUI()
     ImGui::SameLine();
     ImGui::Checkbox(J(u8"ストレッチビルボードON"), reinterpret_cast<bool*>(&m_GSC.stretchFlag));
     ImGui::DragFloat(J(u8"ストレッチビルボードの伸ばす係数"), &m_GSC.strechscale, 0.1f, 1.0f, 100.0f);
+    ImGui::Checkbox(J(u8"削除フラグ"), &m_p.m_deleteflag);
+    ImGui::DragFloat(J(u8"削除時間"), &m_p.deletetime, 0.1f, 0.0f, 10.0f);
 
     //デバッグ用にブレンドモード設定
     constexpr const char* BlendName[] =
@@ -577,7 +604,7 @@ void GPUParticle::Play()
 void GPUParticle::DeleteMe(float elapsedTime)
 {
     time += elapsedTime;
-    if (time > deletetime)
+    if (time > m_p.deletetime)
     {
         GameObjectManager::Instance().Remove(GetGameObject());
     }

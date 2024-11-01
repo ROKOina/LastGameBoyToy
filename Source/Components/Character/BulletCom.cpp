@@ -7,6 +7,7 @@
 #include "Components\System\GameObject.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "HitProcess/HitProcessCom.h"
+#include "Components\CPUParticle.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -47,13 +48,20 @@ void BulletCom::Update(float elapsedTime)
         else if (GetGameObject()->GetComponent<HitProcessCom>()->IsHitNonChara(nonCharaObj))
         {
             //ヒットエフェクト生成
-            hiteffectobject = GameObjectManager::Instance().Create();
-            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
-            hiteffectobject->SetName("HitEffect");
-            std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/Effect/hanabi.gpuparticle", 500);
-            hiteffct->Play();
-            hiteffct->SetDeleteTime(0.3f);
-            hiteffct->SetDeleteFlag(true);
+            {
+                std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
+                hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+                hiteffectobject->SetName("HitEffect");
+                std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/Effect/hanabi.gpuparticle", 500);
+                hiteffct->Play();
+            }
+            {
+                std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
+                hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+                hiteffectobject->SetName("HitSmokeEffect");
+                std::shared_ptr<CPUParticle>hiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/Effect/hitsmokeeffect.cpuparticle", 1000);
+                hiteffct->SetActive(true);
+            }
 
             auto& stats = nonCharaObj->GetComponent<CharaStatusCom>();
             stats->AddDamagePoint(damageValue);

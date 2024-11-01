@@ -9,7 +9,7 @@ class CPUParticle :public Component
 {
 public:
 
-    CPUParticle(const char* filename, int num, bool col = false);
+    CPUParticle(const char* filename, int num);
     ~CPUParticle();
 
     //初期設定
@@ -120,12 +120,16 @@ public:
         float limitime = 0.0f;
         float collsionradius = 0.0f;
 
+        //ここから別バージョン
+        bool collider = false;
+        bool deleteflag = false;
+        DirectX::XMFLOAT3 m_direction = { 1.0f,1.0f,1.0f };
+        float deletetime = 0.0f;
+
         template<class Archive>
         void serialize(Archive& archive, int version);
     };
-
-    //方向ベクトルを代入
-    void SetDirection(const DirectX::XMFLOAT3& direction) { this->m_direction = direction; }
+    SerializeCPUParticle m_scp;
 
     //アクティブ化
     void SetActive(const bool& active) { this->m_active = active; }
@@ -134,11 +138,9 @@ private:
 
     int m_numparticle = 0;
     float timer = 0.0f;
+    float deletetimer = 0.0f;
     bool m_active = true;
     bool m_pause = true;
-    SerializeCPUParticle m_scp;
-    DirectX::XMFLOAT3 m_direction = { 1.0f,1.0f,1.0f };
-    bool collider = false;
 
 private:
 

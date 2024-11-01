@@ -14,7 +14,7 @@ public:
     ~GPUParticle() {};
 
     //初期設定
-    void Start()override {};
+    void Start()override;
 
     //更新処理
     void Update(float elapsedTime)override;
@@ -88,11 +88,6 @@ public:
 
     //アクティブ化
     void SetLoop(const bool& loop) { m_GSC.isLoopFlg = loop; }
-    void SetStop(const bool& stop) { stopFlg = stop; }
-    void SetDeleteFlag(const bool& deleteflag) { m_deleteflag = deleteflag; }
-
-    //Delete時間
-    void SetDeleteTime(const float& time) { deletetime = time; }
 
     //保存するコンスタントバッファ
     struct GPUparticleSaveConstants
@@ -156,6 +151,10 @@ public:
         int m_depthS = 2;
         std::string	m_textureName;
 
+        //ここから別バージョン
+        bool m_deleteflag = false;
+        float deletetime = 0.0f;
+
         template<class Archive>
         void serialize(Archive& archive, int version);
     };
@@ -164,7 +163,6 @@ public:
 private:
     float emitTimer = 0.0f;
     bool stopFlg = false;
-    bool m_deleteflag = false;
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_particlebuffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_particlesrv;
@@ -178,5 +176,4 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_constantbuffer;
     const size_t m_maxparticle = 0;
     float time = 0.0f;
-    float deletetime = 0.0f;
 };

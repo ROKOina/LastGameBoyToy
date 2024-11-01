@@ -49,7 +49,7 @@ void TestCharacter_MoveState::Enter()
 void TestCharacter_MoveState::Execute(const float& elapsedTime)
 {
     //“ü—Í’lŽæ“¾
-    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
+    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec(owner->GetGameObject());
 
     //•à‚­
     DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
@@ -164,7 +164,7 @@ void TestCharacter_DashState::Enter()
 void TestCharacter_DashState::Execute(const float& elapsedTime)
 {
     //“ü—Í’lŽæ“¾
-    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec();
+    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec(owner->GetGameObject());
 
     //ˆÚ“®
     DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();

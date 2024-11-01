@@ -117,7 +117,6 @@ void Sprite::SaveParameterCPU::serialize(Archive& archive, int version)
             CEREAL_NVP(texSize)
         );
     }
-
 }
 
 // コンストラクタ
@@ -345,12 +344,10 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
             }
         }
     }
-  
-    // 座標とピボットの処理
-    float pivotX = (texture2ddesc_.Width /spc.texSize.x)  *spc.pivot.x;
-    float pivotY = (texture2ddesc_.Height / spc.texSize.y) * spc.pivot.y;
 
-       
+    // 座標とピボットの処理
+    float pivotX = (texture2ddesc_.Width / spc.texSize.x) * spc.pivot.x;
+    float pivotY = (texture2ddesc_.Height / spc.texSize.y) * spc.pivot.y;
 
     // スプライトの頂点座標の計算
     //左上
@@ -415,10 +412,10 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
         vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = { spc.color.x, spc.color.y, spc.color.z, spc.color.w };
 
         // テクスチャ座標
-        vertices[0].texcoord = {  0.0f/spc.texSize.x,0.0f/ spc.texSize.y };
-        vertices[1].texcoord = { ( spc.texSize.x) / texture2ddesc_.Width,0.0f/ spc.texSize.y };
-        vertices[2].texcoord = {  0.0f/spc.texSize.x, ( spc.texSize.y) / texture2ddesc_.Height };
-        vertices[3].texcoord = { ( spc.texSize.x) / texture2ddesc_.Width, (spc.texSize.y) / texture2ddesc_.Height};
+        vertices[0].texcoord = { 0.0f / spc.texSize.x,0.0f / spc.texSize.y };
+        vertices[1].texcoord = { (spc.texSize.x) / texture2ddesc_.Width,0.0f / spc.texSize.y };
+        vertices[2].texcoord = { 0.0f / spc.texSize.x, (spc.texSize.y) / texture2ddesc_.Height };
+        vertices[3].texcoord = { (spc.texSize.x) / texture2ddesc_.Width, (spc.texSize.y) / texture2ddesc_.Height };
     }
     dc->Unmap(vertexBuffer_.Get(), 0);
 
@@ -465,17 +462,17 @@ void Sprite::DrawCollsionBox()
 
     // スプライトの位置とスケールにオフセット値を加算
       //左上
-    float x0 = spc.position.x ;
-    float y0 = spc.position.y ;
+    float x0 = spc.position.x;
+    float y0 = spc.position.y;
     //
     float x1 = spc.position.x + spc.texSize.x * (spc.scale.x + spc.collsionscaleoffset.x) + spc.collsionpositionoffset.x;
     float y1 = spc.position.y;
     //左下
-    float x2 = spc.position.x ;
+    float x2 = spc.position.x;
     float y2 = spc.position.y + (spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) + spc.collsionpositionoffset.y;
     //右下
     float x3 = spc.position.x + (spc.texSize.x * spc.scale.x + spc.collsionscaleoffset.x) + spc.collsionpositionoffset.x;
-    float y3 = spc.position.y + (spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) +  spc.collsionpositionoffset.y;
+    float y3 = spc.position.y + (spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) + spc.collsionpositionoffset.y;
 
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)
         {
@@ -492,8 +489,8 @@ void Sprite::DrawCollsionBox()
             y += cy;
         };
 
-    float cx = spc.position.x +  spc.pivot.x + spc.collsionpositionoffset.x;
-    float cy = spc.position.y +  spc.pivot.y + spc.collsionpositionoffset.y;
+    float cx = spc.position.x + spc.pivot.x + spc.collsionpositionoffset.x;
+    float cy = spc.position.y + spc.pivot.y + spc.collsionpositionoffset.y;
     rotate(x0, y0, cx, cy, spc.angle);
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);
@@ -791,8 +788,8 @@ void Sprite::OnGUI()
         ImGui::ColorEdit4((char*)u8"イージング色", &spc.easingcolor.x);
         ImGui::DragFloat2((char*)u8"位置", &spc.position.x);
         ImGui::DragFloat2((char*)u8"イージング位置", &spc.easingposition.x);
-        ImGui::DragFloat2((char*)u8"大きさ", &spc.scale.x,0.01f);
-        ImGui::DragFloat2((char*)u8"イージング大きさ", &spc.easingscale.x,0.01f);
+        ImGui::DragFloat2((char*)u8"大きさ", &spc.scale.x, 0.01f);
+        ImGui::DragFloat2((char*)u8"イージング大きさ", &spc.easingscale.x, 0.01f);
         ImGui::DragFloat((char*)u8"回転", &spc.angle);
         ImGui::DragFloat((char*)u8"イージング回転", &spc.easingangle);
         ImGui::DragFloat2((char*)u8"中心位置", &spc.pivot.x);
@@ -910,7 +907,7 @@ bool Sprite::cursorVsCollsionBox()
 
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = { spc.position.x  + (spc.texSize.x /2) + spc.collsionpositionoffset.x,spc.position.y  + (spc.texSize.y  / 2) + spc.collsionpositionoffset.y};
+    DirectX::XMFLOAT2 pos = { spc.position.x + (spc.texSize.x / 2) + spc.collsionpositionoffset.x,spc.position.y + (spc.texSize.y / 2) + spc.collsionpositionoffset.y };
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 

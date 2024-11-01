@@ -15,8 +15,66 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 #include "Components/PushBackCom.h"
+#include "Components\GPUParticle.h"
+#include <random>
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
+
+// シリアライズ
+namespace DirectX
+{
+    template<class Archive>
+    void serialize(Archive& archive, XMUINT4& v)
+    {
+        archive(
+            cereal::make_nvp("x", v.x),
+            cereal::make_nvp("y", v.y),
+            cereal::make_nvp("z", v.z),
+            cereal::make_nvp("w", v.w)
+        );
+    }
+
+    template<class Archive>
+    void serialize(Archive& archive, XMFLOAT2& v)
+    {
+        archive(
+            cereal::make_nvp("x", v.x),
+            cereal::make_nvp("y", v.y)
+        );
+    }
+
+    template<class Archive>
+    void serialize(Archive& archive, XMFLOAT3& v)
+    {
+        archive(
+            cereal::make_nvp("x", v.x),
+            cereal::make_nvp("y", v.y),
+            cereal::make_nvp("z", v.z)
+        );
+    }
+
+    template<class Archive>
+    void serialize(Archive& archive, XMFLOAT4& v)
+    {
+        archive(
+            cereal::make_nvp("x", v.x),
+            cereal::make_nvp("y", v.y),
+            cereal::make_nvp("z", v.z),
+            cereal::make_nvp("w", v.w)
+        );
+    }
+
+    template<class Archive>
+    void serialize(Archive& archive, XMFLOAT4X4& m)
+    {
+        archive(
+            cereal::make_nvp("_11", m._11), cereal::make_nvp("_12", m._12), cereal::make_nvp("_13", m._13), cereal::make_nvp("_14", m._14),
+            cereal::make_nvp("_21", m._21), cereal::make_nvp("_22", m._22), cereal::make_nvp("_23", m._23), cereal::make_nvp("_24", m._24),
+            cereal::make_nvp("_31", m._31), cereal::make_nvp("_32", m._32), cereal::make_nvp("_33", m._33), cereal::make_nvp("_34", m._34),
+            cereal::make_nvp("_41", m._41), cereal::make_nvp("_42", m._42), cereal::make_nvp("_43", m._43), cereal::make_nvp("_44", m._44)
+        );
+    }
+}
 
 template<class Archive>
 void SpawnCom::SpawnParameter::serialize(Archive& archive, int version)
@@ -27,7 +85,8 @@ void SpawnCom::SpawnParameter::serialize(Archive& archive, int version)
         CEREAL_NVP(spawnRadius),
         CEREAL_NVP(spawnCount),
         CEREAL_NVP(objecttype),
-        CEREAL_NVP(Yoffset)
+        CEREAL_NVP(Yoffset),
+        CEREAL_NVP(distanceXY)
     );
 }
 
@@ -86,7 +145,7 @@ void SpawnCom::OnGUI()
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
-        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE" };
+        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION" };
         static_assert(ARRAYSIZE(objectTypeItems) == static_cast<int>(ObjectType::MAX), "objectTypeItems Size Error!");
         ImGui::Combo((char*)u8"オブジェクトタイプ", &sp.objecttype, objectTypeItems, static_cast<int>(ObjectType::MAX));
         objtype = static_cast<ObjectType>(sp.objecttype);
@@ -96,6 +155,7 @@ void SpawnCom::OnGUI()
         ImGui::DragFloat((char*)u8"生成半径", &sp.spawnRadius, 0.0f, 0.0f, 50.0f);
         ImGui::DragInt((char*)u8"生成数", &sp.spawnCount, 1, 0, 100);
         ImGui::DragFloat((char*)u8"Y軸オフセット", &sp.Yoffset, 0.0f, 0.0f, 20.0f);
+        ImGui::DragFloat2((char*)u8"最小最大", &sp.distanceXY.x, 0.1f, 0.0f, 20.0f);
         ImGui::TreePop();
     }
 }
@@ -107,9 +167,36 @@ void SpawnCom::SpawnGameObject()
     std::shared_ptr<SphereColliderCom> collider;
     std::shared_ptr<RendererCom> renderer;
     std::shared_ptr<CPUParticle>cpuparticle;
+    std::shared_ptr<GPUParticle>gpuparticle;
     std::shared_ptr<PushBackCom>pushback;
 
+    // 親オブジェクトの位置を取得
+    DirectX::XMFLOAT3 originalPosition = GetGameObject()->transform_->GetWorldPosition();
+
+    // ランダムな位置を生成
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * DirectX::XM_PI);
+    std::uniform_real_distribution<float> distanceDist(sp.distanceXY.x, sp.distanceXY.y);
+
+    float randomAngle = angleDist(gen);
+    float randomDistance = std::sqrt(distanceDist(gen)) * sp.spawnRadius; // 平方根で距離分布を調整
+
+    float offsetX = std::cos(randomAngle) * randomDistance;
+    float offsetZ = std::sin(randomAngle) * randomDistance;
+
+    // 新しい位置を元の位置にオフセットを加えて設定
+    DirectX::XMFLOAT3 newPosition =
+    {
+        originalPosition.x + offsetX,
+        originalPosition.y + sp.Yoffset,
+        originalPosition.z + offsetZ
+    };
+    obj->transform_->SetWorldPosition(newPosition);
+
     //どのオブジェクトを生成するか決定する
+    objtype = static_cast<ObjectType>(sp.objecttype);
+    sp.objecttype = static_cast<int>(objtype);
     switch (objtype)
     {
     case ObjectType::ENEMY:
@@ -137,8 +224,17 @@ void SpawnCom::SpawnGameObject()
         obj->SetName("fireball");
         cpuparticle = obj->AddComponent<CPUParticle>("Data/Effect/fireball.cpuparticle", 1000);
         cpuparticle->SetActive(true);
-        obj->AddComponent<EasingMoveCom>(nullptr);
+        obj->AddComponent<EasingMoveCom>("Data/3DEasingData/missile.easingmove");
 
+        break;
+
+    case ObjectType::EXPLOSION:
+
+        obj->SetName("explosion");
+        obj->AddComponent<CPUParticle>("Data/Effect/explosionsmoke.cpuparticle", 1000);
+        obj->AddComponent<CPUParticle>("Data/Effect/explosionfire.cpuparticle", 1000);
+        gpuparticle = obj->AddComponent<GPUParticle>("Data/Effect/explosion.gpuparticle", 10000);
+        gpuparticle->Play();
         break;
 
     default:
@@ -146,6 +242,8 @@ void SpawnCom::SpawnGameObject()
         collider = nullptr;
         renderer = nullptr;
         cpuparticle = nullptr;
+        gpuparticle = nullptr;
+        pushback = nullptr;
 
         break;
     }
@@ -153,23 +251,6 @@ void SpawnCom::SpawnGameObject()
     // オブジェクトに番号を付ける
     std::string objectName = std::string(obj->GetName()) + "_" + std::to_string(currentSpawnedCount);
     obj->SetName(objectName.c_str());
-
-    // 半径spawnRadiusメートル以内のランダムな位置を計算
-    float randomAngle = static_cast<float>(rand()) / RAND_MAX * 2.0f * DirectX::XM_PI; // 0から2πまでのランダム角度
-    float randomDistance = static_cast<float>(rand()) / RAND_MAX * sp.spawnRadius;     // 0からspawnRadiusまでのランダム距離
-
-    // 2D平面上でランダム位置を計算
-    float offsetX = cosf(randomAngle) * randomDistance;
-    float offsetZ = sinf(randomAngle) * randomDistance;
-
-    // 新しい位置を元の位置にオフセットを加えて設定
-    DirectX::XMFLOAT3 newPosition =
-    {
-        GetGameObject()->transform_->GetWorldPosition().x + offsetX,
-        GetGameObject()->transform_->GetWorldPosition().y + sp.Yoffset, //ここだけオフセット値でいくぜ
-        GetGameObject()->transform_->GetWorldPosition().z + offsetZ
-    };
-    obj->transform_->SetWorldPosition(newPosition);
 
     // 現在の生成数をインクリメント
     currentSpawnedCount++;

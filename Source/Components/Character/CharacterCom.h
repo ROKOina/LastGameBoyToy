@@ -48,6 +48,7 @@ public:
         SUB_ATTACK,
         MAIN_SKILL,
         SUB_SKILL,
+        ULT,
         NONE,
         MAX,
     };
@@ -90,7 +91,7 @@ public:
     virtual void UltSkill() {};
 
     //LeftShift (固定ダッシュ)
-    void LeftShiftSkill();
+    void LeftShiftSkill(float elapsedTime);
 
     virtual void SpaceSkill() {}
 
@@ -150,7 +151,8 @@ public:
 
     void SetMoveFlag(bool flag) { useMoveFlag = flag; }
 
-    void AddHitC() { hitDamage++; }
+    bool GetIsHitAttack() { return isHitAttack; }
+    void SetIsHitAttack(bool flg) { isHitAttack = flg; }
 
 private:
     //カメラ操作
@@ -206,13 +208,33 @@ private:
     DirectX::XMFLOAT2 leftStick = {};
     DirectX::XMFLOAT2 rightStick = {};
 
+    //ダッシュ関係
     bool dashFlag = false;
+
     float dashGauge = 10;
     float dashGaugeMax = 10;
-    float dashGaugeMinus = 5;
-    float dashGaugePlus = 8;
-    float dashSpeed = 10;
-    float dashRecast = 1;
+    float dashGaugeMinus = 1;   //一秒間減る数
+    float dashGaugePlus = 2;
+
+    float dashSpeed = 5;
+    float dashSpeedFirst = 50;  //初速
+    float dashSpeedNormal = 5; //ダッシュの速さ
+
+    float dashRecast = 3;
+
+    float dashFirstTimer = 0;
+    float dashFirstTime = 0.1f; //初速長さ
+
+    //ウルト関係
+    int ultID = 0;  //ウルトの種類　0:attack 1:heal 2:power
+    bool isMaxUlt = false;  //ウルトが溜まっているか
+    bool isUseUlt = false;  //ウルト使用中か
+    float ultGauge = 0;
+    float ultGaugeMax = 100;
+    //アタック
+    int attackUltCountMax = 5;  //ウルトを打てる数
+    int attackUltCounter;
+
 
     AbnormalCondition abnormalcondition;
 
@@ -226,5 +248,5 @@ private:
     float nowAngle = 0.0f;
     float lerpSpeed = 4.0f;
 
-    int hitDamage = 0;
+    bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
 };

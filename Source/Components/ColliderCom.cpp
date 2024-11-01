@@ -75,6 +75,7 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
         if (judgeTag_ == otherSide->myTag_) {
             HitObj h;
             h.hitPos = rayResult.position;
+            h.hitNormal = rayResult.normal;
             h.gameObject = otherSide->GetGameObject();
             hitObj_.emplace_back(h);
             isHit = true;
@@ -85,6 +86,7 @@ void Collider::ColliderVSOther(std::shared_ptr<Collider> otherSide)
         if (otherSide->judgeTag_ == myTag_) {
             HitObj h;
             h.hitPos = otherRayResult.position;
+            h.hitNormal = otherRayResult.normal;
             h.gameObject = GetGameObject();
             otherSide->hitObj_.emplace_back(h);
             otherSide->isHit = true;

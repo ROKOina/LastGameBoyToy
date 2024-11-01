@@ -13,7 +13,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 
-CEREAL_CLASS_VERSION(CPUParticle::SerializeCPUParticle, 1)
+CEREAL_CLASS_VERSION(CPUParticle::SerializeCPUParticle, 2)
 
 // シリアライズ
 namespace DirectX
@@ -106,13 +106,31 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
         CEREAL_NVP(limitime),
         CEREAL_NVP(collsionradius)
     );
+    // バージョン1には存在しないフィールドにはデフォルト値を与える
+    if (version == 1)
+    {
+        collider = false;
+        deleteflag = false;
+        m_direction = { 1.0f,1.0f,1.0f };
+        deletetime = 0.0f;
+    }
+    if (version >= 2)
+    {
+        archive
+        (
+            CEREAL_NVP(collider),
+            CEREAL_NVP(deleteflag),
+            CEREAL_NVP(m_direction),
+            CEREAL_NVP(deletetime)
+        );
+    }
 }
 
 //日本語にするマクロ
 #define J(x) reinterpret_cast<const char*>(x)
 
 //コンストラクタ
-CPUParticle::CPUParticle(const char* filename, int num, bool col)
+CPUParticle::CPUParticle(const char* filename, int num)
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -165,9 +183,6 @@ CPUParticle::CPUParticle(const char* filename, int num, bool col)
         D3D11_TEXTURE2D_DESC texture2d_desc{};
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_scp.m_filename.c_str(), m_shaderresourceview.GetAddressOf(), &texture2d_desc);
     }
-
-    //コライダーフラグ
-    col = collider;
 }
 
 //デストラクタ
@@ -191,6 +206,16 @@ void CPUParticle::Update(float elapsedTime)
         {
             m_active = false;
             timer = 0.0f;
+        }
+
+        //削除
+        if (m_scp.deleteflag && !m_active)
+        {
+            deletetimer += elapsedTime;
+            if (deletetimer > m_scp.deletetime)
+            {
+                GameObjectManager::Instance().Remove(GetGameObject());
+            }
         }
 
         for (int i = 0; i < m_numparticle; i++)
@@ -306,7 +331,7 @@ void CPUParticle::Render()
     dc->PSSetShader(NULL, NULL, 0);
 
     //当たり判定描画
-    if (collider)
+    if (m_scp.collider)
     {
         for (int i = 0; i < m_numparticle; ++i)
         {
@@ -385,13 +410,13 @@ void CPUParticle::ParticleMove(float elapsedTime)
                 m_data[j].vz += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.z);
 
                 //ベクトルを適用
-                float length = sqrt(m_direction.x * m_direction.x + m_direction.y * m_direction.y + m_direction.z * m_direction.z);
-                m_direction.x /= length;
-                m_direction.y /= length;
-                m_direction.z /= length;
-                m_data[j].vx += m_direction.x * m_scp.m_speed;
-                m_data[j].vy += m_direction.y * m_scp.m_speed;
-                m_data[j].vz += m_direction.z * m_scp.m_speed;
+                float length = sqrt(m_scp.m_direction.x * m_scp.m_direction.x + m_scp.m_direction.y * m_scp.m_direction.y + m_scp.m_direction.z * m_scp.m_direction.z);
+                m_scp.m_direction.x /= length;
+                m_scp.m_direction.y /= length;
+                m_scp.m_direction.z /= length;
+                m_data[j].vx += m_scp.m_direction.x * m_scp.m_speed;
+                m_data[j].vy += m_scp.m_direction.y * m_scp.m_speed;
+                m_data[j].vz += m_scp.m_direction.z * m_scp.m_speed;
 
                 //浮力ランダム
                 m_data[j].ax += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.x);
@@ -498,6 +523,9 @@ void CPUParticle::OnGUI()
     ImGui::Checkbox(J(u8"エフェクト描画"), &m_active);
     ImGui::SameLine();
     ImGui::Checkbox(J(u8"エフェクト停止"), &m_pause);
+    ImGui::SameLine();
+    ImGui::Checkbox(J(u8"削除フラグ"), &m_scp.deleteflag);
+    ImGui::DragFloat(J(u8"削除時間"), &m_scp.deletetime, 0.1f, 0.0f, 10.0f);
     ImGui::SetNextItemWidth(80);
     ImGui::InputInt(J(u8"開始コマ"), &m_scp.m_type);
     ImGui::SameLine();
@@ -548,7 +576,7 @@ void CPUParticle::OnGUI()
     ImGui::SameLine();
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"消滅時の大きさ"), &m_scp.m_latesize.y, 0.01f, 0.0f, 1.0f);
-    ImGui::DragFloat3(J(u8"方向ベクトル"), &m_direction.x, 0.1f);
+    ImGui::DragFloat3(J(u8"方向ベクトル"), &m_scp.m_direction.x, 0.1f);
     ImGui::DragFloat(J(u8"ベクトルに加算するスピード"), &m_scp.m_speed, 0.1f);
     ImGui::DragFloat(J(u8"パーティクルの速さ"), &m_scp.m_string, 0.01f, 1.0f, 10.0f);
     ImGui::SetNextItemWidth(90);
@@ -556,6 +584,7 @@ void CPUParticle::OnGUI()
     ImGui::SameLine();
     ImGui::SetNextItemWidth(90);
     ImGui::DragFloat(J(u8"パーティクルの最後の速さ"), &m_scp.m_stringlate.y, 0.01f, 1.0f, 10.0f);
+    ImGui::Checkbox(J(u8"当たり判定の描画"), &m_scp.collider);
     ImGui::DragFloat(u8"当たり判定の半径", &m_scp.collsionradius);
 }
 
