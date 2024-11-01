@@ -208,6 +208,7 @@
     <ClInclude Include="Source\GameSource\Scene\SceneDebugGame.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneIKTest.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneLobby\SceneLobby.h" />
+    <ClInclude Include="Source\GameSource\Scene\ScenePVE\Direction\PVEDirection.h" />
     <ClInclude Include="Source\GameSource\Scene\ScenePVE\ScenePVE.h" />
     <ClInclude Include="Source\GameSource\Scene\ScenePVP\ScenePVP.h" />
     <ClInclude Include="Source\GameSource\Scene\SceneResult\SceneResult.h" />
@@ -344,6 +345,7 @@
     <ClCompile Include="Source\GameSource\Scene\SceneDebugGame.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneIKTest.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneLobby\SceneLobby.cpp" />
+    <ClCompile Include="Source\GameSource\Scene\ScenePVE\Direction\PVEDirection.cpp" />
     <ClCompile Include="Source\GameSource\Scene\ScenePVE\ScenePVE.cpp" />
     <ClCompile Include="Source\GameSource\Scene\ScenePVP\ScenePVP.cpp" />
     <ClCompile Include="Source\GameSource\Scene\SceneResult\SceneResult.cpp" />
