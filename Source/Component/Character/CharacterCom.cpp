@@ -32,12 +32,26 @@ void CharacterCom::Update(float elapsedTime)
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
-        MainAttackDown();
+        //ウルト中は攻撃が変わる
+        if (!isUseUlt)
+            MainAttackDown();
+        else
+        {
+            if (Rcool.timer >= Rcool.time)
+            {
+                Rcool.timer = 0;
+                UltSkill();
+                attackUltCounter++;
+                if (attackUltCounter >= attackUltCountMax)
+                    isUseUlt = false;
+            }
+        }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
-        MainAttackPushing();
+        if (!isUseUlt)
+            MainAttackPushing();
     }
 
     if (CharacterInput::SubAttackButton & GetButtonDown())
@@ -126,7 +140,24 @@ void CharacterCom::Update(float elapsedTime)
     {
         //Rcool.timer = 0;
         //UltSkill();
-        //if()
+
+        //ウルト発動フラグON
+        if (isMaxUlt)
+        {
+            SetRSkillCoolTime(0.5f);
+            isUseUlt = true;
+            isMaxUlt = false;
+            attackUltCounter = 0;
+            ultGauge = 0;
+        }
+    }
+
+    //ウルト更新
+    ultGauge += elapsedTime;
+    if (ultGauge >= ultGaugeMax)
+    {
+        isMaxUlt = true;
+        ultGauge = ultGaugeMax;
     }
 
     //クールダウン更新
@@ -141,39 +172,71 @@ void CharacterCom::OnGUI()
     ImGui::Checkbox("isHitAttack", &isHitAttack);
     ImGui::DragFloat("jump", &jumpPower, 0.1f);
 
-    ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);
-    ImGui::DragFloat("dashGauge", &dashGauge, 0.1f);
-    ImGui::DragFloat("dashGaugeMax", &dashGaugeMax, 0.1f);
-    ImGui::DragFloat("dashGaugeMinus", &dashGaugeMinus, 0.1f);
-    ImGui::DragFloat("dashGaugePlus", &dashGaugePlus, 0.1f);
+    if (ImGui::TreeNode("ult"))
+    {
+        ImGui::Checkbox("isMaxUlt", &isMaxUlt);
+        ImGui::Checkbox("isUseUlt", &isUseUlt);
+        ImGui::DragFloat("ultGaugeMax", &ultGaugeMax, 0.1f);
+        ImGui::DragFloat("ultGauge", &ultGauge, 0.1f);
 
-    ImGui::DragFloat("dashSpeedFirst", &dashSpeedFirst, 0.1f);
-    ImGui::DragFloat("dashSpeedNormal", &dashSpeedNormal, 0.1f);
-    ImGui::DragFloat("dashFirstTime", &dashFirstTime, 0.1f);
+        ImGui::Separator();
 
-    bool stan = isStan;
-    ImGui::Checkbox("isStan", &stan);
-    ImGui::DragFloat("stanTimer", &stanTimer);
+        ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
+        ImGui::DragInt("attackUltCounter", &attackUltCounter);
 
-    int s = (int)(moveStateMachine.GetCurrentState());
-    ImGui::InputInt("moveS", &s);
-    s = (int)(attackStateMachine.GetCurrentState());
-    ImGui::InputInt("attackS", &s);
-    moveStateMachine.ImGui();
-    attackStateMachine.ImGui();
 
-    ImGui::InputFloat("StickAngle", &stickAngle);
-    ImGui::InputFloat("nowAngle", &nowAngle);
+        ImGui::TreePop();
+    }
 
-    int i = userInput;
-    ImGui::InputInt("input", &i);
-    i = userInputDown;
-    ImGui::InputInt("userInputDown", &i);
-    i = userInputUp;
-    ImGui::InputInt("userInputUp", &i);
+    if (ImGui::TreeNode("dash"))
+    {
+        ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);
+        ImGui::DragFloat("dashGauge", &dashGauge, 0.1f);
+        ImGui::DragFloat("dashGaugeMax", &dashGaugeMax, 0.1f);
+        ImGui::DragFloat("dashGaugeMinus", &dashGaugeMinus, 0.1f);
+        ImGui::DragFloat("dashGaugePlus", &dashGaugePlus, 0.1f);
 
-    ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
-    ImGui::InputInt("netID", &netID);
+        ImGui::DragFloat("dashSpeedFirst", &dashSpeedFirst, 0.1f);
+        ImGui::DragFloat("dashSpeedNormal", &dashSpeedNormal, 0.1f);
+        ImGui::DragFloat("dashFirstTime", &dashFirstTime, 0.1f);
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("state"))
+    {
+        int s = (int)(moveStateMachine.GetCurrentState());
+        ImGui::InputInt("moveS", &s);
+        s = (int)(attackStateMachine.GetCurrentState());
+        ImGui::InputInt("attackS", &s);
+        moveStateMachine.ImGui();
+        attackStateMachine.ImGui(); 
+        
+        ImGui::TreePop();
+    }
+
+
+    if (ImGui::TreeNode("NetInput"))
+    {
+        bool stan = isStan;
+        ImGui::Checkbox("isStan", &stan);
+        ImGui::DragFloat("stanTimer", &stanTimer);
+
+        ImGui::InputFloat("StickAngle", &stickAngle);
+        ImGui::InputFloat("nowAngle", &nowAngle);
+
+        int i = userInput;
+        ImGui::InputInt("input", &i);
+        i = userInputDown;
+        ImGui::InputInt("userInputDown", &i);
+        i = userInputUp;
+        ImGui::InputInt("userInputUp", &i);
+
+        ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
+        ImGui::InputInt("netID", &netID);
+
+        ImGui::TreePop();
+    }
 
     if (ImGui::TreeNode("SkillCool"))
     {

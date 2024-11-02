@@ -1,6 +1,3 @@
-#include "Netwark/Client.h"
-#include "Netwark/Server.h"
-
 #include "ScenePVE.h"
 #include <Graphics\Graphics.h>
 #include <Component\Camera\FreeCameraCom.h>

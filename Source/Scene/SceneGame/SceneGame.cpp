@@ -1,6 +1,8 @@
 //一番上でインクルード（ネットワーク）
-#include "Netwark/Client.h"
-#include "Netwark/Server.h"
+//#include <winsock2.h>
+#include <ws2tcpip.h>
+
+//#pragma comment(lib, "Ws2_32.lib")
 
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
@@ -147,6 +149,15 @@ void SceneGame::Initialize()
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
         }
+        //アタックウルトのエフェクト
+        {
+            std::shared_ptr<GameObject> attackUltEff = obj->AddChildObject();
+            attackUltEff->SetName("attackUltEFF");
+            attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
+            attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr , 10000);
+        }
+
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -290,15 +301,15 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-    if (n)
-    {
-        n->Update();
+    //if (n)
+    //{
+    //    n->Update();
 
-        if (!n->IsNextFrame())
-        {
-            return;
-        }
-    }
+    //    if (!n->IsNextFrame())
+    //    {
+    //        return;
+    //    }
+    //}
 
     photonNet->run(elapsedTime);
 
@@ -340,44 +351,6 @@ void SceneGame::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
-
-    if (n)
-        n->ImGui();
-    else
-    {
-        //ネットワーク決定仮ボタン
-        ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-
-        ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
-
-        static int ClientID = 0;
-        static std::string ip;
-        char ipAdd[256];
-
-        ImGui::InputInt("id", &ClientID);
-        ::strncpy_s(ipAdd, sizeof(ipAdd), ip.c_str(), sizeof(ipAdd));
-        if (ImGui::InputText("ipv4Adress", ipAdd, sizeof(ipAdd), ImGuiInputTextFlags_EnterReturnsTrue))
-        {
-            ip = ipAdd;
-        }
-        if (ImGui::Button("Client"))
-        {
-            if (ip.size() > 0)
-            {
-                n = std::make_unique<NetClient>(ip, ClientID);
-                n->Initialize();
-            }
-        }
-
-        if (ImGui::Button("Server"))
-        {
-            n = std::make_unique<NetServer>();
-            n->Initialize();
-        }
-
-        ImGui::End();
-    }
 
     photonNet->ImGui();
 
@@ -421,57 +394,6 @@ void SceneGame::EffectNew()
         obj->SetName("testui");
         obj->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
     }
-}
-
-void SceneGame::SetUserInputs()
-{
-    // プレイヤーの入力情報
-    SetPlayerInput();
-
-    // 他のプレイヤーの入力情報
-    SetOnlineInput();
-}
-
-void SceneGame::SetPlayerInput()
-{
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
-    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-    if (obj.use_count() == 0)return;
-
-    std::shared_ptr<CharacterCom> chara = obj->GetComponent<CharacterCom>();
-    if (chara.use_count() == 0) return;
-
-    // 入力情報をプレイヤーキャラクターに送信
-    chara->SetUserInput(gamePad.GetButton());
-    chara->SetUserInputDown(gamePad.GetButtonDown());
-    chara->SetUserInputUp(gamePad.GetButtonUp());
-
-    chara->SetLeftStick(gamePad.GetAxisL());
-    chara->SetRightStick(gamePad.GetAxisR());
-}
-
-void SceneGame::SetOnlineInput()
-{
-    if (!n)return;
-
-    for (auto& client : n->GetNetDatas())
-    {
-        std::string name = "Net" + std::to_string(client.id);
-        std::shared_ptr<GameObject> clientObj = GameObjectManager::Instance().Find(name.c_str());
-
-        if (clientObj)
-        {
-            std::shared_ptr<CharacterCom> chara = clientObj->GetComponent<CharacterCom>();
-
-            if (!chara)continue;
-        }
-    }
-}
-
-void SceneGame::DelayOnlineInput()
-{
-    if (!n)return;
 }
 
 void SceneGame::CreateUiObject()

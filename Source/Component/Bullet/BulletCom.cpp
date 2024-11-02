@@ -65,8 +65,6 @@ void BulletCom::Update(float elapsedTime)
                 hiteffct->SetActive(true);
             }
 
-            auto& stats = nonCharaObj->GetComponent<CharaStatusCom>();
-            stats->AddDamagePoint(damageValue);
             GameObjectManager::Instance().Remove(this->GetGameObject());
         }
     }

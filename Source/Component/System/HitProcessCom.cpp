@@ -2,6 +2,7 @@
 
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Character\CharacterCom.h"
+#include "Component\Character\CharaStatusCom.h"
 
 #include "Netwark/Photon/StaticSendDataManager.h"
 
@@ -22,14 +23,26 @@ void HitProcessCom::Update(float elapsedTime)
 
     for (auto& hit : col->OnHitGameObject())
     {
-        parentChara->SetIsHitAttack(true);
+        auto& stats = hit.gameObject.lock()->GetComponent<CharaStatusCom>();
+        if (!stats)continue;
+
         auto& hitChara = hit.gameObject.lock()->GetComponent<CharacterCom>();
         if (!hitChara)
         {
             isHitNonChara = true;
             nonCharaObj = hit.gameObject;
+
+            //–³“GŽžŠÔ‚ÌŠÔ‚Íƒqƒbƒg‚ð—^‚¦‚È‚¢
+            if(!stats->IsInvincible())
+                parentChara->SetIsHitAttack(true);
+
+            //ƒ_ƒ[ƒW‚ð—^‚¦‚é
+            stats->AddDamagePoint(-value);
+
             continue;
         }
+
+        parentChara->SetIsHitAttack(true);
 
         //ƒqƒbƒgˆ—
         HitProcess(parentChara->GetNetID(), hitChara->GetNetID());

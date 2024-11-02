@@ -4,8 +4,8 @@
 #include "Component\Sprite\Sprite.h"
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
+
 #include "Component\System\GameObject.h"
-#include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
@@ -36,17 +36,6 @@ public:
     std::string GetName() const override { return "SceneGame"; };
 
 private:
-    // 各プレイヤーの入力情報を、それぞれのキャラクターに送る
-    void SetUserInputs();
-
-    // プレイヤー( PCの持ち主 )の入力情報
-    void SetPlayerInput();
-
-    // 他のプレイヤー( オンライン )の入力情報
-    void SetOnlineInput();
-
-    //ディレイ方式用入力
-    void DelayOnlineInput();
 
     //UIのゲームオブジェクト生成
     void CreateUiObject();
@@ -54,7 +43,7 @@ private:
     //PVEゲームからリザルトに遷移
     void TransitionPVEFromResult();
 private:
-    std::unique_ptr<NetwarkPost> n;
+    //std::unique_ptr<NetwarkPost> n;
     std::unique_ptr<BasicsApplication> photonNet;
     Light* mainDirectionalLight = nullptr;
 

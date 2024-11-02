@@ -350,13 +350,10 @@
     <ClCompile Include="Source\Math\easing.cpp" />
     <ClCompile Include="Source\Math\Mathf.cpp" />
     <ClCompile Include="Source\Math\TransformUtils.cpp" />
-    <ClCompile Include="Source\Netwark\Client.cpp" />
-    <ClCompile Include="Source\Netwark\NetwarkPost.cpp" />
     <ClCompile Include="Source\Netwark\Photon\BasicsApplication.cpp" />
     <ClCompile Include="Source\Netwark\Photon\Photon_lib.cpp" />
     <ClCompile Include="Source\Netwark\Photon\StaticSendDataManager.cpp" />
     <ClCompile Include="Source\Netwark\Photon\StdIO_UIListener.cpp" />
-    <ClCompile Include="Source\Netwark\Server.cpp" />
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneGame\SceneGame.cpp" />

@@ -4,8 +4,8 @@
 #include "Component\Sprite\Sprite.h"
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
+
 #include "Component\System\GameObject.h"
-#include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
