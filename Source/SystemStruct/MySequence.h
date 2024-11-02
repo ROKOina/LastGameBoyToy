@@ -5,6 +5,7 @@
 #include "ImCurveEdit.h"
 #include <vector>
 #include <string>
+#include <map>
 
 struct MySequence : public ImSequencer::SequenceInterface
 {
@@ -18,7 +19,7 @@ struct MySequence : public ImSequencer::SequenceInterface
     }
     virtual int GetItemCount() const { return (int)myItems.size(); }
 
-    virtual void IntGet(int index, int** start, int** end, int* type, unsigned int* color) 
+    virtual void IntGet(int index, int** start, int** end, int* type, unsigned int* color)
     {
         MySequenceItem& item = myItems[index];
         if (color)
@@ -30,7 +31,7 @@ struct MySequence : public ImSequencer::SequenceInterface
         if (type)
             *type = item.mType;
     }
-    virtual void FloatGet(int index, float** start, float** end, int* type, unsigned int* color) 
+    virtual void FloatGet(int index, float** start, float** end, int* type, unsigned int* color)
     {
         MySequenceItem& item = myItems[index];
         if (color)
@@ -62,10 +63,10 @@ struct MySequence : public ImSequencer::SequenceInterface
     }
     virtual void Add(int type) { myItems.push_back(MySequenceItem{ type, 0, 10, false }); };
     virtual void Del(int index) { myItems.erase(myItems.begin() + index); }
-    int Delete(int index) 
-    { 
+    int Delete(int index)
+    {
         int typeId = myItems[index].mType;
-        myItems.erase(myItems.begin() + index); 
+        myItems.erase(myItems.begin() + index);
         return typeId;
     }
     virtual void Duplicate(int index) { myItems.push_back(myItems[index]); }
@@ -73,15 +74,14 @@ struct MySequence : public ImSequencer::SequenceInterface
     virtual size_t GetCustomHeight(int index) { return myItems[index].mExpanded ? 300 : 0; }
 
     virtual int GetItemTypeCount() const { return SequencerItemTypeNames.size(); }
-    virtual const char* GetItemTypeName(int typeIndex) const 
+    virtual const char* GetItemTypeName(int typeIndex) const
     {
-        auto& it=SequencerItemTypeNames.find(typeIndex);
-        
+        auto& it = SequencerItemTypeNames.find(typeIndex);
+
         return it->second.c_str();
     }
     virtual const char* GetItemLabel(int index) const
     {
-        
         static char tmps[512];
         snprintf(tmps, 512, GetItemTypeName(myItems[index].mType));
         return tmps;
@@ -131,13 +131,12 @@ struct MySequence : public ImSequencer::SequenceInterface
     }
 
     //—v‘f‚Ì–¼‘O
-    void AddTypeName(int typeID,std::string name)
+    void AddTypeName(int typeID, std::string name)
     {
         SequencerItemTypeNames[typeID] = name;
     }
 
     std::map<int, std::string> SequencerItemTypeNames;
-
 
     struct MySequenceItem
     {
@@ -146,5 +145,4 @@ struct MySequence : public ImSequencer::SequenceInterface
         bool mExpanded;
     };
     std::vector<MySequenceItem> myItems;
-
 };

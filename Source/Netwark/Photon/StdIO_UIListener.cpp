@@ -6,6 +6,7 @@ int EG_kbhit();
 using namespace ExitGames::Common;
 
 #ifdef _EG_WINDOWS_PLATFORM
+#define _WINSOCKAPI_  // windows.hを定義した際に、winsock.hを自動的にインクルードしない
 #include <windows.h>
 #include <conio.h>
 

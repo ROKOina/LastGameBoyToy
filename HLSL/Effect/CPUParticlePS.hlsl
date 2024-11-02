@@ -4,7 +4,7 @@
 Texture2D texturemap : register(t0); // カラーテクスチャ
 Texture2D depthmap : register(t8); // 深度テクスチャ（ソフトパーティクル用）
 
-float4 main(PS_IN input) : SV_Target
+float4 main(PS_IN input) : SV_TARGET
 {
     // テクスチャカラーを取得
     float4 color = texturemap.Sample(sampler_states[LINEAR], input.Size);

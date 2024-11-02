@@ -1,7 +1,7 @@
 #pragma once
 #include "PxPhysicsAPI.h"
-#include "Components\RendererCom.h"
-#include "Components\NodeCollsionCom.h"
+#include "Component\Renderer\RendererCom.h"
+#include "Component\Collsion\NodeCollsionCom.h"
 #include <memory>
 #include <map>
 #include <vector>
@@ -39,9 +39,9 @@ public:
         PxRaycastBuffer& hitBuffer);
 
     //Modelの形の当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic,ModelResource* model);
+    physx::PxRigidActor* GenerateCollider(bool isStatic, ModelResource* model);
     //矩形、球、カプセルの当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj);
+    physx::PxRigidActor* GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, GameObj obj);
 
     //MeshDescを保存しているmap取得
     std::map<std::string, physx::PxTriangleMeshDesc>& GetMeshStlege() { return meshStlege; }
@@ -66,7 +66,7 @@ private:
 namespace physx
 {
 #if(1)
-  // XMFLOAT3 との足し算
+    // XMFLOAT3 との足し算
     static inline PxVec3 operator+(const PxVec3& f1, const DirectX::XMFLOAT3& f2)
     {
         return { f1.x + f2.x,f1.y + f2.y, f1.z + f2.z };
@@ -103,5 +103,4 @@ namespace physx
     //}
 
 #endif
-
 }

@@ -1,20 +1,19 @@
 #include "Photon_lib.h"
 #include "limits.h"
 
-#include "Logger.h"
+#include "SystemStruct\Logger.h"
 
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
 #include "../NetData.h"
-#include "Components/System/GameObject.h"
-#include "Components/TransformCom.h"
-#include "Components/RendererCom.h"
-#include "Components/MovementCom.h"
-#include "Components/ColliderCom.h"
-#include "Components\Character\CharaStatusCom.h"
-#include "Components\Character\TestCharacterCom.h"
-#include "Components\Character\InazawaCharacterCom.h"
+#include "Component/System/GameObject.h"
+#include "Component/System/TransformCom.h"
+#include "Component/Renderer/RendererCom.h"
+#include "Component/MoveSystem/MovementCom.h"
+#include "Component/Collsion/ColliderCom.h"
+#include "Component\Character\CharaStatusCom.h"
+#include "Component\Character\InazawaCharacterCom.h"
 
 #include "StaticSendDataManager.h"
 
@@ -461,7 +460,7 @@ void PhotonLib::NetCharaInput()
         static DirectX::XMFLOAT3 hoknaPos = {};
         static DirectX::XMFLOAT3 nowPos = {};
         static int saveFrameHokan = 0;
-        int frameHokan =3; //補完するフレーム
+        int frameHokan = 3; //補完するフレーム
 
         //移動
         if (s.isInputUpdate)

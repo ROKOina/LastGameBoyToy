@@ -1,6 +1,6 @@
 #include "LightManager.h"
 #include "Graphics/Graphics.h"
-#include "Misc.h"
+#include "SystemStruct\Misc.h"
 #include <imgui.h>
 
 //コンストラクタ

@@ -1,5 +1,5 @@
 #include "Physxlib.h"
-#include "Components\TransformCom.h"
+#include "Component/System/TransformCom.h"
 #include <list>
 
 void PhysXLib::Initialize()
@@ -15,7 +15,6 @@ void PhysXLib::Initialize()
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
     PxInitExtensions(*gPhysics, nullptr);
-
 
     // シーンの作成
     gScene = gPhysics->createScene(sceneDesc);
@@ -44,7 +43,6 @@ void PhysXLib::Initialize()
 #define SAFE_RELEASE(p) {if (p) { (p)->release(); (p) = nullptr; }}
 void PhysXLib::Finalize()
 {
-
     //終了処理する前にシミュレーションを終わらす必要あり
 //m_scene->simulate(m_simurationUpdateTimeStep);
     gScene->simulate(0.001f);
@@ -123,7 +121,6 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
         physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
         triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
 
-
         physx::PxRigidActor* rigidObj = nullptr;
         if (isStatic) {
             //動かない(静的)剛体を作成
@@ -136,7 +133,6 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
             // 動かすことのできる(動的)剛体を作成
             rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
         }
-
 
         physx::PxMeshScale scale(PxVec3(1.0f, 1.0f, 1.0f));
         PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
