@@ -249,7 +249,6 @@ void GPUParticle::Update(float elapsedTime)
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
-    // TODOここをフラグで制御
     // オブジェクトの回転に合わせてエフェクトも回転させる処理
     if (m_GSC.worldpos == 0)
     {

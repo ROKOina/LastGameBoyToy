@@ -155,9 +155,8 @@ void SceneGame::Initialize()
             attackUltEff->SetName("attackUltEFF");
             attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr , 10000);
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 10000);
         }
-
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -180,20 +179,20 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/Boss/boss.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-        boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+        boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
         t = boss->transform_;
         boss->AddComponent<MovementCom>();
-        boss->AddComponent<NodeCollsionCom>(nullptr);
+        boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
-        //boss->AddComponent<BossCom>();
-        //boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        boss->AddComponent<BossCom>();
+        boss->AddComponent<AimIKCom>(nullptr, "Boss_head");
         boss->AddComponent<CharaStatusCom>();
 
         auto& pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(2);
-        pushBack->SetWeight(10);
+        pushBack->SetWeight(600);
 
         //ボンプ君
         {

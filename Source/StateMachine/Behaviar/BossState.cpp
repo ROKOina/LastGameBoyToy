@@ -157,26 +157,26 @@ void Boss_BaseState::RandamBehavior(int one, int two)
 #pragma region ‘Ò‹@
 void Boss_IdleState::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_idol"), true);
 }
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
     //‹——£”»’è
-    if (owner->Search(5.0f))
-    {
-        RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
-    }
-    else if (owner->Search(FLT_MAX))
-    {
-        RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
-    }
+    //if (owner->Search(5.0f))
+    //{
+    //    RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
+    //}
+    //else if (owner->Search(FLT_MAX))
+    //{
+    //    RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
+    //}
 
-    //Ž€–Sˆ—
-    if (characterstatas.lock()->GetHitPoint() <= 0)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
-        return;
-    }
+    ////Ž€–Sˆ—
+    //if (characterstatas.lock()->GetHitPoint() <= 0)
+    //{
+    //    bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+    //    return;
+    //}
 }
 #pragma endregion
 

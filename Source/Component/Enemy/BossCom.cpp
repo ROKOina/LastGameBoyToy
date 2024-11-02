@@ -10,19 +10,19 @@ void BossCom::Start()
 {
     //ÉXÉeÅ[Égìoò^
     state.AddState(BossState::IDLE, std::make_shared<Boss_IdleState>(this));
-    state.AddState(BossState::STOPTIME, std::make_shared<Boss_IdleStopState>(this));
-    state.AddState(BossState::MOVE, std::make_shared<Boss_MoveState>(this));
-    state.AddState(BossState::JUMP, std::make_shared <Boss_JumpState>(this));
-    state.AddState(BossState::JUMPLOOP, std::make_shared <Boss_JumpLoopState>(this));
-    state.AddState(BossState::LANDINGATTACK, std::make_shared <Boss_LandingState>(this));
-    state.AddState(BossState::PUNCH, std::make_shared <Boss_PunchState>(this));
-    state.AddState(BossState::KICK, std::make_shared <Boss_KickState>(this));
-    state.AddState(BossState::RANGEATTACK, std::make_shared <Boss_RangeAttackState>(this));
-    state.AddState(BossState::BOMPATTTACK, std::make_shared <Boss_BompAttackState>(this));
-    state.AddState(BossState::FIREBALL, std::make_shared <Boss_FireBallState>(this));
-    state.AddState(BossState::MISSILE, std::make_shared <Boss_MissileAttackState>(this));
-    state.AddState(BossState::HIT, std::make_shared <Boss_DamageState>(this));
-    state.AddState(BossState::DEATH, std::make_shared <Boss_DeathState>(this));
+    //state.AddState(BossState::STOPTIME, std::make_shared<Boss_IdleStopState>(this));
+    //state.AddState(BossState::MOVE, std::make_shared<Boss_MoveState>(this));
+    //state.AddState(BossState::JUMP, std::make_shared <Boss_JumpState>(this));
+    //state.AddState(BossState::JUMPLOOP, std::make_shared <Boss_JumpLoopState>(this));
+    //state.AddState(BossState::LANDINGATTACK, std::make_shared <Boss_LandingState>(this));
+    //state.AddState(BossState::PUNCH, std::make_shared <Boss_PunchState>(this));
+    //state.AddState(BossState::KICK, std::make_shared <Boss_KickState>(this));
+    //state.AddState(BossState::RANGEATTACK, std::make_shared <Boss_RangeAttackState>(this));
+    //state.AddState(BossState::BOMPATTTACK, std::make_shared <Boss_BompAttackState>(this));
+    //state.AddState(BossState::FIREBALL, std::make_shared <Boss_FireBallState>(this));
+    //state.AddState(BossState::MISSILE, std::make_shared <Boss_MissileAttackState>(this));
+    //state.AddState(BossState::HIT, std::make_shared <Boss_DamageState>(this));
+    //state.AddState(BossState::DEATH, std::make_shared <Boss_DeathState>(this));
 
     //èâä˙ÉXÉeÅ[Égìoò^
     state.ChangeState(BossState::IDLE);
