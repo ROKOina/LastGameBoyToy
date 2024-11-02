@@ -1,5 +1,5 @@
 #include "CPUParticle.hlsli"
-#include "..\\3D\\Light.hlsli"
+#include "../../3D/Light.hlsli"
 
 GS_IN main(VS_IN input)
 {

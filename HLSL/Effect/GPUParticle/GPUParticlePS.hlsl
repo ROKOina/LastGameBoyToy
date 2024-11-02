@@ -1,5 +1,5 @@
 #include "GPUParticle.hlsli"
-#include "../Common.hlsli"
+#include "../../Common/Common.hlsli"
 
 Texture2D colortexture : register(t20);
 Texture2D depthmap : register(t8); // 深度テクスチャ（ソフトパーティクル用）

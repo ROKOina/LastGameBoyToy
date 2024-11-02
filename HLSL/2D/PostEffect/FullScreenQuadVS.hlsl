@@ -1,5 +1,5 @@
 #include "FullScreenQuad.hlsli"
-#include "../../Constants.hlsli"
+#include "../../Common/Constants.hlsli"
 
 VS_OUT main(in uint vertexid : SV_VERTEXID)
 {

@@ -1,5 +1,5 @@
 #include "Sprite.hlsli"
-#include  "../Constants.hlsli"
+#include  "../../Common/Constants.hlsli"
 
 VS_OUT main(float4 position : POSITION, float4 color : COLOR, float2 texcoord : TEXCOORD)
 {

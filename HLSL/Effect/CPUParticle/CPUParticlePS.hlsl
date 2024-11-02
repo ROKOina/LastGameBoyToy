@@ -1,4 +1,4 @@
-#include "../Common.hlsli"
+#include "../../Common/Common.hlsli"
 #include "CPUParticle.hlsli"
 
 Texture2D texturemap : register(t0); // カラーテクスチャ

@@ -23,10 +23,18 @@
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Component\Enemy\BossCom.h"
+#include "Component\PostEffect\PostEffect.h"
 
 void ScenePVE::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
+
+    //ポストエフェクト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("posteffect");
+        obj->AddComponent<PostEffect>();
+    }
 
     //フリーカメラ
     {

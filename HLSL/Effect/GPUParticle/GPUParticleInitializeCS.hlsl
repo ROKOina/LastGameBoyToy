@@ -1,5 +1,6 @@
 #include "GPUParticle.hlsli"
-#include "../Constants.hlsli"
+#include "../../Common/Constants.hlsli"
+#include "../../Common/Rand.hlsli"
 
 RWStructuredBuffer<MainParticle> particlebuffer : register(u0);
 

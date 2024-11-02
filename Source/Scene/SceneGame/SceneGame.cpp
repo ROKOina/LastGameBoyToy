@@ -162,7 +162,7 @@ void SceneGame::Initialize()
     }
 
     //BOSS
-#if(0)
+#if(1)
     {
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");

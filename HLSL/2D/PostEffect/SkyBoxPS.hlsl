@@ -1,6 +1,6 @@
 #include "FullScreenQuad.hlsli"
-#include "../../Common.hlsli"
-#include "../../Constants.hlsli"
+#include "../../Common/Common.hlsli"
+#include "../../Common/Constants.hlsli"
 
 Texture2D skybox : register(t10);
 

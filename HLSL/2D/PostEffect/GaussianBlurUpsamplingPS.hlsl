@@ -1,5 +1,5 @@
 #include "PostEffect.hlsli"
-#include "../../Common.hlsli"
+#include "../../Common/Common.hlsli"
 
 static const uint downsampled_count = 6;
 Texture2D downsampled_textures[downsampled_count] : register(t0);

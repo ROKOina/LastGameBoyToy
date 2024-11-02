@@ -1,6 +1,6 @@
 #include "sprite.hlsli"
-#include "../Common.hlsli"
-#include "../Constants.hlsli"
+#include "../../Common/Common.hlsli"
+#include "../../Common/Constants.hlsli"
 
 Texture2D texturemaps : register(t0);
 

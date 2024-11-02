@@ -1,6 +1,6 @@
 #include "FakeDepth.hlsli"
-#include "../Constants.hlsli"
-#include "../Common.hlsli"
+#include "../Common/Constants.hlsli"
+#include "../Common/Common.hlsli"
 
 Texture2D BottomTex : register(t0);
 Texture2D HeightMap : register(t1);
