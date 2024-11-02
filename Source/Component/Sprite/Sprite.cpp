@@ -211,10 +211,7 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     //Dissolveデータ読み込み
     //LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
     //LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-
-    spc.texSize.x = texture2ddesc_.Width;
-    spc.texSize.y = texture2ddesc_.Height;
-
+    // 
     //コリジョンを使うか決める
     ontriiger = collsion;
 }
@@ -347,22 +344,27 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     }
 
     // 座標とピボットの処理
-    float pivotX = (texture2ddesc_.Width / spc.texSize.x) * spc.pivot.x;
-    float pivotY = (texture2ddesc_.Height / spc.texSize.y) * spc.pivot.y;
+    float pivotX = (spc.pivot.x/ spc.texSize.x);
+    float pivotY = (spc.pivot.y / spc.texSize.y);
+
+
+    // スケール倍したテクスチャサイズ
+    float texSizeX = spc.texSize.x * spc.scale.x;
+    float texSizeY= spc.texSize.y * spc.scale.y;
 
     // スプライトの頂点座標の計算
     //左上
-    float x0 = spc.position.x;
-    float y0 = spc.position.y;
-    //右上
-    float x1 = spc.position.x + spc.texSize.x * spc.scale.x;
-    float y1 = spc.position.y;
-    //左下
-    float x2 = spc.position.x;
-    float y2 = spc.position.y + spc.texSize.y * spc.scale.y;
-    //右下
-    float x3 = spc.position.x + spc.texSize.x * spc.scale.x;
-    float y3 = spc.position.y + spc.texSize.y * spc.scale.y;
+    float x0 = spc.position.x - pivotX * texSizeX;
+    float y0 = spc.position.y - pivotY * texSizeY;
+    //右上                   
+    float x1 = spc.position.x + (1- pivotX) * texSizeX;
+    float y1 = spc.position.y -  pivotY * texSizeY;
+    //左下                   
+    float x2 = spc.position.x - pivotX * texSizeX;
+    float y2 = spc.position.y + (1- pivotY) * texSizeY;
+    //右下                   
+    float x3 = spc.position.x + (1-pivotX) * texSizeX;
+    float y3 = spc.position.y + (1-pivotY)* texSizeY;
 
     // スプライトの回転
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)

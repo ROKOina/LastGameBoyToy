@@ -300,9 +300,11 @@ void EventCameraManager::EventCameraImGui()
 
                 //位置表示
                 if (index == 0 || index == ecVec.size() - 1)
-                    Graphics::Instance().GetDebugRenderer()->DrawSphere(FocusFromWorldPos(ec.pos), 0.5f, { 0,1,1,1 });
+                    //Graphics::Instance().GetDebugRenderer()->DrawSphere(FocusFromWorldPos(ec.pos), 0.5f, { 0,1,1,1 });
+                    Graphics::Instance().GetDebugRenderer()->DrawSphere(ec.pos, 0.5f, { 0,1,1,1 });
                 else
-                    Graphics::Instance().GetDebugRenderer()->DrawSphere(FocusFromWorldPos(ec.pos), 0.5f, { 0,0,1,1 });
+                    //Graphics::Instance().GetDebugRenderer()->DrawSphere(FocusFromWorldPos(ec.pos), 0.5f, { 0,0,1,1 });
+                    Graphics::Instance().GetDebugRenderer()->DrawSphere(ec.pos, 0.5f, { 0,0,1,1 });
 
                 index++;
             }
@@ -352,7 +354,8 @@ void EventCameraManager::PlayEventCamera(std::string eventName)
     {
         //初期位置に移動
         if (saveEventCameraBuff.ECTra.size() >= 2)
-            cameraObj.lock()->transform_->SetWorldPosition(FocusFromWorldPos(saveEventCameraBuff.ECTra[0].pos));
+            cameraObj.lock()->transform_->SetWorldPosition(saveEventCameraBuff.ECTra[0].pos);
+            //cameraObj.lock()->transform_->SetWorldPosition(FocusFromWorldPos(saveEventCameraBuff.ECTra[0].pos));
 
         //イベント再生をセット
         auto& camera = cameraObj.lock()->GetComponent<CameraCom>();
@@ -374,6 +377,7 @@ DirectX::XMFLOAT3 EventCameraManager::FocusFromCameraPos()
     cameraPos = cameraObj.lock()->transform_->GetWorldPosition();
     focusPos = focusObj.lock()->transform_->GetWorldPosition();
 
+    return cameraPos;
     return focusPos - cameraPos;
 }
 
@@ -405,7 +409,7 @@ void EventCameraManager::PlayCameraLerp()
 
         //カメラ位置設定
         if (cameraObj.lock())
-            cameraObj.lock()->transform_->SetWorldPosition(FocusFromWorldPos(lpos));
+            cameraObj.lock()->transform_->SetWorldPosition(lpos);
 
         //注視点設定
         if (focusObj.lock())

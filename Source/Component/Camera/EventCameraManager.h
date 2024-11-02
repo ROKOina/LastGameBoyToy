@@ -56,6 +56,8 @@ public:
     //イベント再生
     void PlayEventCamera(std::string eventName);
 
+    bool GetIsPlayEvent() { return isEventPlay; }
+
 private:
     //フォーカスポジションから見たカメラポジションを返す
     DirectX::XMFLOAT3 FocusFromCameraPos();

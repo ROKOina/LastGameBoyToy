@@ -80,7 +80,7 @@ void SceneGame::Initialize()
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
-
+    GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
     //イベント用カメラ
     {
         std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
@@ -161,7 +161,7 @@ void SceneGame::Initialize()
     }
 
     //BOSS
-#if(1)
+#if(0)
     {
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
@@ -273,6 +273,8 @@ void SceneGame::Initialize()
     audio->SetAudio(static_cast<int>(AUDIOID::SE));
     audio->Play(false, 0.5f);
     audio->SetAudioName("Test");
+
+
 
 #pragma endregion
 
@@ -501,6 +503,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
             hpGauge->SetName("HpGauge");
             std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/UIData/HpGauge.ui", Sprite::SpriteShader::DEFALT, false,UiSystem::X_ONLY);
             gauge->SetMaxValue(200);
             float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
             gauge->SetVariableValue(i);
@@ -543,6 +546,10 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("UltFrame");
             hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
+         
+            std::shared_ptr<UiSystem> fade = hpMemori->AddComponent<UiSystem>("Data/UIData/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
+            fade->SetFadeInFlag(true);
+            fade->SetFadeTimer(10.0f);
         }
 
         //HideUltGauge
@@ -575,6 +582,16 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("SkillGauge");
             hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //HitEffect
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("HitEffect");
+
+            bool* flag = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetIsHitAttack();
+            hpMemori->AddComponent<UiFlag>("Data/UIData/HitEffect.ui", Sprite::SpriteShader::DEFALT, false,flag);
         }
     }
 }

@@ -149,7 +149,8 @@ public:
 
     void SetMoveFlag(bool flag) { useMoveFlag = flag; }
 
-    void AddHitC() { hitDamage++; }
+    bool* GetIsHitAttack() { return &isHitAttack; }
+    void SetIsHitAttack(bool flg) { isHitAttack = flg; }
 
 private:
     //カメラ操作
@@ -224,6 +225,7 @@ private:
     //ウルト関係
     int ultID = 0;  //ウルトの種類　0:attack 1:heal 2:power
     bool isMaxUlt = false;  //ウルトが溜まっているか
+    bool isUseUlt = false;  //ウルト使用中か
     float ultGauge = 0;
     float ultGaugeMax = 100;
     //アタック
@@ -242,5 +244,5 @@ private:
     float nowAngle = 0.0f;
     float lerpSpeed = 4.0f;
 
-    int hitDamage = 0;
+    bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
 };

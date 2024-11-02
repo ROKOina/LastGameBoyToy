@@ -7,7 +7,7 @@
 #include "ImGuiRender.h"
 
 const LONG SCREEN_WIDTH = static_cast<LONG>(1920);
-const LONG SCREEN_HEIGHT = static_cast<LONG>(900/*1080*/);
+const LONG SCREEN_HEIGHT = static_cast<LONG>(1080);
 const LPCWSTR TITLE = L"Game";
 
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
