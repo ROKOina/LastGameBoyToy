@@ -1,5 +1,5 @@
 #pragma once
-#include "Components\UI\UiSystem.h"
+#include "UiSystem.h"
 
 class UiFlag : public UiSystem
 {

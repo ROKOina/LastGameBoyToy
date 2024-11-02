@@ -1,66 +1,28 @@
 #include "Netwark/Client.h"
 #include "Netwark/Server.h"
 
-#include "../Source/GameSource/Scene/ScenePVE/ScenePVE.h"
-
-#include "Graphics/Graphics.h"
-#include "Graphics/Light/LightManager.h"
-#include "Input\Input.h"
-#include "Input\GamePad.h"
-
-#include "../Source/GameSource/Scene/SceneManager.h"
-#include "../Source/GameSource/Scene/SceneLoading.h"
-#include "GameSource/GameScript/EventCameraCom.h"
-#include "GameSource/GameScript/FPSCameraCom.h"
-#include "GameSource/GameScript/EventCameraManager.h"
-#include "Scene/SceneManager.h"
-#include "Scene/SceneLoading/SceneLoading.h"
-#include "imgui.h"
-#include "Component\System\GameObject.h"
-#include "Component\Renderer\RendererCom.h"
-#include "Component/System/TransformCom.h"
-#include "Component\Camera\CameraCom.h"
-#include "Component\Animation\AnimationCom.h"
-#include "Component\Collsion\ColliderCom.h"
-#include "Component\MoveSystem\MovementCom.h"
-#include "Component\Character\InazawaCharacterCom.h"
-#include "Component\Animation\FootIKcom.h"
-#include "Component\Collsion\RayCollisionCom.h"
-#include "Component/Camera/FreeCameraCom.h"
 #include "ScenePVE.h"
-
+#include <Graphics\Graphics.h>
+#include <Component\Camera\FreeCameraCom.h>
+#include <Component\Camera\EventCameraCom.h>
+#include <Component\Character\RegisterChara.h>
+#include <Component\Camera\FPSCameraCom.h>
+#include <Component\Collsion\ColliderCom.h>
+#include <Component\Camera\EventCameraManager.h>
+#include <Graphics\Light\LightManager.h>
+#include <Input\Input.h>
+#include <Component\Character\CharacterCom.h>
+#include <Component\Animation\AnimationCom.h>
+#include <StateMachine\Behaviar\BossState.h>
+#include <Component\System\SpawnCom.h>
+#include "PVEDirection.h"
+#include <Component\Stage\StageEditorCom.h>
+#include <Component\Collsion\RayCollisionCom.h>
+#include <Component\MoveSystem\EasingMoveCom.h>
+#include "Component\Collsion\PushBackCom.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 #include "Netwark/Photon/StdIO_UIListener.h"
-
-#include "Components\System\GameObject.h"
-#include "Components\RendererCom.h"
-#include "Components\RayCollisionCom.h"
-#include "Components\TransformCom.h"
-#include "Components\CameraCom.h"
-#include "Components\AnimationCom.h"
-#include "Components\AimIKCom.h"
-#include "Components\MovementCom.h"
-#include "Components\ColliderCom.h"
-#include "Components\Character\TestCharacterCom.h"
-#include "Components\Character\InazawaCharacterCom.h"
-#include "Components\Character\UenoCharacterCom.h"
-#include "Components\Character\NomuraCharacterCom.h"
-#include "Components\Character\HaveAllAttackCharacter.h"
-#include "Components\Character\RegisterChara.h"
-#include "Components/CPUParticle.h"
-#include "Components\FootIKcom.h"
-#include "GameSource/GameScript/FreeCameraCom.h"
-#include "GameSource/GameScript/FPSCameraCom.h"
-#include "GameSource/GameScript/EventCameraCom.h"
-#include "Components/CPUParticle.h"
-#include "Components/GPUParticle.h"
-#include "Graphics/Sprite/Sprite.h"
-#include "Components/StageEditorCom.h"
-#include "Components/SpawnCom.h"
-#include "Components/Enemy/Boss/BossCom.h"
-#include "Components/InstanceRendererCom.h"
-#include "Components\EasingMoveCom.h"
-#include "Components\PushBackCom.h"
-#include "GameSource/Scene/ScenePVE/Direction/PVEDirection.h"
+#include "Component\Enemy\BossCom.h"
 
 void ScenePVE::Initialize()
 {
@@ -81,7 +43,6 @@ void ScenePVE::Initialize()
         eventCamera->AddComponent<EventCameraCom>();
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
-
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -105,18 +66,17 @@ void ScenePVE::Initialize()
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
     }
 
-
     //BOSS
     {
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Jammo/jammo.mdl");
+        r->LoadModel("Data/Model/Jammo/jammo.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
         t = boss->transform_;
         boss->AddComponent<MovementCom>();
-        boss->AddComponent<NodeCollsionCom>("Data/Jammo/jammocollsion.nodecollsion");
+        boss->AddComponent<NodeCollsionCom>("Data/Model/Jammo/jammocollsion.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
@@ -132,7 +92,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
             bompspawn->SetName("bomp");
-            bompspawn->AddComponent<SpawnCom>();
+            bompspawn->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/missile.spawn");
         }
 
         //左手コリジョン
@@ -161,7 +121,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
             cpufireeffect->SetName("cpufireeffect");
-            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fire.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 1000);
             cpufire->SetActive(false);
         }
 
@@ -170,7 +130,7 @@ void ScenePVE::Initialize()
             std::shared_ptr<GameObject>landsmokeeffect = boss->AddChildObject();
             landsmokeeffect->SetName("cpulandsmokeeffect");
             landsmokeeffect->transform_->SetWorldPosition({ 0,1.7f,0 });
-            std::shared_ptr<CPUParticle>landsmoke = landsmokeeffect->AddComponent<CPUParticle>("Data/Effect/landsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>landsmoke = landsmokeeffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/landsmoke.cpuparticle", 1000);
             landsmoke->SetActive(false);
         }
 
@@ -178,7 +138,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject>cycloneffect = boss->AddChildObject();
             cycloneffect->SetName("cycloncpueffect");
-            std::shared_ptr<CPUParticle>cpuparticle = cycloneffect->AddComponent<CPUParticle>("Data/Effect/cyclon.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>cpuparticle = cycloneffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/cyclon.cpuparticle", 1000);
             cpuparticle->SetActive(false);
         }
 
@@ -186,7 +146,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
             cpufireeffect->SetName("fireball");
-            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/Effect/fireball.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 1000);
             cpufire->SetActive(false);
             cpufireeffect->AddComponent<EasingMoveCom>(nullptr);
             std::shared_ptr<SphereColliderCom> fireballcollider = cpufireeffect->AddComponent<SphereColliderCom>();
@@ -205,7 +165,7 @@ void ScenePVE::Initialize()
         //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        obj->AddComponent<RayCollisionCom>("Data/Model/canyon/stage.collision");
         obj->AddComponent<StageEditorCom>();
         /*      RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
               rigid->GenerateCollider(r->GetModel()->GetResource());*/
@@ -221,7 +181,6 @@ void ScenePVE::Initialize()
     photonNet = std::make_unique<BasicsApplication>(l);
 
     PVEDirection::Instance().DirectionStart();
-
 }
 
 void ScenePVE::Finalize()
@@ -241,7 +200,6 @@ void ScenePVE::Update(float elapsedTime)
     GameObjectManager::Instance().Update(elapsedTime);
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
-
 }
 
 void ScenePVE::Render(float elapsedTime)

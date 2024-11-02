@@ -1,5 +1,6 @@
 #include "UiFlag.h"
-#include "Components\Character\CharacterCom.h"
+#include "Component\Character\CharacterCom.h"
+
 UiFlag::UiFlag(const char* filename, SpriteShader spriteshader, bool collsion, bool* flag) :UiSystem(filename, spriteshader, collsion)
 {
     this->flag = flag;

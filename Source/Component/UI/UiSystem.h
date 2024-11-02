@@ -23,19 +23,16 @@ public:
     // GUI描画
     void OnGUI() override;
 
-
     void FadeIn(float elapsedTime);
     void FadeOut(float elapsedTime);
-
 
     //セッター,ゲッター
     void SetVariableValue(float* value) { variableValue = value; }
     void SetMaxValue(float value) { maxValue = value; }
     void SetTImer(float value) { timer = value; }
     void SetFadeTimer(float value) { fadeTimer = value; originalFadeTime = value; }
-    void SetFadeInFlag(bool flag) { fadeInFlag = flag;}
-    void SetFadeOutFlag(bool flag) { fadeOutFlag = flag;}
-
+    void SetFadeInFlag(bool flag) { fadeInFlag = flag; }
+    void SetFadeOutFlag(bool flag) { fadeOutFlag = flag; }
 
 protected:
     float* variableValue;    //参照する値
@@ -49,10 +46,8 @@ protected:
     bool  fadeInFlag = false;       //フェードイン用フラグ
     bool  fadeOutFlag = false;       //フェードアウト用フラグ
 
-
     DirectX::XMFLOAT2 originalTexSize = {};    //元のテクスチャサイズ
 
- 
 public:
     //変更する値を決めるenum
     enum ChangeValue {

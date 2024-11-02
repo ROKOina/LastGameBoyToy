@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Components/AnimationCom.h"
-#include "Components/System/Component.h"
+#include "Component/Animation/AnimationCom.h"
+#include "Component/System/Component.h"
 
 //PVE‚Ì‰‰o“Š‡
 class PVEDirection
@@ -24,7 +24,6 @@ private:
     //‰‰o‚Ì“Š‡
     void DirectionSupervision(float elapsedTime);
 
-
 private:
     void DirectionOne(float elapsedTime);
     void DirectionTwo(float elapsedTime);
@@ -35,5 +34,4 @@ private:
     int directionNumber = 0;
 
     bool flag = false;
-   
 };

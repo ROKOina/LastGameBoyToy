@@ -1,9 +1,12 @@
 #include "UiGauge.h"
 #include "Math\Mathf.h"
-UiGauge::UiGauge(const char* filename, SpriteShader spriteshader, bool collsion) :UiSystem(filename, spriteshader, collsion)
+
+UiGauge::UiGauge(const char* filename, SpriteShader spriteshader, bool collsion, int changeValue) :UiSystem(filename, spriteshader, collsion)
 {
     //Œ³‚ÌtexSize‚ð•ÛŽ
     originalTexSize = spc.texSize;
+    //•ÏX‚·‚é’l‚ðÝ’è
+    this->changeValue = changeValue;
 }
 
 void UiGauge::Update(float elapsedTime)
@@ -12,7 +15,18 @@ void UiGauge::Update(float elapsedTime)
     *variableValue = Mathf::Clamp(*variableValue, 0.01f, maxValue);
     //ƒQ[ƒW‚Ì”{—¦‚ð‹‚ß‚é
     valueRate = *variableValue / maxValue;
-    spc.texSize = { originalTexSize.x * valueRate,spc.texSize.y };
+    //X‚Ì‚Ý
+    if (changeValue == UiSystem::ChangeValue::X_ONLY) {
+        spc.texSize = { originalTexSize.x * valueRate,spc.texSize.y };
+    }
+    //Y‚Ì‚Ý
+    else if (changeValue == UiSystem::ChangeValue::Y_ONLY) {
+        spc.texSize = { spc.texSize.y,originalTexSize.y * valueRate };
+    }
+    //‚w‚x—¼•û
+    else if (changeValue == UiSystem::ChangeValue::X_AND_Y) {
+        spc.texSize = { originalTexSize.x * valueRate,originalTexSize.y * valueRate };
+    }
 
     //eƒNƒ‰ƒX‚ÌUpdate‚ðŒÄ‚Ô
     this->UiSystem::Update(elapsedTime);
