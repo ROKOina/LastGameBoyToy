@@ -149,6 +149,15 @@ void SceneGame::Initialize()
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
         }
+        //アタックウルトのエフェクト
+        {
+            std::shared_ptr<GameObject> attackUltEff = obj->AddChildObject();
+            attackUltEff->SetName("attackUltEFF");
+            attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
+            attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr , 10000);
+        }
+
     }
 
     //カメラをプレイヤーの子どもにして制御する
