@@ -167,17 +167,17 @@ void SceneGame::Initialize()
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Jammo/jammo.mdl");
+        r->LoadModel("Data/Model/Boss/boss.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
         t = boss->transform_;
         boss->AddComponent<MovementCom>();
-        boss->AddComponent<NodeCollsionCom>("Data/Model/Jammo/jammocollsion.nodecollsion");
+        boss->AddComponent<NodeCollsionCom>(nullptr);
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
-        boss->AddComponent<BossCom>();
-        boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        //boss->AddComponent<BossCom>();
+        //boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
         boss->AddComponent<CharaStatusCom>();
 
         auto& pushBack = boss->AddComponent<PushBackCom>();
