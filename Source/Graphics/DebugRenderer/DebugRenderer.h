@@ -5,8 +5,8 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include "Graphics/Shaders/ConstantBuffer.h"
-#include "SystemStruct\QuaternionStruct.h"
+#include "Graphics/ConstantBuffer.h"
+#include "Math\QuaternionStruct.h"
 #include "PxPhysicsAPI.h"
 
 class DebugRenderer

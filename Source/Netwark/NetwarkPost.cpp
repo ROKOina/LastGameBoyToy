@@ -4,16 +4,16 @@
 #include <ws2tcpip.h>
 #pragma comment(lib,"ws2_32.lib")
 
-#include "Components/System/GameObject.h"
-#include "Components/TransformCom.h"
-#include "Components/RendererCom.h"
+#include "Component/System/GameObject.h"
+#include "Component/System/TransformCom.h"
+#include "Component/Renderer/RendererCom.h"
 #include "Graphics/Graphics.h"
 
-#include "Components/AnimationCom.h"
-#include "Components/MovementCom.h"
-#include "Components/Character/InazawaCharacterCom.h"
-#include "Components\Character\TestCharacterCom.h"
-#include "GameSource\Scene\SceneDebugGame.h"
+#include "Component/Animation/AnimationCom.h"
+#include "Component/MoveSystem/MovementCom.h"
+#include "Component/Character/InazawaCharacterCom.h"
+#include "Scene\SceneGame\SceneGame.h"
+
 __fastcall NetwarkPost::~NetwarkPost()
 {
     // ソケット終了
@@ -28,7 +28,6 @@ __fastcall NetwarkPost::~NetwarkPost()
 
     // WSA終了
     WSACleanup();
-
 }
 
 void NetwarkPost::RenderUpdate()
@@ -75,4 +74,3 @@ bool NetwarkPost::IsSynchroFrame(bool isServer)
 
     return true;
 }
-

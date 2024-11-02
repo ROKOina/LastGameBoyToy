@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <memory>
-#include "Misc.h"
+#include "SystemStruct\Misc.h"
 #include "LineRenderer.h"
 #include "Graphics/Graphics.h"
 
@@ -17,7 +17,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
         };
 
         CreateVsFromCso(device, "Shader\\LineVS.cso", vertexShader_.GetAddressOf(), inputLayout_.GetAddressOf(), inputElementDesc, ARRAYSIZE(inputElementDesc));
-  }
+    }
 
     // ピクセルシェーダー
     {
@@ -52,12 +52,10 @@ void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X
     context->PSSetShader(pixelShader_.Get(), nullptr, 0);
     context->IASetInputLayout(inputLayout_.Get());
 
-
     // レンダーステート設定
     context->OMSetBlendState(Graphics::Instance().GetBlendState(BLENDSTATE::ALPHA), nullptr, 0xFFFFFFFF);
     context->OMSetDepthStencilState(Graphics::Instance().GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_OFF), 1);
     context->RSSetState(Graphics::Instance().GetRasterizerState(RASTERIZERSTATE::WIREFRAME));
-
 
     // プリミティブ設定
     UINT stride = sizeof(Vertex);

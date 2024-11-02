@@ -4,7 +4,7 @@
 #include <string>
 
 #include "../NetwarkPost.h"
-#include "Components/Character/RegisterChara.h"
+#include "Component/Character/RegisterChara.h"
 
 static std::string WStringToString
 (

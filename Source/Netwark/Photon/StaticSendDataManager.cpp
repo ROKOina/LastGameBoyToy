@@ -1,5 +1,5 @@
-#include "Components\System\GameObject.h"
-#include "Components\Character\TestCharacterCom.h"
+#include "Component\System\GameObject.h"
+#include <Component\Character\CharacterCom.h>
 
 #include "StaticSendDataManager.h"  //インクルード一番下に
 
@@ -29,7 +29,6 @@ void StaticSendDataManager::SetSendHeal(int myID, int sendID, float heal)
     data.id = sendID;
     data.valueI = int(heal);
     sendData->Enqueue(data);
-
 }
 
 void StaticSendDataManager::SetSendStan(int myID, int sendID, float stanSec)

@@ -1,8 +1,8 @@
-#include "Logger.h"
-#include "Misc.h"
+#include "SystemStruct\Logger.h"
+#include "SystemStruct\Misc.h"
 #include "Model.h"
 #include "Graphics/Graphics.h"
-#include "Dialog.h"
+#include "SystemStruct\Dialog.h"
 #include <fstream>
 #include <imgui.h>
 #include <cereal/cereal.hpp>
@@ -10,7 +10,7 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/unordered_map.hpp>
-#include <SystemStruct/TransformUtils.h>
+#include <Math/TransformUtils.h>
 
 CEREAL_CLASS_VERSION(Model::CollsionParameter, 1)
 

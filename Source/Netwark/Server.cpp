@@ -6,10 +6,10 @@
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
-#include "Components/System/GameObject.h"
-#include "Components/TransformCom.h"
-#include "Components/MovementCom.h"
-#include "Components/Character/CharacterCom.h"
+#include "Component/System/GameObject.h"
+#include "Component/System/TransformCom.h"
+#include "Component/MoveSystem/MovementCom.h"
+#include "Component/Character/CharacterCom.h"
 
 __fastcall NetServer::~NetServer()
 {
@@ -82,12 +82,10 @@ void __fastcall NetServer::Initialize()
 
 void __fastcall NetServer::Update()
 {
-
     isNextFrame = false;
 
     ///******       データ受信        ******///
     Receive();
-
 
 #ifdef PerfectSyn
 
@@ -101,10 +99,8 @@ void __fastcall NetServer::Update()
 
 #endif
 
-
     ///******       データ送信        ******///
     Send();
-
 
 #ifdef EasyFrameSyn
 
@@ -114,12 +110,10 @@ void __fastcall NetServer::Update()
 
 #endif // EasyFrameSyn
 
-
     nowFrame++; //フレーム加算
 
     //次のフレームに行くことを許可する
     isNextFrame = true;
-
 
 #ifdef PerfectSyn
 
@@ -169,7 +163,6 @@ void NetServer::ImGui()
     //if (ImGui::Checkbox("Dele", &aaa)) {
     //    bufRing->Dequeue();
     //}
-
 
     //int frame = nowFrame;
     //ImGui::InputInt("nowFrame", &frame);
@@ -257,14 +250,13 @@ void NetServer::Receive()
 
             //クライアント情報更新
             RenderUpdate();
-}
+        }
         else
         {
             std::cout << WSAGetLastError << std::endl;
         }
         std::cout << "message send:" << buffer << std::endl;
     }
-
 }
 
 void NetServer::Send()

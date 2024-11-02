@@ -8,17 +8,16 @@
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 
-#include "Components/System/GameObject.h"
-#include "Components/TransformCom.h"
-#include "Components/MovementCom.h"
-#include "Components/Character/CharacterCom.h"
+#include "Component/System/GameObject.h"
+#include "Component/System/TransformCom.h"
+#include "Component/MoveSystem/MovementCom.h"
+#include "Component/Character/CharacterCom.h"
 
 NetClient::~NetClient()
 {
     NetwarkPost::~NetwarkPost();
     bufRing.release();
 }
-
 
 void __fastcall NetClient::Initialize()
 {
@@ -38,14 +37,14 @@ void __fastcall NetClient::Initialize()
     auto StringSplit = [](std::string& st, const char del)
         {
             char* sc = (char*)malloc(sizeof(char) * 10);
-            
+
             int count = 0;
             while (1)
             {
                 //文字区切り終了
                 if (st[0] == del || st[0] == '\0')
                 {
-                    if(st[0])
+                    if (st[0])
                         st = st.substr(1);
                     sc[count] = '\0';
                     break;
@@ -62,7 +61,7 @@ void __fastcall NetClient::Initialize()
 
             return s;
         };
-    
+
     //ip登録
     std::string s = StringSplit(ipv4Adress, '.');
     int ip = std::stoi(s);
@@ -110,7 +109,7 @@ void __fastcall NetClient::Initialize()
 
     // インターフェースのアドレス設定
     mr.imr_interface.s_addr = INADDR_ANY;
-    
+
     setsockopt(multicastSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         reinterpret_cast<const char*>(&mr), sizeof(mr));
 
@@ -121,16 +120,14 @@ void __fastcall NetClient::Initialize()
 }
 
 void __fastcall NetClient::Update()
-{    
+{
     isNextFrame = false;
-
 
     ///******       データ受信        ******///
     Receive();
 
     ///******       データ送信        ******///
     Send();
-
 
 #ifdef EasyFrameSyn
 
@@ -139,7 +136,6 @@ void __fastcall NetClient::Update()
         return;
 
 #endif // EasyFrameSyn
-
 
     nowFrame++;
 
@@ -171,7 +167,7 @@ void NetClient::ImGui()
 }
 
 void NetClient::Receive()
-{    
+{
     //マルチキャストアドレスからデータ受信
     char buffer[MAX_BUFFER_NET] = {};
     struct sockaddr_in fromAddr;
@@ -195,7 +191,6 @@ void NetClient::Receive()
         //    if (c.id == id)continue;
         //    saveInt.emplace_back(nowFrame - c.nowFrame);
         //}
-
 
         ////最初の交信時
         //if (!firstConect)

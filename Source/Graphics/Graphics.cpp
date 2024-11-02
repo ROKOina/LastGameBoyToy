@@ -1,9 +1,9 @@
-#include "Misc.h"
+#include "SystemStruct\Misc.h"
 #include "Graphics/Graphics.h"
 
-#include "Shaders/3D/ModelShader.h"
+#include "Graphics\3DShader\ModelShader.h"
 
-#include "Components/CameraCom.h"
+#include "Component/Camera/CameraCom.h"
 #include <iostream>
 
 Graphics* Graphics::instance_ = nullptr;

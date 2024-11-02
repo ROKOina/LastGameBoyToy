@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <memory>
-#include "Misc.h"
+#include "SystemStruct\Misc.h"
 #include "DebugRenderer.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/Shaders/Shader.h"
+#include "Graphics/Shader.h"
 #include "./Phsix/Physxlib.h"
 
 DebugRenderer::DebugRenderer(ID3D11Device* device)
@@ -80,7 +80,7 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
     }
     spheres_.clear();
 
-    //” •`‰æ	
+    //” •`‰æ
     stride = sizeof(vertex);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     context->IASetVertexBuffers(0, 1, boxVertexBuffer_.GetAddressOf(), &stride, &offset);
@@ -145,8 +145,6 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
         context->Draw(cylinderVertexCount_, 0);
     }
     cylinders_.clear();
-
-
 }
 
 // ‹…•`‰æ

@@ -3,11 +3,11 @@
 #include <memory>
 #include <d3d11.h>
 #include <wrl.h>
-#include "Graphics/Shaders/Shader.h"
+#include "Graphics/Shader.h"
 #include "Graphics/DebugRenderer/DebugRenderer.h"
 #include "Graphics/DebugRenderer/LineRenderer.h"
 
-#include "ThreadPool/ThreadPool.h"
+#include "SystemStruct\ThreadPool.h"
 
 #include <mutex>
 
