@@ -1,7 +1,7 @@
-//一番上でインクルード（ネットワーク）
-#include "Netwark/Client.h"
-#include "Netwark/Server.h"
-
+////一番上でインクルード（ネットワーク）
+//#include "Netwark/Client.h"
+//#include "Netwark/Server.h"
+//
 #include "Graphics/Graphics.h"
 #include "Graphics/Light/LightManager.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
@@ -129,86 +129,86 @@ void SceneDebugGame::LoginInitialize()
 
 void SceneDebugGame::LoginUpdate(float elapsedTime)
 {
-    //ネットが定義されていたらログインステート終了
-    if (n)
-    {
-        isLogin = false;
-        GameInitialize();
-    }
+    ////ネットが定義されていたらログインステート終了
+    //if (n)
+    //{
+    //    isLogin = false;
+    //    GameInitialize();
+    //}
 }
 
 void SceneDebugGame::LoginRender(float elapsedTime)
 {
-    // 画面クリア＆レンダーターゲット設定
-    Graphics& graphics = Graphics::Instance();
-    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-    ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
-    ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
-    dc->OMSetRenderTargets(1, &rtv, dsv);
+    //// 画面クリア＆レンダーターゲット設定
+    //Graphics& graphics = Graphics::Instance();
+    //ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+    //ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
+    //ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
+    //dc->OMSetRenderTargets(1, &rtv, dsv);
 
-    //ネットワーク決定仮ボタン
-    ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+    ////ネットワーク決定仮ボタン
+    //ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+    //ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
+    //ImGui::Begin("NetSelect", nullptr, ImGuiWindowFlags_None);
 
-    static int ClientID = 0;
-    static std::string ip;
-    char ipAdd[256];
+    //static int ClientID = 0;
+    //static std::string ip;
+    //char ipAdd[256];
 
-    ImGui::InputInt("id", &ClientID);
-    ::strncpy_s(ipAdd, sizeof(ipAdd), ip.c_str(), sizeof(ipAdd));
-    if (ImGui::InputText("ipv4Adress", ipAdd, sizeof(ipAdd), ImGuiInputTextFlags_EnterReturnsTrue))
-    {
-        ip = ipAdd;
-    }
-    if (ImGui::Button("Client"))
-    {
-        if (ip.size() > 0)
-        {
-            n = std::make_unique<NetClient>(ip, ClientID);
-            n->Initialize();
-        }
-    }
+    //ImGui::InputInt("id", &ClientID);
+    //::strncpy_s(ipAdd, sizeof(ipAdd), ip.c_str(), sizeof(ipAdd));
+    //if (ImGui::InputText("ipv4Adress", ipAdd, sizeof(ipAdd), ImGuiInputTextFlags_EnterReturnsTrue))
+    //{
+    //    ip = ipAdd;
+    //}
+    //if (ImGui::Button("Client"))
+    //{
+    //    if (ip.size() > 0)
+    //    {
+    //        n = std::make_unique<NetClient>(ip, ClientID);
+    //        n->Initialize();
+    //    }
+    //}
 
-    if (ImGui::Button("Server"))
-    {
-        n = std::make_unique<NetServer>();
-        n->Initialize();
-    }
+    //if (ImGui::Button("Server"))
+    //{
+    //    n = std::make_unique<NetServer>();
+    //    n->Initialize();
+    //}
 
-    ImGui::End();
+    //ImGui::End();
 }
 
 void SceneDebugGame::GameInitialize()
 {
-    //プレイヤー追加
-    players[n->GetNetId()] = GenerateTestCharacter(n->GetNetId(), { 0,3,0 });
-    std::shared_ptr<GameObject> cameraPost = players[n->GetNetId()].lock()->AddChildObject();
-    cameraPost->SetName("cameraPostPlayer");
-    std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-    SceneManager::Instance().SetActiveCamera(cameraPost);
-    cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
-    players[n->GetNetId()].lock()->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    ////プレイヤー追加
+    //players[n->GetNetId()] = GenerateTestCharacter(n->GetNetId(), { 0,3,0 });
+    //std::shared_ptr<GameObject> cameraPost = players[n->GetNetId()].lock()->AddChildObject();
+    //cameraPost->SetName("cameraPostPlayer");
+    //std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
+    //SceneManager::Instance().SetActiveCamera(cameraPost);
+    //cameraPost->transform_->SetWorldPosition({ 0, 950, 300 });
+    //players[n->GetNetId()].lock()->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 }
 
 void SceneDebugGame::GameUpdate(float elapsedTime)
 {
-    if (n)
-    {
-        n->Update();
-        for (int id : n->GetNewLoginID())
-        {
-            if (id == n->GetNetId()) continue;
-            players[id] = GenerateTestCharacter(id, { 0,3, id * 2.0f });
-        }
-        n->GetNewLoginID().clear();
+    //if (n)
+    //{
+    //    n->Update();
+    //    for (int id : n->GetNewLoginID())
+    //    {
+    //        if (id == n->GetNetId()) continue;
+    //        players[id] = GenerateTestCharacter(id, { 0,3, id * 2.0f });
+    //    }
+    //    n->GetNewLoginID().clear();
 
-        if (!n->IsNextFrame())
-        {
-            return;
-        }
-    }
+    //    if (!n->IsNextFrame())
+    //    {
+    //        return;
+    //    }
+    //}
 
     // キーの入力情報を各キャラクターに割り当てる
     SetUserInputs();
@@ -239,8 +239,8 @@ void SceneDebugGame::GameRender(float elapsedTime)
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GetMainDirectionalLight()->GetDirection());
 
-    if (n)
-        n->ImGui();
+    //if (n)
+    //    n->ImGui();
 }
 
 void SceneDebugGame::SetUserInputs()
@@ -254,48 +254,48 @@ void SceneDebugGame::SetUserInputs()
 
 void SceneDebugGame::SetPlayerInput()
 {
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    //GamePad& gamePad = Input::Instance().GetGamePad();
 
-    //このクライアントの担当プレイヤーがいなかったらやめる
-    if (players[n->GetNetId()].use_count() == 0)return;
+    ////このクライアントの担当プレイヤーがいなかったらやめる
+    //if (players[n->GetNetId()].use_count() == 0)return;
 
-    std::shared_ptr<CharacterCom> chara = players[n->GetNetId()].lock()->GetComponent<CharacterCom>();
-    if (chara.use_count() == 0) return;
+    //std::shared_ptr<CharacterCom> chara = players[n->GetNetId()].lock()->GetComponent<CharacterCom>();
+    //if (chara.use_count() == 0) return;
 
-    // 入力情報をプレイヤーキャラクターに送信
-    chara->SetUserInput(gamePad.GetButton());
-    chara->SetUserInputDown(gamePad.GetButtonDown());
-    chara->SetUserInputUp(gamePad.GetButtonUp());
+    //// 入力情報をプレイヤーキャラクターに送信
+    //chara->SetUserInput(gamePad.GetButton());
+    //chara->SetUserInputDown(gamePad.GetButtonDown());
+    //chara->SetUserInputUp(gamePad.GetButtonUp());
 
-    chara->SetLeftStick(gamePad.GetAxisL());
-    chara->SetRightStick(gamePad.GetAxisR());
+    //chara->SetLeftStick(gamePad.GetAxisL());
+    //chara->SetRightStick(gamePad.GetAxisR());
 }
 
 void SceneDebugGame::SetOnlineInput()
 {
-    if (!n)return;
+    //if (!n)return;
 
-    for (auto& client : n->GetNetDatas())
-    {
-        if (n->GetNetId() == client.id) continue;
-        if (players[client.id].use_count() != 0)
-        {
-            std::shared_ptr<CharacterCom> chara = players[client.id].lock()->GetComponent<CharacterCom>();
+    //for (auto& client : n->GetNetDatas())
+    //{
+    //    if (n->GetNetId() == client.id) continue;
+    //    if (players[client.id].use_count() != 0)
+    //    {
+    //        std::shared_ptr<CharacterCom> chara = players[client.id].lock()->GetComponent<CharacterCom>();
 
-            if (!chara)continue;
+    //        if (!chara)continue;
 
-            //// 入力情報をプレイヤーキャラクターに送信
-            //chara->SetUserInput(client.input);
-            //chara->SetUserInputDown(client.inputDown);
-            //chara->SetUserInputUp(client.inputUp);
+    //        //// 入力情報をプレイヤーキャラクターに送信
+    //        //chara->SetUserInput(client.input);
+    //        //chara->SetUserInputDown(client.inputDown);
+    //        //chara->SetUserInputUp(client.inputUp);
 
-            //ダメージ情報更新
-            for (int i = 0; i < SceneDebugGame::MAX_PLAYER_NUM; ++i)
-            {
-                if (players[i].use_count() == 0) continue;
+    //        //ダメージ情報更新
+    //        for (int i = 0; i < SceneDebugGame::MAX_PLAYER_NUM; ++i)
+    //        {
+    //            if (players[i].use_count() == 0) continue;
 
-                players[i].lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(client.damageData[i]);
-            }
-        }
-    }
+    //            players[i].lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(client.damageData[i]);
+    //        }
+    //    }
+    //}
 }

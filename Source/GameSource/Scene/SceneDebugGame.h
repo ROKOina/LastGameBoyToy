@@ -7,7 +7,6 @@
 #include "Audio\Audio.h"
 
 #include "Components\System\GameObject.h"
-#include "Netwark/NetwarkPost.h"
 #include "Graphics/Light/Light.h"
 #include <array>
 
@@ -64,11 +63,11 @@ public:
     static constexpr int MAX_PLAYER_NUM = 6;
 
     std::array<std::weak_ptr<GameObject>, MAX_PLAYER_NUM>& GetPlayers() { return players; }
-    std::unique_ptr<NetwarkPost>& GetNetWarkPost() { return n; }
+    //std::unique_ptr<NetwarkPost>& GetNetWarkPost() { return n; }
     Light* GetMainDirectionalLight() { return mainDirectionalLight; }
 
 private:
-    std::unique_ptr<NetwarkPost> n;
+    //std::unique_ptr<NetwarkPost> n;
     Light* mainDirectionalLight = nullptr;
 
     bool isLogin = true;
