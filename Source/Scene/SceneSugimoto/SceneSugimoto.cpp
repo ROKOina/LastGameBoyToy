@@ -67,7 +67,6 @@ void SceneSugimoto::Initialize()
 
   // コダック
   {
-
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("codack");
     obj->transform_->SetWorldPosition({ 0.0f,-5.25f,-6.0f });
