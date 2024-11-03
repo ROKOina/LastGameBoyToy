@@ -295,8 +295,9 @@ void RendererCom::LoadModel(const char* filename)
 
 void RendererCom::LoadMaterial(const char* filename)
 {
+  future.wait();
   assert(model_.get() != nullptr && "ƒ‚ƒfƒ‹‚ð“Ç‚Ýž‚Þ‘O‚ÉŠÖ”‚ðŒÄ‚Ño‚µ‚Ä‚¢‚é");
-  
+
   ID3D11Device* device = Graphics::Instance().GetDevice();
   model_->LoadMaterial(device, filename);
 }

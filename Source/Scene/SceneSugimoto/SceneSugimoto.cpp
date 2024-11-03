@@ -21,6 +21,7 @@
 #include "Component/Particle/CPUParticle.h"
 #include "Component/Particle/CPUParticle.h"
 #include "Component/Particle/GPUParticle.h"
+#include "Component/PostEffect/PostEffect.h"
 #include "Component/Collsion/RayCollisionCom.h"
 #include "Component/Camera/CameraCom.h"
 #include "Component/Camera/FreeCameraCom.h"
@@ -48,6 +49,13 @@ void SceneSugimoto::Initialize()
 
 #pragma region ゲームオブジェクトの設定
 
+  //ポストエフェクト
+  {
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    obj->SetName("posteffect");
+    obj->AddComponent<PostEffect>();
+  }
+
   //フリーカメラ
   {
     std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -55,6 +63,7 @@ void SceneSugimoto::Initialize()
     freeCamera->AddComponent<FreeCameraCom>();
     freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
   }
+  GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
   // コダック
   {
@@ -64,8 +73,8 @@ void SceneSugimoto::Initialize()
     obj->transform_->SetWorldPosition({ 0.0f,-5.25f,-6.0f });
     obj->transform_->SetScale({ 0.01f,0.000001f,0.01f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::FAKE_DEPTH, BLENDSTATE::MULTIPLERENDERTARGETS);
-    r->LoadModel("Data/cube/cube.mdl");
-    r->LoadMaterial("Data/cube/asobi_cube.material");
+    r->LoadModel("Data/Model/cube/cube.mdl");
+    r->LoadMaterial("Data/Model/cube/asobi_cube.material");
     r->SetRenderShadow(false);
     r->SetRenderSilhoutte(false);
   }
@@ -77,8 +86,8 @@ void SceneSugimoto::Initialize()
     instanceOwner->transform_->SetWorldPosition({ -8.0f,0.2f,-6.0f });
     instanceOwner->transform_->SetScale({ 0.02f,0.02f,0.02f });
     std::shared_ptr<InstanceRenderer> ir = instanceOwner->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::FAKE_INTERIOR, 10, BLENDSTATE::MULTIPLERENDERTARGETS);
-    ir->LoadModel("Data/cube/cube.mdl");
-    ir->LoadMaterial("Data/cube/interior.material");
+    ir->LoadModel("Data/Model/cube/cube.mdl");
+    ir->LoadMaterial("Data/Model/cube/interior.material");
 
     auto& cb = ir->SetVariousConstant<FakeInteriorConstants>();
     cb->reflectionAmount = 0.0f;
@@ -103,8 +112,8 @@ void SceneSugimoto::Initialize()
       obj->transform_->SetScale({ 0.999f,3.0f,4.5f });
 
       std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-      r->LoadModel("Data/cube/cube.mdl");
-      r->LoadMaterial("Data/cube/House.material");
+      r->LoadModel("Data/Model/cube/cube.mdl");
+      r->LoadMaterial("Data/Model/cube/House.material");
       r->SetRenderSilhoutte(false);
     }
   }
@@ -115,7 +124,7 @@ void SceneSugimoto::Initialize()
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("stage");
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/canyon/stage.mdl");
+    r->LoadModel("Data/Model/canyon/stage.mdl");
   }
 
 #pragma endregion
@@ -150,9 +159,6 @@ void SceneSugimoto::Finalize()
 // 更新処理
 void SceneSugimoto::Update(float elapsedTime)
 {
-  //イベントカメラ用
-  EventCameraManager::Instance().EventUpdate(elapsedTime);
-
   // ゲームオブジェクトの更新
   GameObjectManager::Instance().UpdateTransform();
   GameObjectManager::Instance().Update(elapsedTime);
