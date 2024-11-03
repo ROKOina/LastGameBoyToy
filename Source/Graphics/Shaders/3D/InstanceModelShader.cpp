@@ -25,9 +25,13 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader, int count)
         PSPath = { "Shader\\AreaEffectCirclePS.cso" };
         break;
     case SHADER_ID_MODEL::FAKE_DEPTH:
-        VSPath = { "Shader\\FakeDepthVS.cso" };
+        VSPath = { "Shader\\InstanceFakeDepthVS.cso" };
         PSPath = { "Shader\\FakeDepthPS.cso" };
         break;
+    case SHADER_ID_MODEL::FAKE_INTERIOR:
+      VSPath = { "Shader\\InstanceFakeDepthVS.cso" };
+      PSPath = { "Shader\\FakeInteriorPS.cso" };
+      break;
     case SHADER_ID_MODEL::SCI_FI_GATE:
         VSPath = { "Shader\\InstancingVS.cso" };
         PSPath = { "Shader\\SciFiGatePS.cso" };
@@ -156,24 +160,26 @@ void InstanceModelShader::SetBuffer(ID3D11DeviceContext* dc, const std::vector<M
 }
 
 //サブセット毎の描画
-void InstanceModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset)
+void InstanceModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset, const std::vector<ModelResource::Material>& materials)
 {
+  auto& material = materials[subset.materialIndex];
+
     //コンスタントバッファの情報
-    m_subsetconstants->data.color = subset.material->color;
-    m_subsetconstants->data.emissivecolor = subset.material->emissivecolor;
-    m_subsetconstants->data.emissiveintensity = subset.material->emissiveintensity;
-    m_subsetconstants->data.Metalness = subset.material->Metalness;
-    m_subsetconstants->data.Roughness = subset.material->Roughness;
-    m_subsetconstants->data.alpha = subset.material->alpha;
+    m_subsetconstants->data.color = material.color;
+    m_subsetconstants->data.emissivecolor = material.emissivecolor;
+    m_subsetconstants->data.emissiveintensity = material.emissiveintensity;
+    m_subsetconstants->data.Metalness = material.Metalness;
+    m_subsetconstants->data.Roughness = material.Roughness;
+    m_subsetconstants->data.alpha = material.alpha;
     m_subsetconstants->Activate(dc, (int)CB_INDEX::SUBSET, true, true, false, false, false, false);
 
     //オブジェクト毎に使いたい定数バッファ
-    m_generalconstants->data.outlineColor = subset.material->outlineColor;
-    m_generalconstants->data.outlineintensity = subset.material->outlineintensity;
+    m_generalconstants->data.outlineColor = material.outlineColor;
+    m_generalconstants->data.outlineintensity = material.outlineintensity;
     m_generalconstants->Activate(dc, (int)CB_INDEX::GENERAL, false, true, false, false, false, false);
 
     //シェーダーリソースビュー設定
-    dc->PSSetShaderResources(0, std::size(subset.material->shaderResourceView), subset.material->shaderResourceView[0].GetAddressOf());
+    dc->PSSetShaderResources(0, std::size(material.shaderResourceView), material.shaderResourceView[0].GetAddressOf());
 
     //インスタンスを使う時専用のDraw
     dc->DrawIndexedInstanced(subset.indexCount, iModelTransforms.size(), subset.startIndex, 0, 0);

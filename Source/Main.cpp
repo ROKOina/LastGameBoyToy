@@ -6,8 +6,14 @@
 #include "Framework.h"
 #include "ImGuiRender.h"
 
+#ifdef _DEBUG
+const LONG SCREEN_WIDTH = static_cast<LONG>(1280);
+const LONG SCREEN_HEIGHT = static_cast<LONG>(720);
+#else
 const LONG SCREEN_WIDTH = static_cast<LONG>(1920);
 const LONG SCREEN_HEIGHT = static_cast<LONG>(1080);
+#endif // _DEBUG
+
 const LPCWSTR TITLE = L"Game";
 //const LONG SCREEN_WIDTH = 1280;
 //const LONG SCREEN_HEIGHT = 720;

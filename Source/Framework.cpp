@@ -11,7 +11,7 @@
 #include "GameSource\Scene\SceneUI\SceneUI.h"
 #include "GameSource\Scene\SceneResult\SceneResult.h"
 
-#include "GameSource\Scene\\SceneTitle\SceneTitle.h"
+#include "GameSource\Scene\SceneSugimoto\SceneSugimoto.h"
 #include "ImGuiRender.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -32,7 +32,7 @@ Framework::Framework(HWND hWnd)
     //SceneManager::Instance().ChangeScene(new SceneGame);
     //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     //SceneManager::Instance().ChangeScene(new SceneDebugGame);
-    SceneManager::Instance().ChangeScene(new SceneTitle);
+    SceneManager::Instance().ChangeScene(new SceneSugimoto);
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
     //SceneManager::Instance().ChangeScene(new SceneTitle);

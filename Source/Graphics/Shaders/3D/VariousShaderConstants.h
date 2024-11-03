@@ -8,7 +8,7 @@ class BaseConstants {
 public:
   virtual void DrawGui() = 0;
 
-  virtual void Update(const float& elapsedTime) = 0;
+  virtual void Update(const float& elapsedTime) {};
 
   virtual void UpdateConstantBuffer(ID3D11DeviceContext* dc) = 0;
 
@@ -101,6 +101,32 @@ public:
 
   float contourIntensity = 1.0;
   float contourSensitive = 500.0;
+
+private:
+  inline static std::unique_ptr<ConstantBuffer<Buffer>> m_constants;
+
+};
+
+class FakeInteriorConstants :public BaseConstants
+{
+public:
+  FakeInteriorConstants();
+
+  void DrawGui()override;
+
+  void UpdateConstantBuffer(ID3D11DeviceContext* dc)override;
+
+public:
+  struct Buffer {
+    DirectX::XMFLOAT2 tiling;
+    float offset = 0.0f;
+    float reflectionAmount;
+  };
+
+public:
+  DirectX::XMFLOAT2 tiling = { 1.0f,1.0f };
+  float offset = 0.0f;
+  float reflectionAmount = 0.5f;
 
 private:
   inline static std::unique_ptr<ConstantBuffer<Buffer>> m_constants;

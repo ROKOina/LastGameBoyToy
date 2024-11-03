@@ -98,3 +98,29 @@ void SciFiGateConstants::UpdateConstantBuffer(ID3D11DeviceContext* dc)
 {
   m_constants->Activate(dc, (int)CB_INDEX::VARIOUS, false, true, false, false, false, false);
 }
+
+FakeInteriorConstants::FakeInteriorConstants()
+{
+  Graphics& graphics = Graphics::Instance();
+
+  if (m_constants == nullptr) {
+    m_constants = std::make_unique<ConstantBuffer<Buffer>>(graphics.GetDevice());
+  }
+}
+
+void FakeInteriorConstants::DrawGui()
+{
+  ImGui::DragFloat2("Tiling", &tiling.x, 0.1f, 0.0f);
+  ImGui::DragFloat("Offset", &offset, 0.01f, 0.0f);
+  ImGui::DragFloat("Reflection", &reflectionAmount, 0.01f, 0.0f);
+}
+
+void FakeInteriorConstants::UpdateConstantBuffer(ID3D11DeviceContext* dc)
+{
+  auto& data = m_constants->data;
+  data.tiling = tiling;
+  data.offset = offset;
+  data.reflectionAmount = reflectionAmount;
+
+  m_constants->Activate(dc, (int)CB_INDEX::VARIOUS, false, true, false, false, false, false);
+}

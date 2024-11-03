@@ -220,7 +220,7 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
   Deserialize(filename);
 
   //マテリアルデシリアライズ
-  MaterialDeserialize(filename);
+  MaterialDeserialize(filename, materials_);
 
   //アニメーションデシリアライズ
   AnimationDeserialize(filename);
@@ -232,7 +232,7 @@ void ModelResource::Load(ID3D11Device* device, const char* filename)
   BuildModel(device, dirname);
 }
 
-void ModelResource::LoadMaterial(ID3D11Device* device, const char* filename)
+void ModelResource::LoadMaterial(ID3D11Device* device, const char* filename, std::shared_ptr<std::vector<ModelResource::Material>> desc)
 {
   // ディレクトリパス取得
   char drive[32], dir[256], dirname[256];
@@ -240,10 +240,10 @@ void ModelResource::LoadMaterial(ID3D11Device* device, const char* filename)
   ::_makepath_s(dirname, sizeof(dirname), drive, dir, nullptr, nullptr);
 
   //マテリアルデシリアライズ
-  MaterialDeserialize(filename);
+  MaterialDeserialize(filename, *desc.get());
 
   // テクスチャ読み込み
-  for (Material& material : materials_)
+  for (Material& material : *desc.get())
   {
     // 相対パスの解決
     char filename[256];
@@ -305,12 +305,6 @@ void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
 
   for (Mesh& mesh : meshes_)
   {
-    // サブセット
-    for (Subset& subset : mesh.subsets)
-    {
-      subset.material = &materials_.at(subset.materialIndex);
-    }
-
     // 頂点バッファ
     {
       D3D11_BUFFER_DESC bufferDesc = {};
@@ -461,34 +455,34 @@ void ModelResource::Serialize(const char* filename)
 
 void ModelResource::AnimSerialize()
 {
-    std::string name = fileName;
-    name.erase(name.find('.') + 1);
-    name += "Animation";
+  std::string name = fileName;
+  name.erase(name.find('.') + 1);
+  name += "Animation";
 
-    std::ofstream ostream(name, std::ios::binary);
-    if (ostream.is_open())
+  std::ofstream ostream(name, std::ios::binary);
+  if (ostream.is_open())
+  {
+    cereal::BinaryOutputArchive archive(ostream);
+
+    try
     {
-        cereal::BinaryOutputArchive archive(ostream);
-
-        try
-        {
-            archive(
-                CEREAL_NVP(animations_)
-            );
-        }
-        catch (...)
-        {
-            LOG("model deserialize failed.\n%s\n", fileName);
-            return;
-        }
+      archive(
+        CEREAL_NVP(animations_)
+      );
     }
+    catch (...)
+    {
+      LOG("model deserialize failed.\n%s\n", fileName);
+      return;
+    }
+  }
 
 }
 
 // デシリアライズ
 void ModelResource::Deserialize(const char* filename)
 {
-    fileName = filename;
+  fileName = filename;
 
   std::ifstream istream(filename, std::ios::binary);
   if (istream.is_open())
@@ -510,7 +504,7 @@ void ModelResource::Deserialize(const char* filename)
 }
 
 //マテリアルデシリアライズ
-void ModelResource::MaterialDeserialize(const char* filename)
+void ModelResource::MaterialDeserialize(const char* filename, std::vector<Material>&	materials)
 {
   std::string name = filename;
   name.erase(name.find('.') + 1);
@@ -525,7 +519,7 @@ void ModelResource::MaterialDeserialize(const char* filename)
     {
       archive
       (
-        CEREAL_NVP(materials_)
+        CEREAL_NVP(materials)
       );
     }
     catch (...)

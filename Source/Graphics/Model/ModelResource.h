@@ -61,8 +61,6 @@ public:
         UINT		indexCount = 0;
         int			materialIndex = 0;
 
-        Material* material = nullptr;
-
         template<class Archive>
         void serialize(Archive& archive, int version);
     };
@@ -172,7 +170,7 @@ public:
     // 読み込み
     void Load(ID3D11Device* device, const char* filename);
     // マテリアル情報のみ読み込む
-    void LoadMaterial(ID3D11Device* device, const char* filename);
+    static void LoadMaterial(ID3D11Device* device, const char* filename, std::shared_ptr<std::vector<ModelResource::Material>> desc);
 
 #ifdef _DEBUG
     //マテリアルシリアライズ
@@ -194,7 +192,7 @@ protected:
     void Deserialize(const char* filename);
 
     //マテリアルデシリアライズ
-    void MaterialDeserialize(const char* filename);
+    static void MaterialDeserialize(const char* filename, std::vector<Material>& materials);
 
     //アニメーションデシリアライズ
     void AnimationDeserialize(const char* filename);

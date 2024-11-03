@@ -63,6 +63,9 @@ public:
         return p;
     }
 
+    void SetRenderShadow(const bool& flag) { m_shadowrender = flag; }
+    void SetRenderSilhoutte(const bool& flag) { m_silhoutterender = flag; }
+    
     SHADER_ID_MODEL GetShaderMode() { return shaderID; }
 
 private:
@@ -91,8 +94,6 @@ private:
     DEPTHSTATE m_depth = DEPTHSTATE::ZT_ON_ZW_ON;
 
     std::shared_ptr<BaseConstants> variousConstant = nullptr;
-
-    
 
     DirectX::XMFLOAT3       BoundsMin;
     DirectX::XMFLOAT3       BoundsMax;

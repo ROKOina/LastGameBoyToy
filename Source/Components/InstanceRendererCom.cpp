@@ -19,8 +19,20 @@ void InstanceRenderer::Render()
     Graphics& Graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
 
+    // 定数バッファをGPUに設定
+    if (variousConstant.get() != nullptr)
+    {
+      variousConstant->UpdateConstantBuffer(dc);
+    }
+
     //セット
     m_instancemodelshader->Begin(dc, m_blend, m_depth, m_rasterizerState);
+
+    const std::vector<ModelResource::Material>* materials;
+    materials = model_->GetAssignMaterials().get();
+    if (materials == nullptr) {
+      materials = &model_->GetResource()->GetMaterials();
+    }
 
     //モデルを描画
     for (auto& mesh : model_->GetResource()->GetMeshes())
@@ -31,7 +43,7 @@ void InstanceRenderer::Render()
             m_instancemodelshader->SetBuffer(dc, model_->GetNodes(), mesh);
 
             //サブセット毎で描画
-            m_instancemodelshader->SetSubset(dc, subset);
+            m_instancemodelshader->SetSubset(dc, subset, *materials);
         }
     }
 
@@ -47,6 +59,11 @@ void InstanceRenderer::Update(float elapsedTime)
     {
         DirectX::XMFLOAT4X4 transform = GetGameObject()->GetComponent<TransformCom>()->GetWorldTransform();
         model_->UpdateTransform(DirectX::XMLoadFloat4x4(&transform));
+
+        // 定数バッファの更新
+        if (variousConstant.get() != nullptr) {
+          variousConstant->Update(elapsedTime);
+        }
     }
 }
 
@@ -170,6 +187,14 @@ void InstanceRenderer::LoadModel(const char* filename)
     }
 
     model_ = std::make_unique<Model>(m);
+}
+
+void InstanceRenderer::LoadMaterial(const char* filename)
+{
+  assert(model_.get() != nullptr && "モデルを読み込む前に関数を呼び出している");
+
+  ID3D11Device* device = Graphics::Instance().GetDevice();
+  model_->LoadMaterial(device, filename);
 }
 
 GameObj InstanceRenderer::CreateInstance(bool isChildObject)

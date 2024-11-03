@@ -2,7 +2,9 @@
 #include "Misc.h"
 #include "Model.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/Model/ResourceManager.h"
 #include "Dialog.h"
+
 #include <fstream>
 #include <imgui.h>
 #include <cereal/cereal.hpp>
@@ -328,6 +330,22 @@ void Model::LoadDesirialize()
     {
         Deserialize(filename);
     }
+}
+
+void Model::LoadMaterial(ID3D11Device* device, const char* filename)
+{
+  //リソースマネージャーに登録されているか
+  if (!ResourceManager::Instance().JudgeMaterialFilename(filename))
+  {
+    assignMaterials = std::make_shared<std::vector<ModelResource::Material>>();
+
+    resource->LoadMaterial(device, filename, assignMaterials);
+    ResourceManager::Instance().RegisterMaterial(filename, assignMaterials);	//リソースマネージャーに追加する
+  }
+  else
+  {
+    assignMaterials = ResourceManager::Instance().LoadMaterialResource(filename);	//ロードする
+  }
 }
 
 //imguiguizmo
