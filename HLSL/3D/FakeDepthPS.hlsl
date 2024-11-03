@@ -4,8 +4,6 @@
 
 Texture2D BottomTex : register(t0);
 Texture2D HeightMap : register(t1);
-Texture2D CenterCircle : register(t2);
-Texture2D EffectRamp : register(t3);
 
 float2 BumpOffset(float3 cameraTangent, float height, float heightRatio)
 {
