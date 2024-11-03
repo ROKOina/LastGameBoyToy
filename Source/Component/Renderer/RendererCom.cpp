@@ -290,6 +290,19 @@ void RendererCom::OnGUI()
 // モデルの読み込み
 void RendererCom::LoadModel(const char* filename)
 {
+  future = Graphics::Instance().GetThreadPool()->submit([&](auto filename) { return ModelInitialize(filename); }, filename);
+}
+
+void RendererCom::LoadMaterial(const char* filename)
+{
+  assert(model_.get() != nullptr && "モデルを読み込む前に関数を呼び出している");
+  
+  ID3D11Device* device = Graphics::Instance().GetDevice();
+  model_->LoadMaterial(device, filename);
+}
+
+void RendererCom::ModelInitialize(const char* filename)
+{
   ID3D11Device* device = Graphics::Instance().GetDevice();
   std::shared_ptr<ModelResource> m = std::make_shared<ModelResource>();
 
@@ -312,14 +325,6 @@ void RendererCom::LoadModel(const char* filename)
   modelFilePath = filename;
 
 #endif // _DEBUG
-}
-
-void RendererCom::LoadMaterial(const char* filename)
-{
-  assert(model_.get() != nullptr && "モデルを読み込む前に関数を呼び出している");
-
-  ID3D11Device* device = Graphics::Instance().GetDevice();
-  model_->LoadMaterial(device, filename);
 }
 
 #ifdef _DEBUG
