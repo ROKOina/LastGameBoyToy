@@ -16,9 +16,9 @@ float2 BumpOffset(float3 cameraTangent, float height, float heightRatio)
 float4 main(VS_OUT pin) : SV_TARGET
 {
     // [“x‚Ì‘å‚«‚³
-    float depthScale = 0.25;
+    float depthScale = 0.35;
 
-    float height = HeightMap.Sample(sampler_states[BLACK_BORDER_LINEAR], pin.texcoord);
+    float height = HeightMap.Sample(sampler_states[BLACK_BORDER_LINEAR], pin.texcoord).r;
     clip(height - 0.00001);
     
     // —§‘ÌŠ´‚ğo‚·‚½‚ß‚ÌUV‚ÌƒYƒ‰‚·—Ê

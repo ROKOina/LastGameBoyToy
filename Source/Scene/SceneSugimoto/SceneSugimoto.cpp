@@ -53,7 +53,8 @@ void SceneSugimoto::Initialize()
   {
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
     obj->SetName("posteffect");
-    obj->AddComponent<PostEffect>();
+    auto& p = obj->AddComponent<PostEffect>();
+    p->SetParameter(3.0f, 0.8f, PostEffect::PostEffectParameter::Exposure);
   }
 
   //フリーカメラ
@@ -69,11 +70,12 @@ void SceneSugimoto::Initialize()
   {
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("codack");
-    obj->transform_->SetWorldPosition({ 0.0f,-5.25f,-6.0f });
-    obj->transform_->SetScale({ 0.01f,0.000001f,0.01f });
+    obj->transform_->SetWorldPosition({ -14.138,-5.9,0.505 });
+    obj->transform_->SetScale({ 0.03f,0.000001f,0.027f });
+    obj->transform_->SetEulerRotation({ 90.0f,0.0f,0.0f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::FAKE_DEPTH, BLENDSTATE::MULTIPLERENDERTARGETS);
     r->LoadModel("Data/Model/cube/cube.mdl");
-    r->LoadMaterial("Data/Model/cube/asobi_cube.material");
+    r->LoadMaterial("Data/Model/cube/Smile.material");
     r->SetRenderShadow(false);
     r->SetRenderSilhoutte(false);
   }
@@ -82,8 +84,8 @@ void SceneSugimoto::Initialize()
   {
     auto& instanceOwner = GameObjectManager::Instance().Create();
     instanceOwner->SetName("Cube Instance Owner");
-    instanceOwner->transform_->SetWorldPosition({ -8.0f,0.2f,-6.0f });
-    instanceOwner->transform_->SetScale({ 0.02f,0.02f,0.02f });
+    instanceOwner->transform_->SetWorldPosition({ -15.0f,-4.6f,-4.0f });
+    instanceOwner->transform_->SetScale({ 0.07f,0.02f,0.02f });
     std::shared_ptr<InstanceRenderer> ir = instanceOwner->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::FAKE_INTERIOR, 10, BLENDSTATE::MULTIPLERENDERTARGETS);
     ir->LoadModel("Data/Model/cube/cube.mdl");
     ir->LoadMaterial("Data/Model/cube/interior.material");
@@ -131,7 +133,7 @@ void SceneSugimoto::Initialize()
 #pragma region グラフィック系の設定
   //平行光源を追加
   mainDirectionalLight = new Light(LightType::Directional);
-  mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
+  mainDirectionalLight->SetDirection({ -0.3f, -0.5f, -0.2 });
   mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
   LightManager::Instance().Register(mainDirectionalLight);
 
