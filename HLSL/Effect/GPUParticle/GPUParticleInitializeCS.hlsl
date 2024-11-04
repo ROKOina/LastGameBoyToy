@@ -19,7 +19,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     // 各フィールドを個別に初期化
     p.position = position;
     p.scale = scale * random(f0);
-    p.color = baseColor * random(f2);
+    p.color = emitTime * (1 - (emitStartColor * emitEndColor));
     p.rotation = rotation;
     p.velocity = 0;
     p.isalive = isalive;

@@ -39,151 +39,132 @@ int Boss_BaseState::ComputeRandom()
     return randomValue;
 }
 
-//アニメーション中の当たり判定
-bool Boss_BaseState::AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname)
+//アニメーションイベント制御
+void Boss_BaseState::AnimtionEventControl(std::string eventname, std::string nodename, const char* objectname)
 {
-    // 初回のみFindしてキャッシュ
-    if (!cachedobject || cachedobject->GetName() != objectname)
+    // アニメーションコンポーネントのロックを一度だけ行う
+    const auto& animationComPtr = animationCom.lock();
+    if (!animationComPtr) return;
+
+    // オブジェクトの取得とnullチェック
+    const auto& object = GameObjectManager::Instance().Find(objectname);
+    if (!object) return;
+
+    // 必要なコンポーネントを一度取得しておく
+    const auto& particleComponent = object->GetComponent<CPUParticle>();
+
+    // コリジョンコンポーネントの取得
+    const auto& collisionComponent = object->GetComponent<SphereColliderCom>();
+
+    //gpuparticleを取得
+    const auto& gpuparticle = object->GetComponent<GPUParticle>();
+
+    // イベント発火ノードのポジション取得と処理
+    DirectX::XMFLOAT3 pos = {};
+    if (animationComPtr->IsEventCallingNodePos(eventname, nodename, pos))
     {
-        cachedobject = GameObjectManager::Instance().Find(objectname);
-        if (!cachedobject)
-        {
-            // オブジェクトが見つからない場合はfalseを返す
-            return false;
-        }
-    }
+        object->transform_->SetWorldPosition(pos);
 
-    // イベントが呼び出されているか確認
-    if (animationCom.lock()->IsEventCallingNodePos(eventname, nodename, nodepos))
-    {
-        auto collider = cachedobject->GetComponent<SphereColliderCom>();
-        if (collider)
+        //あれば
+        if (gpuparticle)
         {
-            collider->SetEnabled(true);
-
-            //ヒット時体力を減らす
-            for (auto& hitgameobject : collider->OnHitGameObject())
-            {
-                hitgameobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
-            }
+            gpuparticle->SetLoop(true);
+            gpuparticle->SetStop(false);
         }
 
-        cachedobject->transform_->SetWorldPosition(nodepos);
+        //あれば
+        if (particleComponent)
+        {
+            particleComponent->SetActive(true);
+        }
 
-        return true;
+        //あれば
+        if (collisionComponent)
+        {
+            collisionComponent->SetEnabled(true);
+        }
     }
     else
     {
-        //エフェクトのONOFFをここでしても良いと思うけどもしかしたら変更するかもね！
-        if (cpuparticle != nullptr)
+        //あれば
+        if (gpuparticle)
         {
-            cpuparticle->GetComponent<CPUParticle>()->SetActive(false);
+            gpuparticle->SetLoop(false);
         }
 
-        auto collider = cachedobject->GetComponent<SphereColliderCom>();
-        if (collider)
+        //あれば
+        if (particleComponent)
         {
-            collider->SetEnabled(false);
+            particleComponent->SetActive(false);
         }
-        return false;
-    }
 
-    if (!cachedobject)
-    {
-        cachedobject.reset(); // キャッシュをリセット
+        //あれば
+        if (collisionComponent)
+        {
+            collisionComponent->SetEnabled(false);
+        }
     }
 }
 
-//CPUエフェクトの検索
-void Boss_BaseState::CPUEffect(const char* objectname, bool posflag)
-{
-    // 初回のみFindしてキャッシュ
-    if (!cpuparticle || cpuparticle->GetName() != objectname)
-    {
-        cpuparticle = GameObjectManager::Instance().Find(objectname);
-        if (posflag)
-        {
-            cpuparticle->transform_->SetWorldPosition(nodepos);
-        }
-        cpuparticle->GetComponent<CPUParticle>()->SetActive(true);
-    }
-
-    if (!cpuparticle)
-    {
-        cpuparticle.reset(); // キャッシュをリセット
-    }
-}
-
-//乱数で選択された行動を選択する関数
-void Boss_BaseState::RandamBehavior(int one, int two)
+//乱数の行動制御
+void Boss_BaseState::RandamBehavior()
 {
     // ランダムで行動を切り替える
     int randomAction = ComputeRandom();
 
     if (randomAction == 1)
     {
-        bossCom.lock()->GetStateMachine().ChangeState(static_cast<BossCom::BossState>(one));
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLESTOP);
     }
     else if (randomAction == 2)
     {
-        bossCom.lock()->GetStateMachine().ChangeState(static_cast<BossCom::BossState>(two));
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHORTATTACK1);
     }
     else if (randomAction == 3)
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::PUNCH);
-    }
-    else if (randomAction == 4)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::KICK);
-    }
-    else if (randomAction == 5)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::BOMPATTTACK);
-    }
-    else if (randomAction == 6)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::RANGEATTACK);
-    }
-    else if (randomAction == 7)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMP);
-    }
-    else if (randomAction == 8)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::FIREBALL);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATSTART);
     }
 }
 
 #pragma region 待機
 void Boss_IdleState::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_idol"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_idol"), true, 0.6f);
 }
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
-    //距離判定
-    //if (owner->Search(5.0f))
-    //{
-    //    RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
-    //}
+    //遠かったら近くにくる
+    if (!owner->Search(7.0f))
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
+        //RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
+    }
+
+    if (owner->Search(7.0f))
+    {
+        RandamBehavior();
+    }
+
     //else if (owner->Search(FLT_MAX))
     //{
-    //    RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
+    //    bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
+
+    //    //RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::MOVE));
     //}
 
-    ////死亡処理
-    //if (characterstatas.lock()->GetHitPoint() <= 0)
-    //{
-    //    bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
-    //    return;
-    //}
+    //死亡処理
+    if (characterstatas.lock()->GetHitPoint() <= 0)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        return;
+    }
 }
 #pragma endregion
 
 #pragma region 待機行動長時間
 void Boss_IdleStopState::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_idol"), true, 0.6f);
 }
 
 void Boss_IdleStopState::Execute(const float& elapsedTime)
@@ -193,7 +174,7 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     //待機時間
     if (idletime >= 2.0f)
     {
-        RandamBehavior(static_cast<int>(BossCom::BossState::IDLE), static_cast<int>(BossCom::BossState::MOVE));
+        RandamBehavior();
     }
 }
 void Boss_IdleStopState::Exit()
@@ -209,16 +190,22 @@ void Boss_IdleStopState::ImGui()
 #pragma region 移動
 void Boss_MoveState::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Running"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_walk_front"), true);
 }
 void Boss_MoveState::Execute(const float& elapsedTime)
 {
-    owner->MoveToTarget(2.0f, 0.4f);
+    owner->MoveToTarget(0.1f, 0.1f);
+
+    //左右の煙
+    AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect");
+    AnimtionEventControl("FOOTSMOKE", "Boss_L_ancle", "leftfootsmokeeffect");
 
     //距離判定
-    if (owner->Search(5.0f))
+    if (owner->Search(7.0f))
     {
-        RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::IDLE));
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+
+        //RandamBehavior(static_cast<int>(BossCom::BossState::STOPTIME), static_cast<int>(BossCom::BossState::IDLE));
     }
 
     //死亡処理
@@ -227,6 +214,12 @@ void Boss_MoveState::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
         return;
     }
+}
+void Boss_MoveState::Exit()
+{
+    //エフェクトを切る
+    GameObjectManager::Instance().Find("rightfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
 }
 #pragma endregion
 
@@ -240,62 +233,6 @@ void Boss_JumpState::Enter()
 }
 void Boss_JumpState::Execute(const float& elapsedTime)
 {
-    //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation())
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMPLOOP);
-        return;
-    }
-
-    //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
-        return;
-    }
-}
-#pragma endregion
-
-#pragma region ジャンプループ
-void Boss_JumpLoopState::Enter()
-{
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Falling"), true);
-}
-void Boss_JumpLoopState::Execute(const float& elapsedTime)
-{
-    //着地すれば
-    if (moveCom.lock()->OnGround())
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LANDINGATTACK);
-        return;
-    }
-
-    //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
-        return;
-    }
-}
-#pragma endregion
-
-#pragma region 着地
-void Boss_LandingState::Enter()
-{
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Landing"), false);
-}
-void Boss_LandingState::Execute(const float& elapsedTime)
-{
-    //煙のエフェクト生成
-    CPUEffect("cpulandsmokeeffect", false);
-
-    //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation())
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
-        return;
-    }
-
     //死亡処理
     if (characterstatas.lock()->GetHitPoint() <= 0)
     {
@@ -312,12 +249,6 @@ void Boss_PunchState::Enter()
 }
 void Boss_PunchState::Execute(const float& elapsedTime)
 {
-    //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("ATTACK", "mixamorig:LeftHand", "lefthandcollsion"))
-    {
-        CPUEffect("cpufireeffect", true);
-    }
-
     //GPUエフェクト生成
     DirectX::XMFLOAT3 pos = {};
     if (animationCom.lock()->IsEventCallingNodePos("EFFECT", "mixamorig:LeftHand", pos))
@@ -353,12 +284,6 @@ void Boss_KickState::Enter()
 }
 void Boss_KickState::Execute(const float& elapsedTime)
 {
-    //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("KICKATTACK", "mixamorig:RightToeBase", "rightlegscollsion"))
-    {
-        CPUEffect("cpufireeffect", true);
-    }
-
     //GPUエフェクト生成
     DirectX::XMFLOAT3 pos = {};
     if (animationCom.lock()->IsEventCallingNodePos("EFFECT", "mixamorig:RightToeBase", pos))
@@ -394,12 +319,6 @@ void Boss_RangeAttackState::Enter()
 }
 void Boss_RangeAttackState::Execute(const float& elapsedTime)
 {
-    //アニメーションイベント時の当たり判定
-    if (AnimNodeCollsion("TATUMAKIATTACK", "mixamorig:LeftToeBase", "rightlegscollsion"))
-    {
-        CPUEffect("cycloncpueffect", false);
-    }
-
     //GPUエフェクト再生
     if (animationCom.lock()->IsEventCalling("EFFECT"))
     {
@@ -552,17 +471,106 @@ void Boss_DeathState::Execute(const float& elapsedTime)
 }
 #pragma endregion
 
-#pragma region ダメージ
-void Boss_DamageState::Enter()
+#pragma region 近距離攻撃1
+void Boss_SA1::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("GetHit1"), false);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1"), false);
 }
-void Boss_DamageState::Execute(const float& elapsedTime)
+void Boss_SA1::Execute(const float& elapsedTime)
 {
-    //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand");
+
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHORTATTACK2);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma region 近距離攻撃2
+void Boss_SA2::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1_2"), false, 0.6f);
+}
+void Boss_SA2::Execute(const float& elapsedTime)
+{
+    AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand");
+
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        //TODOそもそもここランダムでもいいかも
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma region ラリアット開始
+void Boss_LARIATSTART::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_swing_lariat"), false, 0.6f);
+}
+void Boss_LARIATSTART::Execute(const float& elapsedTime)
+{
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATLOOP);
+        return;
+    }
+}
+#pragma endregion
+
+#pragma region ラリアットループ
+void Boss_LARIATLOOP::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_swing_lariat_loop"), true, 0.6f);
+}
+void Boss_LARIATLOOP::Execute(const float& elapsedTime)
+{
+    time += elapsedTime;
+
+    //炎を付ける
+    AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand");
+    AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand");
+
+    //待機時間
+    if (time >= 4.0f)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATEND);
+        time = 0.0f;
+        return;
+    }
+}
+void Boss_LARIATLOOP::Exit()
+{
+    //エフェクトを切ると当たり判定を切る
+    const auto& righthand = GameObjectManager::Instance().Find("righthand");
+    const auto& lefthand = GameObjectManager::Instance().Find("lefthand");
+    righthand->GetComponent<CPUParticle>()->SetActive(false);
+    righthand->GetComponent<SphereColliderCom>()->SetEnabled(false);
+    righthand->GetComponent<GPUParticle>()->SetLoop(false);
+    lefthand->GetComponent<CPUParticle>()->SetActive(false);
+    lefthand->GetComponent<SphereColliderCom>()->SetEnabled(false);
+    lefthand->GetComponent<GPUParticle>()->SetLoop(false);
+}
+#pragma endregion
+
+#pragma region ラリアット終了
+void Boss_LARIATEND::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_swing_lariat_end"), false, 0.6f);
+}
+void Boss_LARIATEND::Execute(const float& elapsedTime)
+{
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        //TODOそもそもここランダムでもいいかも
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
 }

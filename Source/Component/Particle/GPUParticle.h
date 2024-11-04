@@ -160,10 +160,13 @@ public:
 
     //アクティブ化
     void SetLoop(const bool& loop) { m_GSC.isLoopFlg = loop; }
+    void SetStop(const bool& stopFlg) { this->stopFlg = stopFlg; }
 
 private:
     float emitTimer = 0.0f;
     bool stopFlg = false;
+    bool activeflag = false;
+    bool playedOnce = false;
     float time = 0.0f;
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_particlebuffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_particlesrv;
