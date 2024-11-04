@@ -18,6 +18,10 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
     VSPath = { "Shader\\StageVS.cso" };
     PSPath = { "Shader\\DeferredSetupPS.cso" };
     break;
+  case SHADER_ID_MODEL::GHOST_BLUR_DEFFERD:
+    VSPath = { "Shader\\GhostBlurVS.cso" };
+    PSPath = { "Shader\\DeferredSetupPS.cso" };
+    break;
   case SHADER_ID_MODEL::DEFERRED:
     VSPath = { "Shader\\DefaltVS.cso" };
     PSPath = { "Shader\\DeferredSetupPS.cso" };
@@ -33,6 +37,10 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
   case SHADER_ID_MODEL::FAKE_INTERIOR:
     VSPath = { "Shader\\FakeDepthVS.cso" };
     PSPath = { "Shader\\FakeInteriorPS.cso" };
+    break;
+  case SHADER_ID_MODEL::GHOST_BLUR_TOON:
+    VSPath = { "Shader\\GhostBlurVS.cso" };
+    PSPath = { "Shader\\ToonPS.cso" };
     break;
   case SHADER_ID_MODEL::SCI_FI_GATE:
     VSPath = { "Shader\\DefaltVS.cso" };

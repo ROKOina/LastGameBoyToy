@@ -10,6 +10,32 @@
 class ModelShader
 {
 public:
+  //オブジェクトのコンスタントバッファ
+  struct objectconstants
+  {
+    DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
+  };
+
+  //サブセットのコンスタントバッファ
+  struct subsetconstants
+  {
+    DirectX::XMFLOAT4	color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    DirectX::XMFLOAT3 emissivecolor = { 1.0f,1.0f,1.0f };
+    float             emissiveintensity = 0;
+    float             Metalness = 0;
+    float             Roughness = 0;
+    float             alpha = 0.0f;
+    float             dummy = {};
+  };
+
+  //汎用のコンスタントバッファ
+  struct m_general
+  {
+    DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
+    float outlineintensity = 1.0f;
+  };
+
+public:
     ModelShader(SHADER_ID_MODEL shader);
     ~ModelShader() {};
 
@@ -27,34 +53,10 @@ public:
     //描画終了処理
     void End(ID3D11DeviceContext* dc);
 
-public:
-    //オブジェクトのコンスタントバッファ
-    struct objectconstants
-    {
-        DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
-    };
-
-    //サブセットのコンスタントバッファ
-    struct subsetconstants
-    {
-        DirectX::XMFLOAT4	color = { 1.0f, 1.0f, 1.0f, 1.0f };
-        DirectX::XMFLOAT3 emissivecolor = { 1.0f,1.0f,1.0f };
-        float             emissiveintensity = 0;
-        float             Metalness = 0;
-        float             Roughness = 0;
-        float             alpha = 0.0f;
-        float             dummy = {};
-    };
-
-    //汎用のコンスタントバッファ
-    struct m_general
-    {
-        DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
-        float outlineintensity = 1.0f;
-    };
+    DirectX::XMFLOAT4X4* GetOffsetBones() { return m_objectconstants->data.BoneTransforms; }
 
 private:
-    std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
+    std::shared_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
     std::unique_ptr<ConstantBuffer<m_general>> m_generalconstants;
 

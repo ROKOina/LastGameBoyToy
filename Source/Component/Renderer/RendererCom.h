@@ -44,7 +44,10 @@ public:
     void LoadMaterial(const char* filename);
 
     // ƒ‚ƒfƒ‹‚ÌŽæ“¾
-    Model* GetModel() const { return model_.get(); }
+    Model* GetModel()const { return std::weak_ptr<Model>(model_).lock().get(); }
+    std::weak_ptr<Model> GetModelWeak();
+
+    ModelShader* const GetModelShader() { return m_modelshader.get(); }
 
     DirectX::XMFLOAT3 GetBounds() { return bounds; }
     DirectX::XMFLOAT3 GetBoundsMin() { return BoundsMin; }
@@ -87,7 +90,7 @@ private:
 #endif
 
 private:
-    std::unique_ptr<Model>	model_;
+    std::shared_ptr<Model>	model_;
     std::unique_ptr<ModelShader> m_modelshader;
     std::unique_ptr<ModelShader>m_shadow;
     std::unique_ptr<ModelShader>m_silhoutte;

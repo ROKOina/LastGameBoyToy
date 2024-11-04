@@ -48,6 +48,7 @@ void AnimationCom::Update(float elapsedTime)
 bool isAnimLoop;
 void AnimationCom::OnGUI()
 {
+    ImGui::DragFloat("Speed",&animationSpeed,0.1f);
     ImGui::SameLine();
 
     ImGui::Checkbox("isEventWindow", &isEventWindow);

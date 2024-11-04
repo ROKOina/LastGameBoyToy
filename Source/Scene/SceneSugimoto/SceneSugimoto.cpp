@@ -66,11 +66,33 @@ void SceneSugimoto::Initialize()
   }
   GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
+  // ムツキ
+  {
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("Mutsuki");
+    obj->transform_->SetWorldPosition({ -18.138f,-5.9f,7.0f });
+    obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+    obj->transform_->SetEulerRotation({ 0.0f,48.0f, 0.0f });
+
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::GHOST_BLUR_TOON, BLENDSTATE::MULTIPLERENDERTARGETS);
+    r->LoadModel("Data/Model/Mutsuki/Mutsuki.mdl");
+    r->SetRenderShadow(true);
+    r->SetRenderSilhoutte(false);
+
+    auto& cb = r->SetVariousConstant<GhostBlurConstants>();
+    cb->SetRendererCom(r);
+    cb->blurThreshold = 0.85f;
+    cb->samplingRate = 0.01f;
+
+    auto& anim = obj->AddComponent<AnimationCom>();
+    anim->PlayAnimation(0, true);
+  }
+
   // コダック
   {
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("codack");
-    obj->transform_->SetWorldPosition({ -14.138,-5.9,0.505 });
+    obj->transform_->SetWorldPosition({ -14.138f,-5.9f,0.505f });
     obj->transform_->SetScale({ 0.03f,0.000001f,0.027f });
     obj->transform_->SetEulerRotation({ 90.0f,0.0f,0.0f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::FAKE_DEPTH, BLENDSTATE::MULTIPLERENDERTARGETS);
@@ -161,8 +183,8 @@ void SceneSugimoto::Finalize()
 void SceneSugimoto::Update(float elapsedTime)
 {
   // ゲームオブジェクトの更新
-  GameObjectManager::Instance().UpdateTransform();
   GameObjectManager::Instance().Update(elapsedTime);
+  GameObjectManager::Instance().UpdateTransform();
 }
 
 // 描画処理
