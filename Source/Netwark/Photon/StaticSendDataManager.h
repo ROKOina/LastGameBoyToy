@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../RingBuffer.h"
+#include "DirectXMath.h"
 
 //クライアントに送信する情報を管理する
 class StaticSendDataManager

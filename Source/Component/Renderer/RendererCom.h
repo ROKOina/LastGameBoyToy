@@ -63,6 +63,9 @@ public:
         return p;
     }
 
+    void SetRenderShadow(const bool& flag) { m_shadowrender = flag; }
+    void SetRenderSilhoutte(const bool& flag) { m_silhoutterender = flag; }
+    
     SHADER_ID_MODEL GetShaderMode() { return shaderID; }
 
     void JoinThred() { future.get(); }

@@ -21,7 +21,7 @@ public:
     void SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh);
 
     //サブセット毎の描画
-    void SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset);
+    void SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset, const std::vector<ModelResource::Material>& materials);
     void ShadowSetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset& subset);
 
     //描画終了処理
