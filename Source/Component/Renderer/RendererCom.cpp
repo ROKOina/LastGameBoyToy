@@ -303,6 +303,13 @@ void RendererCom::LoadMaterial(const char* filename)
   model_->LoadMaterial(device, filename);
 }
 
+std::weak_ptr<Model> RendererCom::GetModelWeak()
+{
+  if (future._Ptr() != nullptr)
+    future.wait();
+  return std::weak_ptr<Model>(model_);
+}
+
 void RendererCom::ModelInitialize(const char* filename)
 {
   ID3D11Device* device = Graphics::Instance().GetDevice();
@@ -321,7 +328,7 @@ void RendererCom::ModelInitialize(const char* filename)
     m = ResourceManager::Instance().LoadModelResource(filename);	//ÉçÅ[ÉhÇ∑ÇÈ
   }
 
-  model_ = std::make_unique<Model>(m);
+  model_ = std::make_shared<Model>(m);
 
 #ifdef _DEBUG
   modelFilePath = filename;

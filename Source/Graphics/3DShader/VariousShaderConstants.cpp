@@ -1,6 +1,7 @@
 #include "VariousShaderConstants.h"
 #include "imgui.h"
 #include "Graphics/Graphics.h"
+#include "Component/Renderer/RendererCom.h"
 
 EffectConstants::EffectConstants()
 {
@@ -123,4 +124,43 @@ void FakeInteriorConstants::UpdateConstantBuffer(ID3D11DeviceContext* dc)
   data.reflectionAmount = reflectionAmount;
 
   m_constants->Activate(dc, (int)CB_INDEX::VARIOUS, false, true, false, false, false, false);
+}
+
+GhostBlurConstants::GhostBlurConstants()
+{
+  Graphics& graphics = Graphics::Instance();
+
+  if (m_constants == nullptr) {
+    m_constants = std::make_unique<ConstantBuffer<Buffer>>(graphics.GetDevice());
+  }
+}
+
+void GhostBlurConstants::Update(const float& elapsedTime)
+{
+  auto& data = m_constants->data;
+
+  timer -= elapsedTime;
+
+  if (timer <= 0.0f) {
+    // 配列の要素をコピー ( 高速化のためにmemcpyを使用 )
+    std::memcpy(&data.oldBones[0], oldBones1, sizeof(DirectX::XMFLOAT4X4) * MAX_BONES);
+    std::memcpy(oldBones1, oldBones2, sizeof(DirectX::XMFLOAT4X4) * MAX_BONES);
+    std::memcpy(&oldBones2[0], renderer.lock()->GetModelShader()->GetOffsetBones(), sizeof(DirectX::XMFLOAT4X4) * MAX_BONES);
+
+    timer = samplingRate;
+  }
+}
+
+void GhostBlurConstants::DrawGui()
+{
+  ImGui::DragFloat("BlurThreshold", &blurThreshold, 0.01f, 0.0f);
+  ImGui::DragFloat("SamplingRate", &samplingRate, 0.01f, 0.0f);
+}
+
+void GhostBlurConstants::UpdateConstantBuffer(ID3D11DeviceContext* dc)
+{
+  auto& data = m_constants->data;
+  data.blurThreshold = blurThreshold;
+
+  m_constants->Activate(dc, (int)CB_INDEX::VARIOUS, true, false, false, false, false, false);
 }

@@ -2,7 +2,10 @@
 
 #include "Math/Mathf.h"
 #include "Graphics/ConstantBuffer.h"
+#include "Graphics/3DShader/ModelShader.h"
 #include <memory>
+
+class RendererCom;
 
 class BaseConstants {
 public:
@@ -130,5 +133,39 @@ public:
 
 private:
   inline static std::unique_ptr<ConstantBuffer<Buffer>> m_constants;
+
+};
+
+class GhostBlurConstants :public BaseConstants
+{
+public:
+  GhostBlurConstants();
+
+  void SetRendererCom(std::weak_ptr<RendererCom> r) { renderer = r; }
+
+  void Update(const float& elapsedTime)override;
+
+  void DrawGui()override;
+
+  void UpdateConstantBuffer(ID3D11DeviceContext* dc)override;
+
+public:
+  struct Buffer {
+    float blurThreshold;
+    DirectX::XMFLOAT3 pad;
+
+    DirectX::XMFLOAT4X4 oldBones[MAX_BONES];
+  };
+
+public:
+  float blurThreshold = 0.1f;
+  float samplingRate = 0.1f;
+
+private:
+  inline static std::unique_ptr<ConstantBuffer<Buffer>> m_constants;
+  std::weak_ptr<RendererCom> renderer;
+  DirectX::XMFLOAT4X4 oldBones1[MAX_BONES];
+  DirectX::XMFLOAT4X4 oldBones2[MAX_BONES];
+  float timer = 0.0f;
 
 };
