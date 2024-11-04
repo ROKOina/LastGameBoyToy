@@ -241,9 +241,6 @@ void GPUParticle::Start()
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
     m_gpu->data.world = GetGameObject()->transform_->GetWorldTransform();
     m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
-    dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-    dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
 }
 
 //更新処理
@@ -251,25 +248,6 @@ void GPUParticle::Update(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-
-    //ここでループのONOFF制御を行っている無茶苦茶めんどくさい
-    if (m_GSC.isLoopFlg)
-    {
-        if (!playedOnce) // isLoopFlg が true で、まだ再生されていない場合
-        {
-            activeflag = true;
-            if (activeflag)
-            {
-                Play();
-                activeflag = false;
-                playedOnce = true; // 一度だけ再生したらフラグを更新
-            }
-        }
-    }
-    else
-    {
-        playedOnce = false; // isLoopFlg が false になったらリセット
-    }
 
     // オブジェクトの回転に合わせてエフェクトも回転させる処理
     if (m_GSC.worldpos == 0)
@@ -279,6 +257,9 @@ void GPUParticle::Update(float elapsedTime)
         velo = DirectX::XMVector3TransformNormal(velo, transf);
         DirectX::XMStoreFloat3(&m_gpu->data.currentEmitVec, velo);
     }
+
+    //停止処理
+    if (stopFlg == true)return;
 
     // 単発再生
     if (m_GSC.isLoopFlg == false)
@@ -302,12 +283,9 @@ void GPUParticle::Update(float elapsedTime)
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
     m_gpu->data.world = GetGameObject()->transform_->GetWorldTransform();
     m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
     dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
     dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-
-    //停止処理
-    if (stopFlg == true)return;
 
     //更新するコンピュートシェーダーをセットする
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
@@ -351,9 +329,9 @@ void GPUParticle::Render()
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
     m_gpu->data.world = GetGameObject()->transform_->GetWorldTransform();
     m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
     dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
     dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
 
     //解放
     dc->IASetInputLayout(NULL);
@@ -634,9 +612,9 @@ void GPUParticle::Play()
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
     m_gpu->data.world = GetGameObject()->transform_->GetWorldTransform();
     m_gpu->Activate(dc, (int)CB_INDEX::GPU_PARTICLE, false, false, true, true, false, false);
+    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
     dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
     dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
-    dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
 
     //初期化のピクセルシェーダーをセット
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
