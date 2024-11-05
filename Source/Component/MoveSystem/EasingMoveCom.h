@@ -72,4 +72,5 @@ private:
     bool stop = false;
     DirectX::XMFLOAT3 savepos = {};
     size_t currentTargetIndex = 0; // 現在の目標ポイントのインデックス
+    std::string filepath = {};
 };

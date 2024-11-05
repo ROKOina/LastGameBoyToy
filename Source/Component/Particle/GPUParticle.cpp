@@ -227,6 +227,7 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     if (filename)
     {
         Desirialize(filename);
+        filepath = filename;
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
     }
 }
@@ -446,6 +447,14 @@ void GPUParticle::SystemGUI()
     {
         //パラメータリセット関数
         ParameterReset();
+    }
+
+    // ファイルパスを表示
+    char filename[256];
+    ::strncpy_s(filename, sizeof(filename), filepath.c_str(), sizeof(filename));
+    if (ImGui::InputText((char*)u8"ファイルパス", filename, sizeof(filename), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        filepath = filename;
     }
 
     ImGui::Checkbox(J(u8"生存フラグ"), reinterpret_cast<bool*>(&m_gpu->data.isalive));
@@ -722,6 +731,7 @@ void GPUParticle::LoadDesirialize()
     if (result == DialogResult::OK)
     {
         Desirialize(filename);
+        filepath = filename;
     }
 }
 

@@ -509,7 +509,7 @@ void Boss_ShotCharge::Enter()
 }
 void Boss_ShotCharge::Execute(const float& elapsedTime)
 {
-    AnimtionEventControl("CHARGETIME", "Boss_R_hand", "charge", EnableGPUParticle);
+    AnimtionEventControl("CHARGETIME", "Boss_R_neil2_end", "charge", EnableGPUParticle);
 
     time += elapsedTime;
     if (time > 3.0f)

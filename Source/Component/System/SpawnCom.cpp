@@ -98,6 +98,7 @@ SpawnCom::SpawnCom(const char* filename) : currentSpawnedCount(0)
     if (filename)
     {
         Deserialize(filename);
+        filepath = filename;
     }
 }
 
@@ -141,7 +142,15 @@ void SpawnCom::OnGUI()
     {
         LoadDeserialize();
     }
-    ImGui::SameLine();
+
+    // ファイルパスを表示
+    char filename[256];
+    ::strncpy_s(filename, sizeof(filename), filepath.c_str(), sizeof(filename));
+    if (ImGui::InputText((char*)u8"ファイルパス", filename, sizeof(filename), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        filepath = filename;
+    }
+
     ImGui::Checkbox((char*)u8"生成フラグ", &spwntrigger);
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
@@ -334,5 +343,6 @@ void SpawnCom::LoadDeserialize()
     if (result == DialogResult::OK)
     {
         Deserialize(filename);
+        filepath = filename;
     }
 }

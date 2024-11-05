@@ -81,4 +81,6 @@ private:
 
     //¶¬ƒtƒ‰ƒO
     bool spwntrigger = false;
+
+    std::string filepath = {};
 };

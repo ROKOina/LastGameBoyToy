@@ -155,7 +155,7 @@ void SceneGame::Initialize()
             attackUltEff->SetName("attackUltEFF");
             attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr , 5000);
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 5000);
         }
     }
 
@@ -254,7 +254,7 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject> chargeobject = boss->AddChildObject();
             chargeobject->SetName("charge");
-            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beemgathermiddle.gpuparticle", 6000);
+            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
             gpuparticle->SetStop(true);
             chargeobject->AddComponent<SpawnCom>(nullptr);
         }

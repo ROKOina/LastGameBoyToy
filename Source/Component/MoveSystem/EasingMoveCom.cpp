@@ -98,6 +98,7 @@ EasingMoveCom::EasingMoveCom(const char* filename)
     if (filename)
     {
         Deserialize(filename);
+        filepath = filename;
     }
 }
 
@@ -199,6 +200,14 @@ void EasingMoveCom::OnGUI()
     {
         if (play) StopEasing();
         else { savepos = GetGameObject()->transform_->GetWorldPosition(); play = true; }
+    }
+
+    // ファイルパスを表示
+    char filename[256];
+    ::strncpy_s(filename, sizeof(filename), filepath.c_str(), sizeof(filename));
+    if (ImGui::InputText((char*)u8"ファイルパス", filename, sizeof(filename), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        filepath = filename;
     }
 
     char name[256];
@@ -374,5 +383,6 @@ void EasingMoveCom::LoadDeserialize()
     if (result == DialogResult::OK)
     {
         Deserialize(filename);
+        filepath = filename;
     }
 }
