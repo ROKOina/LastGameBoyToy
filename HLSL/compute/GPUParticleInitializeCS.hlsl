@@ -1,5 +1,6 @@
 #include "GPUParticle.hlsli"
 #include "../Constants.hlsli"
+#include "../Rand.hlsli"
 
 RWStructuredBuffer<MainParticle> particlebuffer : register(u0);
 
@@ -18,7 +19,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     // 各フィールドを個別に初期化
     p.position = position;
     p.scale = scale * random(f0);
-    p.color = baseColor * random(f2);
+    p.color = emitStartColor /*emitTime * (1 - emitStartColor)*/;
     p.rotation = rotation;
     p.velocity = 0;
     p.isalive = isalive;
