@@ -5,19 +5,6 @@
 
 StructuredBuffer<MainParticle> particlebuffer : register(t0);
 
-// クォータニオン回転関数
-float3 QuaternionRotate(float3 position, float4 q)
-{
-    float3 u = q.xyz;
-    float s = q.w;
-
-    float3 crossUPos = cross(u, position);
-    float dotUPos = dot(u, position);
-    float dotUU = dot(u, u);
-
-    return 2.0f * dotUPos * u + (s * s - dotUU) * position + 2.0f * s * crossUPos;
-}
-
 [maxvertexcount(4)]
 void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
 {
@@ -47,7 +34,8 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     MainParticle p = particlebuffer[input[0].vertex_id];
 
     //座標変換(速力と位置)
-    float4 viewpos = mul(float4(p.position.xyz, 1.0), view);
+    float4 viewpos = mul(float4(p.position, 1.0), view);
+    float4 worldviewpos = mul(mul(float4(p.position, 1.0f), world), view);
     float4 viewvelo = mul(float4(p.velocity.xyz, 0.0), view);
 
     //回転
@@ -77,8 +65,18 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         }
 
         // 頂点の変換
-        //cornerPos = QuaternionRotate(cornerPos, p.rotation);
-        element.position = mul(float4(viewpos.xyz + cornerPos * float3(p.scale, 1.0f), 1.0f), projection);
+        if (worldpos == 1)
+        {
+            float3 scaledCornerPos = cornerPos * float3(p.scale, 1.0f);
+            float3 worldPosition = worldviewpos.xyz + scaledCornerPos;
+            element.position = mul(float4(worldPosition, 1.0f), projection);
+        }
+        else
+        {
+            float3 scaledCornerPos = cornerPos * float3(p.scale, 1.0f);
+            float3 worldPosition = viewpos.xyz + scaledCornerPos;
+            element.position = mul(float4(worldPosition, 1.0f), projection);
+        }
         element.color.rgb = p.color.rgb * power * baseColor.rgb;
         element.color.a = p.color.a * baseColor.a;
         element.color.rgb *= colorScale;

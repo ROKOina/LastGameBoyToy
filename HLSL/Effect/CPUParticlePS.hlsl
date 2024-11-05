@@ -30,8 +30,5 @@ float4 main(PS_IN input) : SV_TARGET
     if (color.a < EPSILON)
         discard;
 
-    // ƒKƒ“ƒ}•â³
-    color.rgb = pow(color.rgb, 1.0 / GAMMA);
-
     return color;
 }
