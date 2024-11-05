@@ -31,6 +31,9 @@ public:
 
     //パースペクティブ設定
     void SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ);
+    //視野角
+    void SetFov(float fov);
+    float GetFov();
 
     //ビュー行列取得
     const DirectX::XMFLOAT4X4& GetView() const { return view_; }
@@ -118,4 +121,6 @@ private:
 
     //カメライベント中に勝手にtrueになる
     bool isPlayEvent = false;
+
+    float fov = 45;
 };

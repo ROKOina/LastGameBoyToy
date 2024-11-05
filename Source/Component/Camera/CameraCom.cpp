@@ -10,6 +10,7 @@
 //コンストラクタで値を代入
 CameraCom::CameraCom(float fovY, float aspect, float nearZ, float farZ)
 {
+    fov = fovY;
     //パースペクティブ設定
     SetPerspectiveFov(DirectX::XMConvertToRadians(fovY), aspect, nearZ, farZ);
 }
@@ -70,6 +71,10 @@ void CameraCom::Update(float elapsedTime)
 // GUI描画
 void CameraCom::OnGUI()
 {
+    float f = GetFov();
+    if (ImGui::DragFloat("fov", &f))
+        SetFov(f);
+
     ImGui::DragFloat3("Focus", &focus_.x);
     ImGui::DragFloat3("Eye", &eye_.x);
     ImGui::DragFloat("focuslapelate", &focuslapelate, 0.01f, 0.0f, 1.0f);
@@ -143,6 +148,17 @@ void CameraCom::SetPerspectiveFov(float fovY, float aspect, float nearZ, float f
     DirectX::XMMATRIX Projection = DirectX::XMMatrixPerspectiveFovLH(fovY, aspect, nearZ, farZ);	//プロジェクション行列作成
     DirectX::XMStoreFloat4x4(&projection_, Projection);	//rcに渡す
     scope_ = DirectX::XMFLOAT2(nearZ, farZ);
+}
+
+void CameraCom::SetFov(float fov)
+{
+    this->fov = fov;
+    SetPerspectiveFov(DirectX::XMConvertToRadians(fov), Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.1f, 1000.0f);
+}
+
+float CameraCom::GetFov()
+{
+    return fov;
 }
 
 void CameraCom::ActiveCameraChange()
