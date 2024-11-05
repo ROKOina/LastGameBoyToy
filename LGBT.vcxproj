@@ -240,6 +240,7 @@
     <ClInclude Include="Source\Scene\ScenePVE\ScenePVE.h" />
     <ClInclude Include="Source\Scene\ScenePVP\ScenePVP.h" />
     <ClInclude Include="Source\Scene\SceneResult\SceneResult.h" />
+    <ClInclude Include="Source\Scene\SceneSugimoto\SceneSugimoto.h" />
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
     <ClInclude Include="Source\Scene\SceneUI\SceneUI.h" />
@@ -364,6 +365,7 @@
     <ClCompile Include="Source\Scene\ScenePVE\ScenePVE.cpp" />
     <ClCompile Include="Source\Scene\ScenePVP\ScenePVP.cpp" />
     <ClCompile Include="Source\Scene\SceneResult\SceneResult.cpp" />
+    <ClCompile Include="Source\Scene\SceneSugimoto\SceneSugimoto.cpp" />
     <ClCompile Include="Source\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\SceneTraining.cpp" />
     <ClCompile Include="Source\Scene\SceneUI\SceneUI.cpp" />
@@ -385,6 +387,7 @@
     <None Include="HLSL\3D\Decal.hlsli" />
     <None Include="HLSL\3D\FakeDepth.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
+    <None Include="HLSL\3D\FakeInterior.hlsli" />
     <None Include="HLSL\3D\Light.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
     <None Include="HLSL\3D\Shadow.hlsli" />
@@ -486,6 +489,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\3D\FakeInteriorPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\GhostBlurVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\InstanceFakeDepthVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\3D\InstanceShadowVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
@@ -515,6 +530,10 @@
     <FxCompile Include="HLSL\3D\StageVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\ToonPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

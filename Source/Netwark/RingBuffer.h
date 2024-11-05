@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <vector>
 
 // リングバッファクラス
 template<class T>
@@ -70,9 +71,8 @@ public:
         return T();
     }
 
-
     // 登録データ数を返す
-    size_t GetSize() 
+    size_t GetSize()
     {
         return size;
     }

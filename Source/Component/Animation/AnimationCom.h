@@ -126,9 +126,6 @@ private:
 
     //ノーマルアニメーション
 
-    //アニメーション再生速度
-    float                           animationSpeed = 1.0f;
-
     //現在のアニメーションID
     int								currentAnimation = -1;
     //アニメーションの現在の時間
