@@ -297,6 +297,9 @@ void GPUParticle::Update(float elapsedTime)
         DeleteMe(elapsedTime);
     }
 
+    //停止処理
+    if (stopFlg == true)return;
+
     //コンスタントバッファの更新
     m_gpu->data.position = (m_GSC.worldpos == 1) ? DirectX::XMFLOAT3{} : GetGameObject()->transform_->GetWorldPosition();
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
@@ -305,9 +308,6 @@ void GPUParticle::Update(float elapsedTime)
     dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
     dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
     dc->UpdateSubresource(m_constantbuffer.Get(), 0, 0, &m_GSC, 0, 0);
-
-    //停止処理
-    if (stopFlg == true)return;
 
     //更新するコンピュートシェーダーをセットする
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
