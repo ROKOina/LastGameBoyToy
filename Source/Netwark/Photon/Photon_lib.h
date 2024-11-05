@@ -1,3 +1,5 @@
+#pragma once
+
 #include "LoadBalancing-cpp/inc/Client.h"
 #include "UIListener.h"
 #include <vector>

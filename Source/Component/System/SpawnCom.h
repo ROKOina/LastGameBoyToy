@@ -51,6 +51,7 @@ public:
         ENEMY,
         MISSILE,
         EXPLOSION,
+        BEEM,
         MAX
     };
     ObjectType objtype = ObjectType::ENEMY;

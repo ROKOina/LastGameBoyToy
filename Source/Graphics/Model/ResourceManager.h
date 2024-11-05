@@ -25,27 +25,16 @@ public:
     //モデルリソース読み込み
     std::shared_ptr<ModelResource> LoadModelResource(const char* filename);
 
-    //マテリアルリソース読み込み
-    std::shared_ptr<std::vector<ModelResource::Material>> LoadMaterialResource(const char* filename);
-
     //モデルリソース登録
     void RegisterModel(const char* filename, std::shared_ptr<ModelResource> resource);
-
-    //マテリアルリソース登録
-    void RegisterMaterial(const char* filename, std::shared_ptr<std::vector<ModelResource::Material>> material);
 
     //ファイル名で登録確認
     bool JudgeModelFilename(const char* filename);
 
-    //ファイル名で登録確認
-    bool JudgeMaterialFilename(const char* filename);
-
 private:
     using ModelMap = std::map<std::string, std::shared_ptr<ModelResource>>;
-    using MaterialMap = std::map<std::string, std::shared_ptr<std::vector<ModelResource::Material>>>;
 
     ModelMap models_;
-    MaterialMap material_;
     std::mutex mutex_;
 };
 

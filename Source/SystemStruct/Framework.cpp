@@ -9,7 +9,6 @@
 #include "Scene\SceneManager.h"
 #include "Scene\SceneUI\SceneUI.h"
 #include "Scene\SceneResult\SceneResult.h"
-#include "Scene\SceneSugimoto\SceneSugimoto.h"
 
 #include "Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"

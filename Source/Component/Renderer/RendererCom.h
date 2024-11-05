@@ -44,10 +44,7 @@ public:
     void LoadMaterial(const char* filename);
 
     // ƒ‚ƒfƒ‹‚ÌŽæ“¾
-    Model* GetModel()const { return std::weak_ptr<Model>(model_).lock().get(); }
-    std::weak_ptr<Model> GetModelWeak();
-
-    ModelShader* const GetModelShader() { return m_modelshader.get(); }
+    Model* GetModel() const { return model_.get(); }
 
     DirectX::XMFLOAT3 GetBounds() { return bounds; }
     DirectX::XMFLOAT3 GetBoundsMin() { return BoundsMin; }
@@ -66,9 +63,6 @@ public:
         return p;
     }
 
-    void SetRenderShadow(const bool& flag) { m_shadowrender = flag; }
-    void SetRenderSilhoutte(const bool& flag) { m_silhoutterender = flag; }
-    
     SHADER_ID_MODEL GetShaderMode() { return shaderID; }
 
     void JoinThred() { future.get(); }
@@ -90,7 +84,7 @@ private:
 #endif
 
 private:
-    std::shared_ptr<Model>	model_;
+    std::unique_ptr<Model>	model_;
     std::unique_ptr<ModelShader> m_modelshader;
     std::unique_ptr<ModelShader>m_shadow;
     std::unique_ptr<ModelShader>m_silhoutte;

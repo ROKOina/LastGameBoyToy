@@ -58,7 +58,7 @@ void PVEDirection::DirectionOne(float elapsedTime)
     if (!flag)
     {
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
-        EventCameraManager::Instance().PlayEventCamera("Data/EventCamera/test.eventcamera");
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
         flag = true;
     }
 
@@ -73,7 +73,7 @@ void PVEDirection::DirectionTwo(float elapsedTime)
 {
     if (!flag)
     {
-        EventCameraManager::Instance().PlayEventCamera("Data/EventCamera/two.eventcamera");
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/two.eventcamera");
         flag = true;
     }
 }

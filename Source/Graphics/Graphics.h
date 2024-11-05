@@ -106,13 +106,10 @@ enum class SHADER_ID_MODEL
 {
     // デファード描画
     STAGEDEFERRED,
-    GHOST_BLUR_DEFFERD,
     DEFERRED,
 
     // 以降、フォワード描画
     FAKE_DEPTH,
-    FAKE_INTERIOR,
-    GHOST_BLUR_TOON,
 
     // 以降、半透明オブジェクト
     AREA_EFFECT_CIRCLE,

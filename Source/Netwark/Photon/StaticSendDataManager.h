@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../RingBuffer.h"
-#include "DirectXMath.h"
+#include <DirectXMath.h>
 
 //クライアントに送信する情報を管理する
 class StaticSendDataManager
 {
 public:
-    StaticSendDataManager() 
+    StaticSendDataManager()
         : sendData(std::make_unique<RingBuffer<NetSendData>>(100))
     {}
     ~StaticSendDataManager() {}
@@ -47,7 +47,7 @@ public:
     void SetSendMovePos(int myID, int sendID, DirectX::XMFLOAT3 movePos);
 
     //送信情報を全て取得して消す
-    std::vector<NetSendData> GetNetSendDatas() 
+    std::vector<NetSendData> GetNetSendDatas()
     {
         std::vector<NetSendData> netDatas;
         while (1)

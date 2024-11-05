@@ -12,7 +12,6 @@
 #include "SceneTitle/SceneTitle.h"
 #include "SceneResult/SceneResult.h"
 #include "SceneTraining/SceneTraining.h"
-#include "SceneSugimoto\SceneSugimoto.h"
 
 SceneManager::SceneManager()
 {
@@ -118,8 +117,7 @@ void SceneManager::ImGui()
                 "SceneResult",
                 "ScenePVE",
                 "ScenePVP",
-                "SceneTraining",
-                "SceneSugimoto"
+                "SceneTraining"
             };
             int scene_id = 0;
             int last_index = sizeof(scene_names) / sizeof(const char*);
@@ -137,8 +135,7 @@ void SceneManager::ImGui()
                     new SceneResult,
                     new ScenePVE,
                     new ScenePVP,
-                    new SceneTraining,
-                    new SceneSugimoto
+                    new SceneTraining
                 };
                 ChangeScene((scenes[scene_id]));
                 for (int i = 0; i < _countof(scenes); i++)

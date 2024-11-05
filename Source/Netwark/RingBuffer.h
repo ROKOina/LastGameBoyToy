@@ -71,9 +71,8 @@ public:
         return T();
     }
 
-
     // “o˜^ƒf[ƒ^”‚ğ•Ô‚·
-    size_t GetSize() 
+    size_t GetSize()
     {
         return size;
     }

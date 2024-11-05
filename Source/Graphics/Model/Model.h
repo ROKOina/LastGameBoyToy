@@ -81,12 +81,7 @@ public:
     void Deserialize(const char* filename);
 
     //ì«Ç›çûÇ›
-    void LoadDesirialize();   
-
-    // É}ÉeÉäÉAÉãèÓïÒÇÃÇ›ì«Ç›çûÇﬁ
-    void LoadMaterial(ID3D11Device* device, const char* filename);
-
-    std::shared_ptr<std::vector<ModelResource::Material>> GetAssignMaterials() { return assignMaterials; }
+    void LoadDesirialize();
 
     //imguiguizmo
     void BoneGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
@@ -109,8 +104,6 @@ private:
 
 private:
     std::shared_ptr<ModelResource>	resource;
-    std::shared_ptr<std::vector<ModelResource::Material>> assignMaterials;
-    
     std::vector<Node> nodes;
     ImGuizmo::OPERATION	guizmoOperation = ImGuizmo::TRANSLATE;
     ImGuizmo::MODE guizmoMode = ImGuizmo::LOCAL;
