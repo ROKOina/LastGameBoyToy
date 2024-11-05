@@ -54,6 +54,7 @@
 #include "Component/Collsion/FrustumCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
+#include "Setting/Setting.h"
 #include <Component\UI\UiFlag.h>
 
 SceneGame::~SceneGame()
@@ -265,6 +266,11 @@ void SceneGame::Initialize()
     //UIゲームオブジェクト生成
     CreateUiObject();
 
+    //設定画面UIオブジェクト生成
+    ss = std::make_shared<SettingScreen>();
+    ss->CreateSettingUiObject();
+
+
 #pragma endregion
 
 #pragma region グラフィック系の設定
@@ -335,6 +341,10 @@ void SceneGame::Update(float elapsedTime)
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
+    //設定画面更新
+    ss->SettingScreenUpdate(elapsedTime);
+    ss->SetViewSetting(true);
 }
 
 // 描画処理
@@ -368,6 +378,8 @@ void SceneGame::Render(float elapsedTime)
     EventCameraManager::Instance().EventCameraImGui();
 
     ImGui::Begin("Effect");
+
+    ImGui::DragFloat("uvX", &ss->uvX,0.01f,0,1);
     EffectNew();
     ImGui::End();
 }

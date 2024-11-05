@@ -111,6 +111,9 @@ public:
     //カーソルがスプライトに当たっているか
     bool GetHitSprite() { return hit; }
 
+    //数字用に追加
+    DirectX::XMFLOAT2 numUVScroll = { 0,0 };
+
 private:
 
     //頂点構造体
