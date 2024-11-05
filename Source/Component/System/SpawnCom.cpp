@@ -146,7 +146,7 @@ void SpawnCom::OnGUI()
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
-        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION" };
+        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION","BEEM" };
         static_assert(ARRAYSIZE(objectTypeItems) == static_cast<int>(ObjectType::MAX), "objectTypeItems Size Error!");
         ImGui::Combo((char*)u8"オブジェクトタイプ", &sp.objecttype, objectTypeItems, static_cast<int>(ObjectType::MAX));
         objtype = static_cast<ObjectType>(sp.objecttype);
@@ -223,8 +223,14 @@ void SpawnCom::SpawnGameObject()
     case ObjectType::MISSILE:
 
         obj->SetName("fireball");
-        cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 1000);
+        cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
         cpuparticle->SetActive(true);
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
+        collider = obj->AddComponent<SphereColliderCom>();
+        collider->SetEnabled(true);
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
+        collider->SetJudgeTag(COLLIDER_TAG::Player);
+        collider->SetRadius(0.8f);
         obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
 
         break;
@@ -236,6 +242,14 @@ void SpawnCom::SpawnGameObject()
         obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionfire.cpuparticle", 1000);
         gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/explosion.gpuparticle", 10000);
         gpuparticle->Play();
+        break;
+
+    case ObjectType::BEEM:
+
+        obj->SetName("beem");
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beem.gpuparticle", 10000);
+        obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
+
         break;
 
     default:

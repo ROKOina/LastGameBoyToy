@@ -218,7 +218,7 @@ void SceneGame::Initialize()
             lefthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
             lefthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
             lefthandcollider->SetRadius(1.0f);
-            std::shared_ptr<CPUParticle>fireeffect = lefthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 700);
+            std::shared_ptr<CPUParticle>fireeffect = lefthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 500);
             fireeffect->SetActive(false);
             std::shared_ptr<GPUParticle>gpufireeffect = lefthandobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/firespark.gpuparticle", 4000);
             gpufireeffect->SetStop(true);
@@ -233,18 +233,31 @@ void SceneGame::Initialize()
             righthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
             righthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
             righthandcollider->SetRadius(1.0f);
-            std::shared_ptr<CPUParticle>fireeffect = righthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 700);
+            std::shared_ptr<CPUParticle>fireeffect = righthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 500);
             fireeffect->SetActive(false);
             std::shared_ptr<GPUParticle>gpufireeffect = righthandobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/firespark.gpuparticle", 4000);
             gpufireeffect->SetStop(true);
         }
 
-        ////ボンプ君
-        //{
-        //    std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
-        //    bompspawn->SetName("bomp");
-        //    bompspawn->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/missile.spawn");
-        //}
+        //生成オブジェクト
+        {
+            std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
+            spawnobject->SetName("spawn");
+            spawnobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/missile.spawn");
+            std::shared_ptr<GPUParticle>gpuparticle = spawnobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
+            gpuparticle->SetStop(true);
+            std::shared_ptr<CPUParticle>shotsmoke = spawnobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/upshotsmoke.cpuparticle", 1000);
+            shotsmoke->SetActive(false);
+        }
+
+        //チャージ攻撃
+        {
+            std::shared_ptr<GameObject> chargeobject = boss->AddChildObject();
+            chargeobject->SetName("charge");
+            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beemgathermiddle.gpuparticle", 6000);
+            gpuparticle->SetStop(true);
+            chargeobject->AddComponent<SpawnCom>(nullptr);
+        }
     }
 
 #endif
@@ -380,11 +393,11 @@ void SceneGame::EffectNew()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("testeasingobject");
-        std::shared_ptr<CPUParticle>cpuparticle = obj->AddComponent<CPUParticle>("Data/Effect/fireball.cpuparticle", 1000);
+        std::shared_ptr<CPUParticle>cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 1000);
         cpuparticle->SetActive(true);
         obj->AddComponent<EasingMoveCom>(nullptr);
     }
-
+    ImGui::SameLine();
     if (ImGui::Button("UI"))
     {
         auto& obj = GameObjectManager::Instance().Create();

@@ -52,15 +52,16 @@ public:
         LARIATSTART,
         LARIATLOOP,
         LARIATEND,
-        JUMP,
-        PUNCH,
-        KICK,
-        RANGEATTACK,
-        BOMPATTTACK,
-        FIREBALL,
-        MISSILE,
+        JUMPATTACKSTART,
+        JUMPATTACKEND,
+        SHOTSTART,
+        SHOTLOOP,
+        SHOTEND,
+        UPSHOTSTART,
+        UPSHOTCHARGE,
+        UPSHOTLOOP,
+        UPSHOTEND,
         DEATH,
-
         MAX
     };
 
