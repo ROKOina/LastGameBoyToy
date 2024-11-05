@@ -1,6 +1,6 @@
 #include "FullScreenQuad.hlsli"
 #include "PostEffect.hlsli"
-#include "../../Common.hlsli"
+#include "../../Common/Common.hlsli"
 
 Texture2D texture_map : register(t0);
 

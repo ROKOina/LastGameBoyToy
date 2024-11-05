@@ -1,6 +1,6 @@
 #include "Defalt.hlsli"
-#include "../Constants.hlsli"
-#include "../Common.hlsli"
+#include "../Common/Constants.hlsli"
+#include "../Common/Common.hlsli"
 
 cbuffer EffectCircleConstants : register(b0)
 {

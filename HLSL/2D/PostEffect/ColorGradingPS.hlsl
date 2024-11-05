@@ -1,8 +1,8 @@
 #include "FullScreenQuad.hlsli"
 #include "PostEffect.hlsli"
-#include "../../Common.hlsli"
-#include "../../Constants.hlsli"
-#include "../../noise.hlsli"
+#include "../../Common/Common.hlsli"
+#include "../../Common/Constants.hlsli"
+#include "../../Common/noise.hlsli"
 #include "../../3D/Light.hlsli"
 
 Texture2D texturemaps : register(t0);
@@ -49,6 +49,8 @@ float vignette(float2 uv)
     // 中心からの距離を計算
     float2 distance = uv - float2(0.5, 0.5);
     float len = length(distance);
+
+    //float noise = (frac(sin(dot(pin.texcoord, float2(12.9898, 78.233))) * 43758.5453) - 0.5) * 2.0;
 
     // 距離に基づいてビネット効果を計算
     float vignette = smoothstep(vignettesize, vignettesize - vignetteintensity, len);
@@ -282,11 +284,6 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     // 色相と彩度の調整
     sampled_color.rgb = hue_saturation(sampled_color.rgb, hue, saturation);
-
-    //filmGrain
-    //float noise = (frac(sin(dot(pin.texcoord, float2(12.9898, 78.233))) * 43758.5453) - 0.5) * 2.0;
-    //float3 filmgraincolor = noise * 0.05f * 1.0f;
-    //sampled_color.rgb += clamp(filmgraincolor, 0.0f, 1.0f);
 
     // 最終的な色を返す
     return sampled_color;

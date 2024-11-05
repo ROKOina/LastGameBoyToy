@@ -45,20 +45,23 @@ public:
     enum class BossState
     {
         IDLE,
-        STOPTIME,
+        IDLESTOP,
         MOVE,
-        JUMP,
-        JUMPLOOP,
-        LANDINGATTACK,
-        PUNCH,
-        KICK,
-        RANGEATTACK,
-        BOMPATTTACK,
-        FIREBALL,
-        MISSILE,
-        HIT,
+        SHORTATTACK1,
+        SHORTATTACK2,
+        LARIATSTART,
+        LARIATLOOP,
+        LARIATEND,
+        JUMPATTACKSTART,
+        JUMPATTACKEND,
+        SHOTSTART,
+        SHOTLOOP,
+        SHOTEND,
+        UPSHOTSTART,
+        UPSHOTCHARGE,
+        UPSHOTLOOP,
+        UPSHOTEND,
         DEATH,
-
         MAX
     };
 

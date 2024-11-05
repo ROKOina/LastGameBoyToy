@@ -1,4 +1,4 @@
-#include "../../Common.hlsli"
+#include "../../Common/Common.hlsli"
 
 Texture2D hdr_color_buffer_texture : register(t0);
 

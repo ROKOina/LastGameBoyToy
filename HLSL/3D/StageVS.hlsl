@@ -1,5 +1,5 @@
 #include "Defalt.hlsli"
-#include "../Constants.hlsli"
+#include "../Common/Constants.hlsli"
 
 VS_OUT main(VS_IN vin)
 {

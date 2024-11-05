@@ -1,7 +1,7 @@
 #include "FullScreenQuad.hlsli"
 #include "PostEffect.hlsli"
-#include "../../Common.hlsli"
-#include "../../Constants.hlsli"
+#include "../../Common/Common.hlsli"
+#include "../../Common/Constants.hlsli"
 
 Texture2D texturemaps : register(t0);
 Texture2D depth_map : register(t1);

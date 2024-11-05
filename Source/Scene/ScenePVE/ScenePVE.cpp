@@ -20,10 +20,18 @@
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Component\Enemy\BossCom.h"
+#include "Component\PostEffect\PostEffect.h"
 
 void ScenePVE::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
+
+    //ポストエフェクト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("posteffect");
+        obj->AddComponent<PostEffect>();
+    }
 
     //フリーカメラ
     {
@@ -84,74 +92,6 @@ void ScenePVE::Initialize()
         auto& pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(3);
         pushBack->SetWeight(5);
-
-        //ボンプ君
-        {
-            std::shared_ptr<GameObject> bompspawn = boss->AddChildObject();
-            bompspawn->SetName("bomp");
-            bompspawn->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/missile.spawn");
-        }
-
-        //左手コリジョン
-        {
-            std::shared_ptr<GameObject> lefthand = boss->AddChildObject();
-            lefthand->SetName("lefthandcollsion");
-            std::shared_ptr<SphereColliderCom> lefthandcollider = lefthand->AddComponent<SphereColliderCom>();
-            lefthandcollider->SetEnabled(false);
-            lefthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
-            lefthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
-            lefthandcollider->SetRadius(1.0f);
-        }
-
-        //右足コリジョン
-        {
-            std::shared_ptr<GameObject> rightlegs = boss->AddChildObject();
-            rightlegs->SetName("rightlegscollsion");
-            std::shared_ptr<SphereColliderCom> rightlegscollider = rightlegs->AddComponent<SphereColliderCom>();
-            rightlegscollider->SetEnabled(false);
-            rightlegscollider->SetMyTag(COLLIDER_TAG::Enemy);
-            rightlegscollider->SetJudgeTag(COLLIDER_TAG::Player);
-            rightlegscollider->SetRadius(1.0f);
-        }
-
-        //手に付ける火のエフェクト
-        {
-            std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
-            cpufireeffect->SetName("cpufireeffect");
-            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 1000);
-            cpufire->SetActive(false);
-        }
-
-        //着地時の煙エフェクト
-        {
-            std::shared_ptr<GameObject>landsmokeeffect = boss->AddChildObject();
-            landsmokeeffect->SetName("cpulandsmokeeffect");
-            landsmokeeffect->transform_->SetWorldPosition({ 0,1.7f,0 });
-            std::shared_ptr<CPUParticle>landsmoke = landsmokeeffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/landsmoke.cpuparticle", 1000);
-            landsmoke->SetActive(false);
-        }
-
-        //竜巻のエフェクト
-        {
-            std::shared_ptr<GameObject>cycloneffect = boss->AddChildObject();
-            cycloneffect->SetName("cycloncpueffect");
-            std::shared_ptr<CPUParticle>cpuparticle = cycloneffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/cyclon.cpuparticle", 1000);
-            cpuparticle->SetActive(false);
-        }
-
-        //火球
-        {
-            std::shared_ptr<GameObject>cpufireeffect = boss->AddChildObject();
-            cpufireeffect->SetName("fireball");
-            std::shared_ptr<CPUParticle>cpufire = cpufireeffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 1000);
-            cpufire->SetActive(false);
-            cpufireeffect->AddComponent<EasingMoveCom>(nullptr);
-            std::shared_ptr<SphereColliderCom> fireballcollider = cpufireeffect->AddComponent<SphereColliderCom>();
-            fireballcollider->SetEnabled(false);
-            fireballcollider->SetMyTag(COLLIDER_TAG::Enemy);
-            fireballcollider->SetJudgeTag(COLLIDER_TAG::Player);
-            fireballcollider->SetRadius(1.0f);
-        }
     }
 
     //ステージ

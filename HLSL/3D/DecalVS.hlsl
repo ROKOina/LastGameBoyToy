@@ -1,5 +1,5 @@
 #include "Decal.hlsli"
-#include "../Constants.hlsli"
+#include "../Common/Constants.hlsli"
 
 float4 main(float4 position : POSITION) : SV_POSITION
 {

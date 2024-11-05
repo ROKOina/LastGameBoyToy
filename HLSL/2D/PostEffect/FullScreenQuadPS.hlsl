@@ -1,5 +1,5 @@
 #include "FullScreenQuad.hlsli"
-#include "../../Common.hlsli"
+#include "../../Common/Common.hlsli"
 
 Texture2D texture_maps : register(t0);
 

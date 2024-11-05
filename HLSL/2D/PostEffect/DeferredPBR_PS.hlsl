@@ -1,8 +1,8 @@
 #include "FullScreenQuad.hlsli"
 #include "../../3D/PBR+IBLFunction.hlsli"
 #include "../../3D/Light.hlsli"
-#include "../../Common.hlsli"
-#include "../../Constants.hlsli"
+#include "../../Common/Common.hlsli"
+#include "../../Common/Constants.hlsli"
 
 Texture2D colorMap : register(t0);
 Texture2D normalMap : register(t1); // 法線マップ

@@ -13,19 +13,27 @@ class BossCom;
 class Boss_BaseState : public State<BossCom>
 {
 public:
+
+    //ビットで制御する
+    enum EventFlags
+    {
+        None = 0,
+        EnableGPUParticle = 1 << 0,  // ビット 0: GPUパーティクルを有効化
+        EnableCPUParticle = 1 << 1,  // ビット 1: CPUパーティクルを有効化
+        EnableCollision = 1 << 2,    // ビット 2: コリジョンを有効化
+        EnableSpawn = 1 << 3,        // ビット 3: 生成を有効化
+    };
+
     Boss_BaseState(BossCom* owner);
 
-    //アニメーション中の当たり判定
-    bool AnimNodeCollsion(std::string eventname, std::string nodename, const char* objectname);
-
-    //CPUエフェクトの検索
-    void CPUEffect(const char* objectname, bool posflag);
-
-    //乱数で選択された行動を選択する関数
-    void RandamBehavior(int one, int two);
+    //乱数の行動制御
+    void RandamBehavior();
 
     //乱数計算
     int ComputeRandom();
+
+    //アニメーションイベント制御
+    void AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventflags);
 
 protected:
     std::weak_ptr<BossCom> bossCom;
@@ -33,17 +41,12 @@ protected:
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
     std::weak_ptr<CharaStatusCom>characterstatas;
-    std::shared_ptr<GameObject>cachedobject;
-    std::shared_ptr<GameObject>cpuparticle;
 
 private:
 
     //乱数
     std::vector<int> availableNumbers = { };
     std::mt19937 gen;
-
-    // アニメーションイベント時の当たり判定
-    DirectX::XMFLOAT3 nodepos = {};
 };
 
 //待機
@@ -66,8 +69,8 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    virtual void Exit();
-    void ImGui() override;
+    virtual void Exit() {};
+    void ImGui() override {};
     virtual const char* GetName() const override { return "IdleStop"; }
 
 private:
@@ -82,130 +85,228 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "Move"; }
 };
 
-//ジャンプ
-class Boss_JumpState : public Boss_BaseState
+//近距離攻撃1
+class Boss_SA1 : public Boss_BaseState
 {
 public:
-    Boss_JumpState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_SA1(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override {};
     void ImGui() override {};
-    virtual const char* GetName() const override { return "Jump"; }
+    virtual const char* GetName() const override { return "SA1"; }
 };
 
-//ジャンプループ
-class Boss_JumpLoopState : public Boss_BaseState
+//近距離攻撃2
+class Boss_SA2 : public Boss_BaseState
 {
 public:
-    Boss_JumpLoopState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_SA2(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override {};
     void ImGui() override {};
-    virtual const char* GetName() const override { return "JumpLoop"; }
+    virtual const char* GetName() const override { return "SA2"; }
 };
 
-//着地
-class Boss_LandingState : public Boss_BaseState
+//ラリアット開始
+class Boss_LARIATSTART : public Boss_BaseState
 {
 public:
-    Boss_LandingState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_LARIATSTART(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override {};
     void ImGui() override {};
-    virtual void Exit() {};
-    virtual const char* GetName() const override { return "Landing"; }
+    virtual const char* GetName() const override { return "LARIATSTART"; }
 };
 
-//パンチ
-class Boss_PunchState : public Boss_BaseState
+//ラリアットループ
+class Boss_LARIATLOOP : public Boss_BaseState
 {
 public:
-    Boss_PunchState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_LARIATLOOP(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override;
     void ImGui() override {};
-    virtual const char* GetName() const override { return "Punch"; }
+    virtual const char* GetName() const override { return "LARIATLOOP"; }
+
+private:
+    float time = 0.0f;
 };
 
-//キック
-class Boss_KickState : public Boss_BaseState
+//ラリアット終了
+class Boss_LARIATEND : public Boss_BaseState
 {
 public:
-    Boss_KickState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_LARIATEND(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override {};
     void ImGui() override {};
-    virtual const char* GetName() const override { return "Kick"; }
+    virtual const char* GetName() const override { return "LARIATEND"; }
 };
 
-//範囲攻撃
-class Boss_RangeAttackState : public Boss_BaseState
+//打ち上げ始め
+class Boss_UpShotStart : public Boss_BaseState
 {
 public:
-    Boss_RangeAttackState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_UpShotStart(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override {};
     void ImGui() override {};
-    virtual const char* GetName() const override { return "RangeAttack"; }
+    virtual const char* GetName() const override { return "UpShotStart"; }
 };
 
-//ボンプ攻撃
-class Boss_BompAttackState : public Boss_BaseState
+//打ち上げチャージ
+class Boss_UpShotCharge : public Boss_BaseState
 {
 public:
-    Boss_BompAttackState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_UpShotCharge(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override;
     void ImGui() override {};
-    virtual const char* GetName() const override { return "BompAttack"; }
+    virtual const char* GetName() const override { return "UpShotCharge"; }
+
+private:
+    float time = 0.0f;
 };
 
-//ファイヤーボール
-class Boss_FireBallState : public Boss_BaseState
+//打ち上げループ
+class Boss_UpShotLoop : public Boss_BaseState
 {
 public:
-    Boss_FireBallState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_UpShotLoop(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override;
     void ImGui() override {};
-    virtual const char* GetName() const override { return "FireBall"; }
+    virtual const char* GetName() const override { return "UpShotLoop"; }
+
+private:
+    float time = 0.0f;
 };
 
-//ミサイル攻撃
-class Boss_MissileAttackState : public Boss_BaseState
+//打ち上げ終わり
+class Boss_UpShotEnd : public Boss_BaseState
 {
 public:
-    Boss_MissileAttackState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_UpShotEnd(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override {};
     void ImGui() override {};
-    virtual const char* GetName() const override { return "MissileAttack"; }
+    virtual const char* GetName() const override { return "UpShotEnd"; }
 };
 
-//ダメージ
-class Boss_DamageState : public Boss_BaseState
+//打ち始め
+class Boss_ShotStart : public Boss_BaseState
 {
 public:
-    Boss_DamageState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_ShotStart(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override {};
     void ImGui() override {};
-    virtual const char* GetName() const override { return "Damage"; }
+    virtual const char* GetName() const override { return "ShotStart"; }
 };
+
+//チャージ
+class Boss_ShotCharge : public Boss_BaseState
+{
+public:
+    Boss_ShotCharge(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "ShotCharge"; }
+
+private:
+    float time = 0.0f;
+};
+
+//打ちます
+class Boss_Shot : public Boss_BaseState
+{
+public:
+    Boss_Shot(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "Shot"; }
+};
+
+//ジャンプ攻撃始め
+class Boss_JumpAttackStart : public Boss_BaseState
+{
+public:
+    Boss_JumpAttackStart(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "JumpAttackStart"; }
+};
+
+//ジャンプ攻撃終わり
+class Boss_JumpAttackEnd : public Boss_BaseState
+{
+public:
+    Boss_JumpAttackEnd(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "JumpAttackEnd"; }
+};
+
+////ボンプ攻撃
+//class Boss_BompAttackState : public Boss_BaseState
+//{
+//public:
+//    Boss_BompAttackState(BossCom* owner) :Boss_BaseState(owner) {}
+//
+//    void Enter() override;
+//    void Execute(const float& elapsedTime) override;
+//    void ImGui() override {};
+//    virtual const char* GetName() const override { return "BompAttack"; }
+//};
+//
+////ファイヤーボール
+//class Boss_FireBallState : public Boss_BaseState
+//{
+//public:
+//    Boss_FireBallState(BossCom* owner) :Boss_BaseState(owner) {}
+//
+//    void Enter() override;
+//    void Execute(const float& elapsedTime) override;
+//    void ImGui() override {};
+//    virtual const char* GetName() const override { return "FireBall"; }
+//};
 
 //死亡
 class Boss_DeathState : public Boss_BaseState

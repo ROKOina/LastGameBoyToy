@@ -204,7 +204,7 @@ void AnimationCom::AnimEventWindow()
     if (ImGui::Button("Play"))
     {
         PlayAnimation(currentAnimation, isAnimLoop, false, 0.2f);
-        animationSpeed = 1;
+        //anim.animationspeed = 1;
     }
     ImGui::SameLine();
 
@@ -367,7 +367,7 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
 
     // 時間経過
     if (!oneTimeStop)
-        currentSeconds += elapsedTime * animationSpeed;
+        currentSeconds += elapsedTime * animation.animationspeed;
     if (currentSeconds >= animation.secondsLength)
     {
         if (loopAnimation)
@@ -477,7 +477,7 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
     }
 
     //時間経過
-    upperCurrentAnimationSeconds += elapsedTime * animationSpeed;
+    upperCurrentAnimationSeconds += elapsedTime * animation.animationspeed;
 
     //最終フレーム
     if (animationUpperEndFlag)
@@ -655,7 +655,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
     }
 
     //時間経過
-    lowerCurrentAnimationSeconds += elapsedTime * animationSpeed;
+    lowerCurrentAnimationSeconds += elapsedTime * animation.animationspeed;
 
     //最終フレーム
     if (animationLowerEndFlag)

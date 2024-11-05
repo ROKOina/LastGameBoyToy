@@ -1,6 +1,6 @@
 #include "Decal.hlsli"
-#include "../Common.hlsli"
-#include "../Constants.hlsli"
+#include "../Common/Common.hlsli"
+#include "../Common/Constants.hlsli"
 
 Texture2D DecalMap : register(t0);
 Texture2D DepthMap : register(t8);

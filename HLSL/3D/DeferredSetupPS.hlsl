@@ -1,7 +1,7 @@
 #include "Defalt.hlsli"
 #include "Light.hlsli"
 #include "PBR+IBLFunction.hlsli"
-#include "../Constants.hlsli"
+#include "../Common/Constants.hlsli"
 
 // powŠÖ”‚É•‰‚Ì’l‚ª“ü‚é‰Â”\«‚ğ•ñ‚·‚éŒx‚ğ–³Œø‰»
 #pragma warning (disable : 3571)

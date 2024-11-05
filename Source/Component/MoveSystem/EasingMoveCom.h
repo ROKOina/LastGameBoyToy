@@ -52,11 +52,10 @@ public:
         std::vector<int> easingtype = {};
         std::vector<int> easingmovetype = {};
         std::vector<DirectX::XMFLOAT3> easingposition = {};
-        std::vector<int>FlagX = {};
-        std::vector<int>FlagY = {};
-        std::vector<int>FlagZ = {};
         std::string objectname = {};
         float trackingtime = 0.0f;
+        bool deleteflag = false;
+        float deletetime = 0.0f;
 
         template<class Archive>
         void serialize(Archive& archive, int version);

@@ -1,6 +1,7 @@
 #include "GPUParticle.hlsli"
-#include "../Common.hlsli"
-#include "../Constants.hlsli"
+#include "../../Common/Common.hlsli"
+#include "../../Common/Constants.hlsli"
+#include "../../Common/Rand.hlsli"
 
 RWStructuredBuffer<MainParticle> particlebuffer : register(u0);
 
@@ -34,7 +35,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float3 orbY = cross(normVec, float3(0, 0, 1));
         float3 orbVelo = orbZ * orbitalVelocity.z + orbX * orbitalVelocity.x + orbY * orbitalVelocity.y;
 
-         // ランダム成分の強化
+         //ランダム成分の強化
         float3 randomVel = float3(
             ((random(p.position.x * time + id) * 2) - 1) * veloRandScale * random(lerprate * 2.0f),
             ((random(p.position.y * time + id) * 2) - 1) * veloRandScale * random(lerprate * 3.0f),
@@ -83,7 +84,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float pp = lerp(0.0, 1.0, random(theta + id * time));
         float phi = asin((2.0f * pp) - 1.0f);
 
-        //位置,大きさ
+        //位置
         p.position = position.xyz;
 
         //大きさをラープで制御
