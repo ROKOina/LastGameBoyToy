@@ -84,30 +84,34 @@ void SceneGame::Initialize()
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
+
+    ModelResource* m;
     //ステージ
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        obj->transform_->SetScale({ 0.5f, 0.5f, 0.5f });
+        obj->transform_->SetScale({ 0.01f, 0.01f, 0.08f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         //r->LoadModel("Data/canyon/stage.mdl");
-        r->LoadModel("Data/aaaaa.mdl");
+        r->LoadModel("Data/MatuokaStage/StageJson/StageJson.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
-        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-        rigid->GenerateCollider(r->GetModel()->GetResource());
+        PhysXLib::Instance().GenerateManyCollider(r->GetModel()->GetResource());
+        //RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+        //rigid->GenerateCollider(r->GetModel()->GetResource());
+        //m = r->GetModel()->GetResource();
     }
 
     //当たり判定用
     std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
         roboobj->SetName("robo");
-        roboobj->transform_->SetWorldPosition({ 0, 46.3f, 0 });
-        roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
+        roboobj->transform_->SetWorldPosition({ 0, 0, 0 });
+        roboobj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
         std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();

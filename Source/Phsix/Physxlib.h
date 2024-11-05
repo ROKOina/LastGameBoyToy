@@ -38,6 +38,11 @@ public:
         const PxReal maxDistance,
         PxRaycastBuffer& hitBuffer);
 
+    //オブジェクトの塊を分解してColliderを作る（スタティック専用・主にステージで使う）
+    void GenerateManyCollider(ModelResource* model);
+
+    //
+
     //Modelの形の当たり判定作成
     physx::PxRigidActor* GenerateCollider(bool isStatic,ModelResource* model, GameObj obj);
     //矩形、球、カプセルの当たり判定作成
@@ -86,11 +91,15 @@ namespace physx
     }
     static inline void operator+=(PxVec3& f1, const DirectX::XMFLOAT3& f2)
     {
-        f1 = f1 + f2;
+        f1.x += f2.x;
+        f1.y += f2.y;
+        f1.z += f2.z;
     }
     static inline void operator+=(DirectX::XMFLOAT3& f1, const PxVec3& f2)
     {
-        f1 = f1 + f2;
+        f1.x += f2.x;
+        f1.y += f2.y;
+        f1.z += f2.z;
     }
 
     // XMFLOAT4 との足し算

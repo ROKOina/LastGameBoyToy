@@ -207,6 +207,23 @@ void ModelResource::Animation::serialize(Archive& archive, int version)
   );
 }
 
+template<class Archive>
+inline void ModelResource::CollisionVertex::serialize(Archive& archive, int version)
+{
+    archive(
+        CEREAL_NVP(position),
+        CEREAL_NVP(normal)
+    );
+}
+
+template<class Archive>
+void ModelResource::PhysxVertex::serialize(Archive& archive, int version)
+{
+    archive(
+        CEREAL_NVP(vertices)
+    );
+}
+
 // 読み込み
 void ModelResource::Load(ID3D11Device* device, const char* filename)
 {
@@ -587,6 +604,31 @@ void ModelResource::NodeDeserialize(const char* filename)
       return;
     }
   }
+}
+
+void ModelResource::PhyxsDeserialize(const char* filename)
+{
+    std::string path = filename;
+    path.erase(path.rfind('.') + 1);
+    path += "physxData";
+
+    std::ifstream istream(path.c_str(), std::ios::binary);
+    if (istream.is_open())
+    {
+        cereal::BinaryInputArchive archive(istream);
+
+        try
+        {
+            archive(
+                CEREAL_NVP(physxVertex)
+            );
+        }
+        catch (...)
+        {
+            LOG("Physx Data Failed........  \n%s\n", filename);
+            return;
+        }
+    }
 }
 
 // ノードインデックスを取得する

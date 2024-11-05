@@ -103,6 +103,23 @@ public:
         void serialize(Archive& archive, int version);
     };
 
+    struct CollisionVertex
+    {
+        DirectX::XMFLOAT3	position = { 0, 0, 0 };
+        DirectX::XMFLOAT3	normal = { 0, 0, 0 };
+
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
+
+    struct PhysxVertex
+    {
+        std::vector<CollisionVertex> vertices;
+
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
+
     //ノード情報
     struct NodeKeyData
     {
@@ -164,6 +181,7 @@ public:
     std::vector<Node>& GetNodes() { return nodes_; }
     const std::vector<Animation>& GetAnimations() const { return animations_; }
     const std::vector<Material>& GetMaterials() const { return materials_; }
+    const PhysxVertex& GetPhysxVertex() const { return physxVertex; }
     std::vector<Mesh>& GetMeshesEdit() { return meshes_; }
     std::vector<Material>& GetMaterialsEdit() { return materials_; }
     std::string GetFileName() { return fileName; }
@@ -201,6 +219,8 @@ protected:
     //ノードデシリアライズ
     void NodeDeserialize(const char* filename);
 
+    void PhyxsDeserialize(const char* filename);
+
     // ノードインデックスを取得する
     int FindNodeIndex(NodeId nodeId) const;
 
@@ -209,5 +229,6 @@ protected:
     std::vector<Material>	materials_;
     std::vector<Mesh>		meshes_;
     std::vector<Animation>	animations_;
+    PhysxVertex             physxVertex;
     std::string fileName;
 };

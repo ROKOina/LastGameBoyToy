@@ -1,5 +1,6 @@
 #include "Physxlib.h"
 #include "Components\TransformCom.h"
+#include "./Graphics/Model/ResourceManager.h"
 #include <list>
 
 void PhysXLib::Initialize()
@@ -37,23 +38,23 @@ void PhysXLib::Initialize()
     }
 
 
-    //////静的オブジェクトの追加
-    //auto rigid_static
-    //    = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
-    //// 形状(Box)を作成
-    //auto box_shape
-    //    = gPhysics->createShape(
-    //        // Boxの大きさ
-    //        physx::PxBoxGeometry(5.f, 0.5f, 5.f),
-    //        // 摩擦係数と反発係数の設定
-    //        *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
-    //    );
-    //// 形状のローカル座標を設定
-    //box_shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
-    //// 形状を紐づけ
-    //rigid_static->attachShape(*box_shape);
-    //// 剛体を空間に追加
-    //gScene->addActor(*rigid_static);
+    ////静的オブジェクトの追加
+    auto rigid_static
+        = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
+    // 形状(Box)を作成
+    auto box_shape
+        = gPhysics->createShape(
+            // Boxの大きさ
+            physx::PxBoxGeometry(5.f, 0.5f, 5.f),
+            // 摩擦係数と反発係数の設定
+            *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
+        );
+    // 形状のローカル座標を設定
+    box_shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
+    // 形状を紐づけ
+    rigid_static->attachShape(*box_shape);
+    // 剛体を空間に追加
+    gScene->addActor(*rigid_static);
 }
 
 #define SAFE_RELEASE(p) {if (p) { (p)->release(); (p) = nullptr; }}
@@ -92,97 +93,224 @@ bool PhysXLib::RayCast_PhysX(const PxVec3& origin, const PxVec3& unitDir, const 
     return gScene->raycast(origin, unitDir, maxDistance, hitBuffer);
 }
 
+void PhysXLib::GenerateManyCollider(ModelResource* model)
+{
+    for (auto& node : model->GetNodes())
+    {
+        if (node.parentIndex == 1)
+        {
+            // 区切り文字 "(" の位置を検索
+            size_t delimiterPos = node.name.find("__");
+
+            // 区切り文字が見つかった場合、その位置までの部分文字列を取得
+            std::string name = (delimiterPos != std::string::npos) ? node.name.substr(0, delimiterPos) : node.name;
+            name += static_cast<std::string>(".mdl");
+            std::string path = static_cast<std::string>("Data/MatuokaStage/") + name;
+
+            ID3D11Device* device = Graphics::Instance().GetDevice();
+            std::shared_ptr<ModelResource> m = std::make_shared<ModelResource>();
+
+            //リソースマネージャーに登録されているか
+            if (!ResourceManager::Instance().JudgeModelFilename(path.c_str()))
+            {
+                m->Load(device, path.c_str());
+                ResourceManager::Instance().RegisterModel(path.c_str(), m);	//リソースマネージャーに追加する
+            }
+            else
+            {
+                m = ResourceManager::Instance().LoadModelResource(path.c_str());	//ロードする
+            }
+
+            std::vector<PxVec3> vertices;
+            std::vector<PxU32> indices;
+
+            for (auto& mesh : m->GetMeshes())
+            {
+                //頂点情報をDirectXからPhysXに置き換え
+                for (auto& ver : mesh.vertices)
+                {
+                    PxVec3 pos = { ver.position.x,ver.position.y,ver.position.z };
+                    vertices.emplace_back(pos);
+                }
+
+                if (mesh.subsets.size() > 0)
+                {
+                    for (auto& ver : mesh.indices)
+                    {
+                        indices.emplace_back(ver);
+                    }
+                }
+            }
+
+            //メッシュデータの作成
+            physx::PxTriangleMeshDesc meshDesc;
+            meshDesc.setToDefault();
+            meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
+            meshDesc.points.stride = sizeof(PxVec3);
+            meshDesc.points.data = vertices.data();
+
+            meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size()) / 3;
+            meshDesc.triangles.stride = sizeof(PxU32) * 3;
+            meshDesc.triangles.data = indices.data();
+
+            physx::PxTolerancesScale tolerances_scale;
+            PxCookingParams cooking_params(tolerances_scale);
+
+
+            cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
+            cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+
+            physx::PxTriangleMesh* triangle_mesh = nullptr;
+            physx::PxDefaultMemoryOutputStream write_buffer;
+
+
+            if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
+                assert(0 && "PxCookTriangleMesh failed.");
+            }
+            //作成に成功したmeshDescを保存
+            meshStlege[model->GetFileName()] = meshDesc;
+
+            PxDefaultMemoryOutputStream writeBuffer;
+            PxTriangleMeshCookingResult::Enum result;
+
+            physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+            triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
+
+
+            physx::PxRigidActor* rigidObj = nullptr;
+
+            //動かない(静的)剛体を作成
+            rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+            PxTransform& pos = rigidObj->getGlobalPose();
+            pos.p.x = node.translate.x;
+            pos.p.y = node.translate.y;
+            pos.p.z = node.translate.z;
+
+            DirectX::XMFLOAT4 quatF(node.rotate);
+            pos.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+
+            rigidObj->setGlobalPose(pos);
+
+            //当たり判定とモデルのスケールを合わせる
+            float modelDefaultScale = 100.0f;//モデルエディターの１をこのプロジェクトサイズにする値
+            physx::PxMeshScale scale(PxVec3(1, 1, 1));//node.scale.x * 100.0f, node.scale.y * 100.0f, node.scale.z * 100.0f));
+
+
+            //メッシュを当たり判定にセット
+            PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
+            PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
+            rigidObj->attachShape(*shape);
+
+            // 剛体を空間に追加
+            gScene->addActor(*rigidObj);
+        }
+    }
+}
+
 physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* model, GameObj obj)
 {
     ModelResource::Node rootNode = *model->GetNodes().data();
 
+    std::vector<PxVec3> vertices;
+    std::vector<PxU32> indices;
+    int meshCount = 0;
+    int io = 0;
+
+    UINT total = 0;
+    auto debug = Graphics::Instance().GetDebugRenderer();
+
     for (auto& mesh : model->GetMeshes())
     {
         //頂点情報をDirectXからPhysXに置き換え
-        std::vector<PxVec3> vertices;
         for (auto& ver : mesh.vertices)
         {
             PxVec3 pos = { ver.position.x,ver.position.y,ver.position.z };
+            //debug->DrawSphere({ ver.position.x,ver.position.y,ver.position.z }, 0.1f, { 1,1,1,1 });
+
             vertices.emplace_back(pos);
         }
 
-        std::vector<PxU32> indices;
-        for (auto& ver : mesh.indices)
+        if (mesh.subsets.size() > 0)
         {
-            indices.emplace_back(ver);
+            for (auto& ver : mesh.indices)
+            {
+                indices.emplace_back(ver + total);
+            }
         }
-
-        //メッシュデータの作成
-        physx::PxTriangleMeshDesc meshDesc;
-        meshDesc.setToDefault();
-        meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
-        meshDesc.points.stride = sizeof(PxVec3);
-        meshDesc.points.data = vertices.data();
-
-        meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size()) / 3;
-        meshDesc.triangles.stride = sizeof(PxU32) * 3;
-        meshDesc.triangles.data = indices.data();
-
-        physx::PxTolerancesScale tolerances_scale;
-        PxCookingParams cooking_params(tolerances_scale);
-
-        
-        cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
-        cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
-
-        physx::PxTriangleMesh* triangle_mesh = nullptr;
-        physx::PxDefaultMemoryOutputStream write_buffer;
-        
-
-        if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
-            assert(0 && "PxCookTriangleMesh failed.");
-        }
-        //作成に成功したmeshDescを保存
-        meshStlege[model->GetFileName()] = meshDesc;
-
-        PxDefaultMemoryOutputStream writeBuffer;
-        PxTriangleMeshCookingResult::Enum result;
-
-        physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
-        triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
-
-
-        physx::PxRigidActor* rigidObj = nullptr;
-        if (isStatic) {
-            //動かない(静的)剛体を作成
-            rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
-            PxTransform& pos = rigidObj->getGlobalPose();
-            pos.p.x = obj->transform_->GetWorldPosition().x;
-            pos.p.y = obj->transform_->GetWorldPosition().y;
-            pos.p.z = obj->transform_->GetWorldPosition().z;
-
-            auto quat = DirectX::XMQuaternionRotationRollPitchYaw(DirectX::XMConvertToRadians(-90), 0, 0);
-            DirectX::XMFLOAT4 quatF(quat.m128_f32);
-            pos.q = { quatF.x,quatF.y,quatF.z, quatF.w };
-
-            rigidObj->setGlobalPose(pos);
-        }
-        else {
-            // 動かすことのできる(動的)剛体を作成
-            rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
-        }
-
-        //当たり判定とモデルのスケールを合わせる
-        DirectX::XMFLOAT3 sV = obj->transform_->GetScale();
-        float modelDefaultScale = 100.0f;//モデルエディターの１をこのプロジェクトサイズにする値
-        physx::PxMeshScale scale(PxVec3(sV.x * 100.0f, sV.y * 100.0f,sV.z * 100.0f));
-        
-
-        //メッシュを当たり判定にセット
-        PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
-        PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
-        rigidObj->attachShape(*shape);
-
-        // 剛体を空間に追加
-        gScene->addActor(*rigidObj);
-
-        return rigidObj;
+        meshCount++;
+        //total += mesh.indices.size();
     }
+
+    //メッシュデータの作成
+    physx::PxTriangleMeshDesc meshDesc;
+    meshDesc.setToDefault();
+    meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
+    meshDesc.points.stride = sizeof(PxVec3);
+    meshDesc.points.data = vertices.data();
+
+    meshDesc.triangles.count = static_cast<physx::PxU32>(indices.size()) / 3;
+    meshDesc.triangles.stride = sizeof(PxU32) * 3;
+    meshDesc.triangles.data = indices.data();
+
+    physx::PxTolerancesScale tolerances_scale;
+    PxCookingParams cooking_params(tolerances_scale);
+
+
+    cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
+    cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+
+    physx::PxTriangleMesh* triangle_mesh = nullptr;
+    physx::PxDefaultMemoryOutputStream write_buffer;
+
+
+    if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
+        assert(0 && "PxCookTriangleMesh failed.");
+    }
+    //作成に成功したmeshDescを保存
+    meshStlege[model->GetFileName()] = meshDesc;
+
+    PxDefaultMemoryOutputStream writeBuffer;
+    PxTriangleMeshCookingResult::Enum result;
+
+    physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+    triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
+
+
+    physx::PxRigidActor* rigidObj = nullptr;
+    if (isStatic) {
+        //動かない(静的)剛体を作成
+        rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+        PxTransform& pos = rigidObj->getGlobalPose();
+        pos.p.x = obj->transform_->GetWorldPosition().x;
+        pos.p.y = obj->transform_->GetWorldPosition().y;
+        pos.p.z = obj->transform_->GetWorldPosition().z;
+
+        //auto quat = DirectX::XMQuaternionRotationRollPitchYaw(DirectX::XMConvertToRadians(-90), 0, 0);
+        //DirectX::XMFLOAT4 quatF(quat.m128_f32);
+        //pos.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+
+        rigidObj->setGlobalPose(pos);
+    }
+    else {
+        // 動かすことのできる(動的)剛体を作成
+        rigidObj = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
+    }
+
+    //当たり判定とモデルのスケールを合わせる
+    DirectX::XMFLOAT3 sV = obj->transform_->GetScale();
+    float modelDefaultScale = 100.0f;//モデルエディターの１をこのプロジェクトサイズにする値
+    physx::PxMeshScale scale(PxVec3(sV.x * 100.0f, sV.y * 100.0f, sV.z * 100.0f));
+
+
+    //メッシュを当たり判定にセット
+    PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
+    PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
+    rigidObj->attachShape(*shape);
+
+    // 剛体を空間に追加
+    gScene->addActor(*rigidObj);
+
+    return rigidObj;
 
     return nullptr;
 }

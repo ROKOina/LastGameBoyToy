@@ -102,20 +102,23 @@ void StageEditorCom::Update(float elapsedTime)
             )
         );
 
+
         //マウスとステージの当たり判定
         HitResult hit;
-        PxVec3 pos;
-        pos += world_start;
+        PxVec3 pos = { world_start.x,world_start.y,world_start.z };
 
-        PxVec3 dir;
-        dir += world_end - world_start;
+        auto d = Mathf::Normalize(world_end - world_start);
+        PxVec3 dir = {d.x,d.y,d.z};
 
         physx::PxRaycastBuffer Buf;
 
         if (PhysXLib::Instance().RayCast_PhysX(pos, dir, 1000, Buf))
         {
-            DirectX::XMFLOAT3 p;
-            p += Buf.block.position;
+            auto hit = Buf.block;
+            DirectX::XMFLOAT3 p = {};
+            p.x += hit.position.x;
+            p.y += hit.position.y;
+            p.z += hit.position.z;
 
             ObjectPlace(
                 objType,              //選択中のオブジェクト
