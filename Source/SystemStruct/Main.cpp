@@ -23,10 +23,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 #if defined(DEBUG) | defined(_DEBUG)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     //メモリリーク検索
-    //_CrtSetBreakAlloc(212925);
-    //_CrtSetBreakAlloc(258);
-    //_CrtSetBreakAlloc(264);
-    //_CrtSetBreakAlloc(260);
+    //_CrtSetBreakAlloc(257);
 #endif
 
     // サイズ調整
