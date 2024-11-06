@@ -66,7 +66,7 @@ void SettingScreen::CreateSettingUiObject()
     {
         auto& fov = obj->AddChildObject();
         fov->SetName("fov");
-        fov->AddComponent<Sprite>("Data/SerializeData/UIData/setting/fov.ui", Sprite::SpriteShader::DEFALT, false);
+        fov->AddComponent<Sprite>("Data/SerializeData/UIData/setting/fov.ui", Sprite::SpriteShader::DEFALT, true);
 
         //ÉoÅ[
         {
