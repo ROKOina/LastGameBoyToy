@@ -96,14 +96,19 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        //obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
+        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/Model/canyon/stage.collision");
+        //r->LoadModel("Data/canyon/stage.mdl");
+        r->LoadModel("Data/MatuokaStage/StageJson/StageJson.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        obj->AddComponent<NodeCollsionCom>("Data/Stage_Abe/test.nodecollsion");
+        obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
+        //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
-        /*      RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-              rigid->GenerateCollider(r->GetModel()->GetResource());*/
+        //PhysXLib::Instance().GenerateManyCollider(r->GetModel()->GetResource());
+        //RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+        //rigid->GenerateCollider(r->GetModel()->GetResource());
     }
 
     //“–‚½‚è”»’è—p
