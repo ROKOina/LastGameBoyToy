@@ -382,8 +382,8 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
             y += cy;
         };
 
-    float cx = spc.position.x + spc.pivot.x;
-    float cy = spc.position.y + spc.pivot.y;
+    float cx = spc.position.x;
+    float cy = spc.position.y;
     rotate(x0, y0, cx, cy, spc.angle);
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);

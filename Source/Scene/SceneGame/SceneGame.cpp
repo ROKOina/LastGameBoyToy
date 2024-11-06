@@ -433,10 +433,18 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
             hpGauge->SetName("HpGauge");
-            std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::X_ONLY);
+            std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::X_ONLY_ADD);
             gauge->SetMaxValue(200);
             float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
             gauge->SetVariableValue(i);
+        }
+
+        //HpGauge
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
+            hpGauge->SetName("HideHpGauge");
+            std::shared_ptr<UiSystem>gauge = hpGauge->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
         }
         //HpMemori
         {
@@ -476,16 +484,18 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("UltFrame");
             std::shared_ptr<UiSystem> fade = hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
-            fade->SetFadeInFlag(true);
-            fade->SetFadeTimer(10.0f);
         }
 
         //HideUltGauge
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("HideUltGauge");
-            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<GameObject> hideUlt = canvas->AddChildObject();
+            hideUlt->SetName("HideUltGauge");
+            std::shared_ptr<UiGauge>gauge = hideUlt->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::Y_ONLY_SUB);
+            std::shared_ptr<GameObject>player  = GameObjectManager::Instance().Find("player");
+            gauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
+            float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
+            gauge->SetVariableValue(i);
         }
 
         //UltGauge

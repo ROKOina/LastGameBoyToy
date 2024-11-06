@@ -16,16 +16,26 @@ void UiGauge::Update(float elapsedTime)
     //ÉQÅ[ÉWÇÃî{ó¶ÇãÅÇﬂÇÈ
     valueRate = *variableValue / maxValue;
     //XÇÃÇ›
-    if (changeValue == UiSystem::ChangeValue::X_ONLY) {
+    if (changeValue == UiSystem::ChangeValue::X_ONLY_ADD) {
         spc.texSize = { originalTexSize.x * valueRate,spc.texSize.y };
     }
+    //XÇÃÇ›
+    else  if (changeValue == UiSystem::ChangeValue::X_ONLY_SUB) {
+        spc.texSize = { originalTexSize.x *(1- valueRate),spc.texSize.y };
+    }
     //YÇÃÇ›
-    else if (changeValue == UiSystem::ChangeValue::Y_ONLY) {
-        spc.texSize = { spc.texSize.y,originalTexSize.y * valueRate };
+    else if (changeValue == UiSystem::ChangeValue::Y_ONLY_ADD) {
+        spc.texSize = { spc.texSize.x,originalTexSize.y * valueRate};
+    }
+    else if (changeValue == UiSystem::ChangeValue::Y_ONLY_SUB) {
+        spc.texSize = { spc.texSize.x,originalTexSize.y * (1 - valueRate) };
     }
     //ÇwÇxóºï˚
-    else if (changeValue == UiSystem::ChangeValue::X_AND_Y) {
+    else if (changeValue == UiSystem::ChangeValue::X_AND_Y_ADD) {
         spc.texSize = { originalTexSize.x * valueRate,originalTexSize.y * valueRate };
+    }
+    else if (changeValue == UiSystem::ChangeValue::X_AND_Y_SUB) {
+        spc.texSize = { originalTexSize.x * (1 - valueRate) ,originalTexSize.y * (1 - valueRate) };
     }
 
     //êeÉNÉâÉXÇÃUpdateÇåƒÇ‘
