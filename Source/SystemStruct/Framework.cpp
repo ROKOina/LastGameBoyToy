@@ -14,6 +14,7 @@
 #include "ImGuiRender.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
+#include "Phsix\Physxlib.h"
 
 // 垂直同期間隔設定
 static const int syncInterval = 1;
@@ -26,6 +27,9 @@ Framework::Framework(HWND hWnd)
     , input_(hWnd)
     , graphics_(hWnd)
 {
+    //フィジックス初期化
+    PhysXLib::Instance().Initialize();
+
     //sceneGame.Initialize();
     SceneManager::Instance().ChangeScene(new SceneGame);
     //SceneManager::Instance().ChangeScene(new SceneStageEditor);
@@ -62,6 +66,9 @@ void Framework::Update(float elapsedTime/*Elapsed seconds from last frame*/, flo
 {
     // 入力更新処理
     input_.Update();
+
+    // フィジックス更新
+    PhysXLib::Instance().Update(elapsedTime);
 
     // シーン更新処理
     SceneManager::Instance().Update(elapsedTime);
@@ -247,7 +254,7 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
     case WM_SIZE:
     {
         // サイズ変更
-        Resize(LOWORD(lParam), HIWORD(lParam));
+        //Resize(LOWORD(lParam), HIWORD(lParam));
         break;
     }
     default:

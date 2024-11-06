@@ -189,8 +189,15 @@ void DebugRenderer::DrawRigidMesh(std::string filename, const physx::PxRigidActo
     //トランスフォーム
     physx::PxTransform transform = actor->getGlobalPose();
 
+    const PxVec3* originalData = static_cast<const PxVec3*>(meshDesc.points.data);
+
     Mesh mesh;
     mesh.position += transform.p;
+
+    mesh.rotation.x = transform.q.x;
+    mesh.rotation.y = transform.q.y;
+    mesh.rotation.z = transform.q.z;
+    mesh.rotation.w = transform.q.w;
 }
 
 // 球メッシュ作成
