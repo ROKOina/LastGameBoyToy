@@ -321,8 +321,9 @@ void CharacterCom::CameraControl()
             ::SetCursorPos(500, 500);
 
             //動かす速度(感度)
-            float moveX = (newCursor.x - 500) * 0.02f;
-            float moveY = (newCursor.y - 500) * 0.02f;
+            auto& ss = SceneManager::Instance().GetSettingScreen();
+            float moveX = (newCursor.x - 500) * 0.0005f * ss->GetSensitivity();
+            float moveY = (newCursor.y - 500) * 0.0005f * ss->GetSensitivity();
 
             //Y軸回転(ここでオブジェクトの回転)
             DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
