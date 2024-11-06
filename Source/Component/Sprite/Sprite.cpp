@@ -415,10 +415,10 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
         vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = { spc.color.x, spc.color.y, spc.color.z, spc.color.w };
 
         // テクスチャ座標
-        vertices[0].texcoord = { 0.0f / spc.texSize.x,0.0f / spc.texSize.y };
-        vertices[1].texcoord = { (spc.texSize.x) / texture2ddesc_.Width,0.0f / spc.texSize.y };
-        vertices[2].texcoord = { 0.0f / spc.texSize.x, (spc.texSize.y) / texture2ddesc_.Height };
-        vertices[3].texcoord = { (spc.texSize.x) / texture2ddesc_.Width, (spc.texSize.y) / texture2ddesc_.Height };
+        vertices[0].texcoord = { 0.0f / spc.texSize.x + numUVScroll.x ,0.0f / spc.texSize.y + numUVScroll.y };
+        vertices[1].texcoord = { (spc.texSize.x) / texture2ddesc_.Width + numUVScroll.x,0.0f / spc.texSize.y + numUVScroll.y };
+        vertices[2].texcoord = { 0.0f / spc.texSize.x + numUVScroll.x, (spc.texSize.y) / texture2ddesc_.Height + numUVScroll.y };
+        vertices[3].texcoord = { (spc.texSize.x) / texture2ddesc_.Width + numUVScroll.x, (spc.texSize.y) / texture2ddesc_.Height + numUVScroll.y };
     }
     dc->Unmap(vertexBuffer_.Get(), 0);
 
@@ -814,11 +814,13 @@ void Sprite::OnGUI()
     ImGui::Checkbox((char*)u8"ループ再生", &spc.loop);
     ImGui::SameLine();
     ImGui::Checkbox((char*)u8"ワンカット再生", &spc.comback);
-    ImGui::SameLine();
     if (ontriiger)
     {
+        ImGui::SameLine();
         ImGui::Checkbox((char*)u8"ヒット！", &hit);
     }
+
+    ImGui::DragFloat2("numUV", &numUVScroll.x, 0.01f);
 }
 
 //シリアライズ

@@ -28,6 +28,12 @@ public:
 
 private:
 
+    //ランダム位置
+    DirectX::XMFLOAT3 SpawnCom::GenerateRandomPosition();
+
+    //個別で名前を付ける
+    void AssignUniqueName(const std::shared_ptr<GameObject>& obj);
+
     //シリアライズ
     void Serialize();
 
@@ -36,6 +42,21 @@ private:
 
     // デシリアライズの読み込み
     void LoadDeserialize();
+
+private:
+
+    //エネミー生成関数
+    void SetupEnemy(const std::shared_ptr<GameObject>& obj);
+
+    //ミサイル生成関数
+    void SetupMissile(const std::shared_ptr<GameObject>& obj);
+
+    //爆発生成関数
+    void SetupExplosion(const std::shared_ptr<GameObject>& obj);
+
+    //ビーム生成関数
+    void SetupBeam(const std::shared_ptr<GameObject>& obj);
+    void CreateBeamSegment(const std::shared_ptr<GameObject>& origin, const char* easingMovePath);
 
 public:
 

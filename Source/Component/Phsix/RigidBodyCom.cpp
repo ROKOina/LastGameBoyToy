@@ -22,10 +22,13 @@ void RigidBodyCom::Start()
 
 void RigidBodyCom::Update(float elapsedTime)
 {
-    //transform‚ð•¨—‚ÌŒ‹‰Ê‚Éã‘‚«
-    physx::PxTransform transform = rigidActor->getGlobalPose();
-    GetGameObject()->transform_->SetWorldPosition({ transform.p.x,transform.p.y,transform.p.z });
-    GetGameObject()->transform_->SetRotation({ transform.q.x,transform.q.y,transform.q.z,transform.q.w });
+    if (!isStatic)
+    {
+        //transform‚ð•¨—‚ÌŒ‹‰Ê‚Éã‘‚«
+        physx::PxTransform transform = rigidActor->getGlobalPose();
+        GetGameObject()->transform_->SetWorldPosition({ transform.p.x,transform.p.y,transform.p.z });
+        GetGameObject()->transform_->SetRotation({ transform.q.x,transform.q.y,transform.q.z,transform.q.w });
+    }
 }
 
 void RigidBodyCom::OnGUI()
@@ -42,16 +45,15 @@ void RigidBodyCom::OnGUI()
     {
         PxRigidDynamic* dynamicActor = rigidActor->is<PxRigidDynamic>();
         dynamicActor->addForce(rigidTransform.p, physx::PxForceMode::eIMPULSE);
-        dynamicActor->release();
     }
 }
 
-void RigidBodyCom::GenerateCollider(NodeCollsionCom::CollsionType type)
+void RigidBodyCom::GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale)
 {
-    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, type, GetGameObject());
+    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, type, GetGameObject(),scale);
 }
 
 void RigidBodyCom::GenerateCollider(ModelResource* rc)
 {
-    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, rc);
+    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, rc, GetGameObject());
 }

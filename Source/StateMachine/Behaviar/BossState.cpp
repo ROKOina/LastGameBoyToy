@@ -6,6 +6,7 @@
 #include "Component\System\SpawnCom.h"
 #include "Component\PostEffect\PostEffect.h"
 
+//基底コンストラクタ
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 {
     //初期設定
@@ -20,13 +21,13 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     gen = std::mt19937(rd());
 }
 
-//乱数計算
-int Boss_BaseState::ComputeRandom()
+//乱数の近接攻撃制御
+void Boss_BaseState::RandamMeleeAttack()
 {
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
     {
-        availableNumbers = { 1,2,3,4,5,6,7,8 };
+        availableNumbers = { 1,2,3 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成
@@ -36,7 +37,54 @@ int Boss_BaseState::ComputeRandom()
 
     availableNumbers.erase(availableNumbers.begin() + index);
 
-    return randomValue;
+    //ステート切り替え
+    if (randomValue == 1)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLESTOP);
+    }
+    else if (randomValue == 2)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHORTATTACK1);
+    }
+    else if (randomValue == 3)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATSTART);
+    }
+}
+
+//乱数の遠距離攻撃制御
+void Boss_BaseState::RandamLongRangeAttack()
+{
+    //ランダムしたい数を増やす程下記の値が増えていく
+    if (availableNumbers.empty())
+    {
+        availableNumbers = { 1,2,3,4 };
+    }
+
+    // 乱数生成エンジンを使ってランダムにインデックスを生成
+    std::uniform_int_distribution<int> dis(0, availableNumbers.size() - 1);
+    int index = dis(gen);
+    int randomValue = availableNumbers[index];
+
+    availableNumbers.erase(availableNumbers.begin() + index);
+
+    //ステート切り替え
+    if (randomValue == 1)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLESTOP);
+    }
+    else if (randomValue == 2)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::UPSHOTSTART);
+    }
+    else if (randomValue == 3)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHOTSTART);
+    }
+    else if (randomValue == 4)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMPATTACKSTART);
+    }
 }
 
 //アニメーションイベント制御
@@ -109,38 +157,6 @@ void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const st
     }
 }
 
-//乱数の行動制御
-void Boss_BaseState::RandamBehavior()
-{
-    // ランダムで行動を切り替える
-    int randomAction = ComputeRandom();
-
-    if (randomAction == 1)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLESTOP);
-    }
-    else if (randomAction == 2)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHORTATTACK1);
-    }
-    else if (randomAction == 3)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATSTART);
-    }
-    else if (randomAction == 4)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::UPSHOTSTART);
-    }
-    else if (randomAction == 5)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMPATTACKSTART);
-    }
-    else if (randomAction == 6)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHOTSTART);
-    }
-}
-
 #pragma region 待機
 void Boss_IdleState::Enter()
 {
@@ -149,14 +165,19 @@ void Boss_IdleState::Enter()
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
     //遠かったら近くにくる
-    if (!owner->Search(7.0f))
+    if (!owner->Search(20.0f))
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
     }
 
-    if (owner->Search(7.0f))
+    //ここ全体的に修正が必用
+    if (owner->Search(6.0f))
     {
-        RandamBehavior();
+        RandamMeleeAttack();
+    }
+    if (owner->Search(14.0f))
+    {
+        RandamLongRangeAttack();
     }
 
     //死亡処理
@@ -180,7 +201,16 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     //待機時間
     if (idletime >= 2.0f)
     {
-        RandamBehavior();
+        //ここ全体的に修正が必用
+        if (owner->Search(6.0f))
+        {
+            RandamMeleeAttack();
+        }
+        if (owner->Search(14.0f))
+        {
+            RandamLongRangeAttack();
+        }
+
         idletime = 0.0f;
         return;
     }
@@ -398,7 +428,7 @@ void Boss_UpShotCharge::Enter()
 }
 void Boss_UpShotCharge::Execute(const float& elapsedTime)
 {
-    AnimtionEventControl("CHARGETIME", "Boss_L_neil2_end", "spawn", EnableGPUParticle);
+    AnimtionEventControl("CHARGETIME", "Boss_L_neil2_end", "spawn", EnableGPUParticle | EnableCPUParticle);
 
     time += elapsedTime;
     if (time > 3.7f)
@@ -509,7 +539,7 @@ void Boss_ShotCharge::Enter()
 }
 void Boss_ShotCharge::Execute(const float& elapsedTime)
 {
-    AnimtionEventControl("CHARGETIME", "Boss_R_neil2_end", "charge", EnableGPUParticle);
+    AnimtionEventControl("CHARGETIME", "Boss_R_neil2_end", "charge", EnableGPUParticle | EnableCPUParticle);
 
     time += elapsedTime;
     if (time > 3.0f)
@@ -530,6 +560,7 @@ void Boss_ShotCharge::Exit()
 {
     const auto& charge = GameObjectManager::Instance().Find("charge");
     charge->GetComponent<GPUParticle>()->SetLoop(false);
+    charge->GetComponent<CPUParticle>()->SetActive(false);
 }
 #pragma endregion
 
@@ -541,7 +572,8 @@ void Boss_Shot::Enter()
 
 void Boss_Shot::Execute(const float& elapsedTime)
 {
-    AnimtionEventControl("BEEM", "Boss_R_hand", "charge", EnableSpawn);
+    AnimtionEventControl("BEEM", "Boss_R_hand", "charge", EnableSpawn | EnableCPUParticle);
+    AnimtionEventControl("SMOKETIME", "Boss_R_hand", "charge", EnableCPUParticle);
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
@@ -590,6 +622,8 @@ void Boss_JumpAttackEnd::Enter()
 }
 void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
 {
+    AnimtionEventControl("GSMOKE", "Boss_R_neil2_end", "groundsmoke", EnableCPUParticle);
+
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {

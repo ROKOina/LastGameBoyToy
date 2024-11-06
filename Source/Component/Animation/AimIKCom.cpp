@@ -82,7 +82,7 @@ void AimIKCom::AimIK()
         //内積を算出
         auto& player = GameObjectManager::Instance().Find("player");
         dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&enemyfront)), DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&player->transform_->GetWorldPosition()), DirectX::XMLoadFloat3(&GetGameObject()->transform_->GetWorldPosition())))));
-        playerpos = { player->transform_->GetWorldPosition().x,player->transform_->GetWorldPosition().y - 2.5f,player->transform_->GetWorldPosition().z };
+        playerpos = { player->transform_->GetWorldPosition().x,player->transform_->GetWorldPosition().y,player->transform_->GetWorldPosition().z };
 
         //逆行列を生成
         DirectX::XMFLOAT3 inversepos;
@@ -96,7 +96,7 @@ void AimIKCom::AimIK()
         //行列ー＞クォータニオンに変換
         if (dot >= 0.0f)
         {
-            DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&neckpos), DirectX::XMQuaternionRotationMatrix(DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixLookAtLH({ 0,0,0 }, DirectX::XMLoadFloat3(&inversepos), DirectX::XMVector3Normalize({ 0,1,1 })))), 0.1f);
+            DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&neckpos), DirectX::XMQuaternionRotationMatrix(DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixLookAtLH({ 0,0,0 }, DirectX::XMLoadFloat3(&inversepos), DirectX::XMVector3Normalize({ 0,1,0 })))), 0.1f);
             DirectX::XMStoreFloat4(&neckpos, R);
         }
 

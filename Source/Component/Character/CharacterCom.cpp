@@ -293,6 +293,9 @@ void CharacterCom::CameraControl()
             return;
         }
 
+        //設定画面を開く(P)
+        //if()
+
         //UI配置中はマウスを固定しない
         if (!cameraObj->GetComponent<CameraCom>()->GetIsUiCreate())
         {

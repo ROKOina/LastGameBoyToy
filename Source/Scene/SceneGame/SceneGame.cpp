@@ -54,6 +54,7 @@
 #include "Component/Collsion/FrustumCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
+#include "Setting/Setting.h"
 #include <Component\UI\UiFlag.h>
 
 SceneGame::~SceneGame()
@@ -155,7 +156,7 @@ void SceneGame::Initialize()
             attackUltEff->SetName("attackUltEFF");
             attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 5000);
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr , 500);
         }
     }
 
@@ -187,7 +188,7 @@ void SceneGame::Initialize()
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
         boss->AddComponent<BossCom>();
-        boss->AddComponent<AimIKCom>(nullptr, "Boss_head");
+        boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<CharaStatusCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
@@ -256,7 +257,17 @@ void SceneGame::Initialize()
             chargeobject->SetName("charge");
             std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
             gpuparticle->SetStop(true);
-            chargeobject->AddComponent<SpawnCom>(nullptr);
+            chargeobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/beem.spawn");
+            std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 1000);
+            shotsmoke->SetActive(false);
+        }
+
+        //地面を叩き付ける攻撃
+        {
+            std::shared_ptr<GameObject> groundobject = boss->AddChildObject();
+            groundobject->SetName("groundsmoke");
+            std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
+            smoke->SetActive(false);
         }
     }
 
@@ -264,6 +275,11 @@ void SceneGame::Initialize()
 
     //UIゲームオブジェクト生成
     CreateUiObject();
+
+    //設定画面UIオブジェクト生成
+    ss = std::make_shared<SettingScreen>();
+    ss->CreateSettingUiObject();
+
 
 #pragma endregion
 
@@ -335,6 +351,10 @@ void SceneGame::Update(float elapsedTime)
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
+    //設定画面更新
+    ss->SettingScreenUpdate(elapsedTime);
+    ss->SetViewSetting(true);
 }
 
 // 描画処理
@@ -368,6 +388,8 @@ void SceneGame::Render(float elapsedTime)
     EventCameraManager::Instance().EventCameraImGui();
 
     ImGui::Begin("Effect");
+
+    ImGui::DragFloat("uvX", &ss->uvX,0.01f,0,1);
     EffectNew();
     ImGui::End();
 }

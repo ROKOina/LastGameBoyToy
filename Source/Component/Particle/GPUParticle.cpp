@@ -372,6 +372,7 @@ void GPUParticle::Render()
     dc->VSSetShader(NULL, NULL, 0);
     dc->PSSetShader(NULL, NULL, 0);
     dc->GSSetShader(NULL, NULL, 0);
+    dc->CSSetShader(NULL, NULL, 0);
 }
 
 //imgui

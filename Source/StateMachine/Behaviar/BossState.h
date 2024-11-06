@@ -26,11 +26,11 @@ public:
 
     Boss_BaseState(BossCom* owner);
 
-    //乱数の行動制御
-    void RandamBehavior();
+    //乱数の近接攻撃制御
+    void RandamMeleeAttack();
 
-    //乱数計算
-    int ComputeRandom();
+    //乱数の遠距離攻撃制御
+    void RandamLongRangeAttack();
 
     //アニメーションイベント制御
     void AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventflags);

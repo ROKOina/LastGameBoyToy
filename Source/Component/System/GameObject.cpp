@@ -87,22 +87,30 @@ void GameObject::OnGUI()
     ImGui::DragFloat("objSpeed", &objSpeed_, 0.01f);
 
     // コンポーネント
+    int componentIndex = 0;
     for (std::shared_ptr<Component>& component : components_)
     {
         ImGui::Spacing();
         ImGui::Separator();
 
+        // 各コンポーネントに固有の識別子を追加
+        std::string componentLabel = std::string(component->GetName()) + "##" + std::to_string(componentIndex);
         ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-        if (ImGui::TreeNodeEx(component->GetName(), nodeFlags))
+
+        if (ImGui::TreeNodeEx(componentLabel.c_str(), nodeFlags))
         {
             bool enabled = component->GetEnabled();
-            if (ImGui::Checkbox(" ", &enabled))
+            std::string checkboxLabel = "##Enabled" + std::to_string(componentIndex);
+            if (ImGui::Checkbox(checkboxLabel.c_str(), &enabled))
             {
                 component->SetEnabled(enabled);
             }
+
             component->OnGUI();
             ImGui::TreePop();
         }
+
+        componentIndex++;
     }
 }
 
@@ -175,6 +183,20 @@ void GameObjectManager::AllRemove()
         Remove(startObj);
 }
 
+//親が有効か確認
+bool IsParentEnable(const std::weak_ptr<GameObject> obj)
+{
+    auto& parent = obj.lock()->GetParent();
+
+    if (!parent)return true;    //親がいない場合
+    if (!parent->GetEnabled())
+    {
+        return false; //親が向こうの時
+    }
+
+    return IsParentEnable(parent);  //再帰する
+}
+
 // 更新
 void GameObjectManager::Update(float elapsedTime)
 {
@@ -189,7 +211,8 @@ void GameObjectManager::Update(float elapsedTime)
     //更新
     for (std::shared_ptr<GameObject>& obj : updateGameObject_)
     {
-        obj->Update(elapsedTime);
+        if (IsParentEnable(obj))
+            obj->Update(elapsedTime);
     }
 
     //削除
@@ -1015,7 +1038,8 @@ void GameObjectManager::SpriteRender(const DirectX::XMFLOAT4X4& view, const Dire
         if (!sp.lock()->GetGameObject()->GetEnabled())continue;
         if (!sp.lock()->GetEnabled())continue;
 
-        sp.lock()->Render(view, projection);
+        if (IsParentEnable(sp.lock()->GetGameObject()))
+            sp.lock()->Render(view, projection);
     }
 }
 
