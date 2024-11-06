@@ -91,7 +91,7 @@ void SceneGame::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        obj->transform_->SetScale({ 0.01f, 0.01f, 0.08f });
+        obj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         //r->LoadModel("Data/canyon/stage.mdl");
         r->LoadModel("Data/MatuokaStage/StageJson/StageJson.mdl");
@@ -110,8 +110,8 @@ void SceneGame::Initialize()
     std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
     {
         roboobj->SetName("robo");
-        roboobj->transform_->SetWorldPosition({ 0, 0, 0 });
-        roboobj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
+        roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
+        roboobj->transform_->SetScale({ 0.01f, 0.01f, 0.01f });
         std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
         r->LoadModel("Data/OneCoin/robot.mdl");
         std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
@@ -124,7 +124,8 @@ void SceneGame::Initialize()
 
         roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
         RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false,NodeCollsionCom::CollsionType::SPHER).get();
-        rigid->GenerateCollider(NodeCollsionCom::CollsionType::SPHER);
+        rigid->SetNormalizeScale(50000);
+        rigid->GenerateCollider(NodeCollsionCom::CollsionType::SPHER, roboobj->transform_->GetScale());
     }
 
     //ÉvÉåÉCÉÑÅ[

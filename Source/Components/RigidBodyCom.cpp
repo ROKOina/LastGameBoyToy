@@ -24,10 +24,9 @@ void RigidBodyCom::Update(float elapsedTime)
 {
     if (!isStatic)
     {
-        //transform‚ð•¨—‚ÌŒ‹‰Ê‚Éã‘‚«
-        physx::PxTransform transform = rigidActor->getGlobalPose();
-        GetGameObject()->transform_->SetWorldPosition({ transform.p.x,transform.p.y,transform.p.z });
-        GetGameObject()->transform_->SetRotation({ transform.q.x,transform.q.y,transform.q.z,transform.q.w });
+        PxVec3 pos = rigidActor->getGlobalPose().p;
+
+        GetGameObject()->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
     }
 }
 
@@ -48,9 +47,9 @@ void RigidBodyCom::OnGUI()
     }
 }
 
-void RigidBodyCom::GenerateCollider(NodeCollsionCom::CollsionType type)
+void RigidBodyCom::GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale)
 {
-    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, type, GetGameObject());
+    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, type, GetGameObject(),scale);
 }
 
 void RigidBodyCom::GenerateCollider(ModelResource* rc)

@@ -1,5 +1,6 @@
 #include "Physxlib.h"
 #include "Components\TransformCom.h"
+#include "Components\RigidBodyCom.h"
 #include "./Graphics/Model/ResourceManager.h"
 #include <list>
 
@@ -51,6 +52,17 @@ void PhysXLib::Initialize()
         );
     // 形状のローカル座標を設定
     box_shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
+
+    //動かない(静的)剛体を作成
+    PxTransform& pos = rigid_static->getGlobalPose();
+    pos.p.x = 5.0f;
+    pos.p.y = 1.0f;
+    pos.p.z = 0.0f;
+    rigid_static->setGlobalPose(pos);
+
+    //当たり判定とモデルのスケールを合わせる
+    physx::PxMeshScale scale(PxVec3(50,50,50));
+
     // 形状を紐づけ
     rigid_static->attachShape(*box_shape);
     // 剛体を空間に追加
@@ -298,8 +310,8 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
 
     //当たり判定とモデルのスケールを合わせる
     DirectX::XMFLOAT3 sV = obj->transform_->GetScale();
-    float modelDefaultScale = 100.0f;//モデルエディターの１をこのプロジェクトサイズにする値
-    physx::PxMeshScale scale(PxVec3(sV.x * 100.0f, sV.y * 100.0f, sV.z * 100.0f));
+    float modelDefaultScale = 1;//モデルエディターの１をこのプロジェクトサイズにする値
+    physx::PxMeshScale scale(PxVec3(sV.x * 1.0f, sV.y * 1.0f, sV.z * 1.0f));
 
 
     //メッシュを当たり判定にセット
@@ -315,7 +327,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
     return nullptr;
 }
 
-physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, GameObj obj)
+physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, GameObj obj, DirectX::XMFLOAT3 scale)
 {
     physx::PxRigidActor* rigidObj = nullptr;
     physx::PxTransform transform(physx::PxIdentity);
@@ -341,7 +353,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     case NodeCollsionCom::CollsionType::BOX:
         shape = gPhysics->createShape(
             // Boxの大きさ
-            physx::PxBoxGeometry(1.f, 1.f, 1.f),
+            physx::PxBoxGeometry(scale.x,scale.y,scale.z),
             // 摩擦係数と反発係数の設定
             *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
         );
@@ -349,8 +361,8 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
 
     case NodeCollsionCom::CollsionType::SPHER:
         shape = gPhysics->createShape(
-            // Boxの大きさ
-            physx::PxSphereGeometry(0.01f),
+            // SPHERの大きさ
+            physx::PxSphereGeometry((scale.x * obj->GetComponent<RigidBodyCom>()->GetNormalizeScale())),
             // 摩擦係数と反発係数の設定
             *gPhysics->createMaterial(0.5f, 0.5f, 0.f)
         );

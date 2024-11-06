@@ -23,8 +23,11 @@ public:
     // GUI•`‰æ
     void OnGUI() override;
 
-    void GenerateCollider(NodeCollsionCom::CollsionType type);
+    void GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale);
     void GenerateCollider(ModelResource* rc);
+
+    float GetNormalizeScale() { return normalizeScale; }
+    void SetNormalizeScale(float scale) { normalizeScale = scale; }
 
 private:
     bool isStatic = false;
@@ -32,5 +35,6 @@ private:
 
     physx::PxRigidActor* rigidActor = nullptr;
     physx::PxTransform rigidTransform = {};
+    float normalizeScale = 1.0f;
 };
 

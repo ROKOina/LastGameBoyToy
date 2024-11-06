@@ -46,7 +46,7 @@ public:
     //Modelの形の当たり判定作成
     physx::PxRigidActor* GenerateCollider(bool isStatic,ModelResource* model, GameObj obj);
     //矩形、球、カプセルの当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj);
+    physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj, DirectX::XMFLOAT3 scale);
 
     //MeshDescを保存しているmap取得
     std::map<std::string, physx::PxTriangleMeshDesc>& GetMeshStlege() { return meshStlege; }
