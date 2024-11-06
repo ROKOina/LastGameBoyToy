@@ -463,19 +463,29 @@ void Sprite::DrawCollsionBox()
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
 
-    // スプライトの位置とスケールにオフセット値を加算
-      //左上
-    float x0 = spc.position.x;
-    float y0 = spc.position.y;
-    //
-    float x1 = spc.position.x + spc.texSize.x * (spc.scale.x + spc.collsionscaleoffset.x) + spc.collsionpositionoffset.x;
-    float y1 = spc.position.y;
-    //左下
-    float x2 = spc.position.x;
-    float y2 = spc.position.y + (spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) + spc.collsionpositionoffset.y;
-    //右下
-    float x3 = spc.position.x + (spc.texSize.x * spc.scale.x + spc.collsionscaleoffset.x) + spc.collsionpositionoffset.x;
-    float y3 = spc.position.y + (spc.texSize.y * spc.scale.y + spc.collsionscaleoffset.y) + spc.collsionpositionoffset.y;
+
+    // 座標とピボットの処理
+    float pivotX = (spc.pivot.x / spc.texSize.x);
+    float pivotY = (spc.pivot.y / spc.texSize.y);
+
+
+    // スケール倍したテクスチャサイズ
+    float texSizeX = spc.texSize.x * spc.scale.x;
+    float texSizeY = spc.texSize.y * spc.scale.y;
+
+    // スプライトの頂点座標の計算
+    //左上
+    float x0 = spc.position.x - pivotX * texSizeX;
+    float y0 = spc.position.y - pivotY * texSizeY;
+    //右上                   
+    float x1 = spc.position.x + (1 - pivotX) * texSizeX;
+    float y1 = spc.position.y - pivotY * texSizeY;
+    //左下                   
+    float x2 = spc.position.x - pivotX * texSizeX;
+    float y2 = spc.position.y + (1 - pivotY) * texSizeY;
+    //右下                   
+    float x3 = spc.position.x + (1 - pivotX) * texSizeX;
+    float y3 = spc.position.y + (1 - pivotY) * texSizeY;
 
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)
         {
@@ -910,9 +920,18 @@ bool Sprite::cursorVsCollsionBox()
     DirectX::XMFLOAT3 normalCross = Mathf::Cross({ normalUp.x,normalUp.y,0 }, { 0,0,1 });
     DirectX::XMFLOAT2 normalRight = Mathf::Normalize({ normalCross.x,normalCross.y });
 
+    // 座標とピボットの処理
+    float pivotX = (spc.pivot.x / spc.texSize.x);
+    float pivotY = (spc.pivot.y / spc.texSize.y);
+
+
+    // スケール倍したテクスチャサイズ
+    float texSizeX = spc.texSize.x * spc.scale.x;
+    float texSizeY = spc.texSize.y * spc.scale.y;
+
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = { spc.position.x + (spc.texSize.x / 2) + spc.collsionpositionoffset.x,spc.position.y + (spc.texSize.y / 2) + spc.collsionpositionoffset.y };
+    DirectX::XMFLOAT2 pos = { spc.position.x  - spc.pivot.x + (texSizeX / 2) + spc.collsionpositionoffset.x,spc.position.y - spc.pivot.y + (texSizeY / 2) + spc.collsionpositionoffset.y };
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 
@@ -921,7 +940,7 @@ bool Sprite::cursorVsCollsionBox()
     float rightLen = Mathf::Dot(normalRight, curVecPos);
 
     //判定
-    DirectX::XMFLOAT2 scale = { (spc.texSize.x / 2 + spc.collsionscaleoffset.x),(spc.texSize.y / 2 + spc.collsionscaleoffset.y) };
+    DirectX::XMFLOAT2 scale = { (texSizeX / 2 + spc.collsionscaleoffset.x),(texSizeY / 2 + spc.collsionscaleoffset.y) };
     if (upLen * upLen > scale.y * scale.y)return false;
     if (rightLen * rightLen > scale.x * scale.x)return false;
 

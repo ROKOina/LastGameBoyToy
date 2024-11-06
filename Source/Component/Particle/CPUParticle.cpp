@@ -178,6 +178,7 @@ CPUParticle::CPUParticle(const char* filename, int num)
     if (filename)
     {
         Desirialize(filename);
+        filepath = filename;
         D3D11_TEXTURE2D_DESC texture2d_desc{};
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_scp.m_filename.c_str(), m_shaderresourceview.GetAddressOf(), &texture2d_desc);
     }
@@ -460,6 +461,15 @@ void CPUParticle::OnGUI()
     {
         Reset();
     }
+
+    // ファイルパスを表示
+    char filename[256];
+    ::strncpy_s(filename, sizeof(filename), filepath.c_str(), sizeof(filename));
+    if (ImGui::InputText((char*)u8"ファイルパス", filename, sizeof(filename), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        filepath = filename;
+    }
+
     //テクスチャロード
     char textureFile[256];
     ZeroMemory(textureFile, sizeof(textureFile));
@@ -649,6 +659,7 @@ void CPUParticle::LoadDesirialize()
     if (result == DialogResult::OK)
     {
         Desirialize(filename);
+        filepath = filename;
     }
 }
 

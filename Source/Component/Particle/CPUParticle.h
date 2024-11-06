@@ -141,6 +141,7 @@ private:
     float deletetimer = 0.0f;
     bool m_active = true;
     bool m_pause = true;
+    std::string filepath = {};
 
 private:
 

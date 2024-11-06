@@ -87,22 +87,30 @@ void GameObject::OnGUI()
     ImGui::DragFloat("objSpeed", &objSpeed_, 0.01f);
 
     // コンポーネント
+    int componentIndex = 0;
     for (std::shared_ptr<Component>& component : components_)
     {
         ImGui::Spacing();
         ImGui::Separator();
 
+        // 各コンポーネントに固有の識別子を追加
+        std::string componentLabel = std::string(component->GetName()) + "##" + std::to_string(componentIndex);
         ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-        if (ImGui::TreeNodeEx(component->GetName(), nodeFlags))
+
+        if (ImGui::TreeNodeEx(componentLabel.c_str(), nodeFlags))
         {
             bool enabled = component->GetEnabled();
-            if (ImGui::Checkbox(" ", &enabled))
+            std::string checkboxLabel = "##Enabled" + std::to_string(componentIndex);
+            if (ImGui::Checkbox(checkboxLabel.c_str(), &enabled))
             {
                 component->SetEnabled(enabled);
             }
+
             component->OnGUI();
             ImGui::TreePop();
         }
+
+        componentIndex++;
     }
 }
 

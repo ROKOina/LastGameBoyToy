@@ -179,4 +179,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_colormap;
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_constantbuffer;
     const size_t m_maxparticle = 0;
+    std::string filepath = {};
 };

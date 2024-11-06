@@ -188,7 +188,7 @@ void SceneGame::Initialize()
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
         boss->AddComponent<BossCom>();
-        boss->AddComponent<AimIKCom>(nullptr, "Boss_head");
+        boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<CharaStatusCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
@@ -255,9 +255,19 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject> chargeobject = boss->AddChildObject();
             chargeobject->SetName("charge");
-            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beemgathermiddle.gpuparticle", 6000);
+            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
             gpuparticle->SetStop(true);
-            chargeobject->AddComponent<SpawnCom>(nullptr);
+            chargeobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/beem.spawn");
+            std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 1000);
+            shotsmoke->SetActive(false);
+        }
+
+        //’n–Ê‚ğ’@‚«•t‚¯‚éUŒ‚
+        {
+            std::shared_ptr<GameObject> groundobject = boss->AddChildObject();
+            groundobject->SetName("groundsmoke");
+            std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
+            smoke->SetActive(false);
         }
     }
 

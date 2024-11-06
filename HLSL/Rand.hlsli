@@ -9,34 +9,21 @@ uint XOrShift32(uint value)
     return value;
 }
 
-/*
- * 整数の値を1未満の小数にマッピングする
- */
-float MapToFloat(uint value)
+//ランダム関数
+float rand(float2 co) //引数はシード値と呼ばれる　同じ値を渡せば同じものを返す
 {
-    const float precion = 100000000.0;
-    return (value % precion) * rcp(precion);
+    return frac(sin(dot(co.xy, float2(12.9898, 78.233))) * 43758.5453);
 }
 
-/*
- * 3次元のランダムな値を算出する
- */
-float3 Random3(uint3 src, int seed)
+// 1次元のランダムな値を算出する
+float random(float n)
 {
-    uint3 random;
-    random.x = XOrShift32(mad(src.x, src.y, src.z));
-    random.y = XOrShift32(mad(random.x, src.z, src.x) + seed);
-    random.z = XOrShift32(mad(random.y, src.x, src.y) + seed);
-    random.x = XOrShift32(mad(random.z, src.y, src.z) + seed);
-
-    return float3(MapToFloat(random.x), MapToFloat(random.y), MapToFloat(random.z));
+    return frac(sin(n) * 43758.5453123);
 }
 
-float2 Random2(uint2 src, int seed)
+float random(float2 seed)
 {
-    uint2 random;
-    random.x = XOrShift32(mad(src.x, src.y,1));
-    random.y = XOrShift32(mad(random.x, 1, src.x) + seed);
-
-    return float2(MapToFloat(random.x), MapToFloat(random.y));
+    uint h = XOrShift32(asuint(seed.x));
+    h = XOrShift32(h ^ asuint(seed.y));
+    return asfloat((h & 0x007FFFFF) | 0x40000000) - 3.0;
 }
