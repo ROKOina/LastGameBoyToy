@@ -10,8 +10,6 @@
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 
-class SettingScreen;
-
 // ƒQ[ƒ€ƒV[ƒ“
 class SceneGame :public Scene
 {
@@ -52,7 +50,4 @@ private:
 private:
 
     std::shared_ptr<TransformCom>t;
-
-    //İ’è‰æ–Ê
-    std::shared_ptr<SettingScreen> ss;
 };

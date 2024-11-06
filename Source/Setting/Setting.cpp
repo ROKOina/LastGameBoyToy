@@ -7,6 +7,8 @@
 
 void SettingScreen::CreateSettingUiObject()
 {
+    ResetObj();
+
     //settingCanvas
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("settingCanvas");
@@ -122,7 +124,7 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
         //バーが操作されていないならcontinue
 
         //数値を変える
-        int value = Mathf::Lerp(bar.min, bar.max, uvX);
+        int value = Mathf::Lerp(bar.minValue, bar.maxValue, uvX);
         std::string names[3] = { "num1","num10","num100" };
 
         for (int i = 0; i < 3; ++i)
@@ -164,6 +166,7 @@ void SettingScreen::SetViewSetting(bool flg)
 {
     viewSetting = flg;
     auto& canvas = GameObjectManager::Instance().Find("settingCanvas");
+    if (!canvas)return;
 
     //表示設定をする
     if (flg)
@@ -176,4 +179,10 @@ void SettingScreen::SetViewSetting(bool flg)
         if (canvas)
             canvas->SetEnabled(false);
     }
+}
+
+void SettingScreen::ResetObj()
+{
+    barObj.clear();
+    SetViewSetting(false);
 }

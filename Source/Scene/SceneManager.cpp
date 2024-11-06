@@ -13,8 +13,12 @@
 #include "SceneResult/SceneResult.h"
 #include "SceneTraining/SceneTraining.h"
 
+#include "Setting/Setting.h"
+
 SceneManager::SceneManager()
 {
+    //設定画面UIオブジェクト生成
+    ss = std::make_shared<SettingScreen>();
 }
 
 SceneManager::~SceneManager()
@@ -40,13 +44,21 @@ void SceneManager::Update(float elapsedTime)
         currentScene_ = nextScene_;
 
         //シーン初期化処理
-        if (!currentScene_->IsReady())currentScene_->Initialize();
+        if (!currentScene_->IsReady())
+        {
+            currentScene_->Initialize();
+            ss->CreateSettingUiObject();
+            ss->SetViewSetting(false);
+        }
         nextScene_ = nullptr;
     }
 
     if (currentScene_ != nullptr)
     {
         currentScene_->Update(elapsedTime);
+
+        //設定画面更新
+        ss->SettingScreenUpdate(elapsedTime);
     }
 
     //遅延遷移

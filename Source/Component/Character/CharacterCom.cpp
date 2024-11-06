@@ -4,6 +4,8 @@
 #include "Input\Input.h"
 #include "Math/Mathf.h"
 
+#include "Setting/Setting.h"
+
 void CharacterCom::Update(float elapsedTime)
 {
     StanUpdate(elapsedTime);
@@ -294,7 +296,20 @@ void CharacterCom::CameraControl()
         }
 
         //設定画面を開く(P)
-        //if()
+        auto& ss = SceneManager::Instance().GetSettingScreen();
+        bool isViewSetting = ss->IsViewSetting();
+        if (GamePad::BTN_P & gamePad.GetButtonDown())
+        {
+            if (isViewSetting)
+            {
+                ss->SetViewSetting(false);
+            }
+            else
+            {
+                ss->SetViewSetting(true);
+            }
+        }
+        if (isViewSetting)return;
 
         //UI配置中はマウスを固定しない
         if (!cameraObj->GetComponent<CameraCom>()->GetIsUiCreate())
