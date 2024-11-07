@@ -88,7 +88,7 @@ void Boss_BaseState::RandamLongRangeAttack()
 }
 
 //アニメーションイベント制御
-void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventFlags)
+void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventFlags, DirectX::XMFLOAT3 offsetpos)
 {
     // アニメーションコンポーネントのロックを一度だけ行う
     const auto& animationComPtr = animationCom.lock();
@@ -108,7 +108,7 @@ void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const st
     DirectX::XMFLOAT3 pos = {};
     if (animationComPtr->IsEventCallingNodePos(eventname, nodename, pos))
     {
-        object->transform_->SetWorldPosition(pos);
+        object->transform_->SetWorldPosition(pos + offsetpos);
 
         // eventFlags に基づいてコンポーネントを有効化(GPU)
         if (eventFlags & EnableGPUParticle && gpuparticle)
@@ -199,7 +199,7 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     idletime += elapsedTime;
 
     //待機時間
-    if (idletime >= 2.0f)
+    if (idletime >= 1.5f)
     {
         //ここ全体的に修正が必用
         if (owner->Search(owner->meleerange))
@@ -470,6 +470,7 @@ void Boss_UpShotLoop::Enter()
 void Boss_UpShotLoop::Execute(const float& elapsedTime)
 {
     AnimtionEventControl("SPAWN", "Boss_L_neil2_end", "spawn", EnableSpawn | EnableCPUParticle);
+    AnimtionEventControl("SPAWN", "Boss_L_hand", "muzzleflashleft", EnableCPUParticle, { 0.0f,0.5f,0.0f });
 
     time += elapsedTime;
     if (time > 3.0f)
@@ -489,8 +490,10 @@ void Boss_UpShotLoop::Execute(const float& elapsedTime)
 void Boss_UpShotLoop::Exit()
 {
     const auto& spawn = GameObjectManager::Instance().Find("spawn");
+    const auto& muzzleflash = GameObjectManager::Instance().Find("muzzleflashleft");
     spawn->GetComponent<SpawnCom>()->SetOnTrigger(false);
     spawn->GetComponent<CPUParticle>()->SetActive(false);
+    muzzleflash->GetComponent<CPUParticle>()->SetActive(false);
 }
 #pragma endregion
 
@@ -504,7 +507,6 @@ void Boss_UpShotEnd::Execute(const float& elapsedTime)
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {
-        //TODOそもそもここランダムでもいいかも
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
@@ -582,6 +584,7 @@ void Boss_Shot::Enter()
 void Boss_Shot::Execute(const float& elapsedTime)
 {
     AnimtionEventControl("BEEM", "Boss_R_hand", "charge", EnableSpawn | EnableCPUParticle);
+    AnimtionEventControl("BEEM", "Boss_R_hand", "muzzleflash", EnableCPUParticle);
     AnimtionEventControl("SMOKETIME", "Boss_R_hand", "charge", EnableCPUParticle);
 
     //アニメーションが終われば
@@ -608,6 +611,10 @@ void Boss_JumpAttackStart::Enter()
 }
 void Boss_JumpAttackStart::Execute(const float& elapsedTime)
 {
+    //炎を付ける
+    AnimtionEventControl("EFFECTTIME", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+    AnimtionEventControl("EFFECTTIME", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+
     //空中だったら移動
     if (!moveCom.lock()->OnGround())
     {
@@ -627,7 +634,7 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     }
 
     //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
+    if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->GetVelocity().y < -41.0f)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMPATTACKEND);
         return;
@@ -654,10 +661,19 @@ void Boss_JumpAttackEnd::Enter()
 }
 void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
 {
-    AnimtionEventControl("GSMOKE", "Boss_R_neil2_end", "groundsmoke", EnableCPUParticle);
+    //炎を付ける
+    AnimtionEventControl("EFFECTTIME", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+    AnimtionEventControl("EFFECTTIME", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+
+    //エフェクト再生
+    if (animationCom.lock()->IsEventCalling("GSMOKE"))
+    {
+        const auto& smoke = GameObjectManager::Instance().Find("groundsmoke");
+        smoke->GetComponent<CPUParticle>()->SetActive(true);
+    }
 
     //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation())
+    if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
     {
         //TODOそもそもここランダムでもいいかも
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);

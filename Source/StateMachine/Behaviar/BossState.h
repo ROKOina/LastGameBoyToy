@@ -33,7 +33,7 @@ public:
     void RandamLongRangeAttack();
 
     //アニメーションイベント制御
-    void AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventflags);
+    void AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventflags, DirectX::XMFLOAT3 offsetpos = { 0.0f,0.0f,0.0f });
 
 protected:
     std::weak_ptr<BossCom> bossCom;
@@ -283,30 +283,6 @@ public:
     void ImGui() override {};
     virtual const char* GetName() const override { return "JumpAttackEnd"; }
 };
-
-////ボンプ攻撃
-//class Boss_BompAttackState : public Boss_BaseState
-//{
-//public:
-//    Boss_BompAttackState(BossCom* owner) :Boss_BaseState(owner) {}
-//
-//    void Enter() override;
-//    void Execute(const float& elapsedTime) override;
-//    void ImGui() override {};
-//    virtual const char* GetName() const override { return "BompAttack"; }
-//};
-//
-////ファイヤーボール
-//class Boss_FireBallState : public Boss_BaseState
-//{
-//public:
-//    Boss_FireBallState(BossCom* owner) :Boss_BaseState(owner) {}
-//
-//    void Enter() override;
-//    void Execute(const float& elapsedTime) override;
-//    void ImGui() override {};
-//    virtual const char* GetName() const override { return "FireBall"; }
-//};
 
 //死亡
 class Boss_DeathState : public Boss_BaseState

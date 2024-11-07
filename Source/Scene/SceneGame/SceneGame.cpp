@@ -157,7 +157,7 @@ void SceneGame::Initialize()
             attackUltEff->SetName("attackUltEFF");
             attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr , 500);
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 500);
         }
     }
 
@@ -171,6 +171,13 @@ void SceneGame::Initialize()
         //pico位置
         cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    }
+
+    //snowparticle
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("snowparticle");
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
     //BOSS
@@ -250,6 +257,11 @@ void SceneGame::Initialize()
             gpuparticle->SetStop(true);
             std::shared_ptr<CPUParticle>shotsmoke = spawnobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/upshotsmoke.cpuparticle", 1000);
             shotsmoke->SetActive(false);
+
+            std::shared_ptr<GameObject> muzzleflashobject = spawnobject->AddChildObject();
+            muzzleflashobject->SetName("muzzleflashleft");
+            std::shared_ptr<CPUParticle>muzzleflash = muzzleflashobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/muzzleflash.cpuparticle", 500);
+            muzzleflash->SetActive(false);
         }
 
         //チャージ攻撃
@@ -261,6 +273,11 @@ void SceneGame::Initialize()
             chargeobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/beem.spawn");
             std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 1000);
             shotsmoke->SetActive(false);
+
+            std::shared_ptr<GameObject> muzzleflashobject = chargeobject->AddChildObject();
+            muzzleflashobject->SetName("muzzleflash");
+            std::shared_ptr<CPUParticle>muzzleflash = muzzleflashobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/muzzleflash.cpuparticle", 500);
+            muzzleflash->SetActive(false);
         }
 
         //地面を叩き付ける攻撃
@@ -276,7 +293,6 @@ void SceneGame::Initialize()
 
     //UIゲームオブジェクト生成
     CreateUiObject();
-
 
 #pragma endregion
 
@@ -383,7 +399,7 @@ void SceneGame::Render(float elapsedTime)
     ImGui::Begin("Effect");
 
     auto& ss = SceneManager::Instance().GetSettingScreen();
-    ImGui::DragFloat("uvX", &ss->uvX,0.01f,0,1);
+    ImGui::DragFloat("uvX", &ss->uvX, 0.01f, 0, 1);
 
     EffectNew();
     ImGui::End();
@@ -510,7 +526,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hideUlt = canvas->AddChildObject();
             hideUlt->SetName("HideUltGauge");
             std::shared_ptr<UiGauge>gauge = hideUlt->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::Y_ONLY_SUB);
-            std::shared_ptr<GameObject>player  = GameObjectManager::Instance().Find("player");
+            std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
             gauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
             float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
             gauge->SetVariableValue(i);
