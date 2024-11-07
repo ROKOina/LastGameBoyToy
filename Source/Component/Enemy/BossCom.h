@@ -36,6 +36,11 @@ public:
 
 private:
 
+    //後ろにいる場合旋回する
+    void BackTurn();
+
+private:
+
     // ターゲット方向への進行ベクトルを算出
     DirectX::XMFLOAT2 TargetVec();
 
@@ -68,6 +73,10 @@ public:
 public:
 
     StateMachine<BossCom, BossState>& GetStateMachine() { return state; }
+
+    float meleerange = 7.0f;
+    float longrange = 37.0f;
+    float walkrange = 37.0f;
 
 private:
     StateMachine<BossCom, BossState> state;

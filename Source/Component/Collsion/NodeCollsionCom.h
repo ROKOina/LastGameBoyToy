@@ -23,6 +23,17 @@ public:
     // GUI描画
     void OnGUI() override;
 
+private:
+
+    //シリアライズ
+    void Serialize();
+
+    // デシリアライズ
+    void Deserialize(const char* filename);
+
+    // デシリアライズの読み込み
+    void LoadDeserialize();
+
 public:
 
     //デバッグプリミティブの形状
@@ -49,13 +60,25 @@ public:
 
     CollsionType GetColiisionType() { return m_collsiontype; }
 
-private:
+public:
 
-    CollsionType m_collsiontype = CollsionType::SPHER;
+    //staticコリジョンのパラメータ
+    struct StaticCollsionParameter
+    {
+        int collsiontype = {};
+        float radius = 0.0f;
+        DirectX::XMFLOAT3 scale = { 0,0,0 };
+        DirectX::XMFLOAT3 offsetpos = { 0,0,0 };
+
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
+    std::unordered_map<int, std::vector<StaticCollsionParameter>>scp;
 
 private:
 
     const char* m_filename = {};
     Model* model = nullptr;
     bool debugrender = false;
+    CollsionType m_collsiontype = CollsionType::SPHER;
 };

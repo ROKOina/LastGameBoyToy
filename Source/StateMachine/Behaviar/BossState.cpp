@@ -27,7 +27,7 @@ void Boss_BaseState::RandamMeleeAttack()
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
     {
-        availableNumbers = { 1,2,3 };
+        availableNumbers = { 1,2 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成
@@ -46,10 +46,6 @@ void Boss_BaseState::RandamMeleeAttack()
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHORTATTACK1);
     }
-    else if (randomValue == 3)
-    {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATSTART);
-    }
 }
 
 //乱数の遠距離攻撃制御
@@ -58,7 +54,7 @@ void Boss_BaseState::RandamLongRangeAttack()
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
     {
-        availableNumbers = { 1,2,3,4 };
+        availableNumbers = { 1,2,3,4,5 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成
@@ -84,6 +80,10 @@ void Boss_BaseState::RandamLongRangeAttack()
     else if (randomValue == 4)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMPATTACKSTART);
+    }
+    else if (randomValue == 5)
+    {
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATSTART);
     }
 }
 
@@ -165,17 +165,17 @@ void Boss_IdleState::Enter()
 void Boss_IdleState::Execute(const float& elapsedTime)
 {
     //遠かったら近くにくる
-    if (!owner->Search(20.0f))
+    if (!owner->Search(owner->walkrange))
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::MOVE);
     }
 
     //ここ全体的に修正が必用
-    if (owner->Search(6.0f))
+    if (owner->Search(owner->meleerange))
     {
         RandamMeleeAttack();
     }
-    if (owner->Search(14.0f))
+    if (!owner->Search(owner->meleerange) && owner->Search(owner->longrange))
     {
         RandamLongRangeAttack();
     }
@@ -202,11 +202,11 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     if (idletime >= 2.0f)
     {
         //ここ全体的に修正が必用
-        if (owner->Search(6.0f))
+        if (owner->Search(owner->meleerange))
         {
             RandamMeleeAttack();
         }
-        if (owner->Search(14.0f))
+        if (!owner->Search(owner->meleerange) && owner->Search(owner->longrange))
         {
             RandamLongRangeAttack();
         }
@@ -238,7 +238,7 @@ void Boss_MoveState::Execute(const float& elapsedTime)
     AnimtionEventControl("FOOTSMOKE", "Boss_L_ancle", "leftfootsmokeeffect", EnableCPUParticle);
 
     //距離判定
-    if (owner->Search(7.0f))
+    if (owner->Search(owner->longrange))
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
     }
@@ -341,6 +341,13 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
 {
     time += elapsedTime;
 
+    //移動
+    owner->MoveToTarget(0.6f, 0.1f);
+
+    //左右の煙
+    AnimtionEventControl("COLLSION", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
+    AnimtionEventControl("COLLSION", "Boss_L_ancle", "leftfootsmokeeffect", EnableCPUParticle);
+
     //炎を付ける
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
@@ -371,6 +378,8 @@ void Boss_LARIATLOOP::Exit()
     lefthand->GetComponent<CPUParticle>()->SetActive(false);
     lefthand->GetComponent<SphereColliderCom>()->SetEnabled(false);
     lefthand->GetComponent<GPUParticle>()->SetLoop(false);
+    GameObjectManager::Instance().Find("rightfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
 }
 #pragma endregion
 
@@ -599,8 +608,26 @@ void Boss_JumpAttackStart::Enter()
 }
 void Boss_JumpAttackStart::Execute(const float& elapsedTime)
 {
-    //アニメーションが終われば
+    //空中だったら移動
+    if (!moveCom.lock()->OnGround())
+    {
+        owner->MoveToTarget(10.0f, 1.0f);
+    }
+
+    //飛ぶ
+    if (animationCom.lock()->IsEventCalling("JUMPTIME"))
+    {
+        moveCom.lock()->AddForce({ owner->GetGameObject()->transform_->GetWorldPosition().x, 2.5f, owner->GetGameObject()->transform_->GetWorldPosition().z });
+    }
+
+    //アニメーションが終われば重力を強くかける
     if (!animationCom.lock()->IsPlayAnimation())
+    {
+        moveCom.lock()->SetGravity(2.0f);
+    }
+
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::JUMPATTACKEND);
         return;
@@ -612,6 +639,11 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
         return;
     }
+}
+void Boss_JumpAttackStart::Exit()
+{
+    //重力を元に戻す
+    moveCom.lock()->SetGravity(GRAVITY_NORMAL);
 }
 #pragma endregion
 

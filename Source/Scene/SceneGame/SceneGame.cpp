@@ -406,6 +406,7 @@ void SceneGame::EffectNew()
         std::shared_ptr<CPUParticle>cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 1000);
         cpuparticle->SetActive(true);
         obj->AddComponent<EasingMoveCom>(nullptr);
+        obj->AddComponent<NodeCollsionCom>(nullptr);
     }
     ImGui::SameLine();
     if (ImGui::Button("UI"))
