@@ -106,8 +106,7 @@ void SceneGame::Initialize()
         obj->AddComponent<SphereColliderCom>()->SetMyTag(COLLIDER_TAG::Enemy);
         //obj->AddComponent<NodeCollsionCom>(nullptr);
         obj->AddComponent<StageEditorCom>();
-        //PhysXLib::Instance().GenerateManyCollider(r->GetModel()->GetResource());
-        //RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
+        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
         //rigid->GenerateCollider(r->GetModel()->GetResource());
     }
 

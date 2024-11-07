@@ -2,16 +2,16 @@
 #include "Phsix\Physxlib.h"
 #include "Component/System/TransformCom.h"
 
-RigidBodyCom::RigidBodyCom(bool isStatic, NodeCollsionCom::CollsionType type)
+RigidBodyCom::RigidBodyCom(bool isStatic, RigidType type)
 {
     this->isStatic = isStatic;
-    this->type = type;
+    this->rigidType = type;
 }
 
 RigidBodyCom::~RigidBodyCom()
 {
     PhysXLib& p = PhysXLib::Instance();// .GetScene()->removeActor(*rigidActor);
-    rigidActor->release();
+    if(rigidActor) rigidActor->release();
 }
 
 void RigidBodyCom::Start()
@@ -45,6 +45,27 @@ void RigidBodyCom::OnGUI()
     {
         PxRigidDynamic* dynamicActor = rigidActor->is<PxRigidDynamic>();
         dynamicActor->addForce(rigidTransform.p, physx::PxForceMode::eIMPULSE);
+    }
+}
+
+void RigidBodyCom::SetUp()
+{
+    ModelResource* resource = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource();
+
+    switch (rigidType)
+    {
+    case RigidBodyCom::RigidType::Primitive:
+        GenerateCollider(resource);
+        break;
+    case RigidBodyCom::RigidType::Mesh:
+        //NodeCollision‚ð“K‰ž‚³‚¹‚é•K—v‚ ‚è
+        GenerateCollider(NodeCollsionCom::CollsionType::SPHER, { 1.0f,1.0f,1.0f });
+        break;
+    case RigidBodyCom::RigidType::Complex:
+        PhysXLib::Instance().GenerateManyCollider(resource);
+        break;
+    default:
+        break;
     }
 }
 
