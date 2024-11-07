@@ -153,7 +153,9 @@ public:
     float GetRSkillCoolTime() { return Rcool.time; }
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
-
+    void SetUltGauge(float gauge) { ultGauge = gauge; }
+    float* GetUltGauge() { return  &ultGauge; }
+    float GetUltGaugeMax() { return ultGaugeMax; }
     void SetMoveFlag(bool flag) { useMoveFlag = flag; }
 
     bool* GetIsHitAttack() { return &isHitAttack; }

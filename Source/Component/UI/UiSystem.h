@@ -51,8 +51,11 @@ protected:
 public:
     //•ÏX‚·‚é’l‚ğŒˆ‚ß‚éenum
     enum ChangeValue {
-        X_ONLY,
-        Y_ONLY,
-        X_AND_Y
+        X_ONLY_ADD, //‘‚â‚·
+        X_ONLY_SUB, //Œ¸‚ç‚·
+        Y_ONLY_ADD, //‘‚â‚·
+        Y_ONLY_SUB, //Œ¸‚ç‚·
+        X_AND_Y_ADD,//‘‚â‚·
+        X_AND_Y_SUB,//Œ¸‚ç‚·
     };
 };
