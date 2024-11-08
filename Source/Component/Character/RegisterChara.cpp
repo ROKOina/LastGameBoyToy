@@ -44,12 +44,12 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/Model/pico/pico.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-    std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-    c->SetCharaID(int(CHARA_LIST::INAZAWA));
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     //HPの初期設定
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
+    std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
+    c->SetCharaID(int(CHARA_LIST::INAZAWA));
 
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
@@ -62,13 +62,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     auto& pushBack = obj->AddComponent<PushBackCom>();
     pushBack->SetRadius(0.5f);
     pushBack->SetWeight(1);
-
-    //生成コンポーネント君
-    {
-        std::shared_ptr<GameObject> spawnbomber = obj->AddChildObject();
-        spawnbomber->SetName("spawnbomber");
-        spawnbomber->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/explosion.spawn");
-    }
 
     //煙のエフェクト
     {

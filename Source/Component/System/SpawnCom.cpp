@@ -249,13 +249,15 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
     const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
     obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 6000);
+    //obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
+
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Enemy);
-    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetJudgeTag(COLLIDER_TAG::Player /*| COLLIDER_TAG::Bullet*/);
     collider->SetRadius(0.8f);
+
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 }
 
 //爆発生成関数
@@ -283,12 +285,12 @@ void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
     cpuparticle->SetActive(true);
     obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 6000);
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missilestreat.easingmove");
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
+    //obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Enemy);
-    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetJudgeTag(COLLIDER_TAG::Player /*| COLLIDER_TAG::Bullet*/);
     collider->SetRadius(0.8f);
 }
 void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, const char* easingMovePath)
@@ -298,54 +300,51 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
 
     std::string objectName = std::string(origin->GetName()) + "_" + std::to_string(currentSpawnedCount);
     beamSegment->SetName(objectName.c_str());
+    //beamSegment->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 
     const auto& collider = beamSegment->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Enemy);
-    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetJudgeTag(COLLIDER_TAG::Player /*| COLLIDER_TAG::Bullet*/);
     collider->SetRadius(0.8f);
 
     const auto& cpuparticle = beamSegment->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
     beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
     beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
-    beamSegment->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 }
 
 //当たり判定
 void SpawnCom::HitObject()
 {
+    const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+
     // 全ての複製されたオブジェクトに対して当たり判定を確認
-    for (auto& weakObj : spawnedObjects)
+    for (const auto& weakObj : spawnedObjects)
     {
-        if (auto obj = weakObj.lock())
+        if (const auto& obj = weakObj.lock())
         {
             const auto& collision = obj->GetComponent<SphereColliderCom>();
-            const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+            std::shared_ptr<Collider> collider = obj->GetComponent<Collider>();
 
-            if (collision)
+            for (const auto& hitobject : collision->OnHitGameObject())
             {
-                for (const auto& hitobject : collision->OnHitGameObject())
+                if (const auto& hitObj = hitobject.gameObject.lock())
                 {
-                    if (auto hitObj = hitobject.gameObject.lock())
+                    if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                     {
-                        if (auto status = hitObj->GetComponent<CharaStatusCom>())
-                        {
-                            status->AddDamagePoint(-1);
-                        }
+                        posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                        status->AddDamagePoint(-1);
                     }
                 }
-
-                if (collision->GetIsHit())
-                {
-                    posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
-                }
-                else
-                {
-                    posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
-                }
             }
+
+            //for (const auto& hit : collider->OnHitGameObject())
+            //{
+            //    hit.gameObject.lock()->transform_->SetScale({ 1,1,1 });
+            //}
         }
+        //posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
     }
 }
 

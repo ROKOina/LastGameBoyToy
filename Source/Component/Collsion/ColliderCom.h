@@ -30,8 +30,9 @@ enum COLLIDER_TAG : uint64_t
     Enemy = 1 << 10,
     EnemyAttack = 1 << 11,
     EnemyPushBack = 1 << 12,
+    EnemyBullet = 1 << 13,
 
-    Bullet = 1 << 13,
+    Bullet = 1 << 14,
 
     Wall = 1 << 30,
 };
