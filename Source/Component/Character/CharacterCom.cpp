@@ -3,7 +3,7 @@
 #include "Component/System/TransformCom.h"
 #include "Input\Input.h"
 #include "Math/Mathf.h"
-
+#include "Component\PostEffect\PostEffect.h"
 #include "Setting/Setting.h"
 
 void CharacterCom::Update(float elapsedTime)
@@ -97,16 +97,24 @@ void CharacterCom::Update(float elapsedTime)
         LeftShiftSkill(elapsedTime);
 
         //ダッシュ時一回だけ入る
+        const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
         if (!dashFlag)
         {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, PostEffect::PostEffectParameter::BlurStrength);
+            GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.005f, 0.5f);
             dashFlag = true;
             dashGauge -= 2; //最初は一気に減らす
+        }
+        else
+        {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
         }
 
         //ゲージがなくなったらタイマーをセット
         if (dashGauge <= 0)
         {
             LScool.timer = 0;
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
         }
     }
     else
@@ -186,7 +194,6 @@ void CharacterCom::OnGUI()
         ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
         ImGui::DragInt("attackUltCounter", &attackUltCounter);
 
-
         ImGui::TreePop();
     }
 
@@ -212,11 +219,10 @@ void CharacterCom::OnGUI()
         s = (int)(attackStateMachine.GetCurrentState());
         ImGui::InputInt("attackS", &s);
         moveStateMachine.ImGui();
-        attackStateMachine.ImGui(); 
-        
+        attackStateMachine.ImGui();
+
         ImGui::TreePop();
     }
-
 
     if (ImGui::TreeNode("NetInput"))
     {

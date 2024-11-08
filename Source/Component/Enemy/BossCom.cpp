@@ -27,6 +27,9 @@ void BossCom::Start()
     state.AddState(BossState::UPSHOTLOOP, std::make_shared<Boss_UpShotLoop>(this));
     state.AddState(BossState::UPSHOTEND, std::make_shared<Boss_UpShotEnd>(this));
 
+    //–³“GŠÔ
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetInvincibleTime(0.1f);
+
     //‰ŠúƒXƒe[ƒg“o˜^
     state.ChangeState(BossState::IDLE);
 }

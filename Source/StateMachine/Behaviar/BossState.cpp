@@ -155,6 +155,25 @@ void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const st
             spawn->SetOnTrigger(false);
         }
     }
+
+    //ここで共通ヒット処理を行う
+    const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+    if (collision)
+    {
+        for (const auto& hitobject : collision->OnHitGameObject())
+        {
+            hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
+        }
+
+        if (collision->GetIsHit())
+        {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 40.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+        }
+        else
+        {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 2.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+        }
+    }
 }
 
 #pragma region 待機
@@ -295,7 +314,6 @@ void Boss_SA2::Execute(const float& elapsedTime)
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {
-        //TODOそもそもここランダムでもいいかも
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
@@ -393,7 +411,6 @@ void Boss_LARIATEND::Execute(const float& elapsedTime)
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {
-        //TODOそもそもここランダムでもいいかも
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
@@ -470,7 +487,10 @@ void Boss_UpShotLoop::Enter()
 void Boss_UpShotLoop::Execute(const float& elapsedTime)
 {
     AnimtionEventControl("SPAWN", "Boss_L_neil2_end", "spawn", EnableSpawn | EnableCPUParticle);
-    AnimtionEventControl("SPAWN", "Boss_L_hand", "muzzleflashleft", EnableCPUParticle, { 0.0f,0.5f,0.0f });
+    if (GameObjectManager::Instance().Find("spawn")->GetComponent<SpawnCom>()->GetSpawnFlag())
+    {
+        AnimtionEventControl("SPAWN", "Boss_L_hand", "muzzleflashleft", EnableCPUParticle, { 0.0f,1.0f,0.0f });
+    }
 
     time += elapsedTime;
     if (time > 3.0f)
@@ -590,7 +610,6 @@ void Boss_Shot::Execute(const float& elapsedTime)
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {
-        //TODOそもそもここランダムでもいいかも
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
@@ -675,7 +694,6 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
     {
-        //TODOそもそもここランダムでもいいかも
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
