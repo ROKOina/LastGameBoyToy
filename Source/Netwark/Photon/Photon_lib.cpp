@@ -460,14 +460,14 @@ void PhotonLib::NetCharaInput()
         static DirectX::XMFLOAT3 hoknaPos = {};
         static DirectX::XMFLOAT3 nowPos = {};
         static int saveFrameHokan = 0;
-        int frameHokan = 3; //補完するフレーム
+        int frameHokan = 4; //補完するフレーム
 
         //移動
         if (s.isInputUpdate)
         {
             static bool o = false;
             static int oi = 0;
-            int frameAki = 3;
+            int frameAki = 2;
 
             oi++;
             if (o)

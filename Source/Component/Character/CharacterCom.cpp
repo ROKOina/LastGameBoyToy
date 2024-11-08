@@ -275,6 +275,8 @@ void CharacterCom::OnGUI()
 //ダッシュ
 void CharacterCom::LeftShiftSkill(float elapsedTime)
 {
+    if (std::string(GetGameObject()->GetName()) != "player")return;
+
     //最大速度で速さを変える
     auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
     float maxSpeed = moveCmp->GetMoveMaxSpeed();
