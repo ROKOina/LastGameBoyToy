@@ -40,9 +40,9 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-        owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
-            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
-        );
+        //owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
+        //    owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
+        //);
 
         //UŒ‚ˆ—
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, 50);

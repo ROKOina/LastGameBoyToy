@@ -19,7 +19,7 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
 void BaseCharacter_IdleState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), false);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -59,8 +59,12 @@ void BaseCharacter_MoveState::Enter()
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
-    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), false, 0.3f);
+    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), false, 0.3f);
     GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
+
+
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
@@ -100,7 +104,7 @@ void BaseCharacter_JumpState::Enter()
     moveCom.lock()->SetOnGround(false);
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
+    //animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
