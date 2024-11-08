@@ -443,6 +443,7 @@ void PhotonLib::MyCharaInput()
 
 void PhotonLib::NetCharaInput()
 {
+    int count = 0;
     for (auto& s : saveInputPhoton)
     {
         std::string name = "netPlayer" + std::to_string(s.id);
@@ -456,36 +457,36 @@ void PhotonLib::NetCharaInput()
         chara->SetUserInputDown(s.nextInput.inputDown);
         chara->SetUserInputUp(s.nextInput.inputUp);
 
-        static bool upHokan = false;
-        static DirectX::XMFLOAT3 hoknaPos = {};
-        static DirectX::XMFLOAT3 nowPos = {};
-        static int saveFrameHokan = 0;
+        static bool upHokan[5] = { false };
+        static DirectX::XMFLOAT3 hoknaPos[5] = {};
+        static DirectX::XMFLOAT3 nowPos[5] = {};
+        static int saveFrameHokan[5] = { 0 };
         int frameHokan = 4; //•âŠ®‚·‚éƒtƒŒ[ƒ€
 
         //ˆÚ“®
         if (s.isInputUpdate)
         {
-            static bool o = false;
-            static int oi = 0;
+            static bool o[5] = { false };
+            static int oi[5] = { 0 };
             int frameAki = 2;
 
-            oi++;
-            if (o)
+            oi[count]++;
+            if (o[count])
             {
-                o = false;
+                o[count] = false;
 
-                hoknaPos = s.nextInput.pos;
-                nowPos = netPlayer->transform_->GetWorldPosition();
-                if (Mathf::Length(nowPos - hoknaPos) > 0.1f)
+                hoknaPos[count] = s.nextInput.pos;
+                nowPos[count] = netPlayer->transform_->GetWorldPosition();
+                if (Mathf::Length(nowPos[count] - hoknaPos[count]) > 0.1f)
                 {
-                    saveFrameHokan = 1;
-                    upHokan = true;
+                    saveFrameHokan[count] = 1;
+                    upHokan[count] = true;
                 }
             }
-            if (oi > frameAki)
+            if (oi[count] > frameAki)
             {
-                o = true;
-                oi = 0;
+                o[count] = true;
+                oi[count] = 0;
             }
         }
         else
@@ -493,18 +494,18 @@ void PhotonLib::NetCharaInput()
             //netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
         }
 
-        if (upHokan)
+        if (upHokan[count])
         {
-            float w = float(saveFrameHokan) / float(frameHokan);
-            DirectX::XMFLOAT3 Hpos = Mathf::Lerp(nowPos, hoknaPos, w);
+            float w = float(saveFrameHokan[count]) / float(frameHokan);
+            DirectX::XMFLOAT3 Hpos = Mathf::Lerp(nowPos[count], hoknaPos[count], w);
             netPlayer->transform_->SetWorldPosition(Hpos);
-            saveFrameHokan++;
+            saveFrameHokan[count]++;
             if (Mathf::Length(Hpos) <= 0.1f)
             {
-                netPlayer->transform_->SetWorldPosition(hoknaPos);
-                upHokan = false;
+                netPlayer->transform_->SetWorldPosition(hoknaPos[count]);
+                upHokan[count] = false;
             }
-            if (saveFrameHokan > frameHokan)upHokan = false;
+            if (saveFrameHokan[count] > frameHokan)upHokan[count] = false;
         }
 
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
@@ -517,6 +518,8 @@ void PhotonLib::NetCharaInput()
 
         s.nextInput.inputDown = 0;
         s.nextInput.inputUp = 0;
+
+        count++;
     }
 }
 
