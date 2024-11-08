@@ -19,6 +19,7 @@
 #include <random>
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Renderer\RendererCom.h"
+#include "Component\PostEffect\PostEffect.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -123,11 +124,19 @@ void SpawnCom::Update(float elapsedTime)
         for (int i = 0; i < sp.spawnCount; ++i)
         {
             SpawnGameObject();
+            spawnflag = true;  // オブジェクト生成が行われたタイミングでフラグを true に
         }
 
         // タイマーをリセット
         lastSpawnTime = 0.0f;
     }
+    else
+    {
+        spawnflag = false;
+    }
+
+    //当たり判定
+    HitObject();
 }
 
 // imgui
@@ -153,6 +162,8 @@ void SpawnCom::OnGUI()
     }
 
     ImGui::Checkbox((char*)u8"生成フラグ", &spwntrigger);
+    ImGui::SameLine();
+    ImGui::Checkbox((char*)u8"生成時フラグ", &spawnflag);
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
@@ -176,6 +187,7 @@ void SpawnCom::SpawnGameObject()
 {
     // 新しいオブジェクトを作成
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    sharedobj = obj;
 
     // 位置設定
     DirectX::XMFLOAT3 newPosition = GenerateRandomPosition();
@@ -282,7 +294,8 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
     const auto& beamSegment = GameObjectManager::Instance().Create();
     beamSegment->transform_->SetWorldPosition(origin->transform_->GetWorldPosition());
 
-    AssignUniqueName(beamSegment);
+    std::string objectName = std::string(origin->GetName()) + "_" + std::to_string(currentSpawnedCount);
+    beamSegment->SetName(objectName.c_str());
 
     const auto& collider = beamSegment->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
@@ -294,6 +307,33 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
     cpuparticle->SetActive(true);
     beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
     beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
+}
+
+//当たり判定
+void SpawnCom::HitObject()
+{
+    //当たり判定の処理
+    if (auto obj = sharedobj.lock())
+    {
+        const auto& collision = obj->GetComponent<SphereColliderCom>();
+        const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+        if (collision)
+        {
+            for (const auto& hitobject : collision->OnHitGameObject())
+            {
+                hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
+            }
+
+            if (collision->GetIsHit())
+            {
+                posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 40.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+            }
+            else
+            {
+                posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 2.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+            }
+        }
+    }
 }
 
 //ランダム位置

@@ -27,6 +27,9 @@ void BossCom::Start()
     state.AddState(BossState::UPSHOTLOOP, std::make_shared<Boss_UpShotLoop>(this));
     state.AddState(BossState::UPSHOTEND, std::make_shared<Boss_UpShotEnd>(this));
 
+    //無敵時間
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetInvincibleTime(0.1f);
+
     //初期ステート登録
     state.ChangeState(BossState::IDLE);
 }
@@ -39,11 +42,23 @@ void BossCom::Update(float elapsedTime)
 
     //ターゲット位置は常にプレイヤー
     targetposition = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+
+    //後ろにいる場合旋回する
+    BackTurn();
+
+    //DebugPrimitive
+    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), meleerange, 0.1f, { 1.0f,0.0f,0.0f,1.0f });
+    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), longrange, 0.1f, { 0.0f,1.0f,0.0f,1.0f });
+    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), walkrange, 0.1f, { 0.0f,0.0f,1.0f,1.0f });
 }
 
 //imgui
 void BossCom::OnGUI()
 {
+    ImGui::DragFloat("meleerange", &meleerange, 1.0f, 0.0f, 50.0f);
+    ImGui::DragFloat("longrange", &longrange, 1.0f, 0.0f, 50.0f);
+    ImGui::DragFloat("walkrange", &walkrange, 1.0f, 0.0f, 50.0f);
+
     state.ImGui();
 }
 
@@ -109,6 +124,45 @@ void BossCom::Jump(float power)
     // ジャンプ力を設定
     DirectX::XMFLOAT3 jumppower = { vec.x, power, vec.y };
     GetGameObject()->GetComponent<MovementCom>()->AddForce(jumppower);
+}
+
+//後ろにいる場合旋回する
+void BossCom::BackTurn()
+{
+    // プレイヤーの位置取得
+    DirectX::XMFLOAT3 playerpos = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition();
+    DirectX::XMFLOAT3 bossPos = GetGameObject()->transform_->GetWorldPosition();
+
+    // プレイヤーとボス間の距離ベクトル
+    float vx = playerpos.x - bossPos.x;
+    float vy = playerpos.y - bossPos.y;
+    float vz = playerpos.z - bossPos.z;
+
+    // XZ平面での距離を計算
+    float distXZ = sqrtf(vx * vx + vz * vz);
+
+    // プレイヤー方向の単位ベクトル
+    vx /= distXZ;
+    vz /= distXZ;
+
+    // ボスの前方向ベクトル (Y軸回転角から算出)
+    float rotationY = DirectX::XMConvertToRadians(GetGameObject()->transform_->GetEulerRotation().y);
+    float frontX = sinf(rotationY);
+    float frontZ = cosf(rotationY);
+
+    // 内積で前後判定
+    float dot = (frontX * vx) + (frontZ * vz);
+
+    if (dot > 0.0f)
+    {
+        // ボスを回転
+        MoveToTarget(0.0f, 0.001f);  // ここで、回転速度を適切に設定
+    }
+    if (dot < 0.0f)
+    {
+        // ボスを回転
+        MoveToTarget(0.0f, 0.03f);  // ここで、回転速度を適切に設定
+    }
 }
 
 // ターゲット方向への進行ベクトルを算出
