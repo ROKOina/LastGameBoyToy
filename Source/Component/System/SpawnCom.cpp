@@ -187,7 +187,7 @@ void SpawnCom::SpawnGameObject()
 {
     // 新しいオブジェクトを作成
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-    sharedobj = obj;
+    spawnedObjects.push_back(obj);  // オブジェクトをリストに追加
 
     // 位置設定
     DirectX::XMFLOAT3 newPosition = GenerateRandomPosition();
@@ -248,13 +248,14 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
     obj->SetName("fireball");
     const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 6000);
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Enemy);
     collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.8f);
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 }
 
 //爆発生成関数
@@ -280,8 +281,9 @@ void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
 
     const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 6000);
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missilestreat.easingmove");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
@@ -307,30 +309,41 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
     cpuparticle->SetActive(true);
     beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
     beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
+    beamSegment->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 }
 
 //当たり判定
 void SpawnCom::HitObject()
 {
-    //当たり判定の処理
-    if (auto obj = sharedobj.lock())
+    // 全ての複製されたオブジェクトに対して当たり判定を確認
+    for (auto& weakObj : spawnedObjects)
     {
-        const auto& collision = obj->GetComponent<SphereColliderCom>();
-        const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
-        if (collision)
+        if (auto obj = weakObj.lock())
         {
-            for (const auto& hitobject : collision->OnHitGameObject())
-            {
-                hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
-            }
+            const auto& collision = obj->GetComponent<SphereColliderCom>();
+            const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
 
-            if (collision->GetIsHit())
+            if (collision)
             {
-                posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 40.0f, PostEffect::PostEffectParameter::VignetteIntensity);
-            }
-            else
-            {
-                posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 2.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                for (const auto& hitobject : collision->OnHitGameObject())
+                {
+                    if (auto hitObj = hitobject.gameObject.lock())
+                    {
+                        if (auto status = hitObj->GetComponent<CharaStatusCom>())
+                        {
+                            status->AddDamagePoint(-1);
+                        }
+                    }
+                }
+
+                if (collision->GetIsHit())
+                {
+                    posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                }
+                else
+                {
+                    posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                }
             }
         }
     }

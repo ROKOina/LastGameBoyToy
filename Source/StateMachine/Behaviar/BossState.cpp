@@ -5,6 +5,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\System\SpawnCom.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Component\Camera\CameraCom.h"
 
 //基底コンストラクタ
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
@@ -167,11 +168,11 @@ void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const st
 
         if (collision->GetIsHit())
         {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 40.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
         }
         else
         {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 2.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
         }
     }
 }
@@ -677,6 +678,9 @@ void Boss_JumpAttackStart::Exit()
 void Boss_JumpAttackEnd::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_swing_attack_end"), false, false, 0.1f);
+
+    //カメラシェイク
+    GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.02f, 0.5f);
 }
 void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
 {
@@ -694,6 +698,8 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
     {
+        //カメラシェイク
+        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.7f);
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
