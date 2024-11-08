@@ -138,6 +138,24 @@ void BaseCharacter_JumpState::Exit()
 
 #pragma endregion
 
+#pragma region Death
+
+void BaseCharacter_DeathState::Enter()
+{
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
+}
+
+void BaseCharacter_DeathState::Execute(const float& elapsedTime)
+{
+}
+
+void BaseCharacter_DeathState::Exit()
+{
+}
+
+#pragma endregion
+
 #pragma region Hitscan
 
 void BaseCharacter_HitscanState::Enter()
@@ -346,3 +364,4 @@ void BaseCharacter_NoneAttack::Enter()
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }
+

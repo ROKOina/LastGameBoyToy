@@ -85,6 +85,19 @@ private:
     float HoveringTime = 0.05f;
 };
 
+class BaseCharacter_DeathState : public BaseCharacter_BaseState
+{
+public:
+    BaseCharacter_DeathState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    virtual const char* GetName() const override { return "Death"; }
+
+private:
+};
+
 class BaseCharacter_HitscanState : public BaseCharacter_BaseState
 {
     //　※　ヒットスキャンOBJを起動するだけのステート　※

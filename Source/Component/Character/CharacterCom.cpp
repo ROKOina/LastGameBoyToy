@@ -1,4 +1,5 @@
 #include "CharacterCom.h"
+#include "CharaStatusCom.h"
 #include "Component/Camera/CameraCom.h"
 #include "Component/System/TransformCom.h"
 #include "Input\Input.h"
@@ -23,7 +24,11 @@ void CharacterCom::Update(float elapsedTime)
     nowAngle = InterpolateAngle(nowAngle, stickAngle, elapsedTime, lerpSpeed);
 
     //ステート処理
-    attackStateMachine.Update(elapsedTime);
+    if (!GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
+        attackStateMachine.Update(elapsedTime);
+    else
+        if (moveStateMachine.GetCurrentState() != CHARACTER_MOVE_ACTIONS::DEATH)    //死亡処理
+            moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::DEATH);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
 
 #ifdef _DEBUG

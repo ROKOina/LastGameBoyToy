@@ -42,7 +42,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player.mdl");
     //r->LoadModel("Data/Model/pico/pico.mdl");
-    //obj->AddComponent<AimIKCom>("Spine", nullptr);
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>(nullptr);
     //obj->AddComponent<NodeCollsionCom>("Data/Model/pico/pico.nodecollsion");
