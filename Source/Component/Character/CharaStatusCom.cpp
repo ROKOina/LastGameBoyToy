@@ -3,6 +3,11 @@
 // XVˆ—
 void CharaStatusCom::Update(float elapsedTime)
 {
+    if (hitPoint <= 0)
+    {
+        isDeath = true;
+    }
+
     // –³“GŠÔ‚ÌŒ¸­ˆ—
     if (currentInvincibleTime > 0.0f)
     {

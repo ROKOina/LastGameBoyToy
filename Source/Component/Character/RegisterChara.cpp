@@ -37,12 +37,15 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
 void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
-    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
+    obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+    //obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/pico/pico.mdl");
-    obj->AddComponent<AimIKCom>("Spine", nullptr);
+    r->LoadModel("Data/Model/player_True/player.mdl");
+    //r->LoadModel("Data/Model/pico/pico.mdl");
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/Model/pico/pico.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
+    //obj->AddComponent<NodeCollsionCom>("Data/Model/pico/pico.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     //HP‚Ì‰Šúİ’è

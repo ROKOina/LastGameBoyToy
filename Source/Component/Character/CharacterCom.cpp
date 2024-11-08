@@ -1,4 +1,5 @@
 #include "CharacterCom.h"
+#include "CharaStatusCom.h"
 #include "Component/Camera/CameraCom.h"
 #include "Component/System/TransformCom.h"
 #include "Input\Input.h"
@@ -23,7 +24,11 @@ void CharacterCom::Update(float elapsedTime)
     nowAngle = InterpolateAngle(nowAngle, stickAngle, elapsedTime, lerpSpeed);
 
     //ステート処理
-    attackStateMachine.Update(elapsedTime);
+    if (!GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
+        attackStateMachine.Update(elapsedTime);
+    else
+        if (moveStateMachine.GetCurrentState() != CHARACTER_MOVE_ACTIONS::DEATH)    //死亡処理
+            moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::DEATH);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
 
 #ifdef _DEBUG
@@ -270,6 +275,8 @@ void CharacterCom::OnGUI()
 //ダッシュ
 void CharacterCom::LeftShiftSkill(float elapsedTime)
 {
+    if (std::string(GetGameObject()->GetName()) != "player")return;
+
     //最大速度で速さを変える
     auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
     float maxSpeed = moveCmp->GetMoveMaxSpeed();
@@ -327,8 +334,9 @@ void CharacterCom::CameraControl()
             ::SetCursorPos(500, 500);
 
             //動かす速度(感度)
-            float moveX = (newCursor.x - 500) * 0.02f;
-            float moveY = (newCursor.y - 500) * 0.02f;
+            auto& ss = SceneManager::Instance().GetSettingScreen();
+            float moveX = (newCursor.x - 500) * 0.0005f * ss->GetSensitivity();
+            float moveY = (newCursor.y - 500) * 0.0005f * ss->GetSensitivity();
 
             //Y軸回転(ここでオブジェクトの回転)
             DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();

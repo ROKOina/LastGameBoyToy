@@ -20,7 +20,7 @@ public:
     bool IsViewSetting() { return viewSetting; }
     void SetViewSetting(bool flg);
 
-    float uvX = 0;  //仮変数
+    int GetSensitivity() { return sensitivity; }
 
 private:
     bool viewSetting = false;   //直接操作禁止
@@ -48,4 +48,6 @@ private:
     //バーから数字を変える用に保存しておく
     std::vector<valueLimit> barObj;
 
+    //感度保存
+    int sensitivity = 30;
 };

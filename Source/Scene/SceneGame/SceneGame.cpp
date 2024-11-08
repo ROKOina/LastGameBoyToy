@@ -134,13 +134,14 @@ void SceneGame::Initialize()
         obj->SetName("player");
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
 
+
         //ウルト関係Obj追加
         {
             //アタック系ウルト
             std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
             ultAttckChild->SetName("UltAttackChild");
             //位置をカメラと一緒にする
-            ultAttckChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+            ultAttckChild->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
 
             std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
             rayCol->SetMyTag(COLLIDER_TAG::Player);
@@ -169,8 +170,20 @@ void SceneGame::Initialize()
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
 
         //pico位置
-        cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+        cameraPost->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+
+        //腕
+        {
+            std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
+            armChild->SetName("armChild");
+            armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.20f });
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            auto& anim = armChild->AddComponent<AnimationCom>();
+            anim->PlayAnimation(0, true);
+        }
     }
 
     //snowparticle
@@ -397,9 +410,6 @@ void SceneGame::Render(float elapsedTime)
     EventCameraManager::Instance().EventCameraImGui();
 
     ImGui::Begin("Effect");
-
-    auto& ss = SceneManager::Instance().GetSettingScreen();
-    ImGui::DragFloat("uvX", &ss->uvX, 0.01f, 0, 1);
 
     EffectNew();
     ImGui::End();

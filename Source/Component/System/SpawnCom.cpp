@@ -258,6 +258,9 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
     collider->SetRadius(0.8f);
 
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
+
+    //ˆîàV‰¼’Ç‰Á
+    obj->AddComponent<NodeCollsionCom>(nullptr);
 }
 
 //”š”­¶¬ŠÖ”
@@ -292,6 +295,9 @@ void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
     collider->SetMyTag(COLLIDER_TAG::Enemy);
     collider->SetJudgeTag(COLLIDER_TAG::Player /*| COLLIDER_TAG::Bullet*/);
     collider->SetRadius(0.8f);
+
+    //ˆîàV‰¼’Ç‰Á
+    obj->AddComponent<NodeCollsionCom>(nullptr);
 }
 void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, const char* easingMovePath)
 {
@@ -312,6 +318,9 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
     cpuparticle->SetActive(true);
     beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
     beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
+
+    //ˆîàV‰¼’Ç‰Á
+    beamSegment->AddComponent<NodeCollsionCom>(nullptr);
 }
 
 //“–‚½‚è”»’è
