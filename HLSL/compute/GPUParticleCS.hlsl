@@ -63,7 +63,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 
         //速力更新
         p.position += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
-        p.velocity = totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
+        p.velocity = p.position;
     }
 
     // パーティクルの再生成

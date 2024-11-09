@@ -56,33 +56,32 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     {
         float3 cornerPos = BILLBOARD[i];
 
-        // ストレッチビルボードを適用
-        if (stretchFlag == 1 && length(p.velocity.xyz) > 0.001f)
-        {
-            float3 stretchDirection = normalize(viewvelo.xyz);
-            float stretchAmount = length(viewvelo.xyz) * strechscale;
-            cornerPos += stretchDirection * stretchAmount * (BILLBOARD[i].x > 0 ? 1 : -1);
-        }
-        
-        // 頂点の変換
+        //スケール
+        float3 scaledCornerPos = cornerPos * float3(p.scale, 1.0f);
+        float3 worldPosition = 0;
+
+        //パーティクル遅延なし
         if (worldpos == 1)
         {
-            float3 scaledCornerPos = cornerPos * float3(p.scale, 1.0f);
-            float3 worldPosition = worldviewpos.xyz + scaledCornerPos;
-            element.position = mul(float4(worldPosition, 1.0f), projection);
+            worldPosition = worldviewpos.xyz + scaledCornerPos;
         }
-        else
+        //ストレッチビルボードあり
+        else if (stretchFlag == 1)
         {
-            float3 scaledCornerPos = cornerPos * float3(p.scale, 1.0f);
             float3 stretchDirection = normalize(viewvelo.xyz);
             if (i % 2 == 1)
-            //    scaledCornerPos += -stretchDirection * 5;
-            //else
+                scaledCornerPos += -stretchDirection * strechscale;
+            else
                 scaledCornerPos += stretchDirection * strechscale;
-                
-            float3 worldPosition = viewpos.xyz + scaledCornerPos;
-            element.position = mul(float4(worldPosition, 1.0f), projection);
+            worldPosition = viewpos.xyz + scaledCornerPos;
         }
+        //それ以外
+        else
+        {
+            worldPosition = viewpos.xyz + scaledCornerPos;
+        }
+
+        element.position = mul(float4(worldPosition, 1.0f), projection);
         element.color.rgb = p.color.rgb * power * baseColor.rgb;
         element.color.a = p.color.a * baseColor.a;
         element.color.rgb *= colorScale;
