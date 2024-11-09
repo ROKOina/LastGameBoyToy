@@ -63,7 +63,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
             float stretchAmount = length(viewvelo.xyz) * strechscale;
             cornerPos += stretchDirection * stretchAmount * (BILLBOARD[i].x > 0 ? 1 : -1);
         }
-
+        
         // ’¸“_‚Ì•ÏŠ·
         if (worldpos == 1)
         {
@@ -74,6 +74,12 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         else
         {
             float3 scaledCornerPos = cornerPos * float3(p.scale, 1.0f);
+            float3 stretchDirection = normalize(viewvelo.xyz);
+            if (i % 2 == 1)
+            //    scaledCornerPos += -stretchDirection * 5;
+            //else
+                scaledCornerPos += stretchDirection * strechscale;
+                
             float3 worldPosition = viewpos.xyz + scaledCornerPos;
             element.position = mul(float4(worldPosition, 1.0f), projection);
         }
