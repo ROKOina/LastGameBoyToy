@@ -105,8 +105,8 @@ void BulletCom::BulletVSEnemyMissile()
             GameObj obj = GameObjectManager::Instance().Create();
             obj->SetName("explosion");
             obj->transform_->SetWorldPosition(gameObject->transform_->GetWorldPosition());
-            obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitfire.cpuparticle", 1000);
-            const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hitexplosion.gpuparticle", 10000);
+            obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitfire.cpuparticle", 300);
+            const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hitexplosion.gpuparticle", 5000);
             gpuparticle->Play();
 
             objectsToRemove.push_back(gameObject);
@@ -127,14 +127,10 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     //弾丸オブジェクトを生成///////
     GameObj obj = GameObjectManager::Instance().Create();
     obj->SetName("damageball");
-    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     firePos.y += 1.0f;
     obj->transform_->SetWorldPosition(firePos);
-
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS));
-    renderCom->LoadModel("Data/Model/cube/cube.mdl");
 
     ///////////////////////////////
 
@@ -148,6 +144,10 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
 
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
+
+    //パーティクル
+    const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    gpuparticle->Play();
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
