@@ -333,6 +333,7 @@ void SpawnCom::HitObject()
                     if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                     {
                         posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                        GetGameObject()->transform_->SetScale({ 1.0f,1.0f,1.0f });
                         status->AddDamagePoint(-1);
                     }
                 }

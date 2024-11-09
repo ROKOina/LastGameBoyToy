@@ -69,6 +69,9 @@ void BulletCom::Update(float elapsedTime)
         }
     }
 
+    //銃弾と敵の攻撃との衝突処理
+    BulletVSEnemyMissile();
+
     //弾消去
     EraseBullet(elapsedTime);
 }
@@ -78,6 +81,42 @@ void BulletCom::EraseBullet(float elapsedTime)
     timer += elapsedTime;
     if (timer > aliveTime)
     {
+        GameObjectManager::Instance().Remove(this->GetGameObject());
+    }
+}
+
+//銃弾と敵の攻撃との衝突処理
+void BulletCom::BulletVSEnemyMissile()
+{
+    const auto& collision = GetGameObject()->GetComponent<SphereColliderCom>();
+    if (!collision) return;
+
+    // "BOSS" オブジェクトへの参照を取得
+    const auto& bossObject = GameObjectManager::Instance().Find("BOSS");
+    std::vector<std::shared_ptr<GameObject>> objectsToRemove;
+
+    for (const auto& hitobject : collision->OnHitGameObject())
+    {
+        const auto& gameObject = hitobject.gameObject.lock();
+        // "BOSS" でないオブジェクトのみ削除リストに追加
+        if (gameObject && gameObject != bossObject)
+        {
+            //爆破エフェクト再生
+            GameObj obj = GameObjectManager::Instance().Create();
+            obj->SetName("explosion");
+            obj->transform_->SetWorldPosition(gameObject->transform_->GetWorldPosition());
+            obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitfire.cpuparticle", 1000);
+            const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hitexplosion.gpuparticle", 10000);
+            gpuparticle->Play();
+
+            objectsToRemove.push_back(gameObject);
+        }
+    }
+
+    // 一括削除
+    for (const auto& gameObject : objectsToRemove)
+    {
+        GameObjectManager::Instance().Remove(gameObject);
         GameObjectManager::Instance().Remove(this->GetGameObject());
     }
 }
@@ -116,6 +155,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
         coll->SetJudgeTag(COLLIDER_TAG::Enemy);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.6f);
 
     //弾
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
