@@ -28,6 +28,9 @@ public:
     //弾消去処理
     void EraseBullet(float elapsedTIme);
 
+    //銃弾と敵の攻撃との衝突処理
+    void BulletVSEnemyMissile();
+
     //セッター・ゲッター
     void SetAliveTime(float time) { aliveTime = time; };
 

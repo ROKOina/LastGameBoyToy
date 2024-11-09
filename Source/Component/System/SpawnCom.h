@@ -108,5 +108,6 @@ private:
     bool spawnflag = false;
     std::string filepath = {};
 
-    std::weak_ptr<GameObject>sharedobj;
+    // 複製されたオブジェクトを管理するリスト
+    std::vector<std::weak_ptr<GameObject>> spawnedObjects;
 };
