@@ -228,9 +228,9 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     obj->SetName("NoobEnemy");
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     const auto& renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    renderer->LoadModel("Data/Model/Jammo/jammo.mdl");
+    renderer->LoadModel("Data/Model/Enemy/Enemy.mdl");
     obj->AddComponent<MovementCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/Model/Jammo/jammocollsion.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
     obj->AddComponent<NoobEnemyCom>();
