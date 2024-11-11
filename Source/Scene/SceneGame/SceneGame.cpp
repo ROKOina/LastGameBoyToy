@@ -55,6 +55,7 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include <Component\UI\UiFlag.h>
+#include "Component\Renderer\TrailCom.h"
 
 #include "Setting/Setting.h"
 
@@ -439,6 +440,8 @@ void SceneGame::EffectNew()
         cpuparticle->SetActive(true);
         obj->AddComponent<EasingMoveCom>(nullptr);
         obj->AddComponent<NodeCollsionCom>(nullptr);
+        std::shared_ptr<Trail>trailcom = obj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
+        trailcom->SetTransform(obj->transform_->GetWorldTransform());
     }
     ImGui::SameLine();
     if (ImGui::Button("UI"))
