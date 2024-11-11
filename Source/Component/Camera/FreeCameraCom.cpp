@@ -26,7 +26,7 @@ void FreeCameraCom::Start()
     //基底クラスのカメラを呼ぶ
     CameraCom::Start();
 
-    //ActiveCameraChange();
+    ActiveCameraChange();
 }
 
 // 更新処理

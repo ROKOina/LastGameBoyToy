@@ -38,7 +38,8 @@ void ScenePVE::Initialize()
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
-        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        freeCamera->transform_->SetWorldPosition({ -3.814f, -5.078f, 29.042f });
+        freeCamera->transform_->SetEulerRotation({ 5.279f, -365.373f, 0.0f });
     }
 
     //イベント用カメラ
@@ -46,7 +47,9 @@ void ScenePVE::Initialize()
         std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
         eventCamera->SetName("eventcamera");
         eventCamera->AddComponent<EventCameraCom>();
-        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        eventCamera->transform_->SetWorldPosition({ -3.814f, -5.078f, 29.042f });
+        eventCamera->transform_->SetEulerRotation({ 5.279f, -365.373f, 0.0f });
+
     }
 
     //コンスタントバッファの初期化
@@ -76,17 +79,17 @@ void ScenePVE::Initialize()
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Jammo/jammo.mdl");
+        r->LoadModel("Data/Model/Boss/boss.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
         t = boss->transform_;
         boss->AddComponent<MovementCom>();
-        boss->AddComponent<NodeCollsionCom>("Data/Model/Jammo/jammocollsion.nodecollsion");
+        boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
         boss->AddComponent<BossCom>();
-        boss->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+        boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<CharaStatusCom>();
 
         auto& pushBack = boss->AddComponent<PushBackCom>();
@@ -98,14 +101,10 @@ void ScenePVE::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        //obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/canyon/stage.mdl");
+        r->LoadModel("Data/Model/canyon/stage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/Model/canyon/stage.collision");
         obj->AddComponent<StageEditorCom>();
-        /*      RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-              rigid->GenerateCollider(r->GetModel()->GetResource());*/
     }
 
     //平行光源を追加
