@@ -55,15 +55,17 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         //トータルの速力
         float3 totalVelocity = currentEmitVec * speed + randomVel + orbVelo + radialVec + spiralVec;
 
-        //重力適量
+        // 重力の適用
+        p.velocity.y -= lerp(emitStartGravity, emitEndGravity, lerprate) * deltatime;
         p.position.y -= lerp(emitStartGravity, emitEndGravity, lerprate) * deltatime;
 
-        //浮力
+        // 浮力の適用
+        p.velocity.y += buoyancy * deltatime;
         p.position.y += buoyancy * deltatime;
 
         //速力更新
-        p.position += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
-        p.velocity = totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * deltatime;
+        p.velocity = totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate); // 速力の更新
+        p.position += p.velocity * deltatime; // 位置の更新
     }
 
     // パーティクルの再生成

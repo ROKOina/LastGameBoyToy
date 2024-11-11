@@ -134,7 +134,6 @@ void SceneGame::Initialize()
         obj->SetName("player");
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
 
-
         //ウルト関係Obj追加
         {
             //アタック系ウルト
@@ -219,7 +218,7 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject>rightfootsmokeobject = boss->AddChildObject();
             rightfootsmokeobject->SetName("rightfootsmokeeffect");
-            std::shared_ptr<CPUParticle>rightfootsmokeeffect = rightfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>rightfootsmokeeffect = rightfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 600);
             rightfootsmokeeffect->SetActive(false);
         }
 
@@ -227,7 +226,7 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject>leftfootsmokeobject = boss->AddChildObject();
             leftfootsmokeobject->SetName("leftfootsmokeeffect");
-            std::shared_ptr<CPUParticle>leftfootsmokeeffect = leftfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>leftfootsmokeeffect = leftfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 600);
             leftfootsmokeeffect->SetActive(false);
         }
 
@@ -266,9 +265,9 @@ void SceneGame::Initialize()
             std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
             spawnobject->SetName("spawn");
             spawnobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/missile.spawn");
-            std::shared_ptr<GPUParticle>gpuparticle = spawnobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
+            std::shared_ptr<GPUParticle>gpuparticle = spawnobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 4000);
             gpuparticle->SetStop(true);
-            std::shared_ptr<CPUParticle>shotsmoke = spawnobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/upshotsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>shotsmoke = spawnobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/upshotsmoke.cpuparticle", 800);
             shotsmoke->SetActive(false);
 
             std::shared_ptr<GameObject> muzzleflashobject = spawnobject->AddChildObject();
@@ -281,10 +280,10 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject> chargeobject = boss->AddChildObject();
             chargeobject->SetName("charge");
-            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
+            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 4000);
             gpuparticle->SetStop(true);
             chargeobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/beem.spawn");
-            std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 800);
             shotsmoke->SetActive(false);
 
             std::shared_ptr<GameObject> muzzleflashobject = chargeobject->AddChildObject();

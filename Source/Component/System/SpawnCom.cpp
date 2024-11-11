@@ -248,7 +248,7 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
     obj->SetName("fireball");
     const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 6000);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
 
@@ -282,7 +282,7 @@ void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
 
     const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 6000);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missilestreat.easingmove");
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 
@@ -309,7 +309,7 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
 
     const auto& cpuparticle = beamSegment->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
+    beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
     beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
 }
 

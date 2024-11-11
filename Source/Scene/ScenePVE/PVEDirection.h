@@ -30,6 +30,7 @@ private:
 
 private:
     std::shared_ptr<TransformCom>t;
+    std::weak_ptr<AnimationCom> animationCom;
 
     int directionNumber = 0;
 
