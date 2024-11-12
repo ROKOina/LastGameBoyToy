@@ -38,6 +38,7 @@ void UiGauge::Update(float elapsedTime)
         spc.texSize = { originalTexSize.x * (1 - valueRate) ,originalTexSize.y * (1 - valueRate) };
     }
 
+
     //eƒNƒ‰ƒX‚ÌUpdate‚ðŒÄ‚Ô
     this->UiSystem::Update(elapsedTime);
 }
