@@ -29,8 +29,12 @@ public:
     void GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale);
     void GenerateCollider(ModelResource* rc);
 
+    NodeCollsionCom::CollsionType GetPrimitiveType() { return type; }
+    void SetPrimitiveType(NodeCollsionCom::CollsionType t) { type = t; }
     float GetNormalizeScale() { return normalizeScale; }
     void SetNormalizeScale(float scale) { normalizeScale = scale; }
+    std::string GetUseResourcePath() { return useResourcePath; }
+    void SetUseResourcePath(std::string path) { useResourcePath = path; }
 
 public:
     enum class RigidType
@@ -46,6 +50,7 @@ private:
     RigidType rigidType = RigidType::Max;
     NodeCollsionCom::CollsionType type = NodeCollsionCom::CollsionType::MAX;
 
+    std::string useResourcePath;
     physx::PxRigidActor* rigidActor = nullptr;
     physx::PxTransform rigidTransform = {};
     float normalizeScale = 1.0f;

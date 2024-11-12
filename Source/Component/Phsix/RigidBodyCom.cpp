@@ -1,5 +1,6 @@
 #include "RigidBodyCom.h"
 #include "Phsix\Physxlib.h"
+#include "Graphics\Model\ResourceManager.h"
 #include "Component/System/TransformCom.h"
 
 RigidBodyCom::RigidBodyCom(bool isStatic, RigidType type)
@@ -50,19 +51,34 @@ void RigidBodyCom::OnGUI()
 
 void RigidBodyCom::SetUp()
 {
-    ModelResource* resource = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource();
+    ID3D11Device* device = Graphics::Instance().GetDevice();
+    std::shared_ptr<ModelResource> resource = std::make_shared<ModelResource>();
 
+    if (!useResourcePath.empty())
+    {
+        //リソースマネージャーに登録されているか
+        if (!ResourceManager::Instance().JudgeModelFilename(useResourcePath.c_str()))
+        {
+            resource->Load(device, useResourcePath.c_str());
+            ResourceManager::Instance().RegisterModel(useResourcePath.c_str(), resource);	//リソースマネージャーに追加する
+        }
+        else
+        {
+            resource = ResourceManager::Instance().LoadModelResource(useResourcePath.c_str());	//ロードする
+        }
+    }
+       
     switch (rigidType)
     {
-    case RigidBodyCom::RigidType::Primitive:
-        GenerateCollider(resource);
-        break;
     case RigidBodyCom::RigidType::Mesh:
+        GenerateCollider(resource.get());
+        break;
+    case RigidBodyCom::RigidType::Primitive:
         //NodeCollisionを適応させる必要あり
-        GenerateCollider(NodeCollsionCom::CollsionType::SPHER, { 1.0f,1.0f,1.0f });
+        GenerateCollider(NodeCollsionCom::CollsionType::SPHER, GetGameObject()->transform_->GetScale());
         break;
     case RigidBodyCom::RigidType::Complex:
-        PhysXLib::Instance().GenerateManyCollider(resource);
+        PhysXLib::Instance().GenerateManyCollider_Convex(resource.get(), GetGameObject()->transform_->GetScale().x * normalizeScale);
         break;
     default:
         break;
@@ -76,5 +92,10 @@ void RigidBodyCom::GenerateCollider(NodeCollsionCom::CollsionType type, DirectX:
 
 void RigidBodyCom::GenerateCollider(ModelResource* rc)
 {
-    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, rc, GetGameObject());
+    rigidActor = PhysXLib::Instance().GenerateMeshCollider(
+        isStatic, rc, 
+        GetGameObject()->transform_->GetWorldPosition(),
+        GetGameObject()->transform_->GetRotation(),
+        GetGameObject()->transform_->GetScale(),
+        normalizeScale);
 }

@@ -19,8 +19,8 @@ void PhysXLib::Initialize()
     // シーンの設定
     PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
     sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f); // 重力設定
-    sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
-    gDispatcher = PxDefaultCpuDispatcherCreate(2);  // 2スレッドでディスパッチャーを作成
+    //  sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+    gDispatcher = PxDefaultCpuDispatcherCreate(12);  // 2スレッドでディスパッチャーを作成
     sceneDesc.cpuDispatcher = gDispatcher;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
     PxInitExtensions(*gPhysics, m_device);
@@ -61,7 +61,7 @@ void PhysXLib::Initialize()
     rigid_static->setGlobalPose(pos);
 
     //当たり判定とモデルのスケールを合わせる
-    physx::PxMeshScale scale(PxVec3(50,50,50));
+    physx::PxMeshScale scale(PxVec3(50, 50, 50));
 
     // 形状を紐づけ
     rigid_static->attachShape(*box_shape);
@@ -99,12 +99,36 @@ void PhysXLib::Update(float elapsedTime)
     gScene->fetchResults(true);
 }
 
-bool PhysXLib::RayCast_PhysX(const PxVec3& origin, const PxVec3& unitDir, const PxReal maxDistance, PxRaycastBuffer& hitBuffer)
+bool PhysXLib::SphereCast_PhysX(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& dir, float radius, float dist, PxSweepBuffer& hit)
 {
-    return gScene->raycast(origin, unitDir, maxDistance, hitBuffer);
+    //スフィアのジオメトリ設定
+    PxSphereGeometry sphereGeom(radius);     // スフィアジオメトリを作成
+
+    // 2. スフィアの始点（Transform）と方向設定
+    PxTransform startTransform(PxVec3(pos.x, pos.y, pos.z));  // スフィアの始点
+    PxVec3 direction(dir.x, dir.y, dir.z);                   // スフィアのキャスト方向（下向き）
+
+    // 4. スフィアキャストの実行
+    bool answer = gScene->sweep(
+        sphereGeom,              // スフィアジオメトリ
+        startTransform,          // 始点のトランスフォーム
+        direction,               // キャストの方向
+        dist,             // 最大距離
+        hit                  // 結果のバッファ
+    );
+
+    return answer;
 }
 
-void PhysXLib::GenerateManyCollider(ModelResource* model)
+bool PhysXLib::RayCast_PhysX(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& unitDir, const float maxDistance, PxRaycastBuffer& hitBuffer)
+{
+    physx::PxVec3 start = { origin.x,origin.y,origin.z };
+    physx::PxVec3 dir = { unitDir.x,unitDir.y,unitDir.z };
+
+    return gScene->raycast(start, dir, maxDistance, hitBuffer);
+}
+
+void PhysXLib::GenerateManyCollider(ModelResource* model, float worldScale)
 {
     for (auto& node : model->GetNodes())
     {
@@ -153,6 +177,12 @@ void PhysXLib::GenerateManyCollider(ModelResource* model)
                 }
             }
 
+            physx::PxRigidActor* rigidObj = nullptr;
+
+            //動かない(静的)剛体を作成
+            rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+            PxTransform& trans = rigidObj->getGlobalPose();
+
             //メッシュデータの作成
             physx::PxTriangleMeshDesc meshDesc;
             meshDesc.setToDefault();
@@ -188,27 +218,33 @@ void PhysXLib::GenerateManyCollider(ModelResource* model)
             triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
 
 
-            physx::PxRigidActor* rigidObj = nullptr;
+            DirectX::XMMATRIX transVec = DirectX::XMLoadFloat4x4(&Mathf::GenerateTransform(node.translate, node.rotate, node.scale));
+            DirectX::XMMATRIX parentVec = DirectX::XMLoadFloat4x4(&Mathf::GenerateTransform({ 0,0,0 }, { worldScale, worldScale, worldScale }));
+            transVec = DirectX::XMMatrixMultiply(transVec, parentVec);
+            DirectX::XMFLOAT4X4 answer{};
+            DirectX::XMStoreFloat4x4(&answer, transVec);
 
-            //動かない(静的)剛体を作成
-            rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
-            PxTransform& pos = rigidObj->getGlobalPose();
-            pos.p.x = node.translate.x;
-            pos.p.y = node.translate.y;
-            pos.p.z = node.translate.z;
+            DirectX::XMFLOAT3 pos = Mathf::TransformSamplePosition(answer);
+
+            trans.p.x = pos.x;
+            trans.p.y = pos.y;
+            trans.p.z = pos.z;
 
             DirectX::XMFLOAT4 quatF(node.rotate);
-            pos.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+            trans.q = { quatF.x,quatF.y,quatF.z, quatF.w };
 
-            rigidObj->setGlobalPose(pos);
+            rigidObj->setGlobalPose(trans);
+
+            DirectX::XMFLOAT3 scale;
+            scale.x = std::sqrt(answer._11 * answer._11 + answer._12 * answer._12 + answer._13 * answer._13);
+            scale.y = std::sqrt(answer._21 * answer._21 + answer._22 * answer._22 + answer._23 * answer._23);
+            scale.z = std::sqrt(answer._31 * answer._31 + answer._32 * answer._32 + answer._33 * answer._33);
 
             //当たり判定とモデルのスケールを合わせる
-            float modelDefaultScale = 100.0f;//モデルエディターの１をこのプロジェクトサイズにする値
-            physx::PxMeshScale scale(PxVec3(1, 1, 1));//node.scale.x * 100.0f, node.scale.y * 100.0f, node.scale.z * 100.0f));
-
+            physx::PxMeshScale s(PxVec3(scale.x, scale.y, scale.z));
 
             //メッシュを当たり判定にセット
-            PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
+            PxTriangleMeshGeometry meshGeometry(triangle_mesh, s);
             PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
             rigidObj->attachShape(*shape);
 
@@ -218,16 +254,184 @@ void PhysXLib::GenerateManyCollider(ModelResource* model)
     }
 }
 
-physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* model, GameObj obj)
+void PhysXLib::GenerateManyCollider_Convex(ModelResource* model, float worldScale)
 {
-    ModelResource::Node rootNode = *model->GetNodes().data();
+    //判定の形
+    int convexIndex = INT_MAX;
+    int triangleIndex = INT_MAX;
+    int boxIndex = INT_MAX;
 
+    int nodeCount = 0;
+
+    //ステージのオブジェクト分の物理オブジェクトを生成する
+    for (auto& node : model->GetNodes())
+    {
+        //判定の親ノードを記憶
+        if (node.name == "Triangle") { triangleIndex = nodeCount; }
+        if (node.name == "Convex")
+        {
+            convexIndex = nodeCount;
+        }
+        if (node.name == "Box")
+        {
+            boxIndex = nodeCount;
+        }
+        nodeCount++;
+
+        //判定によってビットを立てる
+        int colliderType = 0;
+        if (node.parentIndex == triangleIndex) { colliderType |= 1 << 0; }
+        if (node.parentIndex == convexIndex) { colliderType |= 1 << 1; }
+        if (node.parentIndex == boxIndex) { colliderType |= 1 << 2; }
+
+        //ビットが立っていた場合Modelの形を取得する
+        if (colliderType > 0)
+        {
+            // 区切り文字 "(" の位置を検索
+            size_t delimiterPos = node.name.find("__");
+
+            // 区切り文字が見つかった場合、その位置までの部分文字列を取得
+            std::string name = (delimiterPos != std::string::npos) ? node.name.substr(0, delimiterPos) : node.name;
+            name += static_cast<std::string>(".mdl");
+            std::string path = static_cast<std::string>("Data/Model/MatuokaStage/") + name;
+
+            ID3D11Device* device = Graphics::Instance().GetDevice();
+            std::shared_ptr<ModelResource> m = std::make_shared<ModelResource>();
+
+            //リソースマネージャーに登録されているか
+            if (!ResourceManager::Instance().JudgeModelFilename(path.c_str()))
+            {
+                m->Load(device, path.c_str());
+                ResourceManager::Instance().RegisterModel(path.c_str(), m);	//リソースマネージャーに追加する
+            }
+            else
+            {
+                m = ResourceManager::Instance().LoadModelResource(path.c_str());	//ロードする
+            }
+
+            DirectX::XMMATRIX transVec = DirectX::XMLoadFloat4x4(&Mathf::GenerateTransform(node.translate, node.rotate, node.scale));
+            DirectX::XMMATRIX parentVec = DirectX::XMLoadFloat4x4(&Mathf::GenerateTransform({ 0,0,0 }, { worldScale, worldScale, worldScale }));
+            transVec = DirectX::XMMatrixMultiply(transVec, parentVec);
+            DirectX::XMFLOAT4X4 answer{};
+            DirectX::XMStoreFloat4x4(&answer, transVec);
+
+            switch (colliderType)
+            {
+            case 1 << 0://TriangleMesh
+                GenerateMeshCollider(
+                    true, m.get(),
+                    Mathf::TransformSamplePosition(answer),
+                    node.rotate,
+                    Mathf::TransformSampleScale(answer), 1
+                );
+                break;
+
+            case 1 << 1://ConvexMesh
+                GenerateConvexCollider(
+                    true, m.get(),
+                    Mathf::TransformSamplePosition(answer),
+                    node.rotate,
+                    Mathf::TransformSampleScale(answer), 1
+                );
+                break;
+
+            case 1 << 2:
+                break;
+
+            default:
+                break;
+            }
+
+
+            //std::vector<PxVec3> vertices;
+            //std::vector<PxU32> indices;
+
+            //for (auto& mesh : m->GetMeshes())
+            //{
+            //    //頂点情報をDirectXからPhysXに置き換え
+            //    for (auto& ver : mesh.vertices)
+            //    {
+            //        PxVec3 pos = { ver.position.x,ver.position.y,ver.position.z };
+            //        vertices.emplace_back(pos);
+            //    }
+            //}
+
+            //physx::PxRigidActor* rigidObj = nullptr;
+
+            ////動かない(静的)剛体を作成
+            //rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+            //PxTransform& trans = rigidObj->getGlobalPose();
+
+            ////メッシュデータの作成
+            //physx::PxConvexMeshDesc meshDesc;
+            //meshDesc.setToDefault();
+            //meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
+            //meshDesc.points.stride = sizeof(PxVec3);
+            //meshDesc.points.data = vertices.data();
+            //meshDesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
+
+            //physx::PxTolerancesScale tolerances_scale;
+            //PxCookingParams cooking_params(tolerances_scale);
+
+            //cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
+            //cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+
+            //physx::PxConvexMesh* triangle_mesh = nullptr;
+            //physx::PxDefaultMemoryOutputStream write_buffer;
+
+
+            //if (!PxCookConvexMesh(cooking_params, meshDesc, write_buffer)) {
+            //    assert(0 && "PxCookTriangleMesh failed.");
+            //}
+
+            //PxDefaultMemoryOutputStream writeBuffer;
+            //PxTriangleMeshCookingResult::Enum result;
+
+            //physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+            //triangle_mesh = gPhysics->createConvexMesh(read_buffer);
+
+
+            //DirectX::XMMATRIX transVec = DirectX::XMLoadFloat4x4(&Mathf::GenerateTransform(node.translate, node.rotate, node.scale));
+            //DirectX::XMMATRIX parentVec = DirectX::XMLoadFloat4x4(&Mathf::GenerateTransform({ 0,0,0 }, { worldScale, worldScale, worldScale }));
+            //transVec = DirectX::XMMatrixMultiply(transVec, parentVec);
+            //DirectX::XMFLOAT4X4 answer{};
+            //DirectX::XMStoreFloat4x4(&answer, transVec);
+
+            //DirectX::XMFLOAT3 pos = Mathf::TransformSamplePosition(answer);
+
+            //trans.p.x = pos.x;
+            //trans.p.y = pos.y;
+            //trans.p.z = pos.z;
+
+            //DirectX::XMFLOAT4 quatF(node.rotate);
+            //trans.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+
+            //rigidObj->setGlobalPose(trans);
+
+            //DirectX::XMFLOAT3 scale;
+            //scale.x = std::sqrt(answer._11 * answer._11 + answer._12 * answer._12 + answer._13 * answer._13);
+            //scale.y = std::sqrt(answer._21 * answer._21 + answer._22 * answer._22 + answer._23 * answer._23);
+            //scale.z = std::sqrt(answer._31 * answer._31 + answer._32 * answer._32 + answer._33 * answer._33);
+
+            ////当たり判定とモデルのスケールを合わせる
+            //physx::PxMeshScale s(PxVec3(scale.x, scale.y, scale.z));
+
+            ////メッシュを当たり判定にセット
+            //PxConvexMeshGeometry meshGeometry(triangle_mesh, s);
+            //PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
+            //rigidObj->attachShape(*shape);
+
+            //// 剛体を空間に追加
+            //gScene->addActor(*rigidObj);
+        }
+    }
+}
+
+physx::PxRigidActor* PhysXLib::GenerateMeshCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale)
+{
     std::vector<PxVec3> vertices;
     std::vector<PxU32> indices;
-    int meshCount = 0;
-    int io = 0;
 
-    UINT total = 0;
     auto debug = Graphics::Instance().GetDebugRenderer();
 
     for (auto& mesh : model->GetMeshes())
@@ -236,8 +440,6 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
         for (auto& ver : mesh.vertices)
         {
             PxVec3 pos = { ver.position.x,ver.position.y,ver.position.z };
-            //debug->DrawSphere({ ver.position.x,ver.position.y,ver.position.z }, 0.1f, { 1,1,1,1 });
-
             vertices.emplace_back(pos);
         }
 
@@ -245,11 +447,9 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
         {
             for (auto& ver : mesh.indices)
             {
-                indices.emplace_back(ver + total);
+                indices.emplace_back(ver);
             }
         }
-        meshCount++;
-        //total += mesh.indices.size();
     }
 
     //メッシュデータの作成
@@ -291,16 +491,16 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
     if (isStatic) {
         //動かない(静的)剛体を作成
         rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
-        PxTransform& pos = rigidObj->getGlobalPose();
-        pos.p.x = obj->transform_->GetWorldPosition().x;
-        pos.p.y = obj->transform_->GetWorldPosition().y;
-        pos.p.z = obj->transform_->GetWorldPosition().z;
+        PxTransform& trans = rigidObj->getGlobalPose();
 
-        //auto quat = DirectX::XMQuaternionRotationRollPitchYaw(DirectX::XMConvertToRadians(-90), 0, 0);
-        //DirectX::XMFLOAT4 quatF(quat.m128_f32);
-        //pos.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+        trans.p.x = pos.x;
+        trans.p.y = pos.y;
+        trans.p.z = pos.z;
 
-        rigidObj->setGlobalPose(pos);
+        DirectX::XMFLOAT4 quatF(rotate);
+        trans.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+
+        rigidObj->setGlobalPose(trans);
     }
     else {
         // 動かすことのできる(動的)剛体を作成
@@ -308,13 +508,12 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
     }
 
     //当たり判定とモデルのスケールを合わせる
-    DirectX::XMFLOAT3 sV = obj->transform_->GetScale();
-    float modelDefaultScale = 1;//モデルエディターの１をこのプロジェクトサイズにする値
-    physx::PxMeshScale scale(PxVec3(sV.x * 1.0f, sV.y * 1.0f, sV.z * 1.0f));
+    DirectX::XMFLOAT3 sV = scale * worldScale;
+    physx::PxMeshScale meshScale(PxVec3(sV.x, sV.y, sV.z));
 
 
     //メッシュを当たり判定にセット
-    PxTriangleMeshGeometry meshGeometry(triangle_mesh, scale);
+    PxTriangleMeshGeometry meshGeometry(triangle_mesh, meshScale);
     PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
     rigidObj->attachShape(*shape);
 
@@ -322,8 +521,83 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, ModelResource* mo
     gScene->addActor(*rigidObj);
 
     return rigidObj;
+}
 
-    return nullptr;
+physx::PxRigidActor* PhysXLib::GenerateConvexCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale)
+{
+    std::vector<PxVec3> vertices;
+    std::vector<PxU32> indices;
+
+    for (auto& mesh : model->GetMeshes())
+    {
+        //頂点情報をDirectXからPhysXに置き換え
+        for (auto& ver : mesh.vertices)
+        {
+            PxVec3 pos = { ver.position.x,ver.position.y,ver.position.z };
+            vertices.emplace_back(pos);
+        }
+    }
+
+    //メッシュデータの作成
+    physx::PxConvexMeshDesc meshDesc;
+    meshDesc.setToDefault();
+    meshDesc.points.count = static_cast<physx::PxU32>(vertices.size());
+    meshDesc.points.stride = sizeof(PxVec3);
+    meshDesc.points.data = vertices.data();
+    meshDesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
+
+    physx::PxTolerancesScale tolerances_scale;
+    PxCookingParams cooking_params(tolerances_scale);
+
+
+    cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
+    cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
+
+    physx::PxConvexMesh* triangle_mesh = nullptr;
+    physx::PxDefaultMemoryOutputStream write_buffer;
+
+
+    if (!PxCookConvexMesh(cooking_params, meshDesc, write_buffer)) {
+        assert(0 && "PxCookConvexMesh failed.");
+    }
+
+    PxDefaultMemoryOutputStream writeBuffer;
+    PxTriangleMeshCookingResult::Enum result;
+
+    physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
+    triangle_mesh = gPhysics->createConvexMesh(read_buffer);
+
+
+    physx::PxRigidActor* rigidObj = nullptr;
+
+    //動かない(静的)剛体を作成
+    rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
+    PxTransform& trans = rigidObj->getGlobalPose();
+
+    trans.p.x = pos.x;
+    trans.p.y = pos.y;
+    trans.p.z = pos.z;
+
+    DirectX::XMFLOAT4 quatF(rotate);
+    trans.q = { quatF.x,quatF.y,quatF.z, quatF.w };
+
+    rigidObj->setGlobalPose(trans);
+
+
+    //当たり判定とモデルのスケールを合わせる
+    DirectX::XMFLOAT3 sV = scale * worldScale;
+    physx::PxMeshScale meshScale(PxVec3(sV.x, sV.y, sV.z));
+
+
+    //メッシュを当たり判定にセット
+    PxConvexMeshGeometry meshGeometry(triangle_mesh, meshScale);
+    PxShape* shape = gPhysics->createShape(meshGeometry, *gPhysics->createMaterial(0.5f, 0.5f, 0.5f));
+    rigidObj->attachShape(*shape);
+
+    // 剛体を空間に追加
+    gScene->addActor(*rigidObj);
+
+    return rigidObj;
 }
 
 physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, GameObj obj, DirectX::XMFLOAT3 scale)
@@ -352,7 +626,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     case NodeCollsionCom::CollsionType::BOX:
         shape = gPhysics->createShape(
             // Boxの大きさ
-            physx::PxBoxGeometry(scale.x,scale.y,scale.z),
+            physx::PxBoxGeometry(scale.x, scale.y, scale.z),
             // 摩擦係数と反発係数の設定
             *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
         );
