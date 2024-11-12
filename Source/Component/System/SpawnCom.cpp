@@ -19,6 +19,7 @@
 #include <random>
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Renderer\RendererCom.h"
+#include "Component\PostEffect\PostEffect.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -123,11 +124,19 @@ void SpawnCom::Update(float elapsedTime)
         for (int i = 0; i < sp.spawnCount; ++i)
         {
             SpawnGameObject();
+            spawnflag = true;  // オブジェクト生成が行われたタイミングでフラグを true に
         }
 
         // タイマーをリセット
         lastSpawnTime = 0.0f;
     }
+    else
+    {
+        spawnflag = false;
+    }
+
+    //当たり判定
+    HitObject();
 }
 
 // imgui
@@ -153,6 +162,8 @@ void SpawnCom::OnGUI()
     }
 
     ImGui::Checkbox((char*)u8"生成フラグ", &spwntrigger);
+    ImGui::SameLine();
+    ImGui::Checkbox((char*)u8"生成時フラグ", &spawnflag);
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
@@ -176,6 +187,7 @@ void SpawnCom::SpawnGameObject()
 {
     // 新しいオブジェクトを作成
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    spawnedObjects.push_back(obj);  // オブジェクトをリストに追加
 
     // 位置設定
     DirectX::XMFLOAT3 newPosition = GenerateRandomPosition();
@@ -216,9 +228,9 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     obj->SetName("NoobEnemy");
     obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     const auto& renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    renderer->LoadModel("Data/Model/Jammo/jammo.mdl");
+    renderer->LoadModel("Data/Model/Enemy/Enemy.mdl");
     obj->AddComponent<MovementCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/Model/Jammo/jammocollsion.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
     obj->AddComponent<NoobEnemyCom>();
@@ -236,13 +248,15 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
     obj->SetName("fireball");
     const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
+    obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
+
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Enemy);
     collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.8f);
-    obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
 }
 
 //爆発生成関数
@@ -268,8 +282,9 @@ void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
 
     const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missilestreat.easingmove");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
@@ -282,7 +297,9 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
     const auto& beamSegment = GameObjectManager::Instance().Create();
     beamSegment->transform_->SetWorldPosition(origin->transform_->GetWorldPosition());
 
-    AssignUniqueName(beamSegment);
+    std::string objectName = std::string(origin->GetName()) + "_" + std::to_string(currentSpawnedCount);
+    beamSegment->SetName(objectName.c_str());
+    beamSegment->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
 
     const auto& collider = beamSegment->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
@@ -292,8 +309,43 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
 
     const auto& cpuparticle = beamSegment->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
     cpuparticle->SetActive(true);
-    beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
+    beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
     beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
+}
+
+//当たり判定
+void SpawnCom::HitObject()
+{
+    const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+
+    // 全ての複製されたオブジェクトに対して当たり判定を確認
+    for (const auto& weakObj : spawnedObjects)
+    {
+        if (const auto& obj = weakObj.lock())
+        {
+            const auto& collision = obj->GetComponent<SphereColliderCom>();
+            std::shared_ptr<Collider> collider = obj->GetComponent<Collider>();
+
+            for (const auto& hitobject : collision->OnHitGameObject())
+            {
+                if (const auto& hitObj = hitobject.gameObject.lock())
+                {
+                    if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
+                    {
+                        posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                        GetGameObject()->transform_->SetScale({ 1.0f,1.0f,1.0f });
+                        status->AddDamagePoint(-1);
+                    }
+                }
+            }
+
+            //for (const auto& hit : collider->OnHitGameObject())
+            //{
+            //    hit.gameObject.lock()->transform_->SetScale({ 1,1,1 });
+            //}
+        }
+        //posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+    }
 }
 
 //ランダム位置

@@ -17,6 +17,7 @@
 #include "Component/Renderer/InstanceRendererCom.h"
 #include "Component\Renderer\DecalCom.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Component\Renderer\TrailCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -287,6 +288,9 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     RenderUseDepth();
     InstanceRenderUseDepth();
 
+    //トレイル描画
+    TrailRender();
+
     // デカール描画
     DecalRender();
 
@@ -522,6 +526,13 @@ void GameObjectManager::StartUpObjects()
             decalobject.emplace_back(decalcomp);
         }
 
+        //トレイルオブジェクトがあれば入る
+        std::shared_ptr<Trail>trailcomp = obj->GetComponent<Trail>();
+        if (trailcomp)
+        {
+            trailobject.emplace_back(trailcomp);
+        }
+
         obj->Start();
         updateGameObject_.emplace_back(obj);
 
@@ -708,6 +719,16 @@ void GameObjectManager::RemoveGameObjects()
         {
             decalobject.erase(decalobject.begin() + d);
             --d;
+        }
+    }
+
+    //トレイル解放
+    for (int t = 0; t < trailobject.size(); ++t)
+    {
+        if (trailobject[t].expired())
+        {
+            trailobject.erase(trailobject.begin() + t);
+            --t;
         }
     }
 
@@ -1025,6 +1046,20 @@ void GameObjectManager::DecalRender()
         if (!d.lock()->GetEnabled())continue;
 
         d.lock()->Render();
+    }
+}
+
+//トレイル描画
+void GameObjectManager::TrailRender()
+{
+    if (trailobject.size() <= 0)return;
+
+    for (std::weak_ptr<Trail>& t : trailobject)
+    {
+        if (!t.lock()->GetGameObject()->GetEnabled())continue;
+        if (!t.lock()->GetEnabled())continue;
+
+        t.lock()->Render();
     }
 }
 

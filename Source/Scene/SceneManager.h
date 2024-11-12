@@ -4,6 +4,7 @@
 
 class GameObject;
 class CameraCom;
+class SettingScreen;
 
 //シーンマネージャー
 class SceneManager
@@ -58,6 +59,8 @@ public:
 
     bool GetTransitionFlag() { return transitionFlag; }
 
+    std::shared_ptr<SettingScreen> GetSettingScreen() { return ss; }
+
 private:
     Scene* currentScene_ = nullptr;
     Scene* nextScene_ = nullptr;
@@ -77,4 +80,7 @@ private:
     float transitionTime = 0;
     float transitionTimer = 0;
     Scene* transitionScene_ = nullptr;
+
+    //設定画面
+    std::shared_ptr<SettingScreen> ss;
 };

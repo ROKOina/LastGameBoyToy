@@ -42,6 +42,7 @@ public:
         JUMP,
         JUMPLOOP,
         LANDING,
+        DEATH,
         NONE,
         MAX,
     };

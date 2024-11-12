@@ -55,8 +55,10 @@
 #include "Component/Collsion/FrustumCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
-#include "Setting/Setting.h"
 #include <Component\UI\UiFlag.h>
+#include "Component\Renderer\TrailCom.h"
+
+#include "Setting/Setting.h"
 
 SceneGame::~SceneGame()
 {
@@ -140,7 +142,7 @@ void SceneGame::Initialize()
             std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
             ultAttckChild->SetName("UltAttackChild");
             //位置をカメラと一緒にする
-            ultAttckChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+            ultAttckChild->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
 
             std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
             rayCol->SetMyTag(COLLIDER_TAG::Player);
@@ -157,7 +159,7 @@ void SceneGame::Initialize()
             attackUltEff->SetName("attackUltEFF");
             attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr , 500);
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 500);
         }
     }
 
@@ -169,8 +171,27 @@ void SceneGame::Initialize()
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
 
         //pico位置
-        cameraPost->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+        cameraPost->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+
+        //腕
+        {
+            std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
+            armChild->SetName("armChild");
+            armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.20f });
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            auto& anim = armChild->AddComponent<AnimationCom>();
+            anim->PlayAnimation(0, true);
+        }
+    }
+
+    //snowparticle
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("snowparticle");
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
     //BOSS
@@ -188,9 +209,9 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
+        boss->AddComponent<CharaStatusCom>();
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
-        boss->AddComponent<CharaStatusCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
@@ -199,7 +220,7 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject>rightfootsmokeobject = boss->AddChildObject();
             rightfootsmokeobject->SetName("rightfootsmokeeffect");
-            std::shared_ptr<CPUParticle>rightfootsmokeeffect = rightfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>rightfootsmokeeffect = rightfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 600);
             rightfootsmokeeffect->SetActive(false);
         }
 
@@ -207,7 +228,7 @@ void SceneGame::Initialize()
         {
             std::shared_ptr<GameObject>leftfootsmokeobject = boss->AddChildObject();
             leftfootsmokeobject->SetName("leftfootsmokeeffect");
-            std::shared_ptr<CPUParticle>leftfootsmokeeffect = leftfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>leftfootsmokeeffect = leftfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 600);
             leftfootsmokeeffect->SetActive(false);
         }
 
@@ -246,21 +267,31 @@ void SceneGame::Initialize()
             std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
             spawnobject->SetName("spawn");
             spawnobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/missile.spawn");
-            std::shared_ptr<GPUParticle>gpuparticle = spawnobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
+            std::shared_ptr<GPUParticle>gpuparticle = spawnobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 4000);
             gpuparticle->SetStop(true);
-            std::shared_ptr<CPUParticle>shotsmoke = spawnobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/upshotsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>shotsmoke = spawnobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/upshotsmoke.cpuparticle", 800);
             shotsmoke->SetActive(false);
+
+            std::shared_ptr<GameObject> muzzleflashobject = spawnobject->AddChildObject();
+            muzzleflashobject->SetName("muzzleflashleft");
+            std::shared_ptr<CPUParticle>muzzleflash = muzzleflashobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/muzzleflash.cpuparticle", 500);
+            muzzleflash->SetActive(false);
         }
 
         //チャージ攻撃
         {
             std::shared_ptr<GameObject> chargeobject = boss->AddChildObject();
             chargeobject->SetName("charge");
-            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 6000);
+            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 4000);
             gpuparticle->SetStop(true);
             chargeobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/beem.spawn");
-            std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 800);
             shotsmoke->SetActive(false);
+
+            std::shared_ptr<GameObject> muzzleflashobject = chargeobject->AddChildObject();
+            muzzleflashobject->SetName("muzzleflash");
+            std::shared_ptr<CPUParticle>muzzleflash = muzzleflashobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/muzzleflash.cpuparticle", 500);
+            muzzleflash->SetActive(false);
         }
 
         //地面を叩き付ける攻撃
@@ -276,11 +307,6 @@ void SceneGame::Initialize()
 
     //UIゲームオブジェクト生成
     CreateUiObject();
-
-    //設定画面UIオブジェクト生成
-    ss = std::make_shared<SettingScreen>();
-    ss->CreateSettingUiObject();
-
 
 #pragma endregion
 
@@ -352,10 +378,6 @@ void SceneGame::Update(float elapsedTime)
     // ゲームオブジェクトの更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-
-    //設定画面更新
-    ss->SettingScreenUpdate(elapsedTime);
-    ss->SetViewSetting(true);
 }
 
 // 描画処理
@@ -390,7 +412,6 @@ void SceneGame::Render(float elapsedTime)
 
     ImGui::Begin("Effect");
 
-    ImGui::DragFloat("uvX", &ss->uvX,0.01f,0,1);
     EffectNew();
     ImGui::End();
 }
@@ -419,6 +440,9 @@ void SceneGame::EffectNew()
         std::shared_ptr<CPUParticle>cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 1000);
         cpuparticle->SetActive(true);
         obj->AddComponent<EasingMoveCom>(nullptr);
+        obj->AddComponent<NodeCollsionCom>(nullptr);
+        std::shared_ptr<Trail>trailcom = obj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
+        trailcom->SetTransform(obj->transform_->GetWorldTransform());
     }
     ImGui::SameLine();
     if (ImGui::Button("UI"))
@@ -510,7 +534,7 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hideUlt = ultFrame->AddChildObject();
             hideUlt->SetName("HideUltGauge");
             std::shared_ptr<UiGauge>gauge = hideUlt->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::Y_ONLY_SUB);
-            std::shared_ptr<GameObject>player  = GameObjectManager::Instance().Find("player");
+            std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
             gauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
             float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
             gauge->SetVariableValue(i);
