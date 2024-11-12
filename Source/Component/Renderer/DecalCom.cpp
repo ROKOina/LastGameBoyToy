@@ -163,7 +163,6 @@ Decal::Decal(const char* filename)
     CreatePsFromCso(graphics.GetDevice(), "Shader\\DecalPS.cso", pixelshader.GetAddressOf());
 
     //テクスチャ読み込み
-    //D3D11_TEXTURE2D_DESC texture2d_desc{};
     LoadTextureFromFile(Graphics::Instance().GetDevice(), filename, decalmap.GetAddressOf(), NULL);
 }
 

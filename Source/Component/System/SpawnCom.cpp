@@ -18,6 +18,8 @@
 #include "Component\Particle\GPUParticle.h"
 #include <random>
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Renderer\RendererCom.h"
+#include "Component\PostEffect\PostEffect.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -122,11 +124,19 @@ void SpawnCom::Update(float elapsedTime)
         for (int i = 0; i < sp.spawnCount; ++i)
         {
             SpawnGameObject();
+            spawnflag = true;  // オブジェクト生成が行われたタイミングでフラグを true に
         }
 
         // タイマーをリセット
         lastSpawnTime = 0.0f;
     }
+    else
+    {
+        spawnflag = false;
+    }
+
+    //当たり判定
+    HitObject();
 }
 
 // imgui
@@ -152,6 +162,8 @@ void SpawnCom::OnGUI()
     }
 
     ImGui::Checkbox((char*)u8"生成フラグ", &spwntrigger);
+    ImGui::SameLine();
+    ImGui::Checkbox((char*)u8"生成時フラグ", &spawnflag);
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
@@ -173,111 +185,200 @@ void SpawnCom::OnGUI()
 //ゲームオブジェクトを複製する処理
 void SpawnCom::SpawnGameObject()
 {
+    // 新しいオブジェクトを作成
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-    std::shared_ptr<SphereColliderCom> collider;
-    std::shared_ptr<RendererCom> renderer;
-    std::shared_ptr<CPUParticle>cpuparticle;
-    std::shared_ptr<GPUParticle>gpuparticle;
-    std::shared_ptr<PushBackCom>pushback;
+    spawnedObjects.push_back(obj);  // オブジェクトをリストに追加
 
-    // 親オブジェクトの位置を取得
+    // 位置設定
+    DirectX::XMFLOAT3 newPosition = GenerateRandomPosition();
+    obj->transform_->SetWorldPosition(newPosition);
+
+    // オブジェクトタイプに基づいて設定
+    objtype = static_cast<ObjectType>(sp.objecttype);
+    sp.objecttype = static_cast<int>(objtype);
+
+    // 各オブジェクトタイプに応じて処理を分岐
+    switch (objtype)
+    {
+    case ObjectType::ENEMY:
+        SetupEnemy(obj);
+        break;
+    case ObjectType::MISSILE:
+        SetupMissile(obj);
+        break;
+    case ObjectType::EXPLOSION:
+        SetupExplosion(obj);
+        break;
+    case ObjectType::BEEM:
+        SetupBeam(obj);
+        break;
+    default:
+        // サポートされていないタイプの場合、処理を終了
+        break;
+    }
+
+    // オブジェクトに番号を付ける
+    AssignUniqueName(obj);
+    currentSpawnedCount++;
+}
+
+//エネミー生成関数
+void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
+{
+    obj->SetName("NoobEnemy");
+    obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+    const auto& renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+    renderer->LoadModel("Data/Model/Enemy/Enemy.mdl");
+    std::shared_ptr<MovementCom>m = obj->AddComponent<MovementCom>();
+    m->SetIsRaycast(false);
+    m->SetGravity(0.0f);
+    obj->AddComponent<NodeCollsionCom>(nullptr);
+    obj->AddComponent<AnimationCom>();
+    obj->AddComponent<AimIKCom>(nullptr, nullptr);
+    obj->AddComponent<NoobEnemyCom>();
+    obj->AddComponent<CharaStatusCom>();
+    const auto& collider = obj->AddComponent<SphereColliderCom>();
+    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    const auto& pushback = obj->AddComponent<PushBackCom>();
+    pushback->SetRadius(0.5f);
+    pushback->SetWeight(600.0f);
+}
+
+//ミサイル生成関数
+void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
+{
+    obj->SetName("fireball");
+    const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
+    cpuparticle->SetActive(true);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
+    obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
+
+    const auto& collider = obj->AddComponent<SphereColliderCom>();
+    collider->SetEnabled(true);
+    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetRadius(0.8f);
+}
+
+//爆発生成関数
+void SpawnCom::SetupExplosion(const std::shared_ptr<GameObject>& obj)
+{
+    obj->SetName("explosion");
+    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionsmoke.cpuparticle", 1000);
+    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionfire.cpuparticle", 1000);
+    const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/explosion.gpuparticle", 10000);
+    gpuparticle->Play();
+}
+
+//ビーム生成関数
+void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
+{
+    obj->SetName("beam");
+
+    // 4方向のビーム生成
+    CreateBeamSegment(obj, "Data/SerializeData/3DEasingData/missileleft.easingmove");
+    CreateBeamSegment(obj, "Data/SerializeData/3DEasingData/missileleft45.easingmove");
+    CreateBeamSegment(obj, "Data/SerializeData/3DEasingData/missileright.easingmove");
+    CreateBeamSegment(obj, "Data/SerializeData/3DEasingData/missileright45.easingmove");
+
+    const auto& cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
+    cpuparticle->SetActive(true);
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
+    obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missilestreat.easingmove");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
+
+    const auto& collider = obj->AddComponent<SphereColliderCom>();
+    collider->SetEnabled(true);
+    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetRadius(0.8f);
+}
+void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, const char* easingMovePath)
+{
+    const auto& beamSegment = GameObjectManager::Instance().Create();
+    beamSegment->transform_->SetWorldPosition(origin->transform_->GetWorldPosition());
+
+    std::string objectName = std::string(origin->GetName()) + "_" + std::to_string(currentSpawnedCount);
+    beamSegment->SetName(objectName.c_str());
+    beamSegment->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
+
+    const auto& collider = beamSegment->AddComponent<SphereColliderCom>();
+    collider->SetEnabled(true);
+    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetRadius(0.8f);
+
+    const auto& cpuparticle = beamSegment->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
+    cpuparticle->SetActive(true);
+    beamSegment->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
+    beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
+}
+
+//当たり判定
+void SpawnCom::HitObject()
+{
+    const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+
+    // 全ての複製されたオブジェクトに対して当たり判定を確認
+    for (const auto& weakObj : spawnedObjects)
+    {
+        if (const auto& obj = weakObj.lock())
+        {
+            const auto& collision = obj->GetComponent<SphereColliderCom>();
+            std::shared_ptr<Collider> collider = obj->GetComponent<Collider>();
+
+            for (const auto& hitobject : collision->OnHitGameObject())
+            {
+                if (const auto& hitObj = hitobject.gameObject.lock())
+                {
+                    if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
+                    {
+                        posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                        GetGameObject()->transform_->SetScale({ 1.0f,1.0f,1.0f });
+                        status->AddDamagePoint(-1);
+                    }
+                }
+            }
+
+            //for (const auto& hit : collider->OnHitGameObject())
+            //{
+            //    hit.gameObject.lock()->transform_->SetScale({ 1,1,1 });
+            //}
+        }
+        //posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+    }
+}
+
+//ランダム位置
+DirectX::XMFLOAT3 SpawnCom::GenerateRandomPosition()
+{
     DirectX::XMFLOAT3 originalPosition = GetGameObject()->transform_->GetWorldPosition();
 
-    // ランダムな位置を生成
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * DirectX::XM_PI);
     std::uniform_real_distribution<float> distanceDist(sp.distanceXY.x, sp.distanceXY.y);
 
     float randomAngle = angleDist(gen);
-    float randomDistance = std::sqrt(distanceDist(gen)) * sp.spawnRadius; // 平方根で距離分布を調整
+    float randomDistance = std::sqrt(distanceDist(gen)) * sp.spawnRadius;
 
     float offsetX = std::cos(randomAngle) * randomDistance;
     float offsetZ = std::sin(randomAngle) * randomDistance;
 
-    // 新しい位置を元の位置にオフセットを加えて設定
-    DirectX::XMFLOAT3 newPosition =
+    return
     {
         originalPosition.x + offsetX,
         originalPosition.y + sp.Yoffset,
         originalPosition.z + offsetZ
     };
-    obj->transform_->SetWorldPosition(newPosition);
+}
 
-    //どのオブジェクトを生成するか決定する
-    objtype = static_cast<ObjectType>(sp.objecttype);
-    sp.objecttype = static_cast<int>(objtype);
-    switch (objtype)
-    {
-    case ObjectType::ENEMY:
-
-        obj->SetName("NoobEnemy");
-        obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-        renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        renderer->LoadModel("Data/Model/Jammo/jammo.mdl");
-        obj->AddComponent<MovementCom>();
-        obj->AddComponent<NodeCollsionCom>("Data/Model/Jammo/jammocollsion.nodecollsion");
-        obj->AddComponent<AnimationCom>();
-        obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
-        obj->AddComponent<NoobEnemyCom>();
-        obj->AddComponent<CharaStatusCom>();
-        collider = obj->AddComponent<SphereColliderCom>();
-        collider->SetMyTag(COLLIDER_TAG::Enemy);
-        pushback = obj->AddComponent<PushBackCom>();
-        pushback->SetRadius(0.5f);
-        pushback->SetWeight(0.5f);
-
-        break;
-
-    case ObjectType::MISSILE:
-
-        obj->SetName("fireball");
-        cpuparticle = obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fireball.cpuparticle", 600);
-        cpuparticle->SetActive(true);
-        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 5000);
-        collider = obj->AddComponent<SphereColliderCom>();
-        collider->SetEnabled(true);
-        collider->SetMyTag(COLLIDER_TAG::Enemy);
-        collider->SetJudgeTag(COLLIDER_TAG::Player);
-        collider->SetRadius(0.8f);
-        obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
-
-        break;
-
-    case ObjectType::EXPLOSION:
-
-        obj->SetName("explosion");
-        obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionsmoke.cpuparticle", 1000);
-        obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionfire.cpuparticle", 1000);
-        gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/explosion.gpuparticle", 10000);
-        gpuparticle->Play();
-        break;
-
-    case ObjectType::BEEM:
-
-        obj->SetName("beem");
-        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beem.gpuparticle", 10000);
-        obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
-
-        break;
-
-    default:
-
-        collider = nullptr;
-        renderer = nullptr;
-        cpuparticle = nullptr;
-        gpuparticle = nullptr;
-        pushback = nullptr;
-
-        break;
-    }
-
-    // オブジェクトに番号を付ける
+//個別で名前を付ける
+void SpawnCom::AssignUniqueName(const std::shared_ptr<GameObject>& obj)
+{
     std::string objectName = std::string(obj->GetName()) + "_" + std::to_string(currentSpawnedCount);
     obj->SetName(objectName.c_str());
-
-    // 現在の生成数をインクリメント
-    currentSpawnedCount++;
 }
 
 //シリアライズ

@@ -179,6 +179,7 @@
     <ClInclude Include="Source\Component\Renderer\DecalCom.h" />
     <ClInclude Include="Source\Component\Renderer\InstanceRendererCom.h" />
     <ClInclude Include="Source\Component\Renderer\RendererCom.h" />
+    <ClInclude Include="Source\Component\Renderer\TrailCom.h" />
     <ClInclude Include="Source\Component\Sprite\Sprite.h" />
     <ClInclude Include="Source\Component\Stage\StageEditorCom.h" />
     <ClInclude Include="Source\Component\System\Component.h" />
@@ -187,6 +188,7 @@
     <ClInclude Include="Source\Component\System\RayCastManager.h" />
     <ClInclude Include="Source\Component\System\SpawnCom.h" />
     <ClInclude Include="Source\Component\System\TransformCom.h" />
+    <ClInclude Include="Source\Component\UI\PlayerUI.h" />
     <ClInclude Include="Source\Component\UI\UiFlag.h" />
     <ClInclude Include="Source\Component\UI\UiGauge.h" />
     <ClInclude Include="Source\Component\UI\UiSystem.h" />
@@ -244,6 +246,7 @@
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
     <ClInclude Include="Source\Scene\SceneUI\SceneUI.h" />
+    <ClInclude Include="Source\Setting\Setting.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BaseCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
@@ -314,6 +317,7 @@
     <ClCompile Include="Source\Component\Renderer\DecalCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\InstanceRendererCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\RendererCom.cpp" />
+    <ClCompile Include="Source\Component\Renderer\TrailCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Component\Stage\StageEditorCom.cpp" />
     <ClCompile Include="Source\Component\System\GameObject.cpp" />
@@ -321,6 +325,7 @@
     <ClCompile Include="Source\Component\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Component\System\SpawnCom.cpp" />
     <ClCompile Include="Source\Component\System\TransformCom.cpp" />
+    <ClCompile Include="Source\Component\UI\PlayerUI.cpp" />
     <ClCompile Include="Source\Component\UI\UiFlag.cpp" />
     <ClCompile Include="Source\Component\UI\UiGauge.cpp" />
     <ClCompile Include="Source\Component\UI\UiSystem.cpp" />
@@ -369,6 +374,7 @@
     <ClCompile Include="Source\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\SceneTraining.cpp" />
     <ClCompile Include="Source\Scene\SceneUI\SceneUI.cpp" />
+    <ClCompile Include="Source\Setting\Setting.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BaseCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
@@ -384,6 +390,7 @@
     <None Include="HLSL\2D\PostEffect\FilterFunctions.hlsli" />
     <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
+    <None Include="HLSL\2D\Trail.hlsli" />
     <None Include="HLSL\3D\Decal.hlsli" />
     <None Include="HLSL\3D\FakeDepth.hlsli" />
     <None Include="HLSL\3D\Defalt.hlsli" />
@@ -460,6 +467,14 @@
     <FxCompile Include="HLSL\2D\PostEffect\ToneMapPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\TrailPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\TrailVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\AreaEffectCirclePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

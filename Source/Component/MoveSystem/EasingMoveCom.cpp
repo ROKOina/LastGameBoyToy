@@ -75,20 +75,27 @@ namespace DirectX
 template<class Archive>
 void EasingMoveCom::EasingMoveParameter::serialize(Archive& archive, int version)
 {
-    archive
-    (
-        CEREAL_NVP(filename),
-        CEREAL_NVP(delaytime),
-        CEREAL_NVP(delatimeuse),
-        CEREAL_NVP(timescale),
-        CEREAL_NVP(easingtype),
-        CEREAL_NVP(easingmovetype),
-        CEREAL_NVP(easingposition),
-        CEREAL_NVP(objectname),
-        CEREAL_NVP(trackingtime),
-        CEREAL_NVP(deleteflag),
-        CEREAL_NVP(deletetime)
-    );
+    switch (version)
+    {
+    case 1:
+
+        archive
+        (
+            CEREAL_NVP(filename),
+            CEREAL_NVP(delaytime),
+            CEREAL_NVP(delatimeuse),
+            CEREAL_NVP(timescale),
+            CEREAL_NVP(easingtype),
+            CEREAL_NVP(easingmovetype),
+            CEREAL_NVP(easingposition),
+            CEREAL_NVP(objectname),
+            CEREAL_NVP(trackingtime),
+            CEREAL_NVP(deleteflag),
+            CEREAL_NVP(deletetime)
+        );
+
+        break;
+    }
 }
 
 //コンストラクタ

@@ -26,14 +26,14 @@ public:
 
     Boss_BaseState(BossCom* owner);
 
-    //乱数の行動制御
-    void RandamBehavior();
+    //乱数の近接攻撃制御
+    void RandamMeleeAttack();
 
-    //乱数計算
-    int ComputeRandom();
+    //乱数の遠距離攻撃制御
+    void RandamLongRangeAttack();
 
     //アニメーションイベント制御
-    void AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventflags);
+    void AnimtionEventControl(const std::string& eventname, const std::string& nodename, const char* objectname, int eventflags, DirectX::XMFLOAT3 offsetpos = { 0.0f,0.0f,0.0f });
 
 protected:
     std::weak_ptr<BossCom> bossCom;
@@ -266,7 +266,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit()override {};
+    void Exit()override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "JumpAttackStart"; }
 };
@@ -283,30 +283,6 @@ public:
     void ImGui() override {};
     virtual const char* GetName() const override { return "JumpAttackEnd"; }
 };
-
-////ボンプ攻撃
-//class Boss_BompAttackState : public Boss_BaseState
-//{
-//public:
-//    Boss_BompAttackState(BossCom* owner) :Boss_BaseState(owner) {}
-//
-//    void Enter() override;
-//    void Execute(const float& elapsedTime) override;
-//    void ImGui() override {};
-//    virtual const char* GetName() const override { return "BompAttack"; }
-//};
-//
-////ファイヤーボール
-//class Boss_FireBallState : public Boss_BaseState
-//{
-//public:
-//    Boss_FireBallState(BossCom* owner) :Boss_BaseState(owner) {}
-//
-//    void Enter() override;
-//    void Execute(const float& elapsedTime) override;
-//    void ImGui() override {};
-//    virtual const char* GetName() const override { return "FireBall"; }
-//};
 
 //死亡
 class Boss_DeathState : public Boss_BaseState

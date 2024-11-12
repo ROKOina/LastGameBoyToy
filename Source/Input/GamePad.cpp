@@ -153,6 +153,7 @@ void GamePad::Update()
     if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)newButtonState |= BTN_LEFT_TRIGGER;
     if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)newButtonState |= BTN_RIGHT_TRIGGER;
     if (GetAsyncKeyState(VK_LCONTROL) & 0x8000)newButtonState |= BTN_LCONTROL;
+    if (GetAsyncKeyState('P') & 0x8000)newButtonState |= BTN_P;
 
     //if (GetAsyncKeyState(VK_UP) & 0x8000)		newButtonState |= BTN_UP;
     //if (GetAsyncKeyState(VK_RIGHT) & 0x8000)	newButtonState |= BTN_RIGHT;

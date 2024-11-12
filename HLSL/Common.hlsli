@@ -10,7 +10,11 @@
 #define WHITE_BORDER_POINT 6
 #define WHITE_BORDER_LINEAR 7
 #define WHITE_BORDER_ANISOTROPIC 8
-SamplerState sampler_states[9] : register(s0);
+#define TRANSPARENT_BORDER_POINT 10
+#define TRANSPARENT_BORDER_LINEAR 11
+#define TRANSPARENT_BORDER_ANISOTROPIC 12
+
+SamplerState sampler_states[TRANSPARENT_BORDER_ANISOTROPIC] : register(s0);
 SamplerComparisonState comparison_sampler_state : register(s9);
 
 // ‰~Žü—¦

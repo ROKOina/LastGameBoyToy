@@ -7,7 +7,7 @@ Texture2D texturemaps : register(t0);
 float4 main(VS_OUT pin) : SV_TARGET
 {
     //テクスチャから色をサンプルし、リニア空間に変換
-    float4 color = texturemaps.Sample(sampler_states[LINEAR], pin.texcoord);
+    float4 color = texturemaps.Sample(sampler_states[TRANSPARENT_BORDER_LINEAR], pin.texcoord);
 
     //逆ガンマ補正でリニア空間に変換 (通常のガンマ値は 2.2)
     color.rgb = pow(color.rgb, GAMMA);

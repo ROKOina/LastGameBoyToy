@@ -36,9 +36,13 @@ public:
     void SetInvincibleTime(float time) { invincibleTime = time; }
     bool IsInvincible() const { return currentInvincibleTime > 0.0f; }
 
+    bool IsDeath() { return isDeath; }
+
 private:
     float hitPoint = 100;
     float maxHitPoint = 100;              //HPの最大値
     float invincibleTime = 3.0f;        // 無敵時間の長さ（秒）
     float currentInvincibleTime = 0.0f; // 残りの無敵時間
+
+    bool isDeath = false;   //死亡フラグ
 };

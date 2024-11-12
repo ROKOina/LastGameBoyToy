@@ -75,7 +75,7 @@ private:
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
     {
-        DirectX::XMFLOAT4 vignettecolor = { 1.0f,0.0f,0.0f,1.0f };
+        DirectX::XMFLOAT4 vignettecolor = { 1.000f, 0.197f, 0.197f, 1.000f };
         float colorize[3] = { 1, 1, 1 };
         float brightness = 0.0f;
         float contrast = 0.10f;
@@ -84,8 +84,8 @@ private:
         float bloomextractionthreshold = 0.800f;
         float blurconvolutionintensity = 0.200f;
         float exposure = 1.4f;
-        float vignettesize = 0.8f;
-        float vignetteintensity = 0.05f;
+        float vignettesize = 0.7f;
+        float vignetteintensity = 0.01f;
         DirectX::XMFLOAT4 ssrparameter = { 50.0f,10.0f,0.1f,1.0f };
         float distance_to_sun = 100.361f;
         float blurstrength = {};

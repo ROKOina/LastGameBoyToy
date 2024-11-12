@@ -1,8 +1,11 @@
 #include "CharacterCom.h"
+#include "CharaStatusCom.h"
 #include "Component/Camera/CameraCom.h"
 #include "Component/System/TransformCom.h"
 #include "Input\Input.h"
 #include "Math/Mathf.h"
+#include "Component\PostEffect\PostEffect.h"
+#include "Setting/Setting.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -21,7 +24,11 @@ void CharacterCom::Update(float elapsedTime)
     nowAngle = InterpolateAngle(nowAngle, stickAngle, elapsedTime, lerpSpeed);
 
     //ステート処理
-    attackStateMachine.Update(elapsedTime);
+    if (!GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
+        attackStateMachine.Update(elapsedTime);
+    else
+        if (moveStateMachine.GetCurrentState() != CHARACTER_MOVE_ACTIONS::DEATH)    //死亡処理
+            moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::DEATH);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
 
 #ifdef _DEBUG
@@ -95,16 +102,24 @@ void CharacterCom::Update(float elapsedTime)
         LeftShiftSkill(elapsedTime);
 
         //ダッシュ時一回だけ入る
+        const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
         if (!dashFlag)
         {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, PostEffect::PostEffectParameter::BlurStrength);
+            GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.005f, 0.5f);
             dashFlag = true;
             dashGauge -= 2; //最初は一気に減らす
+        }
+        else
+        {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
         }
 
         //ゲージがなくなったらタイマーをセット
         if (dashGauge <= 0)
         {
             LScool.timer = 0;
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
         }
     }
     else
@@ -184,7 +199,6 @@ void CharacterCom::OnGUI()
         ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
         ImGui::DragInt("attackUltCounter", &attackUltCounter);
 
-
         ImGui::TreePop();
     }
 
@@ -210,11 +224,10 @@ void CharacterCom::OnGUI()
         s = (int)(attackStateMachine.GetCurrentState());
         ImGui::InputInt("attackS", &s);
         moveStateMachine.ImGui();
-        attackStateMachine.ImGui(); 
-        
+        attackStateMachine.ImGui();
+
         ImGui::TreePop();
     }
-
 
     if (ImGui::TreeNode("NetInput"))
     {
@@ -262,6 +275,8 @@ void CharacterCom::OnGUI()
 //ダッシュ
 void CharacterCom::LeftShiftSkill(float elapsedTime)
 {
+    if (std::string(GetGameObject()->GetName()) != "player")return;
+
     //最大速度で速さを変える
     auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
     float maxSpeed = moveCmp->GetMoveMaxSpeed();
@@ -293,6 +308,22 @@ void CharacterCom::CameraControl()
             return;
         }
 
+        //設定画面を開く(P)
+        auto& ss = SceneManager::Instance().GetSettingScreen();
+        bool isViewSetting = ss->IsViewSetting();
+        if (GamePad::BTN_P & gamePad.GetButtonDown())
+        {
+            if (isViewSetting)
+            {
+                ss->SetViewSetting(false);
+            }
+            else
+            {
+                ss->SetViewSetting(true);
+            }
+        }
+        if (isViewSetting)return;
+
         //UI配置中はマウスを固定しない
         if (!cameraObj->GetComponent<CameraCom>()->GetIsUiCreate())
         {
@@ -303,8 +334,9 @@ void CharacterCom::CameraControl()
             ::SetCursorPos(500, 500);
 
             //動かす速度(感度)
-            float moveX = (newCursor.x - 500) * 0.02f;
-            float moveY = (newCursor.y - 500) * 0.02f;
+            auto& ss = SceneManager::Instance().GetSettingScreen();
+            float moveX = (newCursor.x - 500) * 0.0005f * ss->GetSensitivity();
+            float moveY = (newCursor.y - 500) * 0.0005f * ss->GetSensitivity();
 
             //Y軸回転(ここでオブジェクトの回転)
             DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();

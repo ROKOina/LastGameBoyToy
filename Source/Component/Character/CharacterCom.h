@@ -42,6 +42,7 @@ public:
         JUMP,
         JUMPLOOP,
         LANDING,
+        DEATH,
         NONE,
         MAX,
     };
@@ -147,13 +148,19 @@ public:
 
     void SetQSkillCoolTime(float time) { Qcool.time = time; }
     float GetQSkillCoolTime() { return Qcool.time; }
+    float GetQSkillCoolTimer() { return Qcool.timer; }
     void SetESkillCoolTime(float time) { Ecool.time = time; }
     float GetESkillCoolTime() { return Ecool.time; }
+    float GetESkillCoolTimer() { return Ecool.timer; }
     void SetRSkillCoolTime(float time) { Rcool.time = time; }
     float GetRSkillCoolTime() { return Rcool.time; }
+    float GetRSkillCoolTimer() { return Rcool.timer; }
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
-
+    float GetSpaceSkillCoolTimer() { return Spacecool.timer; }
+    void SetUltGauge(float gauge) { ultGauge = gauge; }
+    float* GetUltGauge() { return  &ultGauge; }
+    float GetUltGaugeMax() { return ultGaugeMax; }
     void SetMoveFlag(bool flag) { useMoveFlag = flag; }
 
     bool* GetIsHitAttack() { return &isHitAttack; }

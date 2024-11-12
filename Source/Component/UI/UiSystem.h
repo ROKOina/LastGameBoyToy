@@ -35,7 +35,7 @@ public:
     void SetFadeOutFlag(bool flag) { fadeOutFlag = flag; }
 
 protected:
-    float* variableValue;    //参照する値
+    float* variableValue;           //参照する値
     float  maxValue = 0.0f;         //最大値
     float  valueRate = 0.0f;        //割合
 
@@ -51,8 +51,11 @@ protected:
 public:
     //変更する値を決めるenum
     enum ChangeValue {
-        X_ONLY,
-        Y_ONLY,
-        X_AND_Y
+        X_ONLY_ADD, //増やす
+        X_ONLY_SUB, //減らす
+        Y_ONLY_ADD, //増やす
+        Y_ONLY_SUB, //減らす
+        X_AND_Y_ADD,//増やす
+        X_AND_Y_SUB,//減らす
     };
 };

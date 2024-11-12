@@ -40,12 +40,12 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-        owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
-            owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
-        );
+        //owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
+        //    owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
+        //);
 
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, 50);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, 1);
         //Fire(owner->GetGameObject(), arrowSpeed, attackPower);
         //RayFire(owner->GetGameObject());
 
@@ -92,7 +92,7 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
     {
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, 1, 20);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, 1, 1);
         //Fire(owner->GetGameObject(), arrowSpeed);
         arrowCount--;
         intervalTimer = 0;

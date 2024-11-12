@@ -84,7 +84,7 @@ void NoobEnemyCom::StateUpdate(float elapsedTime)
 void NoobEnemyCom::TransitionIdleState()
 {
     state = State::Idle;
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_run"), true);
     firstIdleTime = static_cast<float>(rand()) / RAND_MAX * 1.5f;
 }
 
@@ -92,13 +92,14 @@ void NoobEnemyCom::TransitionIdleState()
 void NoobEnemyCom::TransitionPursuit()
 {
     state = State::Purstuit;
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Running"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_run"), true);
 }
 
 //爆発ステート
 void NoobEnemyCom::TransitionExplosion()
 {
     state = State::Explosion;
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_dead"), false);
 }
 
 //待機ステート更新処理
@@ -118,7 +119,7 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
 {
     auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
     DirectX::XMFLOAT3 v = GetEnemyToPlayer() * speed;
-    moveCom->AddForce({ v.x,0.0f,v.z });
+    moveCom->AddForce({ v.x,v.y,v.z });
     DirectX::XMFLOAT3 t = { GetEnemyToPlayer().x,0.0f,GetEnemyToPlayer().z };
     GetGameObject()->transform_->Turn(t, 0.1f);
 
@@ -132,7 +133,7 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
 void NoobEnemyCom::UpdateExplosion(float elapsedTime)
 {
     explosionGrace -= elapsedTime;
-    if (0 > explosionGrace)
+    if (!animationCom.lock()->IsPlayAnimation())
     {
         //一定時間その場に止まってから爆発
         GameObjectManager::Instance().Remove(this->GetGameObject());
