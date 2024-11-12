@@ -300,6 +300,13 @@ void SceneGame::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
             smoke->SetActive(false);
         }
+
+        //雑魚的生成オブジェクト
+        {
+            //std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
+            //spawnobject->SetName("spawnenemy");
+            //spawnobject->AddComponent<SpawnCom>(nullptr);
+        }
     }
 
 #endif
