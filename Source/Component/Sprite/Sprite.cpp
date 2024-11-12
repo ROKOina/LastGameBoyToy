@@ -809,7 +809,7 @@ void Sprite::OnGUI()
         ImGui::DragFloat2((char*)u8"テクスチャサイズ", &spc.texSize.x);
         ImGui::DragFloat((char*)u8"再生速度", &spc.timescale, 0.1f, 0.0f, 5.0f);
         DirectX::XMFLOAT2 mouse = {(float)(Input::Instance().GetMouse().GetPositionX()),(float)(Input::Instance().GetMouse().GetPositionY()) };
-        ImGui::DragFloat2((char*)u8"再生速度", &mouse.x);
+        ImGui::DragFloat2((char*)u8"マウス位置", &mouse.x);
         ImGui::TreePop();
     }
 

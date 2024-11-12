@@ -35,7 +35,7 @@ public:
     void SetFadeOutFlag(bool flag) { fadeOutFlag = flag; }
 
 protected:
-    float* variableValue;    //参照する値
+    float* variableValue;           //参照する値
     float  maxValue = 0.0f;         //最大値
     float  valueRate = 0.0f;        //割合
 
