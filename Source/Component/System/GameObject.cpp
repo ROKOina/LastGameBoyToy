@@ -18,6 +18,7 @@
 #include "Component\Renderer\DecalCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Renderer\TrailCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -548,6 +549,13 @@ void GameObjectManager::StartUpObjects()
         if (pushBackComponent)
         {
             pushBackObject_.emplace_back(pushBackComponent);
+        }
+
+        //物理初期設定
+        std::shared_ptr<RigidBodyCom> rigidBodyComponent = obj->GetComponent<RigidBodyCom>();
+        if (rigidBodyComponent)
+        {
+            rigidBodyComponent->SetUp();
         }
 
         obj->UpdateTransform();

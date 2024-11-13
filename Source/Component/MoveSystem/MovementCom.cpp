@@ -4,6 +4,7 @@
 #include "Component/System/TransformCom.h"
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
+#include "Phsix\Physxlib.h"
 
 // 更新処理
 void MovementCom::Update(float elapsedTime)
@@ -140,10 +141,11 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
 
         // 判定
         RayCastManager::Result hit;
-        if (isRaycast && RayCastManager::Instance().RayCast(start, end, hit))
+        PxRaycastBuffer buffer;
+        if (isRaycast && PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start),Mathf::Length(end - start), buffer))//RayCast(start, end, hit))
         {
             // 地面に接地している
-            position.y = hit.position.y;
+            position.y = buffer.block.position.y;
             velocity_.y = 0;
             nonMaxSpeedVelocity_.y = 0;
             onGround_ = true;
@@ -176,12 +178,13 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
     if (velocityLengthXZ > 0.0f)
     {
         // レイの始点位置と終点位置
-        DirectX::XMFLOAT3 start = { position.x, position.y + stepOffset, position.z };
-        DirectX::XMFLOAT3 end = { position.x + totalVelocity.x * elapsedTime, position.y + stepOffset, position.z + totalVelocity.z * elapsedTime };
+        DirectX::XMFLOAT3 start = { position.x, position.y + 3.0f, position.z };
+        DirectX::XMFLOAT3 end = { position.x + moveVec.x * 1.3f * elapsedTime, position.y + 3.0f, position.z + moveVec.z * 1.3f * elapsedTime };
 
         // レイキャストによる壁判定
         RayCastManager::Result hit;
-        if (isRaycast && RayCastManager::Instance().RayCast(start, end, hit))
+        PxSweepBuffer buffer;
+        if (isRaycast && PhysXLib::Instance().SphereCast_PhysX(start, Mathf::Normalize(end - start), 1.0f, Mathf::Length(end - start), buffer))
         {
             // 移動後の位置から壁までのベクトル
             DirectX::XMVECTOR Start = XMLoadFloat3(&start);
@@ -189,26 +192,32 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
             DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(End, Start);
 
             // 壁の法線
-            DirectX::XMVECTOR Normal = XMLoadFloat3(&hit.normal);
+            DirectX::XMFLOAT3 normal = { buffer.block.normal.x,  buffer.block.normal.y,  -buffer.block.normal.z };
+            DirectX::XMVECTOR Normal = XMLoadFloat3(&normal);
 
             // 入射ベクトルを法線ベクトルに射影
             DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(Vec, Normal);
 
             // 補正位置の計算
+            //DirectX::XMFLOAT3 correction;
+            //DirectX::XMStoreFloat3(&correction, DirectX::XMVectorMultiplyAdd(Normal, Dot, Start));
             DirectX::XMFLOAT3 correction;
-            DirectX::XMStoreFloat3(&correction, DirectX::XMVectorMultiplyAdd(Normal, Dot, Start));
+            DirectX::XMStoreFloat3(&correction, DirectX::XMVectorMultiply(Normal, Dot));
+            DirectX::XMStoreFloat3(&correction, DirectX::XMVectorAdd(DirectX::XMVectorScale(Normal, DirectX::XMVectorGetX(Dot) + 1), Start));
+
 
             // 壁との接触位置からの補正処理
-            start = hit.position;
+            DirectX::XMFLOAT3 hitPos = { buffer.block.position.x,  buffer.block.position.y,  buffer.block.position.z };
+            /*start = hitPos;*/
             end = correction;
 
             // 補正後の位置を設定
-            position = start;
+            position = GetGameObject()->transform_->GetWorldPosition();
         }
         else
         {
-            position.x += totalVelocity.x * elapsedTime;
-            position.z += totalVelocity.z * elapsedTime;
+            position.x += moveVec.x * elapsedTime;
+            position.z += moveVec.z * elapsedTime;
         }
     }
 

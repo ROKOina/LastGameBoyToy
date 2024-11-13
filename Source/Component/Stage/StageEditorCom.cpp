@@ -111,24 +111,6 @@ void StageEditorCom::Update(float elapsedTime)
         PxVec3 dir = {d.x,d.y,d.z};
 
         physx::PxRaycastBuffer Buf;
-
-        if (PhysXLib::Instance().RayCast_PhysX(pos, dir, 1000, Buf))
-        {
-            auto hit = Buf.block;
-            DirectX::XMFLOAT3 p = {};
-            p.x += hit.position.x;
-            p.y += hit.position.y;
-            p.z += hit.position.z;
-
-            ObjectPlace(
-                objType,              //選択中のオブジェクト
-                p,         //位置
-                { 0.02f,0.02f,0.02f },//スケール
-                { 0,0,0,1 },          //回転値
-                placeObjcts[objType.c_str()].filePath.c_str(),    //modelのパス
-                placeObjcts[objType.c_str()].collisionPath.c_str()//nodeCollsionのパス
-            );
-        }
     }
 }
 
