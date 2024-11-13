@@ -170,6 +170,7 @@
     <ClInclude Include="Source\Component\Collsion\RayCollisionCom.h" />
     <ClInclude Include="Source\Component\Enemy\BossCom.h" />
     <ClInclude Include="Source\Component\Enemy\NoobEnemyCom.h" />
+    <ClInclude Include="Source\Component\Light\LightCom.h" />
     <ClInclude Include="Source\Component\MoveSystem\EasingMoveCom.h" />
     <ClInclude Include="Source\Component\MoveSystem\MovementCom.h" />
     <ClInclude Include="Source\Component\Particle\CPUParticle.h" />
@@ -308,6 +309,7 @@
     <ClCompile Include="Source\Component\Collsion\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Component\Enemy\BossCom.cpp" />
     <ClCompile Include="Source\Component\Enemy\NoobEnemyCom.cpp" />
+    <ClCompile Include="Source\Component\Light\LightCom.cpp" />
     <ClCompile Include="Source\Component\MoveSystem\EasingMoveCom.cpp" />
     <ClCompile Include="Source\Component\MoveSystem\MovementCom.cpp" />
     <ClCompile Include="Source\Component\Particle\CPUParticle.cpp" />

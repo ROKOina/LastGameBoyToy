@@ -635,16 +635,16 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     AnimtionEventControl("EFFECTTIME", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     AnimtionEventControl("EFFECTTIME", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
 
-    //空中だったら移動
-    if (!moveCom.lock()->OnGround())
-    {
-        owner->MoveToTarget(10.0f, 1.0f);
-    }
-
     //飛ぶ
     if (animationCom.lock()->IsEventCalling("JUMPTIME"))
     {
         moveCom.lock()->AddForce({ owner->GetGameObject()->transform_->GetWorldPosition().x, 2.5f, owner->GetGameObject()->transform_->GetWorldPosition().z });
+    }
+
+    //空中だったら移動
+    if (!moveCom.lock()->OnGround())
+    {
+        owner->MoveToTarget(10.0f, 1.0f);
     }
 
     //アニメーションが終われば重力を強くかける
