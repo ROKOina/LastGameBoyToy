@@ -52,33 +52,49 @@ void RigidBodyCom::OnGUI()
 void RigidBodyCom::SetUp()
 {
     ID3D11Device* device = Graphics::Instance().GetDevice();
-    std::shared_ptr<ModelResource> resource = std::make_shared<ModelResource>();
 
-    if (!useResourcePath.empty())
-    {
-        //リソースマネージャーに登録されているか
-        if (!ResourceManager::Instance().JudgeModelFilename(useResourcePath.c_str()))
-        {
-            resource->Load(device, useResourcePath.c_str());
-            ResourceManager::Instance().RegisterModel(useResourcePath.c_str(), resource);	//リソースマネージャーに追加する
-        }
-        else
-        {
-            resource = ResourceManager::Instance().LoadModelResource(useResourcePath.c_str());	//ロードする
-        }
-    }
-       
     switch (rigidType)
     {
     case RigidBodyCom::RigidType::Mesh:
-        GenerateCollider(resource.get());
+    case RigidBodyCom::RigidType::Convex:
+
+        if (!useResourcePath.empty())
+        {
+            GenerateCollider(
+                ResourceManager::Instance().GetModelResource(useResourcePath.c_str()).get(),
+                rigidType == RigidType::Convex
+            );
+        }
+        else
+        {
+            GenerateCollider(
+                GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource(),
+                rigidType == RigidType::Convex
+            );
+        }
+
         break;
+
     case RigidBodyCom::RigidType::Primitive:
         //NodeCollisionを適応させる必要あり
         GenerateCollider(NodeCollsionCom::CollsionType::SPHER, GetGameObject()->transform_->GetScale());
         break;
     case RigidBodyCom::RigidType::Complex:
-        PhysXLib::Instance().GenerateManyCollider_Convex(resource.get(), GetGameObject()->transform_->GetScale().x * normalizeScale);
+
+        if (!useResourcePath.empty())
+        {
+            PhysXLib::Instance().GenerateManyCollider_Convex(
+                ResourceManager::Instance().GetModelResource(useResourcePath.c_str()).get(), 
+                GetGameObject()->transform_->GetScale().x * normalizeScale
+            );
+        }
+        else
+        {
+            PhysXLib::Instance().GenerateManyCollider_Convex(
+                GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource(),
+                GetGameObject()->transform_->GetScale().x * normalizeScale
+            );
+        }
         break;
     default:
         break;
@@ -90,12 +106,24 @@ void RigidBodyCom::GenerateCollider(NodeCollsionCom::CollsionType type, DirectX:
     rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, type, GetGameObject(),scale);
 }
 
-void RigidBodyCom::GenerateCollider(ModelResource* rc)
+void RigidBodyCom::GenerateCollider(ModelResource* rc, bool isConvex)
 {
-    rigidActor = PhysXLib::Instance().GenerateMeshCollider(
-        isStatic, rc, 
-        GetGameObject()->transform_->GetWorldPosition(),
-        GetGameObject()->transform_->GetRotation(),
-        GetGameObject()->transform_->GetScale(),
-        normalizeScale);
+    if (isConvex)
+    {
+        rigidActor = PhysXLib::Instance().GenerateConvexCollider(
+            isStatic, rc,
+            GetGameObject()->transform_->GetWorldPosition(),
+            GetGameObject()->transform_->GetRotation(),
+            GetGameObject()->transform_->GetScale(),
+            normalizeScale);
+    }
+    else
+    {
+        rigidActor = PhysXLib::Instance().GenerateMeshCollider(
+            isStatic, rc,
+            GetGameObject()->transform_->GetWorldPosition(),
+            GetGameObject()->transform_->GetRotation(),
+            GetGameObject()->transform_->GetScale(),
+            normalizeScale);
+    }
 }

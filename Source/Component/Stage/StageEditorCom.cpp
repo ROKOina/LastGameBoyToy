@@ -19,6 +19,7 @@
 #include <iostream>
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -175,11 +176,25 @@ void StageEditorCom::OnGUI()
 
         if (ImGui::TreeNode(objName.first.c_str()))
         {
+            //Staticかどうか
             ImGui::Checkbox("Static", &objName.second.staticFlag);
+            //NodeCollisionのファイル読み取り
             if (ImGui::Button((char*)u8"当たり判定設定"))
             {
                 FileRead(objName.second.collisionPath);
             }
+
+            //オブジェクトの生成関数設定
+            constexpr const char* FuncName[] =
+            {
+                "None",
+                "TestNakanisi",
+                "TowerGimic"
+            };
+            int funcIndex = (int)objName.second.func;
+            ImGui::Combo((char*)u8"生成関数", &funcIndex, FuncName, (int)GenerateFuncName::Max);
+            objName.second.func = (GenerateFuncName)funcIndex;
+
             ImGui::TreePop();
         }
     }
@@ -200,7 +215,7 @@ void StageEditorCom::ObjectRegister()
     ImGui::InputText("ObjName", registerObjName, sizeof(registerObjName));
 }
 
-void StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale, DirectX::XMFLOAT4 rotation, const char* model_filename, const char* collision_filename)
+GameObj StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale, DirectX::XMFLOAT4 rotation, const char* model_filename, const char* collision_filename)
 {
     //オブジェクトを配置
     GameObj obj = GameObjectManager::Instance().Create();
@@ -216,7 +231,15 @@ void StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position
     RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
     render->LoadModel(model_filename);
 
+    //生成関数があれば起動
+    if (placeObjcts[objType.c_str()].func != GenerateFuncName::None)
+    {
+        generateFunc[(int)placeObjcts[objType.c_str()].func](obj);
+    }
+
     placeObjcts[objType.c_str()].objList.emplace_back(obj);
+
+    return obj;
 }
 
 void StageEditorCom::FileRead(std::string& path)
@@ -303,6 +326,7 @@ void StageEditorCom::ObjectSave()
         j[placeObj.first]["FileName"] = placeObj.second.filePath;
         j[placeObj.first]["CollsionFileName"] = placeObj.second.collisionPath;
         j[placeObj.first]["StaticFlag"] = placeObj.second.staticFlag;
+        j[placeObj.first]["Func"] = (int)placeObj.second.func;
 
         int i = 0;
         for (auto& obj : placeObj.second.objList)
@@ -360,6 +384,7 @@ void StageEditorCom::ObjectLoad()
                 placeObjcts[item.key()].staticFlag = data["StaticFlag"];
                 placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
                 placeObjcts[item.key()].filePath = data["FileName"];
+                placeObjcts[item.key()].func = (GenerateFuncName)data["Func"];
 
                 for (int index = 0; index < data["Position"].size(); ++index)
                 {
@@ -379,4 +404,18 @@ void StageEditorCom::ObjectLoad()
             }
         }
     }
+}
+
+void StageEditorCom::TestNakanisi(GameObj place)
+{
+   RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
+   
+   std::string path = place->GetComponent<RendererCom>()->GetModelPath();
+   rigid->SetUseResourcePath(path);
+}
+
+void StageEditorCom::TowerGimic(GameObj place)
+{
+    //(上野君)ギミックのオブジェクトを生成をここに書く
+    //transform、モデル、nodeColliderは設定されてるからそれ以外のコンポーネントを頼む
 }
