@@ -63,23 +63,23 @@ float4 main(VS_OUT pin) : SV_TARGET
     }
 
     // スポットライトの計算
-    for (int i = 0; i < 2; ++i)
+    for (int k = 0; k < 2; ++k)
     {
-        float3 L = spotLight[i].position.xyz - wPos.xyz;
+        float3 L = spotLight[k].position.xyz - wPos.xyz;
         float distance = length(L);
         L = normalize(L);
 
         // スポットライトの角度減衰
-        float spotEffect = dot(-L, normalize(spotLight[i].direction.xyz));
-        float innerCos = cos(spotLight[i].innerCorn);
-        float outerCos = cos(spotLight[i].outerCorn);
+        float spotEffect = dot(-L, normalize(spotLight[k].direction.xyz));
+        float innerCos = cos(spotLight[k].innerCorn);
+        float outerCos = cos(spotLight[k].outerCorn);
         float spotAttenuation = saturate((spotEffect - outerCos) / (innerCos - outerCos));
 
         // 距離減衰
-        float distanceAttenuation = saturate(1.0 - (distance / spotLight[i].range));
+        float distanceAttenuation = saturate(1.0 - (distance / spotLight[k].range));
         distanceAttenuation *= distanceAttenuation;
 
-        color += BRDF(albedoColor, MRAO.x, MRAO.y, N, V, L, spotLight[i].color.rgb, indirectDiffuse, envColor).rgb * spotLight[i].color.rgb * distanceAttenuation * spotAttenuation;
+        color += BRDF(albedoColor, MRAO.x, MRAO.y, N, V, L, spotLight[k].color.rgb, indirectDiffuse, envColor).rgb * spotLight[k].color.rgb * distanceAttenuation * spotAttenuation;
     }
 
     // AOマップ適用
