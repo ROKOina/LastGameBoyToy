@@ -37,36 +37,6 @@ void PhysXLib::Initialize()
         m_cliant->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
         m_cliant->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
     }
-
-
-    ////静的オブジェクトの追加
-    auto rigid_static
-        = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
-    // 形状(Box)を作成
-    auto box_shape
-        = gPhysics->createShape(
-            // Boxの大きさ
-            physx::PxBoxGeometry(5.f, 0.5f, 5.f),
-            // 摩擦係数と反発係数の設定
-            *gPhysics->createMaterial(0.5f, 0.5f, 0.5f)
-        );
-    // 形状のローカル座標を設定
-    box_shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
-
-    //動かない(静的)剛体を作成
-    PxTransform& pos = rigid_static->getGlobalPose();
-    pos.p.x = 5.0f;
-    pos.p.y = 1.0f;
-    pos.p.z = 0.0f;
-    rigid_static->setGlobalPose(pos);
-
-    //当たり判定とモデルのスケールを合わせる
-    physx::PxMeshScale scale(PxVec3(50, 50, 50));
-
-    // 形状を紐づけ
-    rigid_static->attachShape(*box_shape);
-    // 剛体を空間に追加
-    gScene->addActor(*rigid_static);
 }
 
 #define SAFE_RELEASE(p) {if (p) { (p)->release(); (p) = nullptr; }}
