@@ -167,6 +167,8 @@ void SettingScreen::CreateSettingUiObject()
             order %= 10;
 
             numSprite->numUVScroll.x = 1.0f + (order / 10.0f - 0.1f);
+            if (numSprite->numUVScroll.x > 1)
+                numSprite->numUVScroll.x -= 1;
         }
         count++;
     }
@@ -209,7 +211,9 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
         if (!button)continue;
         auto& buttonSprite = button->GetComponent<Sprite>();
         if (!buttonSprite)continue;
-        buttonSprite->spc.position.x = mx + buttonSprite->spc.texSize.x * buttonSprite->spc.scale.x;
+        DirectX::XMFLOAT3 worldPos = button->transform_->GetWorldPosition();
+        button->transform_->SetWorldPosition({ mx + buttonSprite->spc.texSize.x * buttonSprite->spc.scale.x,worldPos.y,worldPos.z });
+        //buttonSprite->spc.position.x = mx + buttonSprite->spc.texSize.x * buttonSprite->spc.scale.x;
 
         //”’l‚ğ•Ï‚¦‚é
         int value = Mathf::Lerp(bar.minValue, bar.maxValue, per);
@@ -228,6 +232,8 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
             order %= 10;
 
            numSprite->numUVScroll.x = 1.0f + (order / 10.0f - 0.1f);
+           if (numSprite->numUVScroll.x >= 1)
+               numSprite->numUVScroll.x -= 1;
         }
 
         //ID–ˆ‚Éˆ—
