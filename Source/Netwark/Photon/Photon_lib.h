@@ -205,5 +205,7 @@ private:
         NextInput nextInput;
     };
 
+    std::string netName = {};
+
     std::vector<SaveInput> saveInputPhoton;
 };

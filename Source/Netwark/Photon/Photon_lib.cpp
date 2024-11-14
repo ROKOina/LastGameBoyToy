@@ -302,14 +302,20 @@ void PhotonLib::LobbyImGui()
         //V‚µ‚­ƒ‹[ƒ€¶¬
         char name[256];
         ::strncpy_s(name, sizeof(name), roomName.c_str(), sizeof(name));
-        if (ImGui::InputText(" ", name, sizeof(name)))
+        if (ImGui::InputText("roomName", name, sizeof(name)))
         {
             roomName = name;
         }
 
+        ::strncpy_s(name, sizeof(name), netName.c_str(), sizeof(name));
+        if (ImGui::InputText("netName", name, sizeof(name)))
+        {
+            netName = name;
+        }
+
         if (ImGui::Button("CreateOrJoinRoom"))
         {
-            if (roomName.size() > 0)
+            if (roomName.size() > 0 && netName.size() > 0)
                 joinPermission = true;
         }
 
@@ -349,12 +355,6 @@ void PhotonLib::NetInputUpdate()
 
         std::vector<SaveBuffer> saveB;
         saveB = s.inputBuf->GetHeadFromSize(100);
-
-        std::vector<DirectX::XMFLOAT3>p;
-        for (auto& b : saveB)
-        {
-            p.emplace_back(b.pos);
-        }
 
         bool isInputInit = false;
         for (auto& b : saveB)
