@@ -17,6 +17,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
@@ -323,7 +324,19 @@ void StageEditorCom::ObjectSave()
 
     for (auto& placeObj : placeObjcts)
     {
-        j[placeObj.first]["FileName"] = placeObj.second.filePath;
+        // base_path から target_path への相対パスを取得
+        // 区切り文字 "(" の位置を検索
+        size_t delimiterPos = placeObj.second.filePath.find("Data");
+
+        // 区切り文字が見つかった場合、その位置までの部分文字列を取得
+        std::string name = (delimiterPos != std::string::npos) ? placeObj.second.filePath.substr(0, delimiterPos) : placeObj.second.filePath;
+        name += static_cast<std::string>("Data");
+
+        std::filesystem::path relative_path = std::filesystem::relative(placeObj.second.filePath, name);
+        std::string path = relative_path.string();
+        path = "Data/" + path;
+
+        j[placeObj.first]["FileName"] = path;
         j[placeObj.first]["CollsionFileName"] = placeObj.second.collisionPath;
         j[placeObj.first]["StaticFlag"] = placeObj.second.staticFlag;
         j[placeObj.first]["Func"] = (int)placeObj.second.func;
