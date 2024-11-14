@@ -26,6 +26,9 @@ public:
     // GUI描画
     void OnGUI();
 
+    //Jsonのデータを元にオブジェクト配置
+    void PlaceJsonData(std::string filename);
+
 private:
     //配置するオブジェクトを登録
     void ObjectRegister();
