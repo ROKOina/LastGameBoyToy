@@ -169,7 +169,7 @@ void SceneGame::Initialize()
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
 
         //picoˆÊ’u
-        cameraPost->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
+        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //˜r

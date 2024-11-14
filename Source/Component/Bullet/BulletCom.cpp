@@ -129,7 +129,8 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     obj->SetName("damageball");
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    firePos.y += 1.0f;
+    float ya = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
+    firePos.y += ya;
     obj->transform_->SetWorldPosition(firePos);
 
     ///////////////////////////////
