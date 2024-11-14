@@ -528,17 +528,17 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<UiSystem> fade = hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
-        //HideUltGauge
-        {
-            std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
-            std::shared_ptr<GameObject> hideUlt = ultFrame->AddChildObject();
-            hideUlt->SetName("HideUltGauge");
-            std::shared_ptr<UiGauge>gauge = hideUlt->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::Y_ONLY_SUB);
-            std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
-            gauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
-            float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
-            gauge->SetVariableValue(i);
-        }
+       ////HideUltGauge
+       //{
+       //    std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+       //    std::shared_ptr<GameObject> hideUlt = ultFrame->AddChildObject();
+       //    hideUlt->SetName("HideUltGauge");
+       //    std::shared_ptr<UiGauge>gauge = hideUlt->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::Y_ONLY_SUB);
+       //    std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+       //    gauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
+       //    float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
+       //    gauge->SetVariableValue(i);
+       //}
 
          //UltGauge
         {
@@ -548,6 +548,58 @@ void SceneGame::CreateUiObject()
             ultGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
+        //UltGauge
+        {
+            std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+            std::shared_ptr<GameObject> ultGauge = ultFrame->AddChildObject();
+            ultGauge->SetName("UltGauge");
+            ultGauge->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
+            skillFrame->SetName("SkillFrame");
+            skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //SkillFrame2
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skill_Q = SkillFrame->AddChildObject();
+            skill_Q->SetName("Skill_Frame2");
+            skill_Q->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame2_01.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillMask
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
+            skillFrame->SetName("SkillGaugeHide");
+            skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillGauge
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
+            skillFrame->SetName("SkillGauge");     
+            std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge.ui", Sprite::SpriteShader::DEFALT, false, 1030, 937);
+            std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
+            float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
+            skillGauge->SetVariableValue(i);
+        }
+
+        //Skill_E
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
+            skillGauge->SetName("Skill_E");
+            skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_E.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+     
+////////////////<Skill_Space>/////////////////////////////////////
 
         //SkillFrame
         {
@@ -577,7 +629,7 @@ void SceneGame::CreateUiObject()
         {
             std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
             std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
-            skillFrame->SetName("SkillGauge");     
+            skillFrame->SetName("SkillGauge");
             std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge.ui", Sprite::SpriteShader::DEFALT, false, 1030, 937);
             std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
             skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
@@ -585,14 +637,13 @@ void SceneGame::CreateUiObject()
             skillGauge->SetVariableValue(i);
         }
 
-        //Skill_Q
+        //Skill_Space
         {
             std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
             std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
-            skillGauge->SetName("Skill_Q");
+            skillGauge->SetName("Skill_E");
             skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_Q.ui", Sprite::SpriteShader::DEFALT, false);
         }
-     
 
         //HitEffect
         {
