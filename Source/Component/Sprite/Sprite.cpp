@@ -219,19 +219,44 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
 //初期設定
 void Sprite::Start()
 {
-    first = true;
+    GetGameObject()->transform_->SetWorldPosition({ spc.position.x, spc.position.y, 1.0f });
+    GetGameObject()->transform_->SetScale({ spc.scale.x, spc.scale.y, 1.0f });
 }
 
 //更新処理
 void Sprite::Update(float elapsedTime)
 {
-    if (first != false)
-    {
-        GetGameObject()->transform_->SetWorldPosition({ spc.position.x, spc.position.y, 0.0f });
-        first = false;
-    }
     spc.position.x = GetGameObject()->transform_->GetWorldPosition().x;
     spc.position.y = GetGameObject()->transform_->GetWorldPosition().y;
+
+    // 子どもがいれば
+    //if (!GetGameObject()->GetChildren().empty())
+    //{
+    //    // 親のスケールを取得
+    //    DirectX::XMFLOAT3 parentScale = GetGameObject()->transform_->GetScale();
+
+    //    for (const auto& child : GetGameObject()->GetChildren())
+    //    {
+    //        // 子のスケールを一時的に変数に格納
+    //        DirectX::XMFLOAT3 childScale = child.lock()->transform_->GetScale();
+
+    //        //子のスケールを親のスケールに合わせて更新
+    //        childScale.x = parentScale.x;
+    //        childScale.y = parentScale.y;
+
+    //        child.lock()->transform_->SetScale(childScale);
+
+    //        // 更新されたスケールを子のスケールに設定
+    //        spc.scale.x = childScale.x;
+    //        spc.scale.y = childScale.y;
+    //    }
+    //}
+    //else
+    //{
+    //    // 親だけの場合、親のスケールをそのまま設定
+    //    spc.scale.x = GetGameObject()->transform_->GetScale().x;
+    //    spc.scale.y = GetGameObject()->transform_->GetScale().y;
+    //}
 
     // イージングが有効な場合
     if (play)
@@ -725,9 +750,6 @@ void Sprite::OnGUI()
         ::_makepath_s(fullPath, sizeof(fullPath), drive, dir, textureFile, nullptr);
         LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
     }
-
-    ImGui::SameLine();
-    ImGui::Checkbox("first", &first);
 
     // テクスチャのプレビュー
     ImGui::Text("Resource Preview");

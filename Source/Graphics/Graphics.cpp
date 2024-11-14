@@ -653,21 +653,21 @@ Graphics::Graphics(HWND hWnd)
         desc.BorderColor[2] = 1;
         desc.BorderColor[3] = 0;
 
-        // WHITE_BORDER_POINT
+        // TRANSPARENT_BORDER_POINT
         {
             desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
             hr = device_->CreateSamplerState(&desc, samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_POINT].GetAddressOf());
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
 
-        // WHITE_BORDER_LINEAR
+        // TRANSPARENT_BORDER_LINEAR
         {
             desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
             hr = device_->CreateSamplerState(&desc, samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_LINEAR].GetAddressOf());
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
 
-        // WHITE_BORDER_ANISOTROPIC
+        // TRANSPARENT_BORDER_ANISOTROPIC
         {
             desc.Filter = D3D11_FILTER_ANISOTROPIC;
             hr = device_->CreateSamplerState(&desc, samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_ANISOTROPIC].GetAddressOf());
@@ -826,7 +826,4 @@ void Graphics::SetSamplerState()
 
     //ピクセルシェーダのサンプラーステート設定
     immediateContext_->PSSetSamplers(0, SAMPLEMODE::MAX, santolers);
-
-    //ジオメトリシェーダのサンプラーステート設定
-    immediateContext_->GSSetSamplers(0, SAMPLEMODE::MAX, santolers);
 }

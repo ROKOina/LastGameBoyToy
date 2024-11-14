@@ -1,6 +1,5 @@
 #include "PostEffect.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/Light/LightManager.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include "Graphics/Texture.h"
 #include <imgui.h>
@@ -98,9 +97,6 @@ void PostEffect::OnGUI()
         ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
         ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
     }
-
-    //ƒ‰ƒCƒg‚Ìimgui
-    LightManager::Instance().DrawDebugGUI();
 
     if (ImGui::TreeNode("shadow"))
     {

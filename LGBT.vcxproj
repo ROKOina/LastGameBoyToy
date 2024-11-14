@@ -200,9 +200,6 @@
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\LineRenderer.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
-    <ClInclude Include="Source\Graphics\Light\Light.h" />
-    <ClInclude Include="Source\Graphics\Light\LightData.h" />
-    <ClInclude Include="Source\Graphics\Light\LightManager.h" />
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
     <ClInclude Include="Source\Graphics\Model\ResourceManager.h" />
@@ -337,8 +334,6 @@
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\LineRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
-    <ClCompile Include="Source\Graphics\Light\Light.cpp" />
-    <ClCompile Include="Source\Graphics\Light\LightManager.cpp" />
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
     <ClCompile Include="Source\Graphics\Model\ResourceManager.cpp" />

@@ -82,7 +82,7 @@ private:
         float hue = 0.000f;
         float saturation = 0.0f;
         float bloomextractionthreshold = 0.800f;
-        float blurconvolutionintensity = 0.200f;
+        float blurconvolutionintensity = 0.130f;
         float exposure = 1.4f;
         float vignettesize = 0.7f;
         float vignetteintensity = 0.01f;

@@ -10,6 +10,11 @@ UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsio
     originalPos = spc.position;
 }
 
+void UI_Skill::Start()
+{
+    this->UiSystem::Start();
+}
+
 void UI_Skill::Update(float elapsedTime)
 {
     // 変化値がマイナスに行かないように補正
@@ -18,7 +23,5 @@ void UI_Skill::Update(float elapsedTime)
     //ゲージの倍率を求める
     valueRate = *variableValue / maxValue;
     float addPos = changePosValue * valueRate;
-    spc.position = { spc.position.x,originalPos.y - addPos};
-    
+    spc.position = { spc.position.x,originalPos.y - addPos };
 }
-

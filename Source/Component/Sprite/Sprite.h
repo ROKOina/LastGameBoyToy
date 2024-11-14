@@ -149,5 +149,4 @@ private:
     bool drawcollsion = false;
     bool hit = false;
     bool ontriiger = false;
-    bool first = false;
 };
