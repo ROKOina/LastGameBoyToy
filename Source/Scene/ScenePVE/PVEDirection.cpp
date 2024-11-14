@@ -29,9 +29,9 @@ void PVEDirection::DirectionStart()
         DirectionBoss->SetName("Direction");
         std::shared_ptr<RendererCom> r = DirectionBoss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/Boss/boss.mdl");
-        DirectionBoss->transform_->SetWorldPosition({ -2.479,-5.385,34.773 });
-        DirectionBoss->transform_->SetEulerRotation({ 0.0f,200.999f,0.00f });
-        DirectionBoss->transform_->SetScale({ 0.06f, 0.06f, 0.06f });
+        DirectionBoss->transform_->SetWorldPosition({ -2.878,-0.176,15.196 });
+        DirectionBoss->transform_->SetEulerRotation({ 0.0, 180.0f, 0.0f });
+        DirectionBoss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
         t = DirectionBoss->transform_;
         DirectionBoss->AddComponent<AnimationCom>();
         DirectionBoss->AddComponent<MovementCom>();
@@ -46,7 +46,7 @@ void PVEDirection::DirectionStart()
         {
             auto& fixationPoint = GameObjectManager::Instance().Create();
             fixationPoint->SetName("Point");
-            fixationPoint->transform_->SetWorldPosition({ -4.916f, -5.170f,34.448f });
+            fixationPoint->transform_->SetWorldPosition({ -9.289, 4.573,7.350 });
             fixationPoint->AddComponent<MovementCom>();
         }
     }
@@ -67,6 +67,9 @@ void PVEDirection::DirectionSupervision(float elapsedTime)
     case 1:
         DirectionTwo(elapsedTime);
         break;
+    case 2:
+        DirectionEnd(elapsedTime);
+        break;
     }
 }
 
@@ -82,7 +85,7 @@ void PVEDirection::DirectionOne(float elapsedTime)
     }
 
     auto& moveCom = GameObjectManager::Instance().Find("Direction")->GetComponent<MovementCom>();
-    DirectX::XMFLOAT3 v = GameObjectManager::Instance().Find("Direction")->transform_->GetWorldFront()*0.05f;
+    DirectX::XMFLOAT3 v = GameObjectManager::Instance().Find("Direction")->transform_->GetWorldFront()*0.27f;
     moveCom->AddForce({ v.x,v.y,v.z });
 
     auto& pointCom= GameObjectManager::Instance().Find("Point")->GetComponent<MovementCom>();
@@ -103,9 +106,9 @@ void PVEDirection::DirectionTwo(float elapsedTime)
 {
     if (!flag)
     {
-        GameObjectManager::Instance().Find("Seconds")->transform_->SetWorldPosition({-3.679f,-2.558f,33.935f});
+        GameObjectManager::Instance().Find("Seconds")->transform_->SetWorldPosition({ -2.878f,5.8f,6.073 });
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/two.eventcamera");
-        animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1"), true, false, 0.1f);
+        animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1"), false, false, 0.1f);
         flag = true;
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->CameraShake(30.0f, 10.0f);
     }
@@ -113,5 +116,28 @@ void PVEDirection::DirectionTwo(float elapsedTime)
     DirectX::XMFLOAT3 e = GameObjectManager::Instance().Find("Seconds")->transform_->GetWorldPosition();
     DirectX::XMFLOAT3 tes = Mathf::Lerp(s, e, 0.1f);
     GameObjectManager::Instance().Find("Point")->transform_->SetWorldPosition(tes);
+
+    if (animationCom.lock()->IsPlayAnimation()==false)
+    {
+        directionNumber += 1;
+    }
+
+}
+
+void PVEDirection::DirectionEnd(float elapsedTime)
+{
+
+    //最初にイベントカメラへ変更
+    GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
+
+    //ゲームオブジェクト本体を復活
+    GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
+    GameObjectManager::Instance().Find("player")->SetEnabled(true);
+
+    //見世物はいったん使わないから消す
+    GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
+   
+    GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -2.3,-1,-49.3 });
+
 
 }

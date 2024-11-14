@@ -27,6 +27,7 @@ private:
 private:
     void DirectionOne(float elapsedTime);
     void DirectionTwo(float elapsedTime);
+    void DirectionEnd(float elapsedTIme);
 
 private:
     std::shared_ptr<TransformCom>t;
