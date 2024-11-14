@@ -50,6 +50,25 @@ bool ResourceManager::JudgeModelFilename(const char* filename)
     }
 }
 
+std::shared_ptr<ModelResource> ResourceManager::GetModelResource(const char* filename)
+{
+    ID3D11Device* device = Graphics::Instance().GetDevice();
+    std::shared_ptr<ModelResource> resource = std::make_shared<ModelResource>();
+
+    //リソースマネージャーに登録されているか
+    if (!ResourceManager::Instance().JudgeModelFilename(filename))
+    {
+        resource->Load(device, filename);
+        ResourceManager::Instance().RegisterModel(filename, resource);	//リソースマネージャーに追加する
+    }
+    else
+    {
+        resource = ResourceManager::Instance().LoadModelResource(filename);	//ロードする
+    }
+
+    return resource;
+}
+
 //std::shared_ptr<ParticleSystemCom::SaveParticleData> ResourceManagerParticle::LoadParticleResource(const char* filename)
 //{
 //    std::lock_guard<std::mutex> lock(mutex_);
