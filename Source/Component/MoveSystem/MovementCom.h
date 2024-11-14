@@ -102,4 +102,5 @@ private:
     float moveAcceleration_ = 3.0f;            //加速度
     inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット
     bool isRaycast = true;                      //レイキャストをするか（true：使用する）
+
 };

@@ -5,7 +5,6 @@
 //#pragma comment(lib, "Ws2_32.lib")
 
 #include "Graphics/Graphics.h"
-#include "Graphics/Light/LightManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 #include "SceneGame.h"
@@ -57,6 +56,7 @@
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include <Component\UI\UiFlag.h>
 #include "Component\Renderer\TrailCom.h"
+#include "Component\Light\LightCom.h"
 
 #include "Setting/Setting.h"
 
@@ -80,6 +80,13 @@ void SceneGame::Initialize()
         obj->AddComponent<PostEffect>();
     }
 
+    //ライト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("directionallight");
+        obj->AddComponent<Light>(nullptr);
+    }
+
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -100,40 +107,43 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        //obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/Model/canyon/stage.collision");
+        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<StageEditorCom>();
-        /*      RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-              rigid->GenerateCollider(r->GetModel()->GetResource());*/
+        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
+        rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
+        rigid->SetNormalizeScale(1);
     }
 
     //当たり判定用
-    std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
-    {
-        //roboobj->SetName("robo");
-        //roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
-        //roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        //std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        //r->LoadModel("Data/OneCoin/robot.mdl");
-        //std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
-        //a->PlayAnimation(0, true, false, 0.001f);
+    //std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
+    //{
+    //    roboobj->SetName("robo");
+    //    roboobj->transform_->SetWorldPosition({ 0, 3.0f, 0 });
+    //    roboobj->transform_->SetScale({ 3,3,3 });
+    //    std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    //    r->LoadModel("Data/OneCoin/robot.mdl");
+    //    std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
+    //    a->PlayAnimation(0, true, false, 0.001f);
 
-        //std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
-        //sphere->SetRadius(2.0f);
-        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
-        //sphere->SetJudgeTag(COLLIDER_TAG::Player);
+    //    std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
+    //    sphere->SetRadius(2.0f);
+    //    sphere->SetMyTag(COLLIDER_TAG::Enemy);
+    //    sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
-  /*      roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);*/
-    }
+    //    roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
+    //    RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Primitive).get();
+    //    rigid->SetPrimitiveType(NodeCollsionCom::CollsionType::SPHER);
+    //}
 
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
+        obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
 
         //ウルト関係Obj追加
@@ -301,6 +311,13 @@ void SceneGame::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
             smoke->SetActive(false);
         }
+
+        //雑魚的生成オブジェクト
+        {
+            //std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
+            //spawnobject->SetName("spawnenemy");
+            //spawnobject->AddComponent<SpawnCom>(nullptr);
+        }
     }
 
 #endif
@@ -311,18 +328,13 @@ void SceneGame::Initialize()
 #pragma endregion
 
 #pragma region グラフィック系の設定
-    //平行光源を追加
-    mainDirectionalLight = new Light(LightType::Directional);
-    mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
-    mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
-    LightManager::Instance().Register(mainDirectionalLight);
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
     // スカイボックスの設定
     std::array<const char*, 4> filepath = {
-      "Data\\Texture\\snowy_hillside_4k.DDS",
+      "Data\\Texture\\CosmicCoolCloudBottom.DDS",
       "Data\\Texture\\diffuse_iem.dds",
       "Data\\Texture\\specular_pmrem.dds",
       "Data\\Texture\\lut_ggx.DDS"
@@ -399,11 +411,8 @@ void SceneGame::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
-    // ライトの定数バッファを更新
-    LightManager::Instance().UpdateConstatBuffer();
-
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 
     photonNet->ImGui();
 
@@ -494,7 +503,6 @@ void SceneGame::CreateUiObject()
             hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpMemori.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
-
         //BoostFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
@@ -518,7 +526,6 @@ void SceneGame::CreateUiObject()
             BoostGauge->SetName("BoostGauge");
             BoostGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
-
 
         //UltFrame
         {

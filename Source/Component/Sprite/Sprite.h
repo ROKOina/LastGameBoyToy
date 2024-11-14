@@ -24,7 +24,7 @@ public:
     ~Sprite() {}
 
     //‰Šúİ’è
-    void Start()override {};
+    void Start()override;
 
     //XVˆ—
     void Update(float elapsedTime)override;

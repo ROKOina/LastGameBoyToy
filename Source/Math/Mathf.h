@@ -55,12 +55,15 @@ public:
     static int GetSign(const int& value);
 
     // 行列から指定の列を抜き出す
+    static DirectX::XMFLOAT3 Mathf::TransformSampleScale(const DirectX::XMFLOAT4X4& trans);
     static DirectX::XMFLOAT3 TransformSamplePosition(const DirectX::XMFLOAT4X4& trans);
     static DirectX::XMFLOAT3 TransformSampleRight(const DirectX::XMFLOAT4X4& trans);
     static DirectX::XMFLOAT3 TransformSampleUp(const DirectX::XMFLOAT4X4& trans);
     static DirectX::XMFLOAT3 TransformSampleFront(const DirectX::XMFLOAT4X4& trans);
 
-    //
+    //位置やスケールを使って行列を生成
+    static DirectX::XMFLOAT4X4 GenerateTransform(const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT4 rotation, const DirectX::XMFLOAT3 scale);
+    static DirectX::XMFLOAT4X4 GenerateTransform(const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT3 scale);
 };
 
 // ※以下の参考 : https://qiita.com/HnniTns/items/6e7edc82775a86923cef

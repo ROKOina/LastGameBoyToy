@@ -170,6 +170,7 @@
     <ClInclude Include="Source\Component\Collsion\RayCollisionCom.h" />
     <ClInclude Include="Source\Component\Enemy\BossCom.h" />
     <ClInclude Include="Source\Component\Enemy\NoobEnemyCom.h" />
+    <ClInclude Include="Source\Component\Light\LightCom.h" />
     <ClInclude Include="Source\Component\MoveSystem\EasingMoveCom.h" />
     <ClInclude Include="Source\Component\MoveSystem\MovementCom.h" />
     <ClInclude Include="Source\Component\Particle\CPUParticle.h" />
@@ -199,9 +200,6 @@
     <ClInclude Include="Source\Graphics\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer\LineRenderer.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
-    <ClInclude Include="Source\Graphics\Light\Light.h" />
-    <ClInclude Include="Source\Graphics\Light\LightData.h" />
-    <ClInclude Include="Source\Graphics\Light\LightManager.h" />
     <ClInclude Include="Source\Graphics\Model\Model.h" />
     <ClInclude Include="Source\Graphics\Model\ModelResource.h" />
     <ClInclude Include="Source\Graphics\Model\ResourceManager.h" />
@@ -308,6 +306,7 @@
     <ClCompile Include="Source\Component\Collsion\RayCollisionCom.cpp" />
     <ClCompile Include="Source\Component\Enemy\BossCom.cpp" />
     <ClCompile Include="Source\Component\Enemy\NoobEnemyCom.cpp" />
+    <ClCompile Include="Source\Component\Light\LightCom.cpp" />
     <ClCompile Include="Source\Component\MoveSystem\EasingMoveCom.cpp" />
     <ClCompile Include="Source\Component\MoveSystem\MovementCom.cpp" />
     <ClCompile Include="Source\Component\Particle\CPUParticle.cpp" />
@@ -335,8 +334,6 @@
     <ClCompile Include="Source\Graphics\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer\LineRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
-    <ClCompile Include="Source\Graphics\Light\Light.cpp" />
-    <ClCompile Include="Source\Graphics\Light\LightManager.cpp" />
     <ClCompile Include="Source\Graphics\Model\Model.cpp" />
     <ClCompile Include="Source\Graphics\Model\ModelResource.cpp" />
     <ClCompile Include="Source\Graphics\Model\ResourceManager.cpp" />

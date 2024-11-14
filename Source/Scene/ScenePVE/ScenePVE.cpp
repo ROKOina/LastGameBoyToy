@@ -6,7 +6,6 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Collsion\ColliderCom.h>
 #include <Component\Camera\EventCameraManager.h>
-#include <Graphics\Light\LightManager.h>
 #include <Input\Input.h>
 #include <Component\Character\CharacterCom.h>
 #include <Component\Animation\AnimationCom.h>
@@ -21,6 +20,7 @@
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Component\Enemy\BossCom.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Component\Light\LightCom.h"
 
 void ScenePVE::Initialize()
 {
@@ -31,6 +31,13 @@ void ScenePVE::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
         obj->AddComponent<PostEffect>();
+    }
+
+    //ライト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("directionallight");
+        obj->AddComponent<Light>(nullptr);
     }
 
     //フリーカメラ
@@ -49,7 +56,6 @@ void ScenePVE::Initialize()
         eventCamera->AddComponent<EventCameraCom>();
         eventCamera->transform_->SetWorldPosition({ -3.814f, -5.078f, 29.042f });
         eventCamera->transform_->SetEulerRotation({ 5.279f, -365.373f, 0.0f });
-
     }
 
     //コンスタントバッファの初期化
@@ -107,12 +113,6 @@ void ScenePVE::Initialize()
         obj->AddComponent<StageEditorCom>();
     }
 
-    //平行光源を追加
-    mainDirectionalLight = new Light(LightType::Directional);
-    mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
-    mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
-    LightManager::Instance().Register(mainDirectionalLight);
-
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
 
@@ -153,11 +153,8 @@ void ScenePVE::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
-    // ライトの定数バッファを更新
-    LightManager::Instance().UpdateConstatBuffer();
-
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();

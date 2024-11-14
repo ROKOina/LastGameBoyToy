@@ -6,6 +6,12 @@ UiSystem::UiSystem(const char* filename, SpriteShader spriteshader, bool collsio
     fadeOutFlag = false;
 }
 
+//‰Šúİ’è
+void UiSystem::Start()
+{
+    this->Sprite::Start();
+}
+
 void UiSystem::Update(float elapsedTime)
 {
     //eƒNƒ‰ƒX‚Ìupdate‚ğŒÄ‚Ô
