@@ -369,38 +369,45 @@ void StageEditorCom::ObjectLoad()
     DialogResult result = Dialog::OpenFileName(filename, sizeof(filename), filter, nullptr, Framework::GetInstance()->GetHWND());
     if (result == DialogResult::OK)
     {
-        //ファイルを開く
-        fstream ifs(filename);
-        if (ifs.good())
+        PlaceJsonData(filename);
+    }
+}
+
+void StageEditorCom::PlaceJsonData(std::string filename)
+{
+    using namespace std;
+
+    //ファイルを開く
+    fstream ifs(filename);
+    if (ifs.good())
+    {
+        //Json型を取得
+        nlohmann::json json;
+        ifs >> json;
+
+        for (auto& item : json.items())
         {
-            //Json型を取得
-            nlohmann::json json;
-            ifs >> json;
+            //オブジェクトの内容にアクセス
+            const auto& data = item.value();
+            placeObjcts[item.key()].staticFlag = data["StaticFlag"];
+            placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
+            placeObjcts[item.key()].filePath = data["FileName"];
+            placeObjcts[item.key()].func = (GenerateFuncName)data["Func"];
 
-            for (auto& item : json.items())
+            for (int index = 0; index < data["Position"].size(); ++index)
             {
-                //オブジェクトの内容にアクセス
-                const auto& data = item.value();
-                placeObjcts[item.key()].staticFlag = data["StaticFlag"];
-                placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
-                placeObjcts[item.key()].filePath = data["FileName"];
-                placeObjcts[item.key()].func = (GenerateFuncName)data["Func"];
+                DirectX::XMFLOAT3 pos = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
+                DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
+                DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
 
-                for (int index = 0; index < data["Position"].size(); ++index)
-                {
-                    DirectX::XMFLOAT3 pos = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
-                    DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
-                    DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
-
-                    ObjectPlace(
-                        item.key(),//選択中のオブジェクト
-                        pos,       //位置
-                        scale,     //スケール
-                        rotation,  //回転値
-                        placeObjcts[item.key()].filePath.c_str(),    //modelのパス
-                        placeObjcts[item.key()].collisionPath.c_str()//nodeCollsionのパス
-                    );
-                }
+                ObjectPlace(
+                    item.key(),//選択中のオブジェクト
+                    pos,       //位置
+                    scale,     //スケール
+                    rotation,  //回転値
+                    placeObjcts[item.key()].filePath.c_str(),    //modelのパス
+                    placeObjcts[item.key()].collisionPath.c_str()//nodeCollsionのパス
+                );
             }
         }
     }
