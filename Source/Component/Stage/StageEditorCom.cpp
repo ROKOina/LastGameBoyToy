@@ -20,6 +20,7 @@
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Component\System\SpawnCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -103,13 +104,12 @@ void StageEditorCom::Update(float elapsedTime)
             )
         );
 
-
         //マウスとステージの当たり判定
         HitResult hit;
         PxVec3 pos = { world_start.x,world_start.y,world_start.z };
 
         auto d = Mathf::Normalize(world_end - world_start);
-        PxVec3 dir = {d.x,d.y,d.z};
+        PxVec3 dir = { d.x,d.y,d.z };
 
         physx::PxRaycastBuffer Buf;
     }
@@ -415,14 +415,16 @@ void StageEditorCom::PlaceJsonData(std::string filename)
 
 void StageEditorCom::TestNakanisi(GameObj place)
 {
-   RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
-   
-   std::string path = place->GetComponent<RendererCom>()->GetModelPath();
-   rigid->SetUseResourcePath(path);
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
+
+    std::string path = place->GetComponent<RendererCom>()->GetModelPath();
+    rigid->SetUseResourcePath(path);
 }
 
 void StageEditorCom::TowerGimic(GameObj place)
 {
     //(上野君)ギミックのオブジェクトを生成をここに書く
     //transform、モデル、nodeColliderは設定されてるからそれ以外のコンポーネントを頼む
+
+    place->AddComponent<SpawnCom>(nullptr);
 }
