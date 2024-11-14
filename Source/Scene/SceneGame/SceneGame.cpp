@@ -113,7 +113,7 @@ void SceneGame::Initialize()
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic2.json");
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
         RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
         rigid->SetNormalizeScale(1);
