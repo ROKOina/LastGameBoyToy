@@ -1,5 +1,4 @@
 #include "Graphics/Graphics.h"
-#include "Graphics/Light/LightManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 #include "Scene/SceneManager.h"
@@ -19,6 +18,7 @@
 #include "SceneTitle.h"
 #include "Scene\SceneGame\SceneGame.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Component\Light\LightCom.h"
 
 void SceneTitle::Initialize()
 {
@@ -30,6 +30,13 @@ void SceneTitle::Initialize()
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
+
+    //ライト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("directionallight");
+        obj->AddComponent<Light>(nullptr);
     }
 
     //コンスタントバッファの初期化
@@ -86,12 +93,6 @@ void SceneTitle::Initialize()
         obj->SetName("posteffect");
         obj->AddComponent<PostEffect>();
     }
-
-    //平行光源を追加
-    mainDirectionalLight = new Light(LightType::Directional);
-    mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
-    mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
-    LightManager::Instance().Register(mainDirectionalLight);
 }
 
 void SceneTitle::Finalize()
@@ -123,11 +124,8 @@ void SceneTitle::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
-    // ライトの定数バッファを更新
-    LightManager::Instance().UpdateConstatBuffer();
-
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }
 
 void SceneTitle::UIUpdate(float elapsedTime)

@@ -13,7 +13,7 @@ public:
     const char* GetName() const override { return "UiGauge"; }
 
     // 開始処理
-    void Start() override {};
+    void Start() override;
 
     // 更新処理
     void Update(float elapsedTime) override;

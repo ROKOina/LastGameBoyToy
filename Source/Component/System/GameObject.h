@@ -21,6 +21,7 @@ class PushBackCom;
 class Sprite;
 class Decal;
 class PostEffect;
+class Trail;
 
 // ゲームオブジェクト
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -206,6 +207,9 @@ private:
     //デカール描画
     void DecalRender();
 
+    //トレイル描画
+    void TrailRender();
+
     //スプライト描画
     void SpriteRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
@@ -240,6 +244,9 @@ private:
 
     //デカール描画
     std::vector<std::weak_ptr<Decal>> decalobject;
+
+    //トレイル描画
+    std::vector<std::weak_ptr<Trail>>trailobject;
 
     //ポストエフェクト描画
     std::vector<std::weak_ptr<PostEffect>>posteffectobject;

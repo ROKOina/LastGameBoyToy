@@ -6,7 +6,6 @@
 #include "Audio\Audio.h"
 
 #include "Component\System\GameObject.h"
-#include "Graphics/Light/Light.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 
@@ -45,7 +44,6 @@ private:
 private:
     //std::unique_ptr<NetwarkPost> n;
     std::unique_ptr<BasicsApplication> photonNet;
-    Light* mainDirectionalLight = nullptr;
 
 private:
 

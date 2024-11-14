@@ -6,7 +6,6 @@
 #include "Audio\Audio.h"
 
 #include "Component\System\GameObject.h"
-#include "Graphics/Light/Light.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 
@@ -31,7 +30,4 @@ public:
 
     //–¼‘OŽæ“¾
     std::string GetName() const override { return "SceneTraining"; };
-
-private:
-    Light* mainDirectionalLight = nullptr;
 };

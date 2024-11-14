@@ -4,6 +4,7 @@
 #include "Component/System/TransformCom.h"
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
+#include "Phsix\Physxlib.h"
 
 // 更新処理
 void MovementCom::Update(float elapsedTime)
@@ -140,10 +141,11 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
 
         // 判定
         RayCastManager::Result hit;
-        if (isRaycast && RayCastManager::Instance().RayCast(start, end, hit))
+        PxRaycastBuffer buffer;
+        if (isRaycast && PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer))//RayCast(start, end, hit))
         {
             // 地面に接地している
-            position.y = hit.position.y;
+            position.y = buffer.block.position.y;
             velocity_.y = 0;
             nonMaxSpeedVelocity_.y = 0;
             onGround_ = true;
@@ -176,39 +178,53 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
     if (velocityLengthXZ > 0.0f)
     {
         // レイの始点位置と終点位置
-        DirectX::XMFLOAT3 start = { position.x, position.y + stepOffset, position.z };
-        DirectX::XMFLOAT3 end = { position.x + totalVelocity.x * elapsedTime, position.y + stepOffset, position.z + totalVelocity.z * elapsedTime };
+        DirectX::XMFLOAT3 start = { position.x, position.y + 3.0f, position.z };
+        DirectX::XMFLOAT3 end = {
+            position.x + moveVec.x * 1.3f * elapsedTime,
+            position.y + 3.0f,
+            position.z + moveVec.z * 1.3f * elapsedTime
+        };
 
-        // レイキャストによる壁判定
-        RayCastManager::Result hit;
-        if (isRaycast && RayCastManager::Instance().RayCast(start, end, hit))
+        // SphereCastによる壁判定
+        PxSweepBuffer buffer;
+        static bool wasColliding = false;  // 前フレームで壁に衝突していたか
+        if (isRaycast && PhysXLib::Instance().SphereCast_PhysX(
+            start, Mathf::Normalize(end - start), 1.0f, Mathf::Length(end - start), buffer))
         {
-            // 移動後の位置から壁までのベクトル
+            // 壁に衝突した場合、壁に沿ったスライドベクトルを計算
             DirectX::XMVECTOR Start = XMLoadFloat3(&start);
             DirectX::XMVECTOR End = XMLoadFloat3(&end);
-            DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(End, Start);
+            DirectX::XMVECTOR MoveVec = DirectX::XMVectorSubtract(End, Start);
 
-            // 壁の法線
-            DirectX::XMVECTOR Normal = XMLoadFloat3(&hit.normal);
+            // 壁の法線を取得
+            DirectX::XMFLOAT3 normal = { buffer.block.normal.x, buffer.block.normal.y, buffer.block.normal.z };
+            DirectX::XMVECTOR Normal = XMLoadFloat3(&normal);
 
-            // 入射ベクトルを法線ベクトルに射影
-            DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(Vec, Normal);
+            // 壁に沿ったスライドベクトルの計算
+            DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(MoveVec, Normal);
+            DirectX::XMVECTOR SlideVec = DirectX::XMVectorSubtract(MoveVec, DirectX::XMVectorMultiply(Normal, Dot));
 
-            // 補正位置の計算
-            DirectX::XMFLOAT3 correction;
-            DirectX::XMStoreFloat3(&correction, DirectX::XMVectorMultiplyAdd(Normal, Dot, Start));
+            // キャラクターを壁から離すための補正距離
+            const float separationDistance = wasColliding ? 0.002f : 0.01f;  // 初回のみ大きめ、継続時は小さめにする
+            DirectX::XMVECTOR SeparationVec = DirectX::XMVectorScale(Normal, separationDistance);
 
-            // 壁との接触位置からの補正処理
-            start = hit.position;
-            end = correction;
+            // スライドベクトルと補正ベクトルを加算して補正位置を計算
+            DirectX::XMFLOAT3 correctedPosition;
+            DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(Start, SlideVec));
+            DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(XMLoadFloat3(&correctedPosition), SeparationVec));
 
-            // 補正後の位置を設定
-            position = start;
+            // 壁に沿った移動と補正を適用
+            position.x = correctedPosition.x;
+            position.z = correctedPosition.z;
+
+            wasColliding = true;  // 次のフレームでの補正を減少させる
         }
         else
         {
-            position.x += totalVelocity.x * elapsedTime;
-            position.z += totalVelocity.z * elapsedTime;
+            // 壁に衝突しない場合、通常の移動
+            position.x += moveVec.x * elapsedTime;
+            position.z += moveVec.z * elapsedTime;
+            wasColliding = false;  // 壁に衝突していないので、補正をリセット
         }
     }
 

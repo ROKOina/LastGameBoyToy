@@ -211,14 +211,53 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     //Dissolveデータ読み込み
     //LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
     //LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    // 
+    //
     //コリジョンを使うか決める
     ontriiger = collsion;
+}
+
+//初期設定
+void Sprite::Start()
+{
+    GetGameObject()->transform_->SetWorldPosition({ spc.position.x, spc.position.y, 1.0f });
+    GetGameObject()->transform_->SetScale({ spc.scale.x, spc.scale.y, 1.0f });
 }
 
 //更新処理
 void Sprite::Update(float elapsedTime)
 {
+    spc.position.x = GetGameObject()->transform_->GetWorldPosition().x;
+    spc.position.y = GetGameObject()->transform_->GetWorldPosition().y;
+
+    // 子どもがいれば
+    //if (!GetGameObject()->GetChildren().empty())
+    //{
+    //    // 親のスケールを取得
+    //    DirectX::XMFLOAT3 parentScale = GetGameObject()->transform_->GetScale();
+
+    //    for (const auto& child : GetGameObject()->GetChildren())
+    //    {
+    //        // 子のスケールを一時的に変数に格納
+    //        DirectX::XMFLOAT3 childScale = child.lock()->transform_->GetScale();
+
+    //        //子のスケールを親のスケールに合わせて更新
+    //        childScale.x = parentScale.x;
+    //        childScale.y = parentScale.y;
+
+    //        child.lock()->transform_->SetScale(childScale);
+
+    //        // 更新されたスケールを子のスケールに設定
+    //        spc.scale.x = childScale.x;
+    //        spc.scale.y = childScale.y;
+    //    }
+    //}
+    //else
+    //{
+    //    // 親だけの場合、親のスケールをそのまま設定
+    //    spc.scale.x = GetGameObject()->transform_->GetScale().x;
+    //    spc.scale.y = GetGameObject()->transform_->GetScale().y;
+    //}
+
     // イージングが有効な場合
     if (play)
     {
@@ -343,29 +382,27 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
         }
     }
 
-
-
     // スケール倍したテクスチャサイズ
     float texSizeX = spc.texSize.x * spc.scale.x;
-    float texSizeY= spc.texSize.y * spc.scale.y;
+    float texSizeY = spc.texSize.y * spc.scale.y;
 
     // 座標とピボットの処理
-    float pivotX = (spc.pivot.x/ texSizeX);
+    float pivotX = (spc.pivot.x / texSizeX);
     float pivotY = (spc.pivot.y / texSizeY);
 
     // スプライトの頂点座標の計算
     //左上
     float x0 = spc.position.x - pivotX * texSizeX;
     float y0 = spc.position.y - pivotY * texSizeY;
-    //右上                   
-    float x1 = spc.position.x + (1- pivotX) * texSizeX;
-    float y1 = spc.position.y -  pivotY * texSizeY;
-    //左下                   
+    //右上
+    float x1 = spc.position.x + (1 - pivotX) * texSizeX;
+    float y1 = spc.position.y - pivotY * texSizeY;
+    //左下
     float x2 = spc.position.x - pivotX * texSizeX;
-    float y2 = spc.position.y + (1- pivotY) * texSizeY;
-    //右下                   
-    float x3 = spc.position.x + (1-pivotX) * texSizeX;
-    float y3 = spc.position.y + (1-pivotY)* texSizeY;
+    float y2 = spc.position.y + (1 - pivotY) * texSizeY;
+    //右下
+    float x3 = spc.position.x + (1 - pivotX) * texSizeX;
+    float y3 = spc.position.y + (1 - pivotY) * texSizeY;
 
     // スプライトの回転
     auto rotate = [](float& x, float& y, float cx, float cy, float angle)
@@ -464,7 +501,6 @@ void Sprite::DrawCollsionBox()
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
 
-
     // スケール倍したテクスチャサイズ
     float texSizeX = spc.texSize.x * spc.scale.x;
     float texSizeY = spc.texSize.y * spc.scale.y;
@@ -477,13 +513,13 @@ void Sprite::DrawCollsionBox()
     //左上
     float x0 = spc.position.x - pivotX * texSizeX;
     float y0 = spc.position.y - pivotY * texSizeY;
-    //右上                   
+    //右上
     float x1 = spc.position.x + (1 - pivotX) * texSizeX;
     float y1 = spc.position.y - pivotY * texSizeY;
-    //左下                   
+    //左下
     float x2 = spc.position.x - pivotX * texSizeX;
     float y2 = spc.position.y + (1 - pivotY) * texSizeY;
-    //右下                   
+    //右下
     float x3 = spc.position.x + (1 - pivotX) * texSizeX;
     float y3 = spc.position.y + (1 - pivotY) * texSizeY;
 
@@ -808,8 +844,8 @@ void Sprite::OnGUI()
         ImGui::DragFloat2((char*)u8"中心位置", &spc.pivot.x);
         ImGui::DragFloat2((char*)u8"テクスチャサイズ", &spc.texSize.x);
         ImGui::DragFloat((char*)u8"再生速度", &spc.timescale, 0.1f, 0.0f, 5.0f);
-        DirectX::XMFLOAT2 mouse = {(float)(Input::Instance().GetMouse().GetPositionX()),(float)(Input::Instance().GetMouse().GetPositionY()) };
-        ImGui::DragFloat2((char*)u8"再生速度", &mouse.x);
+        DirectX::XMFLOAT2 mouse = { (float)(Input::Instance().GetMouse().GetPositionX()),(float)(Input::Instance().GetMouse().GetPositionY()) };
+        ImGui::DragFloat2((char*)u8"マウス位置", &mouse.x);
         ImGui::TreePop();
     }
 
@@ -922,7 +958,6 @@ bool Sprite::cursorVsCollsionBox()
     DirectX::XMFLOAT3 normalCross = Mathf::Cross({ normalUp.x,normalUp.y,0 }, { 0,0,1 });
     DirectX::XMFLOAT2 normalRight = Mathf::Normalize({ normalCross.x,normalCross.y });
 
-
     // スケール倍したテクスチャサイズ
     float texSizeX = spc.texSize.x * spc.scale.x;
     float texSizeY = spc.texSize.y * spc.scale.y;
@@ -933,7 +968,7 @@ bool Sprite::cursorVsCollsionBox()
 
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = { spc.position.x + (texSizeX/2 - spc.pivot.x) +  spc.collsionpositionoffset.x,spc.position.y + (texSizeY / 2 - spc.pivot.y) + spc.collsionpositionoffset.y };
+    DirectX::XMFLOAT2 pos = { spc.position.x + (texSizeX / 2 - spc.pivot.x) + spc.collsionpositionoffset.x,spc.position.y + (texSizeY / 2 - spc.pivot.y) + spc.collsionpositionoffset.y };
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 
@@ -942,7 +977,7 @@ bool Sprite::cursorVsCollsionBox()
     float rightLen = Mathf::Dot(normalRight, curVecPos);
 
     //判定
-    DirectX::XMFLOAT2 scale = { (texSizeX /2 + spc.collsionscaleoffset.x),(texSizeY /2 + spc.collsionscaleoffset.y) };
+    DirectX::XMFLOAT2 scale = { (texSizeX / 2 + spc.collsionscaleoffset.x),(texSizeY / 2 + spc.collsionscaleoffset.y) };
     if (upLen * upLen > scale.y * scale.y)return false;
     if (rightLen * rightLen > scale.x * scale.x)return false;
 

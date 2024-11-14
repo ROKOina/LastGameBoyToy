@@ -5,7 +5,6 @@
 #include "Audio\Audio.h"
 
 #include "Component\System\GameObject.h"
-#include "Graphics/Light/Light.h"
 
 #include "Netwark/Photon/BasicsApplication.h"
 
@@ -49,9 +48,6 @@ private:
 
     //PVEƒQ[ƒ€‚©‚çƒŠƒUƒ‹ƒg‚É‘JˆÚ
     void TransitionPVEFromResult();
-
-private:
-    Light* mainDirectionalLight = nullptr;
 
 private:
 

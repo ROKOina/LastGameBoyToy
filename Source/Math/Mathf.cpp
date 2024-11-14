@@ -189,6 +189,16 @@ int Mathf::GetSign(const int& value)
     return (value > 0) - (value < 0);
 }
 
+DirectX::XMFLOAT3 Mathf::TransformSampleScale(const DirectX::XMFLOAT4X4& trans)
+{
+    DirectX::XMFLOAT3 scale;
+    scale.x = sqrtf(trans._11 * trans._11 + trans._12 * trans._12 + trans._13 * trans._13);
+    scale.y = sqrtf(trans._21 * trans._21 + trans._22 * trans._22 + trans._23 * trans._23);
+    scale.z = sqrtf(trans._31 * trans._31 + trans._32 * trans._32 + trans._33 * trans._33);
+
+    return scale;
+}
+
 DirectX::XMFLOAT3 Mathf::TransformSamplePosition(const DirectX::XMFLOAT4X4& trans)
 {
     return DirectX::XMFLOAT3(trans._41, trans._42, trans._43);
@@ -207,4 +217,25 @@ DirectX::XMFLOAT3 Mathf::TransformSampleUp(const DirectX::XMFLOAT4X4& trans)
 DirectX::XMFLOAT3 Mathf::TransformSampleFront(const DirectX::XMFLOAT4X4& trans)
 {
     return DirectX::XMFLOAT3(trans._31, trans._32, trans._33);
+}
+
+DirectX::XMFLOAT4X4 Mathf::GenerateTransform(const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT4 rotation, const DirectX::XMFLOAT3 scale)
+{
+    // ワールド行列の更新
+    DirectX::XMVECTOR Q = DirectX::XMLoadFloat4(&rotation);
+    DirectX::XMMATRIX S = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+    DirectX::XMMATRIX R = DirectX::XMMatrixRotationQuaternion(Q);
+    DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+    DirectX::XMMATRIX W = S * R * T;
+
+    DirectX::XMFLOAT4X4 transform = {};
+    DirectX::XMStoreFloat4x4(&transform, W);
+
+    return transform;
+}
+
+DirectX::XMFLOAT4X4 Mathf::GenerateTransform(const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT3 scale)
+{
+    return GenerateTransform(position, {0,0,0,1}, scale);
 }

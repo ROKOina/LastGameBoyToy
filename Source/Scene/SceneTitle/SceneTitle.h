@@ -6,7 +6,6 @@
 #include "Audio\Audio.h"
 
 #include "Component\System\GameObject.h"
-#include "Graphics/Light/Light.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 
@@ -34,7 +33,4 @@ public:
 
 private:
     void UIUpdate(float elapsedTime);
-
-private:
-    Light* mainDirectionalLight = nullptr;
 };

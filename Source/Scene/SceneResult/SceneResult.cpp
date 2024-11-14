@@ -1,5 +1,4 @@
 #include "Graphics/Graphics.h"
-#include "Graphics/Light/LightManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 #include "Scene/SceneManager.h"
@@ -19,6 +18,7 @@
 #include "SceneResult.h"
 #include "Scene\SceneTitle\SceneTitle.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Component\Light\LightCom.h"
 
 void SceneResult::Initialize()
 {
@@ -29,6 +29,13 @@ void SceneResult::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
         obj->AddComponent<PostEffect>();
+    }
+
+    //ライト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("directionallight");
+        obj->AddComponent<Light>(nullptr);
     }
 
     //フリーカメラ
@@ -78,12 +85,6 @@ void SceneResult::Initialize()
             modoru->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/modoru.ui", Sprite::SpriteShader::DEFALT, true);
         }
     }
-
-    //平行光源を追加
-    mainDirectionalLight = new Light(LightType::Directional);
-    mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
-    mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
-    LightManager::Instance().Register(mainDirectionalLight);
 }
 
 void SceneResult::Finalize()
@@ -115,11 +116,8 @@ void SceneResult::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
-    // ライトの定数バッファを更新
-    LightManager::Instance().UpdateConstatBuffer();
-
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }
 
 void SceneResult::UIUpdate(float elapsedTime)

@@ -15,6 +15,7 @@
 #include "Component/Collsion/PushBackCom.h"
 #include "Component/System/HitProcessCom.h"
 #include "Component\System\SpawnCom.h"
+#include "Component\Renderer\TrailCom.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
 {

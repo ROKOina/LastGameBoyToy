@@ -32,19 +32,26 @@ public:
     //更新処理
     void Update(float elapsedTime);
 
+    bool SphereCast_PhysX(
+        const DirectX::XMFLOAT3& pos, 
+        const DirectX::XMFLOAT3& dir, 
+        float radius, float dist, 
+        PxSweepBuffer& hit);
+
     bool RayCast_PhysX(
-        const PxVec3& origin,
-        const PxVec3& unitDir,
-        const PxReal maxDistance,
+        const DirectX::XMFLOAT3& origin,
+        const  DirectX::XMFLOAT3& unitDir,
+        const float maxDistance,
         PxRaycastBuffer& hitBuffer);
 
     //オブジェクトの塊を分解してColliderを作る（スタティック専用・主にステージで使う）
-    void GenerateManyCollider(ModelResource* model);
+    void GenerateManyCollider(ModelResource* model, float worldScale);
+    void GenerateManyCollider_Convex(ModelResource* model, float worldScale);
 
-    //
 
     //Modelの形の当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic,ModelResource* model, GameObj obj);
+    physx::PxRigidActor* GenerateMeshCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale);
+    physx::PxRigidActor* GenerateConvexCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale);
     //矩形、球、カプセルの当たり判定作成
     physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj, DirectX::XMFLOAT3 scale);
 
@@ -67,7 +74,7 @@ private:
     PxDefaultCpuDispatcher* gDispatcher = nullptr;
     PxScene* gScene = nullptr;
 
-
+    //デバッガーアプリと通信用
     static constexpr auto HostID = "127.0.0.1";
     static constexpr auto PostID = 5425;
     static constexpr auto TimeoutMilliSecounds = 10;

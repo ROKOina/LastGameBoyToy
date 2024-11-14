@@ -648,6 +648,32 @@ Graphics::Graphics(HWND hWnd)
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
 
+        desc.BorderColor[0] = 1;
+        desc.BorderColor[1] = 1;
+        desc.BorderColor[2] = 1;
+        desc.BorderColor[3] = 0;
+
+        // TRANSPARENT_BORDER_POINT
+        {
+            desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+            hr = device_->CreateSamplerState(&desc, samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_POINT].GetAddressOf());
+            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        }
+
+        // TRANSPARENT_BORDER_LINEAR
+        {
+            desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+            hr = device_->CreateSamplerState(&desc, samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_LINEAR].GetAddressOf());
+            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        }
+
+        // TRANSPARENT_BORDER_ANISOTROPIC
+        {
+            desc.Filter = D3D11_FILTER_ANISOTROPIC;
+            hr = device_->CreateSamplerState(&desc, samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_ANISOTROPIC].GetAddressOf());
+            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        }
+
         // SHADOW_ONLY
         {
             ZeroMemory(&desc, sizeof(desc));
@@ -782,27 +808,22 @@ DirectX::XMFLOAT3 Graphics::WorldToScreenPos(DirectX::XMFLOAT3 worldPos, std::sh
 //サンプラーステートの設定
 void Graphics::SetSamplerState()
 {
-    //ピクセルシェーダのサンプラーステート設定
-    immediateContext_->PSSetSamplers(0, 1, samplerStates[SAMPLEMODE::WRAP_POINT].GetAddressOf());
-    immediateContext_->PSSetSamplers(1, 1, samplerStates[SAMPLEMODE::WRAP_LINEAR].GetAddressOf());
-    immediateContext_->PSSetSamplers(2, 1, samplerStates[SAMPLEMODE::WRAP_ANISOTROPIC].GetAddressOf());
-    immediateContext_->PSSetSamplers(3, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_POINT].GetAddressOf());
-    immediateContext_->PSSetSamplers(4, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_LINEAR].GetAddressOf());
-    immediateContext_->PSSetSamplers(5, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_ANISOTROPIC].GetAddressOf());
-    immediateContext_->PSSetSamplers(6, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_POINT].GetAddressOf());
-    immediateContext_->PSSetSamplers(7, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_LINEAR].GetAddressOf());
-    immediateContext_->PSSetSamplers(8, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_ANISOTROPIC].GetAddressOf());
-    immediateContext_->PSSetSamplers(9, 1, samplerStates[SAMPLEMODE::SHADOW].GetAddressOf());
+    ID3D11SamplerState* santolers[] = {
+        samplerStates[SAMPLEMODE::WRAP_POINT].Get(),
+        samplerStates[SAMPLEMODE::WRAP_LINEAR].Get(),
+        samplerStates[SAMPLEMODE::WRAP_ANISOTROPIC].Get(),
+        samplerStates[SAMPLEMODE::BLACK_BORDER_POINT].Get(),
+        samplerStates[SAMPLEMODE::BLACK_BORDER_LINEAR].Get(),
+        samplerStates[SAMPLEMODE::BLACK_BORDER_ANISOTROPIC].Get(),
+        samplerStates[SAMPLEMODE::WHITE_BORDER_POINT].Get(),
+        samplerStates[SAMPLEMODE::WHITE_BORDER_LINEAR].Get(),
+        samplerStates[SAMPLEMODE::WHITE_BORDER_ANISOTROPIC].Get(),
+        samplerStates[SAMPLEMODE::SHADOW].Get(),
+        samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_POINT].Get(),
+        samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_LINEAR].Get(),
+        samplerStates[SAMPLEMODE::TRANSPARENT_BORDER_ANISOTROPIC].Get()
+    };
 
-    //ジオメトリシェーダのサンプラーステート設定
-    immediateContext_->GSSetSamplers(0, 1, samplerStates[SAMPLEMODE::WRAP_POINT].GetAddressOf());
-    immediateContext_->GSSetSamplers(1, 1, samplerStates[SAMPLEMODE::WRAP_LINEAR].GetAddressOf());
-    immediateContext_->GSSetSamplers(2, 1, samplerStates[SAMPLEMODE::WRAP_ANISOTROPIC].GetAddressOf());
-    immediateContext_->GSSetSamplers(3, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_POINT].GetAddressOf());
-    immediateContext_->GSSetSamplers(4, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_LINEAR].GetAddressOf());
-    immediateContext_->GSSetSamplers(5, 1, samplerStates[SAMPLEMODE::BLACK_BORDER_ANISOTROPIC].GetAddressOf());
-    immediateContext_->GSSetSamplers(6, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_POINT].GetAddressOf());
-    immediateContext_->GSSetSamplers(7, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_LINEAR].GetAddressOf());
-    immediateContext_->GSSetSamplers(8, 1, samplerStates[SAMPLEMODE::WHITE_BORDER_ANISOTROPIC].GetAddressOf());
-    immediateContext_->GSSetSamplers(9, 1, samplerStates[SAMPLEMODE::SHADOW].GetAddressOf());
+    //ピクセルシェーダのサンプラーステート設定
+    immediateContext_->PSSetSamplers(0, SAMPLEMODE::MAX, santolers);
 }

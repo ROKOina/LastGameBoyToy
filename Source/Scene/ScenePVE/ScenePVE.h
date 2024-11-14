@@ -6,7 +6,6 @@
 #include "Audio\Audio.h"
 
 #include "Component\System\GameObject.h"
-#include "Graphics/Light/Light.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 
@@ -32,7 +31,6 @@ public:
     //–¼‘OŽæ“¾
     std::string GetName() const override { return "ScenePVE"; };
 private:
-    Light* mainDirectionalLight = nullptr;
     std::unique_ptr<BasicsApplication> photonNet;
     std::shared_ptr<TransformCom>t;
 };

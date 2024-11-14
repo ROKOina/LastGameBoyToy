@@ -7,6 +7,12 @@ UiFlag::UiFlag(const char* filename, SpriteShader spriteshader, bool collsion, b
     spc.color.w = 0.0f;
 }
 
+// ŠJŽnˆ—
+void UiFlag::Start()
+{
+    this->UiSystem::Start();
+}
+
 void UiFlag::Update(float elapsedTime)
 {
     if (*flag) {

@@ -3,7 +3,6 @@
 #include "Netwark/Photon/StaticSendDataManager.h"
 
 #include "Graphics/Graphics.h"
-#include "Graphics/Light/LightManager.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 
 #include "imgui.h"
@@ -30,6 +29,7 @@
 #include "Component/Camera/EventCameraManager.h"
 #include "Component/Renderer/RendererCom.h"
 #include "Component/Renderer/InstanceRendererCom.h"
+#include "Component\Light\LightCom.h"
 
 #include "Phsix\Physxlib.h"
 
@@ -54,6 +54,13 @@ void SceneSugimoto::Initialize()
         obj->SetName("posteffect");
         auto& p = obj->AddComponent<PostEffect>();
         p->SetParameter(3.0f, 0.8f, PostEffect::PostEffectParameter::Exposure);
+    }
+
+    //ライト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("directionallight");
+        obj->AddComponent<Light>(nullptr);
     }
 
     //フリーカメラ
@@ -151,15 +158,10 @@ void SceneSugimoto::Initialize()
 #pragma endregion
 
 #pragma region グラフィック系の設定
-    //平行光源を追加
-    mainDirectionalLight = new Light(LightType::Directional);
-    mainDirectionalLight->SetDirection({ -0.3f, -0.5f, -0.2 });
-    mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
-    LightManager::Instance().Register(mainDirectionalLight);
 
     // スカイボックスの設定
     std::array<const char*, 4> filepath = {
-      "Data\\Texture\\snowy_hillside_4k.DDS",
+      "Data\\Texture\\CosmicCoolCloudBottom.DDS",
       "Data\\Texture\\diffuse_iem.dds",
       "Data\\Texture\\specular_pmrem.dds",
       "Data\\Texture\\lut_ggx.DDS"
@@ -204,11 +206,8 @@ void SceneSugimoto::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
-    // ライトの定数バッファを更新
-    LightManager::Instance().UpdateConstatBuffer();
-
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }
 
 void SceneSugimoto::SetUserInputs()

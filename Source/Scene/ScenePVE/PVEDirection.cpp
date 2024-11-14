@@ -64,10 +64,9 @@ void PVEDirection::DirectionOne(float elapsedTime)
 {
     if (!flag)
     {
-       
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
-        
+
         flag = true;
     }
 

@@ -874,7 +874,6 @@ void AnimationCom::SeparateNode()
     for (auto& node : model->GetNodes())
     {
         if (std::string(node.name).find("Hip") != std::string::npos)
-            //if (std::strcmp(node.name, "Hip") == 0)
         {
             lowerNodes.emplace_back(&node);
             continue;

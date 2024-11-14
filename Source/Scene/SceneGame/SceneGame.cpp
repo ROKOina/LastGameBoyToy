@@ -5,7 +5,6 @@
 //#pragma comment(lib, "Ws2_32.lib")
 
 #include "Graphics/Graphics.h"
-#include "Graphics/Light/LightManager.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 #include "SceneGame.h"
@@ -42,6 +41,7 @@
 #include "Component\Collsion\PushBackCom.h"
 #include "Component\UI\UiSystem.h"
 #include "Component\UI\UiGauge.h"
+#include "Component\UI\PlayerUI.h"
 #include "Component\System\HitProcessCom.h"
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Component/Camera/EventCameraManager.h"
@@ -55,6 +55,8 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include <Component\UI\UiFlag.h>
+#include "Component\Renderer\TrailCom.h"
+#include "Component\Light\LightCom.h"
 
 #include "Setting/Setting.h"
 
@@ -78,6 +80,13 @@ void SceneGame::Initialize()
         obj->AddComponent<PostEffect>();
     }
 
+    //ライト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("directionallight");
+        obj->AddComponent<Light>(nullptr);
+    }
+
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -98,40 +107,43 @@ void SceneGame::Initialize()
     {
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("stage");
-        //obj->transform_->SetWorldPosition({ 0, 3.7f, 0 });
-        //obj->transform_->SetScale({ 0.8f, 0.8f, 0.8f });
+        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/canyon/stage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/Model/canyon/stage.collision");
+        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         obj->AddComponent<StageEditorCom>();
-        /*      RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, NodeCollsionCom::CollsionType::SPHER).get();
-              rigid->GenerateCollider(r->GetModel()->GetResource());*/
+        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
+        rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
+        rigid->SetNormalizeScale(1);
     }
 
     //当たり判定用
-    std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
-    {
-        //roboobj->SetName("robo");
-        //roboobj->transform_->SetWorldPosition({ 0, 10, 0 });
-        //roboobj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        //std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        //r->LoadModel("Data/OneCoin/robot.mdl");
-        //std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
-        //a->PlayAnimation(0, true, false, 0.001f);
+    //std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
+    //{
+    //    roboobj->SetName("robo");
+    //    roboobj->transform_->SetWorldPosition({ 0, 3.0f, 0 });
+    //    roboobj->transform_->SetScale({ 3,3,3 });
+    //    std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
+    //    r->LoadModel("Data/OneCoin/robot.mdl");
+    //    std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
+    //    a->PlayAnimation(0, true, false, 0.001f);
 
-        //std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
-        //sphere->SetRadius(2.0f);
-        //sphere->SetMyTag(COLLIDER_TAG::Enemy);
-        //sphere->SetJudgeTag(COLLIDER_TAG::Player);
+    //    std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
+    //    sphere->SetRadius(2.0f);
+    //    sphere->SetMyTag(COLLIDER_TAG::Enemy);
+    //    sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
-  /*      roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-        roboobj->AddComponent<RigidBodyCom>(false, NodeCollsionCom::CollsionType::SPHER);*/
-    }
+    //    roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
+    //    RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Primitive).get();
+    //    rigid->SetPrimitiveType(NodeCollsionCom::CollsionType::SPHER);
+    //}
 
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
+        obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
 
         //ウルト関係Obj追加
@@ -299,6 +311,13 @@ void SceneGame::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
             smoke->SetActive(false);
         }
+
+        //雑魚的生成オブジェクト
+        {
+            //std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
+            //spawnobject->SetName("spawnenemy");
+            //spawnobject->AddComponent<SpawnCom>(nullptr);
+        }
     }
 
 #endif
@@ -309,18 +328,13 @@ void SceneGame::Initialize()
 #pragma endregion
 
 #pragma region グラフィック系の設定
-    //平行光源を追加
-    mainDirectionalLight = new Light(LightType::Directional);
-    mainDirectionalLight->SetDirection({ -0.5f, -0.5f, 0 });
-    mainDirectionalLight->SetColor(DirectX::XMFLOAT4(1, 1, 1, 1));
-    LightManager::Instance().Register(mainDirectionalLight);
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
     // スカイボックスの設定
     std::array<const char*, 4> filepath = {
-      "Data\\Texture\\snowy_hillside_4k.DDS",
+      "Data\\Texture\\CosmicCoolCloudBottom.DDS",
       "Data\\Texture\\diffuse_iem.dds",
       "Data\\Texture\\specular_pmrem.dds",
       "Data\\Texture\\lut_ggx.DDS"
@@ -397,11 +411,8 @@ void SceneGame::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
-    // ライトの定数バッファを更新
-    LightManager::Instance().UpdateConstatBuffer();
-
     //オブジェクト描画
-    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, mainDirectionalLight->GetDirection());
+    GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 
     photonNet->ImGui();
 
@@ -439,6 +450,8 @@ void SceneGame::EffectNew()
         cpuparticle->SetActive(true);
         obj->AddComponent<EasingMoveCom>(nullptr);
         obj->AddComponent<NodeCollsionCom>(nullptr);
+        std::shared_ptr<Trail>trailcom = obj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
+        trailcom->SetTransform(obj->transform_->GetWorldTransform());
     }
     ImGui::SameLine();
     if (ImGui::Button("UI"))
@@ -464,6 +477,7 @@ void SceneGame::CreateUiObject()
             reticle->SetName("reticle");
             reticle->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Reticle.ui", Sprite::SpriteShader::DEFALT, false);
         }
+
         //HpFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
@@ -473,26 +487,18 @@ void SceneGame::CreateUiObject()
         }
         //HpGauge
         {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
+            std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+            std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
             hpGauge->SetName("HpGauge");
             std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::X_ONLY_ADD);
             gauge->SetMaxValue(200);
             float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
             gauge->SetVariableValue(i);
         }
-
-        //HpGauge
-        {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpGauge = canvas->AddChildObject();
-            hpGauge->SetName("HideHpGauge");
-            std::shared_ptr<UiSystem>gauge = hpGauge->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
-        }
         //HpMemori
         {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+            std::shared_ptr<GameObject> hpMemori = hpFrame->AddChildObject();
             hpMemori->SetName("HpMemori");
             hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpMemori.ui", Sprite::SpriteShader::DEFALT, false);
         }
@@ -500,25 +506,25 @@ void SceneGame::CreateUiObject()
         //BoostFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("BoostFrame");
-            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<GameObject> boostFrame = canvas->AddChildObject();
+            boostFrame->SetName("BoostFrame");
+            boostFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostFrame2
         {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("BoostFrame2");
-            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<GameObject> BoostFrame = GameObjectManager::Instance().Find("BoostFrame");
+            std::shared_ptr<GameObject> BoostFrame2 = BoostFrame->AddChildObject();
+            BoostFrame2->SetName("BoostFrame2");
+            BoostFrame2->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //BoostGauge
         {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("BoostGauge");
-            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<GameObject> BoostFrame = GameObjectManager::Instance().Find("BoostFrame");
+            std::shared_ptr<GameObject> BoostGauge = BoostFrame->AddChildObject();
+            BoostGauge->SetName("BoostGauge");
+            BoostGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //UltFrame
@@ -531,8 +537,8 @@ void SceneGame::CreateUiObject()
 
         //HideUltGauge
         {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hideUlt = canvas->AddChildObject();
+            std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+            std::shared_ptr<GameObject> hideUlt = ultFrame->AddChildObject();
             hideUlt->SetName("HideUltGauge");
             std::shared_ptr<UiGauge>gauge = hideUlt->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::Y_ONLY_SUB);
             std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
@@ -543,26 +549,54 @@ void SceneGame::CreateUiObject()
 
         //UltGauge
         {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("UltGauge");
-            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+            std::shared_ptr<GameObject> ultGauge = ultFrame->AddChildObject();
+            ultGauge->SetName("UltGauge");
+            ultGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //SkillFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("SkillFrame");
-            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
+            skillFrame->SetName("SkillFrame");
+            skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillFrame2
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skill_Q = SkillFrame->AddChildObject();
+            skill_Q->SetName("Skill_Frame2");
+            skill_Q->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame2_01.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillMask
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
+            skillFrame->SetName("SkillGaugeHide");
+            skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //SkillGauge
         {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("SkillGauge");
-            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
+            skillFrame->SetName("SkillGauge");
+            std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge.ui", Sprite::SpriteShader::DEFALT, false, 1030, 937);
+            std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
+            float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
+            skillGauge->SetVariableValue(i);
+        }
+
+        //Skill_Q
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
+            skillGauge->SetName("Skill_Q");
+            skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_Q.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
         //HitEffect

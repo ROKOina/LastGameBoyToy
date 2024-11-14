@@ -9,6 +9,11 @@ UiGauge::UiGauge(const char* filename, SpriteShader spriteshader, bool collsion,
     this->changeValue = changeValue;
 }
 
+void UiGauge::Start()
+{
+    this->UiSystem::Start();
+}
+
 void UiGauge::Update(float elapsedTime)
 {
     // 変化値がマイナスに行かないように補正
@@ -21,11 +26,11 @@ void UiGauge::Update(float elapsedTime)
     }
     //Xのみ
     else  if (changeValue == UiSystem::ChangeValue::X_ONLY_SUB) {
-        spc.texSize = { originalTexSize.x *(1- valueRate),spc.texSize.y };
+        spc.texSize = { originalTexSize.x * (1 - valueRate),spc.texSize.y };
     }
     //Yのみ
     else if (changeValue == UiSystem::ChangeValue::Y_ONLY_ADD) {
-        spc.texSize = { spc.texSize.x,originalTexSize.y * valueRate};
+        spc.texSize = { spc.texSize.x,originalTexSize.y * valueRate };
     }
     else if (changeValue == UiSystem::ChangeValue::Y_ONLY_SUB) {
         spc.texSize = { spc.texSize.x,originalTexSize.y * (1 - valueRate) };

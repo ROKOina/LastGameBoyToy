@@ -10,6 +10,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"
 #include <Component\MoveSystem\MovementCom.h>
+#include "Component\Renderer\TrailCom.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -54,7 +55,7 @@ void BulletCom::Update(float elapsedTime)
                 std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
                 hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
                 hiteffectobject->SetName("HitEffect");
-                std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 500);
+                std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
                 hiteffct->Play();
             }
             {
@@ -128,6 +129,9 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     GameObj obj = GameObjectManager::Instance().Create();
     obj->SetName("damageball");
 
+    std::shared_ptr<Trail>trail = obj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
+    trail->SetTransform(obj->transform_->GetWorldTransform());
+
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     float ya = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
     firePos.y += ya;
@@ -147,8 +151,11 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     moveCom->SetIsRaycast(false);
 
     //パーティクル
-    const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
-    gpuparticle->Play();
+    const auto& bulletgpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    bulletgpuparticle->Play();
+    std::shared_ptr<GameObject>bullettrajectory = obj->AddChildObject();
+    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
+    bullettrajectoryparticle->Play();
 
     std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);

@@ -226,20 +226,22 @@ void SpawnCom::SpawnGameObject()
 void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
 {
     obj->SetName("NoobEnemy");
-    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
+    obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     const auto& renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     renderer->LoadModel("Data/Model/Enemy/Enemy.mdl");
-    obj->AddComponent<MovementCom>();
+    std::shared_ptr<MovementCom>m = obj->AddComponent<MovementCom>();
+    m->SetIsRaycast(false);
+    m->SetGravity(0.0f);
     obj->AddComponent<NodeCollsionCom>(nullptr);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<AimIKCom>(nullptr, "mixamorig:Neck");
+    obj->AddComponent<AimIKCom>(nullptr, nullptr);
     obj->AddComponent<NoobEnemyCom>();
     obj->AddComponent<CharaStatusCom>();
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetMyTag(COLLIDER_TAG::Enemy);
     const auto& pushback = obj->AddComponent<PushBackCom>();
     pushback->SetRadius(0.5f);
-    pushback->SetWeight(0.5f);
+    pushback->SetWeight(600.0f);
 }
 
 //É~ÉTÉCÉãê∂ê¨ä÷êî
