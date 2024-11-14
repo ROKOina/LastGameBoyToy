@@ -3,6 +3,9 @@
 #include <List>
 #include <map>
 #include <Math\Collision.h>
+#include <functional>
+
+using GenerateFunc = std::function<void(GameObj my)>;
 
 class StageEditorCom : public Component
 {
@@ -23,12 +26,15 @@ public:
     // GUI描画
     void OnGUI();
 
+    //Jsonのデータを元にオブジェクト配置
+    void PlaceJsonData(std::string filename);
+
 private:
     //配置するオブジェクトを登録
     void ObjectRegister();
 
     //ステージにオブジェクト配置
-    void ObjectPlace(
+    GameObj ObjectPlace(
         std::string objType,
         DirectX::XMFLOAT3 position,
         DirectX::XMFLOAT3 scale,
@@ -46,13 +52,37 @@ private:
     void ObjectLoad();
 
 private:
+    //ゲームオブジェクト生成関数の名前
+    enum class GenerateFuncName
+    {
+        None = 0,//設定しない
 
+        TestNakanisi,
+        TowerGimic,
+        Max,
+    };
+
+    //ゲームオブジェクト生成関数
+    static void TestNakanisi(GameObj place);
+    static void TowerGimic(GameObj place);
+
+    GenerateFunc generateFunc[(int)GenerateFuncName::Max] =
+    {
+        nullptr, //None
+
+        TestNakanisi,
+        TowerGimic
+    };
+
+    //保存用のデータを格納する構造体
     struct PlaceObject
     {
         bool staticFlag = false;
         std::string filePath;
         std::string collisionPath;
         std::list<GameObj> objList;
+
+        GenerateFuncName func;
     };
 
 private:

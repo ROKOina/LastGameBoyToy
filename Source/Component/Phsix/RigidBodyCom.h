@@ -27,7 +27,7 @@ public:
     void SetUp();
 
     void GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale);
-    void GenerateCollider(ModelResource* rc);
+    void GenerateCollider(ModelResource* rc, bool isConvex);
 
     NodeCollsionCom::CollsionType GetPrimitiveType() { return type; }
     void SetPrimitiveType(NodeCollsionCom::CollsionType t) { type = t; }
@@ -41,6 +41,7 @@ public:
     {
         Primitive, //BoxやSphere
         Mesh,
+        Convex,
         Complex,   //ステージなどの複数のMeshが集まったMesh
         Max,
     };

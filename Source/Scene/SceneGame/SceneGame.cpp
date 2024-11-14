@@ -112,7 +112,8 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-        obj->AddComponent<StageEditorCom>();
+        StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
         RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
         rigid->SetNormalizeScale(1);
@@ -181,7 +182,7 @@ void SceneGame::Initialize()
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
 
         //picoˆÊ’u
-        cameraPost->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
+        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //˜r
