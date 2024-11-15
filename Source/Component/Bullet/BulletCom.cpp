@@ -139,13 +139,13 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
 
+    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
+    trail->SetTransform(viewObj->transform_->GetWorldTransform());
+
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     float ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
     firePos.y += ya;
     viewObj->transform_->SetWorldPosition(firePos);
-
-    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
-    trail->SetTransform(viewObj->transform_->GetWorldTransform());
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
