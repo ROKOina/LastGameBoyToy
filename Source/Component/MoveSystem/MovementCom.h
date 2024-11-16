@@ -64,7 +64,11 @@ public:
 
     //重力影響度
     const float& GetGravityEffect()const { return gravityeffect; }
-    void SetGravityEffect(float gravityeffect) { gravityeffect = gravityeffect; }
+    void SetGravityEffect(float gravityeffect) { this->gravityeffect = gravityeffect; }
+
+    //落下スピード
+    const float& GetFallSpeed()const { return fallspeed; }
+    void SetFallSpeed(float fallspeed) { this->fallspeed = fallspeed; }
 
     //接地判定
     const bool OnGround() { return onGround_; }
@@ -102,5 +106,4 @@ private:
     float moveAcceleration_ = 3.0f;            //加速度
     inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット
     bool isRaycast = true;                      //レイキャストをするか（true：使用する）
-
 };

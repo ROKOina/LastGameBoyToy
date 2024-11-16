@@ -232,11 +232,15 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     std::shared_ptr<MovementCom>m = obj->AddComponent<MovementCom>();
     m->SetIsRaycast(false);
     m->SetGravity(0.0f);
+    m->SetFallSpeed(-0.4f);
     obj->AddComponent<NodeCollsionCom>(nullptr);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<AimIKCom>(nullptr, nullptr);
+    std::shared_ptr<AimIKCom>aik = obj->AddComponent<AimIKCom>(nullptr, "head");
+    aik->SetOffsetY(4.3f);
     obj->AddComponent<NoobEnemyCom>();
     obj->AddComponent<CharaStatusCom>();
+    std::shared_ptr<GPUParticle>gp = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyaura.gpuparticle", 1000);
+    gp->Play();
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetMyTag(COLLIDER_TAG::Enemy);
     const auto& pushback = obj->AddComponent<PushBackCom>();
@@ -256,7 +260,7 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
 
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
-    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetMyTag(COLLIDER_TAG::EnemyBullet);
     collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.8f);
 }
@@ -290,7 +294,7 @@ void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
 
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
-    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetMyTag(COLLIDER_TAG::EnemyBullet);
     collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.8f);
 }
@@ -305,7 +309,7 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
 
     const auto& collider = beamSegment->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
-    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetMyTag(COLLIDER_TAG::EnemyBullet);
     collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.8f);
 

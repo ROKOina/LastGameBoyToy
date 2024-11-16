@@ -12,17 +12,29 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
-#include "Component\Animation\FootIKcom.h"
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneTitle.h"
 #include "Scene\SceneGame\SceneGame.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
+#include "Component\Character\RegisterChara.h"
+#include "Component\Stage\StageEditorCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
+#include "Component\Particle\GPUParticle.h"
+#include "Graphics/SkyBoxManager/SkyBoxManager.h"
+#include <Component\Camera\FPSCameraCom.h>
+#include <Component\Camera\EventCameraCom.h>
+#include <Component\Camera\EventCameraManager.h>
 
 void SceneTitle::Initialize()
 {
-    Graphics& graphics = Graphics::Instance();
+    //ポストエフェクト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("posteffect");
+        obj->AddComponent<PostEffect>();
+    }
 
     //フリーカメラ
     {
@@ -30,6 +42,15 @@ void SceneTitle::Initialize()
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
+    GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+
+    //イベント用カメラ
+    {
+        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
+        eventCamera->SetName("eventcamera");
+        eventCamera->AddComponent<EventCameraCom>();
+        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
     //ライト
@@ -39,32 +60,35 @@ void SceneTitle::Initialize()
         obj->AddComponent<Light>(nullptr);
     }
 
-    //コンスタントバッファの初期化
-    ConstantBufferInitialize();
+    //ステージ
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("stage");
+        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
+    }
 
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/Model/OneCoin/robot.mdl");
-        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        //std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
+        obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/player_True/player.mdl");
+        std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
+        anim->PlayAnimation(1, true);
     }
 
-    //ステージ
+    //snowparticle
     {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 0.0f, 0 });
-        obj->transform_->SetScale({ 0.6f, 0.6f, 0.6f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/IKTestStage/ExampleStage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/Model/IKTestStage/ExampleStage.collision");
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("snowparticle");
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
     //キャンバス
@@ -87,12 +111,17 @@ void SceneTitle::Initialize()
         }
     }
 
-    //ポストエフェクト
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("posteffect");
-        obj->AddComponent<PostEffect>();
-    }
+    //コンスタントバッファの初期化
+    ConstantBufferInitialize();
+
+    // スカイボックスの設定
+    std::array<const char*, 4> filepath = {
+      "Data\\Texture\\CosmicCoolCloudBottom.DDS",
+      "Data\\Texture\\diffuse_iem.dds",
+      "Data\\Texture\\specular_pmrem.dds",
+      "Data\\Texture\\lut_ggx.DDS"
+    };
+    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
 }
 
 void SceneTitle::Finalize()
@@ -105,6 +134,9 @@ void SceneTitle::Update(float elapsedTime)
 
     UIUpdate(elapsedTime);
 
+    //イベントカメラ用
+    EventCameraManager::Instance().EventUpdate(elapsedTime);
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }
@@ -116,6 +148,9 @@ void SceneTitle::Render(float elapsedTime)
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
     ID3D11RenderTargetView* rtv = graphics.GetRenderTargetView();
     ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
+    FLOAT color[] = { 0.0f, 0.0f, 0.5f, 1.0f };	// RGBA(0.0～1.0)
+    dc->ClearRenderTargetView(rtv, color);
+    dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     dc->OMSetRenderTargets(1, &rtv, dsv);
 
     //コンスタントバッファの更新
@@ -126,6 +161,9 @@ void SceneTitle::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
+
+    //イベントカメラ用
+    EventCameraManager::Instance().EventCameraImGui();
 }
 
 void SceneTitle::UIUpdate(float elapsedTime)

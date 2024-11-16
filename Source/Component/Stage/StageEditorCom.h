@@ -64,7 +64,7 @@ private:
 
     //ゲームオブジェクト生成関数
     static void TestNakanisi(GameObj place);
-    static void TowerGimic(GameObj place);
+    static void TowerGimic(GameObj& place);
 
     GenerateFunc generateFunc[(int)GenerateFuncName::Max] =
     {
