@@ -17,6 +17,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
@@ -323,7 +324,19 @@ void StageEditorCom::ObjectSave()
 
     for (auto& placeObj : placeObjcts)
     {
-        j[placeObj.first]["FileName"] = placeObj.second.filePath;
+        // base_path から target_path への相対パスを取得
+        // 区切り文字 "(" の位置を検索
+        size_t delimiterPos = placeObj.second.filePath.find("Data");
+
+        // 区切り文字が見つかった場合、その位置までの部分文字列を取得
+        std::string name = (delimiterPos != std::string::npos) ? placeObj.second.filePath.substr(0, delimiterPos) : placeObj.second.filePath;
+        name += static_cast<std::string>("Data");
+
+        std::filesystem::path relative_path = std::filesystem::relative(placeObj.second.filePath, name);
+        std::string path = relative_path.string();
+        path = "Data/" + path;
+
+        j[placeObj.first]["FileName"] = path;
         j[placeObj.first]["CollsionFileName"] = placeObj.second.collisionPath;
         j[placeObj.first]["StaticFlag"] = placeObj.second.staticFlag;
         j[placeObj.first]["Func"] = (int)placeObj.second.func;
@@ -369,38 +382,45 @@ void StageEditorCom::ObjectLoad()
     DialogResult result = Dialog::OpenFileName(filename, sizeof(filename), filter, nullptr, Framework::GetInstance()->GetHWND());
     if (result == DialogResult::OK)
     {
-        //ファイルを開く
-        fstream ifs(filename);
-        if (ifs.good())
+        PlaceJsonData(filename);
+    }
+}
+
+void StageEditorCom::PlaceJsonData(std::string filename)
+{
+    using namespace std;
+
+    //ファイルを開く
+    fstream ifs(filename);
+    if (ifs.good())
+    {
+        //Json型を取得
+        nlohmann::json json;
+        ifs >> json;
+
+        for (auto& item : json.items())
         {
-            //Json型を取得
-            nlohmann::json json;
-            ifs >> json;
+            //オブジェクトの内容にアクセス
+            const auto& data = item.value();
+            placeObjcts[item.key()].staticFlag = data["StaticFlag"];
+            placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
+            placeObjcts[item.key()].filePath = data["FileName"];
+            placeObjcts[item.key()].func = (GenerateFuncName)data["Func"];
 
-            for (auto& item : json.items())
+            for (int index = 0; index < data["Position"].size(); ++index)
             {
-                //オブジェクトの内容にアクセス
-                const auto& data = item.value();
-                placeObjcts[item.key()].staticFlag = data["StaticFlag"];
-                placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
-                placeObjcts[item.key()].filePath = data["FileName"];
-                placeObjcts[item.key()].func = (GenerateFuncName)data["Func"];
+                DirectX::XMFLOAT3 pos = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
+                DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
+                DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
 
-                for (int index = 0; index < data["Position"].size(); ++index)
-                {
-                    DirectX::XMFLOAT3 pos = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
-                    DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
-                    DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
-
-                    ObjectPlace(
-                        item.key(),//選択中のオブジェクト
-                        pos,       //位置
-                        scale,     //スケール
-                        rotation,  //回転値
-                        placeObjcts[item.key()].filePath.c_str(),    //modelのパス
-                        placeObjcts[item.key()].collisionPath.c_str()//nodeCollsionのパス
-                    );
-                }
+                ObjectPlace(
+                    item.key(),//選択中のオブジェクト
+                    pos,       //位置
+                    scale,     //スケール
+                    rotation,  //回転値
+                    placeObjcts[item.key()].filePath.c_str(),    //modelのパス
+                    placeObjcts[item.key()].collisionPath.c_str()//nodeCollsionのパス
+                );
             }
         }
     }
