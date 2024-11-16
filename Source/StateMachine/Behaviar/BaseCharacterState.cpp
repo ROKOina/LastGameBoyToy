@@ -336,13 +336,22 @@ void Ult_Attack_State::Enter()
     DirectX::XMFLOAT3 end = start + front * 100;
 
     //エフェクト
-    auto& effObj= GameObjectManager::Instance().Create();
+    auto& arm = camera->GetChildFind("armChild");
+    DirectX::XMFLOAT3 gunPos = {};
+    if (arm)
+    {
+        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+        const auto& node = model->FindNode("gun2");
+
+        gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+    }
+
+    auto& effObj= obj->AddChildObject();
     effObj->SetName("ultAttackEff");
-    effObj->transform_->SetWorldPosition(camera->transform_->GetWorldPosition());
-    effObj->transform_->SetRotation(QuaternionStruct::LookRotation(front));
+    effObj->transform_->SetWorldPosition(gunPos + front * 0.5f);
     
-    const auto& bulletgpuparticle = effObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/ultAttack.gpuparticle", 1000);
-    bulletgpuparticle->Play();
+    const auto& bulletgpuparticle = effObj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/playerultattack.cpuparticle", 500);
+    bulletgpuparticle->SetActive(true);
     effObj->AddComponent<RemoveTimerCom>(0.2f);
 
     ray->SetStart(start);

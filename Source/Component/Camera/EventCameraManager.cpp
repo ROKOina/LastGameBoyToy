@@ -17,7 +17,7 @@
 #include "SystemStruct\Logger.h"
 
 CEREAL_CLASS_VERSION(EventCameraManager::ECTransform, 1)
-CEREAL_CLASS_VERSION(EventCameraManager::SaveEventCameraBuff, 1)
+CEREAL_CLASS_VERSION(EventCameraManager::SaveEventCameraBuff, 2)
 
 // シリアライズ
 namespace DirectX
@@ -94,6 +94,16 @@ void EventCameraManager::SaveEventCameraBuff::serialize(Archive& archive, int ve
         CEREAL_NVP(focusObjName),
         CEREAL_NVP(ECTra)
     );
+    // バージョン1には存在しないフィールドにはデフォルト値を与える
+    if (version == 1) {
+        isFocusLocal = false;  // デフォルト値を設定
+    }
+    if (version >= 2) {
+        archive(
+            CEREAL_NVP(isFocusLocal)
+        );
+    }
+
 }
 
 //シリアライズ
@@ -185,6 +195,9 @@ void EventCameraManager::EventCameraImGui()
         }
 
         ImGui::Separator();
+
+        //注視点の子供にする
+        ImGui::Checkbox("isFocusLocal", &saveEventCameraBuff.isFocusLocal);
 
         //再生
         if (ImGui::Button("Play"))
@@ -354,8 +367,12 @@ void EventCameraManager::PlayEventCamera(std::string eventName)
     {
         //初期位置に移動
         if (saveEventCameraBuff.ECTra.size() >= 2)
-            cameraObj.lock()->transform_->SetWorldPosition(saveEventCameraBuff.ECTra[0].pos);
-            //cameraObj.lock()->transform_->SetWorldPosition(FocusFromWorldPos(saveEventCameraBuff.ECTra[0].pos));
+        {
+            if (!saveEventCameraBuff.isFocusLocal)
+                cameraObj.lock()->transform_->SetWorldPosition(saveEventCameraBuff.ECTra[0].pos);
+            else
+                cameraObj.lock()->transform_->SetWorldPosition(FocusFromWorldPos(saveEventCameraBuff.ECTra[0].pos));
+        }
 
         //イベント再生をセット
         auto& camera = cameraObj.lock()->GetComponent<CameraCom>();
@@ -409,7 +426,12 @@ void EventCameraManager::PlayCameraLerp()
 
         //カメラ位置設定
         if (cameraObj.lock())
-            cameraObj.lock()->transform_->SetWorldPosition(lpos);
+        {
+            if (!saveEventCameraBuff.isFocusLocal)
+                cameraObj.lock()->transform_->SetWorldPosition(lpos);
+            else
+                cameraObj.lock()->transform_->SetWorldPosition(FocusFromWorldPos(lpos));
+        }
 
         //注視点設定
         if (focusObj.lock())
