@@ -163,6 +163,7 @@
     <ClInclude Include="Source\Component\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\Picohard.h" />
     <ClInclude Include="Source\Component\Character\RegisterChara.h" />
+    <ClInclude Include="Source\Component\Character\RemoveTimerCom.h" />
     <ClInclude Include="Source\Component\Collsion\ColliderCom.h" />
     <ClInclude Include="Source\Component\Collsion\FrustumCom.h" />
     <ClInclude Include="Source\Component\Collsion\NodeCollsionCom.h" />

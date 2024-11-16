@@ -4,6 +4,8 @@
 #include "Component/Renderer/RendererCom.h"
 #include "Component\Bullet\BulletCom.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Particle\GPUParticle.h"
+#include "Component\Character\RemoveTimerCom.h"
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -329,8 +331,19 @@ void Ult_Attack_State::Enter()
     auto& ray = obj->GetComponent<RayColliderCom>();
     DirectX::XMFLOAT3 start = obj->transform_->GetWorldPosition();
 
-    DirectX::XMFLOAT3 front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
+    auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
+    DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
     DirectX::XMFLOAT3 end = start + front * 100;
+
+    //エフェクト
+    auto& effObj= GameObjectManager::Instance().Create();
+    effObj->SetName("ultAttackEff");
+    effObj->transform_->SetWorldPosition(camera->transform_->GetWorldPosition());
+    effObj->transform_->SetRotation(QuaternionStruct::LookRotation(front));
+    
+    const auto& bulletgpuparticle = effObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/ultAttack.gpuparticle", 1000);
+    bulletgpuparticle->Play();
+    effObj->AddComponent<RemoveTimerCom>(0.2f);
 
     ray->SetStart(start);
     ray->SetEnd(end);
