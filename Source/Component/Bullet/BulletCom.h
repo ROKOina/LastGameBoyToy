@@ -39,11 +39,15 @@ public:
     void SetDamageValue(int value) { damageValue = value; }
     int GetDamageValue() { return damageValue; }
 
+    void SetViewBullet(std::shared_ptr<GameObject> obj) { viewBullet = obj; }
+
 private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
     int ownerID;
     int damageValue = 10;
+
+    std::weak_ptr<GameObject> viewBullet;
 };
 
 class BulletCreate

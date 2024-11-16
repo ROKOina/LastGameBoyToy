@@ -59,9 +59,9 @@ void PushBackCom::PushBackUpdate(std::shared_ptr<PushBackCom> otherSide)
         DirectX::XMFLOAT3 otherPlus;
         DirectX::XMStoreFloat3(&otherPlus, DirectX::XMVectorScale(OtherFromMyNormVec, -inSphere * otherRatio));
 
-        myPos = { myPos.x + myPlus.x,myPos.y + myPlus.y,myPos.z + myPlus.z };
+        myPos = { myPos.x + myPlus.x,myPos.y/* + myPlus.y*/,myPos.z + myPlus.z };
         GetGameObject()->transform_->SetWorldPosition(myPos);
-        otherPos = { otherPos.x + otherPlus.x,otherPos.y + otherPlus.y,otherPos.z + otherPlus.z };
+        otherPos = { otherPos.x + otherPlus.x,otherPos.y /*+ otherPlus.y*/,otherPos.z + otherPlus.z };
         otherSide->GetGameObject()->transform_->SetWorldPosition(otherPos);
 
         isHit = true;
