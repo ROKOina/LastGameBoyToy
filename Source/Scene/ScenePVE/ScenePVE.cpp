@@ -25,6 +25,10 @@
 #include <Component/System/HitProcessCom.h>
 #include "Component/Particle/CPUParticle.h"
 #include "Component/Particle/GPUParticle.h"
+#include <Component/UI/UiSystem.h>
+#include <Component/UI/PlayerUI.h>
+#include <Component/UI/UiFlag.h>
+#include <Component/UI/UiGauge.h>
 
 void ScenePVE::Initialize()
 {
@@ -102,7 +106,6 @@ void ScenePVE::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        obj->transform_->SetWorldPosition({ -2.3,-1,-49.3 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
 
         //ウルト関係Obj追加
@@ -130,6 +133,7 @@ void ScenePVE::Initialize()
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
             std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 500);
         }
+        //obj->transform_->SetWorldPosition({ -2.3,0.0f,-49.3 });
     }
 
     //カメラをプレイヤーの子どもにして制御する
@@ -279,6 +283,8 @@ void ScenePVE::Initialize()
         }
     }
 
+    CreateUiObject();
+
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
@@ -338,4 +344,153 @@ void ScenePVE::Render(float elapsedTime)
 
     //EffectNew();
     ImGui::End();
+}
+
+void ScenePVE::CreateUiObject()
+{
+    //UI
+    {
+        //キャンバス
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("Canvas");
+
+        //レティクル
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
+            reticle->SetName("reticle");
+            reticle->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Reticle.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //HpFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
+            hpFrame->SetName("HpFrame");
+            hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpFrame.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //HpGauge
+        {
+            std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+            std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
+            hpGauge->SetName("HpGauge");
+            std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::X_ONLY_ADD);
+            gauge->SetMaxValue(200);
+            float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
+            gauge->SetVariableValue(i);
+        }
+        //HpMemori
+        {
+            std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+            std::shared_ptr<GameObject> hpMemori = hpFrame->AddChildObject();
+            hpMemori->SetName("HpMemori");
+            hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpMemori.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //BoostFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> boostFrame = canvas->AddChildObject();
+            boostFrame->SetName("BoostFrame");
+            boostFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame_01.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //BoostFrame2
+        {
+            std::shared_ptr<GameObject> BoostFrame = GameObjectManager::Instance().Find("BoostFrame");
+            std::shared_ptr<GameObject> BoostFrame2 = BoostFrame->AddChildObject();
+            BoostFrame2->SetName("BoostFrame2");
+            BoostFrame2->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame_02.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //BoostGauge
+        {
+            std::shared_ptr<GameObject> BoostFrame = GameObjectManager::Instance().Find("BoostFrame");
+            std::shared_ptr<GameObject> BoostGauge = BoostFrame->AddChildObject();
+            BoostGauge->SetName("BoostGauge");
+            BoostGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //UltFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("UltFrame");
+            std::shared_ptr<UiSystem> fade = hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //HideUltGauge
+        {
+            std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+            std::shared_ptr<GameObject> hideUlt = ultFrame->AddChildObject();
+            hideUlt->SetName("HideUltGauge");
+            std::shared_ptr<UiGauge>gauge = hideUlt->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HideUltGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::Y_ONLY_SUB);
+            std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+            gauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
+            float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
+            gauge->SetVariableValue(i);
+        }
+
+        //UltGauge
+        {
+            std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+            std::shared_ptr<GameObject> ultGauge = ultFrame->AddChildObject();
+            ultGauge->SetName("UltGauge");
+            ultGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
+            skillFrame->SetName("SkillFrame");
+            skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillFrame2
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skill_Q = SkillFrame->AddChildObject();
+            skill_Q->SetName("Skill_Frame2");
+            skill_Q->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame2_01.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillMask
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
+            skillFrame->SetName("SkillGaugeHide");
+            skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //SkillGauge
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
+            skillFrame->SetName("SkillGauge");
+            std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge.ui", Sprite::SpriteShader::DEFALT, false, 1030, 937);
+            std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
+            float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
+            skillGauge->SetVariableValue(i);
+        }
+
+        //Skill_Q
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
+            std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
+            skillGauge->SetName("Skill_Q");
+            skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_Q.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+
+        //HitEffect
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("HitEffect");
+
+            bool* flag = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetIsHitAttack();
+            hpMemori->AddComponent<UiFlag>("Data/SerializeData/UIData/Player/HitEffect.ui", Sprite::SpriteShader::DEFALT, false, flag);
+        }
+    }
 }

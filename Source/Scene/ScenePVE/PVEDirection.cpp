@@ -40,7 +40,7 @@ void PVEDirection::DirectionStart()
         {
             auto& DirectionBossSeconds = DirectionBoss->AddChildObject();
             DirectionBossSeconds->SetName("Seconds");
-           // DirectionBossSeconds->transform_->
+           // DirectionBossSeconds->transform_->SetLocalPosition({ 0,5,0 });
         }
 
         {
@@ -48,12 +48,15 @@ void PVEDirection::DirectionStart()
             fixationPoint->SetName("Point");
             fixationPoint->transform_->SetWorldPosition({ -9.289, 4.573,7.350 });
             fixationPoint->AddComponent<MovementCom>();
+            fixationPoint->GetComponent<MovementCom>()->SetGravity(0.0f);
         }
     }
     //最初にイベントカメラへ変更
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
     animationCom = GameObjectManager::Instance().Find("Direction")->GetComponent<AnimationCom>();
+
+    directionNumber = 3;
 }
 
 //シーン演出統括
@@ -62,19 +65,28 @@ void PVEDirection::DirectionSupervision(float elapsedTime)
     switch (directionNumber)
     {
     case 0:
-        DirectionOne(elapsedTime);
+        DirectionFOne(elapsedTime);
         break;
     case 1:
-        DirectionTwo(elapsedTime);
+        DirectionFTwo(elapsedTime);
         break;
     case 2:
-        DirectionEnd(elapsedTime);
+        DirectionFEnd(elapsedTime);
+        break;
+    case 3:
+        DirectionCOne(elapsedTime);
+        break;
+    case 4:
+        DirectionCTwo(elapsedTime);
+        break;
+    case 5:
+        DirectionCEnd(elapsedTime);
         break;
     }
 }
 
 //シーン演出
-void PVEDirection::DirectionOne(float elapsedTime)
+void PVEDirection::DirectionFOne(float elapsedTime)
 {
     if (!flag)
     {       
@@ -102,7 +114,7 @@ void PVEDirection::DirectionOne(float elapsedTime)
     }
 }
 
-void PVEDirection::DirectionTwo(float elapsedTime)
+void PVEDirection::DirectionFTwo(float elapsedTime)
 {
     if (!flag)
     {
@@ -120,24 +132,62 @@ void PVEDirection::DirectionTwo(float elapsedTime)
     if (animationCom.lock()->IsPlayAnimation()==false)
     {
         directionNumber += 1;
+        flag = false;
     }
 
 }
 
-void PVEDirection::DirectionEnd(float elapsedTime)
+void PVEDirection::DirectionFEnd(float elapsedTime)
+{
+    if (!flag)
+    {
+        //最初にイベントカメラへ変更
+        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
+
+        //ゲームオブジェクト本体を復活
+        GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
+        GameObjectManager::Instance().Find("player")->SetEnabled(true);
+
+        //見世物はいったん使わないから消す
+        GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
+        flag = true;
+    }
+    //GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -2.3,-1,-49.3 });
+
+    if (GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->IsDeath())
+    {
+        directionNumber += 1;
+        flag = false;
+    }
+
+}
+
+
+void PVEDirection::DirectionCOne(float elaspsedTime)
+{
+    if (!flag)
+    {
+        GameObjectManager::Instance().Find("BOSS")->SetEnabled(false);
+        GameObjectManager::Instance().Find("player")->SetEnabled(false);
+
+        GameObjectManager::Instance().Find("Direction")->SetEnabled(true);
+
+        GameObjectManager::Instance().Find("Direction")->transform_->SetWorldPosition({ -2.500,-0.005,-11.000 });
+        GameObjectManager::Instance().Find("Seconds")->transform_->SetLocalPosition({ 0.00,23.0,-13.0 });
+
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/clearS.eventcamera");
+
+        animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_dead"), false, false, 0.1f);
+        flag = true;
+    }
+}
+
+void PVEDirection::DirectionCTwo(float elaspdTime)
 {
 
-    //最初にイベントカメラへ変更
-    GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
+}
 
-    //ゲームオブジェクト本体を復活
-    GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
-    GameObjectManager::Instance().Find("player")->SetEnabled(true);
-
-    //見世物はいったん使わないから消す
-    GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
-   
-    GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -2.3,-1,-49.3 });
-
+void PVEDirection::DirectionCEnd(float elaspdTime)
+{
 
 }
