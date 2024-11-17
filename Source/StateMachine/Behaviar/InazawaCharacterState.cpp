@@ -39,6 +39,11 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(0, false);
+        armAnim->SetAnimationSeconds(0.3f);
+
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
         //owner->GetGameObject()->GetComponent<AnimationCom>()->PlayAnimation(
         //    owner->GetGameObject()->GetComponent<AnimationCom>()->FindAnimation("Single_Shot"), false
@@ -91,6 +96,11 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
     {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(0, false);
+        armAnim->SetAnimationSeconds(0.3f);
+
         //UŒ‚ˆ—
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, 1, 1);
         //Fire(owner->GetGameObject(), arrowSpeed);
