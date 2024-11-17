@@ -526,12 +526,20 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
     const ModelResource::Animation& animationTwo = animations.at(lowerAnimationTwoIndex);
     const ModelResource::Animation& animationThree = animations.at(lowerAnimationThreeIndex);
     const ModelResource::Animation& animationFour = animations.at(lowerAnimationFourIndex);
+    const ModelResource::Animation& animationFive = animations.at(lowerAnimetionFiveIndex);
+    const ModelResource::Animation& animationSix = animations.at(lowerAnimationSixIndex);
+    const ModelResource::Animation& animationSeven = animations.at(lowerAnimationSevenIndex);
+    const ModelResource::Animation& animationEight = animations.at(lowerAnimationEightIndex);
 
     //アニメーションデータからキーフレームデータリストを取得
     const std::vector<ModelResource::Keyframe>& Keyframes = animation.keyframes;
     const std::vector<ModelResource::Keyframe>& TwoKeyframes = animationTwo.keyframes;
     const std::vector<ModelResource::Keyframe>& ThreeKeyframes = animationThree.keyframes;
     const std::vector<ModelResource::Keyframe>& FourKeyframes = animationFour.keyframes;
+    const std::vector<ModelResource::Keyframe>& FiveKeyframes = animationFive.keyframes;
+    const std::vector<ModelResource::Keyframe>& SixKeyframes = animationSix.keyframes;
+    const std::vector<ModelResource::Keyframe>& SevenKeyframes = animationSeven.keyframes;
+    const std::vector<ModelResource::Keyframe>& EightKeyframes = animationEight.keyframes;
     int keyCount = static_cast<int>(Keyframes.size());
     for (int keyIndex = 0; keyIndex < keyCount - 1; ++keyIndex)
     {
@@ -542,11 +550,17 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
         const ModelResource::Keyframe& walkBack = TwoKeyframes.at(keyIndex + 1);
         const ModelResource::Keyframe& walkRight = ThreeKeyframes.at(keyIndex + 1);
         const ModelResource::Keyframe& walkLeft = FourKeyframes.at(keyIndex + 1);
+        const ModelResource::Keyframe& walkFrontRight = FiveKeyframes.at(keyIndex + 1);
+        const ModelResource::Keyframe& walkFrontLeft = SixKeyframes.at(keyIndex + 1);
+        const ModelResource::Keyframe& walkBackRight = SevenKeyframes.at(keyIndex + 1);
+        const ModelResource::Keyframe& walkBackLeft = EightKeyframes.at(keyIndex + 1);
 
         if (lowerCurrentAnimationSeconds >= keyframe0.seconds && lowerCurrentAnimationSeconds < keyframe1.seconds)
         {
             //再生時間とキーフレームの時間から補完率を算出する
             float rate = (lowerCurrentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
+
+            
 
             int lowerNodeCount = static_cast<int>(lowerNodes.size());
             for (int nodeIndex = 0, lowerNodeIndex = 0; lowerNodeIndex < lowerNodeCount; ++nodeIndex)
@@ -609,39 +623,75 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                     float stickAngle = GetGameObject()->GetComponent<CharacterCom>()->GetStickAngle();
 
                     //右から上
-                    if (stickAngle >= 0.0f && stickAngle < 90.0f)
+                    if (stickAngle >= 0.0f && stickAngle < 45.0f)
                     {
-                        walkBlendRate = stickAngle / 90.0f;
+                        walkBlendRate = stickAngle / 45.0f;
 
                         const ModelResource::NodeKeyData& key0 = walkRight.nodeKeys.at(nodeIndex);
+                        const ModelResource::NodeKeyData& key1 = walkFrontRight.nodeKeys.at(nodeIndex);
+
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
+                    }
+                    else if (stickAngle >= 45.0f && stickAngle < 90.0f)
+                    {
+                        const ModelResource::NodeKeyData& key0 = walkFrontRight.nodeKeys.at(nodeIndex);
                         const ModelResource::NodeKeyData& key1 = walkFront.nodeKeys.at(nodeIndex);
 
+                        walkBlendRate = (stickAngle - 45.0f) / 45.0f;
+
                         ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
-                    else if (stickAngle >= 90.0f && stickAngle < 180.0f)
+                    else if (stickAngle >= 90.0f && stickAngle < 135.0f)
                     {
                         const ModelResource::NodeKeyData& key0 = walkFront.nodeKeys.at(nodeIndex);
+                        const ModelResource::NodeKeyData& key1 = walkFrontLeft.nodeKeys.at(nodeIndex);
+
+                        walkBlendRate = (stickAngle - 90.0f) / 135.0f;
+
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
+                    }
+                    else if (stickAngle >= 135.0f && stickAngle < 180.0f)
+                    {
+                        const ModelResource::NodeKeyData& key0 = walkFrontLeft.nodeKeys.at(nodeIndex);
                         const ModelResource::NodeKeyData& key1 = walkLeft.nodeKeys.at(nodeIndex);
 
-                        walkBlendRate = (stickAngle - 90.0f) / 90.0f;
+                        walkBlendRate = (stickAngle - 135.0f) / 45.0f;
 
                         ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
-                    else if (stickAngle >= 180.0f && stickAngle < 270.0f)
+                    else if (stickAngle >= 180.0f && stickAngle < 225.0f)
                     {
                         const ModelResource::NodeKeyData& key0 = walkLeft.nodeKeys.at(nodeIndex);
-                        const ModelResource::NodeKeyData& key1 = walkBack.nodeKeys.at(nodeIndex);
+                        const ModelResource::NodeKeyData& key1 = walkBackLeft.nodeKeys.at(nodeIndex);
 
-                        walkBlendRate = (stickAngle - 180.0f) / 90.0f;
+                        walkBlendRate = (stickAngle - 180.0f) / 45.0f;
 
                         ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
-                    else if (stickAngle >= 270.0f && stickAngle < 360.0f)
+                    else if (stickAngle >= 225.0f && stickAngle < 270.0f)
+                    {
+                        const ModelResource::NodeKeyData& key0 = walkBackLeft.nodeKeys.at(nodeIndex);
+                        const ModelResource::NodeKeyData& key1 = walkBack.nodeKeys.at(nodeIndex);
+
+                        walkBlendRate = (stickAngle - 225.0f) / 45.0f;
+
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
+                    }
+                    else if (stickAngle >= 270.0f && stickAngle < 315.0f)
                     {
                         const ModelResource::NodeKeyData& key0 = walkBack.nodeKeys.at(nodeIndex);
+                        const ModelResource::NodeKeyData& key1 = walkBackRight.nodeKeys.at(nodeIndex);
+
+                        walkBlendRate = (stickAngle - 270.0f) / 45.0f;
+
+                        ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
+                    }
+                    else if (stickAngle >= 315.0f && stickAngle < 360.0f)
+                    {
+                        const ModelResource::NodeKeyData& key0 = walkBackRight.nodeKeys.at(nodeIndex);
                         const ModelResource::NodeKeyData& key1 = walkRight.nodeKeys.at(nodeIndex);
 
-                        walkBlendRate = (stickAngle - 270.0f) / 90.0f;
+                        walkBlendRate = (stickAngle - 315.0f) / 45.0f;
 
                         ComputeLowerAnimation(key0, key1, blendRate, walkBlendRate, lowerNodeIndex);
                     }
@@ -752,6 +802,11 @@ void AnimationCom::PlayLowerBodyOnlyAnimation(PlayLowBodyAnimParam param)
     lowerAnimationTwoIndex = param.lowerAnimeTwoId;//後
     lowerAnimationThreeIndex = param.lowerAnimeThreeId;//右
     lowerAnimationFourIndex = param.lowerAnimeFourId;//左
+    lowerAnimetionFiveIndex = param.lowerAnimeFiveId;
+    lowerAnimationSixIndex = param.lowerAnimaSixId;
+    lowerAnimationSevenIndex = param.lowerAnimaSevenId;
+    lowerAnimationEightIndex = param.lowerAnimaEightId;
+
     lowerCurrentAnimationSeconds = 0.0f;
     animationLowerLoopFlag = param.loop;
     animationLowerEndFlag = false;
@@ -873,7 +928,7 @@ void AnimationCom::SeparateNode()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     for (auto& node : model->GetNodes())
     {
-        if (std::string(node.name).find("Hip") != std::string::npos)
+        if (std::string(node.name).find("hip1") != std::string::npos)
         {
             lowerNodes.emplace_back(&node);
             continue;
