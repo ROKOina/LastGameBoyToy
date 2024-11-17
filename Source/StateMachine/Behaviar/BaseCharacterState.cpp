@@ -53,6 +53,10 @@ void BaseCharacter_MoveState::Enter()
         param.lowerAnimeTwoId = animationCom.lock()->FindAnimation("Walk_Back"),
         param.lowerAnimeThreeId = animationCom.lock()->FindAnimation("Walk_Right"),
         param.lowerAnimeFourId = animationCom.lock()->FindAnimation("Walk_Left"),
+        param.lowerAnimeFiveId= animationCom.lock()->FindAnimation("Walk_RF"),
+        param.lowerAnimaSixId= animationCom.lock()->FindAnimation("Walk_LF"),
+        param.lowerAnimaSevenId= animationCom.lock()->FindAnimation("Walk_RB"),
+        param.lowerAnimaEightId= animationCom.lock()->FindAnimation("Walk_LB"),
         param.loop = true,
         param.rootFlag = false,
         param.blendType = 2,
@@ -65,8 +69,8 @@ void BaseCharacter_MoveState::Enter()
     GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
 
 
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);
+    /*animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);*/
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
