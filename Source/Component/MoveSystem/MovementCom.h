@@ -27,6 +27,9 @@ public:
     //velocity
     void AddForce(const DirectX::XMFLOAT3& force);
 
+    //ƒ‰ƒ“ƒ_ƒ€•ûŒü‚É”ò‚Î‚·
+    void ApplyRandomForce(float forcestrength, float yforce);
+
     //nonMaxSpeedVelocity
     void AddNonMaxSpeedForce(const DirectX::XMFLOAT3& force);
 
@@ -80,6 +83,7 @@ public:
 
     //Å‘å‘¬“x
     const float& GetMoveMaxSpeed()const { return moveMaxSpeed_; }
+    void SetMoveMaxSpeed(float moveMaxSpeed) { moveMaxSpeed = moveMaxSpeed_; }
     void SetAddMoveMaxSpeed(float addSpeed) { moveMaxSpeed_ += addSpeed; }  //‘«‚·
     void SetSubMoveMaxSpeed(float subSpeed) { moveMaxSpeed_ -= subSpeed; }  //ˆø‚­
 

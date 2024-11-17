@@ -56,6 +56,9 @@ private:
     void SetupBeam(const std::shared_ptr<GameObject>& obj);
     void CreateBeamSegment(const std::shared_ptr<GameObject>& origin, const char* easingMovePath);
 
+    //ギミックミサイル生成関数
+    void CreateGimmickMissile(const std::shared_ptr<GameObject>& obj);
+
     //当たり判定
     void HitObject();
 
@@ -78,6 +81,7 @@ public:
         MISSILE,
         EXPLOSION,
         BEEM,
+        GIMMICKMISSILE,
         MAX
     };
     ObjectType objtype = ObjectType::ENEMY;

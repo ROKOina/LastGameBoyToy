@@ -305,6 +305,7 @@ void SceneGame::Initialize()
         obj->SetName("bomberexplosion");
         obj->transform_->SetWorldPosition({ -1.917f,23.375f,-32.530f });
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomberexplosion.gpuparticle", 6000);
+        obj->AddComponent<SpawnCom>(nullptr);
     }
 
 #endif

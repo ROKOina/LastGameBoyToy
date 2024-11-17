@@ -167,7 +167,7 @@ void SpawnCom::OnGUI()
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
-        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION","BEEM" };
+        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION","BEEM","GIMMICKMISSILE" };
         static_assert(ARRAYSIZE(objectTypeItems) == static_cast<int>(ObjectType::MAX), "objectTypeItems Size Error!");
         ImGui::Combo((char*)u8"オブジェクトタイプ", &sp.objecttype, objectTypeItems, static_cast<int>(ObjectType::MAX));
         objtype = static_cast<ObjectType>(sp.objecttype);
@@ -211,6 +211,9 @@ void SpawnCom::SpawnGameObject()
         break;
     case ObjectType::BEEM:
         SetupBeam(obj);
+        break;
+    case ObjectType::GIMMICKMISSILE:
+        CreateGimmickMissile(obj);
         break;
     default:
         // サポートされていないタイプの場合、処理を終了
@@ -269,9 +272,11 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
 void SpawnCom::SetupExplosion(const std::shared_ptr<GameObject>& obj)
 {
     obj->SetName("explosion");
-    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionsmoke.cpuparticle", 1000);
-    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionfire.cpuparticle", 1000);
-    const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/explosion.gpuparticle", 10000);
+    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionfire.cpuparticle", 500);
+    std::shared_ptr<GameObject> chiledobj = obj->AddChildObject();
+    chiledobj->SetName("explosionchildren");
+    chiledobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionsmoke.cpuparticle", 500);
+    const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/explosion.gpuparticle", 3000);
     gpuparticle->Play();
 }
 
@@ -319,6 +324,19 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
     beamSegment->AddComponent<EasingMoveCom>(easingMovePath);
 }
 
+//ギミックミサイル生成関数
+void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
+{
+    obj->SetName("gimmickmissile");
+    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmickfire.cpuparticle", 1000);
+    std::shared_ptr<MovementCom>move = obj->AddComponent<MovementCom>();
+    move->ApplyRandomForce(55.0f, 19.0f);
+    move->SetFallSpeed(-45.0f);
+    move->SetFriction(2.0f);
+    move->SetMoveAcceleration(30.0f);
+    move->SetMoveMaxSpeed(15.0f);
+}
+
 //当たり判定
 void SpawnCom::HitObject()
 {
@@ -332,23 +350,21 @@ void SpawnCom::HitObject()
             const auto& collision = obj->GetComponent<SphereColliderCom>();
             std::shared_ptr<Collider> collider = obj->GetComponent<Collider>();
 
-            for (const auto& hitobject : collision->OnHitGameObject())
+            if (collider)
             {
-                if (const auto& hitObj = hitobject.gameObject.lock())
+                for (const auto& hitobject : collision->OnHitGameObject())
                 {
-                    if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
+                    if (const auto& hitObj = hitobject.gameObject.lock())
                     {
-                        posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
-                        GetGameObject()->transform_->SetScale({ 1.0f,1.0f,1.0f });
-                        status->AddDamagePoint(-1);
+                        if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
+                        {
+                            posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+                            GetGameObject()->transform_->SetScale({ 1.0f,1.0f,1.0f });
+                            status->AddDamagePoint(-1);
+                        }
                     }
                 }
             }
-
-            //for (const auto& hit : collider->OnHitGameObject())
-            //{
-            //    hit.gameObject.lock()->transform_->SetScale({ 1,1,1 });
-            //}
         }
         //posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
     }

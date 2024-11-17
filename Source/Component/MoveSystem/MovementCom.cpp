@@ -5,6 +5,7 @@
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
 #include "Phsix\Physxlib.h"
+#include <random>
 
 // 更新処理
 void MovementCom::Update(float elapsedTime)
@@ -244,4 +245,38 @@ void MovementCom::AddForce(const DirectX::XMFLOAT3& force)
     velocity_.x += force.x * moveAcceleration_;
     velocity_.y += force.y * moveAcceleration_;
     velocity_.z += force.z * moveAcceleration_;
+}
+
+//ランダム方向に飛ばす
+void MovementCom::ApplyRandomForce(float forcestrength, float yforce)
+{
+    // ランダムな X, Z 成分を生成
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+
+    // X, Z でランダム方向ベクトルを作成
+    DirectX::XMVECTOR randomVec = DirectX::XMVectorSet(dist(gen), dist(gen), dist(gen), 0.0f);
+
+    // ゼロベクトルかどうかを確認
+    if (DirectX::XMVector3Equal(randomVec, DirectX::XMVectorZero()))
+    {
+        // ゼロベクトルの場合はデフォルトの方向を設定（例えばZ軸方向）
+        randomVec = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+    }
+
+    // ベクトルを正規化
+    randomVec = DirectX::XMVector3Normalize(randomVec);
+
+    // X, Z 成分に力の大きさを掛ける
+    randomVec = DirectX::XMVectorScale(randomVec, forcestrength);
+
+    // Y成分を追加
+    DirectX::XMFLOAT3 force;
+    DirectX::XMStoreFloat3(&force, randomVec);
+    force.y = yforce; // Y成分は直接設定
+
+    // AddForce を呼び出し
+    velocity_.y += force.y;
+    AddNonMaxSpeedForce(force);
 }
