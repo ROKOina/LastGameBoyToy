@@ -106,7 +106,6 @@ void CharacterCom::Update(float elapsedTime)
         if (!dashFlag)
         {
             posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, PostEffect::PostEffectParameter::BlurStrength);
-            GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.005f, 0.5f);
             dashFlag = true;
             dashGauge -= 2; //Å‰‚Íˆê‹C‚ÉŒ¸‚ç‚·
         }

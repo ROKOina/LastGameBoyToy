@@ -16,4 +16,16 @@ cbuffer CbPostEffect : register(b3)
     float blurstrength;
     float blurradius;
     float blurdecay;
+    float4 mist_color;
+    float2 mist_density;
+    float2 mist_height_falloff;
+    float2 height_mist_offset;
+    float mist_cutoff_distance;
+    float mist_flow_speed;
+    float mist_flow_noise_scale_factor;
+    float mist_flow_density_lower_limit;
+    float sun_highlight_exponential_factor;
+    float sun_highlight_intensity;
+    int ismist;
+    float3 padding;
 };

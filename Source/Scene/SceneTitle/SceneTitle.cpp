@@ -27,21 +27,34 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 
+SceneTitle::~SceneTitle()
+{
+    GameObjectManager::Instance().AllRemove();
+    GameObjectManager::Instance().RemoveGameObjects();
+}
+
 void SceneTitle::Initialize()
 {
     //ポストエフェクト
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
-        obj->AddComponent<PostEffect>();
+        std::shared_ptr<PostEffect>posteffect = obj->AddComponent<PostEffect>();
+        posteffect->SetIsMist(true);
     }
 
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        freeCamera->AddComponent<FreeCameraCom>();
-        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        freeCamera->transform_->SetWorldPosition({ -1.471f, 2.519f, -2.190f });
+        freeCamera->transform_->SetEulerRotation({ 3.681f,391.512f,0.0f });
+        std::shared_ptr<FreeCameraCom> camera = freeCamera->AddComponent<FreeCameraCom>();
+        camera->SetFocusPos({ -0.114f,2.352f,0.023f });
+        camera->SetFocus({ -0.427f,2.391f,-0.488f });
+        camera->SetEye({ -1.471f,2.519f,-2.190f });
+        camera->SetDistance(2.601f);
+        camera->SetUpdate(false);
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
@@ -57,7 +70,7 @@ void SceneTitle::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
-        obj->AddComponent<Light>(nullptr);
+        obj->AddComponent<Light>("Data/SerializeData/LightData/title.light");
     }
 
     //ステージ
@@ -78,10 +91,11 @@ void SceneTitle::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
         obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+        obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/player_True/player.mdl");
         std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
-        anim->PlayAnimation(1, true);
+        anim->PlayAnimation(5, true);
     }
 
     //snowparticle
@@ -107,7 +121,7 @@ void SceneTitle::Initialize()
         {
             auto& next = obj->AddChildObject();
             next->SetName("next");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/next.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/next.ui", Sprite::SpriteShader::BLUR, true);
         }
     }
 

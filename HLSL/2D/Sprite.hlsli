@@ -7,9 +7,9 @@ struct VS_OUT
 
 cbuffer SpriteConstants : register(b0)
 {
+    float3 blurcolor;
+    float blurdistance;
+    float blurpower;
+    float luminance;
     float2 uvscroll;
-    float cliptime;
-    float edgethreshold;
-    float edgeoffset;
-    float3 edgecolor;
 };
