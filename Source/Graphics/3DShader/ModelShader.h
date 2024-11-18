@@ -51,6 +51,10 @@ public:
     {
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
+        float dissolveThreshold = 0.0f; // ディゾルブ閾値
+        DirectX::XMFLOAT3 dissolveEdgeColor = { 1,1,1 }; // エッジの色
+        float dissolveEdgeWidth = { 1.0f }; // エッジ幅
+        DirectX::XMFLOAT3 lastpadding = {};
     };
 
 private:
@@ -62,4 +66,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;
     Microsoft::WRL::ComPtr<ID3D11GeometryShader>     m_geometryshader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>        m_inputlayout;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_dissolveresource;
 };

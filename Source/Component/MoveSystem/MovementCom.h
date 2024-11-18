@@ -77,6 +77,9 @@ public:
     const bool OnGround() { return onGround_; }
     void SetOnGround(bool flag) { onGround_ = flag; }
 
+    // 着地した瞬間のフラグを取得
+    bool JustLanded() const { return justLanded_; }
+
     //摩擦
     const float& GetFriction()const { return friction_; }
     void SetFriction(float friction) { friction_ = friction; }
@@ -104,6 +107,8 @@ private:
     float gravityeffect = 30.0f;               //重力の影響度
     float fallspeed = -100.0f;                 //落ちるスピード
     bool onGround_ = false;                    //地面についているか
+    bool wasOnGround_ = false;                 // 前フレームの着地状態
+    bool justLanded_ = false;                  // 今フレームで着地した瞬間かどうか
     float friction_ = 12.620f;                 //摩擦
     float moveMaxSpeed_ = 5.0f;                //最大速度
     float firstMoveMaxSpeed = 5.0f;                //初期最大速度

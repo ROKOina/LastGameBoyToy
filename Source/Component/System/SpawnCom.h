@@ -62,6 +62,9 @@ private:
     //当たり判定
     void HitObject();
 
+    //地面に着地したら消す
+    void OnGroundDelete(float elapsedTime);
+
 public:
 
     //更新するか否か
@@ -114,4 +117,5 @@ private:
 
     // 複製されたオブジェクトを管理するリスト
     std::vector<std::weak_ptr<GameObject>> spawnedObjects;
+    std::vector<std::pair<std::weak_ptr<GameObject>, float>> deleteQueue; // 削除予定キュー
 };

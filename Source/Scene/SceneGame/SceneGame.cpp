@@ -290,13 +290,6 @@ void SceneGame::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
             smoke->SetActive(false);
         }
-
-        //雑魚的生成オブジェクト
-        {
-            //std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
-            //spawnobject->SetName("spawnenemy");
-            //spawnobject->AddComponent<SpawnCom>(nullptr);
-        }
     }
 
     //大技的なやつ
@@ -305,7 +298,7 @@ void SceneGame::Initialize()
         obj->SetName("bomberexplosion");
         obj->transform_->SetWorldPosition({ -1.917f,23.375f,-32.530f });
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomberexplosion.gpuparticle", 6000);
-        obj->AddComponent<SpawnCom>(nullptr);
+        obj->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/energyspawn.spawn");
     }
 
 #endif

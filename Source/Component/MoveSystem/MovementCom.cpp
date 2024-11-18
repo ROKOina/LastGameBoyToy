@@ -158,6 +158,12 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
         }
     }
 
+    // 着地した瞬間を判定
+    justLanded_ = !wasOnGround_ && onGround_;
+
+    // 現在の状態を次のフレーム用に記録
+    wasOnGround_ = onGround_;
+
     GetGameObject()->transform_->SetWorldPosition(position);
 }
 

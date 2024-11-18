@@ -7,12 +7,10 @@ StageGimmick_BaseState::StageGimmick_BaseState(StageGimmick* owner) : State(owne
     spawn = owner->GetGameObject()->GetComponent<SpawnCom>();
     status = owner->GetGameObject()->GetComponent<CharaStatusCom>();
     gpuparticle = owner->GetGameObject()->GetComponent<GPUParticle>();
+    cpuparticle = owner->GetGameObject()->GetComponent<CPUParticle>();
 }
 
 #pragma region ‘Ò‹@
-void StageGimmick_IdleState::Enter()
-{
-}
 void StageGimmick_IdleState::Execute(const float& elapsedTime)
 {
     const auto& boss = GameObjectManager::Instance().Find("BOSS");
@@ -34,30 +32,22 @@ void StageGimmick_IdleState::Execute(const float& elapsedTime)
             spawnChangeNum = changeNum;
             return;
         }
-    }
 
-    //‘å‹Z“I‚È‚â‚Â
-    if (*status.lock()->GetHitPoint() <= 5.0f)
-    {
-        owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BIGATTACK);
-        return;
-    }
-
-    //ƒMƒ~ƒbƒN‚Ì‘Ï‹v’l‚ª–³‚­‚È‚ê‚Î”j‰óƒXƒe[ƒg‚É‘JˆÚ
-    if (status.lock()->IsDeath())
-    {
-        owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BREAK);
-        return;
+        //‘å‹Z“I‚È‚â‚Â
+        if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 20.0f)
+        {
+            owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BIGATTACK);
+            return;
+        }
     }
 }
 #pragma endregion
 
 #pragma region ƒGƒlƒ~[¶¬
-void StageGimmick_EnemySpawnState::Enter()
-{
-}
 void StageGimmick_EnemySpawnState::Execute(const float& elapsedTime)
 {
+    const auto& boss = GameObjectManager::Instance().Find("BOSS");
+
     //ŽžŠÔŒo‰ß‚Å¶¬
     time += elapsedTime;
     if (time > 2.0f)
@@ -73,32 +63,35 @@ void StageGimmick_EnemySpawnState::Execute(const float& elapsedTime)
     }
 
     //‘å‹Z“I‚È‚â‚Â
-    if (*status.lock()->GetHitPoint() <= 5.0f)
+    if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 20.0f)
     {
         owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BIGATTACK);
         return;
     }
-
-    //ƒMƒ~ƒbƒN‚Ì‘Ï‹v’l‚ª–³‚­‚È‚ê‚Î”j‰óƒXƒe[ƒg‚É‘JˆÚ
-    if (status.lock()->IsDeath())
-    {
-        owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BREAK);
-        return;
-    }
+}
+void StageGimmick_EnemySpawnState::Exit()
+{
+    spawn.lock()->SetOnTrigger(false);
 }
 #pragma endregion
 
 #pragma region ‹­‚¢UŒ‚
 void StageGimmick_BigAttackState::Enter()
 {
+    const auto& bomber = GameObjectManager::Instance().Find("bomberexplosion");
     gpuparticle.lock()->SetLoop(true);
+    bomber->GetComponent<GPUParticle>()->SetLoop(true);
+    bomber->GetComponent<SpawnCom>()->SetOnTrigger(true);
 }
 void StageGimmick_BigAttackState::Execute(const float& elapsedTime)
 {
-    //‘å‹Z‚ð‘Å‚Ä‚Î‘¦À‚É”j‰ó‚µ‚Ä—Ç‚¢
+    const auto& boss = GameObjectManager::Instance().Find("BOSS");
+
+    if (*status.lock()->GetHitPoint() <= 0.0f || *boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 0.0f)
     {
-        //owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BREAK);
-        //return;
+        gpuparticle.lock()->SetLoop(false);
+        owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BREAK);
+        return;
     }
 }
 #pragma endregion
@@ -107,8 +100,26 @@ void StageGimmick_BigAttackState::Execute(const float& elapsedTime)
 void StageGimmick_BreakState::Enter()
 {
     //’×‚ê‚½‚ç‰Œ‚ðo‚·‰‰o‚ð‚·‚é
+    cpuparticle.lock()->SetActive(true);
 }
 void StageGimmick_BreakState::Execute(const float& elapsedTime)
 {
+    const auto& zero = GameObjectManager::Instance().Find("Reactar0");
+    const auto& one = GameObjectManager::Instance().Find("Reactar1");
+    const auto& two = GameObjectManager::Instance().Find("Reactar2");
+    const auto& three = GameObjectManager::Instance().Find("Reactar3");
+    const auto& bomber = GameObjectManager::Instance().Find("bomberexplosion");
+    const auto& boss = GameObjectManager::Instance().Find("BOSS");
+
+    //”j‰ó
+    if (*zero->GetComponent<CharaStatusCom>()->GetHitPoint() <= 0.0f &&
+        *one->GetComponent<CharaStatusCom>()->GetHitPoint() <= 0.0f &&
+        *two->GetComponent<CharaStatusCom>()->GetHitPoint() <= 0.0f &&
+        *three->GetComponent<CharaStatusCom>()->GetHitPoint() <= 0.0f ||
+        *boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 0.0f)
+    {
+        bomber->GetComponent<GPUParticle>()->SetLoop(false);
+        bomber->GetComponent<SpawnCom>()->SetOnTrigger(false);
+    }
 }
 #pragma endregion

@@ -40,7 +40,7 @@ void SceneTitle::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
         std::shared_ptr<PostEffect>posteffect = obj->AddComponent<PostEffect>();
-        posteffect->SetIsMist(true);
+        posteffect->SetIsMist(false);
     }
 
     //ƒtƒŠ[ƒJƒƒ‰
@@ -197,6 +197,8 @@ void SceneTitle::UIUpdate(float elapsedTime)
             {
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
+                    //ˆÃ“]
+                    GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
                     SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
                 }
             }

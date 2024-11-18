@@ -5,6 +5,7 @@
 #include "Component\System\SpawnCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Particle\GPUParticle.h"
+#include "Component\Particle\CPUParticle.h"
 
 //ベースとなるステート
 class StageGimmick_BaseState : public State<StageGimmick>
@@ -16,6 +17,7 @@ protected:
     std::weak_ptr<SpawnCom>spawn;
     std::weak_ptr<CharaStatusCom>status;
     std::weak_ptr<GPUParticle>gpuparticle;
+    std::weak_ptr<CPUParticle>cpuparticle;
 };
 
 //待機
@@ -24,7 +26,7 @@ class StageGimmick_IdleState : public StageGimmick_BaseState
 public:
     StageGimmick_IdleState(StageGimmick* owner) :StageGimmick_BaseState(owner) {}
 
-    void Enter() override;
+    void Enter() override {};
     void Execute(const float& elapsedTime) override;
     virtual void Exit() {};
     void ImGui() override {};
@@ -40,9 +42,9 @@ class StageGimmick_EnemySpawnState : public StageGimmick_BaseState
 public:
     StageGimmick_EnemySpawnState(StageGimmick* owner) :StageGimmick_BaseState(owner) {}
 
-    void Enter() override;
+    void Enter() override {};
     void Execute(const float& elapsedTime) override;
-    virtual void Exit() {};
+    virtual void Exit();
     void ImGui() override {};
     virtual const char* GetName() const override { return "EnemySpawn"; }
 

@@ -137,6 +137,9 @@ void SpawnCom::Update(float elapsedTime)
 
     //当たり判定
     HitObject();
+
+    //地面に着地したら消す
+    OnGroundDelete(elapsedTime);
 }
 
 // imgui
@@ -216,7 +219,6 @@ void SpawnCom::SpawnGameObject()
         CreateGimmickMissile(obj);
         break;
     default:
-        // サポートされていないタイプの場合、処理を終了
         break;
     }
 
@@ -236,7 +238,7 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     m->SetIsRaycast(false);
     m->SetGravity(0.0f);
     m->SetFallSpeed(-0.4f);
-    obj->AddComponent<NodeCollsionCom>(nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/noobenemy.nodecollsion");
     obj->AddComponent<AnimationCom>();
     std::shared_ptr<AimIKCom>aik = obj->AddComponent<AimIKCom>(nullptr, "head");
     aik->SetOffsetY(4.3f);
@@ -335,6 +337,21 @@ void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
     move->SetFriction(2.0f);
     move->SetMoveAcceleration(30.0f);
     move->SetMoveMaxSpeed(15.0f);
+    const auto& collider = obj->AddComponent<SphereColliderCom>();
+    collider->SetEnabled(false);
+    collider->SetMyTag(COLLIDER_TAG::EnemyBullet);
+    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetRadius(0.6f);
+
+    //爆発物
+    std::shared_ptr<GameObject>explosion = obj->AddChildObject();
+    explosion->SetName("explosion");
+    std::shared_ptr<CPUParticle>cpuparticle = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionfireparple.cpuparticle", 500);
+    cpuparticle->SetActive(false);
+    std::shared_ptr<GameObject> chiledobj = explosion->AddChildObject();
+    chiledobj->SetName("explosionchildren");
+    std::shared_ptr<CPUParticle>cpuchilld = chiledobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionsmokeparple.cpuparticle", 500);
+    cpuchilld->SetActive(false);
 }
 
 //当たり判定
@@ -367,6 +384,83 @@ void SpawnCom::HitObject()
             }
         }
         //posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
+    }
+}
+
+//地面に着地したら消す
+void SpawnCom::OnGroundDelete(float elapsedTime)
+{
+    if (objtype == ObjectType::GIMMICKMISSILE)
+    {
+        // 生成済みオブジェクトをすべて走査
+        for (auto it = spawnedObjects.begin(); it != spawnedObjects.end();)
+        {
+            // オブジェクトがまだ有効か確認
+            if (const auto& obj = it->lock())
+            {
+                // MovementCom を取得し、地面判定
+                if (const auto& move = obj->GetComponent<MovementCom>())
+                {
+                    if (move->OnGround())
+                    {
+                        // 削除予定キューに追加
+                        bool alreadyInQueue = false;
+                        for (const auto& entry : deleteQueue)
+                        {
+                            if (entry.first.lock() == obj)
+                            {
+                                alreadyInQueue = true;
+                                break;
+                            }
+                        }
+
+                        if (!alreadyInQueue)
+                        {
+                            deleteQueue.emplace_back(obj, 0.0f); // 経過時間を初期化して追加
+                        }
+
+                        //着地した瞬間の処理
+                        if (move->JustLanded())
+                        {
+                            obj->GetComponent<CPUParticle>()->SetActive(false);
+                            const auto& explosion = obj->GetChildFind("explosion");
+                            explosion->GetComponent<CPUParticle>()->SetActive(true);
+                            explosion->GetChildFind("explosionchildren")->GetComponent<CPUParticle>()->SetActive(true);
+                        }
+                    }
+                }
+                ++it;
+            }
+            else
+            {
+                // オブジェクトが無効化された場合、リストから削除
+                it = spawnedObjects.erase(it);
+            }
+        }
+
+        // 削除予定キューを走査
+        for (auto it = deleteQueue.begin(); it != deleteQueue.end();)
+        {
+            if (const auto& obj = it->first.lock())
+            {
+                // 経過時間を更新
+                it->second += elapsedTime; // フレーム間の経過時間を加算
+
+                // 経過時間が削除遅延を超えたら削除
+                if (it->second >= 1.5f)
+                {
+                    GameObjectManager::Instance().Remove(obj); // ゲームオブジェクトを削除
+                    it = deleteQueue.erase(it); // キューからも削除
+                    continue;
+                }
+                ++it;
+            }
+            else
+            {
+                // オブジェクトが無効化された場合、キューから削除
+                it = deleteQueue.erase(it);
+            }
+        }
     }
 }
 

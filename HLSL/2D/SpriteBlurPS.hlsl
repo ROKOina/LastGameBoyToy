@@ -7,10 +7,18 @@ Texture2D texturemaps : register(t0);
 // ぼかし用関数
 float4 blur(float2 uv, float w, float kx, float ky)
 {
+    float4 tex0 = texturemaps.Sample(sampler_states[TRANSPARENT_BORDER_LINEAR], uv);
+        //アルファが低い場合は破棄
+    if (tex0.a < EPSILON)
+        return tex0;
+
     float2 shiftUv = float2(uv.x + kx * blurdistance, uv.y + ky * blurdistance);
     float4 tex = texturemaps.Sample(sampler_states[TRANSPARENT_BORDER_LINEAR], shiftUv);
 
     tex.a = tex.a * w * blurpower * luminance;
+
+
+
     return tex;
 }
 
