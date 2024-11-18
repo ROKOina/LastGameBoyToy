@@ -53,7 +53,7 @@ public:
     physx::PxRigidActor* GenerateMeshCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale);
     physx::PxRigidActor* GenerateConvexCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale);
     //矩形、球、カプセルの当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic,NodeCollsionCom::CollsionType type, GameObj obj, DirectX::XMFLOAT3 scale);
+    physx::PxRigidActor* GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 pos, DirectX::XMFLOAT3 scale);
 
     //MeshDescを保存しているmap取得
     std::map<std::string, physx::PxTriangleMeshDesc>& GetMeshStlege() { return meshStlege; }

@@ -103,7 +103,7 @@ void RigidBodyCom::SetUp()
 
 void RigidBodyCom::GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale)
 {
-    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, type, GetGameObject(),scale);
+    rigidActor = PhysXLib::Instance().GenerateCollider(isStatic, type, GetGameObject()->transform_->GetWorldPosition(), scale);
 }
 
 void RigidBodyCom::GenerateCollider(ModelResource* rc, bool isConvex)
