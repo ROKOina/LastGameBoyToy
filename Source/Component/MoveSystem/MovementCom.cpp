@@ -185,19 +185,34 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
     if (velocityLengthXZ > 0.0f)
     {
         // レイの始点位置と終点位置
-        DirectX::XMFLOAT3 start = { position.x, position.y + 3.0f, position.z };
+        DirectX::XMFLOAT3 start = { position.x, position.y + 2.0f, position.z };
         DirectX::XMFLOAT3 end = {
-            position.x + moveVec.x * 1.3f * elapsedTime,
-            position.y + 3.0f,
-            position.z + moveVec.z * 1.3f * elapsedTime
+            position.x + moveVec.x * elapsedTime,
+            position.y + 2.0f,
+            position.z + moveVec.z * elapsedTime
         };
 
         // SphereCastによる壁判定
-        PxSweepBuffer buffer;
+        PxRaycastBuffer buffer;
+        float r = 1.0f;
+
         static bool wasColliding = false;  // 前フレームで壁に衝突していたか
-        if (isRaycast && PhysXLib::Instance().SphereCast_PhysX(
-            start, Mathf::Normalize(end - start), 1.0f, Mathf::Length(end - start), buffer))
+        if (isRaycast && PhysXLib::Instance().RayCast_PhysX(
+            start, Mathf::Normalize(end - start), Mathf::Length(end - start) + r, buffer))
         {
+
+            DirectX::XMFLOAT3 p = {};
+            p.x = buffer.block.position.x;
+            p.y = buffer.block.position.y;
+            p.z = buffer.block.position.z;
+
+            DirectX::XMFLOAT3 n = {};
+            n = Mathf::Normalize(start - end);
+            p = p + (n * r);
+
+            position.x = p.x;
+            position.z = p.z;
+
             // 壁に衝突した場合、壁に沿ったスライドベクトルを計算
             DirectX::XMVECTOR Start = XMLoadFloat3(&start);
             DirectX::XMVECTOR End = XMLoadFloat3(&end);
@@ -211,20 +226,20 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
             DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(MoveVec, Normal);
             DirectX::XMVECTOR SlideVec = DirectX::XMVectorSubtract(MoveVec, DirectX::XMVectorMultiply(Normal, Dot));
 
-            // キャラクターを壁から離すための補正距離
-            const float separationDistance = wasColliding ? 0.002f : 0.01f;  // 初回のみ大きめ、継続時は小さめにする
-            DirectX::XMVECTOR SeparationVec = DirectX::XMVectorScale(Normal, separationDistance);
-
             // スライドベクトルと補正ベクトルを加算して補正位置を計算
             DirectX::XMFLOAT3 correctedPosition;
-            DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(Start, SlideVec));
-            DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(XMLoadFloat3(&correctedPosition), SeparationVec));
+            DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&p), SlideVec));
 
-            // 壁に沿った移動と補正を適用
             position.x = correctedPosition.x;
             position.z = correctedPosition.z;
 
-            wasColliding = true;  // 次のフレームでの補正を減少させる
+            //if (!PhysXLib::Instance().RayCast_PhysX(
+            //    position, Mathf::Normalize(correctedPosition - p), Mathf::Length(correctedPosition - p) + r, buffer))
+            //{
+            //    // 壁に沿った移動と補正を適用
+            //    position.x = correctedPosition.x;
+            //    position.z = correctedPosition.z;
+            //}         
         }
         else
         {
