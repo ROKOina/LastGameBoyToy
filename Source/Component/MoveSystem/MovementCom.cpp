@@ -223,6 +223,9 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
             DirectX::XMFLOAT3 correctedPosition;
             DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&p), SlideVec));
 
+            position.x = correctedPosition.x;
+            position.z = correctedPosition.z;
+
             //if (!PhysXLib::Instance().RayCast_PhysX(
             //    position, Mathf::Normalize(correctedPosition - p), Mathf::Length(correctedPosition - p) + r, buffer))
             //{
