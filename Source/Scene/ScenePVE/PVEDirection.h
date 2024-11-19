@@ -31,6 +31,8 @@ private:
 
     void DirectionCOne(float elapsedTime);
     void DirectionCTwo(float elapsedTime);
+    void DirectionCThi(float elapsedTime);
+    void DirectionCFou(float elapsedTime);
     void DirectionCEnd(float elapsedTime);
 
 private:

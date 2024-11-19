@@ -108,6 +108,9 @@ public:
     //イベント中に指定されたノードのワールド位置を送る
     bool IsEventCallingNodePos(std::string eventName, std::string nodeName, DirectX::XMFLOAT3& pos);
 
+    void SetRootNode(const char* nodeName);
+    void SetRootHipNode(const char* nodeHipName);
+
 private:
 
     //下半身別アニメーション計算
