@@ -498,5 +498,3 @@ void RendererCom::ExportMaterialFile()
         model_->GetResource()->MaterialSerialize(filename);
     }
 }
-
-#endif // _DEBUG

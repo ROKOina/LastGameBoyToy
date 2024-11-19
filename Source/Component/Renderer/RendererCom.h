@@ -74,7 +74,7 @@ public:
 private:
     void ModelInitialize(const char* filename);
 
-#ifdef _DEBUG
+
     // マテリアルを選択するImGui
     void MaterialSelector();
 
@@ -85,7 +85,6 @@ private:
     // 編集したマテリアルファイルを書き出す
     void ExportMaterialFile();
 
-#endif
 
 private:
     std::unique_ptr<Model>	model_;

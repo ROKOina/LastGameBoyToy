@@ -47,12 +47,14 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+
     //HP‚Ì‰ŠúÝ’è
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.4f);
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
+    c->SetESkillCoolTime(5.0f);
 
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));

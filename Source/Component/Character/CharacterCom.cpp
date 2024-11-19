@@ -107,7 +107,7 @@ void CharacterCom::Update(float elapsedTime)
         {
             posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, PostEffect::PostEffectParameter::BlurStrength);
             dashFlag = true;
-            dashGauge -= 2; //Å‰‚Íˆê‹C‚ÉŒ¸‚ç‚·
+            dashGauge -= 5; //Å‰‚Íˆê‹C‚ÉŒ¸‚ç‚·
         }
         else
         {
