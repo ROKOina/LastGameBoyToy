@@ -55,7 +55,8 @@ void PVEDirection::DirectionStart()
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
     animationCom = GameObjectManager::Instance().Find("Direction")->GetComponent<AnimationCom>();
-
+    //animationCom.lock()->SetRootNode("RootNode");
+    //animationCom.lock()->SetRootHipNode("Boss_parvis");
     directionNumber = 3;
 }
 
@@ -80,6 +81,12 @@ void PVEDirection::DirectionSupervision(float elapsedTime)
         DirectionCTwo(elapsedTime);
         break;
     case 5:
+        DirectionCThi(elapsedTime);
+        break;
+    case 6:
+        DirectionCFou(elapsedTime);
+        break;
+    case 7:
         DirectionCEnd(elapsedTime);
         break;
     }
@@ -180,14 +187,58 @@ void PVEDirection::DirectionCOne(float elaspsedTime)
         animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_dead"), false, false, 0.1f);
         flag = true;
     }
+
+    if (!EventCameraManager::Instance().GetIsPlayEvent())
+    {
+        directionNumber += 1;
+        flag = false;
+    }
 }
 
 void PVEDirection::DirectionCTwo(float elaspdTime)
 {
+    if (!flag)
+    {
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/ClearTwo.eventcamera");
+        flag = true;
+    }
 
+    if (!EventCameraManager::Instance().GetIsPlayEvent())
+    {
+        directionNumber += 1;
+        flag = false;
+    }
 }
+
+void PVEDirection::DirectionCThi(float elapsedTime)
+{
+    if (!flag)
+    {
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/ClearEnd.eventcamera");
+        flag = true;
+    }
+
+    if (!EventCameraManager::Instance().GetIsPlayEvent())
+    {
+        directionNumber += 1;
+        flag = false;
+    }
+}
+
+void PVEDirection::DirectionCFou(float elapsedTime)
+{
+    if (!flag)
+    {
+        GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
+        flag = false;
+    }
+
+    //if()
+}
+
+
 
 void PVEDirection::DirectionCEnd(float elaspdTime)
 {
-
+    
 }

@@ -977,3 +977,14 @@ void AnimationCom::ComputeRootMotion()
     //ルートモーションフラグをオフにする
     rootMotionFlag = false;
 }
+
+//ルートモーションのノードのセッター
+void AnimationCom::SetRootHipNode(const char* hipNodeName)
+{
+    rootMotionHipNodeIndex = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNodeIndex(hipNodeName);
+}
+
+void AnimationCom::SetRootNode(const char* nodeName)
+{
+    rootMotionNodeIndex = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNodeIndex(nodeName);
+}
