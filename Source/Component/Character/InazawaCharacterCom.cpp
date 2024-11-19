@@ -16,7 +16,6 @@ void InazawaCharacterCom::Start()
 
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<InazawaCharacter_AttackState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<InazawaCharacter_ESkillState>(this));
-    SetESkillCoolTime(5);
     //ウルト追加
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::ULT, std::make_shared<Ult_Attack_State>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
@@ -76,6 +75,18 @@ void InazawaCharacterCom::MainAttackDown()
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
 }
 
+//ブリンク
+void InazawaCharacterCom::SubAttackDown()
+{
+    //入力値取得
+    DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec(GetGameObject());
+
+    //ダッシュ
+    auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
+    DirectX::XMFLOAT3 v = moveVec * 50.0f;
+    moveCom->AddNonMaxSpeedForce(v);
+}
+
 void InazawaCharacterCom::SubSkill()
 {
     //if (!useSkillE)
@@ -87,6 +98,9 @@ void InazawaCharacterCom::SubSkill()
 
 void InazawaCharacterCom::SpaceSkill()
 {
+    //削除予定
+    return;
+
     auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
     if (!moveCom->OnGround() && !isDashJump && airTimer > 0.1f)
     {

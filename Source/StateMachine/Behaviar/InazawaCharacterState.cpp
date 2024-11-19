@@ -73,7 +73,7 @@ void InazawaCharacter_AttackState::ImGui()
 void InazawaCharacter_ESkillState::Enter()
 {
     arrowCount = 8;
-    skillTimer = 5.0f;
+    skillTimer = 3.0f;
     intervalTimer = 0.0f;
 }
 

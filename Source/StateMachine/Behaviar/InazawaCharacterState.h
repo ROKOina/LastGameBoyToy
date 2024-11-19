@@ -54,5 +54,5 @@ public:
     int arrowCount;
     float intervalTimer;
     float interval = 0.25f;
-    float skillTimer = 5.0f;
+    float skillTimer = 3.0f;
 };

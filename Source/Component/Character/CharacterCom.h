@@ -158,6 +158,9 @@ public:
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
     float* GetSpaceSkillCoolTimer() { return &Spacecool.timer; }
+    void SetLeftClickSkillCoolTime(float time) { LeftClickcool.time = time; }
+    float GetLeftClickSkillCoolTime() { return LeftClickcool.time; }
+    float* GetLeftClickSkillCoolTimer() { return &LeftClickcool.timer; }
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
     float GetUltGaugeMax() { return ultGaugeMax; }
@@ -212,6 +215,7 @@ protected:
     SkillCoolTime Rcool;
     SkillCoolTime LScool;
     SkillCoolTime Spacecool;
+    SkillCoolTime LeftClickcool;
 
   CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ÉEÉãÉgÇÃéÌóﬁÅ@0:attack 1:heal 2:power
 

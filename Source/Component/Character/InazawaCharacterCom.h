@@ -15,6 +15,7 @@ public:
 
     void MainAttackDown() override;
 
+    void SubAttackDown() override;
     void SubSkill() override;
 
     void SpaceSkill() override;

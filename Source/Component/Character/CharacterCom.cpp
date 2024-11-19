@@ -61,8 +61,10 @@ void CharacterCom::Update(float elapsedTime)
             MainAttackPushing();
     }
 
-    if (CharacterInput::SubAttackButton & GetButtonDown())
+    if (CharacterInput::SubAttackButton & GetButtonDown()
+        && LeftClickcool.timer >= LeftClickcool.time)
     {
+        LeftClickcool.timer = 0;
         SubAttackDown();
     }
     else if (CharacterInput::SubAttackButton & GetButton())
@@ -264,6 +266,9 @@ void CharacterCom::OnGUI()
         ImGui::DragFloat("SpaceTime", &Spacecool.time);
         ImGui::DragFloat("SpaceTimer", &Spacecool.timer);
         ImGui::Separator();
+        ImGui::DragFloat("LeftClickTime", &LeftClickcool.time);
+        ImGui::DragFloat("LeftClickTimer", &LeftClickcool.timer);
+        ImGui::Separator();
         ImGui::DragFloat("RTime", &Rcool.time);
         ImGui::DragFloat("RTimer", &Rcool.timer);
 
@@ -402,6 +407,7 @@ void CharacterCom::CoolUpdate(float elapsedTime)
     Rcool.timer += elapsedTime;
     LScool.timer += elapsedTime;
     Spacecool.timer += elapsedTime;
+    LeftClickcool.timer += elapsedTime;
 }
 
 float CharacterCom::Lerp(float start, float end, float t)
