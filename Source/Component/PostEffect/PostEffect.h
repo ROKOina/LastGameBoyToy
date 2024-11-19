@@ -91,6 +91,18 @@ private:
         float blurstrength = {};
         float blurradius = { 1.0f };
         float blurdecay = { 0.999f };
+        DirectX::XMFLOAT4 mist_color = { 0.651f, 0.651f, 0.659f, 1.000f };
+        DirectX::XMFLOAT2 mist_density = { 0.003f, 1.000f };
+        DirectX::XMFLOAT2 mist_height_falloff = { 1000.000f, 1000.000f };
+        DirectX::XMFLOAT2 height_mist_offset = { 1000.000f, 1000.000f };
+        float mist_cutoff_distance = 50.161f;
+        float mist_flow_speed = 23.898f;
+        float mist_flow_noise_scale_factor = 0.100f;
+        float mist_flow_density_lower_limit = 0.164f;
+        float sun_highlight_exponential_factor = 500.000f;
+        float sun_highlight_intensity = 0.000f;
+        int ismist = false;
+        DirectX::XMFLOAT3 padding = {};
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
@@ -110,6 +122,7 @@ public:
     CascadedShadowMap* GetCascadedShadow() const { return m_cascadedshadowmap.get(); }
     MultiRenderTarget* GetMultiRenderTarget() const { return m_gBuffer.get(); }
     float m_criticaldepthvalue = 300.0f;
+    void SetIsMist(bool value) { m_posteffect->data.ismist = value; }
 
 private:
     enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, ssr, fxaa, depthCopy, max };

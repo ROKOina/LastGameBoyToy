@@ -82,7 +82,7 @@ void AimIKCom::AimIK()
         //“àÏ‚ğZo
         auto& player = GameObjectManager::Instance().Find("player");
         dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&enemyfront)), DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&player->transform_->GetWorldPosition()), DirectX::XMLoadFloat3(&GetGameObject()->transform_->GetWorldPosition())))));
-        playerpos = { player->transform_->GetWorldPosition().x,player->transform_->GetWorldPosition().y,player->transform_->GetWorldPosition().z };
+        playerpos = { player->transform_->GetWorldPosition().x,player->transform_->GetWorldPosition().y + offsetYpos,player->transform_->GetWorldPosition().z };
 
         //‹ts—ñ‚ğ¶¬
         DirectX::XMFLOAT3 inversepos;

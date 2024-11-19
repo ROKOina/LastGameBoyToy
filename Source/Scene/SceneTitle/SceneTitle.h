@@ -14,7 +14,7 @@ class SceneTitle :public Scene
 {
 public:
     SceneTitle() {};
-    ~SceneTitle()override {};
+    ~SceneTitle()override;
 
     // ‰Šú‰»
     void Initialize()override;

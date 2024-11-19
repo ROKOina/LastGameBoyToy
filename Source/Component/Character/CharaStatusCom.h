@@ -31,6 +31,7 @@ public:
     // HPの減少と増加
     void AddDamagePoint(float value);
     void AddHealPoint(float value) { hitPoint += value; }
+    float GetFrameDamage() { return frameDamage; }
 
     // 無敵時間を設定
     void SetInvincibleTime(float time) { invincibleTime = time; }
@@ -43,6 +44,7 @@ private:
     float maxHitPoint = 100;              //HPの最大値
     float invincibleTime = 3.0f;        // 無敵時間の長さ（秒）
     float currentInvincibleTime = 0.0f; // 残りの無敵時間
+    float frameDamage = 0.0f;           // このフレーム中に受けたダメージ
 
     bool isDeath = false;   //死亡フラグ
 };

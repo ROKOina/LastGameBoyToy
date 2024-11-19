@@ -163,6 +163,7 @@
     <ClInclude Include="Source\Component\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\Picohard.h" />
     <ClInclude Include="Source\Component\Character\RegisterChara.h" />
+    <ClInclude Include="Source\Component\Character\RemoveTimerCom.h" />
     <ClInclude Include="Source\Component\Collsion\ColliderCom.h" />
     <ClInclude Include="Source\Component\Collsion\FrustumCom.h" />
     <ClInclude Include="Source\Component\Collsion\NodeCollsionCom.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="Source\Component\Renderer\TrailCom.h" />
     <ClInclude Include="Source\Component\Sprite\Sprite.h" />
     <ClInclude Include="Source\Component\Stage\StageEditorCom.h" />
+    <ClInclude Include="Source\Component\Stage\StageGimmickCom.h" />
     <ClInclude Include="Source\Component\System\Component.h" />
     <ClInclude Include="Source\Component\System\GameObject.h" />
     <ClInclude Include="Source\Component\System\HitProcessCom.h" />
@@ -250,6 +252,7 @@
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\NomuraCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\PicohardState.h" />
+    <ClInclude Include="Source\StateMachine\Behaviar\StageGimmickState.h" />
     <ClInclude Include="Source\StateMachine\State.h" />
     <ClInclude Include="Source\StateMachine\StateMachine.h" />
     <ClInclude Include="Source\SystemStruct\Dialog.h" />
@@ -319,6 +322,7 @@
     <ClCompile Include="Source\Component\Renderer\TrailCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Component\Stage\StageEditorCom.cpp" />
+    <ClCompile Include="Source\Component\Stage\StageGimmickCom.cpp" />
     <ClCompile Include="Source\Component\System\GameObject.cpp" />
     <ClCompile Include="Source\Component\System\HitProcessCom.cpp" />
     <ClCompile Include="Source\Component\System\RayCastManager.cpp" />
@@ -377,6 +381,7 @@
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\NomuraCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\PicohardState.cpp" />
+    <ClCompile Include="Source\StateMachine\Behaviar\StageGimmickState.cpp" />
     <ClCompile Include="Source\SystemStruct\Dialog.cpp" />
     <ClCompile Include="Source\SystemStruct\Framework.cpp" />
     <ClCompile Include="Source\SystemStruct\Logger.cpp" />
@@ -462,6 +467,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\ToneMapPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\SpriteBlurPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>

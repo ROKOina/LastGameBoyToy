@@ -105,10 +105,12 @@ void NodeCollsionCom::Start()
     if (m_filename != nullptr && model != nullptr)
     {
         model->Deserialize(m_filename);
+        filepath = m_filename;
     }
     else if (m_filename != nullptr)
     {
         Deserialize(m_filename);
+        filepath = m_filename;
     }
 }
 
@@ -279,6 +281,14 @@ void NodeCollsionCom::OnGUI()
         {
             model->LoadDesirialize();
         }
+    }
+
+    // ファイルパスを表示
+    char filename[256];
+    ::strncpy_s(filename, sizeof(filename), filepath.c_str(), sizeof(filename));
+    if (ImGui::InputText((char*)u8"ファイルパス", filename, sizeof(filename), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        filepath = filename;
     }
 
     static std::unordered_map<int, bool> nodeCreationState;
@@ -520,5 +530,6 @@ void NodeCollsionCom::LoadDeserialize()
     if (result == DialogResult::OK)
     {
         Deserialize(filename);
+        filepath = filename;
     }
 }

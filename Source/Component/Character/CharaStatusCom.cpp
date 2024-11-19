@@ -8,6 +8,8 @@ void CharaStatusCom::Update(float elapsedTime)
         isDeath = true;
     }
 
+    frameDamage = 0.0f;
+
     // 無敵時間の減少処理
     if (currentInvincibleTime > 0.0f)
     {
@@ -25,6 +27,7 @@ void CharaStatusCom::AddDamagePoint(float value)
     if (!IsInvincible())
     {
         hitPoint += value;
+        frameDamage += value;
 
         // ダメージを受けたら無敵時間をリセット
         currentInvincibleTime = invincibleTime;

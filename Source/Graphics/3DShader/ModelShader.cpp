@@ -79,6 +79,12 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
         m_subsetconstants = std::make_unique<ConstantBuffer<subsetconstants>>(Graphics.GetDevice());
         m_generalconstants = std::make_unique<ConstantBuffer<m_general>>(Graphics.GetDevice());
     }
+
+    //ディゾルブテクスチャを読み込み
+    {
+        D3D11_TEXTURE2D_DESC texture2d_desc{};
+        LoadTextureFromFile(Graphics.GetDevice(), "Data/Texture/Dissolve.png", m_dissolveresource.GetAddressOf(), &texture2d_desc);
+    }
 }
 
 //描画設定
@@ -157,10 +163,14 @@ void ModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset
     //オブジェクト毎に使いたい定数バッファ
     m_generalconstants->data.outlineColor = subset.material->outlineColor;
     m_generalconstants->data.outlineintensity = subset.material->outlineintensity;
+    m_generalconstants->data.dissolveEdgeColor = subset.material->dissolveEdgeColor;
+    m_generalconstants->data.dissolveEdgeWidth = subset.material->dissolveEdgeWidth;
+    m_generalconstants->data.dissolveThreshold = subset.material->dissolveThreshold;
     m_generalconstants->Activate(dc, (int)CB_INDEX::GENERAL, false, true, false, false, false, false);
 
     //シェーダーリソースビュー設定
     dc->PSSetShaderResources(0, std::size(subset.material->shaderResourceView), subset.material->shaderResourceView[0].GetAddressOf());
+    dc->PSSetShaderResources(23, 1, m_dissolveresource.GetAddressOf());
 
     dc->DrawIndexed(subset.indexCount, subset.startIndex, 0);
 }

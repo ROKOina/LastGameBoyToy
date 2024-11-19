@@ -21,6 +21,11 @@
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Component\System\SpawnCom.h"
+#include "Component\Character\CharaStatusCom.h"
+#include "StageGimmickCom.h"
+#include "Component\Particle\GPUParticle.h"
+#include "Component\Particle\CPUParticle.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -104,13 +109,12 @@ void StageEditorCom::Update(float elapsedTime)
             )
         );
 
-
         //マウスとステージの当たり判定
         HitResult hit;
         PxVec3 pos = { world_start.x,world_start.y,world_start.z };
 
         auto d = Mathf::Normalize(world_end - world_start);
-        PxVec3 dir = {d.x,d.y,d.z};
+        PxVec3 dir = { d.x,d.y,d.z };
 
         physx::PxRaycastBuffer Buf;
     }
@@ -219,7 +223,7 @@ void StageEditorCom::ObjectRegister()
 GameObj StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale, DirectX::XMFLOAT4 rotation, const char* model_filename, const char* collision_filename)
 {
     //オブジェクトを配置
-    GameObj obj = GameObjectManager::Instance().Create();
+    auto& obj = GameObjectManager::Instance().Create();
     std::string objName = objType + std::to_string(placeObjcts[objType.c_str()].objList.size());
     obj->SetName(objName.c_str());
 
@@ -336,8 +340,12 @@ void StageEditorCom::ObjectSave()
         std::string path = relative_path.string();
         path = "Data/" + path;
 
+        // collisionPath の相対パスを取得
+        std::filesystem::path relative_collision_path = std::filesystem::relative(placeObj.second.collisionPath, name);
+        std::string collision_path = "Data/" + relative_collision_path.string();
+
         j[placeObj.first]["FileName"] = path;
-        j[placeObj.first]["CollsionFileName"] = placeObj.second.collisionPath;
+        j[placeObj.first]["CollsionFileName"] = collision_path;
         j[placeObj.first]["StaticFlag"] = placeObj.second.staticFlag;
         j[placeObj.first]["Func"] = (int)placeObj.second.func;
 
@@ -428,14 +436,26 @@ void StageEditorCom::PlaceJsonData(std::string filename)
 
 void StageEditorCom::TestNakanisi(GameObj place)
 {
-   RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
-   
-   std::string path = place->GetComponent<RendererCom>()->GetModelPath();
-   rigid->SetUseResourcePath(path);
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
+
+    std::string path = place->GetComponent<RendererCom>()->GetModelPath();
+    rigid->SetUseResourcePath(path);
 }
 
-void StageEditorCom::TowerGimic(GameObj place)
+void StageEditorCom::TowerGimic(GameObj& place)
 {
     //(上野君)ギミックのオブジェクトを生成をここに書く
     //transform、モデル、nodeColliderは設定されてるからそれ以外のコンポーネントを頼む
+    //任されましたヨイショー
+    place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/energy.gpuparticle", 6000);
+    place->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/enemy.spawn");
+    place->AddComponent<StageGimmick>();
+    std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 100);
+    cpuparticle->SetActive(false);
+    std::shared_ptr<SphereColliderCom>collider = place->AddComponent<SphereColliderCom>();
+    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetRadius(0.8f);
+    std::shared_ptr<CharaStatusCom>status = place->AddComponent<CharaStatusCom>();
+    status->SetInvincibleTime(0.2f);
+    status->SetHitPoint(15.0f);
 }

@@ -25,15 +25,21 @@ private:
     void DirectionSupervision(float elapsedTime);
 
 private:
-    void DirectionOne(float elapsedTime);
-    void DirectionTwo(float elapsedTime);
-    void DirectionEnd(float elapsedTIme);
+    void DirectionFOne(float elapsedTime);
+    void DirectionFTwo(float elapsedTime);
+    void DirectionFEnd(float elapsedTIme);
+
+    void DirectionCOne(float elapsedTime);
+    void DirectionCTwo(float elapsedTime);
+    void DirectionCEnd(float elapsedTime);
 
 private:
     std::shared_ptr<TransformCom>t;
     std::weak_ptr<AnimationCom> animationCom;
 
     int directionNumber = 0;
+   
 
     bool flag = false;
+   
 };

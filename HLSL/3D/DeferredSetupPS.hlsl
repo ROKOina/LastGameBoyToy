@@ -12,12 +12,17 @@ Texture2D MetallicMap : register(t2);  // メタリックマップ
 Texture2D RoughnessMap : register(t3); // ラフネスマップ
 Texture2D AOMap : register(t4);        // AOマップ
 Texture2D EmissionMap : register(t5);  // エミッションマップ
+Texture2D DissolveMap : register(t23);  // ディゾルブマップ
 
 // アウトラインの定数バッファ
 cbuffer General : register(b11)
 {
     float3 outlineColor;
     float outlineintensity;
+    float dissolveThreshold; // ディゾルブ閾値
+    float3 dissolveEdgeColor; // エッジの色
+    float dissolveEdgeWidth; // エッジ幅
+    float3 lastpadding;
 }
 
 // MRT対応
@@ -39,11 +44,25 @@ PS_OUT main(VS_OUT pin)
 {
     PS_OUT pout = (PS_OUT) 0;
 
+    // ディゾルブマップをサンプリング
+    float dissolveValue = DissolveMap.Sample(sampler_states[LINEAR], pin.texcoord).r;
+    float dalpha = smoothstep(dissolveThreshold, dissolveThreshold, dissolveValue);
+
     // 色テクスチャをサンプリング
     float4 diffuseColor = DiffuseMap.Sample(sampler_states[ANISOTROPIC], pin.texcoord) * pin.color;
+
+    // 完全に透明な場合はピクセルを破棄
+    if (dalpha <= 0.0)
+    {
+        discard; // ピクセルを破棄
+    }
+
     // リニア空間に変換
     pout.diffuse = diffuseColor;
     pout.diffuse.rgb = pow(pout.diffuse.rgb, GAMMA);
+
+     // アルファ値を適用
+    pout.diffuse.a = dalpha;
 
     // 法線マップ
     float3 normal = NormalMap.Sample(sampler_states[ANISOTROPIC], pin.texcoord).xyz;
