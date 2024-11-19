@@ -184,11 +184,8 @@ public:
         f.clear();
     }
 
-#ifdef _DEBUG
     //マテリアルシリアライズ
     void ModelResource::MaterialSerialize(const char* filename);
-
-#endif // _DEBUG
 
     //上書きセーブ
     void AnimSerialize();

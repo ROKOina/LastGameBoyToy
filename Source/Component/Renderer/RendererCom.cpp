@@ -289,7 +289,6 @@ void RendererCom::LoadMaterial(const char* filename)
     model_->GetResource()->LoadMaterial(device, filename);
 }
 
-#ifdef _DEBUG
 #include "SystemStruct\Framework.h"
 #include <shlwapi.h>
 #include "Graphics/Texture.h"
@@ -490,5 +489,3 @@ void RendererCom::ExportMaterialFile()
         model_->GetResource()->MaterialSerialize(filename);
     }
 }
-
-#endif // _DEBUG
