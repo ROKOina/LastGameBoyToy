@@ -249,8 +249,14 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
             auto& cameraObj = GameObjectManager::Instance().Find("cameraPostPlayer");
             if (!cameraObj)break;
             auto& camera = cameraObj->GetComponent<CameraCom>();
-            
+
             camera->SetFov(value);
+
+            //˜rƒ‚ƒfƒ‹‚ÌˆÊ’u•ÏX
+            auto& fps = cameraObj->GetChildFind("armChild");
+            DirectX::XMFLOAT3 fpsPos = fps->transform_->GetLocalPosition();
+            fpsPos.z = Mathf::Lerp(1.8f, -0.1f, per);
+            fps->transform_->SetLocalPosition(fpsPos);
         }
         break;
         };

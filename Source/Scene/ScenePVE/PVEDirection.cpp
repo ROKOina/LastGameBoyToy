@@ -8,6 +8,7 @@
 #include "Component\PostEffect\PostEffect.h"
 #include <Scene/SceneManager.h>
 #include "Scene/SceneResult/SceneResult.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 PVEDirection::PVEDirection()
 {
@@ -29,12 +30,54 @@ void PVEDirection::DirectionStart()
 
    
 
+    {
+        auto& armParts = GameObjectManager::Instance().Create();
+        armParts->SetName("arm");
+        std::shared_ptr<RendererCom> r = armParts->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Boss/parts/arm.mdl");
+        armParts->transform_->SetWorldPosition({ 10.552f, 20.0f,-32.969f });
+        armParts->transform_->SetEulerRotation({ 0.0f,-155.999f, - 32.0f });
+        armParts->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
+        armParts->AddComponent<MovementCom>();
+        RigidBodyCom* rigid = armParts->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Mesh).get();
+        armParts->GetComponent<MovementCom>()->SetGravity(0.0);
+        armParts->SetEnabled(false);
+    }
+
+    {
+        auto& headParts = GameObjectManager::Instance().Create();
+        headParts->SetName("head");
+        std::shared_ptr<RendererCom> r = headParts->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Boss/parts/head.mdl");
+        headParts->AddComponent<MovementCom>();
+        headParts->transform_->SetWorldPosition({ 12.721f,30.0f,-33.909f });
+        headParts->transform_->SetEulerRotation({ -10.00f,-210.998f, 42.0f });
+        headParts->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
+        RigidBodyCom* rigid = headParts->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Mesh).get();
+        headParts->GetComponent<MovementCom>()->SetGravity(0.0);
+        headParts->SetEnabled(false);
+    }
+
+    {
+        auto& shoulderParts = GameObjectManager::Instance().Create();
+        shoulderParts->SetName("shoulder");
+        std::shared_ptr<RendererCom> r = shoulderParts->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Boss/parts/shoulder.mdl");
+        shoulderParts->AddComponent<MovementCom>();
+        shoulderParts->transform_->SetWorldPosition({ 13.378f, 25.0f,-29.444f });
+        shoulderParts->transform_->SetEulerRotation({ 0.0f,-33.0f, -30.0f });
+        shoulderParts->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
+        RigidBodyCom* rigid = shoulderParts->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Mesh).get();
+        shoulderParts->GetComponent<MovementCom>()->SetGravity(0.0);
+        shoulderParts->SetEnabled(false);
+
+    }
 
     {
         auto& DirectionBoss = GameObjectManager::Instance().Create();
         DirectionBoss->SetName("Direction");
         std::shared_ptr<RendererCom> r = DirectionBoss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Boss/boss.mdl");
+        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
         DirectionBoss->transform_->SetWorldPosition({ -2.878,-0.176,15.196 });
         DirectionBoss->transform_->SetEulerRotation({ 0.0, 180.0f, 0.0f });
         DirectionBoss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
@@ -125,6 +168,7 @@ void PVEDirection::DirectionFOne(float elapsedTime)
         directionNumber += 1;
         flag = false;
     }
+
 }
 
 void PVEDirection::DirectionFTwo(float elapsedTime)
@@ -240,6 +284,12 @@ void PVEDirection::DirectionCThi(float elapsedTime)
     if (!flag)
     {
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/ClearEnd.eventcamera");
+        GameObjectManager::Instance().Find("arm")->SetEnabled(true);
+        GameObjectManager::Instance().Find("head")->SetEnabled(true);
+        GameObjectManager::Instance().Find("shoulder")->SetEnabled(true);
+        GameObjectManager::Instance().Find("arm")->GetComponent<MovementCom>()->SetGravity(0.98f);
+        GameObjectManager::Instance().Find("head")->GetComponent<MovementCom>()->SetGravity(0.98f);
+        GameObjectManager::Instance().Find("shoulder")->GetComponent<MovementCom>()->SetGravity(0.98f);
         flag = true;
     }
 

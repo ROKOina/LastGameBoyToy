@@ -39,7 +39,8 @@ public:
 public:
     enum class RigidType
     {
-        Primitive, //BoxやSphere
+        PrimitiveBox, //BoxやSphere
+        PrimitiveSphere, //BoxやSphere
         Mesh,
         Convex,
         Complex,   //ステージなどの複数のMeshが集まったMesh
