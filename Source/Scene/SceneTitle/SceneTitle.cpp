@@ -17,6 +17,7 @@
 #include "SceneTitle.h"
 #include "Scene\SceneSelect\SceneSelect.h"
 #include "Scene\SceneGame\SceneGame.h"
+#include "Scene/ScenePVE/ScenePVE.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Character\RegisterChara.h"
@@ -201,7 +202,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
                     //ˆÃ“]
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
                     //SceneManager::Instance().ChangeSceneDelay(new SceneSelect, 2);
-                    SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
+                    SceneManager::Instance().ChangeSceneDelay(new ScenePVE, 2);
                 }
             }
         }

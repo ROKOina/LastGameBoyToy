@@ -51,9 +51,9 @@ void AudioSource::Play(bool loop, float volume)
     buffer.pAudioData = resource_->GetAudioData();
     buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
     buffer.Flags = XAUDIO2_END_OF_STREAM;
-
+    
     sourceVoice_->SubmitSourceBuffer(&buffer);
-
+    
     HRESULT hr = sourceVoice_->Start();
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     sourceVoice_->SetVolume(volume * 0.1f);

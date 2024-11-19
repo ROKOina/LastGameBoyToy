@@ -77,7 +77,7 @@ void PVEDirection::DirectionStart()
         auto& DirectionBoss = GameObjectManager::Instance().Create();
         DirectionBoss->SetName("Direction");
         std::shared_ptr<RendererCom> r = DirectionBoss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Boss/boss.mdl");
+        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
         DirectionBoss->transform_->SetWorldPosition({ -2.878,-0.176,15.196 });
         DirectionBoss->transform_->SetEulerRotation({ 0.0, 180.0f, 0.0f });
         DirectionBoss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
@@ -168,6 +168,7 @@ void PVEDirection::DirectionFOne(float elapsedTime)
         directionNumber += 1;
         flag = false;
     }
+
 }
 
 void PVEDirection::DirectionFTwo(float elapsedTime)

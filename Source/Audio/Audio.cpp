@@ -55,6 +55,11 @@ void Audio::RegisterAudioSources()
     audioResources[AUDIOID::SE] = LoadAudioSource("Data/AudioData/TestAudio/SE.wav");
 }
 
+void Audio::RegisterAudioSources(AUDIOID id, const char* filename)
+{
+    audioResources[id] = LoadAudioSource(filename);
+}
+
 // オーディオソース読み込み
 std::shared_ptr<AudioResource> Audio::LoadAudioSource(const char* filename)
 {
