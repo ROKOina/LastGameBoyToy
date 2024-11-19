@@ -12,6 +12,15 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
         if (modelmap.first == filename) {
             if (modelmap.second) {
                 model = std::make_shared<ModelResource>(*modelmap.second.get());
+                for (auto& mesh : model->GetMeshesEdit())
+                {
+                    // サブセット
+                    for (auto& subset : mesh.subsets)
+                    {
+                        subset.material = &model->GetMaterialsEdit().at(subset.materialIndex);
+                    }
+                }
+
             }
         }
     }
@@ -34,7 +43,9 @@ void ResourceManager::RegisterModel(const char* filename, std::shared_ptr<ModelR
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (models_.count(filename) == 0)
+    {
         models_[filename] = resource;
+    }
 }
 
 bool ResourceManager::JudgeModelFilename(const char* filename)
