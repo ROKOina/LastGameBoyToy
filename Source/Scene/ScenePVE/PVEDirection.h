@@ -24,6 +24,8 @@ private:
     //‰‰o‚Ì“Š‡
     void DirectionSupervision(float elapsedTime);
 
+    
+
 private:
     void DirectionFOne(float elapsedTime);
     void DirectionFTwo(float elapsedTime);
@@ -40,8 +42,9 @@ private:
     std::weak_ptr<AnimationCom> animationCom;
 
     int directionNumber = 0;
-   
 
+    float deleyTimer = 0;
+    float deleyTime = 2.0f;
     bool flag = false;
    
 };
