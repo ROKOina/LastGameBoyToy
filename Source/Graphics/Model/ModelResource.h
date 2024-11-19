@@ -46,6 +46,9 @@ public:
         //オブジェクト毎の定数バッファをメッシュに入れておく(シリアライズは絶対する)
         DirectX::XMFLOAT3 outlineColor = { 0,0,0 };
         float outlineintensity = 1.0f;
+        float dissolveThreshold = 0.0f; // ディゾルブ閾値
+        DirectX::XMFLOAT3 dissolveEdgeColor = { 1,1,1 }; // エッジの色
+        float dissolveEdgeWidth = 0.0f; // エッジ幅
         float alpha = 1.0f;
 
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView[6];
@@ -185,11 +188,8 @@ public:
         f.clear();
     }
 
-#ifdef _DEBUG
     //マテリアルシリアライズ
     void ModelResource::MaterialSerialize(const char* filename);
-
-#endif // _DEBUG
 
     //上書きセーブ
     void AnimSerialize();

@@ -26,6 +26,11 @@ public:
     //AimIK関数
     void AimIK();
 
+public:
+
+    //Y軸のオフセット位置
+    void SetOffsetY(float offset) { offset = offsetYpos; }
+
 private:
 
     //ikさせるboneを探す
@@ -38,4 +43,5 @@ private:
     const char* playercopyname = {};
     const char* enemycopyname = {};
     DirectX::XMFLOAT4 neckpos = { 0,0,0,1 };
+    float offsetYpos = 0.0f;
 };

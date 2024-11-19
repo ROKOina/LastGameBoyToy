@@ -32,13 +32,11 @@ Framework::Framework(HWND hWnd)
     PhysXLib::Instance().Initialize();
 
     //sceneGame.Initialize();
-    SceneManager::Instance().ChangeScene(new SceneGame);
-    //SceneManager::Instance().ChangeScene(new SceneSelect);
+    //SceneManager::Instance().ChangeScene(new SceneGame);
     //SceneManager::Instance().ChangeScene(new SceneStageEditor);
-    //SceneManager::Instance().ChangeScene(new SceneTitle);
+    SceneManager::Instance().ChangeScene(new SceneTitle);
     //SceneManager::Instance().ChangeScene(new SceneResult);
     //SceneManager::Instance().ChangeScene(new SceneIKTest);
-    //SceneManager::Instance().ChangeScene(new SceneTitle);
      //SceneManager::Instance().ChangeScene(new SceneUI);
 
     // オーディオ初期化
@@ -88,9 +86,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     ID3D11DeviceContext* dc = graphics_.GetDeviceContext();
 
-    //シーンだけ上に描画
-    //PostEffect::Instance().SceneImGui();
-
     //imguiguizmo
     ImGuizmo::BeginFrame();
     ImGuizmo::SetOrthographic(false);
@@ -111,7 +106,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
     if (resize)
     {
         graphics_.ResizeBackBuffer(width, height);
-        //PostEffect::Instance().ResizeBuffer();
         resize = false;
     }
 }

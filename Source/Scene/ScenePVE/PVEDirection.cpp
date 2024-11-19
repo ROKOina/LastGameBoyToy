@@ -5,6 +5,9 @@
 #include "Component\System\TransformCom.h"
 #include "Component\Enemy\BossCom.h"
 #include "Component\MoveSystem\MovementCom.h"
+#include "Component\PostEffect\PostEffect.h"
+#include <Scene/SceneManager.h>
+#include "Scene/SceneResult/SceneResult.h"
 
 PVEDirection::PVEDirection()
 {
@@ -23,6 +26,9 @@ void PVEDirection::DirectionStart()
 {
     GameObjectManager::Instance().Find("BOSS")->SetEnabled(false);
     GameObjectManager::Instance().Find("player")->SetEnabled(false);
+
+   
+
 
     {
         auto& DirectionBoss = GameObjectManager::Instance().Create();
@@ -55,8 +61,9 @@ void PVEDirection::DirectionStart()
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
     animationCom = GameObjectManager::Instance().Find("Direction")->GetComponent<AnimationCom>();
-
-    directionNumber = 3;
+    //animationCom.lock()->SetRootNode("RootNode");
+    //animationCom.lock()->SetRootHipNode("Boss_parvis");
+    directionNumber = 0;
 }
 
 //シーン演出統括
@@ -80,6 +87,12 @@ void PVEDirection::DirectionSupervision(float elapsedTime)
         DirectionCTwo(elapsedTime);
         break;
     case 5:
+        DirectionCThi(elapsedTime);
+        break;
+    case 6:
+        DirectionCFou(elapsedTime);
+        break;
+    case 7:
         DirectionCEnd(elapsedTime);
         break;
     }
@@ -122,7 +135,6 @@ void PVEDirection::DirectionFTwo(float elapsedTime)
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/two.eventcamera");
         animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1"), false, false, 0.1f);
         flag = true;
-    GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->CameraShake(30.0f, 10.0f);
     }
     DirectX::XMFLOAT3 s = GameObjectManager::Instance().Find("Point")->transform_->GetWorldPosition();
     DirectX::XMFLOAT3 e = GameObjectManager::Instance().Find("Seconds")->transform_->GetWorldPosition();
@@ -131,8 +143,15 @@ void PVEDirection::DirectionFTwo(float elapsedTime)
 
     if (animationCom.lock()->IsPlayAnimation()==false)
     {
-        directionNumber += 1;
-        flag = false;
+        //暗転
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
+        deleyTimer += elapsedTime;
+        if (deleyTime < deleyTimer)
+        {
+            directionNumber += 1;
+            deleyTimer = 0.0f;
+            flag = false;
+        }
     }
 
 }
@@ -143,21 +162,29 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
     {
         //最初にイベントカメラへ変更
         GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
-
+        //暗転
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, PostEffect::PostEffectParameter::Exposure);
         //ゲームオブジェクト本体を復活
         GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
         GameObjectManager::Instance().Find("player")->SetEnabled(true);
 
         //見世物はいったん使わないから消す
         GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
+        
         flag = true;
     }
     //GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -2.3,-1,-49.3 });
 
     if (GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->IsDeath())
     {
-        directionNumber += 1;
-        flag = false;
+        //暗転
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
+        deleyTimer += elapsedTime;
+        if (deleyTime < deleyTimer)
+        {
+            directionNumber += 1;
+            flag = false;
+        }
     }
 
 }
@@ -167,6 +194,11 @@ void PVEDirection::DirectionCOne(float elaspsedTime)
 {
     if (!flag)
     {
+        //暗転
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, PostEffect::PostEffectParameter::Exposure);
+
+        GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+
         GameObjectManager::Instance().Find("BOSS")->SetEnabled(false);
         GameObjectManager::Instance().Find("player")->SetEnabled(false);
 
@@ -180,14 +212,62 @@ void PVEDirection::DirectionCOne(float elaspsedTime)
         animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_dead"), false, false, 0.1f);
         flag = true;
     }
+
+    if (!EventCameraManager::Instance().GetIsPlayEvent())
+    {
+        directionNumber += 1;
+        flag = false;
+    }
 }
 
 void PVEDirection::DirectionCTwo(float elaspdTime)
 {
+    if (!flag)
+    {
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/ClearTwo.eventcamera");
+        flag = true;
+    }
+
+    if (!EventCameraManager::Instance().GetIsPlayEvent())
+    {
+        directionNumber += 1;
+        flag = false;
+    }
+}
+
+void PVEDirection::DirectionCThi(float elapsedTime)
+{
+    if (!flag)
+    {
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/ClearEnd.eventcamera");
+        flag = true;
+    }
+
+    if (!EventCameraManager::Instance().GetIsPlayEvent())
+    {
+        directionNumber += 1;
+        flag = false;
+    }
+}
+
+void PVEDirection::DirectionCFou(float elapsedTime)
+{
+    if (!flag)
+    {
+        GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
+        //暗転
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
+        SceneManager::Instance().ChangeSceneDelay(new SceneResult, 2);
+        flag = true;
+    }
+
 
 }
+
+
 
 void PVEDirection::DirectionCEnd(float elaspdTime)
 {
-
+    
 }
+

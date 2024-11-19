@@ -52,6 +52,7 @@ public:
 
     //ƒJƒƒ‰‚ÌêŠæ“¾
     const DirectX::XMFLOAT3& GetEye()const { return eye_; }
+    void SetEye(DirectX::XMFLOAT3 eye) { eye_ = eye; }
 
     //‘O•ûŒüæ“¾
     const DirectX::XMFLOAT3& GetFront()const { return front_; }

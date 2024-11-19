@@ -193,6 +193,38 @@ float3 lens_flare(float2 uv, float2 pos)
     return f0 * glory_light_intensity + c * lens_flare_intensity;
 }
 
+//大気（ミスト）のエフェクト
+float3 atmosphere(float3 fragment_color, float3 mist_color, float3 pixel_coord, float3 eye_coord)
+{
+    const float3 mist_flow_direction = float3(-1.0, -.2, -0.5);
+    const float3 mist_flow_coord = pixel_coord.xyz + (mist_flow_direction * mist_flow_speed * time);
+    const float flowing_density = lerp(mist_flow_density_lower_limit, 1.0, noise(fmod(mist_flow_coord * mist_flow_noise_scale_factor, 289)));
+
+    float3 eye_to_pixel = pixel_coord - eye_coord;
+
+    float z = length(pixel_coord - eye_coord);
+    z = smoothstep(0, mist_cutoff_distance, z) * z;
+
+    const float2 coefficients = mist_density * smoothstep(0.0, mist_height_falloff, height_mist_offset - pixel_coord.y) * flowing_density;
+
+    const float2 factors = exp(-z * coefficients);
+
+    const float extinction = factors.x;
+    const float inscattering = factors.y;
+    fragment_color = fragment_color * extinction + mist_color * (1.0 - inscattering);
+
+    float3 sun_position = -normalize(directionalLight.direction.xyz) * distance_to_sun;
+    float sun_highlight_factor = max(0, dot(normalize(eye_to_pixel), normalize(sun_position - eye_coord)));
+    sun_highlight_factor = pow(sun_highlight_factor, sun_highlight_exponential_factor);
+
+    const float near = 250.0;
+    const float far = distance_to_sun;
+    float3 sunhighlight_color = lerp(0, sun_highlight_intensity * (normalize(directionalLight.color.rgb)), sun_highlight_factor * smoothstep(near, far, z));
+    fragment_color += sunhighlight_color;
+
+    return fragment_color;
+}
+
 //色に対して修正を行い、修正された色を返します
 float3 cc(float3 color, float factor, float factor2) // color modifier
 {
@@ -251,10 +283,16 @@ float4 main(VS_OUT pin) : SV_TARGET
     sampled_color.rgb = lerp(sampled_color.rgb, radialblur(pin.texcoord).rgb, blurstrength);
 
     // 輪郭線効果の描画 (輪郭線をエッジ部分にのみ適用)
-    //sampled_color.rgb += OutlineEffect(pin.texcoord.xy, width, height, inverseviewprojection, cameraposition);
+    sampled_color.rgb += OutlineEffect(pin.texcoord.xy, dimensions.x, dimensions.y, inverseviewprojection, cameraposition);
 
     // ビネット効果の適用
     sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
+
+    //大気
+    if (ismist == 1)
+    {
+        sampled_color.rgb = atmosphere(sampled_color.xyz, mist_color.rgb * directionalLight.color.rgb * directionalLight.color.w, world_position.xyz, cameraposition.xyz);
+    }
 
     //レンズフレアとグローライトのエフェクト
     float4 ndc_sun_position = mul(float4(-normalize(directionalLight.direction.xyz) * distance_to_sun, 1), viewProjection);
@@ -282,11 +320,6 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     // 色相と彩度の調整
     sampled_color.rgb = hue_saturation(sampled_color.rgb, hue, saturation);
-
-    //filmGrain
-    //float noise = (frac(sin(dot(pin.texcoord, float2(12.9898, 78.233))) * 43758.5453) - 0.5) * 2.0;
-    //float3 filmgraincolor = noise * 0.05f * 1.0f;
-    //sampled_color.rgb += clamp(filmgraincolor, 0.0f, 1.0f);
 
     // 最終的な色を返す
     return sampled_color;

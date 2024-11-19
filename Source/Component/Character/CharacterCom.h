@@ -151,18 +151,19 @@ public:
     float GetQSkillCoolTimer() { return Qcool.timer; }
     void SetESkillCoolTime(float time) { Ecool.time = time; }
     float GetESkillCoolTime() { return Ecool.time; }
-    float GetESkillCoolTimer() { return Ecool.timer; }
+    float* GetESkillCoolTimer() { return &Ecool.timer; }
     void SetRSkillCoolTime(float time) { Rcool.time = time; }
     float GetRSkillCoolTime() { return Rcool.time; }
     float GetRSkillCoolTimer() { return Rcool.timer; }
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
-    float GetSpaceSkillCoolTimer() { return Spacecool.timer; }
+    float* GetSpaceSkillCoolTimer() { return &Spacecool.timer; }
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
     float GetUltGaugeMax() { return ultGaugeMax; }
     void SetMoveFlag(bool flag) { useMoveFlag = flag; }
-
+    float GetDahsGaugeMax() { return dashGaugeMax; }
+    float* GetDashGauge() { return &dashGauge; }
     bool* GetIsHitAttack() { return &isHitAttack; }
     void SetIsHitAttack(bool flg) { isHitAttack = flg; }
 

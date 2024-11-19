@@ -171,6 +171,9 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     case SpriteShader::DEFALT:
         PSPath = { "Shader\\SpritePS.cso" };
         break;
+    case SpriteShader::BLUR:
+        PSPath = { "Shader\\SpriteBlurPS.cso" };
+        break;
     case SpriteShader::DISSOLVE:
         PSPath = { "Shader\\DeferredSetupPS.cso" };
         break;
@@ -229,7 +232,7 @@ void Sprite::Update(float elapsedTime)
     spc.position.x = GetGameObject()->transform_->GetWorldPosition().x;
     spc.position.y = GetGameObject()->transform_->GetWorldPosition().y;
 
-    // 子どもがいれば
+    //// 子どもがいれば
     //if (!GetGameObject()->GetChildren().empty())
     //{
     //    // 親のスケールを取得
@@ -382,13 +385,13 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
         }
     }
 
+    // 座標とピボットの処理
+    float pivotX = (spc.pivot.x / spc.texSize.x);
+    float pivotY = (spc.pivot.y / spc.texSize.y);
+
     // スケール倍したテクスチャサイズ
     float texSizeX = spc.texSize.x * spc.scale.x;
     float texSizeY = spc.texSize.y * spc.scale.y;
-
-    // 座標とピボットの処理
-    float pivotX = (spc.pivot.x / texSizeX);
-    float pivotY = (spc.pivot.y / texSizeY);
 
     // スプライトの頂点座標の計算
     //左上
@@ -426,6 +429,10 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);
     rotate(x3, y3, cx, cy, spc.angle);
+
+    //当たり判定用の中心位置を求める
+    collisionPivot.x = x0 + (x3 - x0) / 2;
+    collisionPivot.y = y0 + (y3 - y0) / 2;
 
     // NDC空間への変換
     x0 = 2.0f * x0 / viewport.Width - 1.0f;
@@ -501,13 +508,13 @@ void Sprite::DrawCollsionBox()
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
 
+
+    // 座標とピボットの処理
+    float pivotX = (spc.pivot.x / spc.texSize.x);
+    float pivotY = (spc.pivot.y / spc.texSize.y);
     // スケール倍したテクスチャサイズ
     float texSizeX = spc.texSize.x * spc.scale.x;
     float texSizeY = spc.texSize.y * spc.scale.y;
-
-    // 座標とピボットの処理
-    float pivotX = (spc.pivot.x / texSizeX);
-    float pivotY = (spc.pivot.y / texSizeY);
 
     // スプライトの頂点座標の計算
     //左上
@@ -538,8 +545,8 @@ void Sprite::DrawCollsionBox()
             y += cy;
         };
 
-    float cx = spc.position.x + spc.pivot.x + spc.collsionpositionoffset.x;
-    float cy = spc.position.y + spc.pivot.y + spc.collsionpositionoffset.y;
+    float cx = spc.position.x  + spc.collsionpositionoffset.x;
+    float cy = spc.position.y  + spc.collsionpositionoffset.y;
     rotate(x0, y0, cx, cy, spc.angle);
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);
@@ -814,10 +821,10 @@ void Sprite::OnGUI()
     if (ImGui::TreeNode("ConstantsBuffer"))
     {
         ImGui::DragFloat2((char*)u8"UVスクロール", &constants.uvscroll.x, 0.1f);
-        ImGui::DragFloat((char*)u8"クリップ", &constants.cliptime, 0.1f, 0.0f, 1.0f);
-        ImGui::DragFloat((char*)u8"縁しきい値", &constants.edgethreshold, 0.1f, 0.0f, 1.0f);
-        ImGui::DragFloat((char*)u8"縁オフセット値", &constants.edgeoffset, 0.1f, 0.0f, 1.0f);
-        ImGui::ColorEdit3((char*)u8"縁色", &constants.edgecolor.x);
+        ImGui::ColorEdit3((char*)u8"ブラー色", &constants.blurcolor.x);
+        ImGui::DragFloat((char*)u8"ルミナンス", &constants.luminance, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat((char*)u8"ブラー距離", &constants.blurdistance, 0.1f, 0.0f, 20.0f);
+        ImGui::DragFloat((char*)u8"ブラーパワー", &constants.blurpower, 0.1f, 0.0f, 1.0f);
         ImGui::TreePop();
     }
 
@@ -846,6 +853,8 @@ void Sprite::OnGUI()
         ImGui::DragFloat((char*)u8"再生速度", &spc.timescale, 0.1f, 0.0f, 5.0f);
         DirectX::XMFLOAT2 mouse = { (float)(Input::Instance().GetMouse().GetPositionX()),(float)(Input::Instance().GetMouse().GetPositionY()) };
         ImGui::DragFloat2((char*)u8"マウス位置", &mouse.x);
+        ImGui::DragFloat2((char*)u8"当たり判定中心位置", &collisionPivot.x);
+        spc.easingposition.y;
         ImGui::TreePop();
     }
 
@@ -963,18 +972,18 @@ bool Sprite::cursorVsCollsionBox()
     float texSizeY = spc.texSize.y * spc.scale.y;
 
     // 座標とピボットの処理
-    float pivotX = (spc.pivot.x / texSizeX);
-    float pivotY = (spc.pivot.y / texSizeY);
+    float pivotX = (spc.pivot.x / spc.texSize.x);
+    float pivotY = (spc.pivot.y / spc.texSize.y);
 
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = { spc.position.x + (texSizeX / 2 - spc.pivot.x) + spc.collsionpositionoffset.x,spc.position.y + (texSizeY / 2 - spc.pivot.y) + spc.collsionpositionoffset.y };
+    DirectX::XMFLOAT2 pos = {  collisionPivot.x + spc.collsionpositionoffset.x, collisionPivot.y + spc.collsionpositionoffset.y};
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 
     //長さを測る
     float upLen = Mathf::Dot(normalUp, curVecPos);
-    float rightLen = Mathf::Dot(normalRight, curVecPos);
+    float rightLen = Mathf::Dot(normalRight, curVecPos); 
 
     //判定
     DirectX::XMFLOAT2 scale = { (texSizeX / 2 + spc.collsionscaleoffset.x),(texSizeY / 2 + spc.collsionscaleoffset.y) };

@@ -39,20 +39,21 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
-    //obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player.mdl");
-    //r->LoadModel("Data/Model/pico/pico.mdl");
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+
     //HP‚Ì‰ŠúÝ’è
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
+    status->SetInvincibleTime(0.4f);
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
+    c->SetESkillCoolTime(5.0f);
 
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));

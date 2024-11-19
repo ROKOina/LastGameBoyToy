@@ -95,25 +95,26 @@ void BulletCom::BulletVSEnemyMissile()
     const auto& collision = GetGameObject()->GetComponent<SphereColliderCom>();
     if (!collision) return;
 
-    // "BOSS" オブジェクトへの参照を取得
-    const auto& bossObject = GameObjectManager::Instance().Find("BOSS");
     std::vector<std::shared_ptr<GameObject>> objectsToRemove;
 
     for (const auto& hitobject : collision->OnHitGameObject())
     {
         const auto& gameObject = hitobject.gameObject.lock();
         // "BOSS" でないオブジェクトのみ削除リストに追加
-        if (gameObject && gameObject != bossObject)
+        if (gameObject)
         {
-            //爆破エフェクト再生
-            GameObj obj = GameObjectManager::Instance().Create();
-            obj->SetName("explosion");
-            obj->transform_->SetWorldPosition(gameObject->transform_->GetWorldPosition());
-            obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitfire.cpuparticle", 300);
-            const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hitexplosion.gpuparticle", 5000);
-            gpuparticle->Play();
+            if (hitobject.gameObject.lock()->GetComponent<SphereColliderCom>()->GetMyTag() == COLLIDER_TAG::EnemyBullet)
+            {
+                //爆破エフェクト再生
+                GameObj obj = GameObjectManager::Instance().Create();
+                obj->SetName("explosion");
+                obj->transform_->SetWorldPosition(gameObject->transform_->GetWorldPosition());
+                obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitfire.cpuparticle", 300);
+                const auto& gpuparticle = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hitexplosion.gpuparticle", 5000);
+                gpuparticle->Play();
 
-            objectsToRemove.push_back(gameObject);
+                objectsToRemove.push_back(gameObject);
+            }
         }
     }
 
@@ -203,7 +204,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(objPoint->GetName(), "player") == 0)
-        coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
     coll->SetRadius(0.6f);

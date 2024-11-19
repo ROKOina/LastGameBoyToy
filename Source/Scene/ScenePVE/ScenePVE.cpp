@@ -41,6 +41,8 @@ void ScenePVE::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
         obj->AddComponent<PostEffect>();
+
+        
     }
 
     //ƒ‰ƒCƒg

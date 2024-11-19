@@ -119,8 +119,16 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
 {
     auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
     DirectX::XMFLOAT3 v = GetEnemyToPlayer() * speed;
-    moveCom->AddForce({ v.x,v.y,v.z });
-    DirectX::XMFLOAT3 t = { GetEnemyToPlayer().x,0.0f,GetEnemyToPlayer().z };
+
+    //// y成分が0.0f以下にならないようにチェック
+    //if (v.y < 0.0f) {
+    //    v.y = 0.1f;
+    //}
+
+    moveCom->AddForce({ v.x, v.y, v.z });
+
+    // tのy成分も0.0f以下にならないように設定
+    DirectX::XMFLOAT3 t = { GetEnemyToPlayer().x, 0.0f, GetEnemyToPlayer().z };
     GetGameObject()->transform_->Turn(t, 0.1f);
 
     if (explosionDist > GetPlayerDist())

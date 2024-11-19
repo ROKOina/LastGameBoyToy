@@ -23,9 +23,6 @@ void InazawaCharacterCom::Start()
 
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
-
-    //–³“GŽžŠÔÝ’è
-    GetGameObject()->GetComponent<CharaStatusCom>()->SetInvincibleTime(0.4f);
 }
 
 void InazawaCharacterCom::Update(float elapsedTime)

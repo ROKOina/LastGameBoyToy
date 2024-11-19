@@ -289,7 +289,6 @@ void RendererCom::LoadMaterial(const char* filename)
     model_->GetResource()->LoadMaterial(device, filename);
 }
 
-#ifdef _DEBUG
 #include "SystemStruct\Framework.h"
 #include <shlwapi.h>
 #include "Graphics/Texture.h"
@@ -388,6 +387,9 @@ void RendererCom::MaterialSelector()
             ImGui::DragFloat("EmissivePower", &material->emissiveintensity, 0.1f, 0.0f, 100.0f);
             ImGui::ColorEdit3("outlineColor", &material->outlineColor.x);
             ImGui::DragFloat("outlineintensity", &material->outlineintensity, 0.1f, 0.0f, 10.0f);
+            ImGui::DragFloat("dissolveThreshold", &material->dissolveThreshold, 0.1f, 0.0f, 1.0f);
+            ImGui::DragFloat("dissolveEdgeWidth", &material->dissolveEdgeWidth, 0.001f, 0.01f, 0.1f);
+            ImGui::ColorEdit3("dissolveEdgeColor", &material->dissolveEdgeColor.x);
             ImGui::DragFloat("alpha", &material->alpha, 0.1f, 0.0f, 1.0f);
 
             // マテリアルファイルを上書き
@@ -490,5 +492,3 @@ void RendererCom::ExportMaterialFile()
         model_->GetResource()->MaterialSerialize(filename);
     }
 }
-
-#endif // _DEBUG
