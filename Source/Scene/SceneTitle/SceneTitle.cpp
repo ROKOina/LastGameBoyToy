@@ -15,6 +15,7 @@
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneTitle.h"
+#include "Scene\SceneSelect\SceneSelect.h"
 #include "Scene\SceneGame\SceneGame.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
@@ -200,6 +201,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 {
                     //ˆÃ“]
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
+                    //SceneManager::Instance().ChangeSceneDelay(new SceneSelect, 2);
                     SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
                 }
             }

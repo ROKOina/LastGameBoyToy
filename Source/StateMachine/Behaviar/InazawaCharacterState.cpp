@@ -41,7 +41,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     {
         auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
         auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(0, false);
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
         armAnim->SetAnimationSeconds(0.3f);
 
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
@@ -98,7 +98,7 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
     {
         auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
         auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(0, false);
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
         armAnim->SetAnimationSeconds(0.3f);
 
         //UŒ‚ˆ—

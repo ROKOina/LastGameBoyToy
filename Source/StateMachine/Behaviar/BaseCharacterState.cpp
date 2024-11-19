@@ -6,6 +6,8 @@
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Character\RemoveTimerCom.h"
+#include "Component\Camera\CameraCom.h"
+#include <Component\Camera\EventCameraManager.h>
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -150,6 +152,10 @@ void BaseCharacter_DeathState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
+
+    //イベントカメラ
+    GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+    EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
 }
 
 void BaseCharacter_DeathState::Execute(const float& elapsedTime)
