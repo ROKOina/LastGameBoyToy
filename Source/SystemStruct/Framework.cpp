@@ -9,6 +9,7 @@
 #include "Scene\SceneManager.h"
 #include "Scene\SceneUI\SceneUI.h"
 #include "Scene\SceneResult\SceneResult.h"
+#include "Scene\SceneSelect\SceneSelect.h"
 
 #include "Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
@@ -32,6 +33,7 @@ Framework::Framework(HWND hWnd)
 
     //sceneGame.Initialize();
     SceneManager::Instance().ChangeScene(new SceneGame);
+    //SceneManager::Instance().ChangeScene(new SceneSelect);
     //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     //SceneManager::Instance().ChangeScene(new SceneTitle);
     //SceneManager::Instance().ChangeScene(new SceneResult);

@@ -146,6 +146,8 @@ void SceneGame::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        //自分のプレイヤーは表示切る
+        //obj->GetComponent<RendererCom>()->SetEnabled(false);
 
         //ウルト関係Obj追加
         {
@@ -190,7 +192,7 @@ void SceneGame::Initialize()
             std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
-            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.20f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,1.8f });
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();

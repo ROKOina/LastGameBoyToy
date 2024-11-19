@@ -167,7 +167,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
 
         //ƒJƒƒ‰‚ÌŽq‹Ÿ‚É‚·‚é
         DirectX::XMFLOAT3 cameraFromGun = gunPos - cameraPos;
-        DirectX::XMFLOAT3 fpsPos = fpsDir * 30;
+        DirectX::XMFLOAT3 fpsPos = fpsDir * 60;
 
         DirectX::XMFLOAT3 velo = fpsPos - cameraFromGun;
         moveCom->SetNonMaxSpeedVelocity(Mathf::Normalize(velo) * bulletSpeed);
@@ -211,7 +211,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     //’e
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
-    bulletCom->SetAliveTime(2.0f);
+    bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(-damageValue);
     bulletCom->SetViewBullet(viewObj);
 

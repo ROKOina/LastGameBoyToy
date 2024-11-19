@@ -1,3 +1,4 @@
+#include "SceneSelect.h"
 #include "Graphics/Graphics.h"
 #include "Input\Input.h"
 #include "Input\GamePad.h"
@@ -15,12 +16,13 @@
 #include "Component\Animation\FootIKcom.h"
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
-#include "SceneTitle.h"
-#include "Scene\SceneSelect\SceneSelect.h"
+#include "Scene\SceneGame\SceneGame.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
+#include "Component/Particle/GPUParticle.h"
 
-void SceneTitle::Initialize()
+
+void SceneSelect::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -79,13 +81,41 @@ void SceneTitle::Initialize()
             title->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/title.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
-        //プレイ
+        //PVE
         {
             auto& next = obj->AddChildObject();
-            next->SetName("next");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/next.ui", Sprite::SpriteShader::DEFALT, true);
+            next->SetName("PVE");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::DEFALT, true);
+        }
+        //PVP
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("PVP");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::DEFALT, true);
+        }
+        //トレーニング
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("Training");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
+        }
+
+
+        //セレクト棒
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("selectBow");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/selectBow.ui", Sprite::SpriteShader::DEFALT, true);
         }
     }
+
+    ////選択パーティクル
+    //{
+    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    //    obj->SetName("selectParticle");
+    //    obj->AddComponent<GPUParticle>(/*"Data/SerializeData/GPUEffect/snow.gpuparticle"*/nullptr, 500);
+    //}
+
 
     //ポストエフェクト
     {
@@ -95,21 +125,21 @@ void SceneTitle::Initialize()
     }
 }
 
-void SceneTitle::Finalize()
+void SceneSelect::Finalize()
 {
 }
 
-void SceneTitle::Update(float elapsedTime)
+void SceneSelect::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    UIUpdate(elapsedTime);
+    //UIUpdate(elapsedTime);
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }
 
-void SceneTitle::Render(float elapsedTime)
+void SceneSelect::Render(float elapsedTime)
 {
     // 画面クリア＆レンダーターゲット設定
     Graphics& graphics = Graphics::Instance();
@@ -128,14 +158,14 @@ void SceneTitle::Render(float elapsedTime)
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }
 
-void SceneTitle::UIUpdate(float elapsedTime)
+void SceneSelect::UIUpdate(float elapsedTime)
 {
     auto& canvas = GameObjectManager::Instance().Find("Canvas");
     if (!canvas)return;
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    //ゲームシーンへ
+    //タイトルへ
     {
         auto& next = canvas->GetChildFind("next");
         auto& sprite = next->GetComponent<Sprite>();
@@ -145,7 +175,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
             {
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
-                    SceneManager::Instance().ChangeSceneDelay(new SceneSelect, 2);
+                    SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
                 }
             }
         }

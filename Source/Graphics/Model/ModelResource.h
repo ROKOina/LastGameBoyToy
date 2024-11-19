@@ -168,6 +168,7 @@ public:
     const std::vector<Animation>& GetAnimations() const { return animations_; }
     const std::vector<Material>& GetMaterials() const { return materials_; }
     std::vector<Mesh>& GetMeshesEdit() { return meshes_; }
+    std::vector<Animation>& GetAnimationsEdit() { return animations_; }
     std::vector<Material>& GetMaterialsEdit() { return materials_; }
     std::string GetFileName() { return fileName; }
 
