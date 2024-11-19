@@ -353,9 +353,6 @@ void SceneGame::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
-    //ボスの位置取得
-    //sc->data.bossposiotn = t->GetLocalPosition();
-
     //遷移関係
     TransitionPVEFromResult();
 

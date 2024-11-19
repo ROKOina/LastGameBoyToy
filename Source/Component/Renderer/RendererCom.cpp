@@ -289,6 +289,11 @@ void RendererCom::LoadMaterial(const char* filename)
     model_->GetResource()->LoadMaterial(device, filename);
 }
 
+//マテリアルの名前を取得して値を変更する処理
+void RendererCom::ChangeMaterialParameter(const char* materialname, float parameter)
+{
+}
+
 #ifdef _DEBUG
 #include "SystemStruct\Framework.h"
 #include <shlwapi.h>

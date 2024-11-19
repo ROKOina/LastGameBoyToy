@@ -43,6 +43,9 @@ public:
     // マテリアルのみ読み込む
     void LoadMaterial(const char* filename);
 
+    //マテリアルの名前を取得して値を変更する処理
+    void ChangeMaterialParameter(const char* materialname, float parameter);
+
     // モデルの取得
     Model* GetModel() const { return model_.get(); }
     std::string GetModelPath() { return modelFilePath; }
