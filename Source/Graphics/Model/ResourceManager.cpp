@@ -43,9 +43,7 @@ void ResourceManager::RegisterModel(const char* filename, std::shared_ptr<ModelR
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (models_.count(filename) == 0)
-    {
         models_[filename] = resource;
-    }
 }
 
 bool ResourceManager::JudgeModelFilename(const char* filename)
