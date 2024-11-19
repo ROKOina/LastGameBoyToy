@@ -171,6 +171,9 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     case SpriteShader::DEFALT:
         PSPath = { "Shader\\SpritePS.cso" };
         break;
+    case SpriteShader::BLUR:
+        PSPath = { "Shader\\SpriteBlurPS.cso" };
+        break;
     case SpriteShader::DISSOLVE:
         PSPath = { "Shader\\DeferredSetupPS.cso" };
         break;
@@ -818,10 +821,10 @@ void Sprite::OnGUI()
     if (ImGui::TreeNode("ConstantsBuffer"))
     {
         ImGui::DragFloat2((char*)u8"UVスクロール", &constants.uvscroll.x, 0.1f);
-        ImGui::DragFloat((char*)u8"クリップ", &constants.cliptime, 0.1f, 0.0f, 1.0f);
-        ImGui::DragFloat((char*)u8"縁しきい値", &constants.edgethreshold, 0.1f, 0.0f, 1.0f);
-        ImGui::DragFloat((char*)u8"縁オフセット値", &constants.edgeoffset, 0.1f, 0.0f, 1.0f);
-        ImGui::ColorEdit3((char*)u8"縁色", &constants.edgecolor.x);
+        ImGui::ColorEdit3((char*)u8"ブラー色", &constants.blurcolor.x);
+        ImGui::DragFloat((char*)u8"ルミナンス", &constants.luminance, 0.1f, 0.0f, 10.0f);
+        ImGui::DragFloat((char*)u8"ブラー距離", &constants.blurdistance, 0.1f, 0.0f, 20.0f);
+        ImGui::DragFloat((char*)u8"ブラーパワー", &constants.blurpower, 0.1f, 0.0f, 1.0f);
         ImGui::TreePop();
     }
 

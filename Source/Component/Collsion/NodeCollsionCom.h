@@ -78,6 +78,7 @@ public:
 private:
 
     const char* m_filename = {};
+    std::string filepath = {};
     Model* model = nullptr;
     bool debugrender = false;
     CollsionType m_collsiontype = CollsionType::SPHER;

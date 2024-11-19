@@ -17,8 +17,15 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
+#include "Component\System\SpawnCom.h"
+#include "Component\Character\CharaStatusCom.h"
+#include "StageGimmickCom.h"
+#include "Component\Particle\GPUParticle.h"
+#include "Component\Particle\CPUParticle.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -102,13 +109,12 @@ void StageEditorCom::Update(float elapsedTime)
             )
         );
 
-
         //マウスとステージの当たり判定
         HitResult hit;
         PxVec3 pos = { world_start.x,world_start.y,world_start.z };
 
         auto d = Mathf::Normalize(world_end - world_start);
-        PxVec3 dir = {d.x,d.y,d.z};
+        PxVec3 dir = { d.x,d.y,d.z };
 
         physx::PxRaycastBuffer Buf;
     }
@@ -175,11 +181,25 @@ void StageEditorCom::OnGUI()
 
         if (ImGui::TreeNode(objName.first.c_str()))
         {
+            //Staticかどうか
             ImGui::Checkbox("Static", &objName.second.staticFlag);
+            //NodeCollisionのファイル読み取り
             if (ImGui::Button((char*)u8"当たり判定設定"))
             {
                 FileRead(objName.second.collisionPath);
             }
+
+            //オブジェクトの生成関数設定
+            constexpr const char* FuncName[] =
+            {
+                "None",
+                "TestNakanisi",
+                "TowerGimic"
+            };
+            int funcIndex = (int)objName.second.func;
+            ImGui::Combo((char*)u8"生成関数", &funcIndex, FuncName, (int)GenerateFuncName::Max);
+            objName.second.func = (GenerateFuncName)funcIndex;
+
             ImGui::TreePop();
         }
     }
@@ -200,10 +220,10 @@ void StageEditorCom::ObjectRegister()
     ImGui::InputText("ObjName", registerObjName, sizeof(registerObjName));
 }
 
-void StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale, DirectX::XMFLOAT4 rotation, const char* model_filename, const char* collision_filename)
+GameObj StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 scale, DirectX::XMFLOAT4 rotation, const char* model_filename, const char* collision_filename)
 {
     //オブジェクトを配置
-    GameObj obj = GameObjectManager::Instance().Create();
+    auto& obj = GameObjectManager::Instance().Create();
     std::string objName = objType + std::to_string(placeObjcts[objType.c_str()].objList.size());
     obj->SetName(objName.c_str());
 
@@ -216,7 +236,15 @@ void StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 position
     RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
     render->LoadModel(model_filename);
 
+    //生成関数があれば起動
+    if (placeObjcts[objType.c_str()].func != GenerateFuncName::None)
+    {
+        generateFunc[(int)placeObjcts[objType.c_str()].func](obj);
+    }
+
     placeObjcts[objType.c_str()].objList.emplace_back(obj);
+
+    return obj;
 }
 
 void StageEditorCom::FileRead(std::string& path)
@@ -300,9 +328,26 @@ void StageEditorCom::ObjectSave()
 
     for (auto& placeObj : placeObjcts)
     {
-        j[placeObj.first]["FileName"] = placeObj.second.filePath;
-        j[placeObj.first]["CollsionFileName"] = placeObj.second.collisionPath;
+        // base_path から target_path への相対パスを取得
+        // 区切り文字 "(" の位置を検索
+        size_t delimiterPos = placeObj.second.filePath.find("Data");
+
+        // 区切り文字が見つかった場合、その位置までの部分文字列を取得
+        std::string name = (delimiterPos != std::string::npos) ? placeObj.second.filePath.substr(0, delimiterPos) : placeObj.second.filePath;
+        name += static_cast<std::string>("Data");
+
+        std::filesystem::path relative_path = std::filesystem::relative(placeObj.second.filePath, name);
+        std::string path = relative_path.string();
+        path = "Data/" + path;
+
+        // collisionPath の相対パスを取得
+        std::filesystem::path relative_collision_path = std::filesystem::relative(placeObj.second.collisionPath, name);
+        std::string collision_path = "Data/" + relative_collision_path.string();
+
+        j[placeObj.first]["FileName"] = path;
+        j[placeObj.first]["CollsionFileName"] = collision_path;
         j[placeObj.first]["StaticFlag"] = placeObj.second.staticFlag;
+        j[placeObj.first]["Func"] = (int)placeObj.second.func;
 
         int i = 0;
         for (auto& obj : placeObj.second.objList)
@@ -345,38 +390,72 @@ void StageEditorCom::ObjectLoad()
     DialogResult result = Dialog::OpenFileName(filename, sizeof(filename), filter, nullptr, Framework::GetInstance()->GetHWND());
     if (result == DialogResult::OK)
     {
-        //ファイルを開く
-        fstream ifs(filename);
-        if (ifs.good())
+        PlaceJsonData(filename);
+    }
+}
+
+void StageEditorCom::PlaceJsonData(std::string filename)
+{
+    using namespace std;
+
+    //ファイルを開く
+    fstream ifs(filename);
+    if (ifs.good())
+    {
+        //Json型を取得
+        nlohmann::json json;
+        ifs >> json;
+
+        for (auto& item : json.items())
         {
-            //Json型を取得
-            nlohmann::json json;
-            ifs >> json;
+            //オブジェクトの内容にアクセス
+            const auto& data = item.value();
+            placeObjcts[item.key()].staticFlag = data["StaticFlag"];
+            placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
+            placeObjcts[item.key()].filePath = data["FileName"];
+            placeObjcts[item.key()].func = (GenerateFuncName)data["Func"];
 
-            for (auto& item : json.items())
+            for (int index = 0; index < data["Position"].size(); ++index)
             {
-                //オブジェクトの内容にアクセス
-                const auto& data = item.value();
-                placeObjcts[item.key()].staticFlag = data["StaticFlag"];
-                placeObjcts[item.key()].collisionPath = data["CollsionFileName"];
-                placeObjcts[item.key()].filePath = data["FileName"];
+                DirectX::XMFLOAT3 pos = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
+                DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
+                DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
 
-                for (int index = 0; index < data["Position"].size(); ++index)
-                {
-                    DirectX::XMFLOAT3 pos = { data["Position"].at(index)["x"], data["Position"].at(index)["y"], data["Position"].at(index)["z"] };
-                    DirectX::XMFLOAT3 scale = { data["Scale"].at(index)["x"], data["Scale"].at(index)["y"], data["Scale"].at(index)["z"] };
-                    DirectX::XMFLOAT4 rotation = { data["Rotation"].at(index)["x"], data["Rotation"].at(index)["y"], data["Rotation"].at(index)["z"], data["Rotation"].at(index)["w"] };
-
-                    ObjectPlace(
-                        item.key(),//選択中のオブジェクト
-                        pos,       //位置
-                        scale,     //スケール
-                        rotation,  //回転値
-                        placeObjcts[item.key()].filePath.c_str(),    //modelのパス
-                        placeObjcts[item.key()].collisionPath.c_str()//nodeCollsionのパス
-                    );
-                }
+                ObjectPlace(
+                    item.key(),//選択中のオブジェクト
+                    pos,       //位置
+                    scale,     //スケール
+                    rotation,  //回転値
+                    placeObjcts[item.key()].filePath.c_str(),    //modelのパス
+                    placeObjcts[item.key()].collisionPath.c_str()//nodeCollsionのパス
+                );
             }
         }
     }
+}
+
+void StageEditorCom::TestNakanisi(GameObj place)
+{
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
+
+    std::string path = place->GetComponent<RendererCom>()->GetModelPath();
+    rigid->SetUseResourcePath(path);
+}
+
+void StageEditorCom::TowerGimic(GameObj& place)
+{
+    //(上野君)ギミックのオブジェクトを生成をここに書く
+    //transform、モデル、nodeColliderは設定されてるからそれ以外のコンポーネントを頼む
+    //任されましたヨイショー
+    place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/energy.gpuparticle", 6000);
+    place->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/enemy.spawn");
+    place->AddComponent<StageGimmick>();
+    std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 100);
+    cpuparticle->SetActive(false);
+    std::shared_ptr<SphereColliderCom>collider = place->AddComponent<SphereColliderCom>();
+    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetRadius(0.8f);
+    std::shared_ptr<CharaStatusCom>status = place->AddComponent<CharaStatusCom>();
+    status->SetInvincibleTime(0.2f);
+    status->SetHitPoint(15.0f);
 }

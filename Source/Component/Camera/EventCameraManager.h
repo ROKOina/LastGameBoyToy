@@ -48,6 +48,9 @@ public:
         std::string focusObjName;   //注視点オブジェの名前
         std::vector<ECTransform> ECTra;
 
+        //ver2
+        bool isFocusLocal = false;  //注視点の子にするか
+
         template<class Archive>
         void serialize(Archive& archive, int version);
     };

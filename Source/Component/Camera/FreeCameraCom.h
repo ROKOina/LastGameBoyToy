@@ -28,12 +28,16 @@ public:
 
     void SetDistance(float dis) { distance = dis; }
 
+    //“®‚©‚³‚È‚­‚·‚éˆ—
+    void SetUpdate(bool u) { update = u; }
+
     //FreeCameraƒNƒ‰ƒX
 public:
 
 private:
     DirectX::XMFLOAT3 focusPos = { 0,0,0 };
     float distance = 10;
+    bool update = true;
 
     DirectX::XMFLOAT2	oldCursor = {};
     DirectX::XMFLOAT2	newCursor = {};

@@ -98,8 +98,8 @@ public:
     struct LightCB
     {
         DirectionalLightData directionalLight = {};
-        PointLightData       pointLight = {};
-        SpotLightData        spotLight = {};
+        PointLightData       pointLight[POINT_LIGHT_MAX];
+        SpotLightData        spotLight[SPOT_LIGHT_MAX];
 
         template<class Archive>
         void serialize(Archive& archive, int version);

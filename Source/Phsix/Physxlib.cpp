@@ -305,7 +305,14 @@ void PhysXLib::GenerateManyCollider_Convex(ModelResource* model, float worldScal
                 );
                 break;
 
-            case 1 << 2:
+            case 1 << 2://Box
+
+                DirectX::XMFLOAT3 max = m.get()->GetMeshes().at(0).boundsMax;
+                DirectX::XMFLOAT3 min = m.get()->GetMeshes().at(0).boundsMin;
+                DirectX::XMFLOAT3 scale = (max - min) / 2.0f;
+                scale *= Mathf::TransformSampleScale(answer);
+
+                GenerateCollider(true, NodeCollsionCom::CollsionType::BOX, Mathf::TransformSamplePosition(answer), scale);
                 break;
 
             default:
@@ -570,11 +577,11 @@ physx::PxRigidActor* PhysXLib::GenerateConvexCollider(bool isStatic, ModelResour
     return rigidObj;
 }
 
-physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, GameObj obj, DirectX::XMFLOAT3 scale)
+physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 pos,DirectX::XMFLOAT3 scale)
 {
     physx::PxRigidActor* rigidObj = nullptr;
     physx::PxTransform transform(physx::PxIdentity);
-    transform.p = { obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y,obj->transform_->GetWorldPosition().z };
+    transform.p = { pos.x,pos.y,pos.z };
 
     if (isStatic) {
         //“®‚©‚È‚¢(Ã“I)„‘Ì‚ðì¬
@@ -605,7 +612,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     case NodeCollsionCom::CollsionType::SPHER:
         shape = gPhysics->createShape(
             // SPHER‚Ì‘å‚«‚³
-            physx::PxSphereGeometry((scale.x * obj->GetComponent<RigidBodyCom>()->GetNormalizeScale())),
+            physx::PxSphereGeometry(scale.x),
             // –€ŽCŒW”‚Æ”½”­ŒW”‚ÌÝ’è
             *gPhysics->createMaterial(0.5f, 0.5f, 0.f)
         );
@@ -629,10 +636,7 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(bool isStatic, NodeCollsionCom::
     shape->setLocalPose(physx::PxTransform(physx::PxIdentity));
     rigidObj->attachShape(*shape);
     shape->release();
-
-    //physx::PxTransform transform;
-    //transform.p = { obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y,obj->transform_->GetWorldPosition().z };
-    //rigidObj->setGlobalPose(transform);
+    rigidObj->setGlobalPose(transform);
 
     // „‘Ì‚ð‹óŠÔ‚É’Ç‰Á
     gScene->addActor(*rigidObj);

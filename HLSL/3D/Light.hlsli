@@ -32,6 +32,6 @@ struct SpotLightData
 cbuffer LightBuffer : register(b8)
 {
     DirectionalLightData directionalLight;
-    PointLightData pointLight;
-    SpotLightData spotLight;
+    PointLightData pointLight[PointLightMax];
+    SpotLightData spotLight[SpotLightMax];
 };

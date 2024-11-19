@@ -31,6 +31,8 @@ public:
     //ファイル名で登録確認
     bool JudgeModelFilename(const char* filename);
 
+    std::shared_ptr<ModelResource> GetModelResource(const char* filename);
+ 
 private:
     using ModelMap = std::map<std::string, std::shared_ptr<ModelResource>>;
 

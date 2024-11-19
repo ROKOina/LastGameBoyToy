@@ -45,6 +45,7 @@ public:
 
     // モデルの取得
     Model* GetModel() const { return model_.get(); }
+    std::string GetModelPath() { return modelFilePath; }
 
     DirectX::XMFLOAT3 GetBounds() { return bounds; }
     DirectX::XMFLOAT3 GetBoundsMin() { return BoundsMin; }
@@ -102,13 +103,11 @@ private:
     DirectX::XMFLOAT3 bounds;
 
     SHADER_ID_MODEL     shaderID = SHADER_ID_MODEL::DEFERRED;
-#ifdef _DEBUG
+
     int							selectionMaterialIndex = -1;
     bool						hiddenProperty = false;
     std::string					modelFilePath;
     std::string					filePathDriveToModel = "";
-
-#endif // _DEBUG
 
     //モデル読み込みをスレッド化
     std::future<void> future;

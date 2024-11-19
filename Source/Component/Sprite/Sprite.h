@@ -15,7 +15,9 @@ public:
     enum class SpriteShader
     {
         DEFALT,
-        DISSOLVE
+        BLUR,
+        DISSOLVE,
+        MAX
     };
 
 public:
@@ -100,11 +102,11 @@ public:
     //定数バッファの構造体
     struct SaveConstantsParameter
     {
+        DirectX::XMFLOAT3 blurcolor = { 1.0f,1.0f,1.0f };
+        float blurdistance = { 8.0f };
+        float blurpower = { 0.1f };
+        float luminance = { 0.0f };
         DirectX::XMFLOAT2 uvscroll = { 0.0f,0.0f };
-        float cliptime = 0.0f;
-        float edgethreshold = 0.6f;
-        float edgeoffset = 0.1f;
-        DirectX::XMFLOAT3 edgecolor = { 1,1,1 };
     };
     SaveConstantsParameter constants;
 

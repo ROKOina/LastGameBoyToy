@@ -23,6 +23,10 @@ void HitProcessCom::Update(float elapsedTime)
 
     for (auto& hit : col->OnHitGameObject())
     {
+        float ultGauge = *parentChara->GetUltGauge();
+        ultGauge += 5;
+        parentChara->SetUltGauge(ultGauge);
+
         auto& stats = hit.gameObject.lock()->GetComponent<CharaStatusCom>();
         if (!stats)continue;
 

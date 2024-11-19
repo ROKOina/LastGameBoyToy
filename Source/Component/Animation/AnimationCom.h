@@ -51,6 +51,11 @@ public:
         int   lowerAnimeTwoId = 0;  ///歩きモーション用
         int   lowerAnimeThreeId = 0;///歩きモーション用
         int   lowerAnimeFourId = 0; ///歩きモーション用
+        int   lowerAnimeFiveId = 0; ///歩きモーション用
+        int   lowerAnimaSixId = 0;  ///歩きモーション用
+        int   lowerAnimaSevenId = 0;///歩きモーション用 
+        int   lowerAnimaEightId = 0;///歩きモーション用
+
         bool  loop = false;         //ループ再生するかしないか
         bool  rootFlag = false;     //ルートモーションするかしないか
         int   blendType = 0;        // 0=ノーマルアニメーション 1=ブレンドアニメーション 2=歩きブレンドアニメーション
@@ -102,6 +107,9 @@ public:
     bool IsEventCalling(std::string eventName);
     //イベント中に指定されたノードのワールド位置を送る
     bool IsEventCallingNodePos(std::string eventName, std::string nodeName, DirectX::XMFLOAT3& pos);
+
+    void SetRootNode(const char* nodeName);
+    void SetRootHipNode(const char* nodeHipName);
 
 private:
 
@@ -160,11 +168,15 @@ private:
     int                             currentUpperAnimation = -1;
     int                             currentLowerAnimation = -1;
     //上半身下半身のアニメーション番号
-    int                             upperAnimationIndex = 0;
-    int                             lowerAnimationIndex = 0;
-    int                             lowerAnimationTwoIndex = 0;
+    int                             upperAnimationIndex      = 0;
+    int                             lowerAnimationIndex      = 0;
+    int                             lowerAnimationTwoIndex   = 0;
     int                             lowerAnimationThreeIndex = 0;
-    int                             lowerAnimationFourIndex = 0;
+    int                             lowerAnimationFourIndex  = 0;
+    int                             lowerAnimetionFiveIndex  = 0; 
+    int                             lowerAnimationSixIndex   = 0;  
+    int                             lowerAnimationSevenIndex = 0; 
+    int                             lowerAnimationEightIndex = 0;
 
     //下半身のアニメーション制御の番号 0=normal 1=blendAnime 2=walkAnime
     int                             lowerBlendType = 0;

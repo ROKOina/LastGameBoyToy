@@ -29,7 +29,6 @@
 #include "Component/Camera/FreeCameraCom.h"
 #include "Component/Camera/FPSCameraCom.h"
 #include "Component/Camera/EventCameraCom.h"
-#include "Component/Particle/CPUParticle.h"
 #include "Component/Particle/GPUParticle.h"
 #include "Component/Sprite/Sprite.h"
 #include "Component/Stage/StageEditorCom.h"
@@ -112,32 +111,12 @@ void SceneGame::Initialize()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-        obj->AddComponent<StageEditorCom>();
+        StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
         RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
         rigid->SetNormalizeScale(1);
     }
-
-    //当たり判定用
-    //std::shared_ptr<GameObject> roboobj = GameObjectManager::Instance().Create();
-    //{
-    //    roboobj->SetName("robo");
-    //    roboobj->transform_->SetWorldPosition({ 0, 3.0f, 0 });
-    //    roboobj->transform_->SetScale({ 3,3,3 });
-    //    std::shared_ptr<RendererCom> r = roboobj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-    //    r->LoadModel("Data/OneCoin/robot.mdl");
-    //    std::shared_ptr<AnimationCom> a = roboobj->AddComponent<AnimationCom>();
-    //    a->PlayAnimation(0, true, false, 0.001f);
-
-    //    std::shared_ptr<SphereColliderCom> sphere = roboobj->AddComponent<SphereColliderCom>();
-    //    sphere->SetRadius(2.0f);
-    //    sphere->SetMyTag(COLLIDER_TAG::Enemy);
-    //    sphere->SetJudgeTag(COLLIDER_TAG::Player);
-
-    //    roboobj->AddComponent<NodeCollsionCom>("Data/OneCoin/OneCoin.nodecollsion");
-    //    RigidBodyCom* rigid = roboobj->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Primitive).get();
-    //    rigid->SetPrimitiveType(NodeCollsionCom::CollsionType::SPHER);
-    //}
 
     //プレイヤー
     {
@@ -181,7 +160,7 @@ void SceneGame::Initialize()
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
 
         //pico位置
-        cameraPost->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
+        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //腕
@@ -193,7 +172,7 @@ void SceneGame::Initialize()
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
-            anim->PlayAnimation(0, true);
+            anim->PlayAnimation(0, false);
         }
     }
 
@@ -311,13 +290,15 @@ void SceneGame::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
             smoke->SetActive(false);
         }
+    }
 
-        //雑魚的生成オブジェクト
-        {
-            //std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
-            //spawnobject->SetName("spawnenemy");
-            //spawnobject->AddComponent<SpawnCom>(nullptr);
-        }
+    //大技的なやつ
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("bomberexplosion");
+        obj->transform_->SetWorldPosition({ -1.917f,23.375f,-32.530f });
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomberexplosion.gpuparticle", 6000);
+        obj->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/energyspawn.spawn");
     }
 
 #endif
@@ -331,15 +312,6 @@ void SceneGame::Initialize()
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
-
-    // スカイボックスの設定
-    std::array<const char*, 4> filepath = {
-      "Data\\Texture\\CosmicCoolCloudBottom.DDS",
-      "Data\\Texture\\diffuse_iem.dds",
-      "Data\\Texture\\specular_pmrem.dds",
-      "Data\\Texture\\lut_ggx.DDS"
-    };
-    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
 
 #pragma endregion
 

@@ -56,8 +56,14 @@ private:
     void SetupBeam(const std::shared_ptr<GameObject>& obj);
     void CreateBeamSegment(const std::shared_ptr<GameObject>& origin, const char* easingMovePath);
 
+    //ギミックミサイル生成関数
+    void CreateGimmickMissile(const std::shared_ptr<GameObject>& obj);
+
     //当たり判定
     void HitObject();
+
+    //地面に着地したら消す
+    void OnGroundDelete(float elapsedTime);
 
 public:
 
@@ -78,6 +84,7 @@ public:
         MISSILE,
         EXPLOSION,
         BEEM,
+        GIMMICKMISSILE,
         MAX
     };
     ObjectType objtype = ObjectType::ENEMY;
@@ -110,4 +117,5 @@ private:
 
     // 複製されたオブジェクトを管理するリスト
     std::vector<std::weak_ptr<GameObject>> spawnedObjects;
+    std::vector<std::pair<std::weak_ptr<GameObject>, float>> deleteQueue; // 削除予定キュー
 };
