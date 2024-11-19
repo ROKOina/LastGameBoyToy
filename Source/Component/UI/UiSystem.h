@@ -1,5 +1,6 @@
 #pragma once
 #include "Component\Sprite\Sprite.h"
+#include "Component\System\TransformCom.h"
 #include "math.h"
 class UiSystem : public Sprite
 {
@@ -45,6 +46,8 @@ protected:
     float originalFadeTime = 0.0f; //最大値を保持しておく変数
     bool  fadeInFlag = false;       //フェードイン用フラグ
     bool  fadeOutFlag = false;       //フェードアウト用フラグ
+
+    bool isDebug = false;           //デバッグ用フラグ
 
     DirectX::XMFLOAT2 originalTexSize = {};    //元のテクスチャサイズ
 
