@@ -55,7 +55,7 @@ void Boss_BaseState::RandamLongRangeAttack()
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
     {
-        availableNumbers = { 1,2,3,4,5 };
+        availableNumbers = { 1,2,3,5 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成

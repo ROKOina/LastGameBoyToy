@@ -43,9 +43,6 @@ public:
     // マテリアルのみ読み込む
     void LoadMaterial(const char* filename);
 
-    //マテリアルの名前を取得して値を変更する処理
-    void ChangeMaterialParameter(const char* materialname, float parameter);
-
     // モデルの取得
     Model* GetModel() const { return model_.get(); }
     std::string GetModelPath() { return modelFilePath; }
@@ -71,20 +68,25 @@ public:
 
     void JoinThred() { future.get(); }
 
+    //フラグで制御
+    void SetOnFlag(bool setflag) { OnFlag = setflag; }
+
 private:
     void ModelInitialize(const char* filename);
-
 
     // マテリアルを選択するImGui
     void MaterialSelector();
 
     ModelResource::Material* GetSelectionMaterial();
+    std::vector<ModelResource::Material*> RendererCom::GetAllMaterials();
 
     void TextureGui(ModelResource::Material*);
 
     // 編集したマテリアルファイルを書き出す
     void ExportMaterialFile();
 
+    //マテリアルの変更
+    void ChangeMaterialParameter();
 
 private:
     std::unique_ptr<Model>	model_;
@@ -110,6 +112,8 @@ private:
     bool						hiddenProperty = false;
     std::string					modelFilePath;
     std::string					filePathDriveToModel = "";
+
+    bool OnFlag = false;
 
     //モデル読み込みをスレッド化
     std::future<void> future;

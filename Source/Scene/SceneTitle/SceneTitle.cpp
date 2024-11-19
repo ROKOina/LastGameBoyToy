@@ -94,6 +94,7 @@ void SceneTitle::Initialize()
         obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/player_True/player.mdl");
+        r->SetOnFlag(true);
         std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
         anim->PlayAnimation(5, true);
     }

@@ -20,6 +20,10 @@ RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, DEPTHSTATE de
 // 開始処理
 void RendererCom::Start()
 {
+    if (OnFlag)
+    {
+        ChangeMaterialParameter();
+    }
 }
 
 //描画
@@ -290,11 +294,22 @@ void RendererCom::LoadMaterial(const char* filename)
 }
 
 //マテリアルの名前を取得して値を変更する処理
-void RendererCom::ChangeMaterialParameter(const char* materialname, float parameter)
+void RendererCom::ChangeMaterialParameter()
 {
+    // 全マテリアルを取得
+    std::vector<ModelResource::Material*> materials = GetAllMaterials();
+
+    // ループでマテリアルの色を変更
+    for (size_t i = 0; i < materials.size(); i++)
+    {
+        if (materials[i] != nullptr)
+        {
+            materials[i]->outlineColor = { 0.000f, 0.282f, 1.000f };
+            materials[i]->outlineintensity = { 5.0f };
+        }
+    }
 }
 
-#ifdef _DEBUG
 #include "SystemStruct\Framework.h"
 #include <shlwapi.h>
 #include "Graphics/Texture.h"
@@ -329,6 +344,8 @@ void RendererCom::MaterialSelector()
     ImGui::Separator();
 
     std::vector<const char*> materialNames = {};
+
+    ImGui::Checkbox("flag", &OnFlag);
 
     //マテリアル情報の表示(パターン1)
     ImGui::Text("Materials");
@@ -417,6 +434,26 @@ ModelResource::Material* RendererCom::GetSelectionMaterial()
         }
     }
     return nullptr;
+}
+
+//全マテリアル取得
+std::vector<ModelResource::Material*> RendererCom::GetAllMaterials()
+{
+    std::vector<ModelResource::Material*> materialPtrs;
+
+    if (model_.get() != nullptr)
+    {
+        const std::vector<ModelResource::Material>& materials = model_->GetResource()->GetMaterials();
+        materialPtrs.reserve(materials.size());
+
+        for (const auto& material : materials)
+        {
+            // const_castを使用してポインタを格納
+            materialPtrs.push_back(const_cast<ModelResource::Material*>(&material));
+        }
+    }
+
+    return materialPtrs;
 }
 
 void RendererCom::TextureGui(ModelResource::Material* material)
