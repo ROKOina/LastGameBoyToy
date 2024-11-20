@@ -87,6 +87,12 @@ void SceneGame::Initialize()
         obj->AddComponent<Light>(nullptr);
     }
 
+    //オーディオ
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("Audio");
+    }
+
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();

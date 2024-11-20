@@ -28,6 +28,7 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
+#include "Component\Audio\AudioCom.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -132,6 +133,18 @@ void SceneTitle::Initialize()
       "Data\\Texture\\lut_ggx.DDS"
     };
     SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
+
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Audio");
+        audioObj = audio->AddComponent<AudioCom>().get();
+        audioObj->RegisterSource(AUDIOID::SCENE_TITLE, "Title");
+        audioObj->RegisterSource(AUDIOID::CURSOR, "Cursor");
+        audioObj->RegisterSource(AUDIOID::ENTER, "Enter");
+
+        audioObj->Play("Title", true, 0.0f);
+        audioObj->FeedStart("Title", 0.5f, 0.1f);
+    }
 }
 
 void SceneTitle::Finalize()
@@ -193,6 +206,9 @@ void SceneTitle::UIUpdate(float elapsedTime)
             {
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
+                    audioObj->FeedStart("Title", 0.0f, elapsedTime);
+                    audioObj->Play("Enter", false, 1.0f);
+
                     //ˆÃ“]
                     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);

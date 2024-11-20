@@ -15,6 +15,7 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
+    audioCom = owner->GetGameObject()->GetComponent<AudioCom>();
     characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
 
     // 乱数エンジンのシードを設定
@@ -54,12 +55,8 @@ void Boss_BaseState::RandamLongRangeAttack()
 {
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
-    {
-        //ジャンプ攻撃アニメーションが無いため消しておく
-        //TODO アニメーションが修正次第ここも直す
-
-        availableNumbers = { 1,2,3,5 };
-        //availableNumbers = { 1,2,3,4,5 };
+    {   
+        availableNumbers = { 1,2,3,4,5 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成
@@ -630,6 +627,10 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     AnimtionEventControl("EFFECTTIME", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
 
     //飛ぶ
+    if(animationCom.lock()->IsEventCalling("JUMPINIT"))
+    { 
+        audioCom.lock()->Play("JUMP_ATTACK_START", false, 5.0f); 
+    }
     if (animationCom.lock()->IsEventCalling("JUMPTIME"))
     {
         moveCom.lock()->AddForce({ owner->GetGameObject()->transform_->GetWorldPosition().x, 2.5f, owner->GetGameObject()->transform_->GetWorldPosition().z });
@@ -671,7 +672,8 @@ void Boss_JumpAttackStart::Exit()
 #pragma region ジャンプ攻撃終わり
 void Boss_JumpAttackEnd::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_swing_attack_end"), false, false, 0.1f);
+    audioCom.lock()->Play("JUMP_ATTACK_END", false, 10.0f);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_jump_attack_end"), false, false, 0.1f);
 
     //カメラシェイク
     GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.02f, 0.5f);
@@ -690,10 +692,15 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     }
 
     //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
+    if (moveCom.lock()->JustLanded())
     {
         //カメラシェイク
-        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.7f);
+        audioCom.lock()->Play("JUMP_ATTACK_GROUND", false, 10.0f);
+        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.5f);
+    }
+
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
