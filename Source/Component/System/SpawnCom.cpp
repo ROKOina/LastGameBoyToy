@@ -234,6 +234,8 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     const auto& renderer = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     renderer->LoadModel("Data/Model/Enemy/Enemy.mdl");
+    renderer->SetOutlineColor({ 1,0,0 });
+    renderer->SetOutlineIntensity(10.0f);
     std::shared_ptr<MovementCom>m = obj->AddComponent<MovementCom>();
     m->SetIsRaycast(false);
     m->SetGravity(0.0f);
@@ -245,7 +247,7 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     obj->AddComponent<NoobEnemyCom>();
     obj->AddComponent<CharaStatusCom>();
     obj->AddComponent<FrustumCom>();
-    std::shared_ptr<GPUParticle>gp = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyaura.gpuparticle", 1000);
+    std::shared_ptr<GPUParticle>gp = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyaura.gpuparticle", 500);
     gp->Play();
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetMyTag(COLLIDER_TAG::Enemy);
