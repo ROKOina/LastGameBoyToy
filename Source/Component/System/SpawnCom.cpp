@@ -253,7 +253,7 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetMyTag(COLLIDER_TAG::Enemy);
     collider->SetJudgeTag(COLLIDER_TAG::Player);
-    collider->SetEnabled(false);
+    collider->SetEnabled(true);
     collider->SetRadius(1.0f);
     const auto& pushback = obj->AddComponent<PushBackCom>();
     pushback->SetRadius(0.5f);

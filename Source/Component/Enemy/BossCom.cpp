@@ -31,7 +31,7 @@ void BossCom::Start()
     state.AddState(BossState::EVENT_DEATH, std::make_shared<Boss_EventDeath>(this));
 
     //初期ステート登録
-    state.ChangeState(BossState::EVENT_WALK);
+    state.ChangeState(BossState::IDLE);
 }
 
 //更新処理
