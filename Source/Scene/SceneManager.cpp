@@ -116,6 +116,7 @@ void SceneManager::ChangeSceneDelay(Scene* scene, float time)
 //imgui
 void SceneManager::ImGui()
 {
+#ifdef _DEBUG
     const Scene* scene = GetScene();
     if (scene != nullptr)
     {
@@ -158,6 +159,7 @@ void SceneManager::ImGui()
         }
         ImGui::End();
     }
+#endif
 }
 
 DirectX::XMFLOAT3 SceneManager::InputVec(std::shared_ptr<GameObject> obj) const

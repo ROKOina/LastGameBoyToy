@@ -102,6 +102,9 @@ public:
 
     virtual void SpaceSkill() {}
 
+    //攻撃ウルト取得
+    void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }
+
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS>& GetAttackStateMachine() { return attackStateMachine; }
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>& GetMoveStateMachine() { return moveStateMachine; }
     GameObject* GetCameraObj() { return cameraObj; }
@@ -158,6 +161,9 @@ public:
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
     float* GetSpaceSkillCoolTimer() { return &Spacecool.timer; }
+    void SetLeftClickSkillCoolTime(float time) { LeftClickcool.time = time; }
+    float GetLeftClickSkillCoolTime() { return LeftClickcool.time; }
+    float* GetLeftClickSkillCoolTimer() { return &LeftClickcool.timer; }
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
     float GetUltGaugeMax() { return ultGaugeMax; }
@@ -189,6 +195,9 @@ private:
     float InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed);
     float Lerp(float start, float end, float t);
 
+    //UltUpdate
+    void UltUpdate(float elapsedTime);
+
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
@@ -215,6 +224,7 @@ protected:
     SkillCoolTime Rcool;
     SkillCoolTime LScool;
     SkillCoolTime Spacecool;
+    SkillCoolTime LeftClickcool;
 
     CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
 
@@ -252,6 +262,7 @@ private:
     //アタックULT
     int attackUltCountMax = 5;  //ウルトを打てる数
     int attackUltCounter;
+    std::weak_ptr<GameObject> attackUltRayObj;  //ウルトレイ
 
     AbnormalCondition abnormalcondition;
 

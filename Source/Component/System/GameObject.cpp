@@ -280,10 +280,15 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     RenderForward();
     InstanceRenderForward();
 
-    // デバッグレンダー
     auto& graphics = Graphics::Instance();
+#ifdef _DEBUG
+    // デバッグレンダー
     graphics.GetDebugRenderer()->Render(graphics.GetDeviceContext(), view, projection);
     graphics.GetLineRenderer()->Render(graphics.GetDeviceContext(), view, projection);
+#else
+
+#endif // _DEBUG
+
 
     // 深度マップを使用するシェーダー描画
     RenderUseDepth();
@@ -304,6 +309,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     // スプライト描画
     SpriteRender(view, projection);
 
+#ifdef _DEBUG
     // デバッグ情報の描画
     if (graphics.IsDebugGUI())
     {
@@ -338,6 +344,11 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
 
     // ギズモの描画
     DrawGuizmo(view, projection);
+
+#else
+
+#endif // _DEBUG
+
 }
 
 //ゲームオブジェクトを探す

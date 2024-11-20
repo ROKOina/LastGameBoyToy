@@ -1,10 +1,13 @@
 #include "CharacterCom.h"
 #include "CharaStatusCom.h"
 #include "Component/Camera/CameraCom.h"
+#include "Component/Collsion/ColliderCom.h"
 #include "Component/System/TransformCom.h"
+#include "Component/Particle/GPUParticle.h"
 #include "Input\Input.h"
 #include "Math/Mathf.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "RemoveTimerCom.h"
 #include "Setting/Setting.h"
 
 void CharacterCom::Update(float elapsedTime)
@@ -31,8 +34,6 @@ void CharacterCom::Update(float elapsedTime)
             moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::DEATH);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
 
-#ifdef _DEBUG
-
     int inputNum = GetButtonDown();
 
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
@@ -44,6 +45,7 @@ void CharacterCom::Update(float elapsedTime)
             MainAttackDown();
         else
         {
+            //ウルト中
             if (Rcool.timer >= Rcool.time)
             {
                 Rcool.timer = 0;
@@ -61,8 +63,10 @@ void CharacterCom::Update(float elapsedTime)
             MainAttackPushing();
     }
 
-    if (CharacterInput::SubAttackButton & GetButtonDown())
+    if (CharacterInput::SubAttackButton & GetButtonDown()
+        && LeftClickcool.timer >= LeftClickcool.time)
     {
+        LeftClickcool.timer = 0;
         SubAttackDown();
     }
     else if (CharacterInput::SubAttackButton & GetButton())
@@ -70,13 +74,11 @@ void CharacterCom::Update(float elapsedTime)
         SubAttackPushing();
     }
 
-#else
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
         //MainAttack();
     }
 
-#endif // _DEBUG
 
     if (CharacterInput::MainSkillButton_Q & GetButtonDown()
         && Qcool.timer >= Qcool.time)
@@ -166,12 +168,7 @@ void CharacterCom::Update(float elapsedTime)
     }
 
     //ウルト更新
-    ultGauge += elapsedTime;
-    if (ultGauge >= ultGaugeMax)
-    {
-        isMaxUlt = true;
-        ultGauge = ultGaugeMax;
-    }
+    UltUpdate(elapsedTime);
 
     //クールダウン更新
     CoolUpdate(elapsedTime);
@@ -265,6 +262,9 @@ void CharacterCom::OnGUI()
         ImGui::Separator();
         ImGui::DragFloat("SpaceTime", &Spacecool.time);
         ImGui::DragFloat("SpaceTimer", &Spacecool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("LeftClickTime", &LeftClickcool.time);
+        ImGui::DragFloat("LeftClickTimer", &LeftClickcool.timer);
         ImGui::Separator();
         ImGui::DragFloat("RTime", &Rcool.time);
         ImGui::DragFloat("RTimer", &Rcool.timer);
@@ -430,11 +430,55 @@ void CharacterCom::CoolUpdate(float elapsedTime)
     Rcool.timer += elapsedTime;
     LScool.timer += elapsedTime;
     Spacecool.timer += elapsedTime;
+    LeftClickcool.timer += elapsedTime;
 }
 
 float CharacterCom::Lerp(float start, float end, float t)
 {
     return start + t * (end - start);
+}
+
+void CharacterCom::UltUpdate(float elapsedTime)
+{
+    //ゲージ更新
+    ultGauge += elapsedTime;
+    if (ultGauge >= ultGaugeMax)
+    {
+        isMaxUlt = true;
+        ultGauge = ultGaugeMax;
+    }
+
+    //ウルトエフェクト
+    if (attackUltRayObj.lock())
+    {
+        auto& rayCol = attackUltRayObj.lock()->GetComponent<RayColliderCom>();
+        if (rayCol)
+        {
+            for (auto& obj : rayCol->OnHitGameObject())
+            {
+                {
+                    std::shared_ptr<GameObject> attackUltEffBomb = GameObjectManager::Instance().Create();
+                    attackUltEffBomb->SetName("attackUltEffBomb");
+                    attackUltEffBomb->transform_->SetWorldPosition(obj.hitPos);
+                    std::shared_ptr<GPUParticle> eff = attackUltEffBomb->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircle.gpuparticle", 300);
+                    eff->Play();
+                    attackUltEffBomb->AddComponent<RemoveTimerCom>(3);
+                    {
+                        std::shared_ptr<GameObject> attackUltEffBomb02 = attackUltEffBomb->AddChildObject();
+                        attackUltEffBomb02->SetName("attackUltEffBomb02");
+                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb02->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircleLight.gpuparticle", 100);
+                        eff->Play();
+                    }
+                    {
+                        std::shared_ptr<GameObject> attackUltEffBomb03 = attackUltEffBomb->AddChildObject();
+                        attackUltEffBomb03->SetName("attackUltEffBomb03");
+                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb03->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombFire.gpuparticle", 50);
+                        eff->Play();
+                    }
+                }
+            }
+        }
+    }
 }
 
 float CharacterCom::InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed)
