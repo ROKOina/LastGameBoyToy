@@ -104,7 +104,7 @@ void RendererCom::Update(float elapsedTime)
         BoundsMax.y = (std::max)(BoundsMax.y, worldBoundsMax.y);
         BoundsMax.z = (std::max)(BoundsMax.z, worldBoundsMax.z);
 
-        if (std::string(GetGameObject()->GetName()) == "tes")
+        if (std::string(GetGameObject()->GetName()) == "Reactar0")
         {
             auto s = GetGameObject()->transform_->GetScale();
             DirectX::XMFLOAT3 a = (mesh.boundsMax - mesh.boundsMin) * s / 2;
