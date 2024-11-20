@@ -737,10 +737,18 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
     moveCom->AddForce({ v.x,v.y,v.z });
 
     //エフェクト出すならここですかね
+
+     //左右の煙
+    AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
+    AnimtionEventControl("FOOTSMOKE", "Boss_L_ancle", "leftfootsmokeeffect", EnableCPUParticle);
 }
 
 void Boss_EventWalk::Exit()
 {
+    //エフェクトを切る
+    GameObjectManager::Instance().Find("rightfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+
     owner->GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animationCom.lock()->FindAnimation("Boss_walk_front")].animationspeed = 1.0f;
 }
 
@@ -752,6 +760,7 @@ void Boss_EventPunch::Enter()
 void Boss_EventPunch::Execute(const float& elapsedTime)
 {
     //ここでエフェクト出す
+    AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle);
 }
 
 void Boss_EventDeath::Enter()
