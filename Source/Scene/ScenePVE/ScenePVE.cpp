@@ -154,9 +154,9 @@ void ScenePVE::Initialize()
         boss->SetName("BOSS");
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
-        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
-        boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
-        t = boss->transform_;
+        //boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        //boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
+        //t = boss->transform_;
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();

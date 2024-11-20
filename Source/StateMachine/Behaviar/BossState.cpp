@@ -716,3 +716,44 @@ void Boss_DeathState::Execute(const float& elapsedTime)
 {
 }
 #pragma endregion
+
+void Boss_EventWalk::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_walk_front"), true, false, 0.1f);
+    owner->GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animationCom.lock()->FindAnimation("Boss_walk_front")].animationspeed = 2.0f;
+}
+
+void Boss_EventWalk::Execute(const float& elapsedTime)
+{
+    auto& moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
+    DirectX::XMFLOAT3 v = owner->GetGameObject()->transform_->GetWorldFront() * 0.1f;
+    moveCom->AddForce({ v.x,v.y,v.z });
+
+
+    //エフェクト出すならここですかね
+
+}
+
+void Boss_EventWalk::Exit()
+{
+    owner->GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animationCom.lock()->FindAnimation("Boss_walk_front")].animationspeed = 1.0f;
+}
+
+void Boss_EventPunch::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1"), false, false, 0.1f);
+}
+
+void Boss_EventPunch::Execute(const float& elapsedTime)
+{
+    //ここでエフェクト出す
+}
+
+void Boss_EventDeath::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_dead"), false, false, 0.1f);
+}
+
+void Boss_EventDeath::Execute(const float& elapsedTime)
+{
+}

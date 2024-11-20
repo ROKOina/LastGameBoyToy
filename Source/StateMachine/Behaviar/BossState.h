@@ -295,3 +295,39 @@ public:
     void ImGui() override {};
     virtual const char* GetName() const override { return "Death"; }
 };
+
+class Boss_EventWalk : public Boss_BaseState
+{
+public:
+    Boss_EventWalk(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override;
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "EventWalk"; }
+};
+
+class Boss_EventPunch : public Boss_BaseState
+{
+public:
+    Boss_EventPunch(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "EventPunch"; }
+};
+
+class Boss_EventDeath : public Boss_BaseState
+{
+public:
+    Boss_EventDeath(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "EventDeath"; }
+};

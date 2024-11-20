@@ -38,6 +38,8 @@ private:
     void DirectionCEnd(float elapsedTime);
 
 private:
+    GameObj eventBoss;
+
     std::shared_ptr<TransformCom>t;
     std::weak_ptr<AnimationCom> animationCom;
 
@@ -45,6 +47,5 @@ private:
 
     float deleyTimer = 0;
     float deleyTime = 2.0f;
-    bool flag = false;
-   
+    bool flag = false; 
 };
