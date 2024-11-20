@@ -56,6 +56,7 @@
 #include <Component\UI\UiFlag.h>
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Light\LightCom.h"
+#include "Component\Character\Prop\SetNodeWorldPosCom.h"
 
 #include "Setting/Setting.h"
 
@@ -196,6 +197,8 @@ void SceneGame::Initialize()
                 chargeEff->SetName("chargeEff");
                 std::shared_ptr<GPUParticle> eff = chargeEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playercharge.gpuparticle", 300);
                 eff->SetLoop(false);
+                //銃口にくっ付ける
+                chargeEff->AddComponent<SetNodeWorldPosCom>();
             }
             //攻撃ためマックス
             {
@@ -204,6 +207,18 @@ void SceneGame::Initialize()
                 chargeMaxEff->SetName("chargeMaxEff");
                 std::shared_ptr<GPUParticle> eff = chargeMaxEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerchargeFull.gpuparticle", 300);
                 eff->SetLoop(false);
+                //銃口にくっ付ける
+                chargeMaxEff->AddComponent<SetNodeWorldPosCom>();
+
+            }
+            //ウルトマズルフラッシュ
+            {
+                std::shared_ptr<GameObject> attackUltMuzzleEff = armChild->AddChildObject();
+                attackUltMuzzleEff->transform_->SetLocalPosition({-3.1f,12.94f,1.69f});
+                attackUltMuzzleEff->SetName("attackUltMuzzleEff");
+                std::shared_ptr<GPUParticle> eff = attackUltMuzzleEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltMuzzleF.gpuparticle", 20);
+                eff->SetLoop(false);
+
             }
         }
     }
