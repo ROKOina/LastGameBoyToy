@@ -4,6 +4,7 @@
 #include"Component/Character/CharaStatusCom.h"
 #include "Graphics/Graphics.h"
 #include "Component/Renderer/RendererCom.h"
+#include "Component\Particle\GPUParticle.h"
 #include <cmath>
 
 //コンストラクタ
@@ -74,6 +75,9 @@ void NoobEnemyCom::StateUpdate(float elapsedTime)
     case State::Purstuit:
         UpdatePursuit(elapsedTime);
         break;
+    case State::Death:
+        UpdateDeath(elapsedTime);
+        break;
     case State::Explosion:
         UpdateExplosion(elapsedTime);
         break;
@@ -100,6 +104,14 @@ void NoobEnemyCom::TransitionExplosion()
 {
     state = State::Explosion;
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_dead"), false);
+    GetGameObject()->GetChildFind("accumulateexplosion")->GetComponent<GPUParticle>()->SetLoop(false);
+}
+
+//死亡ステート
+void NoobEnemyCom::TransiotnDeath()
+{
+    state = State::Death;
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_dead"), false);
 }
 
 //待機ステート更新処理
@@ -112,6 +124,12 @@ void NoobEnemyCom::UpdateIdle(float elapsedTime)
         TransitionPursuit();
         firstIdleTime = 0.0f;
     }
+
+    //死亡フラグが立てば
+    if (GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
+    {
+        TransiotnDeath();
+    }
 }
 
 //追跡ステート更新処理
@@ -120,30 +138,60 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
     auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
     DirectX::XMFLOAT3 v = GetEnemyToPlayer() * speed;
 
-    //// y成分が0.0f以下にならないようにチェック
-    //if (v.y < 0.0f) {
-    //    v.y = 0.1f;
-    //}
-
     moveCom->AddForce({ v.x, v.y, v.z });
 
     // tのy成分も0.0f以下にならないように設定
     DirectX::XMFLOAT3 t = { GetEnemyToPlayer().x, 0.0f, GetEnemyToPlayer().z };
     GetGameObject()->transform_->Turn(t, 0.1f);
 
+    //爆発の溜めパーティクル再生
+    if (8.5f > GetPlayerDist())
+    {
+        GetGameObject()->GetChildFind("accumulateexplosion")->GetComponent<GPUParticle>()->SetLoop(true);
+    }
+
+    //爆発ステートに遷移
     if (explosionDist > GetPlayerDist())
     {
         TransitionExplosion();
+    }
+
+    //死亡フラグが立てば
+    if (GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
+    {
+        TransiotnDeath();
     }
 }
 
 //爆発ステート更新処理
 void NoobEnemyCom::UpdateExplosion(float elapsedTime)
 {
-    explosionGrace -= elapsedTime;
     if (!animationCom.lock()->IsPlayAnimation())
     {
-        //一定時間その場に止まってから爆発
-        GameObjectManager::Instance().Remove(this->GetGameObject());
+        time += elapsedTime;
+        GetGameObject()->GetComponent<RendererCom>()->SetDissolveThreshold(time);
+
+        if (time > 1.0f)
+        {
+            //一定時間その場に止まってから爆発
+            GameObjectManager::Instance().Remove(this->GetGameObject());
+        }
+    }
+}
+
+//死亡ステート
+void NoobEnemyCom::UpdateDeath(float elapsedTime)
+{
+    //アニメーションが終われば再生
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        time += elapsedTime;
+        GetGameObject()->GetComponent<RendererCom>()->SetDissolveThreshold(time);
+
+        if (time > 1.0f)
+        {
+            //一定時間その場に止まってから爆発
+            GameObjectManager::Instance().Remove(this->GetGameObject());
+        }
     }
 }

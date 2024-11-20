@@ -244,8 +244,9 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     obj->AddComponent<AnimationCom>();
     std::shared_ptr<AimIKCom>aik = obj->AddComponent<AimIKCom>(nullptr, "head");
     aik->SetOffsetY(4.3f);
-    obj->AddComponent<NoobEnemyCom>();
-    obj->AddComponent<CharaStatusCom>();
+    std::shared_ptr<CharaStatusCom>charastatus = obj->AddComponent<CharaStatusCom>();
+    charastatus->SetHitPoint(5);
+    charastatus->SetInvincibleTime(0.2f);
     obj->AddComponent<FrustumCom>();
     std::shared_ptr<GPUParticle>gp = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyaura.gpuparticle", 500);
     gp->Play();
@@ -254,6 +255,14 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     const auto& pushback = obj->AddComponent<PushBackCom>();
     pushback->SetRadius(0.5f);
     pushback->SetWeight(600.0f);
+
+    std::shared_ptr<GameObject> accumulateparticle = obj->AddChildObject();
+    accumulateparticle->SetName("accumulateexplosion");
+    accumulateparticle->transform_->SetWorldPosition({ obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y + 2.0f,obj->transform_->GetWorldPosition().z });
+    std::shared_ptr<GPUParticle>acp = accumulateparticle->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/noobenemyaccumulate.gpuparticle", 500);
+    acp->SetLoop(false);
+
+    obj->AddComponent<NoobEnemyCom>();
 }
 
 //É~ÉTÉCÉãê∂ê¨ä÷êî

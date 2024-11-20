@@ -52,6 +52,8 @@ private:
     void TransitionPursuit();
     //爆発ステート
     void TransitionExplosion();
+    //死亡ステート
+    void TransiotnDeath();
 
     //更新
 
@@ -61,6 +63,8 @@ private:
     void UpdatePursuit(float elpasedTime);
     //爆発ステート更新処理
     void UpdateExplosion(float elapsedTime);
+    //死亡ステート
+    void UpdateDeath(float elapsedTime);
 
 private:
 
@@ -69,6 +73,7 @@ private:
     {
         Idle,
         Purstuit,
+        Death,
         Explosion
     };
 
@@ -83,15 +88,11 @@ private:
     //移動スピード
     float speed = 0.4f;
     //爆発するまでの距離
-    float explosionDist = 2.0f;
-    //爆発範囲
-    float explosionRange = 1.5f;
-    //爆発で与えるダメージ
-    float explosionDamage = 10.0f;
-    //爆発猶予
-    float explosionGrace = 1.0f;
+    float explosionDist = 3.5f;
     //最初の待機時間
     float firstIdleTime = 0.0f;
     //待機時間を進める時間
     float firstIdleTimer = 0.0f;
+    //削除時間
+    float time = {};
 };

@@ -90,6 +90,7 @@ public:
     void SetOutlineColor(const DirectX::XMFLOAT3& color) { p.outlineColor = color; }
     void SetOutlineIntensity(float intensity) { p.outlineintensity = intensity; }
     void SetDissolveThreshold(float threshold) { p.dissolveThreshold = threshold; }
+    float GetDissolveThreshold() const { return p.dissolveThreshold; }
     void SetDissolveEdgeColor(const DirectX::XMFLOAT3& color) { p.dissolveEdgeColor = color; }
     void SetAlpha(float a) { p.alpha = a; }
 
