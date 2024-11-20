@@ -12,6 +12,7 @@
 
 PVEDirection::PVEDirection()
 {
+   
 }
 
 PVEDirection::~PVEDirection()
