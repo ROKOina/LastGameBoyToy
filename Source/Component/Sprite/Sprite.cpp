@@ -19,7 +19,7 @@
 #include "Component/System/TransformCom.h"
 #include <Input/Input.h>
 
-CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 2)
+CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 3)
 
 // シリアライズ
 namespace DirectX
@@ -117,6 +117,11 @@ void Sprite::SaveParameterCPU::serialize(Archive& archive, int version)
             CEREAL_NVP(texSize)
         );
     }
+    if (version >= 3) {
+        archive(
+            CEREAL_NVP(onshot)
+        );
+    }
 }
 
 // コンストラクタ
@@ -211,10 +216,6 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
         LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &collisionTexture2ddesc_);
     }
 
-    //Dissolveデータ読み込み
-    //LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    //LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    //
     //コリジョンを使うか決める
     ontriiger = collsion;
 }
@@ -279,26 +280,40 @@ void Sprite::Update(float elapsedTime)
         // イージング時間の範囲チェック
         if (easingtime > 1.0f)
         {
+            if (spc.onshot)
+            {
+                spc.position = spc.easingposition;
+                spc.color = spc.easingcolor;
+                spc.angle = spc.easingangle;
+                spc.scale = spc.easingscale;
+            }
             // ループまたは戻り値が有効な場合
             if (spc.loop || spc.comback)
             {
                 loopon = !loopon;
                 easingtime = 1.0f;
             }
-            else
+            else if (!spc.onshot)
             {
                 StopEasing(); // イージングを停止
             }
         }
         else if (easingtime < 0.0f)
         {
+            if (spc.onshot)
+            {
+                spc.position = spc.easingposition;
+                spc.color = spc.easingcolor;
+                spc.angle = spc.easingangle;
+                spc.scale = spc.easingscale;
+            }
             // ループが有効な場合
             if (spc.loop)
             {
                 loopon = !loopon;
                 easingtime = 0.0f;
             }
-            else
+            else if (!spc.onshot)
             {
                 StopEasing(); // イージングを停止
             }
@@ -494,6 +509,16 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     {
         EasingSprite();
     }
+}
+
+//イージングプレイ関数
+void Sprite::EasingPlay()
+{
+    savepos = spc.position;
+    savecolor = spc.color;
+    savescale = spc.scale;
+    saveangle = spc.angle;
+    play = true;
 }
 
 //当たり判定用短形
@@ -853,13 +878,14 @@ void Sprite::OnGUI()
         DirectX::XMFLOAT2 mouse = { (float)(Input::Instance().GetMouse().GetPositionX()),(float)(Input::Instance().GetMouse().GetPositionY()) };
         ImGui::DragFloat2((char*)u8"マウス位置", &mouse.x);
         ImGui::DragFloat2((char*)u8"当たり判定中心位置", &collisionPivot.x);
-        spc.easingposition.y;
         ImGui::TreePop();
     }
 
     ImGui::Checkbox((char*)u8"ループ再生", &spc.loop);
     ImGui::SameLine();
     ImGui::Checkbox((char*)u8"ワンカット再生", &spc.comback);
+    ImGui::SameLine();
+    ImGui::Checkbox((char*)u8"戻って来ない", &spc.onshot);
     if (ontriiger)
     {
         ImGui::SameLine();

@@ -204,6 +204,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
         {
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
+                canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
                     audioObj->FeedStart("Title", 0.0f, elapsedTime);
