@@ -146,6 +146,7 @@ void SceneGame::Initialize()
             //ダメージ処理用
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+            hitDamage->SetValue(100);
 
             //キャラクターに登録
             obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
@@ -190,7 +191,7 @@ void SceneGame::Initialize()
                 std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
                 eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
                 eSkillEff->transform_->SetLocalPosition({-0.35f,9.84f,-0.58f});
-                eff->Play();
+                eff->SetLoop(false);
             }
             //攻撃ため
             {

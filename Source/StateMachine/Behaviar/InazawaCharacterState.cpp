@@ -55,8 +55,9 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         armAnim->SetAnimationSeconds(0.3f);
 
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, 1);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, maxDamage * attackPower);
 
         auto& charge = arm->GetChildFind("chargeEff");
         charge->GetComponent<GPUParticle>()->SetLoop(false);
@@ -95,6 +96,10 @@ void InazawaCharacter_ESkillState::Enter()
     arrowCount = 8;
     skillTimer = 3.0f;
     intervalTimer = 0.0f;
+
+    auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& eff = arm->GetChildFind("eSkillEff");
+    eff->GetComponent<GPUParticle>()->SetLoop(true);
 }
 
 void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
@@ -107,11 +112,6 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 
-    //MoveInputVec(owner->GetGameObject());
-
-    //if (moveCom.lock()->OnGround())
-    //    JumpInput(owner->GetGameObject());
-
     intervalTimer += elapsedTime;
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
@@ -122,11 +122,18 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
         armAnim->SetAnimationSeconds(0.3f);
 
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, 1, 1);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, 1, damage);
         //Fire(owner->GetGameObject(), arrowSpeed);
         arrowCount--;
         intervalTimer = 0;
     }
+}
+
+void InazawaCharacter_ESkillState::Exit()
+{
+    auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& eff = arm->GetChildFind("eSkillEff");
+    eff->GetComponent<GPUParticle>()->SetLoop(false);
 }
 
 void InazawaCharacter_ESkillState::ImGui()
