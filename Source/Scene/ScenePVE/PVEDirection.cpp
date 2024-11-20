@@ -146,11 +146,12 @@ void PVEDirection::DirectionFOne(float elapsedTime)
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
         animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_walk_front"), true, false, 0.1f);
+        GameObjectManager::Instance().Find("Direction")->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animationCom.lock()->FindAnimation("Boss_walk_front")].animationspeed = 2.0f;
         flag = true;
     }
 
     auto& moveCom = GameObjectManager::Instance().Find("Direction")->GetComponent<MovementCom>();
-    DirectX::XMFLOAT3 v = GameObjectManager::Instance().Find("Direction")->transform_->GetWorldFront() * 0.27f;
+    DirectX::XMFLOAT3 v = GameObjectManager::Instance().Find("Direction")->transform_->GetWorldFront() * 0.1f;
     moveCom->AddForce({ v.x,v.y,v.z });
 
     auto& pointCom = GameObjectManager::Instance().Find("Point")->GetComponent<MovementCom>();
@@ -164,6 +165,8 @@ void PVEDirection::DirectionFOne(float elapsedTime)
     {
         directionNumber += 1;
         flag = false;
+        pointCom->AddForce({ 0.0f,0.0f,0.0f });
+        GameObjectManager::Instance().Find("Point")->transform_->SetWorldPosition(x);
     }
 
 }
@@ -176,6 +179,7 @@ void PVEDirection::DirectionFTwo(float elapsedTime)
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/two.eventcamera");
         animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1"), false, false, 0.1f);
         flag = true;
+        
     }
     DirectX::XMFLOAT3 s = GameObjectManager::Instance().Find("Point")->transform_->GetWorldPosition();
     DirectX::XMFLOAT3 e = GameObjectManager::Instance().Find("Seconds")->transform_->GetWorldPosition();
@@ -209,6 +213,7 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
         //ゲームオブジェクト本体を復活
         GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
         GameObjectManager::Instance().Find("player")->SetEnabled(true);
+        
 
         //見世物はいったん使わないから消す
         GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
