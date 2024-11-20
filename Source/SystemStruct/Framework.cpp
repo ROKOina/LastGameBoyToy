@@ -32,10 +32,7 @@ Framework::Framework(HWND hWnd)
     //フィジックス初期化
     PhysXLib::Instance().Initialize();
 
-    //SceneManager::Instance().ChangeScene(new SceneGame);
     SceneManager::Instance().ChangeScene(new SceneTitle);
-    //SceneManager::Instance().ChangeScene(new SceneResult);
-    //SceneManager::Instance().ChangeScene(new SceneUI);
 
     // オーディオ初期化
     Audio::Initialize();
