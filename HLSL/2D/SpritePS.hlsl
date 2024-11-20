@@ -16,9 +16,9 @@ float4 main(VS_OUT pin) : SV_TARGET
     color.a *= pin.color.a;
     color.rgb *= pin.color.rgb;
 
-    //アルファが低い場合は破棄
-    if (color.a < EPSILON)
-        discard;
+     //アルファが低い場合は破棄
+     if (color.a < EPSILON)
+         discard;
 
     //最終的な色にガンマ補正を適用 (逆ガンマの 1 / 2.2 = 約 0.4545)
     color.rgb = pow(color.rgb, 1.0 / GAMMA);
