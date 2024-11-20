@@ -252,6 +252,9 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     gp->Play();
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetEnabled(false);
+    collider->SetRadius(1.0f);
     const auto& pushback = obj->AddComponent<PushBackCom>();
     pushback->SetRadius(0.5f);
     pushback->SetWeight(600.0f);
@@ -262,6 +265,14 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     std::shared_ptr<GPUParticle>acp = accumulateparticle->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/noobenemyaccumulate.gpuparticle", 500);
     acp->SetLoop(false);
 
+    //”š”­
+    std::shared_ptr<GameObject>bomber = obj->AddChildObject();
+    bomber->SetName("bomber");
+    bomber->transform_->SetWorldPosition({ obj->transform_->GetWorldPosition().x,obj->transform_->GetWorldPosition().y + 2.0f,obj->transform_->GetWorldPosition().z });
+    std::shared_ptr<GPUParticle>Gbomber = bomber->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomber.gpuparticle", 500);
+    Gbomber->SetLoop(false);
+    std::shared_ptr<CPUParticle>Cbomber = bomber->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/bomber.cpuparticle", 500);
+    Cbomber->SetActive(false);
     obj->AddComponent<NoobEnemyCom>();
 }
 

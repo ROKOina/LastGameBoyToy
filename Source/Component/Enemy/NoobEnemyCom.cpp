@@ -5,6 +5,8 @@
 #include "Graphics/Graphics.h"
 #include "Component/Renderer/RendererCom.h"
 #include "Component\Particle\GPUParticle.h"
+#include "Component\Particle\CPUParticle.h"
+#include "Component\Collsion\ColliderCom.h"
 #include <cmath>
 
 //コンストラクタ
@@ -33,6 +35,9 @@ void NoobEnemyCom::Start()
 void NoobEnemyCom::Update(float elapsedTime)
 {
     StateUpdate(elapsedTime);
+
+    //当たり判定
+    HitPlayer();
 }
 
 //エネミーからプレイヤーへのベクトル
@@ -84,6 +89,21 @@ void NoobEnemyCom::StateUpdate(float elapsedTime)
     }
 }
 
+//当たり判定処理
+void NoobEnemyCom::HitPlayer()
+{
+    for (const auto& hitobject : GetGameObject()->GetComponent<SphereColliderCom>()->OnHitGameObject())
+    {
+        if (const auto& hitObj = hitobject.gameObject.lock())
+        {
+            if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
+            {
+                status->AddDamagePoint(-3);
+            }
+        }
+    }
+}
+
 //待機ステート
 void NoobEnemyCom::TransitionIdleState()
 {
@@ -105,6 +125,14 @@ void NoobEnemyCom::TransitionExplosion()
     state = State::Explosion;
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_dead"), false);
     GetGameObject()->GetChildFind("accumulateexplosion")->GetComponent<GPUParticle>()->SetLoop(false);
+
+    //コライダーON
+    GetGameObject()->GetComponent<SphereColliderCom>()->SetEnabled(true);
+
+    //エフェクト再生
+    const auto& bomber = GetGameObject()->GetChildFind("bomber");
+    bomber->GetComponent<GPUParticle>()->SetLoop(true);
+    bomber->GetComponent<CPUParticle>()->SetActive(true);
 }
 
 //死亡ステート
@@ -145,9 +173,14 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
     GetGameObject()->transform_->Turn(t, 0.1f);
 
     //爆発の溜めパーティクル再生
+    const auto& acumu = GetGameObject()->GetChildFind("accumulateexplosion");
     if (8.5f > GetPlayerDist())
     {
-        GetGameObject()->GetChildFind("accumulateexplosion")->GetComponent<GPUParticle>()->SetLoop(true);
+        acumu->GetComponent<GPUParticle>()->SetLoop(true);
+    }
+    else
+    {
+        acumu->GetComponent<GPUParticle>()->SetLoop(false);
     }
 
     //爆発ステートに遷移
@@ -166,10 +199,16 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
 //爆発ステート更新処理
 void NoobEnemyCom::UpdateExplosion(float elapsedTime)
 {
+    //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {
         time += elapsedTime;
         GetGameObject()->GetComponent<RendererCom>()->SetDissolveThreshold(time);
+
+        //エフェクト停止
+        const auto& bomber = GetGameObject()->GetChildFind("bomber");
+        bomber->GetComponent<GPUParticle>()->SetLoop(false);
+        bomber->GetComponent<CPUParticle>()->SetActive(false);
 
         if (time > 1.0f)
         {

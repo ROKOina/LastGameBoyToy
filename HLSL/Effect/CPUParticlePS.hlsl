@@ -20,28 +20,28 @@ float4 main(PS_IN input) : SV_TARGET
         discard;
 
     // ソフトパーティクル処理
-    float particleDepth = input.Position.z / input.Position.w; // パーティクルの深度
-    float sceneDepth = depthmap.Sample(sampler_states[LINEAR], input.Size).r; // シーンの深度
+    //float particleDepth = input.Position.z / input.Position.w; // パーティクルの深度
+    //float sceneDepth = depthmap.Sample(sampler_states[LINEAR], input.Size).r; // シーンの深度
 
     // パーティクルとシーンの深度差を計算
-    float depthDifference = sceneDepth - particleDepth;
+    //float depthDifference = sceneDepth - particleDepth;
 
     // 深度差が範囲内かチェックし、範囲内の場合のみフェード処理を行う
-    if (depthDifference > 0.1 && depthDifference < 0.5)
-    {
-        // フェード範囲の調整（0.1～0.5の範囲でフェードを行う）
-        float fadeFactor = saturate((depthDifference - 0.1) / (0.5 - 0.1));
-        color.a *= fadeFactor;
-    }
-    else if (depthDifference <= 0.1)
-    {
-        // パーティクルがシーンよりも手前にある場合、アルファを減らす
-        color.a *= 0.0;
-    }
+    //if (depthDifference > 0.1 && depthDifference < 0.5)
+    //{
+    //    // フェード範囲の調整（0.1～0.5の範囲でフェードを行う）
+    //    float fadeFactor = saturate((depthDifference - 0.1) / (0.5 - 0.1));
+    //    color.a *= fadeFactor;
+    //}
+    //else if (depthDifference <= 0.1)
+    //{
+    //    // パーティクルがシーンよりも手前にある場合、アルファを減らす
+    //    color.a *= 0.0;
+    //}
 
-    // アルファが再度低い場合、破棄
-    if (color.a < EPSILON)
-        discard;
+    //// アルファが再度低い場合、破棄
+    //if (color.a < EPSILON)
+    //    discard;
 
     return color;
 }

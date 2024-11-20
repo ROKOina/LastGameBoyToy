@@ -41,6 +41,9 @@ private:
     //ステートの統括
     void StateUpdate(float elapsedTime);
 
+    //当たり判定処理
+    void HitPlayer();
+
 private:
     //ステート関連
 
