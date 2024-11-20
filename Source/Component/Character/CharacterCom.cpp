@@ -388,7 +388,7 @@ void CharacterCom::Vinetto(float elapsedTime)
         // HPが減少した場合のみビネット効果を発動
         if (previousHP - currentHP > 0)
         {
-            posteffect->SetParameter(0.9f, 100.0f, parameters); // 強いビネット効果を設定
+            posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
         }
         else
         {

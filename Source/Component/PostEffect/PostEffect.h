@@ -76,7 +76,7 @@ private:
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
     {
-        DirectX::XMFLOAT4 vignettecolor = { 1.000f, 0.197f, 0.197f, 1.000f };
+        DirectX::XMFLOAT4 vignettecolor = { 0.991f, 0.073f, 0.073f, 1.000f };
         float colorize[3] = { 1, 1, 1 };
         float brightness = 0.0f;
         float contrast = 0.10f;

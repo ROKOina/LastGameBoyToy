@@ -20,10 +20,6 @@ RendererCom::RendererCom(SHADER_ID_MODEL id, BLENDSTATE blendmode, DEPTHSTATE de
 // 開始処理
 void RendererCom::Start()
 {
-    if (OnFlag)
-    {
-        ChangeMaterialParameter();
-    }
 }
 
 //描画
@@ -132,6 +128,9 @@ void RendererCom::Update(float elapsedTime)
 
     if (std::string(GetGameObject()->GetName()) == "test")
         Graphics::Instance().GetDebugRenderer()->DrawBox(pos, bounds, { 1.0f,0.0f,0.0f,1.0f }, GetGameObject()->transform_->GetRotation());
+
+    //値を変更する
+    ChangeMaterialParameter();
 }
 
 //影描画
@@ -304,8 +303,11 @@ void RendererCom::ChangeMaterialParameter()
     {
         if (materials[i] != nullptr)
         {
-            materials[i]->outlineColor = { 0.000f, 0.282f, 1.000f };
-            materials[i]->outlineintensity = { 5.0f };
+            materials[i]->outlineColor = p.outlineColor;
+            materials[i]->outlineintensity = p.outlineintensity;
+            materials[i]->dissolveThreshold = p.dissolveThreshold;
+            materials[i]->dissolveEdgeColor = p.dissolveEdgeColor;
+            materials[i]->alpha = p.alpha;
         }
     }
 }
@@ -345,8 +347,6 @@ void RendererCom::MaterialSelector()
 
     std::vector<const char*> materialNames = {};
 
-    ImGui::Checkbox("flag", &OnFlag);
-
     //マテリアル情報の表示(パターン1)
     ImGui::Text("Materials");
     if (model_->GetResource() != nullptr)
@@ -381,6 +381,12 @@ void RendererCom::MaterialSelector()
 
     ImGui::Separator();
 
+    ImGui::ColorEdit3("outlineColor", &p.outlineColor.x);
+    ImGui::DragFloat("outlineintensity", &p.outlineintensity, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat("dissolveThreshold", &p.dissolveThreshold, 0.1f, 0.0f, 1.0f);
+    ImGui::ColorEdit3("dissolveEdgeColor", &p.dissolveEdgeColor.x);
+    ImGui::DragFloat("alpha", &p.alpha, 0.1f, 0.0f, 1.0f);
+
     // マテリアルのプロパティを表示
     ImGui::Text("Property");
     ModelResource::Material* material = GetSelectionMaterial();
@@ -408,12 +414,6 @@ void RendererCom::MaterialSelector()
             ImGui::DragFloat("Metallic", &material->Metalness, 0.01f, 0.0f, 1.0f);
             ImGui::ColorEdit3("EmissiveColor", &material->emissivecolor.x, ImGuiColorEditFlags_None);
             ImGui::DragFloat("EmissivePower", &material->emissiveintensity, 0.1f, 0.0f, 100.0f);
-            ImGui::ColorEdit3("outlineColor", &material->outlineColor.x);
-            ImGui::DragFloat("outlineintensity", &material->outlineintensity, 0.1f, 0.0f, 10.0f);
-            ImGui::DragFloat("dissolveThreshold", &material->dissolveThreshold, 0.1f, 0.0f, 1.0f);
-            ImGui::DragFloat("dissolveEdgeWidth", &material->dissolveEdgeWidth, 0.001f, 0.01f, 0.1f);
-            ImGui::ColorEdit3("dissolveEdgeColor", &material->dissolveEdgeColor.x);
-            ImGui::DragFloat("alpha", &material->alpha, 0.1f, 0.0f, 1.0f);
 
             // マテリアルファイルを上書き
             if (ImGui::Button("Save")) {
