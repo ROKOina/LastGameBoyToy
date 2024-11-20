@@ -34,8 +34,6 @@ void CharacterCom::Update(float elapsedTime)
             moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::DEATH);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
 
-#ifdef _DEBUG
-
     int inputNum = GetButtonDown();
 
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
@@ -76,13 +74,11 @@ void CharacterCom::Update(float elapsedTime)
         SubAttackPushing();
     }
 
-#else
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
         //MainAttack();
     }
 
-#endif // _DEBUG
 
     if (CharacterInput::MainSkillButton_Q & GetButtonDown()
         && Qcool.timer >= Qcool.time)

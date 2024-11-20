@@ -441,10 +441,12 @@ void SceneGame::Render(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
 
+#ifdef _DEBUG
     ImGui::Begin("Effect");
 
     EffectNew();
     ImGui::End();
+#endif
 }
 
 //エフェクト生成
