@@ -9,7 +9,7 @@ UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsio
     if(changePosValue <= 0.0f) {
         changePosValue *= -1.0f;
     }
-    originalPos = spc.position;
+    originalPos.y = min;
 }
 
 void UI_Skill::Start()

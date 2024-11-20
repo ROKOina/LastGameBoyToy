@@ -37,4 +37,7 @@ public:
 private:
     std::unique_ptr<BasicsApplication> photonNet;
     std::shared_ptr<TransformCom>t;
+
+    AudioSource bgmSource_start;//BGM—p
+    AudioSource bgmSource_clymax;
 };

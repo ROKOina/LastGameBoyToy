@@ -153,7 +153,7 @@ void ScenePVE::Initialize()
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Boss/boss.mdl");
+        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
         boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
         boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
         t = boss->transform_;
@@ -277,6 +277,12 @@ void ScenePVE::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
+    Audio::Instance().RegisterAudioSources(AUDIOID::SceneGame1, "Data/AudioData/SceneGameBGM/BossBattle_start.wav");
+    Audio::Instance().RegisterAudioSources(AUDIOID::SceneGame2, "Data/AudioData/SceneGameBGM/BossBattle_clymax.wav");
+    bgmSource_start.SetAudio((int)AUDIOID::SceneGame1);
+    bgmSource_clymax.SetAudio((int)AUDIOID::SceneGame2);
+
+    bgmSource_start.Play(true, 10.0f);
 
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
@@ -295,12 +301,21 @@ void ScenePVE::Update(float elapsedTime)
 
     photonNet->run(elapsedTime);
 
-    PVEDirection::Instance().Update(elapsedTime);
-
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+    PVEDirection::Instance().Update(elapsedTime);
+
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
+
+    bgmSource_start.GetSourceVoice()->SetVolume(rand() % 10);
+
+    GameObj boss = GameObjectManager::Instance().Find("BOSS");
+    if (boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)
+    {
+        bgmSource_start.Stop();
+        bgmSource_clymax.Play(true,10.0f);
+    }
 }
 
 void ScenePVE::Render(float elapsedTime)

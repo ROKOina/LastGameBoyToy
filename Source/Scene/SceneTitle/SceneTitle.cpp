@@ -17,6 +17,7 @@
 #include "SceneTitle.h"
 #include "Scene\SceneSelect\SceneSelect.h"
 #include "Scene\SceneGame\SceneGame.h"
+#include "Scene/ScenePVE/ScenePVE.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Character\RegisterChara.h"

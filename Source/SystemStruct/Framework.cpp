@@ -10,6 +10,7 @@
 #include "Scene\SceneUI\SceneUI.h"
 #include "Scene\SceneResult\SceneResult.h"
 #include "Scene\SceneSelect\SceneSelect.h"
+#include "Scene/ScenePVE/ScenePVE.h"
 
 #include "Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
