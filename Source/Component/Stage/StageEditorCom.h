@@ -60,19 +60,22 @@ private:
 
         TestNakanisi,
         TowerGimic,
+        GateGimic,
         Max,
     };
 
     //ゲームオブジェクト生成関数
-    static void TestNakanisi(GameObj place);
+    static void TestNakanisi(GameObj& place);
     static void TowerGimic(GameObj& place);
+    static void GateGimic(GameObj& place);
 
     GenerateFunc generateFunc[(int)GenerateFuncName::Max] =
     {
         nullptr, //None
 
         TestNakanisi,
-        TowerGimic
+        TowerGimic,
+        GateGimic,
     };
 
     //保存用のデータを格納する構造体

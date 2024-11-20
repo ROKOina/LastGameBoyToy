@@ -314,7 +314,6 @@ void PVEDirection::DirectionCFou(float elapsedTime)
 {
     if (!flag)
     {
-        GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
         //ˆÃ“]
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);

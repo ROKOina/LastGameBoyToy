@@ -57,7 +57,7 @@
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Character\Prop\SetNodeWorldPosCom.h"
-
+#include "Component\Audio\AudioCom.h"
 #include "Setting/Setting.h"
 
 SceneGame::~SceneGame()
@@ -260,10 +260,12 @@ void SceneGame::Initialize()
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
         boss->AddComponent<BossCom>();
+        boss->AddComponent<AudioCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
+
 
         //右足の煙エフェクト
         {
