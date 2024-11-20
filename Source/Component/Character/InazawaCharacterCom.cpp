@@ -3,6 +3,7 @@
 #include "StateMachine\Behaviar\BaseCharacterState.h"
 #include "Scene/SceneManager.h"
 #include "Component\Camera\CameraCom.h"
+#include "Component\Renderer\RendererCom.h"
 #include "CharaStatusCom.h"
 
 void InazawaCharacterCom::Start()
@@ -39,6 +40,24 @@ void InazawaCharacterCom::Update(float elapsedTime)
     {
         airTimer += elapsedTime;
     }
+
+    //腕モデル待機アニメーション
+    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+
+    if (!armAnim->IsPlayAnimation())
+    {
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
+    }
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
+    {
+        arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_idol")].animationspeed = 5;
+    }
+    else
+    {
+        arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_idol")].animationspeed = 1;
+    }
+
 }
 
 void InazawaCharacterCom::OnGUI()
@@ -48,6 +67,11 @@ void InazawaCharacterCom::OnGUI()
 
 void InazawaCharacterCom::MainAttackDown()
 {
+    //発砲アニメーションの場合はリターン
+    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))return;
+
     if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
 }

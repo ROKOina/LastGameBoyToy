@@ -258,8 +258,6 @@ void ModelResource::LoadMaterial(ID3D11Device* device, const char* filename)
     }
 }
 
-#ifdef _DEBUG
-
 //マテリアルシリアライズ
 void ModelResource::MaterialSerialize(const char* filename)
 {
@@ -287,8 +285,6 @@ void ModelResource::MaterialSerialize(const char* filename)
     }
 }
 
-#endif // _DEBUG
-
 // モデル構築
 void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
 {
@@ -301,9 +297,9 @@ void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
             ::_makepath_s(filename, 256, nullptr, dirname, material.textureFilename[i].c_str(), nullptr);
 
             // テクスチャ読み込み
-            f.emplace_back(std::make_shared<std::future<void>>(Graphics::Instance().GetThreadPool()->submit([&](auto device, auto filename, auto number) { return material.LoadTexture(device, filename, number); }, device, filename, i)));
+            //f.emplace_back(std::make_shared<std::future<void>>(Graphics::Instance().GetThreadPool()->submit([&](auto device, auto filename, auto number) { return material.LoadTexture(device, filename, number); }, device, filename, i)));
 
-            //material.LoadTexture(device, filename, i);
+            material.LoadTexture(device, filename, i);
         }
     }
 

@@ -43,7 +43,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     r->LoadModel("Data/Model/player_True/player.mdl");
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>(nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 

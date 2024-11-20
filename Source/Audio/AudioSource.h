@@ -29,6 +29,9 @@ public:
     // í‚é~
     void Stop();
 
+    void Feed(float startVolume, float endVolume, float );
+
+    IXAudio2SourceVoice* GetSourceVoice() { return sourceVoice_; }
     void AudioRelease();
 
 private:

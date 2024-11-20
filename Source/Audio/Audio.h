@@ -11,6 +11,8 @@ enum class AUDIOID
 {
     BGM,
     SE,
+    SceneGame1,
+    SceneGame2,
     MAX
 };
 
@@ -46,6 +48,8 @@ public:
 
     // オーディオ登録
     void RegisterAudioSources();
+    void RegisterAudioSources(AUDIOID id,const char* filename);
+
     IXAudio2* GetXAudio() const { return xaudio_; }
 
 private:
