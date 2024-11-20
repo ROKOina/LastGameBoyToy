@@ -286,18 +286,6 @@ public:
     virtual const char* GetName() const override { return "JumpAttackEnd"; }
 };
 
-//Ž€–S
-class Boss_DeathState : public Boss_BaseState
-{
-public:
-    Boss_DeathState(BossCom* owner) :Boss_BaseState(owner) {}
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    void ImGui() override {};
-    virtual const char* GetName() const override { return "Death"; }
-};
-
 class Boss_EventWalk : public Boss_BaseState
 {
 public:

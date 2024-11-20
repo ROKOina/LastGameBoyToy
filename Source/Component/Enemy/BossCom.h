@@ -66,7 +66,6 @@ public:
         UPSHOTCHARGE,
         UPSHOTLOOP,
         UPSHOTEND,
-        DEATH,
 
         EVENT_WALK, //イベント用ステート
         EVENT_PUNCH,
