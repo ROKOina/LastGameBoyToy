@@ -1,5 +1,7 @@
 #include "SystemStruct/Misc.h"
 #include "Audio/AudioSource.h"
+#include "Math\easing.h"
+#include "Math\Mathf.h"
 
 void AudioSource::OnGUI()
 {
@@ -59,6 +61,11 @@ void AudioSource::Play(bool loop, float volume)
     sourceVoice_->SetVolume(volume * 0.1f);
 }
 
+void AudioSource::Play()
+{
+    Play(isLooping, volumeControl);
+}
+
 // 停止
 void AudioSource::Stop()
 {
@@ -68,9 +75,23 @@ void AudioSource::Stop()
     sourceVoice_->Stop();
 }
 
-void AudioSource::Feed(float startVolume, float endVolume, float time)
+// 指定された値に音量を近づけていく
+bool AudioSource::Feed(float targetValue, float add)
 {
+    //現在の音量と指定された音量が同じ場合終了
+    if (targetValue == volumeControl) { return true; }
 
+    //指定された音量に近づける
+    if ((targetValue - volumeControl) > 0.0f)
+    {
+        volumeControl = min((volumeControl + add), targetValue);
+        SetVolume(volumeControl);
+    }
+    else
+    {
+        volumeControl = max((volumeControl - add), targetValue);
+        SetVolume(volumeControl);
+    }
 }
 
 void AudioSource::AudioRelease()

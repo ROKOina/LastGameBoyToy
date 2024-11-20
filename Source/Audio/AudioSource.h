@@ -26,12 +26,15 @@ public:
 
     // Ä¶
     void Play(bool loop, float volume = 1.0f);
+    void Play();
+
     // ’â~
     void Stop();
 
-    void Feed(float startVolume, float endVolume, float time);
+    bool Feed(float targetValue, float elapsedTime);
 
     IXAudio2SourceVoice* GetSourceVoice() { return sourceVoice_; }
+    void SetVolume(float volume) { sourceVoice_->SetVolume(volume); }
     void AudioRelease();
 
 private:
@@ -41,12 +44,6 @@ private:
     float volumeControl = 1.0f;
     bool isPlaying = false;
     bool isLooping = false;
-
-    //‰¹—Ê•ÏX—p•Ï”
-    float feedStartValue = 0.0f;
-    float feedEndValue = 0.0f;
-    float feedTime = 0.0f;
-    bool feedFlag = false;
 
     const char* name = "";
 };

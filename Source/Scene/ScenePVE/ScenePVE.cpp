@@ -29,6 +29,7 @@
 #include <Component/UI/PlayerUI.h>
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
+#include "Component\Audio\AudioCom.h"
 
 void ScenePVE::Initialize()
 {
@@ -168,6 +169,10 @@ void ScenePVE::Initialize()
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
+        AudioCom* a = boss->AddComponent<AudioCom>().get();
+        a->RegisterSource(AUDIOID::BOSS_JUMPATTACK_START, "JUMP_ATTACK_START");
+        a->RegisterSource(AUDIOID::BOSS_JUMPATTACK_END, "JUMP_ATTACK_END");
+        a->RegisterSource(AUDIOID::BOSS_JUMPATTACK_GROUND, "JUMP_ATTACK_GROUND");
 
         //右足の煙エフェクト
         {
@@ -265,6 +270,20 @@ void ScenePVE::Initialize()
         obj->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/energyspawn.spawn");
     }
 
+    //オーディオ
+    {
+        audioObj = GameObjectManager::Instance().Create();
+        audioObj->SetName("audio");
+        AudioCom* audio = audioObj->AddComponent<AudioCom>().get();
+        audio->RegisterSource(AUDIOID::SCENE_GAME1, "BGM1");
+        audio->RegisterSource(AUDIOID::SCENE_GAME2, "BGM2");
+        audio->RegisterSource(AUDIOID::CURSOR, "Cursor");
+        audio->RegisterSource(AUDIOID::ENTER, "Enter");
+
+        audioObj->GetComponent<AudioCom>()->Play("BGM1", true, 0.0f);
+        audioObj->GetComponent<AudioCom>()->FeedStart("BGM1", 0.6f, 0.01f);
+    }
+
 #endif
 
     //UIゲームオブジェクト生成
@@ -276,11 +295,6 @@ void ScenePVE::Initialize()
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
-
-    Audio::Instance().RegisterAudioSources(AUDIOID::SceneGame1, "Data/AudioData/SceneGameBGM/BossBattle_start.wav");
-    Audio::Instance().RegisterAudioSources(AUDIOID::SceneGame2, "Data/AudioData/SceneGameBGM/BossBattle_clymax.wav");
-    bgmSource_start.SetAudio((int)AUDIOID::SceneGame1);
-    bgmSource_clymax.SetAudio((int)AUDIOID::SceneGame2);
 
 
     StdIO_UIListener* l = new StdIO_UIListener();
@@ -308,17 +322,15 @@ void ScenePVE::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
-
-    v -= elapsedTime;
-    bgmSource_start.Play(true, v);
-
-    //bgmSource_start.GetSourceVoice()->SetVolume(rand() % 10);
-
     GameObj boss = GameObjectManager::Instance().Find("BOSS");
-    if (boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)
+    if (!battleClymax && boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)
     {
-        bgmSource_start.Stop();
-        bgmSource_clymax.Play(true,10.0f);
+        audioObj->GetComponent<AudioCom>()->FeedStart("BGM1", 0.0f, elapsedTime);
+
+        audioObj->GetComponent<AudioCom>()->Play("BGM2",true,0.0f);
+        audioObj->GetComponent<AudioCom>()->FeedStart("BGM2", 1.0f, elapsedTime / 2);
+        
+        battleClymax = true;
     }
 }
 
