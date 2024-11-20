@@ -75,10 +75,16 @@ void RigidBodyCom::SetUp()
 
         break;
 
-    case RigidBodyCom::RigidType::Primitive:
+    case RigidBodyCom::RigidType::PrimitiveBox:
+        //NodeCollisionを適応させる必要あり
+        GenerateCollider(NodeCollsionCom::CollsionType::BOX, GetGameObject()->transform_->GetScale());
+        break;
+
+    case RigidBodyCom::RigidType::PrimitiveSphere:
         //NodeCollisionを適応させる必要あり
         GenerateCollider(NodeCollsionCom::CollsionType::SPHER, GetGameObject()->transform_->GetScale());
         break;
+
     case RigidBodyCom::RigidType::Complex:
 
         if (!useResourcePath.empty())

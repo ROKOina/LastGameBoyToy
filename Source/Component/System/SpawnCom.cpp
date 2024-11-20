@@ -244,6 +244,7 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     aik->SetOffsetY(4.3f);
     obj->AddComponent<NoobEnemyCom>();
     obj->AddComponent<CharaStatusCom>();
+    obj->AddComponent<FrustumCom>();
     std::shared_ptr<GPUParticle>gp = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyaura.gpuparticle", 1000);
     gp->Play();
     const auto& collider = obj->AddComponent<SphereColliderCom>();
@@ -357,8 +358,6 @@ void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
 //当たり判定
 void SpawnCom::HitObject()
 {
-    const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
-
     // 全ての複製されたオブジェクトに対して当たり判定を確認
     for (const auto& weakObj : spawnedObjects)
     {
@@ -375,15 +374,12 @@ void SpawnCom::HitObject()
                     {
                         if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                         {
-                            posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
-                            GetGameObject()->transform_->SetScale({ 1.0f,1.0f,1.0f });
                             status->AddDamagePoint(-1);
                         }
                     }
                 }
             }
         }
-        //posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
     }
 }
 

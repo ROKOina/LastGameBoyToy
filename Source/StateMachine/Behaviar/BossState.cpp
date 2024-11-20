@@ -57,7 +57,7 @@ void Boss_BaseState::RandamLongRangeAttack()
     {
         //ジャンプ攻撃アニメーションが無いため消しておく
         //TODO アニメーションが修正次第ここも直す
-        
+
         availableNumbers = { 1,2,3,5 };
         //availableNumbers = { 1,2,3,4,5 };
     }
@@ -162,21 +162,11 @@ void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const st
     }
 
     //ここで共通ヒット処理を行う
-    const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
     if (collision)
     {
         for (const auto& hitobject : collision->OnHitGameObject())
         {
             hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
-        }
-
-        if (collision->GetIsHit())
-        {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.9f, 70.0f, PostEffect::PostEffectParameter::VignetteIntensity);
-        }
-        else
-        {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.01f, 4.0f, PostEffect::PostEffectParameter::VignetteIntensity);
         }
     }
 }

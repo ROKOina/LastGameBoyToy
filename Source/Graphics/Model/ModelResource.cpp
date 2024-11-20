@@ -297,9 +297,9 @@ void ModelResource::BuildModel(ID3D11Device* device, const char* dirname)
             ::_makepath_s(filename, 256, nullptr, dirname, material.textureFilename[i].c_str(), nullptr);
 
             // テクスチャ読み込み
-            f.emplace_back(std::make_shared<std::future<void>>(Graphics::Instance().GetThreadPool()->submit([&](auto device, auto filename, auto number) { return material.LoadTexture(device, filename, number); }, device, filename, i)));
+            //f.emplace_back(std::make_shared<std::future<void>>(Graphics::Instance().GetThreadPool()->submit([&](auto device, auto filename, auto number) { return material.LoadTexture(device, filename, number); }, device, filename, i)));
 
-            //material.LoadTexture(device, filename, i);
+            material.LoadTexture(device, filename, i);
         }
     }
 

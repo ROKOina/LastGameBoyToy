@@ -48,7 +48,6 @@ public:
         float outlineintensity = 1.0f;
         float dissolveThreshold = 0.0f; // ディゾルブ閾値
         DirectX::XMFLOAT3 dissolveEdgeColor = { 1,1,1 }; // エッジの色
-        float dissolveEdgeWidth = 0.0f; // エッジ幅
         float alpha = 1.0f;
 
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView[6];

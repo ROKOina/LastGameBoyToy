@@ -75,7 +75,7 @@ public:
     const char* GetName() const override { return "Character"; }
 
     // 開始処理
-    void Start() override {  };
+    void Start() override {};
 
     // 更新処理
     void Update(float elapsedTime) override;
@@ -179,6 +179,9 @@ private:
     //カメラ操作
     void CameraControl();
 
+    //ビネット効果
+    void Vinetto(float elapsedTime);
+
     //スタン更新
     void StanUpdate(float elapsedTime);
 
@@ -223,7 +226,7 @@ protected:
     SkillCoolTime Spacecool;
     SkillCoolTime LeftClickcool;
 
-  CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
+    CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
 
 private:
 

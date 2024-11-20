@@ -17,8 +17,8 @@ void BossCom::Start()
     state.AddState(BossState::LARIATSTART, std::make_shared<Boss_LARIATSTART>(this));
     state.AddState(BossState::LARIATLOOP, std::make_shared<Boss_LARIATLOOP>(this));
     state.AddState(BossState::LARIATEND, std::make_shared<Boss_LARIATEND>(this));
-    state.AddState(BossState::JUMPATTACKSTART, std::make_shared<Boss_JumpAttackStart>(this));
-    state.AddState(BossState::JUMPATTACKEND, std::make_shared<Boss_JumpAttackEnd>(this));
+    //state.AddState(BossState::JUMPATTACKSTART, std::make_shared<Boss_JumpAttackStart>(this));
+    //state.AddState(BossState::JUMPATTACKEND, std::make_shared<Boss_JumpAttackEnd>(this));
     state.AddState(BossState::SHOTSTART, std::make_shared<Boss_ShotStart>(this));
     state.AddState(BossState::SHOTLOOP, std::make_shared<Boss_ShotCharge>(this));
     state.AddState(BossState::SHOTEND, std::make_shared<Boss_Shot>(this));

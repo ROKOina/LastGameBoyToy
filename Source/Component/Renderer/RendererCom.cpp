@@ -104,7 +104,7 @@ void RendererCom::Update(float elapsedTime)
         BoundsMax.y = (std::max)(BoundsMax.y, worldBoundsMax.y);
         BoundsMax.z = (std::max)(BoundsMax.z, worldBoundsMax.z);
 
-        if (std::string(GetGameObject()->GetName()) == "tes")
+        if (std::string(GetGameObject()->GetName()) == "Reactar0")
         {
             auto s = GetGameObject()->transform_->GetScale();
             DirectX::XMFLOAT3 a = (mesh.boundsMax - mesh.boundsMin) * s / 2;
@@ -128,6 +128,9 @@ void RendererCom::Update(float elapsedTime)
 
     if (std::string(GetGameObject()->GetName()) == "test")
         Graphics::Instance().GetDebugRenderer()->DrawBox(pos, bounds, { 1.0f,0.0f,0.0f,1.0f }, GetGameObject()->transform_->GetRotation());
+
+    //値を変更する
+    ChangeMaterialParameter();
 }
 
 //影描画
@@ -289,6 +292,26 @@ void RendererCom::LoadMaterial(const char* filename)
     model_->GetResource()->LoadMaterial(device, filename);
 }
 
+//マテリアルの名前を取得して値を変更する処理
+void RendererCom::ChangeMaterialParameter()
+{
+    // 全マテリアルを取得
+    std::vector<ModelResource::Material*> materials = GetAllMaterials();
+
+    // ループでマテリアルの色を変更
+    for (size_t i = 0; i < materials.size(); i++)
+    {
+        if (materials[i] != nullptr)
+        {
+            materials[i]->outlineColor = p.outlineColor;
+            materials[i]->outlineintensity = p.outlineintensity;
+            materials[i]->dissolveThreshold = p.dissolveThreshold;
+            materials[i]->dissolveEdgeColor = p.dissolveEdgeColor;
+            materials[i]->alpha = p.alpha;
+        }
+    }
+}
+
 #include "SystemStruct\Framework.h"
 #include <shlwapi.h>
 #include "Graphics/Texture.h"
@@ -358,6 +381,12 @@ void RendererCom::MaterialSelector()
 
     ImGui::Separator();
 
+    ImGui::ColorEdit3("outlineColor", &p.outlineColor.x);
+    ImGui::DragFloat("outlineintensity", &p.outlineintensity, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat("dissolveThreshold", &p.dissolveThreshold, 0.1f, 0.0f, 1.0f);
+    ImGui::ColorEdit3("dissolveEdgeColor", &p.dissolveEdgeColor.x);
+    ImGui::DragFloat("alpha", &p.alpha, 0.1f, 0.0f, 1.0f);
+
     // マテリアルのプロパティを表示
     ImGui::Text("Property");
     ModelResource::Material* material = GetSelectionMaterial();
@@ -385,12 +414,6 @@ void RendererCom::MaterialSelector()
             ImGui::DragFloat("Metallic", &material->Metalness, 0.01f, 0.0f, 1.0f);
             ImGui::ColorEdit3("EmissiveColor", &material->emissivecolor.x, ImGuiColorEditFlags_None);
             ImGui::DragFloat("EmissivePower", &material->emissiveintensity, 0.1f, 0.0f, 100.0f);
-            ImGui::ColorEdit3("outlineColor", &material->outlineColor.x);
-            ImGui::DragFloat("outlineintensity", &material->outlineintensity, 0.1f, 0.0f, 10.0f);
-            ImGui::DragFloat("dissolveThreshold", &material->dissolveThreshold, 0.1f, 0.0f, 1.0f);
-            ImGui::DragFloat("dissolveEdgeWidth", &material->dissolveEdgeWidth, 0.001f, 0.01f, 0.1f);
-            ImGui::ColorEdit3("dissolveEdgeColor", &material->dissolveEdgeColor.x);
-            ImGui::DragFloat("alpha", &material->alpha, 0.1f, 0.0f, 1.0f);
 
             // マテリアルファイルを上書き
             if (ImGui::Button("Save")) {
@@ -411,6 +434,26 @@ ModelResource::Material* RendererCom::GetSelectionMaterial()
         }
     }
     return nullptr;
+}
+
+//全マテリアル取得
+std::vector<ModelResource::Material*> RendererCom::GetAllMaterials()
+{
+    std::vector<ModelResource::Material*> materialPtrs;
+
+    if (model_.get() != nullptr)
+    {
+        const std::vector<ModelResource::Material>& materials = model_->GetResource()->GetMaterials();
+        materialPtrs.reserve(materials.size());
+
+        for (const auto& material : materials)
+        {
+            // const_castを使用してポインタを格納
+            materialPtrs.push_back(const_cast<ModelResource::Material*>(&material));
+        }
+    }
+
+    return materialPtrs;
 }
 
 void RendererCom::TextureGui(ModelResource::Material* material)

@@ -17,6 +17,7 @@ public:
         DEFALT,
         BLUR,
         DISSOLVE,
+        CHROMATICABERRATION,
         MAX
     };
 
@@ -151,6 +152,6 @@ private:
     bool drawcollsion = false;
     bool hit = false;
     bool ontriiger = false;
-    
-   DirectX::XMFLOAT2 collisionPivot;
+
+    DirectX::XMFLOAT2 collisionPivot;
 };

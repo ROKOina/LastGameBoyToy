@@ -10,6 +10,7 @@
 #include "Scene\SceneUI\SceneUI.h"
 #include "Scene\SceneResult\SceneResult.h"
 #include "Scene\SceneSelect\SceneSelect.h"
+#include "Scene/ScenePVE/ScenePVE.h"
 
 #include "Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
@@ -31,13 +32,7 @@ Framework::Framework(HWND hWnd)
     //フィジックス初期化
     PhysXLib::Instance().Initialize();
 
-    //sceneGame.Initialize();
-    //SceneManager::Instance().ChangeScene(new SceneGame);
-    //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     SceneManager::Instance().ChangeScene(new SceneTitle);
-    //SceneManager::Instance().ChangeScene(new SceneResult);
-    //SceneManager::Instance().ChangeScene(new SceneIKTest);
-     //SceneManager::Instance().ChangeScene(new SceneUI);
 
     // オーディオ初期化
     Audio::Initialize();
