@@ -29,7 +29,7 @@ public:
     // í‚é~
     void Stop();
 
-    void Feed(float startVolume, float endVolume, float );
+    void Feed(float startVolume, float endVolume, float time);
 
     IXAudio2SourceVoice* GetSourceVoice() { return sourceVoice_; }
     void AudioRelease();
@@ -41,6 +41,12 @@ private:
     float volumeControl = 1.0f;
     bool isPlaying = false;
     bool isLooping = false;
+
+    //âπó ïœçXópïœêî
+    float feedStartValue = 0.0f;
+    float feedEndValue = 0.0f;
+    float feedTime = 0.0f;
+    bool feedFlag = false;
 
     const char* name = "";
 };

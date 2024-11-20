@@ -68,6 +68,11 @@ void AudioSource::Stop()
     sourceVoice_->Stop();
 }
 
+void AudioSource::Feed(float startVolume, float endVolume, float time)
+{
+
+}
+
 void AudioSource::AudioRelease()
 {
     if (sourceVoice_ != nullptr)

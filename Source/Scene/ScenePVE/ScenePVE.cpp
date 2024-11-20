@@ -282,7 +282,6 @@ void ScenePVE::Initialize()
     bgmSource_start.SetAudio((int)AUDIOID::SceneGame1);
     bgmSource_clymax.SetAudio((int)AUDIOID::SceneGame2);
 
-    bgmSource_start.Play(true, 10.0f);
 
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
@@ -295,6 +294,7 @@ void ScenePVE::Finalize()
     photonNet->close();
 }
 
+static float v = 5.0f;
 void ScenePVE::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -308,7 +308,11 @@ void ScenePVE::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
-    bgmSource_start.GetSourceVoice()->SetVolume(rand() % 10);
+
+    v -= elapsedTime;
+    bgmSource_start.Play(true, v);
+
+    //bgmSource_start.GetSourceVoice()->SetVolume(rand() % 10);
 
     GameObj boss = GameObjectManager::Instance().Find("BOSS");
     if (boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)

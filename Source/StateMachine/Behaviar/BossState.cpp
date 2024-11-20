@@ -54,12 +54,8 @@ void Boss_BaseState::RandamLongRangeAttack()
 {
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
-    {
-        //ジャンプ攻撃アニメーションが無いため消しておく
-        //TODO アニメーションが修正次第ここも直す
-        
-        availableNumbers = { 1,2,3,5 };
-        //availableNumbers = { 1,2,3,4,5 };
+    {   
+        availableNumbers = { 1,2,3,4,5 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成
@@ -681,7 +677,7 @@ void Boss_JumpAttackStart::Exit()
 #pragma region ジャンプ攻撃終わり
 void Boss_JumpAttackEnd::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_swing_attack_end"), false, false, 0.1f);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_jump_attack_end"), false, false, 0.1f);
 
     //カメラシェイク
     GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.02f, 0.5f);
@@ -700,10 +696,14 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     }
 
     //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
+    if (moveCom.lock()->OnGround())
     {
         //カメラシェイク
-        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.7f);
+        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.5f);
+    }
+
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
