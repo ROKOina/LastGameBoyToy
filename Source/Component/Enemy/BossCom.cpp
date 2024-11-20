@@ -32,6 +32,12 @@ void BossCom::Start()
 
     //初期ステート登録
     state.ChangeState(BossState::IDLE);
+
+    //SE登録
+    AudioCom* audio = GetGameObject()->GetComponent<AudioCom>().get();
+    audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_START, "JUMP_ATTACK_START");
+    audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_END, "JUMP_ATTACK_END");
+    audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_GROUND, "JUMP_ATTACK_GROUND");
 }
 
 //更新処理
