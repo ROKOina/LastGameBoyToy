@@ -17,8 +17,8 @@ void BossCom::Start()
     state.AddState(BossState::LARIATSTART, std::make_shared<Boss_LARIATSTART>(this));
     state.AddState(BossState::LARIATLOOP, std::make_shared<Boss_LARIATLOOP>(this));
     state.AddState(BossState::LARIATEND, std::make_shared<Boss_LARIATEND>(this));
-    //state.AddState(BossState::JUMPATTACKSTART, std::make_shared<Boss_JumpAttackStart>(this));
-    //state.AddState(BossState::JUMPATTACKEND, std::make_shared<Boss_JumpAttackEnd>(this));
+    state.AddState(BossState::JUMPATTACKSTART, std::make_shared<Boss_JumpAttackStart>(this));
+    state.AddState(BossState::JUMPATTACKEND, std::make_shared<Boss_JumpAttackEnd>(this));
     state.AddState(BossState::SHOTSTART, std::make_shared<Boss_ShotStart>(this));
     state.AddState(BossState::SHOTLOOP, std::make_shared<Boss_ShotCharge>(this));
     state.AddState(BossState::SHOTEND, std::make_shared<Boss_Shot>(this));
@@ -26,12 +26,12 @@ void BossCom::Start()
     state.AddState(BossState::UPSHOTCHARGE, std::make_shared<Boss_UpShotCharge>(this));
     state.AddState(BossState::UPSHOTLOOP, std::make_shared<Boss_UpShotLoop>(this));
     state.AddState(BossState::UPSHOTEND, std::make_shared<Boss_UpShotEnd>(this));
-
-    //無敵時間
-    GetGameObject()->GetComponent<CharaStatusCom>()->SetInvincibleTime(0.1f);
+    state.AddState(BossState::EVENT_WALK, std::make_shared<Boss_EventWalk>(this));
+    state.AddState(BossState::EVENT_PUNCH, std::make_shared<Boss_EventPunch>(this));
+    state.AddState(BossState::EVENT_DEATH, std::make_shared<Boss_EventDeath>(this));
 
     //初期ステート登録
-    state.ChangeState(BossState::IDLE);
+    state.ChangeState(BossState::EVENT_WALK);
 }
 
 //更新処理

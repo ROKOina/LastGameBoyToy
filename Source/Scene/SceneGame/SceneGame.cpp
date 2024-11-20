@@ -251,7 +251,8 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
-        boss->AddComponent<CharaStatusCom>();
+        auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
+        charaStatusCom->SetInvincibleTime(0.1f);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();

@@ -67,6 +67,11 @@ public:
         UPSHOTLOOP,
         UPSHOTEND,
         DEATH,
+
+        EVENT_WALK, //イベント用ステート
+        EVENT_PUNCH,
+        EVENT_DEATH,
+
         MAX
     };
 
