@@ -101,24 +101,26 @@ void CharacterCom::Update(float elapsedTime)
         //ダッシュ処理
         LeftShiftSkill(elapsedTime);
 
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::BlurStrength };
+
         //ダッシュ時一回だけ入る
         const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
         if (!dashFlag)
         {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, PostEffect::PostEffectParameter::BlurStrength);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
             dashFlag = true;
             dashGauge -= 5; //最初は一気に減らす
         }
         else
         {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
         }
 
         //ゲージがなくなったらタイマーをセット
         if (dashGauge <= 0)
         {
             LScool.timer = 0;
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
         }
     }
     else
@@ -138,9 +140,6 @@ void CharacterCom::Update(float elapsedTime)
             dashGauge = dashGaugeMax;
         }
     }
-
-    //ブラー
-    //GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->ParameterMove(elapsedTime, 0.5f, fastDash, PostEffect::PostEffectParameter::BlurStrength);
 
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
@@ -179,6 +178,9 @@ void CharacterCom::Update(float elapsedTime)
 
     //カメラ制御
     CameraControl();
+
+    //ビネット発動
+    Vinetto(elapsedTime);
 }
 
 void CharacterCom::OnGUI()
@@ -370,6 +372,32 @@ void CharacterCom::CameraControl()
             return;
         }
     }
+}
+
+//ビネット効果
+void CharacterCom::Vinetto(float elapsedTime)
+{
+    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
+    float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
+    const auto posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+
+    if (posteffect)
+    {
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::VignetteIntensity };
+
+        // HPが減少した場合のみビネット効果を発動
+        if (previousHP - currentHP > 0)
+        {
+            posteffect->SetParameter(0.9f, 100.0f, parameters); // 強いビネット効果を設定
+        }
+        else
+        {
+            posteffect->SetParameter(0.01f, 8.0f, parameters); // 元に戻す
+        }
+    }
+
+    // 現在のHPを次回用に保存
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
 }
 
 void CharacterCom::StanUpdate(float elapsedTime)

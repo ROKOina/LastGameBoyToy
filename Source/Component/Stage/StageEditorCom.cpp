@@ -26,6 +26,7 @@
 #include "StageGimmickCom.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Collsion\FrustumCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -450,6 +451,7 @@ void StageEditorCom::TowerGimic(GameObj& place)
     place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/energy.gpuparticle", 6000);
     place->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/enemy.spawn");
     place->AddComponent<StageGimmick>();
+    place->AddComponent<FrustumCom>();
     std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 100);
     cpuparticle->SetActive(false);
     std::shared_ptr<SphereColliderCom>collider = place->AddComponent<SphereColliderCom>();

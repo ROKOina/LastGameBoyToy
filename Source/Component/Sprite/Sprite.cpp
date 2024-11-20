@@ -174,8 +174,8 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     case SpriteShader::BLUR:
         PSPath = { "Shader\\SpriteBlurPS.cso" };
         break;
-    case SpriteShader::DISSOLVE:
-        PSPath = { "Shader\\DeferredSetupPS.cso" };
+    case SpriteShader::CHROMATICABERRATION:
+        PSPath = { "Shader\\SpriteChromaticAberrationPS.cso" };
         break;
     default:
         assert(!"シェーダーがありません");
@@ -508,7 +508,6 @@ void Sprite::DrawCollsionBox()
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
 
-
     // 座標とピボットの処理
     float pivotX = (spc.pivot.x / spc.texSize.x);
     float pivotY = (spc.pivot.y / spc.texSize.y);
@@ -545,8 +544,8 @@ void Sprite::DrawCollsionBox()
             y += cy;
         };
 
-    float cx = spc.position.x  + spc.collsionpositionoffset.x;
-    float cy = spc.position.y  + spc.collsionpositionoffset.y;
+    float cx = spc.position.x + spc.collsionpositionoffset.x;
+    float cy = spc.position.y + spc.collsionpositionoffset.y;
     rotate(x0, y0, cx, cy, spc.angle);
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);
@@ -977,13 +976,13 @@ bool Sprite::cursorVsCollsionBox()
 
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = {  collisionPivot.x + spc.collsionpositionoffset.x, collisionPivot.y + spc.collsionpositionoffset.y};
+    DirectX::XMFLOAT2 pos = { collisionPivot.x + spc.collsionpositionoffset.x, collisionPivot.y + spc.collsionpositionoffset.y };
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 
     //長さを測る
     float upLen = Mathf::Dot(normalUp, curVecPos);
-    float rightLen = Mathf::Dot(normalRight, curVecPos); 
+    float rightLen = Mathf::Dot(normalRight, curVecPos);
 
     //判定
     DirectX::XMFLOAT2 scale = { (texSizeX / 2 + spc.collsionscaleoffset.x),(texSizeY / 2 + spc.collsionscaleoffset.y) };
