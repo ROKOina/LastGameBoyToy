@@ -188,20 +188,20 @@ void SceneGame::Initialize()
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
             anim->PlayAnimation(0, false);
-            
+
             //Eskill中エフェクト
             {
                 std::shared_ptr<GameObject> eSkillEff = armChild->AddChildObject();
                 eSkillEff->SetName("eSkillEff");
                 std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
                 eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
-                eSkillEff->transform_->SetLocalPosition({-0.35f,9.84f,-0.58f});
+                eSkillEff->transform_->SetLocalPosition({ -0.35f,9.84f,-0.58f });
                 eff->Play();
             }
             //攻撃ため
             {
                 std::shared_ptr<GameObject> chargeEff = armChild->AddChildObject();
-                chargeEff->transform_->SetLocalPosition({0.98f,12.44f,6.96f});
+                chargeEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
                 chargeEff->SetName("chargeEff");
                 std::shared_ptr<GPUParticle> eff = chargeEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playercharge.gpuparticle", 300);
                 eff->SetLoop(false);
@@ -211,27 +211,23 @@ void SceneGame::Initialize()
             //攻撃ためマックス
             {
                 std::shared_ptr<GameObject> chargeMaxEff = armChild->AddChildObject();
-                chargeMaxEff->transform_->SetLocalPosition({0.98f,12.44f,6.96f});
+                chargeMaxEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
                 chargeMaxEff->SetName("chargeMaxEff");
                 std::shared_ptr<GPUParticle> eff = chargeMaxEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerchargeFull.gpuparticle", 300);
                 eff->SetLoop(false);
                 //銃口にくっ付ける
                 chargeMaxEff->AddComponent<SetNodeWorldPosCom>();
-
             }
             //ウルトマズルフラッシュ
             {
                 std::shared_ptr<GameObject> attackUltMuzzleEff = armChild->AddChildObject();
-                attackUltMuzzleEff->transform_->SetLocalPosition({-3.1f,12.94f,1.69f});
+                attackUltMuzzleEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
                 attackUltMuzzleEff->SetName("attackUltMuzzleEff");
                 std::shared_ptr<GPUParticle> eff = attackUltMuzzleEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltMuzzleF.gpuparticle", 20);
                 eff->SetLoop(false);
-
             }
         }
     }
-    
-
 
     //snowparticle
     {
@@ -261,6 +257,7 @@ void SceneGame::Initialize()
         charaStatusCom->SetInvincibleTime(0.1f);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
+        boss->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
@@ -490,6 +487,12 @@ void SceneGame::EffectNew()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("testui");
         obj->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    }
+    if (ImGui::Button("Light"))
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("testlight");
+        obj->AddComponent<Light>(nullptr);
     }
 }
 

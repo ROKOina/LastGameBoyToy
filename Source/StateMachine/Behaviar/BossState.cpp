@@ -55,7 +55,7 @@ void Boss_BaseState::RandamLongRangeAttack()
 {
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
-    {   
+    {
         availableNumbers = { 1,2,3,4,5 };
     }
 
@@ -627,9 +627,9 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     AnimtionEventControl("EFFECTTIME", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
 
     //飛ぶ
-    if(animationCom.lock()->IsEventCalling("JUMPINIT"))
-    { 
-        audioCom.lock()->Play("JUMP_ATTACK_START", false, 5.0f); 
+    if (animationCom.lock()->IsEventCalling("JUMPINIT"))
+    {
+        audioCom.lock()->Play("JUMP_ATTACK_START", false, 5.0f);
     }
     if (animationCom.lock()->IsEventCalling("JUMPTIME"))
     {
@@ -736,9 +736,7 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 v = owner->GetGameObject()->transform_->GetWorldFront() * 0.1f;
     moveCom->AddForce({ v.x,v.y,v.z });
 
-
     //エフェクト出すならここですかね
-
 }
 
 void Boss_EventWalk::Exit()
