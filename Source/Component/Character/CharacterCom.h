@@ -102,6 +102,9 @@ public:
 
     virtual void SpaceSkill() {}
 
+    //攻撃ウルト取得
+    void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }
+
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS>& GetAttackStateMachine() { return attackStateMachine; }
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>& GetMoveStateMachine() { return moveStateMachine; }
     GameObject* GetCameraObj() { return cameraObj; }
@@ -189,6 +192,9 @@ private:
     float InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed);
     float Lerp(float start, float end, float t);
 
+    //UltUpdate
+    void UltUpdate(float elapsedTime);
+
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
@@ -253,6 +259,7 @@ private:
     //アタックULT
     int attackUltCountMax = 5;  //ウルトを打てる数
     int attackUltCounter;
+    std::weak_ptr<GameObject> attackUltRayObj;  //ウルトレイ
 
     AbnormalCondition abnormalcondition;
 

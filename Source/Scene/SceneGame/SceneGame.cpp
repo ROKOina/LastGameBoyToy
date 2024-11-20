@@ -143,14 +143,18 @@ void SceneGame::Initialize()
             //ダメージ処理用
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+
+            //キャラクターに登録
+            obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
         }
         //アタックウルトのエフェクト
         {
             std::shared_ptr<GameObject> attackUltEff = obj->AddChildObject();
             attackUltEff->SetName("attackUltEFF");
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 100);
             attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 500);
+            eff->Play();
         }
     }
 
@@ -175,8 +179,36 @@ void SceneGame::Initialize()
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
             anim->PlayAnimation(0, false);
+            
+            //Eskill中エフェクト
+            {
+                std::shared_ptr<GameObject> eSkillEff = armChild->AddChildObject();
+                eSkillEff->SetName("eSkillEff");
+                std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
+                eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
+                eSkillEff->transform_->SetLocalPosition({-0.35f,9.84f,-0.58f});
+                eff->Play();
+            }
+            //攻撃ため
+            {
+                std::shared_ptr<GameObject> chargeEff = armChild->AddChildObject();
+                chargeEff->transform_->SetLocalPosition({0.98f,12.44f,6.96f});
+                chargeEff->SetName("chargeEff");
+                std::shared_ptr<GPUParticle> eff = chargeEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playercharge.gpuparticle", 300);
+                eff->SetLoop(false);
+            }
+            //攻撃ためマックス
+            {
+                std::shared_ptr<GameObject> chargeMaxEff = armChild->AddChildObject();
+                chargeMaxEff->transform_->SetLocalPosition({0.98f,12.44f,6.96f});
+                chargeMaxEff->SetName("chargeMaxEff");
+                std::shared_ptr<GPUParticle> eff = chargeMaxEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerchargeFull.gpuparticle", 300);
+                eff->SetLoop(false);
+            }
         }
     }
+    
+
 
     //snowparticle
     {

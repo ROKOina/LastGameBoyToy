@@ -24,6 +24,16 @@ void BaseCharacter_IdleState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+
+    ////FPS—p
+    //auto& camera = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
+    //if (camera)
+    //{
+    //    auto& arm = camera->GetChildFind("armChild");
+    //    auto& armAnim = arm->GetComponent<AnimationCom>();
+
+    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
+    //}
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)

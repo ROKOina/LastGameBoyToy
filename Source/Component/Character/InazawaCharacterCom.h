@@ -22,8 +22,19 @@ public:
 
     void UltSkill() override;
 
+    void ResetShootTimer() { shootTimer = 0; }
+
+private:
+    void FPSArmAnimation();
+
 private:
     //ジャンプダッシュ
     bool isDashJump = false;
     float airTimer = 0.0f;
+
+    //発射間隔
+    float shootTime = 0.6f;
+    float shootTimer = 0;
+
+    bool attackInputSave = false;   //先行入力
 };
