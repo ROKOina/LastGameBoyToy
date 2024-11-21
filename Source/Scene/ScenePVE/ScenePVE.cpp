@@ -234,8 +234,8 @@ void ScenePVE::Initialize()
         boss->AddComponent<AnimationCom>();
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
-        charaStatusCom->SetHitPoint(1000);
-        charaStatusCom->SetMaxHitPoint(1000);
+        charaStatusCom->SetHitPoint(2500);
+        charaStatusCom->SetMaxHitPoint(2500);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<AudioCom>();
@@ -247,7 +247,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject>rightfootsmokeobject = boss->AddChildObject();
             rightfootsmokeobject->SetName("rightfootsmokeeffect");
-            std::shared_ptr<CPUParticle>rightfootsmokeeffect = rightfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 600);
+            std::shared_ptr<CPUParticle>rightfootsmokeeffect = rightfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 400);
             rightfootsmokeeffect->SetActive(false);
         }
 
@@ -255,7 +255,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject>leftfootsmokeobject = boss->AddChildObject();
             leftfootsmokeobject->SetName("leftfootsmokeeffect");
-            std::shared_ptr<CPUParticle>leftfootsmokeeffect = leftfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 600);
+            std::shared_ptr<CPUParticle>leftfootsmokeeffect = leftfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 400);
             leftfootsmokeeffect->SetActive(false);
         }
 
@@ -268,7 +268,7 @@ void ScenePVE::Initialize()
             lefthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
             lefthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
             lefthandcollider->SetRadius(1.0f);
-            std::shared_ptr<CPUParticle>fireeffect = lefthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 500);
+            std::shared_ptr<CPUParticle>fireeffect = lefthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 400);
             fireeffect->SetActive(false);
             std::shared_ptr<GPUParticle>gpufireeffect = lefthandobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/firespark.gpuparticle", 4000);
             gpufireeffect->SetStop(true);
@@ -283,7 +283,7 @@ void ScenePVE::Initialize()
             righthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
             righthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
             righthandcollider->SetRadius(1.0f);
-            std::shared_ptr<CPUParticle>fireeffect = righthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 500);
+            std::shared_ptr<CPUParticle>fireeffect = righthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 400);
             fireeffect->SetActive(false);
             std::shared_ptr<GPUParticle>gpufireeffect = righthandobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/firespark.gpuparticle", 4000);
             gpufireeffect->SetStop(true);
@@ -325,7 +325,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject> groundobject = boss->AddChildObject();
             groundobject->SetName("groundsmoke");
-            std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 1000);
+            std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 500);
             smoke->SetActive(false);
         }
     }
@@ -635,7 +635,7 @@ void ScenePVE::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("lockOn");
 
-            hpMemori->AddComponent<UI_LockOn>(4,0,90);
+            hpMemori->AddComponent<UI_LockOn>(4, 0, 90);
         }
         //decoration
         {

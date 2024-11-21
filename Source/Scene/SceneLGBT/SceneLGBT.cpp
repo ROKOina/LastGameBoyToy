@@ -64,8 +64,6 @@ void SceneLGBT::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, { 0,0,0 });
-
-    ImGui::DragFloat("easingtime", &easingtime);
 }
 
 //シーン遷移

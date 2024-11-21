@@ -352,7 +352,7 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     time += elapsedTime;
 
     //移動
-    owner->MoveToTarget(5.0f, 0.1f);
+    owner->MoveToTarget(9.5f, 0.1f);
 
     //左右の煙
     AnimtionEventControl("COLLSION", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
@@ -774,6 +774,26 @@ void Boss_EventPunch::Exit()
 
 void Boss_EventDeath::Enter()
 {
+    //エフェクトを切ると当たり判定を切る
+    const auto& charge = GameObjectManager::Instance().Find("charge");
+    charge->GetComponent<GPUParticle>()->SetLoop(false);
+    charge->GetComponent<CPUParticle>()->SetActive(false);
+    const auto& spawn = GameObjectManager::Instance().Find("spawn");
+    const auto& muzzleflash = GameObjectManager::Instance().Find("muzzleflashleft");
+    spawn->GetComponent<SpawnCom>()->SetOnTrigger(false);
+    spawn->GetComponent<CPUParticle>()->SetActive(false);
+    muzzleflash->GetComponent<CPUParticle>()->SetActive(false);
+    spawn->GetComponent<GPUParticle>()->SetLoop(false);
+    const auto& righthand = GameObjectManager::Instance().Find("righthand");
+    const auto& lefthand = GameObjectManager::Instance().Find("lefthand");
+    righthand->GetComponent<CPUParticle>()->SetActive(false);
+    righthand->GetComponent<GPUParticle>()->SetLoop(false);
+    lefthand->GetComponent<CPUParticle>()->SetActive(false);
+    lefthand->GetComponent<GPUParticle>()->SetLoop(false);
+    GameObjectManager::Instance().Find("rightfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+
+    //アニメーションが再生
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_dead"), false, false, 0.1f);
 }
 

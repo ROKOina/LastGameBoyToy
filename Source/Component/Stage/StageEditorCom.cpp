@@ -461,8 +461,8 @@ void StageEditorCom::TowerGimic(GameObj& place)
     collider->SetRadius(0.8f);
     std::shared_ptr<CharaStatusCom>status = place->AddComponent<CharaStatusCom>();
     status->SetInvincibleTime(0.2f);
-    status->SetHitPoint(15.0f);
-    status->SetMaxHitPoint(15.0f);
+    status->SetHitPoint(300.0f);
+    status->SetMaxHitPoint(300.0f);
 
     //集まるパーティクル
     std::shared_ptr<GameObject>accumulate = place->AddChildObject();
