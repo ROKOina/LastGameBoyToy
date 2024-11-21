@@ -95,6 +95,25 @@ public:
         return false;
     }
 
+    // コンポーネント取得
+    template<class T>
+    std::shared_ptr<T> GetState()
+    {
+        for (auto& [key, state] : stateList)
+        {
+            std::shared_ptr<T> p = std::dynamic_pointer_cast<T>(state);
+            if (p == nullptr) continue;
+            return p;
+        }
+        return nullptr;
+    }
+
+
+    StatePtr GetState(Enum e)
+    {
+        return stateList[e];
+    }
+
     Enum GetCurrentState() { return currentIndex; }
     Enum GetNextState() { return nextIndex; }
     Enum GetOldState() { return oldIndex; }
