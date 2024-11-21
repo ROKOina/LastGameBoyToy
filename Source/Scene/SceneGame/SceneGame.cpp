@@ -133,8 +133,6 @@ void SceneGame::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
-        //自分のプレイヤーは表示切る
-        //obj->GetComponent<RendererCom>()->SetEnabled(false);
 
         //ウルト関係Obj追加
         {

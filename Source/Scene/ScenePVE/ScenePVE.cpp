@@ -17,8 +17,6 @@
 #include <Component\Collsion\RayCollisionCom.h>
 #include <Component\MoveSystem\EasingMoveCom.h>
 #include "Component\Collsion\PushBackCom.h"
-#include "Netwark/Photon/StaticSendDataManager.h"
-#include "Netwark/Photon/StdIO_UIListener.h"
 #include "Component\Enemy\BossCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
@@ -30,6 +28,9 @@
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
 #include "Component\Audio\AudioCom.h"
+#include <Component\Character\Prop\SetNodeWorldPosCom.h>
+#include "Netwark/Photon/StdIO_UIListener.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 void ScenePVE::Initialize()
 {
@@ -51,6 +52,7 @@ void ScenePVE::Initialize()
         obj->AddComponent<Light>(nullptr);
     }
 
+#ifdef _DEBUG
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -59,6 +61,8 @@ void ScenePVE::Initialize()
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+#endif
+
     //イベント用カメラ
     {
         std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
@@ -75,6 +79,8 @@ void ScenePVE::Initialize()
         obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
+        r->SetOutlineIntensity(5.5f);
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
@@ -106,14 +112,18 @@ void ScenePVE::Initialize()
             //ダメージ処理用
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+
+            //キャラクターに登録
+            obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
         }
         //アタックウルトのエフェクト
         {
             std::shared_ptr<GameObject> attackUltEff = obj->AddChildObject();
             attackUltEff->SetName("attackUltEFF");
+            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 100);
             attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
             attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 500);
+            eff->Play();
         }
     }
 
@@ -133,11 +143,49 @@ void ScenePVE::Initialize()
             std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
-            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.20f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,1.8f });
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
             anim->PlayAnimation(0, false);
+
+            //Eskill中エフェクト
+            {
+                std::shared_ptr<GameObject> eSkillEff = armChild->AddChildObject();
+                eSkillEff->SetName("eSkillEff");
+                std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
+                eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
+                eSkillEff->transform_->SetLocalPosition({ -0.35f,9.84f,-0.58f });
+                eff->Play();
+            }
+            //攻撃ため
+            {
+                std::shared_ptr<GameObject> chargeEff = armChild->AddChildObject();
+                chargeEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
+                chargeEff->SetName("chargeEff");
+                std::shared_ptr<GPUParticle> eff = chargeEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playercharge.gpuparticle", 300);
+                eff->SetLoop(false);
+                //銃口にくっ付ける
+                chargeEff->AddComponent<SetNodeWorldPosCom>();
+            }
+            //攻撃ためマックス
+            {
+                std::shared_ptr<GameObject> chargeMaxEff = armChild->AddChildObject();
+                chargeMaxEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
+                chargeMaxEff->SetName("chargeMaxEff");
+                std::shared_ptr<GPUParticle> eff = chargeMaxEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerchargeFull.gpuparticle", 300);
+                eff->SetLoop(false);
+                //銃口にくっ付ける
+                chargeMaxEff->AddComponent<SetNodeWorldPosCom>();
+            }
+            //ウルトマズルフラッシュ
+            {
+                std::shared_ptr<GameObject> attackUltMuzzleEff = armChild->AddChildObject();
+                attackUltMuzzleEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                attackUltMuzzleEff->SetName("attackUltMuzzleEff");
+                std::shared_ptr<GPUParticle> eff = attackUltMuzzleEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltMuzzleF.gpuparticle", 20);
+                eff->SetLoop(false);
+            }
         }
     }
 
@@ -149,27 +197,28 @@ void ScenePVE::Initialize()
     }
 
     //BOSS
-#if(1)
     {
         auto& boss = GameObjectManager::Instance().Create();
         boss->SetName("BOSS");
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
+        r->SetOutlineColor({ 1,0,0 });
+        r->SetOutlineIntensity(10.0f);
+        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
-        boss->AddComponent<CharaStatusCom>();
+        auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
+        charaStatusCom->SetInvincibleTime(0.1f);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
+        boss->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
-        AudioCom* a = boss->AddComponent<AudioCom>().get();
-        a->RegisterSource(AUDIOID::BOSS_JUMPATTACK_START, "JUMP_ATTACK_START");
-        a->RegisterSource(AUDIOID::BOSS_JUMPATTACK_END, "JUMP_ATTACK_END");
-        a->RegisterSource(AUDIOID::BOSS_JUMPATTACK_GROUND, "JUMP_ATTACK_GROUND");
 
         //右足の煙エフェクト
         {
@@ -281,8 +330,6 @@ void ScenePVE::Initialize()
         audioObj->GetComponent<AudioCom>()->FeedStart("BGM1", 0.6f, 0.01f);
     }
 
-#endif
-
     //UIゲームオブジェクト生成
     CreateUiObject();
 
@@ -293,10 +340,12 @@ void ScenePVE::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
+    //ボスのイベントシーン
+    PVEDirection::Instance().DirectionStart();
+
+    //ネット大事
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
-
-    PVEDirection::Instance().DirectionStart();
 }
 
 void ScenePVE::Finalize()
@@ -304,11 +353,11 @@ void ScenePVE::Finalize()
     photonNet->close();
 }
 
-static float v = 5.0f;
 void ScenePVE::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
+    //ネット更新
     photonNet->run(elapsedTime);
 
     GameObjectManager::Instance().UpdateTransform();
@@ -351,15 +400,8 @@ void ScenePVE::Render(float elapsedTime)
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 
-    photonNet->ImGui();
-
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
-
-    ImGui::Begin("Effect");
-
-    //EffectNew();
-    ImGui::End();
 }
 
 void ScenePVE::CreateUiObject()
