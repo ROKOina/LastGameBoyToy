@@ -246,6 +246,9 @@ void SceneTitle::UIUpdate(float elapsedTime)
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
                 canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
+                canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
+                canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
+                canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
                     audioObj->FeedStart("Title", 0.0f, elapsedTime);
@@ -269,4 +272,6 @@ void SceneTitle::UIUpdate(float elapsedTime)
         if (!deleteFlg)
             delete  s.scene;
     }
+    //–_Á‚·
+    if (SceneManager::Instance().GetTransitionFlag())selectB->SetEnabled(false);
 }

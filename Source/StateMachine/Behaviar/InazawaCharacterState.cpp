@@ -8,6 +8,7 @@
 #include "Component\Bullet\BulletCom.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Particle\GPUParticle.h"
+#include "Component\Audio\AudioCom.h"
 
 InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -28,6 +29,9 @@ void InazawaCharacter_AttackState::Enter()
     auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
     auto& charge = arm->GetChildFind("chargeEff");
     charge->GetComponent<GPUParticle>()->SetLoop(true);
+
+    //‰¹
+    owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_CHARGE", false, 10);
 }
 
 void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
@@ -47,6 +51,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         chargeMax->GetComponent<GPUParticle>()->SetLoop(true);
     }
 
+
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
@@ -57,12 +62,16 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
 
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, maxDamage * attackPower);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower/ maxAttackPower, maxDamage * attackPower);
 
         auto& charge = arm->GetChildFind("chargeEff");
         charge->GetComponent<GPUParticle>()->SetLoop(false);
         auto& chargeMax = arm->GetChildFind("chargeMaxEff");
         chargeMax->GetComponent<GPUParticle>()->SetLoop(false);
+
+        //‰¹
+        owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_CHARGE");
+        owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_SHOOT",false,10);
 
         //ŽËŒ‚ŠÔŠuƒ^ƒCƒ}[‹N“®
         owner->GetGameObject()->GetComponent<InazawaCharacterCom>()->ResetShootTimer();
@@ -126,6 +135,10 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
         //Fire(owner->GetGameObject(), arrowSpeed);
         arrowCount--;
         intervalTimer = 0;
+
+        //‰¹
+        owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_SHOOT");
+        owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_SHOOT", false, 10);
     }
 }
 

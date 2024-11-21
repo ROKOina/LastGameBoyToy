@@ -116,6 +116,14 @@ void ScenePVE::Initialize()
         obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
 
+        auto& au = obj->AddComponent<AudioCom>();
+        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
+        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
+        au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
+        au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
+        au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
+        au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
+
         //ウルト関係Obj追加
         {
             //アタック系ウルト
@@ -164,7 +172,7 @@ void ScenePVE::Initialize()
             std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
-            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,1.8f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
@@ -207,6 +215,23 @@ void ScenePVE::Initialize()
                 std::shared_ptr<GPUParticle> eff = attackUltMuzzleEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltMuzzleF.gpuparticle", 20);
                 eff->SetLoop(false);
             }
+            //ウルト中えふぇ１
+            {
+                std::shared_ptr<GameObject> attackUltSide1 = armChild->AddChildObject();
+                attackUltSide1->transform_->SetLocalPosition({ -7.915f,12.94f,1.69f });
+                attackUltSide1->SetName("attackUltSide1");
+                std::shared_ptr<GPUParticle> eff = attackUltSide1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltSide.gpuparticle", 5);
+                eff->SetLoop(false);
+            }
+            //ウルト中えふぇ２
+            {
+                std::shared_ptr<GameObject> attackUltSide2 = armChild->AddChildObject();
+                attackUltSide2->transform_->SetLocalPosition({ 1.094f,12.94f,1.69f });
+                attackUltSide2->SetName("attackUltSide2");
+                std::shared_ptr<GPUParticle> eff = attackUltSide2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltSide.gpuparticle", 5);
+                eff->SetLoop(false);
+            }
+
         }
     }
 
