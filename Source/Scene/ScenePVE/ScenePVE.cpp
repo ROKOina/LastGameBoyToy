@@ -132,6 +132,7 @@ void ScenePVE::Initialize()
             //ダメージ処理用
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+            hitDamage->SetValue(100);
 
             //キャラクターに登録
             obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
@@ -233,6 +234,8 @@ void ScenePVE::Initialize()
         boss->AddComponent<AnimationCom>();
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
+        charaStatusCom->SetHitPoint(1000);
+        charaStatusCom->SetMaxHitPoint(1000);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<AudioCom>();

@@ -48,7 +48,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
     //HP‚Ì‰ŠúÝ’è
-    status->SetMaxHitPoint(200);
+    status->SetMaxHitPoint(10);
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.4f);
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();

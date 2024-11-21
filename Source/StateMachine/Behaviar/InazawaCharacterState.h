@@ -37,7 +37,7 @@ public:
 
     float attackMaxMoveSpeed = 3.0f;
     float attackPower = 0;
-    float maxAttackPower = 1;
+    float maxAttackPower = 0.7f;    //‚½‚ß•b
     float arrowSpeed = 120;
 
     int maxDamage = 50;
