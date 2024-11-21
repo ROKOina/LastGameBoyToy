@@ -696,21 +696,20 @@ void SceneGame::CreateUiObject()
             gauge->SetVariableValue(i);
         }
 
-        //LockOn
-        {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-            hpMemori->SetName("lockOn");
-
-            hpMemori->AddComponent<UI_LockOn>(4);
-        }
-        //decoration
-        {
-            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
-            skillGauge->SetName("Decoration");
-            skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Decoration.ui", Sprite::SpriteShader::DEFALT, false);
-        }
+      //LockOn
+      {
+          std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+          std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+          hpMemori->SetName("lockOn");
+          hpMemori->AddComponent<UI_LockOn>(4,0,90);
+      }
+      //decoration
+      {
+          std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("Canvas");
+          std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
+          skillGauge->SetName("Decoration");
+          skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Decoration.ui", Sprite::SpriteShader::DEFALT, false);
+      }
 
         //HitEffect
         {
