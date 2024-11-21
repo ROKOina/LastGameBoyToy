@@ -150,7 +150,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
 
     //’e”­ŽË
     std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
-    float g = 2.98f;
+    float g = 5.98f;
     float gravity = g - (g - 0.3) * power;
     moveCom->SetGravity(gravity);
     moveCom->SetFriction(0.0f);

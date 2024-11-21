@@ -254,6 +254,8 @@ void SceneGame::Initialize()
         boss->AddComponent<AnimationCom>();
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
+        charaStatusCom->SetHitPoint(1000);
+        charaStatusCom->SetMaxHitPoint(1000);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AudioCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
