@@ -35,6 +35,7 @@ public:
 
     IXAudio2SourceVoice* GetSourceVoice() { return sourceVoice_; }
     void SetVolume(float volume) { sourceVoice_->SetVolume(volume); }
+    void SetPitch(float value) { sourceVoice_->SetFrequencyRatio(value); }
     void AudioRelease();
 
 private:

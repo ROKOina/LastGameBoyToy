@@ -265,6 +265,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 }
             }
             //セレクト棒壱変更
+            if (sprite->GetHitSpriteEnter()) { audioObj->Stop("Cursor"); audioObj->Play("Cursor", false, 1.0f); }
             selectB->SetEnabled(true);
             DirectX::XMFLOAT3 sP = selectB->transform_->GetWorldPosition();
             sP.y = s.y;

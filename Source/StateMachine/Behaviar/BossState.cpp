@@ -248,6 +248,13 @@ void Boss_MoveState::Execute(const float& elapsedTime)
     AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
     AnimtionEventControl("FOOTSMOKE", "Boss_L_ancle", "leftfootsmokeeffect", EnableCPUParticle);
 
+    //足音
+    if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
+    {
+        audioCom.lock()->Stop("WALK");
+        audioCom.lock()->Play("WALK", false, 7.0f);
+    }
+
     //距離判定
     if (owner->Search(owner->longrange))
     {
@@ -277,6 +284,11 @@ void Boss_SA1::Enter()
 void Boss_SA1::Execute(const float& elapsedTime)
 {
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+    if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
+    {
+        audioCom.lock()->Play("PUNCH", false, 10.0f);
+    }
+
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
@@ -302,6 +314,10 @@ void Boss_SA2::Enter()
 void Boss_SA2::Execute(const float& elapsedTime)
 {
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+    if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
+    {
+        audioCom.lock()->Play("PUNCH", false, 10.0f);
+    }
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
@@ -361,6 +377,12 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     //炎を付ける
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+
+    if (animationCom.lock()->IsEventCalling("SOUND"))
+    {
+        audioCom.lock()->Stop("LARIAT");
+        audioCom.lock()->Play("LARIAT", false, 10.0f);
+    }
 
     //ラリアット持続時間
     if (time >= 4.5f)
@@ -735,6 +757,11 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
     auto& moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     DirectX::XMFLOAT3 v = owner->GetGameObject()->transform_->GetWorldFront() * 0.1f;
     moveCom->AddForce({ v.x,v.y,v.z });
+
+    if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
+    {
+        audioCom.lock()->Play("WALK", false, 10.0f);
+    }
 
     //左右の煙
     AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
