@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Component\Renderer\RendererCom.h" />
     <ClInclude Include="Source\Component\Renderer\TrailCom.h" />
     <ClInclude Include="Source\Component\Sprite\Sprite.h" />
+    <ClInclude Include="Source\Component\Stage\GateGimmickCom.h" />
     <ClInclude Include="Source\Component\Stage\StageEditorCom.h" />
     <ClInclude Include="Source\Component\Stage\StageGimmickCom.h" />
     <ClInclude Include="Source\Component\System\Component.h" />
@@ -252,6 +253,7 @@
     <ClInclude Include="Source\Setting\Setting.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BaseCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
+    <ClInclude Include="Source\StateMachine\Behaviar\GateGimmickState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\NomuraCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\PicohardState.h" />
@@ -326,6 +328,7 @@
     <ClCompile Include="Source\Component\Renderer\RendererCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\TrailCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\Sprite.cpp" />
+    <ClCompile Include="Source\Component\Stage\GateGimmickCom.cpp" />
     <ClCompile Include="Source\Component\Stage\StageEditorCom.cpp" />
     <ClCompile Include="Source\Component\Stage\StageGimmickCom.cpp" />
     <ClCompile Include="Source\Component\System\GameObject.cpp" />
@@ -384,6 +387,7 @@
     <ClCompile Include="Source\Setting\Setting.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BaseCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />
+    <ClCompile Include="Source\StateMachine\Behaviar\GateGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\NomuraCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\PicohardState.cpp" />

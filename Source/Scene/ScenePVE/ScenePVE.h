@@ -35,5 +35,12 @@ public:
 private:
     GameObj audioObj;
     std::unique_ptr<BasicsApplication> photonNet;
+    std::shared_ptr<TransformCom>t;
+
+    GameObj eventObj;
+
+    GameObj bossObj;
+    GameObj stageObj;
+
     bool battleClymax = false;
 };

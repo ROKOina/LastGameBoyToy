@@ -20,6 +20,7 @@ public:
     void SetVolume(float value) { volume = value; }
     void SetLoopFlag(bool flag) { loop = flag; }
 
+    bool GetIsSource() { return source != nullptr; }
     bool GetFeedFlag() { return feedFlag; }
 
 private:

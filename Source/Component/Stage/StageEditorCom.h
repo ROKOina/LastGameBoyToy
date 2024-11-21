@@ -27,9 +27,6 @@ public:
     // GUI描画
     void OnGUI();
 
-    //Jsonのデータを元にオブジェクト配置
-    void PlaceJsonData(std::string filename);
-
 private:
     //配置するオブジェクトを登録
     void ObjectRegister();
@@ -60,21 +57,25 @@ private:
 
         TestNakanisi,
         TowerGimic,
+        GateGimic,
         Max,
     };
 
     //ゲームオブジェクト生成関数
-    static void TestNakanisi(GameObj place);
+    static void TestNakanisi(GameObj& place);
     static void TowerGimic(GameObj& place);
+    static void GateGimic(GameObj& place);
 
     GenerateFunc generateFunc[(int)GenerateFuncName::Max] =
     {
         nullptr, //None
 
         TestNakanisi,
-        TowerGimic
+        TowerGimic,
+        GateGimic,
     };
 
+public:
     //保存用のデータを格納する構造体
     struct PlaceObject
     {
@@ -86,11 +87,16 @@ private:
         GenerateFuncName func;
     };
 
+    //Jsonのデータを元にオブジェクト配置
+    void PlaceJsonData(std::string filename);
+
+    PlaceObject& GetPlaceObject(std::string name) { return placeObjcts[name]; }
+
 private:
     bool onImGui = false;//カーソルがGui上にあるかどうか
     bool nowEdit = false;//編集中フラグ
 
-    std::map<std::string, PlaceObject> placeObjcts;//オブジェクトの名前とModleのファイルパスを紐づけて保存
+    std::map<std::string, PlaceObject> placeObjcts;//オブジェクトの名前とオブジェクトを紐づけて保存
     char registerObjName[256] = {};
     std::string objType;
     std::list<GameObj> objList;

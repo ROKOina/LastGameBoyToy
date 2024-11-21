@@ -35,7 +35,6 @@ public:
     std::string GetName() const override { return "SceneGame"; };
 
 private:
-
     //UIのゲームオブジェクト生成
     void CreateUiObject();
 

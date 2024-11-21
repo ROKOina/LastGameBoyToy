@@ -9,6 +9,7 @@
 #include <Scene/SceneManager.h>
 #include "Scene/SceneResult/SceneResult.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Component\Stage\StageEditorCom.h"
 
 PVEDirection::PVEDirection()
 {
@@ -75,8 +76,6 @@ void PVEDirection::DirectionStart()
         eventBoss->transform_->SetEulerRotation({ 0.0, 180.0f, 0.0f });
         eventBoss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
 
-        animationCom = eventBoss->AddComponent<AnimationCom>();
-
         {
             auto& DirectionBossSeconds = eventBoss->AddChildObject();
             DirectionBossSeconds->SetName("Seconds");
@@ -90,6 +89,7 @@ void PVEDirection::DirectionStart()
             fixationPoint->GetComponent<MovementCom>()->SetGravity(0.0f);
         }
     }
+
     //最初にイベントカメラへ変更
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
@@ -291,7 +291,6 @@ void PVEDirection::DirectionCFou(float elapsedTime)
 {
     if (!flag)
     {
-        GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
         //暗転
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
