@@ -5,6 +5,7 @@
 #include "Component/Animation/AnimationCom.h"
 #include "Component/Character/CharaStatusCom.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Audio\AudioCom.h"
 #include <random>
 
 class BossCom;
@@ -40,6 +41,7 @@ protected:
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
+    std::weak_ptr<AudioCom> audioCom;
     std::weak_ptr<CharaStatusCom>characterstatas;
 
 private:
@@ -284,14 +286,38 @@ public:
     virtual const char* GetName() const override { return "JumpAttackEnd"; }
 };
 
-//Ž€–S
-class Boss_DeathState : public Boss_BaseState
+class Boss_EventWalk : public Boss_BaseState
 {
 public:
-    Boss_DeathState(BossCom* owner) :Boss_BaseState(owner) {}
+    Boss_EventWalk(BossCom* owner) :Boss_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit()override;
     void ImGui() override {};
-    virtual const char* GetName() const override { return "Death"; }
+    virtual const char* GetName() const override { return "EventWalk"; }
+};
+
+class Boss_EventPunch : public Boss_BaseState
+{
+public:
+    Boss_EventPunch(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "EventPunch"; }
+};
+
+class Boss_EventDeath : public Boss_BaseState
+{
+public:
+    Boss_EventDeath(BossCom* owner) :Boss_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit()override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "EventDeath"; }
 };

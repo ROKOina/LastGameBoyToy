@@ -87,6 +87,12 @@ void SceneGame::Initialize()
         obj->AddComponent<Light>(nullptr);
     }
 
+    //オーディオ
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("Audio");
+    }
+
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -127,8 +133,6 @@ void SceneGame::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
-        //自分のプレイヤーは表示切る
-        //obj->GetComponent<RendererCom>()->SetEnabled(false);
 
         //ウルト関係Obj追加
         {
@@ -183,7 +187,7 @@ void SceneGame::Initialize()
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
             anim->PlayAnimation(0, false);
-            
+
             //Eskill中エフェクト
             {
                 std::shared_ptr<GameObject> eSkillEff = armChild->AddChildObject();
@@ -196,7 +200,7 @@ void SceneGame::Initialize()
             //攻撃ため
             {
                 std::shared_ptr<GameObject> chargeEff = armChild->AddChildObject();
-                chargeEff->transform_->SetLocalPosition({0.98f,12.44f,6.96f});
+                chargeEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
                 chargeEff->SetName("chargeEff");
                 std::shared_ptr<GPUParticle> eff = chargeEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playercharge.gpuparticle", 300);
                 eff->SetLoop(false);
@@ -206,27 +210,23 @@ void SceneGame::Initialize()
             //攻撃ためマックス
             {
                 std::shared_ptr<GameObject> chargeMaxEff = armChild->AddChildObject();
-                chargeMaxEff->transform_->SetLocalPosition({0.98f,12.44f,6.96f});
+                chargeMaxEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
                 chargeMaxEff->SetName("chargeMaxEff");
                 std::shared_ptr<GPUParticle> eff = chargeMaxEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerchargeFull.gpuparticle", 300);
                 eff->SetLoop(false);
                 //銃口にくっ付ける
                 chargeMaxEff->AddComponent<SetNodeWorldPosCom>();
-
             }
             //ウルトマズルフラッシュ
             {
                 std::shared_ptr<GameObject> attackUltMuzzleEff = armChild->AddChildObject();
-                attackUltMuzzleEff->transform_->SetLocalPosition({-3.1f,12.94f,1.69f});
+                attackUltMuzzleEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
                 attackUltMuzzleEff->SetName("attackUltMuzzleEff");
                 std::shared_ptr<GPUParticle> eff = attackUltMuzzleEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltMuzzleF.gpuparticle", 20);
                 eff->SetLoop(false);
-
             }
         }
     }
-    
-
 
     //snowparticle
     {
@@ -252,9 +252,11 @@ void SceneGame::Initialize()
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
-        boss->AddComponent<CharaStatusCom>();
+        auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
+        charaStatusCom->SetInvincibleTime(0.1f);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
+        boss->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
@@ -485,6 +487,12 @@ void SceneGame::EffectNew()
         obj->SetName("testui");
         obj->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
     }
+    if (ImGui::Button("Light"))
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("testlight");
+        obj->AddComponent<Light>(nullptr);
+    }
 }
 
 void SceneGame::CreateUiObject()
@@ -664,32 +672,43 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("boostGauge2");
 
-            hpMemori->AddComponent<UI_BoosGauge>(2);
-        }
-        //BossHpFrame
-        {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
-            hpFrame->SetName("BossHpFrame");
-            hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHpFrame.ui", Sprite::SpriteShader::DEFALT, false);
-        }
-        //BossHpGauge
-        {
-            std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("BossHpFrame");
-            std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
-            hpGauge->SetName("BossHpGauge");
-            std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
-            gauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
-            float* i = GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint();
-            gauge->SetVariableValue(i);
-        }
-        //decoration
-        {
-            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
-            skillGauge->SetName("Decoration");
-            skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Decoration.ui", Sprite::SpriteShader::DEFALT, false);
-        }
+         
+          hpMemori->AddComponent<UI_BoosGauge>(2);
+      }
+      //BossHpFrame
+      {
+          std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+          std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
+          hpFrame->SetName("BossHpFrame");
+          hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHpFrame.ui", Sprite::SpriteShader::DEFALT, false);
+      }
+     //BossHpGauge
+      {
+          std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("BossHpFrame");
+          std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
+          hpGauge->SetName("BossHpGauge");
+          std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
+          gauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
+          float* i = GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint();
+          gauge->SetVariableValue(i);
+      }
+
+      //LockOn
+      {
+          std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+          std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+          hpMemori->SetName("lockOn");
+
+
+          hpMemori->AddComponent<UI_LockOn>(4);
+      }
+      //decoration
+      {
+          std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("Canvas");
+          std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
+          skillGauge->SetName("Decoration");
+          skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Decoration.ui", Sprite::SpriteShader::DEFALT, false);
+      }
 
         //HitEffect
         {

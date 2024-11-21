@@ -26,12 +26,15 @@ public:
 
     // Ä¶
     void Play(bool loop, float volume = 1.0f);
+    void Play();
+
     // ’âŽ~
     void Stop();
 
-    void Feed(float startVolume, float endVolume, float );
+    bool Feed(float targetValue, float elapsedTime);
 
     IXAudio2SourceVoice* GetSourceVoice() { return sourceVoice_; }
+    void SetVolume(float volume) { sourceVoice_->SetVolume(volume); }
     void AudioRelease();
 
 private:

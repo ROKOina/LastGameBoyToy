@@ -25,8 +25,14 @@ void StageGimmick_IdleState::Execute(const float& elapsedTime)
 
         int changeNum = static_cast<int>(damagepreview - currentHitPoint);
 
-        //3ずつ減ったときに遷移
-        if (static_cast<int>(damagepreview - currentHitPoint) % 11 == 10 && changeNum != spawnChangeNum)
+        //パーティクル生成
+        if (static_cast<int>(damagepreview - currentHitPoint) % 10 == 9 && changeNum != spawnChangeNum)
+        {
+            owner->GetGameObject()->GetChildFind("accumulateparticle")->GetComponent<GPUParticle>()->SetLoop(true);
+        }
+
+        //15ずつ減ったときに遷移
+        if (static_cast<int>(damagepreview - currentHitPoint) % 16 == 15 && changeNum != spawnChangeNum)
         {
             owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::ENEMYSPAWN);
             spawnChangeNum = changeNum;
@@ -71,6 +77,7 @@ void StageGimmick_EnemySpawnState::Execute(const float& elapsedTime)
 }
 void StageGimmick_EnemySpawnState::Exit()
 {
+    owner->GetGameObject()->GetChildFind("accumulateparticle")->GetComponent<GPUParticle>()->SetLoop(false);
     spawn.lock()->SetOnTrigger(false);
 }
 #pragma endregion

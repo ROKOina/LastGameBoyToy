@@ -15,6 +15,7 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
+    audioCom = owner->GetGameObject()->GetComponent<AudioCom>();
     characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
 
     // 乱数エンジンのシードを設定
@@ -55,11 +56,7 @@ void Boss_BaseState::RandamLongRangeAttack()
     //ランダムしたい数を増やす程下記の値が増えていく
     if (availableNumbers.empty())
     {
-        //ジャンプ攻撃アニメーションが無いため消しておく
-        //TODO アニメーションが修正次第ここも直す
-
-        availableNumbers = { 1,2,3,5 };
-        //availableNumbers = { 1,2,3,4,5 };
+        availableNumbers = { 1,2,3,4,5 };
     }
 
     // 乱数生成エンジンを使ってランダムにインデックスを生成
@@ -195,9 +192,9 @@ void Boss_IdleState::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -230,9 +227,9 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -258,9 +255,9 @@ void Boss_MoveState::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -289,9 +286,9 @@ void Boss_SA1::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -314,9 +311,9 @@ void Boss_SA2::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -337,9 +334,9 @@ void Boss_LARIATSTART::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -374,9 +371,9 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -411,9 +408,9 @@ void Boss_LARIATEND::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -434,9 +431,9 @@ void Boss_UpShotStart::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -460,9 +457,9 @@ void Boss_UpShotCharge::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -496,9 +493,9 @@ void Boss_UpShotLoop::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -527,9 +524,9 @@ void Boss_UpShotEnd::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -550,9 +547,9 @@ void Boss_ShotStart::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -576,9 +573,9 @@ void Boss_ShotCharge::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -610,9 +607,9 @@ void Boss_Shot::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -630,6 +627,10 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     AnimtionEventControl("EFFECTTIME", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
 
     //飛ぶ
+    if (animationCom.lock()->IsEventCalling("JUMPINIT"))
+    {
+        audioCom.lock()->Play("JUMP_ATTACK_START", false, 5.0f);
+    }
     if (animationCom.lock()->IsEventCalling("JUMPTIME"))
     {
         moveCom.lock()->AddForce({ owner->GetGameObject()->transform_->GetWorldPosition().x, 2.5f, owner->GetGameObject()->transform_->GetWorldPosition().z });
@@ -655,9 +656,9 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
@@ -671,7 +672,8 @@ void Boss_JumpAttackStart::Exit()
 #pragma region ジャンプ攻撃終わり
 void Boss_JumpAttackEnd::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_swing_attack_end"), false, false, 0.1f);
+    audioCom.lock()->Play("JUMP_ATTACK_END", false, 10.0f);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_jump_attack_end"), false, false, 0.1f);
 
     //カメラシェイク
     GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.02f, 0.5f);
@@ -690,29 +692,72 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     }
 
     //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation() && moveCom.lock()->OnGround())
+    if (moveCom.lock()->JustLanded())
     {
         //カメラシェイク
-        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.7f);
+        audioCom.lock()->Play("JUMP_ATTACK_GROUND", false, 10.0f);
+        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.5f);
+    }
+
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
         return;
     }
 
     //死亡処理
-    if (characterstatas.lock()->GetHitPoint() <= 0)
+    if (characterstatas.lock()->IsDeath())
     {
-        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::DEATH);
+        bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
 }
 #pragma endregion
 
-#pragma region 死亡
-void Boss_DeathState::Enter()
+void Boss_EventWalk::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_walk_front"), true, false, 0.1f);
+    owner->GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animationCom.lock()->FindAnimation("Boss_walk_front")].animationspeed = 2.0f;
+}
+
+void Boss_EventWalk::Execute(const float& elapsedTime)
+{
+    auto& moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
+    DirectX::XMFLOAT3 v = owner->GetGameObject()->transform_->GetWorldFront() * 0.1f;
+    moveCom->AddForce({ v.x,v.y,v.z });
+
+    //エフェクト出すならここですかね
+
+     //左右の煙
+    AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
+    AnimtionEventControl("FOOTSMOKE", "Boss_L_ancle", "leftfootsmokeeffect", EnableCPUParticle);
+}
+
+void Boss_EventWalk::Exit()
+{
+    //エフェクトを切る
+    GameObjectManager::Instance().Find("rightfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+
+    owner->GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animationCom.lock()->FindAnimation("Boss_walk_front")].animationspeed = 1.0f;
+}
+
+void Boss_EventPunch::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_short_attack_1"), false, false, 0.1f);
+}
+
+void Boss_EventPunch::Execute(const float& elapsedTime)
+{
+    //ここでエフェクト出す
+    AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle);
+}
+
+void Boss_EventDeath::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_dead"), false, false, 0.1f);
 }
-void Boss_DeathState::Execute(const float& elapsedTime)
+
+void Boss_EventDeath::Execute(const float& elapsedTime)
 {
 }
-#pragma endregion

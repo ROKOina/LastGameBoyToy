@@ -449,10 +449,10 @@ void StageEditorCom::TowerGimic(GameObj& place)
     place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/energy.gpuparticle", 6000);
     place->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/enemy.spawn");
     place->AddComponent<StageGimmick>();
-    place->AddComponent<FrustumCom>();
+    //place->AddComponent<FrustumCom>();
     place->GetComponent<RendererCom>()->SetOutlineColor({ 1.000f, 0.361f, 0.000f });
     place->GetComponent<RendererCom>()->SetOutlineIntensity(10.0f);
-    std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 100);
+    std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 50);
     cpuparticle->SetActive(false);
     std::shared_ptr<SphereColliderCom>collider = place->AddComponent<SphereColliderCom>();
     collider->SetMyTag(COLLIDER_TAG::Enemy);
@@ -460,4 +460,10 @@ void StageEditorCom::TowerGimic(GameObj& place)
     std::shared_ptr<CharaStatusCom>status = place->AddComponent<CharaStatusCom>();
     status->SetInvincibleTime(0.2f);
     status->SetHitPoint(15.0f);
+
+    //集まるパーティクル
+    std::shared_ptr<GameObject>accumulate = place->AddChildObject();
+    accumulate->SetName("accumulateparticle");
+    std::shared_ptr<GPUParticle>p = accumulate->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyspawn.gpuparticle", 500);
+    p->SetLoop(false);
 }
