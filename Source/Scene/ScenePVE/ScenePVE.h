@@ -4,12 +4,10 @@
 #include "Component\Sprite\Sprite.h"
 #include "Audio\AudioSource.h"
 #include "Audio\Audio.h"
-
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
-#include "Netwark/Photon/BasicsApplication.h"
 
-//リザルトシーン
+//PvEシーン
 class ScenePVE :public Scene
 {
 public:
@@ -31,14 +29,9 @@ public:
     //UIのゲームオブジェクト生成
     void CreateUiObject();
 
-
     //名前取得
     std::string GetName() const override { return "ScenePVE"; };
 private:
-    std::unique_ptr<BasicsApplication> photonNet;
-    std::shared_ptr<TransformCom>t;
-
-    GameObj bossObj;
     GameObj audioObj;
 
     bool battleClymax = false;
