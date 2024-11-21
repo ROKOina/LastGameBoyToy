@@ -660,7 +660,7 @@ void ScenePVE::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("lockOn");
 
-            hpMemori->AddComponent<UI_LockOn>(4);
+            hpMemori->AddComponent<UI_LockOn>(4,0,90);
         }
         //decoration
         {

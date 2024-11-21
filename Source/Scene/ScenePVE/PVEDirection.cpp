@@ -226,6 +226,9 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
 
         GameObject* eventGate = GameObjectManager::Instance().Find("Gate0").get();
         eventGate->GetComponent<GateGimmick>()->GetStateMachine().ChangeState(GateGimmick::GimmickState::DOWN);
+        DirectX::XMFLOAT3 x = GameObjectManager::Instance().Find("BOSS")->transform_->GetWorldPosition();
+        x.z = 4.5f;
+        GameObjectManager::Instance().Find("BOSS")->transform_->SetWorldPosition({ x.x,x.y,x.z });
         flag = true;
 
     }
