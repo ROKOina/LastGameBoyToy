@@ -156,7 +156,7 @@ void ScenePVE::Initialize()
                 std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
                 eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
                 eSkillEff->transform_->SetLocalPosition({ -0.35f,9.84f,-0.58f });
-                eff->Play();
+                eff->SetLoop(false);
             }
             //çUåÇÇΩÇﬂ
             {
