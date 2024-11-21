@@ -122,6 +122,8 @@ public:
 
     //カーソルがスプライトに当たっているか
     bool GetHitSprite() { return hit; }
+    //カーソルがスプライトに当たった瞬間
+    bool GetHitSpriteEnter() { return hitEnter; }
 
     //クリップタイムセッター、ゲッター
     void SetClipTime(float cliptime) { constants.cliptime = cliptime; }
@@ -166,6 +168,7 @@ private:
     bool loopon = false;
     bool drawcollsion = false;
     bool hit = false;
+    bool hitEnter = false;
     bool ontriiger = false;
 
     DirectX::XMFLOAT2 collisionPivot;

@@ -248,6 +248,13 @@ void Boss_MoveState::Execute(const float& elapsedTime)
     AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
     AnimtionEventControl("FOOTSMOKE", "Boss_L_ancle", "leftfootsmokeeffect", EnableCPUParticle);
 
+    //ë´âπ
+    if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
+    {
+        audioCom.lock()->Stop("WALK");
+        audioCom.lock()->Play("WALK", false, 7.0f);
+    }
+
     //ãóó£îªíË
     if (owner->Search(owner->longrange))
     {
@@ -735,6 +742,11 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
     auto& moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     DirectX::XMFLOAT3 v = owner->GetGameObject()->transform_->GetWorldFront() * 0.1f;
     moveCom->AddForce({ v.x,v.y,v.z });
+
+    if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
+    {
+        audioCom.lock()->Play("WALK", false, 10.0f);
+    }
 
     //ç∂âEÇÃâå
     AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
