@@ -33,6 +33,11 @@
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Component\Stage\GateGimmickCom.h"
 
+ScenePVE::~ScenePVE()
+{
+
+}
+
 void ScenePVE::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -74,7 +79,7 @@ void ScenePVE::Initialize()
 
     //ステージ
     {
-        stageObj = GameObjectManager::Instance().Create();
+        auto& stageObj = GameObjectManager::Instance().Create();
         stageObj->SetName("stage");
         stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
         stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
@@ -87,7 +92,7 @@ void ScenePVE::Initialize()
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //Jsonからオブジェクト配置
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
         StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");   
         for (auto& obj : placeObj.objList)
@@ -367,6 +372,7 @@ void ScenePVE::Initialize()
 void ScenePVE::Finalize()
 {
     photonNet->close();
+    PVEDirection::Instance().DirectionEnd();
 }
 
 void ScenePVE::Update(float elapsedTime)
