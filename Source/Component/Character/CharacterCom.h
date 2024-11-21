@@ -268,6 +268,7 @@ private:
     //ウルト関係
     bool isMaxUlt = false;  //ウルトが溜まっているか
     bool isUseUlt = false;  //ウルト使用中か
+    bool prevIsMaxUlt = false;
     float ultGauge = 0;
     float ultGaugeMax = 100;
     //アタックULT

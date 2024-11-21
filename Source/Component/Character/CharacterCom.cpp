@@ -10,6 +10,7 @@
 #include "RemoveTimerCom.h"
 #include "Setting/Setting.h"
 #include "Component\Audio\AudioCom.h"
+#include "Component\Sprite\Sprite.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -439,6 +440,9 @@ void CharacterCom::Vinetto(float elapsedTime)
         {
             posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
 
+            //イージングプレイ
+            GameObjectManager::Instance().Find("HpGauge")->GetComponent<Sprite>()->EasingPlay();
+
             //音
             GetGameObject()->GetComponent<AudioCom>()->Play("P_DAMAGE", false, 10);
         }
@@ -499,6 +503,24 @@ void CharacterCom::UltUpdate(float elapsedTime)
         isMaxUlt = true;
         ultGauge = ultGaugeMax;
     }
+    else
+    {
+        isMaxUlt = false; // max未到達ならfalseに戻す
+    }
+
+    if (isMaxUlt && !prevIsMaxUlt)
+    {
+        GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->EasingPlay();
+    }
+
+    // isMaxUlt が false または変化がない場合は StopEasing を呼ぶ
+    if (!isMaxUlt)
+    {
+        GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->StopEasing();
+    }
+
+    // 状態を記録
+    prevIsMaxUlt = isMaxUlt;
 
     //ウルトエフェクト
     if (attackUltRayObj.lock())

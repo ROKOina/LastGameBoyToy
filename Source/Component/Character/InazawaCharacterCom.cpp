@@ -5,6 +5,8 @@
 #include "Component\Camera\CameraCom.h"
 #include "Component\Renderer\RendererCom.h"
 #include "CharaStatusCom.h"
+#include "Component\UI\PlayerUI.h"
+#include "Component\Sprite\Sprite.h"
 
 void InazawaCharacterCom::Start()
 {
@@ -102,6 +104,27 @@ void InazawaCharacterCom::SubSkill()
 
 void InazawaCharacterCom::UltSkill()
 {
+    if (*GetRCounter() == 4)
+    {
+        GameObjectManager::Instance().Find("core0")->GetComponent<Sprite>()->EasingPlay();
+    }
+    else if (*GetRCounter() == 3)
+    {
+        GameObjectManager::Instance().Find("core1")->GetComponent<Sprite>()->EasingPlay();
+    }
+    else if (*GetRCounter() == 2)
+    {
+        GameObjectManager::Instance().Find("core2")->GetComponent<Sprite>()->EasingPlay();
+    }
+    else if (*GetRCounter() == 1)
+    {
+        GameObjectManager::Instance().Find("core3")->GetComponent<Sprite>()->EasingPlay();
+    }
+    else if (*GetRCounter() == 0)
+    {
+        GameObjectManager::Instance().Find("core4")->GetComponent<Sprite>()->EasingPlay();
+    }
+
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 

@@ -44,6 +44,9 @@ public:
     //イージングプレイ関数
     void EasingPlay();
 
+    //イージング停止
+    void StopEasing();
+
 private:
 
     //シリアライズ
@@ -54,9 +57,6 @@ private:
 
     // デシリアライズの読み込み
     void LoadDeserialize();
-
-    //イージング停止
-    void StopEasing();
 
     //当たり判定用短形
     void DrawCollsionBox();

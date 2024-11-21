@@ -7,7 +7,7 @@
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include <Scene/SceneManager.h>
-#include "Scene/SceneResult/SceneResult.h"
+#include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\Stage\StageEditorCom.h"
 #include "Component\Animation\AimIKCom.h"
@@ -154,7 +154,6 @@ void PVEDirection::DirectionFOne(float elapsedTime)
         GameObject* eventGate = GameObjectManager::Instance().Find("Gate0").get();
         eventGate->GetComponent<GateGimmick>()->GetStateMachine().ChangeState(GateGimmick::GimmickState::UP);
 
-
         flag = true;
     }
 
@@ -230,7 +229,6 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
         x.z = 4.5f;
         GameObjectManager::Instance().Find("BOSS")->transform_->SetWorldPosition({ x.x,x.y,x.z });
         flag = true;
-
     }
 
     if (GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->IsDeath())
@@ -324,7 +322,7 @@ void PVEDirection::DirectionCFou(float elapsedTime)
         //ˆÃ“]
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
-        SceneManager::Instance().ChangeSceneDelay(new SceneResult, 2);
+        SceneManager::Instance().ChangeSceneDelay(new SceneLGBT, 2);
         flag = true;
     }
 }

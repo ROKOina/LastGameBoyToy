@@ -17,7 +17,6 @@ public:
     // 更新処理
     void Update(float elapsedTime) override;
 
-
 private:
     float changePosValue;
     DirectX::XMFLOAT2 originalPos = {};
@@ -35,11 +34,10 @@ public:
     const char* GetName() const override { return "UI_BoostGauge"; }
 
     // 開始処理
-    void Start() override ;
+    void Start() override;
 
     // 更新処理
     void Update(float elapsedTime) override;
-
 
 private:
     std::vector<std::shared_ptr<GameObject>>   gauges;
@@ -56,33 +54,31 @@ class UI_LockOn : public Component
 {
     //コンポーネントオーバーライド
 public:
-    UI_LockOn(int num,float min,float max);
+    UI_LockOn(int num, float min, float max);
     ~UI_LockOn() {}
 
     // 名前取得
     const char* GetName() const override { return "UI_BoostGauge"; }
 
     // 開始処理
-    void Start() override ;
+    void Start() override;
 
     // 更新処理
     void Update(float elapsedTime) override;
 
     void OnGUI()override;
 
-
     //視線の先のオブジェクトを入手
     std::shared_ptr<GameObject> SearchObjct();
 
-    void UpdateGauge(float elapsedTime,std::shared_ptr<GameObject> obj);
-    
+    void UpdateGauge(float elapsedTime, std::shared_ptr<GameObject> obj);
+
     void LockIn(float elapsedTime);
     void LockOut(float elapsedTime);
 
 private:
     std::vector<std::shared_ptr<GameObject>> reacters;
 
-  
     std::weak_ptr<GameObject> camera;   //カメラ
 
     std::shared_ptr<GameObject> lockOn;
@@ -101,7 +97,6 @@ private:
     float minAngle = 0.0f;
     float maxAngle = 0.0f;
     std::vector<float> similarity;
-
 };
 
 class UI_E_SkillCount : public Component
@@ -123,6 +118,7 @@ public:
     void UpdateCore(float elapsedTime);
 
     void OnGUI()override;
+
 private:
     struct SkillCore {
         std::shared_ptr<UiSystem> coreFrameUi;
@@ -164,7 +160,6 @@ public:
     void Update(float elapsedTime) override;
     void UpdateCore(float elapsedTime);
 
-    
 private:
     struct SkillCore {
         std::shared_ptr<UiSystem> coreFrameUi;
@@ -174,10 +169,9 @@ private:
 
     std::vector<std::shared_ptr<GameObject>> cores;
     std::vector<std::shared_ptr<GameObject>> coreFrames;
-  
 
     int num = 0;
-    int*  ultCount;
+    int* ultCount;
     bool* isUlt;
     float spacing = 30.0f;
     std::weak_ptr<GameObject> player;
@@ -207,7 +201,6 @@ private:
 
     std::shared_ptr<UiSystem> reticleFrameUi;         //外枠
     std::shared_ptr<UiSystem> reticleCircleUi;        //真ん中
-
 
     float* attackPower;  //現在のチャージ率
     float maxAttackPower = 0.0f; //チャージの最大
