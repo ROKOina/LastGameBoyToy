@@ -161,7 +161,8 @@ public:
     void SetRSkillCoolTime(float time) { Rcool.time = time; }
     float GetRSkillCoolTime() { return Rcool.time; }
     float GetRSkillCoolTimer() { return Rcool.timer; }
-
+    int* GetRCounter() { return &attackUltCounter; }
+    int GetRMaxCount() { return attackUltCountMax; }
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
     float* GetSpaceSkillCoolTimer() { return &Spacecool.timer; }

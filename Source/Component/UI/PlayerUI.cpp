@@ -449,4 +449,108 @@ void UI_E_SkillCount::OnGUI()
      ImGui::DragFloat("spcaisn",&spacing);
 }
 
+UI_Ult_Count::UI_Ult_Count(int num)
+{
+    float centerX = 960;//中央値
+    for (int i = 0; i < num; i++) {
 
+        SkillCore localCore;
+        float offset = (i - (num - 1) / 2.0f) * spacing; //配置用のoffset
+        //外枠のゲームオブジェクト生成
+        std::shared_ptr<GameObject> coreFrame = GameObjectManager::Instance().Create();;
+
+        std::string name = "coreFrame";
+        std::string number = std::to_string(i);
+        name += number;
+        coreFrame->SetName(name.c_str());
+        localCore.coreFrameUi = coreFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/E_SkillCoreFrame.ui", Sprite::SpriteShader::DEFALT, false);
+        localCore.coreFrameUi->spc.position = { centerX + offset,localCore.coreFrameUi->spc.position.y };
+        coreFrames.emplace_back(coreFrame);
+
+        //本体のゲームオブジェクト生成
+        std::shared_ptr<GameObject> core;
+        core = GameObjectManager::Instance().Create();
+        name = "core";
+        number = std::to_string(i);
+        name += number;
+        core->SetName(name.c_str());
+        localCore.coreUi = core->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltCore.ui", Sprite::SpriteShader::DEFALT, false);
+        localCore.coreUi->spc.position = { centerX + offset,localCore.coreUi->spc.position.y };
+        cores.emplace_back(core);
+        coresUi.emplace_back(localCore);
+    }
+
+    this->num = num;
+}
+
+void UI_Ult_Count::Start()
+{
+
+    //親子付け
+    for (int i = 0; i < num; i++) {
+        this->GetGameObject()->AddChildObject(coreFrames.at(i));
+        this->GetGameObject()->AddChildObject((cores.at(i)));
+    }
+    //各パラメーター設定
+    player = GameObjectManager::Instance().Find("player");
+    ultCount = player.lock()->GetComponent<InazawaCharacterCom>()->GetRCounter();
+}
+
+void UI_Ult_Count::Update(float elapsedTime)
+{
+    if (player.lock()->GetComponent<InazawaCharacterCom>()->UseUlt()) {
+        UpdateCore(elapsedTime);
+    }
+    else {
+        for (int i = 0; i < num; i++) {
+            coresUi.at(i).coreFrameUi->spc.color.w = 0.0f;
+            coresUi.at(i).coreUi->spc.color.w = 0.0f;
+        }
+    }
+}
+
+void UI_Ult_Count::UpdateCore(float elapsedTime)
+{
+    for (int i = 0; i < num; i++) {
+        if (i < num -  *ultCount) {
+            coresUi.at(i).coreFrameUi->spc.color.w = 1.0f;
+            coresUi.at(i).coreUi->spc.color.w = 1.0f;
+        }
+        else {
+            coresUi.at(i).coreUi->spc.color.w = 0.0f;
+        }
+    }
+   
+}
+
+
+UI_Reticle::UI_Reticle()
+{
+    //Uiのゲームオブジェクト生成
+    //1番外の枠
+    reticleFrame = GameObjectManager::Instance().Create();
+    reticleFrame->SetName("ReticleFrame");
+    reticleFrameUi = reticleFrame->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+
+    //なかのまる
+    reticleCircle = GameObjectManager::Instance().Create();
+    reticleCircle->SetName("ReticleCicle");
+    reticleCircleUi = reticleCircle->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+
+
+}
+
+void UI_Reticle::Start()
+{
+    this->GetGameObject()->AddChildObject(reticleFrame);
+    this->GetGameObject()->AddChildObject(reticleCircle);
+
+    player = GameObjectManager::Instance().Find("player");
+    attackPower = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_AttackState>()->attackPower;
+    maxAttackPower = player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_AttackState>()->maxAttackPower;
+}
+
+void UI_Reticle::Update(float elapsedTime)
+{
+
+}

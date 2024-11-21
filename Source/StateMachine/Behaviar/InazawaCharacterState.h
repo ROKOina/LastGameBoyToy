@@ -56,6 +56,7 @@ public:
 
     float arrowSpeed = 90;
     int arrowCount;
+    const int maxArrowCount = 8;
     float intervalTimer;
     float interval = 0.25f;
     float skillTimer = 3.0f;
