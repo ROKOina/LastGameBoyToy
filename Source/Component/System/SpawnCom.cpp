@@ -20,6 +20,8 @@
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Component\Bullet\MissileCom.h"
+#include "Component\Audio\AudioCom.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -287,6 +289,8 @@ void SpawnCom::SetupMissile(const std::shared_ptr<GameObject>& obj)
     obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missile.easingmove");
+    obj->AddComponent<AudioCom>();
+    obj->AddComponent<MissileCom>();
 
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
@@ -323,6 +327,8 @@ void SpawnCom::SetupBeam(const std::shared_ptr<GameObject>& obj)
     obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/fireball.gpuparticle", 4000);
     obj->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/missilestreat.easingmove");
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/fireball.nodecollsion");
+    obj->AddComponent<AudioCom>();
+    obj->AddComponent<MissileCom>(60.0f);
 
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);

@@ -284,6 +284,11 @@ void Boss_SA1::Enter()
 void Boss_SA1::Execute(const float& elapsedTime)
 {
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+    if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
+    {
+        audioCom.lock()->Play("PUNCH", false, 10.0f);
+    }
+
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
@@ -309,6 +314,10 @@ void Boss_SA2::Enter()
 void Boss_SA2::Execute(const float& elapsedTime)
 {
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+    if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
+    {
+        audioCom.lock()->Play("PUNCH", false, 10.0f);
+    }
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
@@ -368,6 +377,12 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     //炎を付ける
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
+
+    if (animationCom.lock()->IsEventCalling("SOUND"))
+    {
+        audioCom.lock()->Stop("LARIAT");
+        audioCom.lock()->Play("LARIAT", false, 10.0f);
+    }
 
     //ラリアット持続時間
     if (time >= 4.5f)
