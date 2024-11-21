@@ -244,7 +244,7 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     aik->SetOffsetY(4.3f);
     obj->AddComponent<NoobEnemyCom>();
     obj->AddComponent<CharaStatusCom>();
-    obj->AddComponent<FrustumCom>();
+    //obj->AddComponent<FrustumCom>();
     std::shared_ptr<GPUParticle>gp = obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyaura.gpuparticle", 1000);
     gp->Play();
     const auto& collider = obj->AddComponent<SphereColliderCom>();
