@@ -20,11 +20,13 @@ public:
     //XVˆ—
     void Update(float elapsedTime);
     void DirectionStart();
+    int GetDirectionNum() { return directionNumber; }
+
 private:
     //‰‰o‚Ì“Š‡
     void DirectionSupervision(float elapsedTime);
 
-    
+
 
 private:
     void DirectionFOne(float elapsedTime);

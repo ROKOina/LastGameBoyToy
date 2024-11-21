@@ -30,6 +30,7 @@
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
 #include "Component\Audio\AudioCom.h"
+#include "Component\Stage\GateGimmickCom.h"
 
 void ScenePVE::Initialize()
 {
@@ -69,16 +70,30 @@ void ScenePVE::Initialize()
 
     //ステージ
     {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        stageObj = GameObjectManager::Instance().Create();
+        stageObj->SetName("stage");
+        stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
+        stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-        StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
+        stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+
+        //ステージ
+        StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
-        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
+        //配置したステージオブジェクトの中からGateを取得
+        StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");   
+        for (auto& obj : placeObj.objList)
+        {
+            DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+
+            obj->GetComponent<GateGimmick>()->SetDownPos(pos);
+            obj->GetComponent<GateGimmick>()->SetUpPos({ pos.x, 1.85f, pos.z });
+        }
+        
+
+        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
         rigid->SetNormalizeScale(1);
     }
@@ -166,6 +181,7 @@ void ScenePVE::Initialize()
         boss->AddComponent<CharaStatusCom>();
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
+        boss->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);

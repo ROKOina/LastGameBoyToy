@@ -7,6 +7,7 @@ public:
     GateGimmick_BaseState(GateGimmick* owner);
 
 protected:
+    std::weak_ptr<TransformCom> transform;
     std::weak_ptr<GateGimmick> gateGimmick;
 };
 
@@ -40,8 +41,8 @@ public:
     GateGimmick_DownState(GateGimmick* owner) : GateGimmick_BaseState(owner) {}
 
     void Enter() override {};
-    void Execute(const float& elapsedTime) override {};
+    void Execute(const float& elapsedTime) override;
     virtual void Exit() {};
     void ImGui() override {};
-    virtual const char* GetName() const override { return "Idle"; }
+    virtual const char* GetName() const override { return "Down"; }
 };

@@ -25,6 +25,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\FrustumCom.h"
+#include "Component\Stage\GateGimmickCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -471,4 +472,6 @@ void StageEditorCom::TowerGimic(GameObj& place)
 
 void StageEditorCom::GateGimic(GameObj& place)
 {
+    place->AddComponent<GateGimmick>();
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Convex).get();
 }

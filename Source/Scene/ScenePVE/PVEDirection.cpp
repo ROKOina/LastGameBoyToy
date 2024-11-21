@@ -9,6 +9,7 @@
 #include <Scene/SceneManager.h>
 #include "Scene/SceneResult/SceneResult.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Component\Stage\StageEditorCom.h"
 
 PVEDirection::PVEDirection()
 {
@@ -77,19 +78,6 @@ void PVEDirection::DirectionStart()
         eventBoss->transform_->SetEulerRotation({ 0.0, 180.0f, 0.0f });
         eventBoss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
 
-            /*GameObjectManager::Instance().Create();
-        eventBoss->SetName("Direction");
-        std::shared_ptr<RendererCom> r = eventBoss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
-        eventBoss->transform_->SetWorldPosition({ -2.878,-0.176,15.196 });
-        eventBoss->transform_->SetEulerRotation({ 0.0, 180.0f, 0.0f });
-
-        t = eventBoss->transform_;
-        eventBoss->AddComponent<MovementCom>();
-        eventBoss->AddComponent<BossCom>();*/
-
-        animationCom = eventBoss->AddComponent<AnimationCom>();
-
         {
             auto& DirectionBossSeconds = eventBoss->AddChildObject();
             DirectionBossSeconds->SetName("Seconds");
@@ -104,6 +92,7 @@ void PVEDirection::DirectionStart()
             fixationPoint->GetComponent<MovementCom>()->SetGravity(0.0f);
         }
     }
+
     //最初にイベントカメラへ変更
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 

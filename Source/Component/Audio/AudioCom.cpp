@@ -20,10 +20,13 @@ void AudioCom::OnGUI()
 
 void AudioCom::RegisterSource(AUDIOID id, std::string name)
 {
-    std::shared_ptr<AudioSource> source = std::make_shared<AudioSource>();
-    source->SetAudio((int)id);
+    if (!audioSources[name].GetIsSource())
+    {
+        std::shared_ptr<AudioSource> source = std::make_shared<AudioSource>();
+        source->SetAudio((int)id);
 
-    audioSources[name].SetSource(source);
+        audioSources[name].SetSource(source);
+    }
 }
 
 void AudioObj::Update()
