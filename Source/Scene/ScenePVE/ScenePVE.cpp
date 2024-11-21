@@ -99,8 +99,10 @@ void ScenePVE::Initialize()
         {
             DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
 
-            obj->GetComponent<GateGimmick>()->SetDownPos(pos);
-            obj->GetComponent<GateGimmick>()->SetUpPos({ pos.x, 1.85f, pos.z });
+            GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
+            gate->SetDownPos(pos);
+            gate->SetUpPos({ pos.x, 1.85f, pos.z });
+            gate->SetMoveSpeed(0.1f);
         }
         
 
@@ -385,12 +387,12 @@ void ScenePVE::Update(float elapsedTime)
     //ネット更新
     photonNet->run(elapsedTime);
 
+    //イベントカメラ用
+    EventCameraManager::Instance().EventUpdate(elapsedTime);
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
     PVEDirection::Instance().Update(elapsedTime);
-
-    //イベントカメラ用
-    EventCameraManager::Instance().EventUpdate(elapsedTime);
 
     GameObj boss = GameObjectManager::Instance().Find("BOSS");
     if (!battleClymax && boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)
@@ -425,6 +427,9 @@ void ScenePVE::Render(float elapsedTime)
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 
+    //imgui
+    photonNet->ImGui();
+
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
 }
@@ -436,6 +441,7 @@ void ScenePVE::CreateUiObject()
         //キャンバス
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("Canvas");
+        obj->SetEnabled(false);
 
         //レティクル
         {
@@ -624,6 +630,15 @@ void ScenePVE::CreateUiObject()
             gauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
             float* i = GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint();
             gauge->SetVariableValue(i);
+        }
+
+        //LockOn
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("lockOn");
+
+            hpMemori->AddComponent<UI_LockOn>(4);
         }
         //decoration
         {

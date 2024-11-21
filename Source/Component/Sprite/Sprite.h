@@ -112,11 +112,20 @@ public:
         float blurpower = { 0.1f };
         float luminance = { 0.0f };
         DirectX::XMFLOAT2 uvscroll = { 0.0f,0.0f };
+        DirectX::XMFLOAT3 edgecolor = { 1,1,1 };
+        float cliptime = 0.0f;
+        float edgethreshold = 1.0f;
+        float edgeoffset = 0.0f;
+        DirectX::XMFLOAT2 padding = {};
     };
     SaveConstantsParameter constants;
 
     //カーソルがスプライトに当たっているか
     bool GetHitSprite() { return hit; }
+
+    //クリップタイムセッター、ゲッター
+    void SetClipTime(float cliptime) { constants.cliptime = cliptime; }
+    float GetClipTime() { return constants.cliptime; }
 
     //数字用に追加
     DirectX::XMFLOAT2 numUVScroll = { 0,0 };
@@ -145,6 +154,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>                m_constantbuffer;
     D3D11_TEXTURE2D_DESC texture2ddesc_ = {};
     D3D11_TEXTURE2D_DESC collisionTexture2ddesc_ = {};
+    D3D11_TEXTURE2D_DESC rampTexture2ddesc_ = {};
+    D3D11_TEXTURE2D_DESC dissolveTexture2ddesc_ = {};
     DirectX::XMFLOAT2 savepos = {};
     DirectX::XMFLOAT4 savecolor = { 1,1,1,1 };
     DirectX::XMFLOAT2 savescale = {};

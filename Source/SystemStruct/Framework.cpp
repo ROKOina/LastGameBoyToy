@@ -7,11 +7,10 @@
 #include "Framework.h"
 #include "Scene\SceneGame\SceneGame.h"
 #include "Scene\SceneManager.h"
-#include "Scene\SceneUI\SceneUI.h"
 #include "Scene\SceneResult\SceneResult.h"
 #include "Scene\SceneSelect\SceneSelect.h"
 #include "Scene/ScenePVE/ScenePVE.h"
-
+#include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
 #include <imgui.h>
@@ -32,7 +31,7 @@ Framework::Framework(HWND hWnd)
     //フィジックス初期化
     PhysXLib::Instance().Initialize();
 
-    SceneManager::Instance().ChangeScene(new SceneTitle);
+    SceneManager::Instance().ChangeScene(new SceneLGBT);
 
     // オーディオ初期化
     Audio::Initialize();
@@ -50,7 +49,6 @@ Framework::~Framework()
 {
     //sceneGame.Finalize();
     SceneManager::Instance().Clear();
-
 
 #ifdef _DEBUG
     //IMGUI終了化
@@ -88,7 +86,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     ID3D11DeviceContext* dc = graphics_.GetDeviceContext();
 
-
 #ifdef _DEBUG
     //imguiguizmo
     ImGuizmo::BeginFrame();
@@ -100,7 +97,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     // シーン描画処理
     SceneManager::Instance().Render(elapsedTime);
-
 
 #ifdef _DEBUG
     //IMGUI描画

@@ -182,6 +182,11 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     case SpriteShader::CHROMATICABERRATION:
         PSPath = { "Shader\\SpriteChromaticAberrationPS.cso" };
         break;
+    case SpriteShader::DISSOLVE:
+        PSPath = { "Shader\\SpriteDissolvePS.cso" };
+        LoadTextureFromFile(device, "Data\\Texture\\DissolveNoise.png", noiseshaderresourceview_.GetAddressOf(), &dissolveTexture2ddesc_);
+        LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &rampTexture2ddesc_);
+        break;
     default:
         assert(!"シェーダーがありません");
     }
@@ -848,6 +853,10 @@ void Sprite::OnGUI()
         ImGui::DragFloat((char*)u8"ルミナンス", &constants.luminance, 0.1f, 0.0f, 10.0f);
         ImGui::DragFloat((char*)u8"ブラー距離", &constants.blurdistance, 0.1f, 0.0f, 20.0f);
         ImGui::DragFloat((char*)u8"ブラーパワー", &constants.blurpower, 0.1f, 0.0f, 1.0f);
+        ImGui::ColorEdit3((char*)u8"ディゾルブ色", &constants.edgecolor.x);
+        ImGui::DragFloat((char*)u8"クリップ時間", &constants.cliptime, 0.1f, 0.0f, 1.0f);
+        ImGui::DragFloat((char*)u8"ディゾルブ量", &constants.edgethreshold, 0.1f, 0.0f, 1.0f);
+        ImGui::DragFloat((char*)u8"縁オフセット", &constants.edgeoffset, 0.1f, 0.0f, 1.0f);
         ImGui::TreePop();
     }
 

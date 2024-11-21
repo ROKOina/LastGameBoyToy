@@ -12,4 +12,9 @@ cbuffer SpriteConstants : register(b0)
     float blurpower;
     float luminance;
     float2 uvscroll;
+    float3 edgecolor;
+    float cliptime;
+    float edgethreshold;
+    float edgeoffset;
+    float2 padding;
 };
