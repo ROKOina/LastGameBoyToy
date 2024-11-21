@@ -1,7 +1,8 @@
 #include "PlayerUI.h"
 #include "Math\Mathf.h"
 #include "Component\Character\CharacterCom.h"
-
+#include "Component\Character\CharaStatusCom.h"
+#include "Component\Character\InazawaCharacterCom.h"
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
     changePosValue = min - max;
@@ -119,7 +120,7 @@ void UI_BoosGauge::Update(float elapsedTime)
         }
 }
 
-UI_LockOn::UI_LockOn(int num)
+UI_LockOn::UI_LockOn(int num,float min, float max)
 {
     for (int i = 0; i < num; i++) {
         //リアクターを保持
@@ -131,23 +132,53 @@ UI_LockOn::UI_LockOn(int num)
 //カメラ保持
     camera = GameObjectManager::Instance().Find("cameraPostPlayer");
  //Uiのゲームオブジェクト生成
+    //1番外の枠
     lockOn = GameObjectManager::Instance().Create();
     lockOn->SetName("LockOn");
     lockOnUi = lockOn->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnBase.ui", Sprite::SpriteShader::DEFALT, false);
     lockOnUi->spc.objectname = "";
     lockOnUi->spc.color.w = 0.0f;
 
+    //2番目の枠
+    lockOn2 = GameObjectManager::Instance().Create();
+    lockOn2->SetName("LockOn2");
+    lockOn2Ui = lockOn2->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnBase2.ui", Sprite::SpriteShader::DEFALT, false);
+    lockOn2Ui->spc.objectname = "";
+    lockOn2Ui->spc.color.w = 0.0f;
+
+    //ゲージの外枠
+    gaugeFrame = GameObjectManager::Instance().Create();
+    gaugeFrame->SetName("LockOnGaugeFrame");
+    gaugeFrameUi = gaugeFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGaugeFrame.ui", Sprite::SpriteShader::DEFALT, false);
+    gaugeFrameUi->spc.objectname = "";
+    gaugeFrameUi->spc.color.w = 0.0f;
+
+
+    //ゲージのマスク
+    gaugeMask = GameObjectManager::Instance().Create();
+    gaugeMask->SetName("LockOnGaugeMask");
+    gaugeMaskUi= gaugeMask->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGaugeMask.ui", Sprite::SpriteShader::DEFALT, false);
+    gaugeMaskUi->spc.objectname = "";
+    gaugeMaskUi->spc.color.w = 0.0f;
+    
+    //ゲージ本体
     gauge = GameObjectManager::Instance().Create();
     gauge->SetName("LockOnGauge");
-    gaugeUi = gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGaugeFrame.ui", Sprite::SpriteShader::DEFALT, false);
+    gaugeUi = gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGauge.ui", Sprite::SpriteShader::DEFALT, false);
     gaugeUi->spc.objectname = "";
     gaugeUi->spc.color.w = 0.0f;
 
+
+    minAngle = min;
+    maxAngle = max;
  }
 
 void UI_LockOn::Start()
 {
         this->GetGameObject()->AddChildObject(lockOn);
+        this->GetGameObject()->AddChildObject(lockOn2);
+        this->GetGameObject()->AddChildObject(gaugeFrame);        
+        this->GetGameObject()->AddChildObject(gaugeMask);
         this->GetGameObject()->AddChildObject(gauge);
 }
 
@@ -155,14 +186,17 @@ void UI_LockOn::Update(float elapsedTime)
 {
     std::shared_ptr<GameObject> nearObj = SearchObjct();
     if (nearObj != nullptr) {
+
+       gaugeFrameUi->spc.objectname = nearObj->GetName();
        gaugeUi->spc.objectname = nearObj->GetName();
+       gaugeMaskUi->spc.objectname = nearObj->GetName();
        lockOnUi->spc.objectname = nearObj->GetName();
+       lockOn2Ui->spc.objectname = nearObj->GetName();
+       UpdateGauge(elapsedTime, nearObj);
        LockIn(elapsedTime);
 
     }
     else {
-       // gaugeUi->spc.objectname = "";
-       // lockOnUi->spc.objectname = "";
         LockOut(elapsedTime);
     }
     
@@ -181,6 +215,7 @@ std::shared_ptr<GameObject> UI_LockOn::SearchObjct()
     float threshold = 0.99f;
 
     std::shared_ptr<GameObject> nearReacter;
+
     float maxSimilarity = 0.0f;
     int i = 0;
     for (auto& reacter : reacters) {
@@ -208,36 +243,96 @@ std::shared_ptr<GameObject> UI_LockOn::SearchObjct()
     }
 }
 
+void UI_LockOn::UpdateGauge(float elapsedTime,std::shared_ptr<GameObject> obj)
+{
+    float hp = *obj->GetComponent<CharaStatusCom>()->GetHitPoint();
+    float maxHp = obj->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+    // 変化値がマイナスに行かないように補正
+    hp = Mathf::Clamp(hp, 0.01f, maxHp);
+
+    //ゲージの倍率を求める
+   float  valueRate = hp / maxHp;
+   valueRate = 1 - valueRate;
+   float addAngle = maxAngle * valueRate;
+
+   gaugeMaskUi->spc.angle = minAngle + addAngle;
+    
+}
+
 void UI_LockOn::LockIn(float elapsedTime)
 {
-    float changeValue = 1.3f;
-    if (gaugeUi->spc.color.w <= 1.0f) {
-     gaugeUi->spc.color.w += 6.0f *elapsedTime;
-     lockOnUi->spc.color.w += 6.0f  * elapsedTime;
-    }
-    if (gaugeUi->spc.scale.x > 0.3f) {
+    float changeValue = 5.0f;
+    //透明度
+    if (gaugeFrameUi->spc.color.w <= 1.0f) {
 
-        gaugeUi->spc.scale.x -= changeValue* elapsedTime;
+        gaugeFrameUi->spc.color.w += 6.0f *elapsedTime;
+        gaugeUi->spc.color.w += 6.0f *elapsedTime;
+        gaugeMaskUi->spc.color.w += 6.0f *elapsedTime;
+        lockOnUi->spc.color.w += 6.0f  * elapsedTime;
+        lockOn2Ui->spc.color.w += 6.0f  * elapsedTime;
+    }
+
+    //スケール
+    if (gaugeFrameUi->spc.scale.x > 0.5f) {
+
+        gaugeFrameUi->spc.scale.x -= changeValue * elapsedTime;
+        gaugeFrameUi->spc.scale.y -= changeValue * elapsedTime;
+
+        gaugeMaskUi->spc.scale.x -= changeValue * elapsedTime;
+        gaugeMaskUi->spc.scale.y -= changeValue * elapsedTime;
+
+        gaugeUi->spc.scale.x -= changeValue * elapsedTime;
         gaugeUi->spc.scale.y -= changeValue * elapsedTime;
+
         lockOnUi->spc.scale.x -= changeValue * elapsedTime;
         lockOnUi->spc.scale.y -= changeValue * elapsedTime;
+
+        lockOn2Ui->spc.scale.x -= changeValue * elapsedTime;
+        lockOn2Ui->spc.scale.y -= changeValue * elapsedTime;
     }
-    
+
+    //回転
+    if (lockOn2Ui->spc.angle < 60) {
+        lockOn2Ui->spc.angle += 5;
+    }
 }
 
 void UI_LockOn::LockOut(float elapsedTime)
 {
     float changeValue = 1.7f;
-    if (gaugeUi->spc.color.w >= 0.0f) {
-        gaugeUi->spc.color.w -= 6.0f * elapsedTime;
+    if (gaugeFrameUi->spc.color.w >= 0.0f) {
+
+        gaugeFrameUi->spc.color.w -= 6.0f * elapsedTime;
         lockOnUi->spc.color.w -= 6.0f * elapsedTime;
+        lockOn2Ui->spc.color.w -= 6.0f * elapsedTime;
+
+        gaugeUi->spc.color.w -= 6.0f * elapsedTime;
+        gaugeMaskUi->spc.color.w -= 6.0f * elapsedTime;
+
     }
-    if (gaugeUi->spc.scale.x <=0.4f) {
-        gaugeUi->spc.scale.x += changeValue*elapsedTime;
+    if (gaugeFrameUi->spc.scale.x <=1.0f) {
+
+        gaugeFrameUi->spc.scale.x += changeValue*elapsedTime;
+        gaugeFrameUi->spc.scale.y += changeValue*elapsedTime;
+
+        gaugeUi->spc.scale.x += changeValue* elapsedTime;
         gaugeUi->spc.scale.y += changeValue* elapsedTime;
+
+        gaugeMaskUi->spc.scale.x += changeValue * elapsedTime;
+        gaugeMaskUi->spc.scale.y += changeValue * elapsedTime;
+
         lockOnUi->spc.scale.x += changeValue *elapsedTime;
         lockOnUi->spc.scale.y += changeValue *elapsedTime;
+
+        lockOn2Ui->spc.scale.x += changeValue *elapsedTime;
+        lockOn2Ui->spc.scale.y += changeValue *elapsedTime;
     }
+
+    //回転
+    if (lockOn2Ui->spc.angle > 0) {
+        lockOn2Ui->spc.angle -= 6;
+    }
+
 }
 
 
@@ -247,4 +342,51 @@ void UI_LockOn::OnGUI()
     for (int i = 0; i < 4; i++) {  
         ImGui::DragFloat("near", &similarity.at(i));
     }
+}
+
+
+
+UI_E_SkillCount::UI_E_SkillCount(int num)
+{
+    //for (int i = 0; i < num; i++) {
+    //    
+    //    SkillCore localCore;
+    //    //外枠のゲームオブジェクト生成
+    //    std::shared_ptr<GameObject> coreFrame;
+    //    coreFrame = GameObjectManager::Instance().Create();
+    //    std::string name = "coreFrame";
+    //    std::string number = std::to_string(i);
+    //    name += number;
+    //    coreFrame->SetName(name.c_str());
+    //    localCore.coreFrameUi = coreFrame->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    //    coreFrames.emplace_back(coreFrame);
+
+    //    //本体のゲームオブジェクト生成
+    //    std::shared_ptr<GameObject> core;
+    //    core = GameObjectManager::Instance().Create();
+    //    name = "core";
+    //     number = std::to_string(i);
+    //    name += number;
+    //    coreFrame->SetName(name.c_str());
+    //    localCore.coreUi = core->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+
+    //    cores.emplace_back(localCore);
+    //    coresUi.emplace_back(localCore);
+    //}
+    //player = GameObjectManager::Instance().Find("player");
+    //this->num = num;
+}
+
+void UI_E_SkillCount::Start()
+{
+   //親子付け
+    for (int i = 0; i < num; i++) {
+        this->GetGameObject()->AddChildObject(coreFrames.at(i));
+        this->GetGameObject()->AddChildObject(cores.at(i));
+    }
+}
+
+void UI_E_SkillCount::Update(float elapsedTime)
+{
+    
 }
