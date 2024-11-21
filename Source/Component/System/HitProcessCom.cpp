@@ -3,7 +3,7 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Character\CharacterCom.h"
 #include "Component\Character\CharaStatusCom.h"
-
+#include "Component\Sprite\Sprite.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 
 void HitProcessCom::Update(float elapsedTime)
@@ -38,7 +38,7 @@ void HitProcessCom::Update(float elapsedTime)
             nonCharaObj = hit.gameObject;
 
             //無敵時間の間はヒットを与えない
-            if(!stats->IsInvincible())
+            if (!stats->IsInvincible())
                 parentChara->SetIsHitAttack(true);
 
             //ダメージを与える

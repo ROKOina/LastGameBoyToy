@@ -4,6 +4,7 @@
 #include "Component/Renderer/RendererCom.h"
 #include "Component\System\TransformCom.h"
 #include <Component\MoveSystem\MovementCom.h>
+#include "Component\Sprite\Sprite.h"
 
 //初期設定
 void BossCom::Start()
@@ -54,6 +55,9 @@ void BossCom::Update(float elapsedTime)
 
     //後ろにいる場合旋回する
     BackTurn();
+
+    //ダメージ処理
+    DamegaEvent(elapsedTime);
 
     //DebugPrimitive
     Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), meleerange, 0.1f, { 1.0f,0.0f,0.0f,1.0f });
@@ -172,6 +176,21 @@ void BossCom::BackTurn()
         // ボスを回転
         MoveToTarget(0.0f, 0.03f);  // ここで、回転速度を適切に設定
     }
+}
+
+//ダメージ判定
+void BossCom::DamegaEvent(float elapsedTime)
+{
+    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
+    float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
+
+    //HP減少を認知する
+    if (previousHP - currentHP > 0)
+    {
+        GameObjectManager::Instance().Find("BossHpGauge")->GetComponent<Sprite>()->EasingPlay();
+    }
+    // 現在のHPを次回用に保存
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
 }
 
 // ターゲット方向への進行ベクトルを算出

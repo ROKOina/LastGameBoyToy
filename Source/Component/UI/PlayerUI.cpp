@@ -113,7 +113,7 @@ void UI_BoosGauge::Update(float elapsedTime)
     }
 }
 
-UI_LockOn::UI_LockOn(int num,float min, float max)
+UI_LockOn::UI_LockOn(int num, float min, float max)
 {
     for (int i = 0; i < num; i++) {
         //リアクターを保持
@@ -124,8 +124,8 @@ UI_LockOn::UI_LockOn(int num,float min, float max)
     }
     //カメラ保持
     camera = GameObjectManager::Instance().Find("cameraPostPlayer");
- //Uiのゲームオブジェクト生成
-    //1番外の枠
+    //Uiのゲームオブジェクト生成
+       //1番外の枠
     lockOn = GameObjectManager::Instance().Create();
     lockOn->SetName("LockOn");
     lockOnUi = lockOn->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnBase.ui", Sprite::SpriteShader::DEFALT, false);
@@ -146,14 +146,13 @@ UI_LockOn::UI_LockOn(int num,float min, float max)
     gaugeFrameUi->spc.objectname = "";
     gaugeFrameUi->spc.color.w = 0.0f;
 
-
     //ゲージのマスク
     gaugeMask = GameObjectManager::Instance().Create();
     gaugeMask->SetName("LockOnGaugeMask");
-    gaugeMaskUi= gaugeMask->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGaugeMask.ui", Sprite::SpriteShader::DEFALT, false);
+    gaugeMaskUi = gaugeMask->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGaugeMask.ui", Sprite::SpriteShader::DEFALT, false);
     gaugeMaskUi->spc.objectname = "";
     gaugeMaskUi->spc.color.w = 0.0f;
-    
+
     //ゲージ本体
     gauge = GameObjectManager::Instance().Create();
     gauge->SetName("LockOnGauge");
@@ -161,33 +160,30 @@ UI_LockOn::UI_LockOn(int num,float min, float max)
     gaugeUi->spc.objectname = "";
     gaugeUi->spc.color.w = 0.0f;
 
-
     minAngle = min;
     maxAngle = max;
- }
+}
 
 void UI_LockOn::Start()
 {
-        this->GetGameObject()->AddChildObject(lockOn);
-        this->GetGameObject()->AddChildObject(lockOn2);
-        this->GetGameObject()->AddChildObject(gaugeFrame);        
-        this->GetGameObject()->AddChildObject(gaugeMask);
-        this->GetGameObject()->AddChildObject(gauge);
+    this->GetGameObject()->AddChildObject(lockOn);
+    this->GetGameObject()->AddChildObject(lockOn2);
+    this->GetGameObject()->AddChildObject(gaugeFrame);
+    this->GetGameObject()->AddChildObject(gaugeMask);
+    this->GetGameObject()->AddChildObject(gauge);
 }
 
 void UI_LockOn::Update(float elapsedTime)
 {
     std::shared_ptr<GameObject> nearObj = SearchObjct();
     if (nearObj != nullptr) {
-
-       gaugeFrameUi->spc.objectname = nearObj->GetName();
-       gaugeUi->spc.objectname = nearObj->GetName();
-       gaugeMaskUi->spc.objectname = nearObj->GetName();
-       lockOnUi->spc.objectname = nearObj->GetName();
-       lockOn2Ui->spc.objectname = nearObj->GetName();
-       UpdateGauge(elapsedTime, nearObj);
-       LockIn(elapsedTime);
-
+        gaugeFrameUi->spc.objectname = nearObj->GetName();
+        gaugeUi->spc.objectname = nearObj->GetName();
+        gaugeMaskUi->spc.objectname = nearObj->GetName();
+        lockOnUi->spc.objectname = nearObj->GetName();
+        lockOn2Ui->spc.objectname = nearObj->GetName();
+        UpdateGauge(elapsedTime, nearObj);
+        LockIn(elapsedTime);
     }
     else {
         LockOut(elapsedTime);
@@ -233,7 +229,7 @@ std::shared_ptr<GameObject> UI_LockOn::SearchObjct()
     }
 }
 
-void UI_LockOn::UpdateGauge(float elapsedTime,std::shared_ptr<GameObject> obj)
+void UI_LockOn::UpdateGauge(float elapsedTime, std::shared_ptr<GameObject> obj)
 {
     float hp = *obj->GetComponent<CharaStatusCom>()->GetHitPoint();
     float maxHp = obj->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
@@ -241,12 +237,11 @@ void UI_LockOn::UpdateGauge(float elapsedTime,std::shared_ptr<GameObject> obj)
     hp = Mathf::Clamp(hp, 0.01f, maxHp);
 
     //ゲージの倍率を求める
-   float  valueRate = hp / maxHp;
-   valueRate = 1 - valueRate;
-   float addAngle = maxAngle * valueRate;
+    float  valueRate = hp / maxHp;
+    valueRate = 1 - valueRate;
+    float addAngle = maxAngle * valueRate;
 
-   gaugeMaskUi->spc.angle = minAngle + addAngle;
-    
+    gaugeMaskUi->spc.angle = minAngle + addAngle;
 }
 
 void UI_LockOn::LockIn(float elapsedTime)
@@ -254,17 +249,15 @@ void UI_LockOn::LockIn(float elapsedTime)
     float changeValue = 5.0f;
     //透明度
     if (gaugeFrameUi->spc.color.w <= 1.0f) {
-
-        gaugeFrameUi->spc.color.w += 6.0f *elapsedTime;
-        gaugeUi->spc.color.w += 6.0f *elapsedTime;
-        gaugeMaskUi->spc.color.w += 6.0f *elapsedTime;
-        lockOnUi->spc.color.w += 6.0f  * elapsedTime;
-        lockOn2Ui->spc.color.w += 6.0f  * elapsedTime;
+        gaugeFrameUi->spc.color.w += 6.0f * elapsedTime;
+        gaugeUi->spc.color.w += 6.0f * elapsedTime;
+        gaugeMaskUi->spc.color.w += 6.0f * elapsedTime;
+        lockOnUi->spc.color.w += 6.0f * elapsedTime;
+        lockOn2Ui->spc.color.w += 6.0f * elapsedTime;
     }
 
     //スケール
     if (gaugeFrameUi->spc.scale.x > 0.5f) {
-
         gaugeFrameUi->spc.scale.x -= changeValue * elapsedTime;
         gaugeFrameUi->spc.scale.y -= changeValue * elapsedTime;
 
@@ -294,38 +287,34 @@ void UI_LockOn::LockOut(float elapsedTime)
 {
     float changeValue = 1.7f;
     if (gaugeFrameUi->spc.color.w >= 0.0f) {
-
         gaugeFrameUi->spc.color.w -= 6.0f * elapsedTime;
         lockOnUi->spc.color.w -= 6.0f * elapsedTime;
         lockOn2Ui->spc.color.w -= 6.0f * elapsedTime;
 
         gaugeUi->spc.color.w -= 6.0f * elapsedTime;
         gaugeMaskUi->spc.color.w -= 6.0f * elapsedTime;
-
     }
-    if (gaugeFrameUi->spc.scale.x <=1.0f) {
+    if (gaugeFrameUi->spc.scale.x <= 1.0f) {
+        gaugeFrameUi->spc.scale.x += changeValue * elapsedTime;
+        gaugeFrameUi->spc.scale.y += changeValue * elapsedTime;
 
-        gaugeFrameUi->spc.scale.x += changeValue*elapsedTime;
-        gaugeFrameUi->spc.scale.y += changeValue*elapsedTime;
-
-        gaugeUi->spc.scale.x += changeValue* elapsedTime;
-        gaugeUi->spc.scale.y += changeValue* elapsedTime;
+        gaugeUi->spc.scale.x += changeValue * elapsedTime;
+        gaugeUi->spc.scale.y += changeValue * elapsedTime;
 
         gaugeMaskUi->spc.scale.x += changeValue * elapsedTime;
         gaugeMaskUi->spc.scale.y += changeValue * elapsedTime;
 
-        lockOnUi->spc.scale.x += changeValue *elapsedTime;
-        lockOnUi->spc.scale.y += changeValue *elapsedTime;
+        lockOnUi->spc.scale.x += changeValue * elapsedTime;
+        lockOnUi->spc.scale.y += changeValue * elapsedTime;
 
-        lockOn2Ui->spc.scale.x += changeValue *elapsedTime;
-        lockOn2Ui->spc.scale.y += changeValue *elapsedTime;
+        lockOn2Ui->spc.scale.x += changeValue * elapsedTime;
+        lockOn2Ui->spc.scale.y += changeValue * elapsedTime;
     }
 
     //回転
     if (lockOn2Ui->spc.angle > 0) {
         lockOn2Ui->spc.angle -= 15;
     }
-
 }
 
 void UI_LockOn::OnGUI()
@@ -336,16 +325,13 @@ void UI_LockOn::OnGUI()
     }
 }
 
-
-
 UI_E_SkillCount::UI_E_SkillCount(int num)
 {
     for (int i = 0; i < num; i++) {
-        
         SkillCore localCore;
         //外枠のゲームオブジェクト生成
-        std::shared_ptr<GameObject> coreFrame  = GameObjectManager::Instance().Create();;
-  
+        std::shared_ptr<GameObject> coreFrame = GameObjectManager::Instance().Create();;
+
         std::string name = "coreFrame";
         std::string number = std::to_string(i);
         name += number;
@@ -365,17 +351,17 @@ UI_E_SkillCount::UI_E_SkillCount(int num)
         cores.emplace_back(core);
         coresUi.emplace_back(localCore);
     }
-   
+
     gauge = GameObjectManager::Instance().Create();
     std::string name = "skillGaueg";
     gauge->SetName(name.c_str());
-    gaugeUi =  gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/E_SkillGauge.ui", Sprite::SpriteShader::DEFALT, false);
+    gaugeUi = gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/E_SkillGauge.ui", Sprite::SpriteShader::DEFALT, false);
     this->num = num;
 }
 
 void UI_E_SkillCount::Start()
 {
-   //親子付け
+    //親子付け
     for (int i = 0; i < num; i++) {
         this->GetGameObject()->AddChildObject(coreFrames.at(i));
         this->GetGameObject()->AddChildObject(cores.at(i));
@@ -390,7 +376,6 @@ void UI_E_SkillCount::Start()
 
 void UI_E_SkillCount::Update(float elapsedTime)
 {
-    
     if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
         UpdateGauge(elapsedTime);
     }
@@ -409,14 +394,11 @@ void UI_E_SkillCount::UpdateGauge(float elapsedTime)
     *skillTimer = Mathf::Clamp(*skillTimer, 0.01f, skillTime);
     //ゲージの倍率を求める
     float valueRate = *skillTimer / skillTime;
-   
-     gaugeUi->spc.texSize = { gaugeUi->spc.texSize.x,originalTexSize.y * valueRate};
-    
+
+    gaugeUi->spc.texSize = { gaugeUi->spc.texSize.x,originalTexSize.y * valueRate };
 }
 
 void UI_E_SkillCount::OnGUI()
 {
-    ImGui::DragFloat("skillTimer",&*skillTimer);
+    ImGui::DragFloat("skillTimer", &*skillTimer);
 }
-
-

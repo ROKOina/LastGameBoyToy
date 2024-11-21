@@ -231,7 +231,6 @@ void ScenePVE::Initialize()
                 std::shared_ptr<GPUParticle> eff = attackUltSide2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltSide.gpuparticle", 5);
                 eff->SetLoop(false);
             }
-
         }
     }
 
@@ -259,8 +258,8 @@ void ScenePVE::Initialize()
         boss->AddComponent<AnimationCom>();
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
-        charaStatusCom->SetHitPoint(2500);
-        charaStatusCom->SetMaxHitPoint(2500);
+        charaStatusCom->SetHitPoint(2000);
+        charaStatusCom->SetMaxHitPoint(2000);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<AudioCom>();
@@ -350,7 +349,7 @@ void ScenePVE::Initialize()
         {
             std::shared_ptr<GameObject> groundobject = boss->AddChildObject();
             groundobject->SetName("groundsmoke");
-            std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 500);
+            std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 300);
             smoke->SetActive(false);
         }
     }
@@ -463,6 +462,7 @@ void ScenePVE::CreateUiObject()
         //キャンバス
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("Canvas");
+        obj->SetEnabled(false);
 
         //レティクル
         {

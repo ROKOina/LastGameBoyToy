@@ -33,7 +33,7 @@ void StageGimmick_IdleState::Execute(const float& elapsedTime)
         }
 
         //‘å‹Z“I‚È‚â‚Â
-        if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 500.0f)
+        if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 700.0f)
         {
             owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BIGATTACK);
             return;
@@ -73,7 +73,7 @@ void StageGimmick_EnemySpawnState::Execute(const float& elapsedTime)
     }
 
     //‘å‹Z“I‚È‚â‚Â
-    if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 100.0f)
+    if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 700.0f)
     {
         owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BIGATTACK);
         return;

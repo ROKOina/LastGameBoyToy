@@ -111,7 +111,7 @@ private:
     bool wasOnGround_ = false;                 // 前フレームの着地状態
     bool justLanded_ = false;                  // 今フレームで着地した瞬間かどうか
     float friction_ = 12.620f;                 //摩擦
-    float moveMaxSpeed_ = 8.0f;                //最大速度
+    float moveMaxSpeed_ = 9.5f;                //最大速度
     float firstMoveMaxSpeed = 8.0f;             //初期最大速度
     float moveAcceleration_ = 3.0f;            //加速度
     inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット

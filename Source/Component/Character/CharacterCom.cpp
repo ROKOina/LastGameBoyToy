@@ -212,7 +212,7 @@ void CharacterCom::Update(float elapsedTime)
             GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
         }
     }
-    
+
     //ウルト更新
     UltUpdate(elapsedTime);
 
@@ -224,7 +224,6 @@ void CharacterCom::Update(float elapsedTime)
 
     //ダメージビネット発動
     Vinetto(elapsedTime);
-
 }
 
 void CharacterCom::OnGUI()

@@ -39,6 +39,9 @@ private:
     //後ろにいる場合旋回する
     void BackTurn();
 
+    //ダメージ判定
+    void DamegaEvent(float elapsedTime);
+
 private:
 
     // ターゲット方向への進行ベクトルを算出

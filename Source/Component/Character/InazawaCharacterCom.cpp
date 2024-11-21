@@ -28,14 +28,13 @@ void InazawaCharacterCom::Update(float elapsedTime)
 {
     CharacterCom::Update(elapsedTime);
 
-
     FPSArmAnimation();
 
     shootTimer += elapsedTime;
     //攻撃先行入力
     if (attackInputSave)
     {
-        if (shootTimer >= shootTime)            
+        if (shootTimer >= shootTime)
         {
             //スキル発動中はリターン
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
@@ -89,7 +88,7 @@ void InazawaCharacterCom::SubAttackDown()
 
     //ダッシュ
     auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
-    DirectX::XMFLOAT3 v = moveVec * 50.0f;
+    DirectX::XMFLOAT3 v = moveVec * 60.0f;
     moveCom->AddNonMaxSpeedForce(v);
 }
 
@@ -140,5 +139,4 @@ void InazawaCharacterCom::FPSArmAnimation()
 
     arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
         = 1 + (max - fmax) * 0.5f;
-
 }
