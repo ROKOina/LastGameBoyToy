@@ -99,9 +99,3 @@ AudioResource::AudioResource(const char* filename)
 		wfx_.cbSize = sizeof(WAVEFORMATEX);
 	}
 }
-
-// デストラクタ
-AudioResource::~AudioResource()
-{
-
-}

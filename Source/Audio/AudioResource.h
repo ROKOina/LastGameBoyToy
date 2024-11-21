@@ -8,7 +8,7 @@ class AudioResource
 {
 public:
 	AudioResource(const char* filename);
-	~AudioResource();
+	~AudioResource() {}
 
 	// ƒf[ƒ^æ“¾
 	UINT8* GetAudioData() { return data_.data(); }

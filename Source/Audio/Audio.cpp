@@ -1,5 +1,7 @@
 #include "Misc.h"
 #include "Audio/Audio.h"
+#include "Components/System/GameObject.h"
+#pragma comment(lib, "xaudio2.lib")
 
 // コンストラクタ
 Audio::Audio()
@@ -23,9 +25,18 @@ Audio::Audio()
 	hr = xaudio_->CreateMasteringVoice(&masteringVoice_);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
+	// X3DAudio初期化
+	DWORD speakerChannelMask = 0;
+	hr = masteringVoice_->GetChannelMask(&speakerChannelMask);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	hr = X3DAudioInitialize(speakerChannelMask, X3DAUDIO_SPEED_OF_SOUND, x3dAudioHandle_);
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
 	// BGMとSEを一括登録
 	RegisterAudioSources();
 }
+
 
 // デストラクタ
 Audio::~Audio()

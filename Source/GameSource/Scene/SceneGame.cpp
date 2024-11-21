@@ -161,13 +161,20 @@ void SceneGame::Initialize()
 #pragma endregion
 
 #pragma region オーディオ系の設定
-    auto& obj = GameObjectManager::Instance().Create();
+    std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
+    std::shared_ptr<GameObject> bossObj = GameObjectManager::Instance().Find("BOSS");
+
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
     obj->SetName("Audio Test SE");
     std::shared_ptr<AudioSource> audio = obj->AddComponent<AudioSource>();
     audio->SetAudio(static_cast<int>(AUDIOID::SE));
-    audio->Play(false, 0.5f);
     audio->SetAudioName("Test");
 
+    audio->SetListener(playerObj->transform_->GetWorldPosition(), playerObj->transform_->GetWorldFront(), playerObj->transform_->GetWorldUp());
+    audio->SetEmitter(bossObj->transform_->GetWorldPosition(), bossObj->transform_->GetWorldFront(), bossObj->transform_->GetWorldFront());
+
+    audio->EmitterPlay(true, 10.0f);
+    //audio->Play(true);
 #pragma endregion
 
 
@@ -184,6 +191,13 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+    std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
+    std::shared_ptr<GameObject> bossObj = GameObjectManager::Instance().Find("BOSS");
+    std::shared_ptr<GameObject> audio = GameObjectManager::Instance().Find("Audio Test SE");
+
+    audio->GetComponent<AudioSource>()->SetListener(playerObj->transform_->GetWorldPosition(), playerObj->transform_->GetWorldFront(), playerObj->transform_->GetWorldUp());
+    audio->GetComponent<AudioSource>()->SetEmitter(bossObj->transform_->GetWorldPosition(), bossObj->transform_->GetWorldFront(), bossObj->transform_->GetWorldFront());
+
     if (n)
     {
         n->Update();
