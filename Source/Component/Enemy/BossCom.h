@@ -78,9 +78,9 @@ public:
 
     StateMachine<BossCom, BossState>& GetStateMachine() { return state; }
 
-    float meleerange = 7.0f;
-    float longrange = 37.0f;
-    float walkrange = 37.0f;
+    float meleerange = 9.0f;
+    float longrange = 45.0f;
+    float walkrange = 45.0f;
 
 private:
     StateMachine<BossCom, BossState> state;

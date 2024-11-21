@@ -6,7 +6,7 @@ UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsio
 {
     changePosValue = min - max;
     //もしマイナスなら整数値に変える
-    if(changePosValue <= 0.0f) {
+    if (changePosValue <= 0.0f) {
         changePosValue *= -1.0f;
     }
     originalPos.y = min;
@@ -19,13 +19,10 @@ void UI_Skill::Start()
 
 void UI_Skill::Update(float elapsedTime)
 {
-    // 変化値がマイナスに行かないように補正
-     *variableValue = Mathf::Clamp(*variableValue, 0.01f, maxValue);
-
     //ゲージの倍率を求める
     valueRate = *variableValue / maxValue;
     float addPos = changePosValue * valueRate;
-    if (!isDebug){ 
+    if (!isDebug) {
         spc.position = { spc.position.x,originalPos.y - addPos };
     }
 }
@@ -34,7 +31,6 @@ UI_BoosGauge::UI_BoosGauge(int num)
 {
     player = GameObjectManager::Instance().Find("player");
     for (int i = 0; i < num; i++) {
-
         //ブースト回数だけUIを増やす
         //<Frame>//
         std::shared_ptr<GameObject> BoostFrame = GameObjectManager::Instance().Create();
@@ -44,7 +40,7 @@ UI_BoosGauge::UI_BoosGauge(int num)
         std::shared_ptr<UiSystem> frame = BoostFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame.ui", Sprite::SpriteShader::DEFALT, false);
         BoostFrame->SetName(name.c_str());
         //位置調整
-        frame->spc.position = { frame->spc.position.x + (i * (frame->spc.texSize.x * frame->spc.scale.x)) ,frame->spc.position.y - i *  19.0f };
+        frame->spc.position = { frame->spc.position.x + (i * (frame->spc.texSize.x * frame->spc.scale.x)) ,frame->spc.position.y - i * 19.0f };
 
         //<Gauge//
         std::shared_ptr<GameObject> BoostGauge = GameObjectManager::Instance().Create();
@@ -54,8 +50,7 @@ UI_BoosGauge::UI_BoosGauge(int num)
         std::shared_ptr<UiSystem> gauge = BoostGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
         gauge->SetVariableValue(player.lock()->GetComponent<CharacterCom>()->GetDashGauge());
         //位置調整
-        gauge->spc.position = { gauge->spc.position.x + (i * (gauge->spc.texSize.x*gauge->spc.scale.x)) ,gauge->spc.position.y - i * 19.0f };
-
+        gauge->spc.position = { gauge->spc.position.x + (i * (gauge->spc.texSize.x * gauge->spc.scale.x)) ,gauge->spc.position.y - i * 19.0f };
 
         originlTexSize = gauge->spc.texSize;
         frames.emplace_back(BoostFrame);
@@ -68,55 +63,49 @@ UI_BoosGauge::UI_BoosGauge(int num)
 
     //区切りの値を求める
     separateValue = maxDashGauge / num;
-    
 }
 
 void UI_BoosGauge::Start()
 {
-
     //なぜかinitializeでは親子付けできなかった
     //親子付け
     for (int i = 0; i < num; i++) {
         this->GetGameObject()->AddChildObject(frames.at(i));
         this->GetGameObject()->AddChildObject(gauges.at(i));
-       
     }
 }
 
 void UI_BoosGauge::Update(float elapsedTime)
 {
-        std::shared_ptr<UiSystem> gauge = gauges.at(0).get()->GetComponent<UiSystem>();
-        std::shared_ptr<UiSystem> gauge2 = gauges.at(1).get()->GetComponent<UiSystem>();
-     
-        // 変化値がマイナスに行かないように補正
-        *value = Mathf::Clamp(*value, 0.01f, maxDashGauge);
-        float valueRate;
-        //ゲージの倍率を求める
-        valueRate = *value / (maxDashGauge);
-        
-        for (int i = 0; i < num; i++)
-        {
-            std::shared_ptr<UiSystem> gaugeSegment = gauges.at(i).get()->GetComponent<UiSystem>();
-            float segmentStart = separateValue * i;       // 現在のゲージの開始位置
-            float segmentEnd = separateValue * (i + 1);   // 現在のゲージの終了位置
+    std::shared_ptr<UiSystem> gauge = gauges.at(0).get()->GetComponent<UiSystem>();
+    std::shared_ptr<UiSystem> gauge2 = gauges.at(1).get()->GetComponent<UiSystem>();
 
+    // 変化値がマイナスに行かないように補正
+    *value = Mathf::Clamp(*value, 0.01f, maxDashGauge);
+    float valueRate;
+    //ゲージの倍率を求める
+    valueRate = *value / (maxDashGauge);
 
-            if (*value > segmentEnd) {
-                // セグメントがフルの場合
-                gaugeSegment->spc.texSize = { originlTexSize.x, gaugeSegment->spc.texSize.y };
-            }
-            else if (*value > segmentStart) {
-                // セグメントが部分的に埋まっている場合
-                float partialRate = (*value - segmentStart) / separateValue; // セグメント内の比率
-                gaugeSegment->spc.texSize = { originlTexSize.x * partialRate, gaugeSegment->spc.texSize.y };
-              
-            }
-            else {
-                // セグメントが空の場合
-                gaugeSegment->spc.texSize = { 0, gaugeSegment->spc.texSize.y };
+    for (int i = 0; i < num; i++)
+    {
+        std::shared_ptr<UiSystem> gaugeSegment = gauges.at(i).get()->GetComponent<UiSystem>();
+        float segmentStart = separateValue * i;       // 現在のゲージの開始位置
+        float segmentEnd = separateValue * (i + 1);   // 現在のゲージの終了位置
 
-            }
+        if (*value > segmentEnd) {
+            // セグメントがフルの場合
+            gaugeSegment->spc.texSize = { originlTexSize.x, gaugeSegment->spc.texSize.y };
         }
+        else if (*value > segmentStart) {
+            // セグメントが部分的に埋まっている場合
+            float partialRate = (*value - segmentStart) / separateValue; // セグメント内の比率
+            gaugeSegment->spc.texSize = { originlTexSize.x * partialRate, gaugeSegment->spc.texSize.y };
+        }
+        else {
+            // セグメントが空の場合
+            gaugeSegment->spc.texSize = { 0, gaugeSegment->spc.texSize.y };
+        }
+    }
 }
 
 UI_LockOn::UI_LockOn(int num)
@@ -128,9 +117,9 @@ UI_LockOn::UI_LockOn(int num)
         reacters.emplace_back(GameObjectManager::Instance().Find(name.c_str()));
         similarity.emplace_back(0.0f);
     }
-//カメラ保持
+    //カメラ保持
     camera = GameObjectManager::Instance().Find("cameraPostPlayer");
- //Uiのゲームオブジェクト生成
+    //Uiのゲームオブジェクト生成
     lockOn = GameObjectManager::Instance().Create();
     lockOn->SetName("LockOn");
     lockOnUi = lockOn->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnBase.ui", Sprite::SpriteShader::DEFALT, false);
@@ -142,32 +131,28 @@ UI_LockOn::UI_LockOn(int num)
     gaugeUi = gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGaugeFrame.ui", Sprite::SpriteShader::DEFALT, false);
     gaugeUi->spc.objectname = "";
     gaugeUi->spc.color.w = 0.0f;
-
- }
+}
 
 void UI_LockOn::Start()
 {
-        this->GetGameObject()->AddChildObject(lockOn);
-        this->GetGameObject()->AddChildObject(gauge);
+    this->GetGameObject()->AddChildObject(lockOn);
+    this->GetGameObject()->AddChildObject(gauge);
 }
 
 void UI_LockOn::Update(float elapsedTime)
 {
     std::shared_ptr<GameObject> nearObj = SearchObjct();
     if (nearObj != nullptr) {
-       gaugeUi->spc.objectname = nearObj->GetName();
-       lockOnUi->spc.objectname = nearObj->GetName();
-       LockIn(elapsedTime);
-
+        gaugeUi->spc.objectname = nearObj->GetName();
+        lockOnUi->spc.objectname = nearObj->GetName();
+        LockIn(elapsedTime);
     }
     else {
-       // gaugeUi->spc.objectname = "";
-       // lockOnUi->spc.objectname = "";
+        // gaugeUi->spc.objectname = "";
+        // lockOnUi->spc.objectname = "";
         LockOut(elapsedTime);
     }
-    
 }
-
 
 std::shared_ptr<GameObject> UI_LockOn::SearchObjct()
 {
@@ -189,18 +174,17 @@ std::shared_ptr<GameObject> UI_LockOn::SearchObjct()
         reacterDirection = Mathf::Normalize(reacterDirection);
 
         //1に近いほど視線が合っている
-         similarity.at(i) = Mathf::Dot(cameraVec, reacterDirection);
+        similarity.at(i) = Mathf::Dot(cameraVec, reacterDirection);
 
         //閾値を超えているかつ今いる中で一番近い時
-         if (similarity.at(i) > threshold && similarity.at(i) > maxSimilarity) {
-             maxSimilarity = similarity.at(i);
-             nearReacter = reacter;
-         }
+        if (similarity.at(i) > threshold && similarity.at(i) > maxSimilarity) {
+            maxSimilarity = similarity.at(i);
+            nearReacter = reacter;
+        }
         i++;
     }
 
     if (nearReacter) {
-
         return nearReacter;
     }
     else {
@@ -212,17 +196,15 @@ void UI_LockOn::LockIn(float elapsedTime)
 {
     float changeValue = 1.3f;
     if (gaugeUi->spc.color.w <= 1.0f) {
-     gaugeUi->spc.color.w += 6.0f *elapsedTime;
-     lockOnUi->spc.color.w += 6.0f  * elapsedTime;
+        gaugeUi->spc.color.w += 6.0f * elapsedTime;
+        lockOnUi->spc.color.w += 6.0f * elapsedTime;
     }
     if (gaugeUi->spc.scale.x > 0.3f) {
-
-        gaugeUi->spc.scale.x -= changeValue* elapsedTime;
+        gaugeUi->spc.scale.x -= changeValue * elapsedTime;
         gaugeUi->spc.scale.y -= changeValue * elapsedTime;
         lockOnUi->spc.scale.x -= changeValue * elapsedTime;
         lockOnUi->spc.scale.y -= changeValue * elapsedTime;
     }
-    
 }
 
 void UI_LockOn::LockOut(float elapsedTime)
@@ -232,19 +214,18 @@ void UI_LockOn::LockOut(float elapsedTime)
         gaugeUi->spc.color.w -= 6.0f * elapsedTime;
         lockOnUi->spc.color.w -= 6.0f * elapsedTime;
     }
-    if (gaugeUi->spc.scale.x <=0.4f) {
-        gaugeUi->spc.scale.x += changeValue*elapsedTime;
-        gaugeUi->spc.scale.y += changeValue* elapsedTime;
-        lockOnUi->spc.scale.x += changeValue *elapsedTime;
-        lockOnUi->spc.scale.y += changeValue *elapsedTime;
+    if (gaugeUi->spc.scale.x <= 0.4f) {
+        gaugeUi->spc.scale.x += changeValue * elapsedTime;
+        gaugeUi->spc.scale.y += changeValue * elapsedTime;
+        lockOnUi->spc.scale.x += changeValue * elapsedTime;
+        lockOnUi->spc.scale.y += changeValue * elapsedTime;
     }
 }
-
 
 void UI_LockOn::OnGUI()
 {
     ImGui::Text(lockOnUi->spc.objectname.c_str());
-    for (int i = 0; i < 4; i++) {  
+    for (int i = 0; i < 4; i++) {
         ImGui::DragFloat("near", &similarity.at(i));
     }
 }
