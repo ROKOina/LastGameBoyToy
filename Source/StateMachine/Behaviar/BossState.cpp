@@ -210,7 +210,7 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     idletime += elapsedTime;
 
     //待機時間
-    if (idletime >= 0.9f)
+    if (idletime >= 0.5f)
     {
         //ここ全体的に修正が必用
         if (owner->Search(owner->meleerange))
@@ -242,7 +242,7 @@ void Boss_MoveState::Enter()
 }
 void Boss_MoveState::Execute(const float& elapsedTime)
 {
-    owner->MoveToTarget(0.3f, 0.1f);
+    owner->MoveToTarget(0.6f, 0.1f);
 
     //左右の煙
     AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
@@ -352,7 +352,7 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     time += elapsedTime;
 
     //移動
-    owner->MoveToTarget(3.0f, 0.1f);
+    owner->MoveToTarget(5.0f, 0.1f);
 
     //左右の煙
     AnimtionEventControl("COLLSION", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
@@ -450,7 +450,7 @@ void Boss_UpShotCharge::Execute(const float& elapsedTime)
     AnimtionEventControl("CHARGETIME", "Boss_L_neil2_end", "spawn", EnableGPUParticle | EnableCPUParticle);
 
     time += elapsedTime;
-    if (time > 3.0f)
+    if (time > 2.0f)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::UPSHOTLOOP);
         time = 0.0f;
@@ -649,7 +649,7 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     //空中だったら移動
     if (!moveCom.lock()->OnGround())
     {
-        owner->MoveToTarget(FLT_MAX, 1.0f);
+        owner->MoveToTarget(60.0f, 1.0f);
     }
 
     //アニメーションが終われば重力を強くかける
