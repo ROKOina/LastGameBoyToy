@@ -31,6 +31,12 @@
 #include <Component\Character\Prop\SetNodeWorldPosCom.h>
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
+#include "Component\Stage\GateGimmickCom.h"
+
+ScenePVE::~ScenePVE()
+{
+
+}
 
 void ScenePVE::Initialize()
 {
@@ -73,18 +79,32 @@ void ScenePVE::Initialize()
 
     //ステージ
     {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        auto& stageObj = GameObjectManager::Instance().Create();
+        stageObj->SetName("stage");
+        stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
+        stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
         r->SetOutlineIntensity(5.5f);
-        obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-        StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
-        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
+        stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+
+        //ステージ
+        StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //Jsonからオブジェクト配置
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
+        //配置したステージオブジェクトの中からGateを取得
+        StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");   
+        for (auto& obj : placeObj.objList)
+        {
+            DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+
+            obj->GetComponent<GateGimmick>()->SetDownPos(pos);
+            obj->GetComponent<GateGimmick>()->SetUpPos({ pos.x, 1.85f, pos.z });
+        }
+        
+
+        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
         rigid->SetNormalizeScale(1);
     }
@@ -220,6 +240,7 @@ void ScenePVE::Initialize()
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
 
+
         //右足の煙エフェクト
         {
             std::shared_ptr<GameObject>rightfootsmokeobject = boss->AddChildObject();
@@ -351,6 +372,7 @@ void ScenePVE::Initialize()
 void ScenePVE::Finalize()
 {
     photonNet->close();
+    PVEDirection::Instance().DirectionEnd();
 }
 
 void ScenePVE::Update(float elapsedTime)
