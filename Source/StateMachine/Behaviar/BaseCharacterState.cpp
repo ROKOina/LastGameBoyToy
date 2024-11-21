@@ -125,6 +125,11 @@ void BaseCharacter_JumpState::Enter()
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     //animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
+
+    //アニメーション
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
@@ -149,11 +154,22 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
+
+    //アニメーション
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    if (!armAnim->IsPlayAnimation())
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
 }
 
 void BaseCharacter_JumpState::Exit()
 {
     HoveringTimer = 0.0f;
+
+    //アニメーション
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
 }
 
 #pragma endregion
@@ -382,6 +398,11 @@ void Ult_Attack_State::Enter()
     //音
     owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACKULTSHOOT");
     owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACKULTSHOOT", false, 10);
+
+    //anim
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+    armAnim->SetAnimationSeconds(0.3f);
 
     ray->SetStart(start);
     ray->SetEnd(end);
