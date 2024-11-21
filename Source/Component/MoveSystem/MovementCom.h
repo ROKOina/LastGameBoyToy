@@ -85,6 +85,7 @@ public:
     void SetFriction(float friction) { friction_ = friction; }
 
     //最大速度
+    const float& GetFisrtMoveMaxSpeed()const { return firstMoveMaxSpeed; }  //初期最大速度（基準）
     const float& GetMoveMaxSpeed()const { return moveMaxSpeed_; }
     void SetMoveMaxSpeed(float moveMaxSpeed) { moveMaxSpeed = moveMaxSpeed_; }
     void SetAddMoveMaxSpeed(float addSpeed) { moveMaxSpeed_ += addSpeed; }  //足す

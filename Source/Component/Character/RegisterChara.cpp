@@ -37,7 +37,6 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
 
 void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 {
-    obj->transform_->SetWorldPosition({ 0, 0, 0 });
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player.mdl");
@@ -49,7 +48,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
     //HP‚Ì‰ŠúÝ’è
-    status->SetMaxHitPoint(200);
+    status->SetMaxHitPoint(10);
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.4f);
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();

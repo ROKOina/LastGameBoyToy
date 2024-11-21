@@ -210,7 +210,7 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     idletime += elapsedTime;
 
     //待機時間
-    if (idletime >= 1.5f)
+    if (idletime >= 0.9f)
     {
         //ここ全体的に修正が必用
         if (owner->Search(owner->meleerange))
@@ -242,7 +242,7 @@ void Boss_MoveState::Enter()
 }
 void Boss_MoveState::Execute(const float& elapsedTime)
 {
-    owner->MoveToTarget(0.1f, 0.1f);
+    owner->MoveToTarget(0.3f, 0.1f);
 
     //左右の煙
     AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
@@ -352,7 +352,7 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     time += elapsedTime;
 
     //移動
-    owner->MoveToTarget(0.6f, 0.1f);
+    owner->MoveToTarget(3.0f, 0.1f);
 
     //左右の煙
     AnimtionEventControl("COLLSION", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
@@ -362,8 +362,8 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
 
-    //待機時間
-    if (time >= 4.0f)
+    //ラリアット持続時間
+    if (time >= 4.5f)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATEND);
         time = 0.0f;
@@ -442,6 +442,7 @@ void Boss_UpShotStart::Execute(const float& elapsedTime)
 #pragma region 打ち上げチャージ
 void Boss_UpShotCharge::Enter()
 {
+    audioCom.lock()->Play("CHARGE", false, 10.0f);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_up_shot_charge"), true, false, 0.1f);
 }
 void Boss_UpShotCharge::Execute(const float& elapsedTime)
@@ -449,7 +450,7 @@ void Boss_UpShotCharge::Execute(const float& elapsedTime)
     AnimtionEventControl("CHARGETIME", "Boss_L_neil2_end", "spawn", EnableGPUParticle | EnableCPUParticle);
 
     time += elapsedTime;
-    if (time > 3.7f)
+    if (time > 3.0f)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::UPSHOTLOOP);
         time = 0.0f;
@@ -484,8 +485,11 @@ void Boss_UpShotLoop::Execute(const float& elapsedTime)
         AnimtionEventControl("SPAWN", "Boss_L_hand", "muzzleflashleft", EnableCPUParticle, { 0.0f,1.0f,0.0f });
     }
 
+    //モーションに合わせてSE再生
+    if (animationCom.lock()->IsEventCalling("SHOT")) { audioCom.lock()->Play("SHOT", false, 10.0f); }
+
     time += elapsedTime;
-    if (time > 3.0f)
+    if (time > 4.0f)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::UPSHOTEND);
         time = 0.0f;
@@ -558,6 +562,7 @@ void Boss_ShotStart::Execute(const float& elapsedTime)
 #pragma region チャージ
 void Boss_ShotCharge::Enter()
 {
+    audioCom.lock()->Play("CHARGE", false, 10.0f);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_shot_charge_loop"), true, false, 0.1f);
 }
 void Boss_ShotCharge::Execute(const float& elapsedTime)
@@ -565,7 +570,7 @@ void Boss_ShotCharge::Execute(const float& elapsedTime)
     AnimtionEventControl("CHARGETIME", "Boss_R_neil2_end", "charge", EnableGPUParticle | EnableCPUParticle);
 
     time += elapsedTime;
-    if (time > 3.0f)
+    if (time > 2.0f)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::SHOTEND);
         time = 0.0f;
@@ -598,6 +603,11 @@ void Boss_Shot::Execute(const float& elapsedTime)
     AnimtionEventControl("BEEM", "Boss_R_hand", "charge", EnableSpawn | EnableCPUParticle);
     AnimtionEventControl("BEEM", "Boss_R_hand", "muzzleflash", EnableCPUParticle);
     AnimtionEventControl("SMOKETIME", "Boss_R_hand", "charge", EnableCPUParticle);
+
+    if (animationCom.lock()->IsEventCalling("SHOT"))
+    {
+        audioCom.lock()->Play("POWERSHOT", false, 10.0f);
+    }
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
@@ -639,7 +649,7 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     //空中だったら移動
     if (!moveCom.lock()->OnGround())
     {
-        owner->MoveToTarget(10.0f, 1.0f);
+        owner->MoveToTarget(FLT_MAX, 1.0f);
     }
 
     //アニメーションが終われば重力を強くかける
@@ -726,9 +736,7 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
     DirectX::XMFLOAT3 v = owner->GetGameObject()->transform_->GetWorldFront() * 0.1f;
     moveCom->AddForce({ v.x,v.y,v.z });
 
-    //エフェクト出すならここですかね
-
-     //左右の煙
+    //左右の煙
     AnimtionEventControl("FOOTSMOKE", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
     AnimtionEventControl("FOOTSMOKE", "Boss_L_ancle", "leftfootsmokeeffect", EnableCPUParticle);
 }
@@ -751,6 +759,17 @@ void Boss_EventPunch::Execute(const float& elapsedTime)
 {
     //ここでエフェクト出す
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle);
+}
+
+void Boss_EventPunch::Exit()
+{
+    //UI表示
+    GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
+
+    //プレイヤー位置設定
+    const auto& player = GameObjectManager::Instance().Find("player");
+    player->transform_->SetWorldPosition({ -2.471f,-0,-34.219f });
+    player->GetChildFind("cameraPostPlayer")->transform_->SetEulerRotation({ -2.550f,0.0f,0.0f });
 }
 
 void Boss_EventDeath::Enter()

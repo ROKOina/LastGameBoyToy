@@ -30,6 +30,7 @@ void HitProcessCom::Update(float elapsedTime)
         auto& stats = hit.gameObject.lock()->GetComponent<CharaStatusCom>();
         if (!stats)continue;
 
+        //キャラクター以外の場合
         auto& hitChara = hit.gameObject.lock()->GetComponent<CharacterCom>();
         if (!hitChara)
         {

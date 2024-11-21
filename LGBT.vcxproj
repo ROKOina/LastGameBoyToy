@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Component\Renderer\RendererCom.h" />
     <ClInclude Include="Source\Component\Renderer\TrailCom.h" />
     <ClInclude Include="Source\Component\Sprite\Sprite.h" />
+    <ClInclude Include="Source\Component\Stage\GateGimmickCom.h" />
     <ClInclude Include="Source\Component\Stage\StageEditorCom.h" />
     <ClInclude Include="Source\Component\Stage\StageGimmickCom.h" />
     <ClInclude Include="Source\Component\System\Component.h" />
@@ -237,6 +238,7 @@
     <ClInclude Include="Source\Phsix\Physxlib.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Scene\SceneGame\SceneGame.h" />
+    <ClInclude Include="Source\Scene\SceneLGBT\SceneLGBT.h" />
     <ClInclude Include="Source\Scene\SceneLoading\SceneLoading.h" />
     <ClInclude Include="Source\Scene\SceneLobby\SceneLobby.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
@@ -248,10 +250,10 @@
     <ClInclude Include="Source\Scene\SceneSugimoto\SceneSugimoto.h" />
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
-    <ClInclude Include="Source\Scene\SceneUI\SceneUI.h" />
     <ClInclude Include="Source\Setting\Setting.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BaseCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
+    <ClInclude Include="Source\StateMachine\Behaviar\GateGimmickState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\NomuraCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\PicohardState.h" />
@@ -326,6 +328,7 @@
     <ClCompile Include="Source\Component\Renderer\RendererCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\TrailCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\Sprite.cpp" />
+    <ClCompile Include="Source\Component\Stage\GateGimmickCom.cpp" />
     <ClCompile Include="Source\Component\Stage\StageEditorCom.cpp" />
     <ClCompile Include="Source\Component\Stage\StageGimmickCom.cpp" />
     <ClCompile Include="Source\Component\System\GameObject.cpp" />
@@ -369,6 +372,7 @@
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneGame\SceneGame.cpp" />
+    <ClCompile Include="Source\Scene\SceneLGBT\SceneLGBT.cpp" />
     <ClCompile Include="Source\Scene\SceneLoading\SceneLoading.cpp" />
     <ClCompile Include="Source\Scene\SceneLobby\SceneLobby.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
@@ -380,10 +384,10 @@
     <ClCompile Include="Source\Scene\SceneSugimoto\SceneSugimoto.cpp" />
     <ClCompile Include="Source\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\SceneTraining.cpp" />
-    <ClCompile Include="Source\Scene\SceneUI\SceneUI.cpp" />
     <ClCompile Include="Source\Setting\Setting.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BaseCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />
+    <ClCompile Include="Source\StateMachine\Behaviar\GateGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\NomuraCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\PicohardState.cpp" />
@@ -481,6 +485,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\2D\SpriteChromaticAberrationPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\SpriteDissolvePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>

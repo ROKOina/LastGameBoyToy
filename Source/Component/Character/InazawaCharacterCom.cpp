@@ -28,36 +28,8 @@ void InazawaCharacterCom::Update(float elapsedTime)
 {
     CharacterCom::Update(elapsedTime);
 
-    //ジャンプダッシュ処理
-    auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
-    if (moveCom->OnGround())
-    {
-        isDashJump = false;
-        airTimer = 0.0f;
-    }
-    else
-    {
-        airTimer += elapsedTime;
-    }
 
     FPSArmAnimation();
-    ////腕モデル待機アニメーション
-    //auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    //auto& armAnim = arm->GetComponent<AnimationCom>();
-
-    //if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
-    //        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
-    //if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
-    //        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), false);
-
-    //if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
-    //{
-    //    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_idol")].animationspeed = 5;
-    //}
-    //else
-    //{
-    //    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_idol")].animationspeed = 1;
-    //}
 
     shootTimer += elapsedTime;
     //攻撃先行入力
@@ -123,35 +95,10 @@ void InazawaCharacterCom::SubAttackDown()
 
 void InazawaCharacterCom::SubSkill()
 {
-    //if (!useSkillE)
-    //{
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
-    //    useSkillE = true;
-    //}
-}
-
-void InazawaCharacterCom::SpaceSkill()
-{
-    //削除予定
-    return;
-
-    auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
-    if (!moveCom->OnGround() && !isDashJump && airTimer > 0.1f)
-    {
-        //入力値取得
-        DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec(GetGameObject());
-
-        //歩く
-        DirectX::XMFLOAT3 v = moveVec * 50.0f;
-        moveCom->AddNonMaxSpeedForce(v);
-
-        ////旋回処理
-        //GetGameObject()->transform_->Turn(moveVec, 1);
-
-        moveCom->ZeroVelocity();
-        JumpInput(GetGameObject());
-        isDashJump = true;
-    }
+    if (!UseUlt())
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
+    else
+        ResetESkillCool();
 }
 
 void InazawaCharacterCom::UltSkill()
@@ -187,13 +134,11 @@ void InazawaCharacterCom::FPSArmAnimation()
             armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
     }
 
-    //if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
-    //{
-    //    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_idol")].animationspeed = 5;
-    //}
-    //else
-    //{
-    //    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_idol")].animationspeed = 1;
-    //}
+    //アニメーションスピード変更
+    float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
+    float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
+
+    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
+        = 1 + (max - fmax) * 0.5f;
 
 }

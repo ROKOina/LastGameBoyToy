@@ -57,7 +57,7 @@
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Character\Prop\SetNodeWorldPosCom.h"
-
+#include "Component\Audio\AudioCom.h"
 #include "Setting/Setting.h"
 
 SceneGame::~SceneGame()
@@ -133,8 +133,6 @@ void SceneGame::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
-        //自分のプレイヤーは表示切る
-        //obj->GetComponent<RendererCom>()->SetEnabled(false);
 
         //ウルト関係Obj追加
         {
@@ -152,6 +150,7 @@ void SceneGame::Initialize()
             //ダメージ処理用
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+            hitDamage->SetValue(100);
 
             //キャラクターに登録
             obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
@@ -195,8 +194,8 @@ void SceneGame::Initialize()
                 eSkillEff->SetName("eSkillEff");
                 std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
                 eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
-                eSkillEff->transform_->SetLocalPosition({ -0.35f,9.84f,-0.58f });
-                eff->Play();
+                eSkillEff->transform_->SetLocalPosition({-0.35f,9.84f,-0.58f});
+                eff->SetLoop(false);
             }
             //攻撃ため
             {
@@ -255,12 +254,16 @@ void SceneGame::Initialize()
         boss->AddComponent<AnimationCom>();
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
+        charaStatusCom->SetHitPoint(1000);
+        charaStatusCom->SetMaxHitPoint(1000);
         boss->AddComponent<BossCom>();
+        boss->AddComponent<AudioCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
+
 
         //右足の煙エフェクト
         {
@@ -673,26 +676,25 @@ void SceneGame::CreateUiObject()
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("boostGauge2");
 
-         
-          hpMemori->AddComponent<UI_BoosGauge>(2);
-      }
-      //BossHpFrame
-      {
-          std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-          std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
-          hpFrame->SetName("BossHpFrame");
-          hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHpFrame.ui", Sprite::SpriteShader::DEFALT, false);
-      }
-     //BossHpGauge
-      {
-          std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("BossHpFrame");
-          std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
-          hpGauge->SetName("BossHpGauge");
-          std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
-          gauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
-          float* i = GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint();
-          gauge->SetVariableValue(i);
-      }
+            hpMemori->AddComponent<UI_BoosGauge>(2);
+        }
+        //BossHpFrame
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
+            hpFrame->SetName("BossHpFrame");
+            hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHpFrame.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //BossHpGauge
+        {
+            std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("BossHpFrame");
+            std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
+            hpGauge->SetName("BossHpGauge");
+            std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
+            gauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
+            float* i = GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint();
+            gauge->SetVariableValue(i);
+        }
 
       //LockOn
       {

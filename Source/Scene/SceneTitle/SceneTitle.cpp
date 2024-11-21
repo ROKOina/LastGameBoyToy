@@ -16,7 +16,6 @@
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneTitle.h"
 #include "Scene\SceneSelect\SceneSelect.h"
-#include "Scene\SceneGame\SceneGame.h"
 #include "Scene/ScenePVE/ScenePVE.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
@@ -77,7 +76,7 @@ void SceneTitle::Initialize()
         r->SetOutlineColor({ 0.000f, 0.282f, 1.000f });
         r->SetOutlineIntensity(10.0f);
         StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
     }
 
     //プレイヤー
@@ -114,11 +113,31 @@ void SceneTitle::Initialize()
             title->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/title.ui", Sprite::SpriteShader::CHROMATICABERRATION, false);
         }
 
-        //プレイ
+        //PVE
         {
             auto& next = obj->AddChildObject();
-            next->SetName("next");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/next.ui", Sprite::SpriteShader::BLUR, true);
+            next->SetName("PVE");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::DEFALT, true);
+        }
+        //PVP
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("PVP");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::DEFALT, true);
+        }
+        //トレーニング
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("Training");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
+        }
+
+
+        //セレクト棒
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("selectBow");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/selectBow.ui", Sprite::SpriteShader::DEFALT, false);
         }
     }
 
@@ -191,17 +210,41 @@ void SceneTitle::Render(float elapsedTime)
 
 void SceneTitle::UIUpdate(float elapsedTime)
 {
+    //遷移フラグが立っている時は入らない
+    if (SceneManager::Instance().GetTransitionFlag())return;
+
     auto& canvas = GameObjectManager::Instance().Find("Canvas");
     if (!canvas)return;
 
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    //シーン遷移用構造体
+    struct SceneName {
+        SceneName(std::string name, Scene* scene, float y)
+            :name(name), y(y) {
+            this->scene = scene;
+        }
+        std::string name;   //当たり判定オブジェ
+        Scene* scene;
+        float y;
+    };
+    
+    //初期化
+    std::vector<SceneName> names;
+    names.emplace_back("PVE" ,new ScenePVE,560);
+    names.emplace_back("PVP", new ScenePVE, 750);
+    names.emplace_back("Training", new ScenePVE, 940);
 
-    //ゲームシーンへ
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    auto& selectB = canvas->GetChildFind("selectBow");
+    selectB->SetEnabled(false);
+    //シーン遷移
+    for(auto& s: names)
     {
-        auto& next = canvas->GetChildFind("next");
+        bool deleteFlg = false;
+        auto& next = canvas->GetChildFind(s.name.c_str());
         auto& sprite = next->GetComponent<Sprite>();
         if (sprite->GetHitSprite())
         {
+            //クリックで遷移＆演出
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
                 canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
@@ -213,9 +256,19 @@ void SceneTitle::UIUpdate(float elapsedTime)
                     //暗転
                     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
-                    SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
+
+                    SceneManager::Instance().ChangeSceneDelay(s.scene, 2);
+                    deleteFlg = true;
                 }
             }
+            //セレクト棒壱変更
+            selectB->SetEnabled(true);
+            DirectX::XMFLOAT3 sP = selectB->transform_->GetWorldPosition();
+            sP.y = s.y;
+            selectB->transform_->SetWorldPosition(sP);
         }
+        //デリート
+        if (!deleteFlg)
+            delete  s.scene;
     }
 }

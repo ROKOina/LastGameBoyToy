@@ -37,8 +37,10 @@ public:
 
     float attackMaxMoveSpeed = 3.0f;
     float attackPower = 0;
-    float maxAttackPower = 1;
-    float arrowSpeed = 40;
+    float maxAttackPower = 0.7f;    //‚½‚ß•b
+    float arrowSpeed = 120;
+
+    int maxDamage = 50;
 };
 
 class InazawaCharacter_ESkillState : public InazawaCharacter_BaseState
@@ -48,12 +50,15 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit() override;
     void ImGui() override;
     virtual const char* GetName() const override { return "ESkill"; }
 
-    float arrowSpeed = 25.0f;
+    float arrowSpeed = 90;
     int arrowCount;
     float intervalTimer;
     float interval = 0.25f;
     float skillTimer = 3.0f;
+
+    int damage = 30;
 };
