@@ -35,7 +35,6 @@
 
 ScenePVE::~ScenePVE()
 {
-
 }
 
 void ScenePVE::Initialize()
@@ -94,7 +93,7 @@ void ScenePVE::Initialize()
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
-        StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");   
+        StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
         for (auto& obj : placeObj.objList)
         {
             DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
@@ -104,7 +103,6 @@ void ScenePVE::Initialize()
             gate->SetUpPos({ pos.x, 1.85f, pos.z });
             gate->SetMoveSpeed(0.1f);
         }
-        
 
         RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
@@ -244,7 +242,6 @@ void ScenePVE::Initialize()
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
-
 
         //右足の煙エフェクト
         {
