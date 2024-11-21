@@ -146,3 +146,69 @@ private:
     DirectX::XMFLOAT2 originalTexSize = {};
     std::weak_ptr<GameObject> player;
 };
+
+class UI_Ult_Count : public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_Ult_Count(int num);
+    ~UI_Ult_Count() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_BoostGauge"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+    void UpdateCore(float elapsedTime);
+
+    
+private:
+    struct SkillCore {
+        std::shared_ptr<UiSystem> coreFrameUi;
+        std::shared_ptr<UiSystem> coreUi;
+    };
+    std::vector<SkillCore> coresUi;
+
+    std::vector<std::shared_ptr<GameObject>> cores;
+    std::vector<std::shared_ptr<GameObject>> coreFrames;
+  
+
+    int num = 0;
+    int*  ultCount;
+    bool* isUlt;
+    float spacing = 30.0f;
+    std::weak_ptr<GameObject> player;
+};
+
+class UI_Reticle : public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_Reticle();
+    ~UI_Reticle() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_BoostGauge"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+private:
+    std::weak_ptr<GameObject> player;
+
+    std::shared_ptr<GameObject> reticleFrame;
+    std::shared_ptr<GameObject> reticleCircle;
+
+    std::shared_ptr<UiSystem> reticleFrameUi;         //外枠
+    std::shared_ptr<UiSystem> reticleCircleUi;        //真ん中
+
+
+    float* attackPower;  //現在のチャージ率
+    float maxAttackPower = 0.0f; //チャージの最大
+};

@@ -32,6 +32,7 @@
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Component\Stage\GateGimmickCom.h"
+#include <StateMachine\Behaviar\InazawaCharacterState.h>
 
 ScenePVE::~ScenePVE()
 {
@@ -490,21 +491,7 @@ void ScenePVE::CreateUiObject()
             gauge->SetVariableValue(i);
         }
 
-        ////BoostFrame
-        //{
-        //    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-        //    std::shared_ptr<GameObject> boostFrame = canvas->AddChildObject();
-        //    boostFrame->SetName("BoostFrame");
-        //    boostFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame.ui", Sprite::SpriteShader::DEFALT, false);
-        //}
-
-        ////BoostGauge
-        //{
-        //    std::shared_ptr<GameObject> BoostFrame = GameObjectManager::Instance().Find("BoostFrame");
-        //    std::shared_ptr<GameObject> BoostGauge = BoostFrame->AddChildObject();
-        //    BoostGauge->SetName("BoostGauge");
-        //    BoostGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame.ui", Sprite::SpriteShader::DEFALT, false);
-        //}
+     
 
         //UltFrame
         {
@@ -533,6 +520,15 @@ void ScenePVE::CreateUiObject()
             ultGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
             float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
             ultGaugeCmp->SetVariableValue(i);
+        }
+
+        //UltƒJƒEƒ“ƒg
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> ultCore = canvas->AddChildObject();
+            ultCore->SetName("ultCore");
+            int value = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetRMaxCount();
+            ultCore->AddComponent<UI_Ult_Count>(value);
         }
 
         ////////////<SKill_E>/////////////////////////////
