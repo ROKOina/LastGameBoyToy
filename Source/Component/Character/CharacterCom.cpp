@@ -9,6 +9,7 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "RemoveTimerCom.h"
 #include "Setting/Setting.h"
+#include "Component\Audio\AudioCom.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -36,6 +37,7 @@ void CharacterCom::Update(float elapsedTime)
 
     int inputNum = GetButtonDown();
 
+#ifdef _DEBUG
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
@@ -52,7 +54,12 @@ void CharacterCom::Update(float elapsedTime)
                 UltSkill();
                 attackUltCounter++;
                 if (attackUltCounter >= attackUltCountMax)
+                {
+                    //エフェクト切る
+                    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
+                    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
                     isUseUlt = false;
+                }
             }
         }
     }
@@ -62,6 +69,37 @@ void CharacterCom::Update(float elapsedTime)
         if (!isUseUlt)
             MainAttackPushing();
     }
+#else
+    //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
+    if (CharacterInput::MainAttackButton & GetButtonDown())
+    {
+        //ウルト中は攻撃が変わる
+        if (!isUseUlt)
+            MainAttackDown();
+        else
+        {
+            //ウルト中
+            if (Rcool.timer >= Rcool.time)
+            {
+                Rcool.timer = 0;
+                UltSkill();
+                attackUltCounter++;
+                if (attackUltCounter >= attackUltCountMax)
+                {
+                    //エフェクト切る
+                    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
+                    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
+                    isUseUlt = false;
+                }
+            }
+        }
+    }
+    else if (CharacterInput::MainAttackButton & GetButton())
+    {
+        if (!isUseUlt)
+            MainAttackPushing();
+    }
+#endif // DEBUG_
 
     if (CharacterInput::SubAttackButton & GetButtonDown()
         && LeftClickcool.timer >= LeftClickcool.time)
@@ -111,6 +149,9 @@ void CharacterCom::Update(float elapsedTime)
             posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
             dashFlag = true;
             dashGauge -= 5; //最初は一気に減らす
+
+            //音
+            GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
         }
         else
         {
@@ -165,9 +206,13 @@ void CharacterCom::Update(float elapsedTime)
             ultGauge = 0;
             //ステートを初期化
             attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+
+            //エフェクト起動
+            GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
+            GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
         }
     }
-
+    
     //ウルト更新
     UltUpdate(elapsedTime);
 
@@ -177,8 +222,9 @@ void CharacterCom::Update(float elapsedTime)
     //カメラ制御
     CameraControl();
 
-    //ビネット発動
+    //ダメージビネット発動
     Vinetto(elapsedTime);
+
 }
 
 void CharacterCom::OnGUI()
@@ -392,6 +438,9 @@ void CharacterCom::Vinetto(float elapsedTime)
         if (previousHP - currentHP > 0)
         {
             posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
+
+            //音
+            GetGameObject()->GetComponent<AudioCom>()->Play("P_DAMAGE", false, 10);
         }
         else
         {
@@ -478,6 +527,10 @@ void CharacterCom::UltUpdate(float elapsedTime)
                         std::shared_ptr<GPUParticle> eff = attackUltEffBomb03->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombFire.gpuparticle", 50);
                         eff->Play();
                     }
+
+                    //音
+                    GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACK_ULT_BOOM");
+                    GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACK_ULT_BOOM", false, 10);
                 }
             }
         }
