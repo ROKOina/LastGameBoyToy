@@ -438,7 +438,6 @@ void ScenePVE::CreateUiObject()
         //キャンバス
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("Canvas");
-        obj->SetEnabled(false);
 
         //レティクル
         {
@@ -557,6 +556,14 @@ void ScenePVE::CreateUiObject()
             skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_E.ui", Sprite::SpriteShader::DEFALT, false);
         }
 
+        //Skillカウント
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> skillGauge = canvas->AddChildObject();
+            skillGauge->SetName("SkillCore");
+            skillGauge->AddComponent<UI_E_SkillCount>(8);
+        }
+
         ////////////////<Skill_Space>/////////////////////////////////////
 
              //SkillFrame
@@ -634,8 +641,7 @@ void ScenePVE::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
             hpMemori->SetName("lockOn");
-
-            hpMemori->AddComponent<UI_LockOn>(4,0,90);
+            hpMemori->AddComponent<UI_LockOn>(4, 0, 90);
         }
         //decoration
         {

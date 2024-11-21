@@ -21,6 +21,7 @@ public:
 private:
     float changePosValue;
     DirectX::XMFLOAT2 originalPos = {};
+    DirectX::XMFLOAT2 maxPos = {};
 };
 
 class UI_BoosGauge : public Component
@@ -118,18 +119,26 @@ public:
 
     // çXêVèàóù
     void Update(float elapsedTime) override;
+    void UpdateGauge(float elapsedTime);
 
-
+    void OnGUI()override;
 private:
     struct SkillCore {
         std::shared_ptr<UiSystem> coreFrameUi;
         std::shared_ptr<UiSystem> coreUi;
     };
     std::vector<SkillCore> coresUi;
+    std::shared_ptr<UiSystem> gaugeUi;
+
     std::vector<std::shared_ptr<GameObject>> cores;
     std::vector<std::shared_ptr<GameObject>> coreFrames;
+    std::shared_ptr<GameObject> gauge;
 
     int num = 0;
+    int* arrowCount = 0;
+    float* skillTimer = nullptr;
+    float skillTime = 3.0f;
 
+    DirectX::XMFLOAT2 originalTexSize = {};
     std::weak_ptr<GameObject> player;
 };
