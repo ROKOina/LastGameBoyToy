@@ -37,6 +37,7 @@ void CharacterCom::Update(float elapsedTime)
 
     int inputNum = GetButtonDown();
 
+#ifdef _DEBUG
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
@@ -68,6 +69,37 @@ void CharacterCom::Update(float elapsedTime)
         if (!isUseUlt)
             MainAttackPushing();
     }
+#else
+    //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
+    if (CharacterInput::MainAttackButton & GetButtonDown())
+    {
+        //ウルト中は攻撃が変わる
+        if (!isUseUlt)
+            MainAttackDown();
+        else
+        {
+            //ウルト中
+            if (Rcool.timer >= Rcool.time)
+            {
+                Rcool.timer = 0;
+                UltSkill();
+                attackUltCounter++;
+                if (attackUltCounter >= attackUltCountMax)
+                {
+                    //エフェクト切る
+                    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
+                    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
+                    isUseUlt = false;
+                }
+            }
+        }
+    }
+    else if (CharacterInput::MainAttackButton & GetButton())
+    {
+        if (!isUseUlt)
+            MainAttackPushing();
+    }
+#endif // DEBUG_
 
     if (CharacterInput::SubAttackButton & GetButtonDown()
         && LeftClickcool.timer >= LeftClickcool.time)
