@@ -38,6 +38,9 @@ void BossCom::Start()
     audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_START, "JUMP_ATTACK_START");
     audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_END, "JUMP_ATTACK_END");
     audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_GROUND, "JUMP_ATTACK_GROUND");
+    audio->RegisterSource(AUDIOID::BOSS_SHOT, "SHOT");
+    audio->RegisterSource(AUDIOID::BOSS_POWERSHOT, "POWERSHOT");
+    audio->RegisterSource(AUDIOID::BOSS_CHARGE, "CHARGE");
 }
 
 //XVˆ—

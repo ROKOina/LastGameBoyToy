@@ -442,6 +442,7 @@ void Boss_UpShotStart::Execute(const float& elapsedTime)
 #pragma region 打ち上げチャージ
 void Boss_UpShotCharge::Enter()
 {
+    audioCom.lock()->Play("CHARGE", false, 10.0f);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_up_shot_charge"), true, false, 0.1f);
 }
 void Boss_UpShotCharge::Execute(const float& elapsedTime)
@@ -481,8 +482,12 @@ void Boss_UpShotLoop::Execute(const float& elapsedTime)
     AnimtionEventControl("SPAWN", "Boss_L_neil2_end", "spawn", EnableSpawn | EnableCPUParticle);
     if (GameObjectManager::Instance().Find("spawn")->GetComponent<SpawnCom>()->GetSpawnFlag())
     {
+
         AnimtionEventControl("SPAWN", "Boss_L_hand", "muzzleflashleft", EnableCPUParticle, { 0.0f,1.0f,0.0f });
     }
+
+    //モーションに合わせてSE再生
+    if (animationCom.lock()->IsEventCalling("SHOT")){ audioCom.lock()->Play("SHOT", false, 10.0f); }
 
     time += elapsedTime;
     if (time > 3.0f)
@@ -558,6 +563,7 @@ void Boss_ShotStart::Execute(const float& elapsedTime)
 #pragma region チャージ
 void Boss_ShotCharge::Enter()
 {
+    audioCom.lock()->Play("CHARGE", false, 10.0f);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_shot_charge_loop"), true, false, 0.1f);
 }
 void Boss_ShotCharge::Execute(const float& elapsedTime)
@@ -598,6 +604,11 @@ void Boss_Shot::Execute(const float& elapsedTime)
     AnimtionEventControl("BEEM", "Boss_R_hand", "charge", EnableSpawn | EnableCPUParticle);
     AnimtionEventControl("BEEM", "Boss_R_hand", "muzzleflash", EnableCPUParticle);
     AnimtionEventControl("SMOKETIME", "Boss_R_hand", "charge", EnableCPUParticle);
+
+    if (animationCom.lock()->IsEventCalling("SHOT"))
+    {
+        audioCom.lock()->Play("POWERSHOT", false, 10.0f);
+    }
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())

@@ -99,8 +99,10 @@ void ScenePVE::Initialize()
         {
             DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
 
-            obj->GetComponent<GateGimmick>()->SetDownPos(pos);
-            obj->GetComponent<GateGimmick>()->SetUpPos({ pos.x, 1.85f, pos.z });
+            GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
+            gate->SetDownPos(pos);
+            gate->SetUpPos({ pos.x, 1.85f, pos.z });
+            gate->SetMoveSpeed(0.1f);
         }
         
 
