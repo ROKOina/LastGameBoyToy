@@ -18,6 +18,7 @@ public:
     void SetSource(std::shared_ptr<AudioSource> s) { source = s; }
 
     void SetVolume(float value) { volume = value; }
+    void SetPitch(float value) { pitch = value; }
     void SetLoopFlag(bool flag) { loop = flag; }
 
     bool GetIsSource() { return source != nullptr; }
@@ -27,6 +28,7 @@ private:
     std::shared_ptr<AudioSource> source;
 
     float volume = 1.0f;
+    float pitch = 1.0f;
     bool loop = true;
 
     //âπó ïœçXópïœêî
@@ -71,6 +73,7 @@ public:
     void FeedStart(std::string name, float target, float add) { audioSources[name].FeedStart(target, add); }
 
     AudioSource* GetAudioSource(std::string name) { return audioSources[name].GetSource().get(); }
+    AudioObj& GetAudioObj(std::string name) { return audioSources[name]; }
 
 private:
     std::map<std::string, AudioObj> audioSources;

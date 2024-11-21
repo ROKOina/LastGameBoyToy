@@ -330,6 +330,9 @@ void Sprite::Update(float elapsedTime)
     {
         if (cursorVsCollsionBox())
         {
+            //“–‚½‚Á‚½uŠÔ‚ğ‹L˜^
+            (hit == false) ? hitEnter = true : hitEnter = false;
+
             hit = true;
         }
         else

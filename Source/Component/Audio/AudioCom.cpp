@@ -34,6 +34,7 @@ void AudioObj::Update()
     Feed();
 
     source->SetVolume(volume);
+    source->SetPitch(pitch);
 }
 
 void AudioObj::FeedStart(float targetValue, float add)

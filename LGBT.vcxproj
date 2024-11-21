@@ -151,6 +151,7 @@
     <ClInclude Include="Source\Component\Animation\FootIKcom.h" />
     <ClInclude Include="Source\Component\Audio\AudioCom.h" />
     <ClInclude Include="Source\Component\Bullet\BulletCom.h" />
+    <ClInclude Include="Source\Component\Bullet\MissileCom.h" />
     <ClInclude Include="Source\Component\Bullet\ProjectileCom.h" />
     <ClInclude Include="Source\Component\Camera\CameraCom.h" />
     <ClInclude Include="Source\Component\Camera\EventCameraCom.h" />
@@ -295,6 +296,7 @@
     <ClCompile Include="Source\Component\Animation\FootIKCom.cpp" />
     <ClCompile Include="Source\Component\Audio\AudioCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\BulletCom.cpp" />
+    <ClCompile Include="Source\Component\Bullet\MissileCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\ProjectileCom.cpp" />
     <ClCompile Include="Source\Component\Camera\CameraCom.cpp" />
     <ClCompile Include="Source\Component\Camera\EventCameraCom.cpp" />

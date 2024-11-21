@@ -22,6 +22,10 @@ enum class AUDIOID
     BOSS_SHOT,
     BOSS_POWERSHOT,
     BOSS_CHARGE,
+    BOSS_BULLET,
+    BOSS_PUNCH,
+    BOSS_LARIAT,
+    BOSS_WALK,
 
     //ÉvÉåÉCÉÑÅ[
     PLAYER_SHOOT,
