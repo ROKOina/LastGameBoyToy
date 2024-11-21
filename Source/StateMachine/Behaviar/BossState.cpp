@@ -753,6 +753,17 @@ void Boss_EventPunch::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle);
 }
 
+void Boss_EventPunch::Exit()
+{
+    //UI表示
+    GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
+
+    //プレイヤー位置設定
+    const auto& player = GameObjectManager::Instance().Find("player");
+    player->transform_->SetWorldPosition({ -2.471f,-0,-34.219f });
+    player->GetChildFind("cameraPostPlayer")->transform_->SetEulerRotation({ -2.550f,0.0f,0.0f });
+}
+
 void Boss_EventDeath::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_dead"), false, false, 0.1f);
