@@ -17,8 +17,8 @@ void BossCom::Start()
     state.AddState(BossState::LARIATSTART, std::make_shared<Boss_LARIATSTART>(this));
     state.AddState(BossState::LARIATLOOP, std::make_shared<Boss_LARIATLOOP>(this));
     state.AddState(BossState::LARIATEND, std::make_shared<Boss_LARIATEND>(this));
-    //state.AddState(BossState::JUMPATTACKSTART, std::make_shared<Boss_JumpAttackStart>(this));
-    //state.AddState(BossState::JUMPATTACKEND, std::make_shared<Boss_JumpAttackEnd>(this));
+    state.AddState(BossState::JUMPATTACKSTART, std::make_shared<Boss_JumpAttackStart>(this));
+    state.AddState(BossState::JUMPATTACKEND, std::make_shared<Boss_JumpAttackEnd>(this));
     state.AddState(BossState::SHOTSTART, std::make_shared<Boss_ShotStart>(this));
     state.AddState(BossState::SHOTLOOP, std::make_shared<Boss_ShotCharge>(this));
     state.AddState(BossState::SHOTEND, std::make_shared<Boss_Shot>(this));
@@ -26,12 +26,18 @@ void BossCom::Start()
     state.AddState(BossState::UPSHOTCHARGE, std::make_shared<Boss_UpShotCharge>(this));
     state.AddState(BossState::UPSHOTLOOP, std::make_shared<Boss_UpShotLoop>(this));
     state.AddState(BossState::UPSHOTEND, std::make_shared<Boss_UpShotEnd>(this));
-
-    //ñ≥ìGéûä‘
-    GetGameObject()->GetComponent<CharaStatusCom>()->SetInvincibleTime(0.1f);
+    state.AddState(BossState::EVENT_WALK, std::make_shared<Boss_EventWalk>(this));
+    state.AddState(BossState::EVENT_PUNCH, std::make_shared<Boss_EventPunch>(this));
+    state.AddState(BossState::EVENT_DEATH, std::make_shared<Boss_EventDeath>(this));
 
     //èâä˙ÉXÉeÅ[Égìoò^
     state.ChangeState(BossState::IDLE);
+
+    //SEìoò^
+    AudioCom* audio = GetGameObject()->GetComponent<AudioCom>().get();
+    audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_START, "JUMP_ATTACK_START");
+    audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_END, "JUMP_ATTACK_END");
+    audio->RegisterSource(AUDIOID::BOSS_JUMPATTACK_GROUND, "JUMP_ATTACK_GROUND");
 }
 
 //çXêVèàóù

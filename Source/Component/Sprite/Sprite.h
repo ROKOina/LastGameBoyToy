@@ -41,6 +41,9 @@ public:
     //名前設定
     const char* GetName() const override { return "Sprite"; }
 
+    //イージングプレイ関数
+    void EasingPlay();
+
 private:
 
     //シリアライズ
@@ -78,7 +81,7 @@ public:
         DirectX::XMFLOAT2 collsionscaleoffset = { 0.0f,0.0f };
         DirectX::XMFLOAT2 collsionpositionoffset = { 0.0f,0.0f };
         DirectX::XMFLOAT2 pivot = { 0.0f,0.0f };
-        DirectX::XMFLOAT2 texSize{ 0.0f,0.0f };
+        DirectX::XMFLOAT2 texSize = { 0.0f,0.0f };
         float angle = { 0.0f };
         float easingangle = { 0.0f };
         std::string	filename = {};
@@ -94,6 +97,7 @@ public:
         DirectX::XMFLOAT3 screenposoffset = { 0.0f,0.0f,0.0f };
         DirectX::XMFLOAT2 maxscale = { 0.0f,0.0f };
         DirectX::XMFLOAT2 minscale = { 0.0f,0.0f };
+        bool onshot = false;
 
         template<class Archive>
         void serialize(Archive& archive, int version);

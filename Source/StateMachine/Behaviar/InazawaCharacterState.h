@@ -31,6 +31,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit() override;
     void ImGui() override;
     virtual const char* GetName() const override { return "MainAttack"; }
 
@@ -54,5 +55,5 @@ public:
     int arrowCount;
     float intervalTimer;
     float interval = 0.25f;
-    float skillTimer = 5.0f;
+    float skillTimer = 3.0f;
 };

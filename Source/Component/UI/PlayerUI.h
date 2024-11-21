@@ -50,3 +50,43 @@ private:
     DirectX::XMFLOAT2 originlTexSize;   //元のテクスチャーサイズ
     std::weak_ptr<GameObject> player;
 };
+
+class UI_LockOn : public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_LockOn(int num);
+    ~UI_LockOn() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_BoostGauge"; }
+
+    // 開始処理
+    void Start() override ;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    void OnGUI()override;
+
+
+    //視線の先のオブジェクトを入手
+    std::shared_ptr<GameObject> SearchObjct();
+    
+    void LockIn(float elapsedTime);
+    void LockOut(float elapsedTime);
+
+private:
+    std::vector<std::shared_ptr<GameObject>> reacters;
+
+  
+    std::weak_ptr<GameObject> camera;   //カメラ
+
+    std::shared_ptr<GameObject> lockOn;
+    std::shared_ptr<GameObject> gauge;
+
+    std::shared_ptr<UiSystem> lockOnUi; //lockOn
+    std::shared_ptr<UiSystem> gaugeUi;  //Gauge
+
+    std::vector<float> similarity;
+};

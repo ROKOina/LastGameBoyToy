@@ -11,8 +11,14 @@ enum class AUDIOID
 {
     BGM,
     SE,
-    SceneGame1,
-    SceneGame2,
+    SCENE_GAME1,
+    SCENE_GAME2,
+    SCENE_TITLE,
+    CURSOR,
+    ENTER,
+    BOSS_JUMPATTACK_START,
+    BOSS_JUMPATTACK_END,
+    BOSS_JUMPATTACK_GROUND,
     MAX
 };
 

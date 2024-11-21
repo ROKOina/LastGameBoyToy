@@ -118,3 +118,133 @@ void UI_BoosGauge::Update(float elapsedTime)
             }
         }
 }
+
+UI_LockOn::UI_LockOn(int num)
+{
+    for (int i = 0; i < num; i++) {
+        //リアクターを保持
+        std::string name = "Reactar";
+        name = name + std::to_string(i);
+        reacters.emplace_back(GameObjectManager::Instance().Find(name.c_str()));
+        similarity.emplace_back(0.0f);
+    }
+//カメラ保持
+    camera = GameObjectManager::Instance().Find("cameraPostPlayer");
+ //Uiのゲームオブジェクト生成
+    lockOn = GameObjectManager::Instance().Create();
+    lockOn->SetName("LockOn");
+    lockOnUi = lockOn->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnBase.ui", Sprite::SpriteShader::DEFALT, false);
+    lockOnUi->spc.objectname = "";
+    lockOnUi->spc.color.w = 0.0f;
+
+    gauge = GameObjectManager::Instance().Create();
+    gauge->SetName("LockOnGauge");
+    gaugeUi = gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/LockOnGaugeFrame.ui", Sprite::SpriteShader::DEFALT, false);
+    gaugeUi->spc.objectname = "";
+    gaugeUi->spc.color.w = 0.0f;
+
+ }
+
+void UI_LockOn::Start()
+{
+        this->GetGameObject()->AddChildObject(lockOn);
+        this->GetGameObject()->AddChildObject(gauge);
+}
+
+void UI_LockOn::Update(float elapsedTime)
+{
+    std::shared_ptr<GameObject> nearObj = SearchObjct();
+    if (nearObj != nullptr) {
+       gaugeUi->spc.objectname = nearObj->GetName();
+       lockOnUi->spc.objectname = nearObj->GetName();
+       LockIn(elapsedTime);
+
+    }
+    else {
+       // gaugeUi->spc.objectname = "";
+       // lockOnUi->spc.objectname = "";
+        LockOut(elapsedTime);
+    }
+    
+}
+
+
+std::shared_ptr<GameObject> UI_LockOn::SearchObjct()
+{
+    //カメラのポジション
+    DirectX::XMFLOAT3 cameraPos = camera.lock()->GetComponent<CameraCom>()->GetEye();
+
+    //カメラのベクトル
+    DirectX::XMFLOAT3 cameraVec = camera.lock()->GetComponent<CameraCom>()->GetFocus() - cameraPos;
+    cameraVec = Mathf::Normalize(cameraVec);
+    //どの範囲まで描画するかの閾値
+    float threshold = 0.99f;
+
+    std::shared_ptr<GameObject> nearReacter;
+    float maxSimilarity = 0.0f;
+    int i = 0;
+    for (auto& reacter : reacters) {
+        DirectX::XMFLOAT3 reacterPos = reacter->GetComponent<TransformCom>()->GetWorldPosition();
+        DirectX::XMFLOAT3 reacterDirection = reacterPos - cameraPos;
+        reacterDirection = Mathf::Normalize(reacterDirection);
+
+        //1に近いほど視線が合っている
+         similarity.at(i) = Mathf::Dot(cameraVec, reacterDirection);
+
+        //閾値を超えているかつ今いる中で一番近い時
+         if (similarity.at(i) > threshold && similarity.at(i) > maxSimilarity) {
+             maxSimilarity = similarity.at(i);
+             nearReacter = reacter;
+         }
+        i++;
+    }
+
+    if (nearReacter) {
+
+        return nearReacter;
+    }
+    else {
+        return nullptr;
+    }
+}
+
+void UI_LockOn::LockIn(float elapsedTime)
+{
+    float changeValue = 1.3f;
+    if (gaugeUi->spc.color.w <= 1.0f) {
+     gaugeUi->spc.color.w += 6.0f *elapsedTime;
+     lockOnUi->spc.color.w += 6.0f  * elapsedTime;
+    }
+    if (gaugeUi->spc.scale.x > 0.3f) {
+
+        gaugeUi->spc.scale.x -= changeValue* elapsedTime;
+        gaugeUi->spc.scale.y -= changeValue * elapsedTime;
+        lockOnUi->spc.scale.x -= changeValue * elapsedTime;
+        lockOnUi->spc.scale.y -= changeValue * elapsedTime;
+    }
+    
+}
+
+void UI_LockOn::LockOut(float elapsedTime)
+{
+    float changeValue = 1.7f;
+    if (gaugeUi->spc.color.w >= 0.0f) {
+        gaugeUi->spc.color.w -= 6.0f * elapsedTime;
+        lockOnUi->spc.color.w -= 6.0f * elapsedTime;
+    }
+    if (gaugeUi->spc.scale.x <=0.4f) {
+        gaugeUi->spc.scale.x += changeValue*elapsedTime;
+        gaugeUi->spc.scale.y += changeValue* elapsedTime;
+        lockOnUi->spc.scale.x += changeValue *elapsedTime;
+        lockOnUi->spc.scale.y += changeValue *elapsedTime;
+    }
+}
+
+
+void UI_LockOn::OnGUI()
+{
+    ImGui::Text(lockOnUi->spc.objectname.c_str());
+    for (int i = 0; i < 4; i++) {  
+        ImGui::DragFloat("near", &similarity.at(i));
+    }
+}

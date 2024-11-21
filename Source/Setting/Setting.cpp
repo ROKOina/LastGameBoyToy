@@ -44,7 +44,8 @@ void SettingScreen::CreateSettingUiObject()
             {
                 auto& button = Bar->AddChildObject();
                 button->SetName("Button");
-                button->AddComponent<Sprite>("Data/SerializeData/UIData/setting/mouseSenBarButton.ui", Sprite::SpriteShader::DEFALT, false);
+                auto& s = button->AddComponent<Sprite>("Data/SerializeData/UIData/setting/mouseSenBarButton.ui", Sprite::SpriteShader::DEFALT, false);
+                s->spc.pivot.x = 160;
             }
 
             //”šˆê‚ÌˆÊ
@@ -97,7 +98,8 @@ void SettingScreen::CreateSettingUiObject()
             {
                 auto& button = Bar->AddChildObject();
                 button->SetName("Button");
-                button->AddComponent<Sprite>("Data/SerializeData/UIData/setting/fovBarButton.ui", Sprite::SpriteShader::DEFALT, false);
+                auto& s = button->AddComponent<Sprite>("Data/SerializeData/UIData/setting/fovBarButton.ui", Sprite::SpriteShader::DEFALT, false);
+                s->spc.pivot.x = 160;
             }
 
             //”šˆê‚ÌˆÊ

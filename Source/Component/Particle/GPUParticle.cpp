@@ -238,6 +238,11 @@ void GPUParticle::Start()
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
+    //ˆêŽž•Û‘¶
+    isFirstThrow = false;
+    tempWorldPos = m_GSC.worldpos;
+    m_GSC.worldpos = 0;
+
     m_gpu->data.position = (m_GSC.worldpos == 1) ? DirectX::XMFLOAT3{} : GetGameObject()->transform_->GetWorldPosition();
     m_gpu->data.rotation = GetGameObject()->transform_->GetRotation();
     m_gpu->data.world = GetGameObject()->transform_->GetWorldTransform();
@@ -373,6 +378,13 @@ void GPUParticle::Render()
     dc->PSSetShader(NULL, NULL, 0);
     dc->GSSetShader(NULL, NULL, 0);
     dc->CSSetShader(NULL, NULL, 0);
+
+    //ˆê“x‚¾‚¯’Ê‚é
+    if (!isFirstThrow)
+    {
+        m_GSC.worldpos = tempWorldPos;  //•Û‘¶‚ð“K—p
+        isFirstThrow = true;
+    }
 }
 
 //imgui

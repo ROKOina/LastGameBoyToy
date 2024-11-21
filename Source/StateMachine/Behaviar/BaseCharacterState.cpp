@@ -24,6 +24,16 @@ void BaseCharacter_IdleState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+
+    ////FPS用
+    //auto& camera = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
+    //if (camera)
+    //{
+    //    auto& arm = camera->GetChildFind("armChild");
+    //    auto& armAnim = arm->GetComponent<AnimationCom>();
+
+    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
+    //}
 }
 
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
@@ -356,13 +366,16 @@ void Ult_Attack_State::Enter()
         gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
     }
 
-    auto& effObj= obj->AddChildObject();
-    effObj->SetName("ultAttackEff");
-    effObj->transform_->SetWorldPosition(gunPos + front * 0.5f);
-    
-    const auto& bulletgpuparticle = effObj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/playerultattack.cpuparticle", 500);
-    bulletgpuparticle->SetActive(true);
-    effObj->AddComponent<RemoveTimerCom>(0.2f);
+    //用意したエフェクトオブジェクト起動
+    arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
+
+    //auto& effObj= obj->AddChildObject();
+    //effObj->SetName("ultAttackEff");
+    //effObj->transform_->SetWorldPosition(gunPos + front * 0.5f);
+    //
+    //const auto& bulletgpuparticle = effObj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/playerultattack.cpuparticle", 500);
+    //bulletgpuparticle->SetActive(true);
+    //effObj->AddComponent<RemoveTimerCom>(0.2f);
 
     ray->SetStart(start);
     ray->SetEnd(end);

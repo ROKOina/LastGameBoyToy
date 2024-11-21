@@ -16,7 +16,6 @@
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneTitle.h"
 #include "Scene\SceneSelect\SceneSelect.h"
-#include "Scene\SceneGame\SceneGame.h"
 #include "Scene/ScenePVE/ScenePVE.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
@@ -28,6 +27,7 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
+#include "Component\Audio\AudioCom.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -132,6 +132,18 @@ void SceneTitle::Initialize()
       "Data\\Texture\\lut_ggx.DDS"
     };
     SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
+
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Audio");
+        audioObj = audio->AddComponent<AudioCom>().get();
+        audioObj->RegisterSource(AUDIOID::SCENE_TITLE, "Title");
+        audioObj->RegisterSource(AUDIOID::CURSOR, "Cursor");
+        audioObj->RegisterSource(AUDIOID::ENTER, "Enter");
+
+        audioObj->Play("Title", true, 0.0f);
+        audioObj->FeedStart("Title", 0.5f, 0.1f);
+    }
 }
 
 void SceneTitle::Finalize()
@@ -191,12 +203,16 @@ void SceneTitle::UIUpdate(float elapsedTime)
         {
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
+                canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
+                    audioObj->FeedStart("Title", 0.0f, elapsedTime);
+                    audioObj->Play("Enter", false, 1.0f);
+
                     //ˆÃ“]
                     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
-                    SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
+                    SceneManager::Instance().ChangeSceneDelay(new ScenePVE, 2);
                 }
             }
         }
