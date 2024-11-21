@@ -5,7 +5,7 @@
 #include "Component/MoveSystem/MovementCom.h"
 
 //コンストラクタ
-FPSCameraCom::FPSCameraCom() : CameraCom::CameraCom(45, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.1f, 1000.0f)
+FPSCameraCom::FPSCameraCom() : CameraCom::CameraCom(80, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.1f, 1000.0f)
 {
     focuslapelate = 0.93f;
     eyelaperate = 0.01f;

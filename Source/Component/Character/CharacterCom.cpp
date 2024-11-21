@@ -52,7 +52,12 @@ void CharacterCom::Update(float elapsedTime)
                 UltSkill();
                 attackUltCounter++;
                 if (attackUltCounter >= attackUltCountMax)
+                {
+                    //エフェクト切る
+                    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
+                    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
                     isUseUlt = false;
+                }
             }
         }
     }
@@ -165,6 +170,10 @@ void CharacterCom::Update(float elapsedTime)
             ultGauge = 0;
             //ステートを初期化
             attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+
+            //エフェクト起動
+            GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
+            GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
         }
     }
 

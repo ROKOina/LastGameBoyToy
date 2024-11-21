@@ -57,7 +57,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
 
         //UŒ‚ˆ—
-        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower, maxDamage * attackPower);
+        BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower/ maxAttackPower, maxDamage * attackPower);
 
         auto& charge = arm->GetChildFind("chargeEff");
         charge->GetComponent<GPUParticle>()->SetLoop(false);

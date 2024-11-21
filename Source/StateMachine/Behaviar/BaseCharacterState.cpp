@@ -164,9 +164,16 @@ void BaseCharacter_DeathState::Enter()
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
 
+    //プレイヤー映す
+    owner->GetGameObject()->GetComponent<RendererCom>()->SetDissolveThreshold(0);
+    //FPS用オブジェクト隠す
+    GameObjectManager::Instance().Find("armChild")->GetComponent<RendererCom>()->SetDissolveThreshold(1);
+
     //イベントカメラ
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
     EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
+
+    //遷移
     SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 3);
 }
 
