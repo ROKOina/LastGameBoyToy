@@ -38,6 +38,7 @@ public:
     DirectX::XMFLOAT3 GetDownPos() { return downPos; }
     void SetDownPos(DirectX::XMFLOAT3 pos) { downPos = pos; }
     float GetMoveSpeed() { return moveSpeed; }
+    void SetMoveSpeed(float speed) { moveSpeed = speed; }
 
 private:
     StateMachine<GateGimmick, GimmickState> state;

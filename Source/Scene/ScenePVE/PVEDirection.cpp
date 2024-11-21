@@ -11,6 +11,7 @@
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\Stage\StageEditorCom.h"
 #include "Component\Animation\AimIKCom.h"
+#include "StateMachine\Behaviar\GateGimmickState.h"
 
 PVEDirection::PVEDirection()
 {
@@ -146,6 +147,11 @@ void PVEDirection::DirectionFOne(float elapsedTime)
         GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
         eventBoss->GetComponent<BossCom>()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_WALK);
 
+        //イベントシーン用の歩きステートへ遷移
+        GameObject* eventGate = GameObjectManager::Instance().Find("Gate0").get();
+        eventGate->GetComponent<GateGimmick>()->GetStateMachine().ChangeState(GateGimmick::GimmickState::UP);
+
+
         flag = true;
     }
 
@@ -214,6 +220,8 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
 
         eventBoss->GetComponent<BossCom>()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
 
+        GameObject* eventGate = GameObjectManager::Instance().Find("Gate0").get();
+        eventGate->GetComponent<GateGimmick>()->GetStateMachine().ChangeState(GateGimmick::GimmickState::DOWN);
         flag = true;
     }
 
