@@ -41,6 +41,8 @@ void BossCom::Start()
     audio->RegisterSource(AUDIOID::BOSS_SHOT, "SHOT");
     audio->RegisterSource(AUDIOID::BOSS_POWERSHOT, "POWERSHOT");
     audio->RegisterSource(AUDIOID::BOSS_CHARGE, "CHARGE");
+    audio->RegisterSource(AUDIOID::BOSS_PUNCH, "PUNCH");
+    audio->RegisterSource(AUDIOID::BOSS_LARIAT, "LARIAT");
 }
 
 //XVˆ—
