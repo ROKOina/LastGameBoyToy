@@ -40,6 +40,8 @@ void AimIKCom::OnGUI()
 //計算
 void AimIKCom::AimIK()
 {
+    if (!GetEnabled())return;
+
     // レンダラーコンポーネントからモデルを取得
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
 

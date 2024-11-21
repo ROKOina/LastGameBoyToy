@@ -209,7 +209,7 @@ private:
     void UltUpdate(float elapsedTime);
 
 protected:
-    StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS> moveStateMachine;
+    StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>   moveStateMachine;
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
     GameObject* cameraObj = nullptr;
 

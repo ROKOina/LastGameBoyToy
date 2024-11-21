@@ -59,6 +59,6 @@ public:
     float intervalTimer;
     float interval = 0.25f;
     float skillTimer = 3.0f;
-
+    const float skillTime = 3.0f;
     int damage = 30;
 };

@@ -11,6 +11,7 @@
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\Stage\StageEditorCom.h"
 #include "Component\Animation\AimIKCom.h"
+#include "Component\Character\CharacterCom.h"
 #include "StateMachine\Behaviar\GateGimmickState.h"
 
 PVEDirection::PVEDirection()
@@ -28,7 +29,9 @@ void PVEDirection::Update(float elapsedTime)
 
 void PVEDirection::DirectionStart()
 {
-    GameObjectManager::Instance().Find("player")->SetEnabled(false);
+    GameObjectManager::Instance().Find("BOSS")->GetComponent<AimIKCom>()->SetEnabled(false);
+    GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetEnabled(false);
+    //GameObjectManager::Instance().Find("player")->SetEnabled(false);
 
     {
         auto& armParts = GameObjectManager::Instance().Create();
@@ -216,13 +219,18 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, parameters);
         //ゲームオブジェクト本体を復活
         GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
-        GameObjectManager::Instance().Find("player")->SetEnabled(true);
+        GameObjectManager::Instance().Find("BOSS")->GetComponent<AimIKCom>()->SetEnabled(true);
+        GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetEnabled(true);
 
         eventBoss->GetComponent<BossCom>()->GetStateMachine().ChangeState(BossCom::BossState::IDLE);
 
         GameObject* eventGate = GameObjectManager::Instance().Find("Gate0").get();
         eventGate->GetComponent<GateGimmick>()->GetStateMachine().ChangeState(GateGimmick::GimmickState::DOWN);
+        DirectX::XMFLOAT3 x = GameObjectManager::Instance().Find("BOSS")->transform_->GetWorldPosition();
+        x.z = 4.5f;
+        GameObjectManager::Instance().Find("BOSS")->transform_->SetWorldPosition({ x.x,x.y,x.z });
         flag = true;
+
     }
 
     if (GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->IsDeath())
@@ -252,7 +260,7 @@ void PVEDirection::DirectionCOne(float elaspsedTime)
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
         GameObjectManager::Instance().Find("BOSS")->SetEnabled(false);
-        GameObjectManager::Instance().Find("player")->SetEnabled(false);
+        GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetEnabled(false);
 
         eventBoss->SetEnabled(true);
         eventBoss->transform_->SetWorldPosition({ -2.500,-0.005,-11.000 });
