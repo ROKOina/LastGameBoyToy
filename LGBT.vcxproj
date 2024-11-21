@@ -237,6 +237,7 @@
     <ClInclude Include="Source\Phsix\Physxlib.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Scene\SceneGame\SceneGame.h" />
+    <ClInclude Include="Source\Scene\SceneLGBT\SceneLGBT.h" />
     <ClInclude Include="Source\Scene\SceneLoading\SceneLoading.h" />
     <ClInclude Include="Source\Scene\SceneLobby\SceneLobby.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
@@ -248,7 +249,6 @@
     <ClInclude Include="Source\Scene\SceneSugimoto\SceneSugimoto.h" />
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
-    <ClInclude Include="Source\Scene\SceneUI\SceneUI.h" />
     <ClInclude Include="Source\Setting\Setting.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BaseCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
@@ -369,6 +369,7 @@
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneGame\SceneGame.cpp" />
+    <ClCompile Include="Source\Scene\SceneLGBT\SceneLGBT.cpp" />
     <ClCompile Include="Source\Scene\SceneLoading\SceneLoading.cpp" />
     <ClCompile Include="Source\Scene\SceneLobby\SceneLobby.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
@@ -380,7 +381,6 @@
     <ClCompile Include="Source\Scene\SceneSugimoto\SceneSugimoto.cpp" />
     <ClCompile Include="Source\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\SceneTraining.cpp" />
-    <ClCompile Include="Source\Scene\SceneUI\SceneUI.cpp" />
     <ClCompile Include="Source\Setting\Setting.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BaseCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />
@@ -481,6 +481,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\2D\SpriteChromaticAberrationPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\SpriteDissolvePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
