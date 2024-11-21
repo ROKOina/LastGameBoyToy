@@ -120,6 +120,7 @@ public:
     // çXêVèàóù
     void Update(float elapsedTime) override;
     void UpdateGauge(float elapsedTime);
+    void UpdateCore(float elapsedTime);
 
     void OnGUI()override;
 private:
@@ -129,16 +130,19 @@ private:
     };
     std::vector<SkillCore> coresUi;
     std::shared_ptr<UiSystem> gaugeUi;
+    std::shared_ptr<UiSystem> gaugeFrameUi;
 
     std::vector<std::shared_ptr<GameObject>> cores;
     std::vector<std::shared_ptr<GameObject>> coreFrames;
     std::shared_ptr<GameObject> gauge;
+    std::shared_ptr<GameObject> gaugeFrame;
 
     int num = 0;
     int* arrowCount = 0;
     float* skillTimer = nullptr;
     float skillTime = 3.0f;
-
+    float spacing = 30.0f;
+    bool* isShot;
     DirectX::XMFLOAT2 originalTexSize = {};
     std::weak_ptr<GameObject> player;
 };

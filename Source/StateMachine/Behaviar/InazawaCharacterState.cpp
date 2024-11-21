@@ -135,6 +135,7 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
         //Fire(owner->GetGameObject(), arrowSpeed);
         arrowCount--;
         intervalTimer = 0;
+        isShot = true;  
 
         //‰¹
         owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_SHOOT");

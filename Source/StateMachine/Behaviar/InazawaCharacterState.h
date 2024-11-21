@@ -60,5 +60,6 @@ public:
     float interval = 0.25f;
     float skillTimer = 3.0f;
     const float skillTime = 3.0f;
+    bool isShot = false; //撃ったタイミング 
     int damage = 30;
 };
