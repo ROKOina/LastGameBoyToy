@@ -380,7 +380,6 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
                 // 距離に基づくスプライトのスケーリング (線形補間を距離に応じて滑らかに)
                 float scaleFactor = std::clamp(distance / 10.0f, 0.0f, 1.0f);  // クランプで距離を制限
                 DirectX::XMFLOAT2 scale = Mathf::Lerp(spc.maxscale, spc.minscale, scaleFactor);
-                spc.scale = scale;
             }
         }
     }

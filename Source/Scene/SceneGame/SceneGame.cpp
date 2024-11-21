@@ -633,6 +633,16 @@ void SceneGame::CreateUiObject()
           float* i = GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint();
           gauge->SetVariableValue(i);
       }
+
+      //LockOn
+      {
+          std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+          std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+          hpMemori->SetName("lockOn");
+
+
+          hpMemori->AddComponent<UI_LockOn>(4);
+      }
       //decoration
       {
           std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("Canvas");

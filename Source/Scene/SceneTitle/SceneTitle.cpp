@@ -202,7 +202,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
                     //ˆÃ“]
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
                     //SceneManager::Instance().ChangeSceneDelay(new SceneSelect, 2);
-                    SceneManager::Instance().ChangeSceneDelay(new ScenePVE, 2);
+                    SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
                 }
             }
         }
