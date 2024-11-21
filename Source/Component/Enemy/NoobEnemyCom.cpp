@@ -98,7 +98,7 @@ void NoobEnemyCom::HitPlayer()
         {
             if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
             {
-                status->AddDamagePoint(-3);
+                status->AddDamagePoint(-10);
             }
         }
     }

@@ -163,7 +163,7 @@ void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const st
     {
         for (const auto& hitobject : collision->OnHitGameObject())
         {
-            hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-1);
+            hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-40);
         }
     }
 }

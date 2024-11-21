@@ -355,7 +355,7 @@ void SpawnCom::CreateBeamSegment(const std::shared_ptr<GameObject>& origin, cons
 void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
 {
     obj->SetName("gimmickmissile");
-    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmickfire.cpuparticle", 1000);
+    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmickfire.cpuparticle", 500);
     std::shared_ptr<MovementCom>move = obj->AddComponent<MovementCom>();
     move->ApplyRandomForce(55.0f, 19.0f);
     move->SetFallSpeed(-45.0f);
@@ -363,10 +363,10 @@ void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
     move->SetMoveAcceleration(30.0f);
     move->SetMoveMaxSpeed(15.0f);
     const auto& collider = obj->AddComponent<SphereColliderCom>();
-    collider->SetEnabled(false);
+    collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::EnemyBullet);
     collider->SetJudgeTag(COLLIDER_TAG::Player);
-    collider->SetRadius(0.6f);
+    collider->SetRadius(0.7f);
 
     //”š”­•¨
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
@@ -398,7 +398,7 @@ void SpawnCom::HitObject()
                     {
                         if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                         {
-                            status->AddDamagePoint(-1);
+                            status->AddDamagePoint(-30);
                         }
                     }
                 }

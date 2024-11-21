@@ -16,12 +16,9 @@ void UiGauge::Start()
 
 void UiGauge::Update(float elapsedTime)
 {
-    // 変化値がマイナスに行かないように補正
-    *variableValue = Mathf::Clamp(*variableValue, 0.01f, maxValue);
     //ゲージの倍率を求める
     valueRate = *variableValue / maxValue;
     if (!isDebug) {
-
         //Xのみ
         if (changeValue == UiSystem::ChangeValue::X_ONLY_ADD) {
             spc.texSize = { originalTexSize.x * valueRate,spc.texSize.y };
@@ -44,7 +41,6 @@ void UiGauge::Update(float elapsedTime)
         else if (changeValue == UiSystem::ChangeValue::X_AND_Y_SUB) {
             spc.texSize = { originalTexSize.x * (1 - valueRate) ,originalTexSize.y * (1 - valueRate) };
         }
-
     }
     //親クラスのUpdateを呼ぶ
     this->UiSystem::Update(elapsedTime);

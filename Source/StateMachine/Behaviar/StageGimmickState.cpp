@@ -17,35 +17,32 @@ void StageGimmick_IdleState::Execute(const float& elapsedTime)
 
     if (boss)
     {
-        //前回の体力を保持する変数
-        float damagepreview = boss->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
-
-        //現在の体力を取得
-        float currentHitPoint = *boss->GetComponent<CharaStatusCom>()->GetHitPoint();
-
-        int changeNum = static_cast<int>(damagepreview - currentHitPoint);
+        spawntime += elapsedTime;
 
         //パーティクル生成
-        if (static_cast<int>(damagepreview - currentHitPoint) % 10 == 9 && changeNum != spawnChangeNum)
+        if (spawntime > 25.0f)
         {
             owner->GetGameObject()->GetChildFind("accumulateparticle")->GetComponent<GPUParticle>()->SetLoop(true);
         }
 
         //15ずつ減ったときに遷移
-        if (static_cast<int>(damagepreview - currentHitPoint) % 16 == 15 && changeNum != spawnChangeNum)
+        if (spawntime > 30.0f)
         {
             owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::ENEMYSPAWN);
-            spawnChangeNum = changeNum;
             return;
         }
 
         //大技的なやつ
-        if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 20.0f)
+        if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 100.0f)
         {
             owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BIGATTACK);
             return;
         }
     }
+}
+void StageGimmick_IdleState::Exit()
+{
+    spawntime = 0.0f;
 }
 #pragma endregion
 
@@ -69,7 +66,7 @@ void StageGimmick_EnemySpawnState::Execute(const float& elapsedTime)
     }
 
     //大技的なやつ
-    if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 20.0f)
+    if (*boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 100.0f)
     {
         owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BIGATTACK);
         return;
