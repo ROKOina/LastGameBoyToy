@@ -40,7 +40,6 @@ void SceneTitle::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
         std::shared_ptr<PostEffect>posteffect = obj->AddComponent<PostEffect>();
-        posteffect->SetIsMist(false);
     }
 
     //フリーカメラ
@@ -131,7 +130,6 @@ void SceneTitle::Initialize()
             next->SetName("Training");
             next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
         }
-
 
         //セレクト棒
         {
@@ -226,10 +224,10 @@ void SceneTitle::UIUpdate(float elapsedTime)
         Scene* scene;
         float y;
     };
-    
+
     //初期化
     std::vector<SceneName> names;
-    names.emplace_back("PVE" ,new ScenePVE,560);
+    names.emplace_back("PVE", new ScenePVE, 560);
     names.emplace_back("PVP", new ScenePVE, 750);
     names.emplace_back("Training", new ScenePVE, 940);
 
@@ -237,7 +235,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
     auto& selectB = canvas->GetChildFind("selectBow");
     selectB->SetEnabled(false);
     //シーン遷移
-    for(auto& s: names)
+    for (auto& s : names)
     {
         bool deleteFlg = false;
         auto& next = canvas->GetChildFind(s.name.c_str());

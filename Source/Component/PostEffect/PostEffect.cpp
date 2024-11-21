@@ -69,29 +69,10 @@ void PostEffect::OnGUI()
         ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
         ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
-        ImGui::SliderFloat("distance_to_sun", &m_posteffect->data.distance_to_sun, 0.0f, 1000.0f);
         ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
         ImGui::SliderFloat("blurstrength", &m_posteffect->data.blurstrength, +0.0f, +1.0f);
         ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
         ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
-
-        ImGui::Checkbox((char*)u8"fogŽg—p", (bool*)&m_posteffect->data.ismist);
-        if (m_posteffect->data.ismist == 1)
-        {
-            ImGui::ColorEdit4("mist_color", &m_posteffect->data.mist_color.x);
-            ImGui::SliderFloat("extinction:mist_density", &m_posteffect->data.mist_density.x, 0.0f, 1.0f);
-            ImGui::SliderFloat("extinction:mist_height_falloff", &m_posteffect->data.mist_height_falloff.x, -1000.0f, 1000.0f);
-            ImGui::SliderFloat("extinction:height_mist_offset", &m_posteffect->data.height_mist_offset.x, -1000.0f, 1000.0f);
-            ImGui::SliderFloat("inscattering:mist_density", &m_posteffect->data.mist_density.y, 0.0f, 1.0f);
-            ImGui::SliderFloat("inscattering:mist_height_falloff", &m_posteffect->data.mist_height_falloff.y, -1000.0f, 1000.0f);
-            ImGui::SliderFloat("inscattering:height_mist_offset", &m_posteffect->data.height_mist_offset.y, -1000.0f, 1000.0f);
-            ImGui::SliderFloat("mist_cutoff_distance", &m_posteffect->data.mist_cutoff_distance, 0.0f, 500.0f);
-            ImGui::SliderFloat("mist_flow_speed", &m_posteffect->data.mist_flow_speed, 0.0f, 500.0f);
-            ImGui::SliderFloat("mist_flow_noise_scale_factor", &m_posteffect->data.mist_flow_noise_scale_factor, 0.0f, 0.1f);
-            ImGui::SliderFloat("mist_flow_density_lower_limit", &m_posteffect->data.mist_flow_density_lower_limit, 0.0f, 1.0f);
-            ImGui::SliderFloat("sun_highlight_exponential_factor", &m_posteffect->data.sun_highlight_exponential_factor, 0.0f, 500.0f);
-            ImGui::SliderFloat("sun_highlight_intensity", &m_posteffect->data.sun_highlight_intensity, 0.0f, 5.0f);
-        }
     }
 
     if (ImGui::TreeNode("shadow"))
