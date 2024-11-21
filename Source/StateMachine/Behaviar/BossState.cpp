@@ -210,7 +210,7 @@ void Boss_IdleStopState::Execute(const float& elapsedTime)
     idletime += elapsedTime;
 
     //待機時間
-    if (idletime >= 1.5f)
+    if (idletime >= 0.9f)
     {
         //ここ全体的に修正が必用
         if (owner->Search(owner->meleerange))
@@ -352,7 +352,7 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     time += elapsedTime;
 
     //移動
-    owner->MoveToTarget(0.6f, 0.1f);
+    owner->MoveToTarget(2.0f, 0.1f);
 
     //左右の煙
     AnimtionEventControl("COLLSION", "Boss_R_ancle", "rightfootsmokeeffect", EnableCPUParticle);
@@ -362,7 +362,7 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
 
-    //待機時間
+    //ラリアット持続時間
     if (time >= 4.0f)
     {
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::LARIATEND);
