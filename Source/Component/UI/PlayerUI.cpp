@@ -3,6 +3,7 @@
 #include "Component\Character\CharacterCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
+#include"StateMachine\Behaviar\InazawaCharacterState.h"
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
     changePosValue = min - max;
@@ -11,6 +12,7 @@ UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsio
         changePosValue *= -1.0f;
     }
     originalPos.y = min;
+    maxPos.y = max;
 }
 
 void UI_Skill::Start()
@@ -20,6 +22,8 @@ void UI_Skill::Start()
 
 void UI_Skill::Update(float elapsedTime)
 {
+    // 変化値がマイナスに行かないように補正
+    *variableValue = Mathf::Clamp(*variableValue, 0.01f, maxValue);
     //ゲージの倍率を求める
     valueRate = *variableValue / maxValue;
     float addPos = changePosValue * valueRate;
@@ -278,8 +282,11 @@ void UI_LockOn::LockIn(float elapsedTime)
     }
 
     //回転
-    if (lockOn2Ui->spc.angle < 60) {
+    if (lockOn2Ui->spc.angle < 90) {
         lockOn2Ui->spc.angle += 5;
+    }
+    else {
+        lockOn2Ui->spc.angle += 1;
     }
 }
 
@@ -316,7 +323,7 @@ void UI_LockOn::LockOut(float elapsedTime)
 
     //回転
     if (lockOn2Ui->spc.angle > 0) {
-        lockOn2Ui->spc.angle -= 6;
+        lockOn2Ui->spc.angle -= 15;
     }
 
 }
@@ -333,33 +340,37 @@ void UI_LockOn::OnGUI()
 
 UI_E_SkillCount::UI_E_SkillCount(int num)
 {
-    //for (int i = 0; i < num; i++) {
-    //    
-    //    SkillCore localCore;
-    //    //外枠のゲームオブジェクト生成
-    //    std::shared_ptr<GameObject> coreFrame;
-    //    coreFrame = GameObjectManager::Instance().Create();
-    //    std::string name = "coreFrame";
-    //    std::string number = std::to_string(i);
-    //    name += number;
-    //    coreFrame->SetName(name.c_str());
-    //    localCore.coreFrameUi = coreFrame->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
-    //    coreFrames.emplace_back(coreFrame);
+    for (int i = 0; i < num; i++) {
+        
+        SkillCore localCore;
+        //外枠のゲームオブジェクト生成
+        std::shared_ptr<GameObject> coreFrame  = GameObjectManager::Instance().Create();;
+  
+        std::string name = "coreFrame";
+        std::string number = std::to_string(i);
+        name += number;
+        coreFrame->SetName(name.c_str());
+        localCore.coreFrameUi = coreFrame->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        coreFrames.emplace_back(coreFrame);
 
-    //    //本体のゲームオブジェクト生成
-    //    std::shared_ptr<GameObject> core;
-    //    core = GameObjectManager::Instance().Create();
-    //    name = "core";
-    //     number = std::to_string(i);
-    //    name += number;
-    //    coreFrame->SetName(name.c_str());
-    //    localCore.coreUi = core->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        //本体のゲームオブジェクト生成
+        std::shared_ptr<GameObject> core;
+        core = GameObjectManager::Instance().Create();
+        name = "core";
+        number = std::to_string(i);
+        name += number;
+        core->SetName(name.c_str());
+        localCore.coreUi = core->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
 
-    //    cores.emplace_back(localCore);
-    //    coresUi.emplace_back(localCore);
-    //}
-    //player = GameObjectManager::Instance().Find("player");
-    //this->num = num;
+        cores.emplace_back(core);
+        coresUi.emplace_back(localCore);
+    }
+   
+    gauge = GameObjectManager::Instance().Create();
+    std::string name = "skillGaueg";
+    gauge->SetName(name.c_str());
+    gaugeUi =  gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/E_SkillGauge.ui", Sprite::SpriteShader::DEFALT, false);
+    this->num = num;
 }
 
 void UI_E_SkillCount::Start()
@@ -369,9 +380,43 @@ void UI_E_SkillCount::Start()
         this->GetGameObject()->AddChildObject(coreFrames.at(i));
         this->GetGameObject()->AddChildObject(cores.at(i));
     }
+    this->GetGameObject()->AddChildObject(gauge);
+    //各パラメーター設定
+    player = GameObjectManager::Instance().Find("player");
+    arrowCount = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->arrowCount;
+    skillTimer = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->skillTimer;
+    skillTime = player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->skillTime;
 }
 
 void UI_E_SkillCount::Update(float elapsedTime)
 {
     
+    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
+        UpdateGauge(elapsedTime);
+    }
+    else {
+        for (int i = 0; i < num; i++) {
+            coresUi.at(i).coreFrameUi->spc.color.w = 0.0f;
+            coresUi.at(i).coreUi->spc.color.w = 0.0f;
+        }
+        gaugeUi->spc.color.w = 0.0f;
+    }
 }
+
+void UI_E_SkillCount::UpdateGauge(float elapsedTime)
+{
+    // 変化値がマイナスに行かないように補正
+    *skillTimer = Mathf::Clamp(*skillTimer, 0.01f, skillTime);
+    //ゲージの倍率を求める
+    float valueRate = *skillTimer / skillTime;
+   
+     gaugeUi->spc.texSize = { gaugeUi->spc.texSize.x,originalTexSize.y * valueRate};
+    
+}
+
+void UI_E_SkillCount::OnGUI()
+{
+    ImGui::DragFloat("skillTimer",&*skillTimer);
+}
+
+

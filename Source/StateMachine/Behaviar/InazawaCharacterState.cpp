@@ -103,7 +103,7 @@ void InazawaCharacter_AttackState::ImGui()
 void InazawaCharacter_ESkillState::Enter()
 {
     arrowCount = 8;
-    skillTimer = 3.0f;
+    skillTimer = skillTime;
     intervalTimer = 0.0f;
 
     auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
