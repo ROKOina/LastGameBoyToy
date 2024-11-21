@@ -8,6 +8,7 @@
 #include "Component\Character\RemoveTimerCom.h"
 #include "Component\Camera\CameraCom.h"
 #include <Component\Camera\EventCameraManager.h>
+#include "Scene/SceneTitle/SceneTitle.h"
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -166,6 +167,7 @@ void BaseCharacter_DeathState::Enter()
     //イベントカメラ
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
     EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
+    SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 3);
 }
 
 void BaseCharacter_DeathState::Execute(const float& elapsedTime)
