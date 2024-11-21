@@ -50,7 +50,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     //HP‚Ì‰ŠúÝ’è
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
-    status->SetInvincibleTime(0.2f);
+    status->SetInvincibleTime(0.3f);
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
     c->SetESkillCoolTime(8.0f);

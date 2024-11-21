@@ -396,7 +396,7 @@ void SpawnCom::HitObject()
                     {
                         if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                         {
-                            status->AddDamagePoint(-30);
+                            status->AddDamagePoint(-15);
                         }
                     }
                 }
