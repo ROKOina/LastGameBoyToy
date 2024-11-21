@@ -6,6 +6,7 @@
 #include "Audio\Audio.h"
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
+#include "Netwark/Photon/BasicsApplication.h"
 
 //PvEÉVÅ[Éì
 class ScenePVE :public Scene
@@ -33,6 +34,6 @@ public:
     std::string GetName() const override { return "ScenePVE"; };
 private:
     GameObj audioObj;
-
+    std::unique_ptr<BasicsApplication> photonNet;
     bool battleClymax = false;
 };

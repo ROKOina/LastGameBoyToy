@@ -79,7 +79,6 @@ void CharacterCom::Update(float elapsedTime)
         //MainAttack();
     }
 
-
     if (CharacterInput::MainSkillButton_Q & GetButtonDown()
         && Qcool.timer >= Qcool.time)
     {
@@ -301,6 +300,7 @@ void CharacterCom::CameraControl()
     //ゲームカメラの場合
     if (cameraObj->GetComponent<CameraCom>()->GetIsActive())
     {
+#ifdef _DEBUG
         //フリーに切り替え
         if (GamePad::BTN_LCONTROL & gamePad.GetButtonDown())
         {
@@ -308,6 +308,7 @@ void CharacterCom::CameraControl()
             g->GetComponent<CameraCom>()->ActiveCameraChange();
             return;
         }
+#endif
 
         //設定画面を開く(P)
         auto& ss = SceneManager::Instance().GetSettingScreen();

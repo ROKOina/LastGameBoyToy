@@ -29,6 +29,8 @@
 #include <Component/UI/UiGauge.h>
 #include "Component\Audio\AudioCom.h"
 #include <Component\Character\Prop\SetNodeWorldPosCom.h>
+#include "Netwark/Photon/StdIO_UIListener.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 void ScenePVE::Initialize()
 {
@@ -50,6 +52,7 @@ void ScenePVE::Initialize()
         obj->AddComponent<Light>(nullptr);
     }
 
+#ifdef _DEBUG
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
@@ -58,6 +61,8 @@ void ScenePVE::Initialize()
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+#endif
+
     //イベント用カメラ
     {
         std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
@@ -337,15 +342,23 @@ void ScenePVE::Initialize()
 
     //ボスのイベントシーン
     PVEDirection::Instance().DirectionStart();
+
+    //ネット大事
+    StdIO_UIListener* l = new StdIO_UIListener();
+    photonNet = std::make_unique<BasicsApplication>(l);
 }
 
 void ScenePVE::Finalize()
 {
+    photonNet->close();
 }
 
 void ScenePVE::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
+
+    //ネット更新
+    photonNet->run(elapsedTime);
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
