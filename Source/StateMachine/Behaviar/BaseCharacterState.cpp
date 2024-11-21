@@ -9,6 +9,7 @@
 #include "Component\Camera\CameraCom.h"
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene/SceneTitle/SceneTitle.h"
+#include "Component\Audio\AudioCom.h"
 
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -378,13 +379,9 @@ void Ult_Attack_State::Enter()
     //用意したエフェクトオブジェクト起動
     arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
 
-    //auto& effObj= obj->AddChildObject();
-    //effObj->SetName("ultAttackEff");
-    //effObj->transform_->SetWorldPosition(gunPos + front * 0.5f);
-    //
-    //const auto& bulletgpuparticle = effObj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/playerultattack.cpuparticle", 500);
-    //bulletgpuparticle->SetActive(true);
-    //effObj->AddComponent<RemoveTimerCom>(0.2f);
+    //音
+    owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACKULTSHOOT");
+    owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACKULTSHOOT", false, 10);
 
     ray->SetStart(start);
     ray->SetEnd(end);

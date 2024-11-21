@@ -9,6 +9,7 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "RemoveTimerCom.h"
 #include "Setting/Setting.h"
+#include "Component\Audio\AudioCom.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -116,6 +117,9 @@ void CharacterCom::Update(float elapsedTime)
             posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
             dashFlag = true;
             dashGauge -= 5; //最初は一気に減らす
+
+            //音
+            GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
         }
         else
         {
@@ -176,7 +180,7 @@ void CharacterCom::Update(float elapsedTime)
             GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
         }
     }
-
+    
     //ウルト更新
     UltUpdate(elapsedTime);
 
@@ -186,8 +190,9 @@ void CharacterCom::Update(float elapsedTime)
     //カメラ制御
     CameraControl();
 
-    //ビネット発動
+    //ダメージビネット発動
     Vinetto(elapsedTime);
+
 }
 
 void CharacterCom::OnGUI()
@@ -401,6 +406,9 @@ void CharacterCom::Vinetto(float elapsedTime)
         if (previousHP - currentHP > 0)
         {
             posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
+
+            //音
+            GetGameObject()->GetComponent<AudioCom>()->Play("P_DAMAGE", false, 10);
         }
         else
         {
@@ -487,6 +495,10 @@ void CharacterCom::UltUpdate(float elapsedTime)
                         std::shared_ptr<GPUParticle> eff = attackUltEffBomb03->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombFire.gpuparticle", 50);
                         eff->Play();
                     }
+
+                    //音
+                    GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACK_ULT_BOOM");
+                    GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACK_ULT_BOOM", false, 10);
                 }
             }
         }
