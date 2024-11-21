@@ -180,4 +180,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_constantbuffer;
     const size_t m_maxparticle = 0;
     std::string filepath = {};
+
+    //’x‰„—p
+    int tempWorldPos = 0;
+    bool isFirstThrow = false;
 };

@@ -53,7 +53,7 @@ void SceneSugimoto::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
         auto& p = obj->AddComponent<PostEffect>();
-        p->SetParameter(3.0f, 0.8f, PostEffect::PostEffectParameter::Exposure);
+        //p->SetParameter(3.0f, 0.8f, PostEffect::PostEffectParameter::Exposure);
     }
 
     //ƒ‰ƒCƒg

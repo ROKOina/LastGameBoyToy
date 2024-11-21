@@ -28,11 +28,10 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
+#include "Component\Audio\AudioCom.h"
 
 SceneTitle::~SceneTitle()
 {
-    GameObjectManager::Instance().AllRemove();
-    GameObjectManager::Instance().RemoveGameObjects();
 }
 
 void SceneTitle::Initialize()
@@ -49,24 +48,16 @@ void SceneTitle::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        freeCamera->transform_->SetWorldPosition({ -1.471f, 2.519f, -2.190f });
-        freeCamera->transform_->SetEulerRotation({ 3.681f,391.512f,0.0f });
+        freeCamera->transform_->SetWorldPosition({ -2.394f, 0.644f, -2.916f });
+        freeCamera->transform_->SetEulerRotation({ -12.959f,359.176f,0.0f });
         std::shared_ptr<FreeCameraCom> camera = freeCamera->AddComponent<FreeCameraCom>();
-        camera->SetFocusPos({ -0.114f,2.352f,0.023f });
-        camera->SetFocus({ -0.427f,2.391f,-0.488f });
-        camera->SetEye({ -1.471f,2.519f,-2.190f });
-        camera->SetDistance(2.601f);
+        camera->SetFocusPos({ -2.436f,1.322f,0.033f });
+        camera->SetFocus({ -2.422f,1.092f,-0.967f });
+        camera->SetEye({ -2.394f,0.644f,-2.916f });
+        camera->SetDistance(3.026f);
         camera->SetUpdate(false);
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
-
-    //イベント用カメラ
-    {
-        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
-        eventCamera->SetName("eventcamera");
-        eventCamera->AddComponent<EventCameraCom>();
-        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-    }
 
     //ライト
     {
@@ -83,6 +74,8 @@ void SceneTitle::Initialize()
         obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        r->SetOutlineColor({ 0.000f, 0.282f, 1.000f });
+        r->SetOutlineIntensity(10.0f);
         StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
     }
@@ -91,11 +84,13 @@ void SceneTitle::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        obj->transform_->SetWorldPosition({ 0, 0, 0 });
+        obj->transform_->SetWorldPosition({ -0.191, 0.018, 1.802 });
         obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
         obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/player_True/player.mdl");
+        r->SetOutlineColor({ 0.000f, 0.282f, 1.000f });
+        r->SetOutlineIntensity(10.0f);
         std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
         anim->PlayAnimation(5, true);
     }
@@ -116,7 +111,7 @@ void SceneTitle::Initialize()
         {
             auto& title = obj->AddChildObject();
             title->SetName("title");
-            title->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/title.ui", Sprite::SpriteShader::DEFALT, false);
+            title->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/title.ui", Sprite::SpriteShader::CHROMATICABERRATION, false);
         }
 
         //プレイ
@@ -138,6 +133,18 @@ void SceneTitle::Initialize()
       "Data\\Texture\\lut_ggx.DDS"
     };
     SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
+
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Audio");
+        audioObj = audio->AddComponent<AudioCom>().get();
+        audioObj->RegisterSource(AUDIOID::SCENE_TITLE, "Title");
+        audioObj->RegisterSource(AUDIOID::CURSOR, "Cursor");
+        audioObj->RegisterSource(AUDIOID::ENTER, "Enter");
+
+        audioObj->Play("Title", true, 0.0f);
+        audioObj->FeedStart("Title", 0.5f, 0.1f);
+    }
 }
 
 void SceneTitle::Finalize()
@@ -197,11 +204,15 @@ void SceneTitle::UIUpdate(float elapsedTime)
         {
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
+                canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
+                    audioObj->FeedStart("Title", 0.0f, elapsedTime);
+                    audioObj->Play("Enter", false, 1.0f);
+
                     //暗転
-                    GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, PostEffect::PostEffectParameter::Exposure);
-                    //SceneManager::Instance().ChangeSceneDelay(new SceneSelect, 2);
+                    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+                    GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
                     SceneManager::Instance().ChangeSceneDelay(new SceneGame, 2);
                 }
             }

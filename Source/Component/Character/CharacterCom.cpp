@@ -1,10 +1,13 @@
 #include "CharacterCom.h"
 #include "CharaStatusCom.h"
 #include "Component/Camera/CameraCom.h"
+#include "Component/Collsion/ColliderCom.h"
 #include "Component/System/TransformCom.h"
+#include "Component/Particle/GPUParticle.h"
 #include "Input\Input.h"
 #include "Math/Mathf.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "RemoveTimerCom.h"
 #include "Setting/Setting.h"
 
 void CharacterCom::Update(float elapsedTime)
@@ -31,8 +34,6 @@ void CharacterCom::Update(float elapsedTime)
             moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::DEATH);
     if (useMoveFlag)moveStateMachine.Update(elapsedTime);
 
-#ifdef _DEBUG
-
     int inputNum = GetButtonDown();
 
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
@@ -44,6 +45,7 @@ void CharacterCom::Update(float elapsedTime)
             MainAttackDown();
         else
         {
+            //ウルト中
             if (Rcool.timer >= Rcool.time)
             {
                 Rcool.timer = 0;
@@ -61,8 +63,10 @@ void CharacterCom::Update(float elapsedTime)
             MainAttackPushing();
     }
 
-    if (CharacterInput::SubAttackButton & GetButtonDown())
+    if (CharacterInput::SubAttackButton & GetButtonDown()
+        && LeftClickcool.timer >= LeftClickcool.time)
     {
+        LeftClickcool.timer = 0;
         SubAttackDown();
     }
     else if (CharacterInput::SubAttackButton & GetButton())
@@ -70,13 +74,11 @@ void CharacterCom::Update(float elapsedTime)
         SubAttackPushing();
     }
 
-#else
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
         //MainAttack();
     }
 
-#endif // _DEBUG
 
     if (CharacterInput::MainSkillButton_Q & GetButtonDown()
         && Qcool.timer >= Qcool.time)
@@ -101,24 +103,26 @@ void CharacterCom::Update(float elapsedTime)
         //ダッシュ処理
         LeftShiftSkill(elapsedTime);
 
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::BlurStrength };
+
         //ダッシュ時一回だけ入る
         const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
         if (!dashFlag)
         {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, PostEffect::PostEffectParameter::BlurStrength);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
             dashFlag = true;
             dashGauge -= 5; //最初は一気に減らす
         }
         else
         {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
         }
 
         //ゲージがなくなったらタイマーをセット
         if (dashGauge <= 0)
         {
             LScool.timer = 0;
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, PostEffect::PostEffectParameter::BlurStrength);
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
         }
     }
     else
@@ -138,9 +142,6 @@ void CharacterCom::Update(float elapsedTime)
             dashGauge = dashGaugeMax;
         }
     }
-
-    //ブラー
-    //GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->ParameterMove(elapsedTime, 0.5f, fastDash, PostEffect::PostEffectParameter::BlurStrength);
 
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
@@ -167,18 +168,16 @@ void CharacterCom::Update(float elapsedTime)
     }
 
     //ウルト更新
-    ultGauge += elapsedTime;
-    if (ultGauge >= ultGaugeMax)
-    {
-        isMaxUlt = true;
-        ultGauge = ultGaugeMax;
-    }
+    UltUpdate(elapsedTime);
 
     //クールダウン更新
     CoolUpdate(elapsedTime);
 
     //カメラ制御
     CameraControl();
+
+    //ビネット発動
+    Vinetto(elapsedTime);
 }
 
 void CharacterCom::OnGUI()
@@ -263,6 +262,9 @@ void CharacterCom::OnGUI()
         ImGui::Separator();
         ImGui::DragFloat("SpaceTime", &Spacecool.time);
         ImGui::DragFloat("SpaceTimer", &Spacecool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("LeftClickTime", &LeftClickcool.time);
+        ImGui::DragFloat("LeftClickTimer", &LeftClickcool.timer);
         ImGui::Separator();
         ImGui::DragFloat("RTime", &Rcool.time);
         ImGui::DragFloat("RTimer", &Rcool.timer);
@@ -372,6 +374,32 @@ void CharacterCom::CameraControl()
     }
 }
 
+//ビネット効果
+void CharacterCom::Vinetto(float elapsedTime)
+{
+    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
+    float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
+    const auto posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+
+    if (posteffect)
+    {
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::VignetteIntensity };
+
+        // HPが減少した場合のみビネット効果を発動
+        if (previousHP - currentHP > 0)
+        {
+            posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
+        }
+        else
+        {
+            posteffect->SetParameter(0.01f, 8.0f, parameters); // 元に戻す
+        }
+    }
+
+    // 現在のHPを次回用に保存
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
+}
+
 void CharacterCom::StanUpdate(float elapsedTime)
 {
     isStan = false;
@@ -402,11 +430,55 @@ void CharacterCom::CoolUpdate(float elapsedTime)
     Rcool.timer += elapsedTime;
     LScool.timer += elapsedTime;
     Spacecool.timer += elapsedTime;
+    LeftClickcool.timer += elapsedTime;
 }
 
 float CharacterCom::Lerp(float start, float end, float t)
 {
     return start + t * (end - start);
+}
+
+void CharacterCom::UltUpdate(float elapsedTime)
+{
+    //ゲージ更新
+    ultGauge += elapsedTime;
+    if (ultGauge >= ultGaugeMax)
+    {
+        isMaxUlt = true;
+        ultGauge = ultGaugeMax;
+    }
+
+    //ウルトエフェクト
+    if (attackUltRayObj.lock())
+    {
+        auto& rayCol = attackUltRayObj.lock()->GetComponent<RayColliderCom>();
+        if (rayCol)
+        {
+            for (auto& obj : rayCol->OnHitGameObject())
+            {
+                {
+                    std::shared_ptr<GameObject> attackUltEffBomb = GameObjectManager::Instance().Create();
+                    attackUltEffBomb->SetName("attackUltEffBomb");
+                    attackUltEffBomb->transform_->SetWorldPosition(obj.hitPos);
+                    std::shared_ptr<GPUParticle> eff = attackUltEffBomb->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircle.gpuparticle", 300);
+                    eff->Play();
+                    attackUltEffBomb->AddComponent<RemoveTimerCom>(3);
+                    {
+                        std::shared_ptr<GameObject> attackUltEffBomb02 = attackUltEffBomb->AddChildObject();
+                        attackUltEffBomb02->SetName("attackUltEffBomb02");
+                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb02->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircleLight.gpuparticle", 100);
+                        eff->Play();
+                    }
+                    {
+                        std::shared_ptr<GameObject> attackUltEffBomb03 = attackUltEffBomb->AddChildObject();
+                        attackUltEffBomb03->SetName("attackUltEffBomb03");
+                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb03->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombFire.gpuparticle", 50);
+                        eff->Play();
+                    }
+                }
+            }
+        }
+    }
 }
 
 float CharacterCom::InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed)

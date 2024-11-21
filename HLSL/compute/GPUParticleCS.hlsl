@@ -56,15 +56,14 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float3 totalVelocity = currentEmitVec * speed + randomVel + orbVelo + radialVec + spiralVec;
 
         // 重力の適用
-        p.velocity.y -= lerp(emitStartGravity, emitEndGravity, lerprate) * deltatime;
-        p.position.y -= lerp(emitStartGravity, emitEndGravity, lerprate) * deltatime;
+        p.velocity.xyz = 0;
+        p.velocity.y -= lerp(emitStartGravity, emitEndGravity, lerprate) ;
 
         // 浮力の適用
-        p.velocity.y += buoyancy * deltatime;
-        p.position.y += buoyancy * deltatime;
+        p.velocity.y += buoyancy ;
 
-        //速力更新
-        p.velocity = totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate); // 速力の更新
+        //速力更新;
+        p.velocity += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate); // 速力の更新
         p.position += p.velocity * deltatime; // 位置の更新
     }
 
@@ -113,6 +112,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         p.isalive = 0;
         p.lifetime = lifeTime;
         p.age = lifeTime * f0;
+        p.velocity = 0;
     }
 
     // 寿命時間が切れたら生成しない

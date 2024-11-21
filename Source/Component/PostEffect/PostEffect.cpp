@@ -4,6 +4,7 @@
 #include "Graphics/Texture.h"
 #include <imgui.h>
 #include "Graphics/Shader.h"
+#include <Math\Mathf.h>
 
 //コンストラクタ
 PostEffect::PostEffect()
@@ -54,29 +55,6 @@ void PostEffect::Update(float elapsedTime)
 //imgui
 void PostEffect::OnGUI()
 {
-    // Enum メンバーを表示するための名前リスト
-    const char* parameterNames[] = {
-        "Brightness",
-        "Contrast",
-        "Hue",
-        "Saturation",
-        "Exposure",
-        "VignetteSize",
-        "VignetteIntensity",
-        "BlurStrength",
-        "BlurRadius",
-        "BlurDecay"
-    };
-    // 現在の選択インデックスを取得
-    int currentItem = static_cast<int>(p);
-    // ImGui::Combo でドロップダウンリストを表示
-    if (ImGui::Combo("Post Effect Parameter", &currentItem, parameterNames, IM_ARRAYSIZE(parameterNames)))
-    {
-        // 選択が変更されたら、selectedParameter を更新
-        p = static_cast<PostEffectParameter>(currentItem);
-    }
-    ImGui::DragFloat("InParam", &originalparameter, 0.01f, 0.0, 100.0f);
-
     //ポストエフェクト
     if (ImGui::CollapsingHeader("PostEffect", ImGuiTreeNodeFlags_DefaultOpen))
     {
@@ -281,56 +259,66 @@ void PostEffect::DepthCopyAndBind(int registerIndex)
 }
 
 //ここでパラメータとenumclassを設定する
-void PostEffect::SetParameter(float endparameter, float timescale, PostEffectParameter PP)
+void PostEffect::SetParameter(float targetValue, float timeScale, const std::vector<PostEffectParameter>& parameters)
 {
-    originalparameter = endparameter;
-    this->timescale = timescale;
-    p = PP;
+    for (auto& param : parameters)
+    {
+        ParamState& state = paramStates[param];
+        state.targetValue = targetValue;  // 対象となる値
+        state.timeScale = timeScale;      // 変化の速度
+    }
 }
 
 //値を変動させる
 void PostEffect::UpdatePostEffectParameter(float elapsedTime)
 {
-    if (!m_posteffect) return;  // m_posteffectが無効な場合は処理しない
+    if (!m_posteffect) return;  // m_posteffect が無効な場合は処理しない
+
     POSTEFFECT& data = m_posteffect->data;
 
-    // 時間経過で元の値に戻す場合
-    auto Lerp = [](float current, float target, float deltaTime) {return current + (target - current) * deltaTime; };
-
-    // 更新が必要な場合
-    switch (p)
+    for (auto& paramState : paramStates)
     {
-    case PostEffectParameter::Brightness:
-        data.brightness = Lerp(data.brightness, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::Contrast:
-        data.contrast = Lerp(data.contrast, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::Hue:
-        data.hue = Lerp(data.hue, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::Saturation:
-        data.saturation = Lerp(data.saturation, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::Exposure:
-        data.exposure = Lerp(data.exposure, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::VignetteSize:
-        data.vignettesize = Lerp(data.vignettesize, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::VignetteIntensity:
-        data.vignetteintensity = Lerp(data.vignetteintensity, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::BlurStrength:
-        data.blurstrength = Lerp(data.blurstrength, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::BlurRadius:
-        data.blurradius = Lerp(data.blurradius, originalparameter, elapsedTime * timescale);
-        break;
-    case PostEffectParameter::BlurDecay:
-        data.blurdecay = Lerp(data.blurdecay, originalparameter, elapsedTime * timescale);
-        break;
-    default:
-        break;
+        // 各パラメータごとに処理
+        ParamState& state = paramState.second;
+
+        // 時間経過で元の値に戻す場合
+        auto Lerp = [](float current, float target, float deltaTime) {return current + (target - current) * deltaTime; };
+
+        // 各パラメータに応じた処理
+        switch (paramState.first)
+        {
+        case PostEffectParameter::Brightness:
+            data.brightness = Lerp(data.brightness, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Contrast:
+            data.contrast = Lerp(data.contrast, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Hue:
+            data.hue = Lerp(data.hue, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Saturation:
+            data.saturation = Lerp(data.saturation, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Exposure:
+            data.exposure = Lerp(data.exposure, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::VignetteSize:
+            data.vignettesize = Lerp(data.vignettesize, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::VignetteIntensity:
+            data.vignetteintensity = Lerp(data.vignetteintensity, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::BlurStrength:
+            data.blurstrength = Lerp(data.blurstrength, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::BlurRadius:
+            data.blurradius = Lerp(data.blurradius, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::BlurDecay:
+            data.blurdecay = Lerp(data.blurdecay, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        default:
+            break;
+        }
     }
 }

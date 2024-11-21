@@ -8,6 +8,7 @@
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
+#include "Component\Audio\AudioCom.h"
 
 //タイトルシーン
 class SceneTitle :public Scene
@@ -33,4 +34,6 @@ public:
 
 private:
     void UIUpdate(float elapsedTime);
+
+    AudioCom* audioObj;
 };

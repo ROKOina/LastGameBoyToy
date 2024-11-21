@@ -174,6 +174,7 @@ void EventCameraManager::LoadDesirialize()
 
 void EventCameraManager::EventCameraImGui()
 {
+#ifdef _DEBUG
     ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
@@ -329,6 +330,7 @@ void EventCameraManager::EventCameraImGui()
         }
     }
     ImGui::End();
+#endif
 }
 
 void EventCameraManager::EventUpdate(float elapsedTime)

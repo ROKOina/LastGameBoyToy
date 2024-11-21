@@ -32,19 +32,15 @@ Framework::Framework(HWND hWnd)
     //フィジックス初期化
     PhysXLib::Instance().Initialize();
 
-    //sceneGame.Initialize();
-    //SceneManager::Instance().ChangeScene(new SceneGame);
-    //SceneManager::Instance().ChangeScene(new SceneStageEditor);
     SceneManager::Instance().ChangeScene(new SceneTitle);
-    //SceneManager::Instance().ChangeScene(new SceneResult);
-    //SceneManager::Instance().ChangeScene(new SceneIKTest);
-    //SceneManager::Instance().ChangeScene(new ScenePVE);
 
     // オーディオ初期化
     Audio::Initialize();
 
+#ifdef _DEBUG
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
+#endif
 
     instance = this;
 }
@@ -55,8 +51,11 @@ Framework::~Framework()
     //sceneGame.Finalize();
     SceneManager::Instance().Clear();
 
+
+#ifdef _DEBUG
     //IMGUI終了化
     IMGUI_CTRL_UNINITIALZE();
+#endif
 }
 
 #include "Logger.h"
@@ -74,8 +73,10 @@ void Framework::Update(float elapsedTime/*Elapsed seconds from last frame*/, flo
     // シーン更新処理
     SceneManager::Instance().Update(elapsedTime);
 
+#ifdef _DEBUG
     //IMGUI更新
     IMGUI_CTRL_CLEAR_FRAME();
+#endif
 }
 
 // 描画処理
@@ -87,18 +88,24 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     ID3D11DeviceContext* dc = graphics_.GetDeviceContext();
 
+
+#ifdef _DEBUG
     //imguiguizmo
     ImGuizmo::BeginFrame();
     ImGuizmo::SetOrthographic(false);
     RECT r;
     ::GetWindowRect(hWnd_, &r);
     ImGuizmo::SetRect(static_cast<float>(r.left), static_cast<float>(r.top), static_cast<float>(r.right) - static_cast<float>(r.left), static_cast<float>(r.bottom) - static_cast<float>(r.top));
+#endif
 
     // シーン描画処理
     SceneManager::Instance().Render(elapsedTime);
 
+
+#ifdef _DEBUG
     //IMGUI描画
     IMGUI_CTRL_DISPLAY();
+#endif
 
     // バックバッファに描画した画を画面に表示する。
     graphics_.GetSwapChain()->Present(syncInterval, 0);

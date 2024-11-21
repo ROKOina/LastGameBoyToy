@@ -143,6 +143,7 @@ void PhotonLib::update(float elapsedTime)
 
 void PhotonLib::ImGui()
 {
+#ifdef _DEBUG
     //ネットワーク決定仮ボタン
     ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
@@ -229,6 +230,7 @@ void PhotonLib::ImGui()
     ImGui::End();
 
     LobbyImGui();
+#endif
 }
 
 ExitGames::Common::JString PhotonLib::getStateString(void)

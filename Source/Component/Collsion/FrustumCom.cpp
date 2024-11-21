@@ -31,9 +31,9 @@ void FrustumCom::OnGUI()
     for (int i = 0; i < 4; i++)
     {
         Graphics::Instance().GetDebugRenderer()->DrawSphere(
-            nearP[i], 0.01f, { 1,0,0,1 });
+            nearP[i], 0.1f, { 1,0,0,1 });
         Graphics::Instance().GetDebugRenderer()->DrawSphere(
-            farP[i], 1.0f, { 1,1,0,1 });
+            farP[i], 10.0f, { 1,1,0,1 });
     }
     ImGui::InputFloat3("nearP0", &nearP[0].x);
     ImGui::InputFloat3("nearP1", &nearP[1].x);
@@ -146,12 +146,21 @@ void FrustumCom::CalcurateFrustum()
 {
     Graphics& graphics = Graphics::Instance();
 
-    //cameraPos = ;
+    DirectX::XMFLOAT4X4 cameraview = {};
+
+    // FPSカメラだけで良い
+    if (const auto& cameraObject = GameObjectManager::Instance().Find("cameraPostPlayer"))
+    {
+        if (const auto& fpscamera = cameraObject->GetComponent<CameraCom>())
+        {
+            cameraview = fpscamera->GetView();
+        }
+    }
 
     //ビュープロジェクション行列を取得する
     DirectX::XMMATRIX matrix = {};
-    DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(&GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<FPSCameraCom>()->GetView());
-    DirectX::XMMATRIX projMat = DirectX::XMMatrixPerspectiveFovLH(45, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.1f, 1000.0f);
+    DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(&cameraview);
+    DirectX::XMMATRIX projMat = DirectX::XMMatrixPerspectiveFovLH(70, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.01f, 1000.0f);
 
     matrix = viewMat * projMat;
 

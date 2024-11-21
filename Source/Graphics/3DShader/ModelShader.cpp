@@ -164,7 +164,6 @@ void ModelShader::SetSubset(ID3D11DeviceContext* dc, const ModelResource::Subset
     m_generalconstants->data.outlineColor = subset.material->outlineColor;
     m_generalconstants->data.outlineintensity = subset.material->outlineintensity;
     m_generalconstants->data.dissolveEdgeColor = subset.material->dissolveEdgeColor;
-    m_generalconstants->data.dissolveEdgeWidth = subset.material->dissolveEdgeWidth;
     m_generalconstants->data.dissolveThreshold = subset.material->dissolveThreshold;
     m_generalconstants->Activate(dc, (int)CB_INDEX::GENERAL, false, true, false, false, false, false);
 

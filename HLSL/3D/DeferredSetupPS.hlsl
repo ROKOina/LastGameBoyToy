@@ -21,8 +21,6 @@ cbuffer General : register(b11)
     float outlineintensity;
     float dissolveThreshold; // ディゾルブ閾値
     float3 dissolveEdgeColor; // エッジの色
-    float dissolveEdgeWidth; // エッジ幅
-    float3 lastpadding;
 }
 
 // MRT対応

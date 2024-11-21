@@ -4,6 +4,7 @@
 #include <map>
 #include <Math\Collision.h>
 #include <functional>
+#include "Component\Renderer\RendererCom.h"
 
 using GenerateFunc = std::function<void(GameObj my)>;
 

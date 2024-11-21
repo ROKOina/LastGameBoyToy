@@ -8,6 +8,7 @@
 #include "Graphics/PostEffect/CascadedShadowMap.h"
 #include <DirectXMath.h>
 #include "Component\System\Component.h"
+#include <map>
 
 //ポストエフェクト
 class PostEffect :public Component
@@ -63,7 +64,7 @@ public:
     void DepthCopyAndBind(int registerIndex);
 
     //ここでパラメータとenumclassを設定する
-    void SetParameter(float endparameter, float timescale, PostEffectParameter PP);
+    void SetParameter(float endparameter, float timescale, const std::vector<PostEffectParameter>& parameters);
 
 private:
 
@@ -75,7 +76,7 @@ private:
     //ポストエフェクトのコンスタントバッファ
     struct POSTEFFECT
     {
-        DirectX::XMFLOAT4 vignettecolor = { 1.000f, 0.197f, 0.197f, 1.000f };
+        DirectX::XMFLOAT4 vignettecolor = { 0.991f, 0.073f, 0.073f, 1.000f };
         float colorize[3] = { 1, 1, 1 };
         float brightness = 0.0f;
         float contrast = 0.10f;
@@ -134,8 +135,11 @@ private:
     std::unique_ptr<MultiRenderTarget>m_gBuffer;
     std::unique_ptr<CascadedShadowMap> m_cascadedshadowmap;
 
-    //ここパラメータ
-    float originalparameter = 0.0f;
-    float timescale = {};
-    PostEffectParameter p = PostEffectParameter::Contrast;
+    // メンバ変数
+    struct ParamState
+    {
+        float targetValue = 0.0f;
+        float timeScale = 0.0f; // パラメータの変化速度
+    };
+    std::map<PostEffect::PostEffectParameter, ParamState> paramStates;
 };

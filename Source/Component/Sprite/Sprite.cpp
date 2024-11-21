@@ -19,7 +19,7 @@
 #include "Component/System/TransformCom.h"
 #include <Input/Input.h>
 
-CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 2)
+CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 3)
 
 // シリアライズ
 namespace DirectX
@@ -117,6 +117,11 @@ void Sprite::SaveParameterCPU::serialize(Archive& archive, int version)
             CEREAL_NVP(texSize)
         );
     }
+    if (version >= 3) {
+        archive(
+            CEREAL_NVP(onshot)
+        );
+    }
 }
 
 // コンストラクタ
@@ -174,8 +179,8 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     case SpriteShader::BLUR:
         PSPath = { "Shader\\SpriteBlurPS.cso" };
         break;
-    case SpriteShader::DISSOLVE:
-        PSPath = { "Shader\\DeferredSetupPS.cso" };
+    case SpriteShader::CHROMATICABERRATION:
+        PSPath = { "Shader\\SpriteChromaticAberrationPS.cso" };
         break;
     default:
         assert(!"シェーダーがありません");
@@ -211,10 +216,6 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
         LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &collisionTexture2ddesc_);
     }
 
-    //Dissolveデータ読み込み
-    //LoadTextureFromFile(device, "Data\\Texture\\noise.png", noiseshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    //LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &texture2ddesc_);
-    //
     //コリジョンを使うか決める
     ontriiger = collsion;
 }
@@ -279,26 +280,40 @@ void Sprite::Update(float elapsedTime)
         // イージング時間の範囲チェック
         if (easingtime > 1.0f)
         {
+            if (spc.onshot)
+            {
+                spc.position = spc.easingposition;
+                spc.color = spc.easingcolor;
+                spc.angle = spc.easingangle;
+                spc.scale = spc.easingscale;
+            }
             // ループまたは戻り値が有効な場合
             if (spc.loop || spc.comback)
             {
                 loopon = !loopon;
                 easingtime = 1.0f;
             }
-            else
+            else if (!spc.onshot)
             {
                 StopEasing(); // イージングを停止
             }
         }
         else if (easingtime < 0.0f)
         {
+            if (spc.onshot)
+            {
+                spc.position = spc.easingposition;
+                spc.color = spc.easingcolor;
+                spc.angle = spc.easingangle;
+                spc.scale = spc.easingscale;
+            }
             // ループが有効な場合
             if (spc.loop)
             {
                 loopon = !loopon;
                 easingtime = 0.0f;
             }
-            else
+            else if (!spc.onshot)
             {
                 StopEasing(); // イージングを停止
             }
@@ -495,6 +510,16 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     }
 }
 
+//イージングプレイ関数
+void Sprite::EasingPlay()
+{
+    savepos = spc.position;
+    savecolor = spc.color;
+    savescale = spc.scale;
+    saveangle = spc.angle;
+    play = true;
+}
+
 //当たり判定用短形
 void Sprite::DrawCollsionBox()
 {
@@ -506,7 +531,6 @@ void Sprite::DrawCollsionBox()
     D3D11_VIEWPORT viewport{};
     UINT num_viewports{ 1 };
     dc->RSGetViewports(&num_viewports, &viewport);
-
 
     // 座標とピボットの処理
     float pivotX = (spc.pivot.x / spc.texSize.x);
@@ -544,8 +568,8 @@ void Sprite::DrawCollsionBox()
             y += cy;
         };
 
-    float cx = spc.position.x  + spc.collsionpositionoffset.x;
-    float cy = spc.position.y  + spc.collsionpositionoffset.y;
+    float cx = spc.position.x + spc.collsionpositionoffset.x;
+    float cy = spc.position.y + spc.collsionpositionoffset.y;
     rotate(x0, y0, cx, cy, spc.angle);
     rotate(x1, y1, cx, cy, spc.angle);
     rotate(x2, y2, cx, cy, spc.angle);
@@ -853,13 +877,14 @@ void Sprite::OnGUI()
         DirectX::XMFLOAT2 mouse = { (float)(Input::Instance().GetMouse().GetPositionX()),(float)(Input::Instance().GetMouse().GetPositionY()) };
         ImGui::DragFloat2((char*)u8"マウス位置", &mouse.x);
         ImGui::DragFloat2((char*)u8"当たり判定中心位置", &collisionPivot.x);
-        spc.easingposition.y;
         ImGui::TreePop();
     }
 
     ImGui::Checkbox((char*)u8"ループ再生", &spc.loop);
     ImGui::SameLine();
     ImGui::Checkbox((char*)u8"ワンカット再生", &spc.comback);
+    ImGui::SameLine();
+    ImGui::Checkbox((char*)u8"戻って来ない", &spc.onshot);
     if (ontriiger)
     {
         ImGui::SameLine();
@@ -976,13 +1001,13 @@ bool Sprite::cursorVsCollsionBox()
 
     //カーソル位置からコリジョンボックスのベクトル
     DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = {  collisionPivot.x + spc.collsionpositionoffset.x, collisionPivot.y + spc.collsionpositionoffset.y};
+    DirectX::XMFLOAT2 pos = { collisionPivot.x + spc.collsionpositionoffset.x, collisionPivot.y + spc.collsionpositionoffset.y };
     DirectX::XMFLOAT2 curVecPos = cur - pos;
     curVecPos.y *= -1;
 
     //長さを測る
     float upLen = Mathf::Dot(normalUp, curVecPos);
-    float rightLen = Mathf::Dot(normalRight, curVecPos); 
+    float rightLen = Mathf::Dot(normalRight, curVecPos);
 
     //判定
     DirectX::XMFLOAT2 scale = { (texSizeX / 2 + spc.collsionscaleoffset.x),(texSizeY / 2 + spc.collsionscaleoffset.y) };
