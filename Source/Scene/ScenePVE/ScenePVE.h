@@ -13,7 +13,7 @@ class ScenePVE :public Scene
 {
 public:
     ScenePVE() {};
-    ~ScenePVE()override {};
+    ~ScenePVE()override;
 
     // ‰Šú‰»
     void Initialize()override;
@@ -35,5 +35,7 @@ public:
 private:
     GameObj audioObj;
     std::unique_ptr<BasicsApplication> photonNet;
+    std::shared_ptr<TransformCom>t;
+
     bool battleClymax = false;
 };

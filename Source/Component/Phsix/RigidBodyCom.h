@@ -29,12 +29,17 @@ public:
     void GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale);
     void GenerateCollider(ModelResource* rc, bool isConvex);
 
+    
+
     NodeCollsionCom::CollsionType GetPrimitiveType() { return type; }
     void SetPrimitiveType(NodeCollsionCom::CollsionType t) { type = t; }
     float GetNormalizeScale() { return normalizeScale; }
     void SetNormalizeScale(float scale) { normalizeScale = scale; }
     std::string GetUseResourcePath() { return useResourcePath; }
     void SetUseResourcePath(std::string path) { useResourcePath = path; }
+
+    PxTransform GetPxTransform() { return rigidActor->getGlobalPose(); }
+    void SetPxTransform(PxTransform trans) { rigidActor->setGlobalPose(trans); }
 
 public:
     enum class RigidType

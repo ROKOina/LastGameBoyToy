@@ -20,11 +20,15 @@ public:
     //XVˆ—
     void Update(float elapsedTime);
     void DirectionStart();
+    int GetDirectionNum() { return directionNumber; }
+
+    void DirectionEnd();
+
 private:
     //‰‰o‚Ì“Š‡
     void DirectionSupervision(float elapsedTime);
 
-    
+
 
 private:
     void DirectionFOne(float elapsedTime);
@@ -38,7 +42,7 @@ private:
     void DirectionCEnd(float elapsedTime);
 
 private:
-    GameObj eventBoss;
+    //GameObj eventBoss;
 
     std::shared_ptr<TransformCom>t;
     std::weak_ptr<AnimationCom> animationCom;

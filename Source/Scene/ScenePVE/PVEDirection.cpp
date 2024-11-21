@@ -9,6 +9,8 @@
 #include <Scene/SceneManager.h>
 #include "Scene/SceneResult/SceneResult.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Component\Stage\StageEditorCom.h"
+#include "Component\Animation\AimIKCom.h"
 
 PVEDirection::PVEDirection()
 {
@@ -70,12 +72,10 @@ void PVEDirection::DirectionStart()
     }
 
     {
-        eventBoss = GameObjectManager::Instance().Find("BOSS");
+        GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
         eventBoss->transform_->SetWorldPosition({ -2.878,-0.176,15.196 });
         eventBoss->transform_->SetEulerRotation({ 0.0, 180.0f, 0.0f });
         eventBoss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
-
-        animationCom = eventBoss->AddComponent<AnimationCom>();
 
         {
             auto& DirectionBossSeconds = eventBoss->AddChildObject();
@@ -90,10 +90,16 @@ void PVEDirection::DirectionStart()
             fixationPoint->GetComponent<MovementCom>()->SetGravity(0.0f);
         }
     }
+
     //最初にイベントカメラへ変更
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
     directionNumber = 0;
+}
+
+void PVEDirection::DirectionEnd()
+{
+    flag = false;
 }
 
 //シーン演出統括
@@ -137,6 +143,7 @@ void PVEDirection::DirectionFOne(float elapsedTime)
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
 
         //イベントシーン用の歩きステートへ遷移
+        GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
         eventBoss->GetComponent<BossCom>()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_WALK);
 
         flag = true;
@@ -158,6 +165,8 @@ void PVEDirection::DirectionFOne(float elapsedTime)
 
 void PVEDirection::DirectionFTwo(float elapsedTime)
 {
+    GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
+
     if (!flag)
     {
         //イベントシーン用のパンチステートへ遷移
@@ -190,6 +199,8 @@ void PVEDirection::DirectionFTwo(float elapsedTime)
 
 void PVEDirection::DirectionFEnd(float elapsedTime)
 {
+    GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
+
     if (!flag)
     {
         //最初にイベントカメラへ変更
@@ -222,6 +233,8 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
 
 void PVEDirection::DirectionCOne(float elaspsedTime)
 {
+    GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
+
     if (!flag)
     {
         //暗転
@@ -235,6 +248,7 @@ void PVEDirection::DirectionCOne(float elaspsedTime)
 
         eventBoss->SetEnabled(true);
         eventBoss->transform_->SetWorldPosition({ -2.500,-0.005,-11.000 });
+        eventBoss->GetComponent<AimIKCom>()->SetEnabled(false);
         eventBoss->GetComponent<BossCom>()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
 
         GameObjectManager::Instance().Find("Seconds")->transform_->SetLocalPosition({ 0.00,23.0,-13.0 });
@@ -291,7 +305,6 @@ void PVEDirection::DirectionCFou(float elapsedTime)
 {
     if (!flag)
     {
-        GameObjectManager::Instance().Find("Direction")->SetEnabled(false);
         //暗転
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);

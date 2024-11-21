@@ -163,6 +163,8 @@ void CharacterCom::Update(float elapsedTime)
             isMaxUlt = false;
             attackUltCounter = 0;
             ultGauge = 0;
+            //ステートを初期化
+            attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
         }
     }
 

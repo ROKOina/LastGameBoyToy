@@ -57,7 +57,7 @@
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Character\Prop\SetNodeWorldPosCom.h"
-
+#include "Component\Audio\AudioCom.h"
 #include "Setting/Setting.h"
 
 SceneGame::~SceneGame()
@@ -150,6 +150,7 @@ void SceneGame::Initialize()
             //ダメージ処理用
             std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
             hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+            hitDamage->SetValue(100);
 
             //キャラクターに登録
             obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
@@ -193,8 +194,8 @@ void SceneGame::Initialize()
                 eSkillEff->SetName("eSkillEff");
                 std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
                 eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
-                eSkillEff->transform_->SetLocalPosition({ -0.35f,9.84f,-0.58f });
-                eff->Play();
+                eSkillEff->transform_->SetLocalPosition({-0.35f,9.84f,-0.58f});
+                eff->SetLoop(false);
             }
             //攻撃ため
             {
@@ -254,11 +255,13 @@ void SceneGame::Initialize()
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
         boss->AddComponent<BossCom>();
+        boss->AddComponent<AudioCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
         boss->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
+
 
         //右足の煙エフェクト
         {

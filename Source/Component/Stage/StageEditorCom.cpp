@@ -25,6 +25,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\FrustumCom.h"
+#include "Component\Stage\GateGimmickCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -193,7 +194,8 @@ void StageEditorCom::OnGUI()
             {
                 "None",
                 "TestNakanisi",
-                "TowerGimic"
+                "TowerGimic",
+                "GateGimic"
             };
             int funcIndex = (int)objName.second.func;
             ImGui::Combo((char*)u8"¶¬ŠÖ”", &funcIndex, FuncName, (int)GenerateFuncName::Max);
@@ -433,7 +435,7 @@ void StageEditorCom::PlaceJsonData(std::string filename)
     }
 }
 
-void StageEditorCom::TestNakanisi(GameObj place)
+void StageEditorCom::TestNakanisi(GameObj& place)
 {
     RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
 
@@ -449,7 +451,7 @@ void StageEditorCom::TowerGimic(GameObj& place)
     place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/energy.gpuparticle", 6000);
     place->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/enemy.spawn");
     place->AddComponent<StageGimmick>();
-    place->AddComponent<FrustumCom>();
+    //place->AddComponent<FrustumCom>();
     place->GetComponent<RendererCom>()->SetOutlineColor({ 1.000f, 0.361f, 0.000f });
     place->GetComponent<RendererCom>()->SetOutlineIntensity(10.0f);
     std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 50);
@@ -466,4 +468,10 @@ void StageEditorCom::TowerGimic(GameObj& place)
     accumulate->SetName("accumulateparticle");
     std::shared_ptr<GPUParticle>p = accumulate->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyspawn.gpuparticle", 500);
     p->SetLoop(false);
+}
+
+void StageEditorCom::GateGimic(GameObj& place)
+{
+    place->AddComponent<GateGimmick>();
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Convex).get();
 }
