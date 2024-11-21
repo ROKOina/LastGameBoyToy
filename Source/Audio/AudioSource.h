@@ -34,6 +34,9 @@ public:
 	// 停止
 	void Stop();
 
+	//ボリューム設定BGM
+	//void SetVolume(float volume);
+
 	// オーディオ呼び出し関数
 	void SetAudio(int id);
 	// 各オーディオ名設定 

@@ -27,7 +27,7 @@ void AudioSource::Start()
 void AudioSource::Update(float elapsedTime)
 {
     // 3Dオーディオ更新
-    Update3DAudio();
+    //Update3DAudio();
 }
 
 void AudioSource::OnGUI()
@@ -123,10 +123,19 @@ void AudioSource::SetAudio(int id)
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 }
+// ボリューム設定 
+//void AudioSource::SetVolume(float setvolume)
+//{
+//    if (!sourceVoice_)return;
+//    volumeControl = setvolume;
+//    sourceVoice_->SetVolume(setvolume);
+//}
 
 // 再生
 void AudioSource::Play(bool loop, float volume)
 {
+    if (sourceVoice_ == nullptr || resource_ == nullptr) return;
+
     Stop();
 
     // 音量調整反映用
@@ -150,14 +159,70 @@ void AudioSource::Play(bool loop, float volume)
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     sourceVoice_->SetVolume(volume * 0.1f);
 }
-
 // エミッター再生 curveDistanceScaler(減衰範囲)
+//void AudioSource::EmitterPlay(bool loop, float curveDistanceScaler, float volume)
+//{
+//    // エミッター設定
+//    //emitter_->pCone        = cone_.get();
+//
+//    emitter_->pCone = NULL;
+//    emitter_->OrientFront = emitterFront;
+//    emitter_->OrientTop   = emitterTop;
+//    emitter_->Position      = emitterPosition;
+//    emitter_->Velocity      = { 0.0f, 0.0f, 0.0f };
+//
+//    //チャンネル数
+//    emitter_->ChannelCount  = 1;
+//    emitter_->ChannelRadius = 0.0f;
+//
+//    // 距離減衰カーブ
+//    emitter_->CurveDistanceScaler = curveDistanceScaler;
+//    emitter_->pVolumeCurve = NULL;
+//    emitter_->DopplerScaler  = 1.0f;
+//
+//    // 内部半径は使用しない
+//    emitter_->InnerRadius = 0.0f;
+//    emitter_->InnerRadiusAngle = 0.0f;
+//
+//    //チャンネル方位テーブル
+//    float channelAzimuth = 0.0f;
+//    emitter_->pChannelAzimuths = &channelAzimuth;
+//
+//    // ソースボイスにデータを送信
+//    XAUDIO2_BUFFER buffer = { 0 };
+//    buffer.AudioBytes = resource_->GetAudioBytes();
+//    buffer.pAudioData = resource_->GetAudioData();
+//    buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
+//    buffer.Flags = XAUDIO2_END_OF_STREAM;
+//
+//    if (buffer.pAudioData == nullptr || buffer.AudioBytes == 0) {
+//        assert("ソースボイスにデータに問題あり");
+//        return;
+//    }
+//
+//    // 音量調整反映用
+//    volumeControl = volume;
+//    volume = volumeControl;
+//
+//    // ループ制御
+//    isLooping = loop;
+//    loop = isLooping;
+//
+//    // エミッター再生
+//    sourceVoice_->Stop();
+//    sourceVoice_->FlushSourceBuffers();
+//    sourceVoice_->SubmitSourceBuffer(&buffer);
+//
+//    HRESULT hr = sourceVoice_->Start();
+//    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+//
+//    sourceVoice_->SetVolume(volume);
+//}
+
 void AudioSource::EmitterPlay(bool loop, float curveDistanceScaler, float volume)
 {
     // エミッター設定
-    //emitter_->pCone        = cone_.get();
-
-    emitter_->pCone = NULL;
+    emitter_->pCone = nullptr;
     emitter_->OrientFront = emitterFront;
     emitter_->OrientTop   = emitterTop;
     emitter_->Position      = emitterPosition;
@@ -168,8 +233,13 @@ void AudioSource::EmitterPlay(bool loop, float curveDistanceScaler, float volume
     emitter_->ChannelRadius = 0.0f;
 
     // 距離減衰カーブ
+    emitter_->pVolumeCurve       = nullptr;
+    emitter_->pLFECurve             = nullptr;
+    emitter_->pLPFDirectCurve    = nullptr;
+    emitter_->pLPFReverbCurve   = nullptr;
+    emitter_->pReverbCurve        = nullptr;
+
     emitter_->CurveDistanceScaler = curveDistanceScaler;
-    emitter_->pVolumeCurve = NULL;
     emitter_->DopplerScaler  = 1.0f;
 
     // 内部半径は使用しない
@@ -199,6 +269,22 @@ void AudioSource::EmitterPlay(bool loop, float curveDistanceScaler, float volume
     // ループ制御
     isLooping = loop;
     loop = isLooping;
+
+    float matrix[16]; // スピーカーチャンネルのマトリックス
+    dspSettings->pMatrixCoefficients = matrix;
+    dspSettings->SrcChannelCount = 1;
+    dspSettings->DstChannelCount = 1; // ステレオ出力
+
+    const X3DAUDIO_HANDLE* x3dHandle = Audio::Instance().GetX3DAudioHandle();
+
+    // 3Dオーディオパラメータの計算
+    X3DAudioCalculate(*x3dHandle, listener_.get(), emitter_.get(),
+        X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER
+        | X3DAUDIO_CALCULATE_LPF_DIRECT | X3DAUDIO_CALCULATE_LPF_REVERB
+        | X3DAUDIO_CALCULATE_REVERB, dspSettings.get());
+
+    sourceVoice_->SetOutputMatrix(Audio::Instance().GetMasteringVoice(), emitter_->ChannelCount, 2, dspSettings->pMatrixCoefficients);
+    sourceVoice_->SetFrequencyRatio(dspSettings->DopplerFactor);
 
     // エミッター再生
     sourceVoice_->Stop();
