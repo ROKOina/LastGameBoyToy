@@ -50,11 +50,17 @@ void InazawaCharacterCom::Update(float elapsedTime)
     }
 }
 
+static float AH = 0;
+
 void InazawaCharacterCom::OnGUI()
 {
     CharacterCom::OnGUI();
     ImGui::DragFloat("shootTime", &shootTime);
     ImGui::DragFloat("shootTimer", &shootTimer);
+    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+auto& armAnim = arm->GetComponent<AnimationCom>();
+
+    ImGui::DragFloat("A", &AH);
 }
 
 void InazawaCharacterCom::MainAttackDown()
@@ -145,21 +151,27 @@ void InazawaCharacterCom::FPSArmAnimation()
     //移動
     if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
     {
-        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_walk"))return;
-
-        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
+        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
         {
-            if (armAnim->IsEventCalling("attackEnd"))
+            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
+            {
+                if (armAnim->IsEventCalling("attackEnd"))
+                    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
+            }
+            else
                 armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
         }
-        else
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
     }
 
     //アニメーションスピード変更
     float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
     float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
 
+    float v = max - fmax;
+    AH = max;
+    if (v < 0)v = 0;
+
     arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
-        = 1 + (max - fmax) * 0.5f;
+        = 1 + v * 0.1f;
+
 }

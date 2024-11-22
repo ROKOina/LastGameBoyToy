@@ -131,6 +131,22 @@ void SceneTitle::Initialize()
             next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
         }
 
+        //ばつ
+        {
+            {//ue
+                auto& next = obj->AddChildObject();
+                next->SetName("Batu0");
+                next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/batu.ui", Sprite::SpriteShader::DEFALT, false);
+            }
+            {
+                auto& next = obj->AddChildObject();
+                next->SetName("Batu1");
+                next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/batu1.ui", Sprite::SpriteShader::DEFALT, false);
+            }
+        }
+
+
+
         //セレクト棒
         {
             auto& next = obj->AddChildObject();
@@ -227,9 +243,9 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
     //初期化
     std::vector<SceneName> names;
-    names.emplace_back("PVE", new ScenePVE, 560);
-    names.emplace_back("PVP", new ScenePVE, 750);
-    names.emplace_back("Training", new ScenePVE, 940);
+    names.emplace_back("PVE" ,new ScenePVE,560);
+    //names.emplace_back("PVP", new ScenePVE, 750);
+    //names.emplace_back("Training", new ScenePVE, 940);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
     auto& selectB = canvas->GetChildFind("selectBow");
@@ -245,10 +261,16 @@ void SceneTitle::UIUpdate(float elapsedTime)
             //クリックで遷移＆演出
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
+                //イージング
                 canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
+                
+                canvas->GetChildFind("Batu0")->SetEnabled(false);
+                canvas->GetChildFind("Batu1")->SetEnabled(false);
+
+
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
                     audioObj->FeedStart("Title", 0.0f, elapsedTime);

@@ -98,7 +98,7 @@ public:
     virtual void UltSkill() {};
 
     //LeftShift (固定ダッシュ)
-    void LeftShiftSkill(float elapsedTime);
+    void DashFewSub(float elapsedTime);
 
     virtual void SpaceSkill() {}
 
@@ -187,8 +187,14 @@ public:
     bool UseUlt() { return isUseUlt; }
 
 private:
+    //入力ステート更新
+    void InputStateUpdate(float elapsedTime);
+
     //カメラ操作
     void CameraControl();
+
+    //ダッシュ関係（ダッシュ中か返す）
+    bool DashUpdateReIsDash(float elapsedTime);
 
     //ビネット効果
     void Vinetto(float elapsedTime);
@@ -256,9 +262,13 @@ private:
     float dashGaugeMinus = 1;   //一秒間減る数
     float dashGaugePlus = 2;
 
-    float dashSpeed = 5;
-    float dashSpeedFirst = 50;  //初速
-    float dashSpeedNormal = 5; //ダッシュの速さ
+    float dashSpeed = 58;
+    float dashSpeedFirst = 58;  //初速
+    float dashSpeedNormal = 13; //ダッシュの速さ
+
+    //ダッシュすぐ途切れないように
+    float dashDraceTime = 0.1f;
+    float dashDraceTimer = 0;
 
     float dashRecast = 3;
 

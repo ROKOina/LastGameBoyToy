@@ -14,20 +14,204 @@
 
 void CharacterCom::Update(float elapsedTime)
 {
-    StanUpdate(elapsedTime);
-
-    //ステックの角度取得
-    stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
-
-    //ステックの角度制限
-    if (stickAngle < 0.0f)
+    auto& ss = SceneManager::Instance().GetSettingScreen();
+    bool isViewSetting = ss->IsViewSetting();
     {
-        stickAngle += 360.0f;
+        //設定画面を開く(P)
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        if (GamePad::BTN_P & gamePad.GetButtonDown())
+        {
+            if (isViewSetting)
+            {
+                ss->SetViewSetting(false);
+                ::SetCursorPos(500, 500);
+            }
+            else
+            {
+                ss->SetViewSetting(true);
+            }
+        }
     }
 
-    //現在のアニメーションに使用している角度
-    nowAngle = InterpolateAngle(nowAngle, stickAngle, elapsedTime, lerpSpeed);
+    StanUpdate(elapsedTime);
 
+    //設定画面中は操作出来ない
+    bool isDash = false;
+    if (!isViewSetting)
+    {
+        //ステックの角度取得
+        stickAngle = DirectX::XMConvertToDegrees(atan2(leftStick.y, leftStick.x));
+
+        //ステックの角度制限
+        if (stickAngle < 0.0f)
+        {
+            stickAngle += 360.0f;
+        }
+
+        //現在のアニメーションに使用している角度
+        nowAngle = InterpolateAngle(nowAngle, stickAngle, elapsedTime, lerpSpeed);
+
+        //入力ステート更新
+        InputStateUpdate(elapsedTime);
+
+        //ダッシュ
+        isDash = DashUpdateReIsDash(elapsedTime);
+
+        //カメラ制御
+        CameraControl();
+    }
+
+    //ダッシュ関係
+    if (dashFlag)
+        DashFewSub(elapsedTime);
+    if (!isDash)
+    {
+        dashDraceTimer -= elapsedTime;
+        if (dashDraceTimer < 0)
+        {
+            //ダッシュ終了時に一度入る
+            if (dashFlag)
+            {
+                dashFlag = false;
+                dashSpeed = dashSpeedFirst; //初速を設定
+                dashFirstTimer = dashFirstTime; //初速タイマーを初期化
+            }
+
+            //ゲージ増やす
+            dashGauge += dashGaugePlus * elapsedTime;
+            if (dashGauge > dashGaugeMax)
+            {
+                dashGauge = dashGaugeMax;
+            }
+        }
+    }
+    else
+        dashDraceTimer = dashDraceTime; //ダッシュ猶予時間
+
+
+    //ウルト更新
+    UltUpdate(elapsedTime);
+
+    //クールダウン更新
+    CoolUpdate(elapsedTime);
+
+    //ダメージビネット発動
+    Vinetto(elapsedTime);
+}
+
+void CharacterCom::OnGUI()
+{
+    ImGui::Checkbox("isHitAttack", &isHitAttack);
+    ImGui::DragFloat("jump", &jumpPower, 0.1f);
+
+    if (ImGui::TreeNode("ult"))
+    {
+        ImGui::Checkbox("isMaxUlt", &isMaxUlt);
+        ImGui::Checkbox("isUseUlt", &isUseUlt);
+        ImGui::DragFloat("ultGaugeMax", &ultGaugeMax, 0.1f);
+        ImGui::DragFloat("ultGauge", &ultGauge, 0.1f);
+
+        ImGui::Separator();
+
+        ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
+        ImGui::DragInt("attackUltCounter", &attackUltCounter);
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("dash"))
+    {
+        ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);
+        ImGui::DragFloat("dashGauge", &dashGauge, 0.1f);
+        ImGui::DragFloat("dashGaugeMax", &dashGaugeMax, 0.1f);
+        ImGui::DragFloat("dashGaugeMinus", &dashGaugeMinus, 0.1f);
+        ImGui::DragFloat("dashGaugePlus", &dashGaugePlus, 0.1f);
+
+        ImGui::DragFloat("dashSpeedFirst", &dashSpeedFirst, 0.1f);
+        ImGui::DragFloat("dashSpeedNormal", &dashSpeedNormal, 0.1f);
+        ImGui::DragFloat("dashFirstTime", &dashFirstTime, 0.1f);
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("state"))
+    {
+        int s = (int)(moveStateMachine.GetCurrentState());
+        ImGui::InputInt("moveS", &s);
+        s = (int)(attackStateMachine.GetCurrentState());
+        ImGui::InputInt("attackS", &s);
+        moveStateMachine.ImGui();
+        attackStateMachine.ImGui();
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("NetInput"))
+    {
+        bool stan = isStan;
+        ImGui::Checkbox("isStan", &stan);
+        ImGui::DragFloat("stanTimer", &stanTimer);
+
+        ImGui::InputFloat("StickAngle", &stickAngle);
+        ImGui::InputFloat("nowAngle", &nowAngle);
+
+        int i = userInput;
+        ImGui::InputInt("input", &i);
+        i = userInputDown;
+        ImGui::InputInt("userInputDown", &i);
+        i = userInputUp;
+        ImGui::InputInt("userInputUp", &i);
+
+        ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
+        ImGui::InputInt("netID", &netID);
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("SkillCool"))
+    {
+        ImGui::DragFloat("QTime", &Qcool.time);
+        ImGui::DragFloat("QTimer", &Qcool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("ETime", &Ecool.time);
+        ImGui::DragFloat("ETimer", &Ecool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("LSTime", &LScool.time);
+        ImGui::DragFloat("LSTimer", &LScool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("SpaceTime", &Spacecool.time);
+        ImGui::DragFloat("SpaceTimer", &Spacecool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("LeftClickTime", &LeftClickcool.time);
+        ImGui::DragFloat("LeftClickTimer", &LeftClickcool.timer);
+        ImGui::Separator();
+        ImGui::DragFloat("RTime", &Rcool.time);
+        ImGui::DragFloat("RTimer", &Rcool.timer);
+
+        ImGui::TreePop();
+    }
+}
+
+//ダッシュ
+void CharacterCom::DashFewSub(float elapsedTime)
+{
+    if (std::string(GetGameObject()->GetName()) != "player")return;
+
+    //最大速度で速さを変える
+    auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
+    moveCmp->SetAddMoveMaxSpeed(dashSpeed);
+
+    //初速減衰
+    dashFirstTimer -= elapsedTime;
+    if (dashFirstTimer < 0)
+    {
+        //速度を普通に
+        dashSpeed = dashSpeedNormal;
+    }
+}
+
+void CharacterCom::InputStateUpdate(float elapsedTime)
+{
     //ステート処理
     if (!GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
         attackStateMachine.Update(elapsedTime);
@@ -131,60 +315,6 @@ void CharacterCom::Update(float elapsedTime)
         SubSkill();
     }
 
-    //ダッシュスキル
-    SetLSSkillCoolTime(dashRecast);
-    if (CharacterInput::LeftShiftButton & GetButton()
-        && LScool.timer >= LScool.time && dashGauge >= 0 && IsPushLeftStick())
-    {
-        //ゲージ減らす
-        dashGauge -= dashGaugeMinus * elapsedTime;
-        //ダッシュ処理
-        LeftShiftSkill(elapsedTime);
-
-        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::BlurStrength };
-
-        //ダッシュ時一回だけ入る
-        const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
-        if (!dashFlag)
-        {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
-            dashFlag = true;
-            dashGauge -= 5; //最初は一気に減らす
-
-            //音
-            GetGameObject()->GetComponent<AudioCom>()->GetAudioObj("P_DASH").SetPitch(0.7f);
-            GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 5.0f);
-        }
-        else
-        {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
-        }
-
-        //ゲージがなくなったらタイマーをセット
-        if (dashGauge <= 0)
-        {
-            LScool.timer = 0;
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
-        }
-    }
-    else
-    {
-        //ダッシュ終了時に一度入る
-        if (dashFlag)
-        {
-            dashFlag = false;
-            dashSpeed = dashSpeedFirst; //初速を設定
-            dashFirstTimer = dashFirstTime; //初速タイマーを初期化
-        }
-
-        //ゲージ増やす
-        dashGauge += dashGaugePlus * elapsedTime;
-        if (dashGauge > dashGaugeMax)
-        {
-            dashGauge = dashGaugeMax;
-        }
-    }
-
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         Spacecool.timer = 0;
@@ -214,131 +344,6 @@ void CharacterCom::Update(float elapsedTime)
             GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
         }
     }
-
-    //ウルト更新
-    UltUpdate(elapsedTime);
-
-    //クールダウン更新
-    CoolUpdate(elapsedTime);
-
-    //カメラ制御
-    CameraControl();
-
-    //ダメージビネット発動
-    Vinetto(elapsedTime);
-}
-
-void CharacterCom::OnGUI()
-{
-    ImGui::Checkbox("isHitAttack", &isHitAttack);
-    ImGui::DragFloat("jump", &jumpPower, 0.1f);
-
-    if (ImGui::TreeNode("ult"))
-    {
-        ImGui::Checkbox("isMaxUlt", &isMaxUlt);
-        ImGui::Checkbox("isUseUlt", &isUseUlt);
-        ImGui::DragFloat("ultGaugeMax", &ultGaugeMax, 0.1f);
-        ImGui::DragFloat("ultGauge", &ultGauge, 0.1f);
-
-        ImGui::Separator();
-
-        ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
-        ImGui::DragInt("attackUltCounter", &attackUltCounter);
-
-        ImGui::TreePop();
-    }
-
-    if (ImGui::TreeNode("dash"))
-    {
-        ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);
-        ImGui::DragFloat("dashGauge", &dashGauge, 0.1f);
-        ImGui::DragFloat("dashGaugeMax", &dashGaugeMax, 0.1f);
-        ImGui::DragFloat("dashGaugeMinus", &dashGaugeMinus, 0.1f);
-        ImGui::DragFloat("dashGaugePlus", &dashGaugePlus, 0.1f);
-
-        ImGui::DragFloat("dashSpeedFirst", &dashSpeedFirst, 0.1f);
-        ImGui::DragFloat("dashSpeedNormal", &dashSpeedNormal, 0.1f);
-        ImGui::DragFloat("dashFirstTime", &dashFirstTime, 0.1f);
-
-        ImGui::TreePop();
-    }
-
-    if (ImGui::TreeNode("state"))
-    {
-        int s = (int)(moveStateMachine.GetCurrentState());
-        ImGui::InputInt("moveS", &s);
-        s = (int)(attackStateMachine.GetCurrentState());
-        ImGui::InputInt("attackS", &s);
-        moveStateMachine.ImGui();
-        attackStateMachine.ImGui();
-
-        ImGui::TreePop();
-    }
-
-    if (ImGui::TreeNode("NetInput"))
-    {
-        bool stan = isStan;
-        ImGui::Checkbox("isStan", &stan);
-        ImGui::DragFloat("stanTimer", &stanTimer);
-
-        ImGui::InputFloat("StickAngle", &stickAngle);
-        ImGui::InputFloat("nowAngle", &nowAngle);
-
-        int i = userInput;
-        ImGui::InputInt("input", &i);
-        i = userInputDown;
-        ImGui::InputInt("userInputDown", &i);
-        i = userInputUp;
-        ImGui::InputInt("userInputUp", &i);
-
-        ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
-        ImGui::InputInt("netID", &netID);
-
-        ImGui::TreePop();
-    }
-
-    if (ImGui::TreeNode("SkillCool"))
-    {
-        ImGui::DragFloat("QTime", &Qcool.time);
-        ImGui::DragFloat("QTimer", &Qcool.timer);
-        ImGui::Separator();
-        ImGui::DragFloat("ETime", &Ecool.time);
-        ImGui::DragFloat("ETimer", &Ecool.timer);
-        ImGui::Separator();
-        ImGui::DragFloat("LSTime", &LScool.time);
-        ImGui::DragFloat("LSTimer", &LScool.timer);
-        ImGui::Separator();
-        ImGui::DragFloat("SpaceTime", &Spacecool.time);
-        ImGui::DragFloat("SpaceTimer", &Spacecool.timer);
-        ImGui::Separator();
-        ImGui::DragFloat("LeftClickTime", &LeftClickcool.time);
-        ImGui::DragFloat("LeftClickTimer", &LeftClickcool.timer);
-        ImGui::Separator();
-        ImGui::DragFloat("RTime", &Rcool.time);
-        ImGui::DragFloat("RTimer", &Rcool.timer);
-
-        ImGui::TreePop();
-    }
-}
-
-//ダッシュ
-void CharacterCom::LeftShiftSkill(float elapsedTime)
-{
-    if (std::string(GetGameObject()->GetName()) != "player")return;
-
-    //最大速度で速さを変える
-    auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
-    float maxSpeed = moveCmp->GetMoveMaxSpeed();
-    maxSpeed += dashSpeed;
-    moveCmp->SetAddMoveMaxSpeed(maxSpeed);
-
-    //初速減衰
-    dashFirstTimer -= elapsedTime;
-    if (dashFirstTimer < 0)
-    {
-        //速度を普通に
-        dashSpeed = dashSpeedNormal;
-    }
 }
 
 void CharacterCom::CameraControl()
@@ -358,22 +363,6 @@ void CharacterCom::CameraControl()
             return;
         }
 #endif
-
-        //設定画面を開く(P)
-        auto& ss = SceneManager::Instance().GetSettingScreen();
-        bool isViewSetting = ss->IsViewSetting();
-        if (GamePad::BTN_P & gamePad.GetButtonDown())
-        {
-            if (isViewSetting)
-            {
-                ss->SetViewSetting(false);
-            }
-            else
-            {
-                ss->SetViewSetting(true);
-            }
-        }
-        if (isViewSetting)return;
 
         //UI配置中はマウスを固定しない
         if (!cameraObj->GetComponent<CameraCom>()->GetIsUiCreate())
@@ -422,6 +411,52 @@ void CharacterCom::CameraControl()
             return;
         }
     }
+}
+
+bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
+{
+    bool isNowPush = CharacterInput::LeftShiftButton & GetButtonDown();
+
+    //途切れたら入らないように
+    if (!isNowPush && !dashFlag)return false;
+
+    //ダッシュスキル
+    SetLSSkillCoolTime(dashRecast);
+    if (CharacterInput::LeftShiftButton & GetButton()
+        && LScool.timer >= LScool.time && dashGauge >= 0 && IsPushLeftStick())
+    {
+        //ゲージ減らす
+        dashGauge -= dashGaugeMinus * elapsedTime;
+
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::BlurStrength };
+
+        //ダッシュ時一回だけ入る
+        const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+        if (isNowPush)
+        {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
+            dashFlag = true;
+            dashGauge -= 5; //最初は一気に減らす
+
+            //音
+            GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
+        }
+        else
+        {
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
+        }
+
+        //ゲージがなくなったらタイマーをセット
+        if (dashGauge <= 0)
+        {
+            LScool.timer = 0;
+            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 //ビネット効果
