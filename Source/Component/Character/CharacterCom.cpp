@@ -88,7 +88,6 @@ void CharacterCom::Update(float elapsedTime)
     else
         dashDraceTimer = dashDraceTime; //ダッシュ猶予時間
 
-
     //ウルト更新
     UltUpdate(elapsedTime);
 
@@ -464,9 +463,8 @@ void CharacterCom::Vinetto(float elapsedTime)
 {
     float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
     float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
-    const auto posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
 
-    if (posteffect)
+    if (const auto posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>())
     {
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::VignetteIntensity };
 

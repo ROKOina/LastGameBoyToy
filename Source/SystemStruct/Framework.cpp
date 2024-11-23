@@ -8,7 +8,6 @@
 #include "Scene\SceneGame\SceneGame.h"
 #include "Scene\SceneManager.h"
 #include "Scene\SceneResult\SceneResult.h"
-#include "Scene\SceneSelect\SceneSelect.h"
 #include "Scene/ScenePVE/ScenePVE.h"
 #include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\\SceneTitle\SceneTitle.h"

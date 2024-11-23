@@ -1,8 +1,5 @@
 //一番上でインクルード（ネットワーク）
-//#include <winsock2.h>
 #include <ws2tcpip.h>
-
-//#pragma comment(lib, "Ws2_32.lib")
 
 #include "Graphics/Graphics.h"
 #include "Input\Input.h"
@@ -21,7 +18,6 @@
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
-#include "Component\Character\NomuraCharacterCom.h"
 #include "Component\Character\HaveAllAttackCharacter.h"
 #include "Component\Character\RegisterChara.h"
 #include "Component/Particle/CPUParticle.h"
@@ -194,7 +190,7 @@ void SceneGame::Initialize()
                 eSkillEff->SetName("eSkillEff");
                 std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
                 eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
-                eSkillEff->transform_->SetLocalPosition({-0.35f,9.84f,-0.58f});
+                eSkillEff->transform_->SetLocalPosition({ -0.35f,9.84f,-0.58f });
                 eff->SetLoop(false);
             }
             //攻撃ため
@@ -263,7 +259,6 @@ void SceneGame::Initialize()
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
-
 
         //右足の煙エフェクト
         {
@@ -696,20 +691,20 @@ void SceneGame::CreateUiObject()
             gauge->SetVariableValue(i);
         }
 
-      //LockOn
-      {
-          std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-          std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-          hpMemori->SetName("lockOn");
-          hpMemori->AddComponent<UI_LockOn>(4,0,90);
-      }
-      //decoration
-      {
-          std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("Canvas");
-          std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
-          skillGauge->SetName("Decoration");
-          skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Decoration.ui", Sprite::SpriteShader::DEFALT, false);
-      }
+        //LockOn
+        {
+            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+            hpMemori->SetName("lockOn");
+            hpMemori->AddComponent<UI_LockOn>(4, 0, 90);
+        }
+        //decoration
+        {
+            std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("Canvas");
+            std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
+            skillGauge->SetName("Decoration");
+            skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Decoration.ui", Sprite::SpriteShader::DEFALT, false);
+        }
 
         //HitEffect
         {

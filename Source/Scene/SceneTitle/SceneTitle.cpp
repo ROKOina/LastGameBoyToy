@@ -15,7 +15,6 @@
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneTitle.h"
-#include "Scene\SceneSelect\SceneSelect.h"
 #include "Scene/ScenePVE/ScenePVE.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
@@ -145,8 +144,6 @@ void SceneTitle::Initialize()
             }
         }
 
-
-
         //ƒZƒŒƒNƒg–_
         {
             auto& next = obj->AddChildObject();
@@ -243,7 +240,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
     //‰Šú‰»
     std::vector<SceneName> names;
-    names.emplace_back("PVE" ,new ScenePVE,560);
+    names.emplace_back("PVE", new ScenePVE, 560);
     //names.emplace_back("PVP", new ScenePVE, 750);
     //names.emplace_back("Training", new ScenePVE, 940);
 
@@ -266,10 +263,9 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
-                
+
                 canvas->GetChildFind("Batu0")->SetEnabled(false);
                 canvas->GetChildFind("Batu1")->SetEnabled(false);
-
 
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {

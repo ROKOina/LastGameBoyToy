@@ -285,10 +285,8 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     // デバッグレンダー
     graphics.GetDebugRenderer()->Render(graphics.GetDeviceContext(), view, projection);
     graphics.GetLineRenderer()->Render(graphics.GetDeviceContext(), view, projection);
-#else
 
 #endif // _DEBUG
-
 
     // 深度マップを使用するシェーダー描画
     RenderUseDepth();
@@ -345,10 +343,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     // ギズモの描画
     DrawGuizmo(view, projection);
 
-#else
-
 #endif // _DEBUG
-
 }
 
 //ゲームオブジェクトを探す
@@ -772,6 +767,17 @@ void GameObjectManager::DrawLister()
 
             //親子GUI用の再起関数
             CycleDrawLister(obj, selectionGameObject_);
+
+            // コンテキストメニューを表示 (右クリック)
+            if (ImGui::BeginPopupContextItem(obj->GetName())) // obj->GetName()でユニークな識別子を設定
+            {
+                if (ImGui::Selectable((char*)u8"削除"))
+                {
+                    Remove(obj);
+                }
+
+                ImGui::EndPopup();
+            }
         }
     }
     ImGui::End();

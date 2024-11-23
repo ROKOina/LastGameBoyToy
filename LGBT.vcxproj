@@ -162,7 +162,6 @@
     <ClInclude Include="Source\Component\Character\CharaStatusCom.h" />
     <ClInclude Include="Source\Component\Character\HaveAllAttackCharacter.h" />
     <ClInclude Include="Source\Component\Character\InazawaCharacterCom.h" />
-    <ClInclude Include="Source\Component\Character\NomuraCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\Picohard.h" />
     <ClInclude Include="Source\Component\Character\Prop\SetNodeWorldPosCom.h" />
     <ClInclude Include="Source\Component\Character\RegisterChara.h" />
@@ -247,8 +246,6 @@
     <ClInclude Include="Source\Scene\ScenePVE\ScenePVE.h" />
     <ClInclude Include="Source\Scene\ScenePVP\ScenePVP.h" />
     <ClInclude Include="Source\Scene\SceneResult\SceneResult.h" />
-    <ClInclude Include="Source\Scene\SceneSelect\SceneSelect.h" />
-    <ClInclude Include="Source\Scene\SceneSugimoto\SceneSugimoto.h" />
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
     <ClInclude Include="Source\Setting\Setting.h" />
@@ -256,7 +253,6 @@
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\GateGimmickState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
-    <ClInclude Include="Source\StateMachine\Behaviar\NomuraCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\PicohardState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\StageGimmickState.h" />
     <ClInclude Include="Source\StateMachine\State.h" />
@@ -307,7 +303,6 @@
     <ClCompile Include="Source\Component\Character\CharaStatusCom.cpp" />
     <ClCompile Include="Source\Component\Character\HaveAllAttackCharacter.cpp" />
     <ClCompile Include="Source\Component\Character\InazawaCharacterCom.cpp" />
-    <ClCompile Include="Source\Component\Character\NomuraCharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\Picohard.cpp" />
     <ClCompile Include="Source\Component\Character\Prop\SetNodeWorldPosCom.cpp" />
     <ClCompile Include="Source\Component\Character\RegisterChara.cpp" />
@@ -382,8 +377,6 @@
     <ClCompile Include="Source\Scene\ScenePVE\ScenePVE.cpp" />
     <ClCompile Include="Source\Scene\ScenePVP\ScenePVP.cpp" />
     <ClCompile Include="Source\Scene\SceneResult\SceneResult.cpp" />
-    <ClCompile Include="Source\Scene\SceneSelect\SceneSelect.cpp" />
-    <ClCompile Include="Source\Scene\SceneSugimoto\SceneSugimoto.cpp" />
     <ClCompile Include="Source\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\SceneTraining.cpp" />
     <ClCompile Include="Source\Setting\Setting.cpp" />
@@ -391,7 +384,6 @@
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\GateGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
-    <ClCompile Include="Source\StateMachine\Behaviar\NomuraCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\PicohardState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\StageGimmickState.cpp" />
     <ClCompile Include="Source\SystemStruct\Dialog.cpp" />
