@@ -55,39 +55,39 @@ float vignette(float2 uv)
     return vignette;
 }
 
-// エッジ検出関数
+// エッジ検出 (Sobel フィルタ)
 float ComputeSobelEdge(float2 texcoord, float width, float height, Texture2D depth_map, SamplerState sampler_states)
 {
     float2 uvDist = float2(1.0 / width, 1.0 / height);
-    float centerDepth = depth_map.Sample(sampler_states, texcoord); // Center
+    float centerDepth = depth_map.Sample(sampler_states, texcoord); // 中心の深度
     float4 depthDiag;
     float4 depthAxis;
 
-    // Diagonal depths
-    depthDiag.x = depth_map.Sample(sampler_states, texcoord + uvDist); // TR
-    depthDiag.y = depth_map.Sample(sampler_states, texcoord + uvDist * float2(-1.0f, 1.0f)); // TL
-    depthDiag.z = depth_map.Sample(sampler_states, texcoord - uvDist * float2(-1.0f, 1.0f)); // BR
-    depthDiag.w = depth_map.Sample(sampler_states, texcoord - uvDist); // BL
+    // 対角方向の深度
+    depthDiag.x = depth_map.Sample(sampler_states, texcoord + uvDist); // 右上
+    depthDiag.y = depth_map.Sample(sampler_states, texcoord + uvDist * float2(-1.0f, 1.0f)); // 左上
+    depthDiag.z = depth_map.Sample(sampler_states, texcoord - uvDist * float2(-1.0f, 1.0f)); // 右下
+    depthDiag.w = depth_map.Sample(sampler_states, texcoord - uvDist); // 左下
 
-    // Axis depths
-    depthAxis.x = depth_map.Sample(sampler_states, texcoord + uvDist * float2(0.0f, 1.0f)); // T
-    depthAxis.y = depth_map.Sample(sampler_states, texcoord - uvDist * float2(1.0f, 0.0f)); // L
-    depthAxis.z = depth_map.Sample(sampler_states, texcoord + uvDist * float2(1.0f, 0.0f)); // R
-    depthAxis.w = depth_map.Sample(sampler_states, texcoord - uvDist * float2(0.0f, 1.0f)); // B
+    // 軸方向の深度
+    depthAxis.x = depth_map.Sample(sampler_states, texcoord + uvDist * float2(0.0f, 1.0f)); // 上
+    depthAxis.y = depth_map.Sample(sampler_states, texcoord - uvDist * float2(1.0f, 0.0f)); // 左
+    depthAxis.z = depth_map.Sample(sampler_states, texcoord + uvDist * float2(1.0f, 0.0f)); // 右
+    depthAxis.w = depth_map.Sample(sampler_states, texcoord - uvDist * float2(0.0f, 1.0f)); // 下
 
-    // Sobel coefficients
-    const float4 vertDiagCoeff = float4(-1.0f, -1.0f, 1.0f, 1.0f); // TR, TL, BR, BL
+    // Sobel係数
+    const float4 vertDiagCoeff = float4(-1.0f, -1.0f, 1.0f, 1.0f); // 対角 (上下左右)
     const float4 horizDiagCoeff = float4(1.0f, -1.0f, 1.0f, -1.0f);
-    const float4 vertAxisCoeff = float4(-2.0f, 0.0f, 0.0f, 2.0f); // T, L, R, B
-    const float4 horizAxisCoeff = float4(0.0f, -2.0f, 2.0f, 0.0f);
+    const float4 vertAxisCoeff = float4(-2.0f, 0.0f, 0.0f, 2.0f); // 軸方向 (上下)
+    const float4 horizAxisCoeff = float4(0.0f, -2.0f, 2.0f, 0.0f); // 軸方向 (左右)
 
-    // Sobel horizontal and vertical calculations
+    // Sobel の水平方向と垂直方向計算
     float4 sobelH = depthDiag * horizDiagCoeff + depthAxis * horizAxisCoeff;
     float4 sobelV = depthDiag * vertDiagCoeff + depthAxis * vertAxisCoeff;
     float sobelX = dot(sobelH, float4(1.0f, 1.0f, 1.0f, 1.0f));
     float sobelY = dot(sobelV, float4(1.0f, 1.0f, 1.0f, 1.0f));
 
-    // Sobel edge magnitude
+    // Sobel エッジ強度 (勾配の大きさ)
     return sqrt(sobelX * sobelX + sobelY * sobelY);
 }
 
@@ -106,39 +106,40 @@ float4 ConvertToWorldPosition(float2 texcoord, float centerDepth, float width, f
 // 距離に基づいたアウトラインしきい値の計算
 float ComputeOutlineThreshold(float distance, float minThreshold, float maxThreshold)
 {
+    // 線形補間で距離に応じたしきい値を計算
     return lerp(maxThreshold, minThreshold, saturate(distance / 10.0f));
 }
 
-// 輪郭線描画ロジック
+// 輪郭線描画の条件チェック
 float ComputeDepthEdge(float sobel, float distance, float minDistance, float threshold)
 {
     bool drawOutline = distance > minDistance;
     return (drawOutline && sobel > threshold) ? 1.0f : 0.0f;
 }
 
-// メイン処理関数
+// メイン処理関数: アウトライン描画
 float4 OutlineEffect(float2 texcoord, float width, float height, float4x4 inverseviewprojection, float3 cameraposition)
 {
-    // Sobel edge detection
+    // Sobel エッジ検出
     float sobel = ComputeSobelEdge(texcoord, width, height, depth_map, sampler_states[LINEAR]);
 
-    // Center depth
+    // 深度情報の取得
     float centerDepth = depth_map.Sample(sampler_states[LINEAR], texcoord);
 
-    // World position and distance
+    // ワールド座標とカメラ距離計算
     float4 worldPos = ConvertToWorldPosition(texcoord, centerDepth, width, height, inverseviewprojection);
     float distance = length(worldPos.xyz - cameraposition);
 
-    // Adaptive threshold
-    float minThreshold = 0.001;
-    float maxThreshold = 0.01;
+    // 距離に応じた閾値の計算
+    float minThreshold = 0.001; // 最小しきい値
+    float maxThreshold = 0.01; // 最大しきい値
     float threshold = ComputeOutlineThreshold(distance, minThreshold, maxThreshold);
 
-    // Edge detection and outline drawing
-    float minDistance = 1.0; // No outline if too close
+    // エッジ検出と輪郭線描画
+    float minDistance = 1.0; // カメラに近すぎる場合は描画しない
     float depthEdge = ComputeDepthEdge(sobel, distance, minDistance, threshold);
 
-    // Final color calculation
+    // 最終的なアウトラインの色
     return float4(depthEdge, depthEdge, depthEdge, 1.0f) * outlinecolor.Sample(sampler_states[LINEAR], texcoord);
 }
 

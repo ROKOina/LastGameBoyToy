@@ -366,7 +366,7 @@ Graphics::Graphics(HWND hWnd)
             desc.RenderTarget[4].DestBlendAlpha = D3D11_BLEND_ONE;
             desc.RenderTarget[4].BlendOpAlpha = D3D11_BLEND_OP_ADD;
             desc.RenderTarget[4].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-            desc.RenderTarget[5].BlendEnable = FALSE;
+            desc.RenderTarget[5].BlendEnable = TRUE;
             desc.RenderTarget[5].SrcBlend = D3D11_BLEND_SRC_ALPHA;
             desc.RenderTarget[5].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
             desc.RenderTarget[5].BlendOp = D3D11_BLEND_OP_ADD;
