@@ -3,7 +3,6 @@
 #include <Component\Camera\FreeCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Character\RegisterChara.h>
-#include <Component\Camera\FPSCameraCom.h>
 #include <Component\Collsion\ColliderCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include <Input\Input.h>
@@ -28,7 +27,6 @@
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
 #include "Component\Audio\AudioCom.h"
-#include <Component\Character\Prop\SetNodeWorldPosCom.h>
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Component\Stage\GateGimmickCom.h"
@@ -116,123 +114,6 @@ void ScenePVE::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
-
-        auto& au = obj->AddComponent<AudioCom>();
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
-        au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
-        au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
-        au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
-        au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
-
-        //ウルト関係Obj追加
-        {
-            //アタック系ウルト
-            std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
-            ultAttckChild->SetName("UltAttackChild");
-            //位置をカメラと一緒にする
-            ultAttckChild->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
-
-            std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
-            rayCol->SetMyTag(COLLIDER_TAG::Player);
-            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
-            rayCol->SetEnabled(false);
-
-            //ダメージ処理用
-            std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
-            hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-            hitDamage->SetValue(100);
-
-            //キャラクターに登録
-            obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
-        }
-        //アタックウルトのエフェクト
-        {
-            std::shared_ptr<GameObject> attackUltEff = obj->AddChildObject();
-            attackUltEff->SetName("attackUltEFF");
-            std::shared_ptr<GPUParticle> eff = attackUltEff->AddComponent<GPUParticle>(nullptr, 100);
-            attackUltEff->transform_->SetRotation(obj->transform_->GetRotation());
-            attackUltEff->transform_->SetWorldPosition(obj->transform_->GetWorldPosition());
-            eff->Play();
-        }
-    }
-
-    //カメラをプレイヤーの子どもにして制御する
-    {
-        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
-        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
-        cameraPost->SetName("cameraPostPlayer");
-        std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-
-        //pico位置
-        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
-        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
-
-        //腕
-        {
-            std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
-            armChild->SetName("armChild");
-            armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
-            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
-            auto& anim = armChild->AddComponent<AnimationCom>();
-            anim->PlayAnimation(0, false);
-
-            //Eskill中エフェクト
-            {
-                std::shared_ptr<GameObject> eSkillEff = armChild->AddChildObject();
-                eSkillEff->SetName("eSkillEff");
-                std::shared_ptr<GPUParticle> eff = eSkillEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/InaESkill.gpuparticle", 100);
-                eSkillEff->transform_->SetEulerRotation({ -7,-3,-80 });
-                eSkillEff->transform_->SetLocalPosition({ -0.35f,9.84f,-0.58f });
-                eff->SetLoop(false);
-            }
-            //攻撃ため
-            {
-                std::shared_ptr<GameObject> chargeEff = armChild->AddChildObject();
-                chargeEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
-                chargeEff->SetName("chargeEff");
-                std::shared_ptr<GPUParticle> eff = chargeEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playercharge.gpuparticle", 300);
-                eff->SetLoop(false);
-                //銃口にくっ付ける
-                chargeEff->AddComponent<SetNodeWorldPosCom>();
-            }
-            //攻撃ためマックス
-            {
-                std::shared_ptr<GameObject> chargeMaxEff = armChild->AddChildObject();
-                chargeMaxEff->transform_->SetLocalPosition({ 0.98f,12.44f,6.96f });
-                chargeMaxEff->SetName("chargeMaxEff");
-                std::shared_ptr<GPUParticle> eff = chargeMaxEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerchargeFull.gpuparticle", 300);
-                eff->SetLoop(false);
-                //銃口にくっ付ける
-                chargeMaxEff->AddComponent<SetNodeWorldPosCom>();
-            }
-            //ウルトマズルフラッシュ
-            {
-                std::shared_ptr<GameObject> attackUltMuzzleEff = armChild->AddChildObject();
-                attackUltMuzzleEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
-                attackUltMuzzleEff->SetName("attackUltMuzzleEff");
-                std::shared_ptr<GPUParticle> eff = attackUltMuzzleEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltMuzzleF.gpuparticle", 20);
-                eff->SetLoop(false);
-            }
-            //ウルト中えふぇ１
-            {
-                std::shared_ptr<GameObject> attackUltSide1 = armChild->AddChildObject();
-                attackUltSide1->transform_->SetLocalPosition({ -7.915f,12.94f,1.69f });
-                attackUltSide1->SetName("attackUltSide1");
-                std::shared_ptr<GPUParticle> eff = attackUltSide1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltSide.gpuparticle", 5);
-                eff->SetLoop(false);
-            }
-            //ウルト中えふぇ２
-            {
-                std::shared_ptr<GameObject> attackUltSide2 = armChild->AddChildObject();
-                attackUltSide2->transform_->SetLocalPosition({ 1.094f,12.94f,1.69f });
-                attackUltSide2->SetName("attackUltSide2");
-                std::shared_ptr<GPUParticle> eff = attackUltSide2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltSide.gpuparticle", 5);
-                eff->SetLoop(false);
-            }
-        }
     }
 
     //snowparticle
