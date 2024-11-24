@@ -182,38 +182,38 @@ void Light::Update(float elapsedTime)
     }
     case	LightType::Point:
     {
-        //if (cb.pointLight.pointLightCount >= POINT_LIGHT_MAX)
-        //  break;
-        //rc.pointLightData[rc.pointLightCount].position.x = position.x;
-        //rc.pointLightData[rc.pointLightCount].position.y = position.y;
-        //rc.pointLightData[rc.pointLightCount].position.z = position.z;
-        //rc.pointLightData[rc.pointLightCount].position.w = 1.0f;
-        cb.pointLight[0].color = directioncolor * LP.power;
-        //rc.pointLightData[rc.pointLightCount].range = range;
-        //++rc.pointLightCount;
+        if (pointLightCount >= POINT_LIGHT_MAX)
+            break;
+        cb.pointLight[pointLightCount].position.x = position.x;
+        cb.pointLight[pointLightCount].position.y = position.y;
+        cb.pointLight[pointLightCount].position.z = position.z;
+        cb.pointLight[pointLightCount].position.w = 1.0f;
+        cb.pointLight[pointLightCount].color = directioncolor * LP.power;
+        cb.pointLight[pointLightCount].range = range;
+        ++pointLightCount;
         break;
     }
     case	LightType::Spot:
     {
-        //  if (rc.spotLightCount >= SpotLightMax)
-        //    break;
-        //  DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
-        //  DirectX::XMStoreFloat3(&direction, DirectX::XMVector3Normalize(Direction));
+        //if (rc.spotLightCount >= SpotLightMax)
+      //    break;
+      //  DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
+      //  DirectX::XMStoreFloat3(&direction, DirectX::XMVector3Normalize(Direction));
 
-        //  rc.spotLightData[rc.spotLightCount].position.x = position.x;
-        //  rc.spotLightData[rc.spotLightCount].position.y = position.y;
+      //  rc.spotLightData[rc.spotLightCount].position.x = position.x;
+      //  rc.spotLightData[rc.spotLightCount].position.y = position.y;
 
-       //  rc.spotLightData[rc.spotLightCount].position.z = position.z;
-        //  rc.spotLightData[rc.spotLightCount].position.w = 1.0f;
-        //  rc.spotLightData[rc.spotLightCount].direction.x = direction.x;
-        //  rc.spotLightData[rc.spotLightCount].direction.y = direction.y;
-        //  rc.spotLightData[rc.spotLightCount].direction.z = direction.z;
-        //  rc.spotLightData[rc.spotLightCount].direction.w = 0.0f;
-        //  rc.spotLightData[rc.spotLightCount].color = color * power;
-        //  rc.spotLightData[rc.spotLightCount].range = range;
-        //  rc.spotLightData[rc.spotLightCount].innerCorn = innerCorn;
-        //  rc.spotLightData[rc.spotLightCount].outerCorn = outerCorn;
-        //  ++rc.spotLightCount;
+      //  rc.spotLightData[rc.spotLightCount].position.z = position.z;
+      //  rc.spotLightData[rc.spotLightCount].position.w = 1.0f;
+      //  rc.spotLightData[rc.spotLightCount].direction.x = direction.x;
+      //  rc.spotLightData[rc.spotLightCount].direction.y = direction.y;
+      //  rc.spotLightData[rc.spotLightCount].direction.z = direction.z;
+      //  rc.spotLightData[rc.spotLightCount].direction.w = 0.0f;
+      //  rc.spotLightData[rc.spotLightCount].color = color * power;
+      //  rc.spotLightData[rc.spotLightCount].range = range;
+      //  rc.spotLightData[rc.spotLightCount].innerCorn = innerCorn;
+      //  rc.spotLightData[rc.spotLightCount].outerCorn = outerCorn;
+      //  ++rc.spotLightCount;
 
         cb.spotLight[0].color = directioncolor * LP.power;
 
