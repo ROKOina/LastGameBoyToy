@@ -15,7 +15,7 @@ Texture2D lutGGX : register(t13); // スカイボックスの色対応表
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
-// テクスチャからパラメーター取得
+    // テクスチャからパラメーター取得
     float4 albedoColor = colorMap.Sample(sampler_states[BLACK_BORDER_POINT], pin.texcoord.xy);
 
     // ワールド空間の法線
