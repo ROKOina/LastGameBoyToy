@@ -5,7 +5,6 @@
 #include "Graphics/Graphics.h"
 #include "Input/Input.h"
 #include "Framework.h"
-#include "Scene\SceneGame\SceneGame.h"
 #include "Scene\SceneManager.h"
 #include "Scene\SceneResult\SceneResult.h"
 #include "Scene/ScenePVE/ScenePVE.h"
@@ -30,6 +29,7 @@ Framework::Framework(HWND hWnd)
     //フィジックス初期化
     PhysXLib::Instance().Initialize();
 
+    //指定したシーンを選択
     SceneManager::Instance().ChangeScene(new SceneLGBT);
 
     // オーディオ初期化

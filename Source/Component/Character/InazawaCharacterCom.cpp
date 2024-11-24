@@ -58,7 +58,7 @@ void InazawaCharacterCom::OnGUI()
     ImGui::DragFloat("shootTime", &shootTime);
     ImGui::DragFloat("shootTimer", &shootTimer);
     auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-auto& armAnim = arm->GetComponent<AnimationCom>();
+    auto& armAnim = arm->GetComponent<AnimationCom>();
 
     ImGui::DragFloat("A", &AH);
 }
@@ -110,25 +110,15 @@ void InazawaCharacterCom::SubSkill()
 
 void InazawaCharacterCom::UltSkill()
 {
-    if (*GetRCounter() == 4)
+    int counter = *GetRCounter();
+    if (counter >= 0 && counter <= 4)
     {
-        GameObjectManager::Instance().Find("core0")->GetComponent<Sprite>()->EasingPlay();
-    }
-    else if (*GetRCounter() == 3)
-    {
-        GameObjectManager::Instance().Find("core1")->GetComponent<Sprite>()->EasingPlay();
-    }
-    else if (*GetRCounter() == 2)
-    {
-        GameObjectManager::Instance().Find("core2")->GetComponent<Sprite>()->EasingPlay();
-    }
-    else if (*GetRCounter() == 1)
-    {
-        GameObjectManager::Instance().Find("core3")->GetComponent<Sprite>()->EasingPlay();
-    }
-    else if (*GetRCounter() == 0)
-    {
-        GameObjectManager::Instance().Find("core4")->GetComponent<Sprite>()->EasingPlay();
+        std::string coreName = "core" + std::to_string(4 - counter);
+        const auto& sprite = GameObjectManager::Instance().Find(coreName.c_str())->GetComponent<Sprite>();
+        if (sprite)
+        {
+            sprite->EasingPlay();
+        }
     }
 
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
@@ -173,5 +163,4 @@ void InazawaCharacterCom::FPSArmAnimation()
 
     arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
         = 1 + v * 0.1f;
-
 }

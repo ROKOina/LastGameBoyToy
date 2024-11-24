@@ -16,6 +16,7 @@
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneTitle.h"
 #include "Scene/ScenePVE/ScenePVE.h"
+#include "Scene\ScenePVP\ScenePVP.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Character\RegisterChara.h"
@@ -132,11 +133,6 @@ void SceneTitle::Initialize()
 
         //‚Î‚Â
         {
-            {//ue
-                auto& next = obj->AddChildObject();
-                next->SetName("Batu0");
-                next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/batu.ui", Sprite::SpriteShader::DEFALT, false);
-            }
             {
                 auto& next = obj->AddChildObject();
                 next->SetName("Batu1");
@@ -241,7 +237,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
     //‰Šú‰»
     std::vector<SceneName> names;
     names.emplace_back("PVE", new ScenePVE, 560);
-    //names.emplace_back("PVP", new ScenePVE, 750);
+    names.emplace_back("PVP", new ScenePVP, 750);
     //names.emplace_back("Training", new ScenePVE, 940);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -264,7 +260,6 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
 
-                canvas->GetChildFind("Batu0")->SetEnabled(false);
                 canvas->GetChildFind("Batu1")->SetEnabled(false);
 
                 if (!SceneManager::Instance().GetTransitionFlag())

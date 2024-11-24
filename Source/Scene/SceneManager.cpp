@@ -5,8 +5,7 @@
 #include "Component\Character\CharacterCom.h"
 #include "Graphics/Graphics.h"
 #include "Input\Input.h"
-
-#include "SceneGame\SceneGame.h"
+#include "SceneLobby\SceneLobby.h"
 #include "ScenePVE/ScenePVE.h"
 #include "ScenePVP/ScenePVP.h"
 #include "SceneTitle/SceneTitle.h"
@@ -126,13 +125,13 @@ void SceneManager::ImGui()
         {
             constexpr const char* scene_names[] =
             {
-                "SceneGame",
+                "SceneLGBT",
                 "SceneTitle",
-                "SceneResult",
                 "ScenePVE",
                 "ScenePVP",
                 "SceneTraining",
-                "SceneLGBT"
+                "SceneLobby",
+                "SceneResult",
             };
             int scene_id = 0;
             int last_index = sizeof(scene_names) / sizeof(const char*);
@@ -145,13 +144,13 @@ void SceneManager::ImGui()
                 Scene* scenes[] =
                 {
                     // Game scenes
-                    new SceneGame,
+                    new SceneLGBT,
                     new SceneTitle,
-                    new SceneResult,
                     new ScenePVE,
                     new ScenePVP,
                     new SceneTraining,
-                    new SceneLGBT
+                    new SceneLobby,
+                    new SceneResult
                 };
                 ChangeScene((scenes[scene_id]));
                 for (int i = 0; i < _countof(scenes); i++)

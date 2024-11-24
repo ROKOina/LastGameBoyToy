@@ -237,7 +237,6 @@
     <ClInclude Include="Source\Netwark\Server.h" />
     <ClInclude Include="Source\Phsix\Physxlib.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
-    <ClInclude Include="Source\Scene\SceneGame\SceneGame.h" />
     <ClInclude Include="Source\Scene\SceneLGBT\SceneLGBT.h" />
     <ClInclude Include="Source\Scene\SceneLoading\SceneLoading.h" />
     <ClInclude Include="Source\Scene\SceneLobby\SceneLobby.h" />
@@ -368,7 +367,6 @@
     <ClCompile Include="Source\Netwark\Photon\StdIO_UIListener.cpp" />
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
-    <ClCompile Include="Source\Scene\SceneGame\SceneGame.cpp" />
     <ClCompile Include="Source\Scene\SceneLGBT\SceneLGBT.cpp" />
     <ClCompile Include="Source\Scene\SceneLoading\SceneLoading.cpp" />
     <ClCompile Include="Source\Scene\SceneLobby\SceneLobby.cpp" />

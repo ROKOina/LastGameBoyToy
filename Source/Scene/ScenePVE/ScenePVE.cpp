@@ -491,8 +491,6 @@ void ScenePVE::CreateUiObject()
             gauge->SetVariableValue(i);
         }
 
-     
-
         //UltFrame
         {
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");

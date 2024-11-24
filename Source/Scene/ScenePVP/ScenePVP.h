@@ -1,12 +1,6 @@
 #pragma once
 
 #include "Scene/Scene.h"
-#include "Component\Sprite\Sprite.h"
-#include "Audio\AudioSource.h"
-#include "Audio\Audio.h"
-
-#include "Component\System\GameObject.h"
-#include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 
 //リザルトシーン
@@ -30,4 +24,11 @@ public:
 
     //名前取得
     std::string GetName() const override { return "ScenePVP"; };
+
+    //UIのゲームオブジェクト生成
+    void CreateUiObject();
+
+private:
+
+    std::unique_ptr<BasicsApplication> photonNet;
 };
