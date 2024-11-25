@@ -11,7 +11,7 @@ class FrustumCom :public Component
 public:
 
     //初期化
-    void Start() override;
+    void Start() override {};
 
     //更新処理
     void Update(float elapsedTime)override;
@@ -21,17 +21,22 @@ public:
 
     //名前設定
     const char* GetName() const override { return "Frustum"; }
+
 private:
+
     //視錐台生成
-    void CalcurateFrustum();
+    void CalculateFrustum();
 
     //描画判定
-    void DrawJudgement();
+    void PerformDrawJudgement();
 
     //視錐台とAABBの当たり判定計算
-    bool IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, const DirectX::XMFLOAT3 radius);
+    bool IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, const DirectX::XMFLOAT3& radius);
 
-    bool check = false;
+    // 平面計算補助関数
+    void CalculatePlane(float a, float b, float c, float d, int index);
+
+private:
 
     struct  Plane
     {
@@ -39,12 +44,11 @@ private:
         float dist;
     };
 
-public:
     Plane plane[6];
     DirectX::XMFLOAT3 nearP[4] = {};
     DirectX::XMFLOAT3 farP[4] = {};
     DirectX::XMFLOAT3 outLineNorm[4] = {};
     DirectX::XMFLOAT3 cameraPos = { 0,0,0 };
-private:
     std::weak_ptr<CameraCom> cameraCom;
+    bool check = false;
 };

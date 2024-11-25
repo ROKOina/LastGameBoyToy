@@ -451,7 +451,7 @@ void StageEditorCom::TowerGimic(GameObj& place)
     place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/energy.gpuparticle", 6000);
     place->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/enemy.spawn");
     place->AddComponent<StageGimmick>();
-    //place->AddComponent<FrustumCom>();
+    place->AddComponent<FrustumCom>();
     place->GetComponent<RendererCom>()->SetOutlineColor({ 1.000f, 0.361f, 0.000f });
     place->GetComponent<RendererCom>()->SetOutlineIntensity(10.0f);
     std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 50);
