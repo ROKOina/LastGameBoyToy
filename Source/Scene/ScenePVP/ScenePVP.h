@@ -30,5 +30,10 @@ public:
 
 private:
 
+    //オブジェクト生成関数
+    void NewObject();
+
+private:
+
     std::unique_ptr<BasicsApplication> photonNet;
 };

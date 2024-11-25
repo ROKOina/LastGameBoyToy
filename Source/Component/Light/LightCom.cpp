@@ -182,15 +182,15 @@ void Light::Update(float elapsedTime)
     }
     case	LightType::Point:
     {
-        if (pointLightCount >= POINT_LIGHT_MAX)
-            break;
-        cb.pointLight[pointLightCount].position.x = position.x;
-        cb.pointLight[pointLightCount].position.y = position.y;
-        cb.pointLight[pointLightCount].position.z = position.z;
-        cb.pointLight[pointLightCount].position.w = 1.0f;
-        cb.pointLight[pointLightCount].color = directioncolor * LP.power;
-        cb.pointLight[pointLightCount].range = range;
-        ++pointLightCount;
+        //if (pointLightCount >= POINT_LIGHT_MAX)
+        //    break;
+        //cb.pointLight[pointLightCount].position.x = position.x;
+        //cb.pointLight[pointLightCount].position.y = position.y;
+        //cb.pointLight[pointLightCount].position.z = position.z;
+        //cb.pointLight[pointLightCount].position.w = 1.0f;
+        //cb.pointLight[pointLightCount].color = directioncolor * LP.power;
+        //cb.pointLight[pointLightCount].range = range;
+        //++pointLightCount;
         break;
     }
     case	LightType::Spot:

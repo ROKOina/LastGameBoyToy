@@ -121,4 +121,6 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_lightCb;       // 定数バッファ
     LightType m_lightType = LightType::Directional;		 // ライトタイプ
     DirectX::XMFLOAT4 directioncolor = { 1,1,1,1 };
+    int pointLightCount = 0;
+    int spotlightmax = 0;
 };

@@ -5,6 +5,19 @@
 
 StructuredBuffer<MainParticle> particlebuffer : register(t0);
 
+// クォータニオン回転関数
+float3 QuaternionRotate(float3 position, float4 q)
+{
+    float3 u = q.xyz;
+    float s = q.w;
+
+    float3 crossUPos = cross(u, position);
+    float dotUPos = dot(u, position);
+    float dotUU = dot(u, u);
+
+    return 2.0f * dotUPos * u + (s * s - dotUU) * position + 2.0f * s * crossUPos;
+}
+
 [maxvertexcount(4)]
 void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
 {
@@ -63,7 +76,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         //パーティクル遅延なし
         if (worldpos == 1)
         {
-            worldPosition = worldviewpos.xyz + scaledCornerPos;
+            worldPosition = worldviewpos.xyz + QuaternionRotate(scaledCornerPos, p.rotation);
         }
         //ストレッチビルボードあり
         else if (stretchFlag == 1)
@@ -73,12 +86,12 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
                 scaledCornerPos += -stretchDirection * strechscale;
             else
                 scaledCornerPos += stretchDirection * strechscale;
-            worldPosition = viewpos.xyz + scaledCornerPos;
+            worldPosition = viewpos.xyz + QuaternionRotate(scaledCornerPos, p.rotation);
         }
         //それ以外
         else
         {
-            worldPosition = viewpos.xyz + scaledCornerPos;
+            worldPosition = viewpos.xyz + QuaternionRotate(scaledCornerPos, p.rotation);
         }
 
         element.position = mul(float4(worldPosition, 1.0f), projection);
