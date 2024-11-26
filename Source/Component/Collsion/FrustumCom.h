@@ -43,5 +43,4 @@ private:
     };
 
     Plane plane[6];
-    bool check = false;
 };

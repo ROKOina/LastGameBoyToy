@@ -19,7 +19,6 @@ void FrustumCom::Update(float elapsedTime)
 // GUI•`‰æ
 void FrustumCom::OnGUI()
 {
-    ImGui::Checkbox("Draw", &check);
 }
 
 // •`‰æ”»’è
@@ -39,12 +38,10 @@ void FrustumCom::PerformDrawJudgement()
     if (IntersectFrustumVsAABB(pos, bounds))
     {
         renderer->SetEnabled(true);
-        check = true;
     }
     else
     {
         renderer->SetEnabled(false);
-        check = false;
     }
 }
 
