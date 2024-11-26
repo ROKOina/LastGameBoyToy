@@ -4,8 +4,6 @@
 #include <DirectXMath.h>
 #include "Component/System/Component.h"
 
-#define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
-
 class FrustumCom :public Component
 {
 public:
@@ -45,10 +43,5 @@ private:
     };
 
     Plane plane[6];
-    DirectX::XMFLOAT3 nearP[4] = {};
-    DirectX::XMFLOAT3 farP[4] = {};
-    DirectX::XMFLOAT3 outLineNorm[4] = {};
-    DirectX::XMFLOAT3 cameraPos = { 0,0,0 };
-    std::weak_ptr<CameraCom> cameraCom;
     bool check = false;
 };

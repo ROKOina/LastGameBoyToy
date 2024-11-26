@@ -33,8 +33,9 @@ void FrustumCom::PerformDrawJudgement()
     DirectX::XMFLOAT3 bounds = renderer->GetBounds();
 
     //バウンディングボックス描画
-    Graphics::Instance().GetDebugRenderer()->DrawBox(pos, bounds, { 1,0,0,1 });
+    Graphics::Instance().GetDebugRenderer()->DrawBox(pos, bounds, { 0,1,0,1 });
 
+    //描画するかを判定する
     if (IntersectFrustumVsAABB(pos, bounds))
     {
         renderer->SetEnabled(true);
@@ -119,7 +120,7 @@ void FrustumCom::CalculateFrustum() {
     else
     {
         DirectX::XMStoreFloat4x4(&viewMatrix, DirectX::XMMatrixIdentity());
-        fov = 100;
+        fov = 1000;
     }
 
     // プロジェクション行列
