@@ -413,11 +413,18 @@ void ScenePVP::NewObject()
         obj->SetName("testcpuparticle");
         obj->AddComponent<CPUParticle>(nullptr, 10000);
     }
+    ImGui::SameLine();
     if (ImGui::Button("ui"))
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("testui");
         obj->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, true);
+    }
+    if (ImGui::Button("light"))
+    {
+        std::shared_ptr<GameObject>obj = GameObjectManager::Instance().Create();
+        obj->SetName("testlight");
+        obj->AddComponent<Light>(nullptr);
     }
 
     ImGui::End();

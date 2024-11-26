@@ -98,7 +98,7 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
 {
     //形状を判定
     std::shared_ptr<SphereColliderCom> sphere;
-    Model* model=nullptr;
+    Model* model = nullptr;
     std::weak_ptr<NodeCollsionCom> nodeCol;
 
     if (isMyRay)    //自分がスフィア
@@ -236,7 +236,6 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
             }
         }
     }
-
 
     return isHit;
 }

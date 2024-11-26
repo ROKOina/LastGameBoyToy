@@ -37,12 +37,6 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         float2(1.0f, 1.0f), // 右下
     };
 
-    // 簡易的なライティング計算
-    float3 N = normalize(float3(0, 0, 1)); // パーティクル面法線 (デフォルトZ方向)
-    float3 L = normalize(-directionalLight.direction.xyz);
-    float d = dot(L, N);
-    float power = max(0, d) * 0.5f + 0.5f;
-
     //実体を作る
     MainParticle p = particlebuffer[input[0].vertex_id];
 
@@ -95,7 +89,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         }
 
         element.position = mul(float4(worldPosition, 1.0f), projection);
-        element.color.rgb = p.color.rgb * power * baseColor.rgb;
+        element.color.rgb = p.color.rgb * baseColor.rgb;
         element.color.a = p.color.a * baseColor.a;
         element.color.rgb *= colorScale;
         element.texcoord = TEXCOORD[i];

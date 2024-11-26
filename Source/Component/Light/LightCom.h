@@ -12,7 +12,7 @@ public:
     ~Light() {};
 
     //初期設定
-    void Start()override;
+    void Start()override {};
 
     //更新処理
     void Update(float elapsedTime)override;
@@ -44,6 +44,25 @@ public:
 
 public:
 
+    //ライトのパラメータ
+    struct LightParameter
+    {
+        float power = 1.0f;          //ライトの光の強さ
+        int lighttype = 0;           //ライトタイプ
+        DirectX::XMFLOAT4 color;     // 色
+        DirectX::XMFLOAT3 position;  // Point/Spot用位置
+        DirectX::XMFLOAT3 direction; // Directional/Spot用方向
+        float range;                 // Point/Spot用範囲
+        float innerCone;             // Spot用インナー角
+        float outerCone;             // Spot用アウター角
+
+        template<class Archive>
+        void serialize(Archive& archive, int version);
+    };
+    std::vector<LightParameter> LP = {};
+
+private:
+
     // 光源タイプ
     enum class LightType
     {
@@ -58,9 +77,6 @@ public:
     {
         DirectX::XMFLOAT4	direction = { 0.0f,-1.0f,-1.0f,0.0f };
         DirectX::XMFLOAT4	color = { 1,1,1,1 };
-
-        template<class Archive>
-        void serialize(Archive& archive, int version);
     };
 
     // 点光源情報
@@ -70,12 +86,9 @@ public:
         DirectX::XMFLOAT4	color = { 1,1,1,1 };
         float			    range = { 1.0f };
         DirectX::XMFLOAT3	dummy = {};
-
-        template<class Archive>
-        void serialize(Archive& archive, int version);
     };
     // 点光源の最大数
-    static	constexpr	int	POINT_LIGHT_MAX = 10;
+    static	constexpr	int	POINT_LIGHT_MAX = 1;
 
     // スポットライト情報
     struct SpotLightData
@@ -87,12 +100,9 @@ public:
         float			    innerCorn = {}; 	// インナー角度範囲
         float			    outerCorn = {}; 	// アウター角度範囲
         float			    dummy = {};
-
-        template<class Archive>
-        void serialize(Archive& archive, int version);
     };
     // スポットライトの最大数
-    static	constexpr	int	SPOT_LIGHT_MAX = 10;
+    static	constexpr	int	SPOT_LIGHT_MAX = 1;
 
     // 定数バッファ用構造体
     struct LightCB
@@ -100,27 +110,10 @@ public:
         DirectionalLightData directionalLight = {};
         PointLightData       pointLight[POINT_LIGHT_MAX];
         SpotLightData        spotLight[SPOT_LIGHT_MAX];
-
-        template<class Archive>
-        void serialize(Archive& archive, int version);
     };
     LightCB cb = {};
-
-    //ライトのパラメータ
-    struct LightParameter
-    {
-        float power = 1.0f;        //ライトの光の強さ
-        int lighttype = 0;         //ライトタイプ
-
-        template<class Archive>
-        void serialize(Archive& archive, int version);
-    };
-    LightParameter LP = {};
 
 private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_lightCb;       // 定数バッファ
     LightType m_lightType = LightType::Directional;		 // ライトタイプ
-    DirectX::XMFLOAT4 directioncolor = { 1,1,1,1 };
-    int pointLightCount = 0;
-    int spotlightmax = 0;
 };
