@@ -12,7 +12,7 @@ void MissileCom::Update(float elapsedTime)
 {
     GameObj player = GameObjectManager::Instance().Find("player");
     AudioCom* audio = GetGameObject()->GetComponent<AudioCom>().get();
-    
+
     if (!playFlag)
     {
         //ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚É‰‚¶‚Ä‰¹‚ğ‘å‚«‚­
