@@ -109,7 +109,7 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj);
     }
 
     //snowparticle
@@ -120,7 +120,7 @@ void ScenePVP::Initialize()
     }
 
     //UIゲームオブジェクト生成
-    CreateUiObject();
+    //CreateUiObject();
 
 #pragma endregion
 

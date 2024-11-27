@@ -11,6 +11,7 @@
 #include "InazawaCharacterCom.h"
 #include "HaveAllAttackCharacter.h"
 #include "Picohard.h"
+#include "JankratCharacterCom.h"
 #include "Component/Particle/CPUParticle.h"
 #include "Component/Collsion/PushBackCom.h"
 #include "Component/System/HitProcessCom.h"
@@ -33,6 +34,9 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
         break;
     case RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK:
         HaveAllAttackChara(obj);
+        break;
+    case RegisterChara::CHARA_LIST::JANKRAT:
+        JankratChara(obj);
         break;
     default:
         break;
@@ -404,4 +408,27 @@ void RegisterChara::PicohardChara(std::shared_ptr<GameObject>& obj)
         sph->SetRadius(1);
         sph->SetEnabled(false);
     }
+}
+
+void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
+{
+    obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+    r->LoadModel("Data/Model/player_True/player.mdl");
+    r->SetDissolveThreshold(1.0f);
+    obj->AddComponent<AnimationCom>();
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+    std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
+
+
+    std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
+    cameraPost->SetName("cameraPostPlayer");
+    std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
+    fpscamera->ActiveCameraChange();
+
+    //ƒJƒƒ‰ˆÊ’u
+    cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
+    obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 }

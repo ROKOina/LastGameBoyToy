@@ -22,6 +22,7 @@ public:
         INAZAWA,
         HAVE_ALL_ATTACK,
         PICOHARD,
+        JANKRAT,
         MAX,
     };
 
@@ -33,4 +34,5 @@ private:
     void HaveAllAttackChara(std::shared_ptr<GameObject>& obj);
     void UenoChara(std::shared_ptr<GameObject>& obj);
     void PicohardChara(std::shared_ptr<GameObject>& obj);
+    void JankratChara(std::shared_ptr<GameObject>& obj);
 };
