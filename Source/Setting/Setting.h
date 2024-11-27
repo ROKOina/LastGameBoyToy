@@ -50,4 +50,7 @@ private:
 
     //Š´“x•Û‘¶
     int sensitivity = 30;
+
+    //swich•¶—p•Ï”
+    int state = 0;
 };

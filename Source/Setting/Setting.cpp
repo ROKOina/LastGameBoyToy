@@ -21,6 +21,14 @@ void SettingScreen::CreateSettingUiObject()
         settingTitle->AddComponent<Sprite>("Data/SerializeData/UIData/setting/settingTitle.ui", Sprite::SpriteShader::DEFALT, false);
     }
 
+    //外枠
+    {
+        auto& frame = obj->AddChildObject();
+        frame->SetName("settingFrame");
+        frame->AddComponent<Sprite>("Data/SerializeData/UIData/setting/settingFrame.ui", Sprite::SpriteShader::DEFALT, false);
+
+    }
+
     std::vector<int> barInitial;
 
     //感度
@@ -178,8 +186,22 @@ void SettingScreen::CreateSettingUiObject()
 
 void SettingScreen::SettingScreenUpdate(float elaspedTime)
 {
-    if (!viewSetting)return;
-
+    if (!viewSetting) {
+        state = 0;
+        return;
+    }
+    
+    
+   // switch (state)
+   // {
+   // case 0:
+   //     auto& farame = GameObjectManager::Instance().Find("settingFrame");
+   //     auto& frameSprite = farame->GetComponent<Sprite>();
+   //
+   //     break;
+   // case 1:
+   //     break;
+   // }
     //バーに応じて数値を変える
     for (auto& bar : barObj)
     {

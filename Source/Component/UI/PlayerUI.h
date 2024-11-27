@@ -23,6 +23,25 @@ private:
     DirectX::XMFLOAT2 maxPos = {};
 };
 
+//class UI_SkillManager : public Component
+//{
+//    //コンポーネントオーバーライド
+//public:
+//    UI_SkillManager(int num);
+//    ~UI_SkillManager() {}
+//
+//    // 名前取得
+//    const char* GetName() const override { return "UI_BoostGauge"; }
+//
+//    // 開始処理
+//    void Start() override;
+//
+//    // 更新処理
+//    void Update(float elapsedTime) override;
+//
+//private:
+//};
+
 class UI_BoosGauge : public Component
 {
     //コンポーネントオーバーライド

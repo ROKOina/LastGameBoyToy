@@ -530,3 +530,4 @@ void UI_Reticle::Start()
 void UI_Reticle::Update(float elapsedTime)
 {
 }
+
