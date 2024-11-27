@@ -3,85 +3,57 @@
 #include "Component/Renderer/RendererCom.h"
 #include "Scene/SceneManager.h"
 #include "Component/Camera/CameraCom.h"
-#include "Component/Camera/FreeCameraCom.h"
-#include "Component/Camera/FPSCameraCom.h"
-#include "Component/Camera/EventCameraCom.h"
-#include "Graphics\Graphics.h"
+#include "Graphics/Graphics.h"
+#include <DirectXMath.h>
 
-//初期化
-void FrustumCom::Start()
-{
-}
-
-//更新処理
+// 更新処理
 void FrustumCom::Update(float elapsedTime)
 {
-    //視錐台計算
-    CalcurateFrustum();
+    // 視錐台計算
+    CalculateFrustum();
 
-    //描画判定
-    DrawJudgement();
+    // 描画判定
+    PerformDrawJudgement();
 }
 
-//GUI描画
+// GUI描画
 void FrustumCom::OnGUI()
 {
-    ImGui::Checkbox("Draw", &check);
-
-    for (int i = 0; i < 4; i++)
-    {
-        Graphics::Instance().GetDebugRenderer()->DrawSphere(
-            nearP[i], 0.1f, { 1,0,0,1 });
-        Graphics::Instance().GetDebugRenderer()->DrawSphere(
-            farP[i], 10.0f, { 1,1,0,1 });
-    }
-    ImGui::InputFloat3("nearP0", &nearP[0].x);
-    ImGui::InputFloat3("nearP1", &nearP[1].x);
-    ImGui::InputFloat3("nearP2", &nearP[2].x);
-    ImGui::InputFloat3("nearP3", &nearP[3].x);
-
-    ImGui::InputFloat3("farP0", &farP[0].x);
-    ImGui::InputFloat3("farP1", &farP[1].x);
-    ImGui::InputFloat3("farP2", &farP[2].x);
-    ImGui::InputFloat3("farP3", &farP[3].x);
 }
 
-//描画判定
-void FrustumCom::DrawJudgement()
+// 描画判定
+void FrustumCom::PerformDrawJudgement()
 {
+    // オブジェクトの AABB 情報を取得
+    const auto& renderer = GetGameObject()->GetComponent<RendererCom>();
+    if (!renderer) return;
+
     DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
+    DirectX::XMFLOAT3 bounds = renderer->GetBounds();
 
-    pos += GetGameObject()->GetComponent<RendererCom>()->GetBoundsMin() + GetGameObject()->GetComponent<RendererCom>()->GetBounds();
+    //バウンディングボックス描画
+    Graphics::Instance().GetDebugRenderer()->DrawBox(pos, bounds, { 0,1,0,1 });
 
-    if (IntersectFrustumVsAABB(pos, GetGameObject()->GetComponent<RendererCom>()->GetBounds()))
+    //描画するかを判定する
+    if (IntersectFrustumVsAABB(pos, bounds))
     {
-        GetGameObject()->GetComponent<RendererCom>()->SetEnabled(true);
-
-        check = true;
+        renderer->SetEnabled(true);
     }
     else
     {
-        GetGameObject()->GetComponent<RendererCom>()->SetEnabled(false);
-
-        check = false;
+        renderer->SetEnabled(false);
     }
 }
 
-//視錐台とAABBの当たり判定計算
-bool FrustumCom::IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, const DirectX::XMFLOAT3 radius)
+// 視錐台と AABB の当たり判定計算
+bool FrustumCom::IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, const DirectX::XMFLOAT3& radius)
 {
-    //あたったかあたってないか
-    int collisionState = 0;
-
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 6; ++i)
     {
-        //④角平面の法線の成分を用いてAABBの8頂点の中から最近点と最遠点を求める
-        //最短点をいったんAABBの中心とする
-        DirectX::XMFLOAT3 negaPos = aabbPosition;//最近点
-        DirectX::XMFLOAT3 posiPos = aabbPosition;//最遠点
-        //法線Nの成分がプラスなら、最遠点の座標に半径を加算する
+        // 最近点と最遠点を計算
+        DirectX::XMFLOAT3 negaPos = aabbPosition;
+        DirectX::XMFLOAT3 posiPos = aabbPosition;
 
-        //最遠点
         if (plane[i].normal.x > 0.0f)
         {
             posiPos.x += radius.x;
@@ -92,6 +64,7 @@ bool FrustumCom::IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, c
             posiPos.x -= radius.x;
             negaPos.x += radius.x;
         }
+
         if (plane[i].normal.y > 0.0f)
         {
             posiPos.y += radius.y;
@@ -102,6 +75,7 @@ bool FrustumCom::IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, c
             posiPos.y -= radius.y;
             negaPos.y += radius.y;
         }
+
         if (plane[i].normal.z > 0.0f)
         {
             posiPos.z += radius.z;
@@ -113,142 +87,75 @@ bool FrustumCom::IntersectFrustumVsAABB(const DirectX::XMFLOAT3& aabbPosition, c
             negaPos.z += radius.z;
         }
 
-        //  外部と分かれば処理をbreakし確定させる
-        //  交差状態であれば、ステータスを変更してから次の平面とのチェックに続ける
-        //  内部であれば、そのまま次の平面とのチェックに続ける
+        // 平面と最近点・最遠点の距離を計算
+        float negaDist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[i].normal), DirectX::XMLoadFloat3(&negaPos)));
+        float posiDist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[i].normal), DirectX::XMLoadFloat3(&posiPos)));
 
-        float negaN = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[i].normal), DirectX::XMLoadFloat3(&negaPos)));
-        float posiN = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[i].normal), DirectX::XMLoadFloat3(&posiPos)));
-        if (plane[i].dist < negaN && plane[i].dist < posiN)
+        if (negaDist + plane[i].dist < 0.0f)
         {
-            collisionState = 0;
-            continue;
-        }
-        else if (plane[i].dist < negaN != plane[i].dist < posiN)
-        {
-            collisionState = 1;
-        }
-        else
-        {
-            collisionState = 2;
-            break;
+            return false;  // 完全に外部
         }
     }
-    if (collisionState == 2)
-    {
-        return false;
-    }
-    else return true;
+    return true;  // AABB は視錐台内または交差している
 }
 
-//視錐台計算
-void FrustumCom::CalcurateFrustum()
-{
+// 視錐台計算
+void FrustumCom::CalculateFrustum() {
     Graphics& graphics = Graphics::Instance();
 
-    DirectX::XMFLOAT4X4 cameraview = {};
-
-    // FPSカメラだけで良い
+    // ビュー行列を取得
+    DirectX::XMFLOAT4X4 viewMatrix = {};
+    float fov = {};
     if (const auto& cameraObject = GameObjectManager::Instance().Find("cameraPostPlayer"))
     {
-        if (const auto& fpscamera = cameraObject->GetComponent<CameraCom>())
+        if (const auto& fpsCamera = cameraObject->GetComponent<CameraCom>())
         {
-            cameraview = fpscamera->GetView();
+            viewMatrix = fpsCamera->GetView();
+            fov = fpsCamera->GetFov();
         }
     }
-
-    //ビュープロジェクション行列を取得する
-    DirectX::XMMATRIX matrix = {};
-    DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(&cameraview);
-    DirectX::XMMATRIX projMat = DirectX::XMMatrixPerspectiveFovLH(70, Graphics::Instance().GetScreenWidth() / Graphics::Instance().GetScreenHeight(), 0.01f, 1000.0f);
-
-    matrix = viewMat * projMat;
-
-    //ビュープロジェクション行列の逆行列
-    DirectX::XMMATRIX inv_matrix = DirectX::XMMatrixInverse(nullptr, matrix);
-
-    //ビュープロジェクション内の頂点算出用位置ベクトル
-    DirectX::XMVECTOR verts[8] =
+    else
     {
-        //near plane corners
-        {-1,-1,0},//[0]:左下
-        {1,-1,0},//[1]:右下
-        {1,1,0},//[2]:左上
-        {-1,1,0},//[3]:右上
-
-        //far plane cornesrs.
-        {-1,-1,1},//[4]:左下
-        {1,-1,1},//[5]:右下
-        {1,1,1},//[6]:左上
-        {-1,1,1}//[7]:右上
-    };
-
-    //ビュープロジェクション行列の逆行列を用いて,各頂点を算出する
-    for (int i = 0; i < 4; ++i)
-    {
-        DirectX::XMStoreFloat3(&nearP[i], DirectX::XMVector3TransformCoord(verts[i], inv_matrix));
-    }
-    for (int i = 0; i < 4; ++i)
-    {
-        DirectX::XMStoreFloat3(&farP[i], DirectX::XMVector3TransformCoord(verts[i + 4], inv_matrix));
+        DirectX::XMStoreFloat4x4(&viewMatrix, DirectX::XMMatrixIdentity());
+        fov = 1000;
     }
 
-    //視錐台（フラスタム）を構成する６平面を算出する
-    // 0:左側面, 1:右側面, 2:下側面, 3:上側面, 4:奥側面,5:手前側面
+    // プロジェクション行列
+    DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(
+        DirectX::XMConvertToRadians(fov),  // FOV
+        graphics.GetScreenWidth() / graphics.GetScreenHeight(),  // アスペクト比
+        0.01f,  // ニアクリップ
+        1000.0f // ファークリップ
+    );
 
-    DirectX::XMFLOAT4X4 matrix4X4 = {};
-    DirectX::XMStoreFloat4x4(&matrix4X4, matrix);
-    //全ての面の法線は内側を向くように設定すること
+    // ビュー×プロジェクション行列
+    DirectX::XMMATRIX viewProjMatrix = DirectX::XMLoadFloat4x4(&viewMatrix) * projMatrix;
 
-    //左側面
-    plane[0].normal.x = matrix4X4._14 + matrix4X4._11;
-    plane[0].normal.y = matrix4X4._24 + matrix4X4._21;
-    plane[0].normal.z = matrix4X4._34 + matrix4X4._31;
-    DirectX::XMStoreFloat3(&plane[0].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane[0].normal)));
-    plane[0].dist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[0].normal), DirectX::XMLoadFloat3(&farP[0])));
+    // 各平面の法線と距離を計算
+    const DirectX::XMFLOAT4X4 matrix = [&]() {
+        DirectX::XMFLOAT4X4 m;
+        DirectX::XMStoreFloat4x4(&m, viewProjMatrix);
+        return m;
+        }();
 
-    //右側面
-    plane[1].normal.x = matrix4X4._14 - matrix4X4._11;
-    plane[1].normal.y = matrix4X4._24 - matrix4X4._21;
-    plane[1].normal.z = matrix4X4._34 - matrix4X4._31;
-    DirectX::XMStoreFloat3(&plane[1].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane[1].normal)));
-    plane[1].dist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[1].normal), DirectX::XMLoadFloat3(&farP[1])));
+    // 左平面
+    CalculatePlane(matrix._14 + matrix._11, matrix._24 + matrix._21, matrix._34 + matrix._31, matrix._44 + matrix._41, 0);
+    // 右平面
+    CalculatePlane(matrix._14 - matrix._11, matrix._24 - matrix._21, matrix._34 - matrix._31, matrix._44 - matrix._41, 1);
+    // 下平面
+    CalculatePlane(matrix._14 + matrix._12, matrix._24 + matrix._22, matrix._34 + matrix._32, matrix._44 + matrix._42, 2);
+    // 上平面
+    CalculatePlane(matrix._14 - matrix._12, matrix._24 - matrix._22, matrix._34 - matrix._32, matrix._44 - matrix._42, 3);
+    // 奥平面
+    CalculatePlane(matrix._14 - matrix._13, matrix._24 - matrix._23, matrix._34 - matrix._33, matrix._44 - matrix._43, 4);
+    // 手前平面
+    CalculatePlane(matrix._14 + matrix._13, matrix._24 + matrix._23, matrix._34 + matrix._33, matrix._44 + matrix._43, 5);
+}
 
-    //下側面
-    plane[2].normal.x = matrix4X4._14 + matrix4X4._12;
-    plane[2].normal.y = matrix4X4._24 + matrix4X4._22;
-    plane[2].normal.z = matrix4X4._34 + matrix4X4._32;
-    DirectX::XMStoreFloat3(&plane[2].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane[2].normal)));
-    plane[2].dist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[2].normal), DirectX::XMLoadFloat3(&farP[1])));
-
-    //上側面
-    plane[3].normal.x = matrix4X4._14 - matrix4X4._12;
-    plane[3].normal.y = matrix4X4._24 - matrix4X4._22;
-    plane[3].normal.z = matrix4X4._34 - matrix4X4._32;
-    DirectX::XMStoreFloat3(&plane[3].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane[3].normal)));
-    plane[3].dist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[3].normal), DirectX::XMLoadFloat3(&farP[2])));
-
-    //奥側面
-    plane[4].normal.x = matrix4X4._14 - matrix4X4._13;
-    plane[4].normal.y = matrix4X4._24 - matrix4X4._23;
-    plane[4].normal.z = matrix4X4._34 - matrix4X4._33;
-    DirectX::XMStoreFloat3(&plane[4].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane[4].normal)));
-    plane[4].dist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[4].normal), DirectX::XMLoadFloat3(&farP[2])));
-
-    //手前側面
-    plane[5].normal.x = matrix4X4._14 + matrix4X4._13;
-    plane[5].normal.y = matrix4X4._24 + matrix4X4._23;
-    plane[5].normal.z = matrix4X4._34 + matrix4X4._33;
-    DirectX::XMStoreFloat3(&plane[5].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&plane[5].normal)));
-    plane[5].dist = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&plane[5].normal), DirectX::XMLoadFloat3(&nearP[0])));
-
-    //各境界線outLineNormを面の法線の外積から求めて正規化
-    //左下境界線
-    DirectX::XMStoreFloat3(&outLineNorm[0], DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&plane[0].normal), DirectX::XMLoadFloat3(&plane[2].normal))));
-    //右下境界線
-    DirectX::XMStoreFloat3(&outLineNorm[1], DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&plane[2].normal), DirectX::XMLoadFloat3(&plane[1].normal))));
-    //右上境界線
-    DirectX::XMStoreFloat3(&outLineNorm[2], DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&plane[1].normal), DirectX::XMLoadFloat3(&plane[3].normal))));
-    //左上境界線
-    DirectX::XMStoreFloat3(&outLineNorm[3], DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMLoadFloat3(&plane[3].normal), DirectX::XMLoadFloat3(&plane[0].normal))));
+// 平面計算補助関数
+void FrustumCom::CalculatePlane(float a, float b, float c, float d, int index)
+{
+    DirectX::XMFLOAT3 normal = { a, b, c };
+    DirectX::XMStoreFloat3(&plane[index].normal, DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&normal)));
+    plane[index].dist = d / DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMLoadFloat3(&normal)));
 }

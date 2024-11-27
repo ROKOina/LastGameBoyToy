@@ -60,7 +60,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         p.velocity.y -= lerp(emitStartGravity, emitEndGravity, lerprate) ;
 
         // 浮力の適用
-        p.velocity.y += buoyancy ;
+        p.velocity.y += buoyancy;
 
         //速力更新;
         p.velocity += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate); // 速力の更新

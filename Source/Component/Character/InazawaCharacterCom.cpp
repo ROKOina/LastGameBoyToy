@@ -126,6 +126,7 @@ void InazawaCharacterCom::UltSkill()
 
 void InazawaCharacterCom::FPSArmAnimation()
 {
+    if (std::string(GetGameObject()->GetName()) != "player")return;
     auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
     auto& armAnim = arm->GetComponent<AnimationCom>();
 

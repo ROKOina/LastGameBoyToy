@@ -5,7 +5,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Model/Model.h"
 
-#define MAX_BONES 256
+#define MAX_BONES 60
 
 class ModelShader
 {
@@ -32,6 +32,7 @@ public:
     struct objectconstants
     {
         DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
+        DirectX::XMFLOAT4X4 OffsetTransforms[MAX_BONES] = {};
     };
 
     //サブセットのコンスタントバッファ

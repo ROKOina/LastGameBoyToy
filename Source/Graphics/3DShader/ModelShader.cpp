@@ -128,14 +128,25 @@ void ModelShader::SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::No
     {
         for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
         {
+            // オフセット行列を読み込む
             DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-            DirectX::XMMATRIX boneTransform = offsetTransform * DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+
+            // ボーンのワールド変換行列を取得
+            DirectX::XMMATRIX boneTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+
+            // 定数バッファーに送るため、それぞれ保存
+            DirectX::XMStoreFloat4x4(&m_objectconstants->data.OffsetTransforms[i], offsetTransform);
             DirectX::XMStoreFloat4x4(&m_objectconstants->data.BoneTransforms[i], boneTransform);
         }
     }
     else
     {
-        DirectX::XMStoreFloat4x4(&m_objectconstants->data.BoneTransforms[0], DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndex).worldTransform));
+        // ボーンが1つの場合の処理
+        DirectX::XMMATRIX offsetTransform = DirectX::XMMatrixIdentity(); // オフセット行列は単位行列
+        DirectX::XMMATRIX boneTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndex).worldTransform);
+
+        DirectX::XMStoreFloat4x4(&m_objectconstants->data.OffsetTransforms[0], offsetTransform);
+        DirectX::XMStoreFloat4x4(&m_objectconstants->data.BoneTransforms[0], boneTransform);
     }
 
     //コンスタントバッファの更新

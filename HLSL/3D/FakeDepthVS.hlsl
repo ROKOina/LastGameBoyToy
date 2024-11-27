@@ -23,11 +23,11 @@ VS_OUT main(VS_IN vin)
     vout.color.rgb = vin.color.rgb * materialcolor.rgb;
     vout.color.a = vin.color.a * materialcolor.a;
     vout.texcoord = vin.texcoord;
-    
+
     // 接空間(タンジェント)のカメラベクトル
     float3 cameraVec = normalize(cameraposition.xyz - p.xyz);
     float3x3 rotation = float3x3(vout.tangent.xyz, vout.binormal, vout.normal);
     vout.cameraTangent = normalize(mul(rotation, cameraVec));
-    
+
     return vout;
 }

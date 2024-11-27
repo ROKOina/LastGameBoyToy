@@ -52,20 +52,13 @@ void BulletCom::Update(float elapsedTime)
         else if (GetGameObject()->GetComponent<HitProcessCom>()->IsHitNonChara(nonCharaObj))
         {
             //ヒットエフェクト生成
-            {
-                std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
-                hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
-                hiteffectobject->SetName("HitEffect");
-                std::shared_ptr<GPUParticle>hiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
-                hiteffct->Play();
-            }
-            {
-                std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
-                hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
-                hiteffectobject->SetName("HitSmokeEffect");
-                std::shared_ptr<CPUParticle>hiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 1000);
-                hiteffct->SetActive(true);
-            }
+            std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
+            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+            hiteffectobject->SetName("HitEffect");
+            std::shared_ptr<GPUParticle>Chiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
+            Chiteffct->Play();
+            std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
+            Ghiteffct->SetActive(true);
 
             GameObjectManager::Instance().Remove(this->GetGameObject());
             GameObjectManager::Instance().Remove(viewBullet.lock());
@@ -161,7 +154,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     auto& arm = cameraObj->GetChildFind("armChild");
     if (arm)
     {
-        const auto& model= arm->GetComponent<RendererCom>()->GetModel();
+        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
         const auto& node = model->FindNode("gun2");
 
         DirectX::XMFLOAT3 gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
@@ -184,7 +177,6 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     std::shared_ptr<GameObject>bullettrajectory = viewObj->AddChildObject();
     std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
     bullettrajectoryparticle->Play();
-
 
     //判定部分
     GameObj colObj = GameObjectManager::Instance().Create();
