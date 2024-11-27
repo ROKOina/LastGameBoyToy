@@ -331,15 +331,17 @@ void PhotonLib::LobbyImGui()
             ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
 
             std::string selectRoom = WStringToString(rooms[i]->getName().cstr());
-            ImGui::TreeNodeEx(&rooms[i], nodeFlags, selectRoom.c_str());
-
-            // クリックすると選択
-            if (ImGui::IsItemClicked())
+            if (ImGui::TreeNodeEx(&rooms[i], nodeFlags, selectRoom.c_str()))
             {
-                roomName = selectRoom;
-            }
 
-            ImGui::TreePop();
+                // クリックすると選択
+                if (ImGui::IsItemClicked())
+                {
+                    roomName = selectRoom;
+                }
+
+                ImGui::TreePop();
+            }
         }
 
         ImGui::End();
