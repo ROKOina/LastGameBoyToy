@@ -3,6 +3,7 @@
 #include "Component\System\TransformCom.h"
 #include "Math\Mathf.h"
 #include <cereal/cereal.hpp>
+#include <cereal\types\vector.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
 #include <SystemStruct\Dialog.h>
@@ -10,11 +11,7 @@
 #include <fstream>
 #include <filesystem>
 
-CEREAL_CLASS_VERSION(Light::DirectionalLightData, 1)
-CEREAL_CLASS_VERSION(Light::LightCB, 1)
 CEREAL_CLASS_VERSION(Light::LightParameter, 1)
-CEREAL_CLASS_VERSION(Light::PointLightData, 1)
-CEREAL_CLASS_VERSION(Light::SpotLightData, 1)
 
 // シリアライズ
 namespace DirectX
@@ -73,61 +70,22 @@ namespace DirectX
 }
 
 template<class Archive>
-void Light::DirectionalLightData::serialize(Archive& archive, int version)
-{
-    archive
-    (
-        CEREAL_NVP(direction),
-        CEREAL_NVP(color)
-    );
-}
-
-template<class Archive>
-void Light::LightCB::serialize(Archive& archive, int version)
-{
-    archive
-    (
-        CEREAL_NVP(directionalLight),
-        CEREAL_NVP(pointLight),
-        CEREAL_NVP(spotLight)
-    );
-}
-
-template<class Archive>
-void Light::PointLightData::serialize(Archive& archive, int version)
-{
-    archive
-    (
-        CEREAL_NVP(position),
-        CEREAL_NVP(color),
-        CEREAL_NVP(range)
-    );
-}
-
-template<class Archive>
-void Light::SpotLightData::serialize(Archive& archive, int version)
-{
-    archive
-    (
-        CEREAL_NVP(position),
-        CEREAL_NVP(direction),
-        CEREAL_NVP(range),
-        CEREAL_NVP(innerCorn),
-        CEREAL_NVP(outerCorn)
-    );
-}
-
-template<class Archive>
 void Light::LightParameter::serialize(Archive& archive, int version)
 {
     archive
     (
         CEREAL_NVP(power),
-        CEREAL_NVP(lighttype)
+        CEREAL_NVP(lighttype),
+        CEREAL_NVP(color),
+        CEREAL_NVP(position),
+        CEREAL_NVP(direction),
+        CEREAL_NVP(range),
+        CEREAL_NVP(innerCone),
+        CEREAL_NVP(outerCone)
     );
 }
 
-//コンストラクタ
+// コンストラクタ
 Light::Light(const char* filename)
 {
     Graphics& graphics = Graphics::Instance();
@@ -143,101 +101,66 @@ Light::Light(const char* filename)
     desc.ByteWidth = sizeof(LightCB);
     desc.StructureByteStride = 0;
 
-    //コンスタントバッファの作成
+    // 定数バッファの作成
     HRESULT hr = graphics.GetDevice()->CreateBuffer(&desc, 0, m_lightCb.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-    //ファイルがあれば読み込み
+    // ファイルがあれば読み込み
     if (filename)
     {
         Desirialize(filename);
     }
 }
 
-//初期設定
-void Light::Start()
-{
-    directioncolor = cb.directionalLight.color;
-    directioncolor = cb.pointLight[0].color;
-    directioncolor = cb.spotLight[0].color;
-}
-
-//更新処理
+// 更新処理
 void Light::Update(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
     ID3D11DeviceContext* dc = graphics.GetDeviceContext();
 
-    //ライトタイプによって変更
-    m_lightType = static_cast<LightType>(LP.lighttype);
-    LP.lighttype = static_cast<int>(m_lightType);
-
-    // 登録されている光源の情報を設定
-    switch (m_lightType)
+    // LP を反映して光源の更新
+    for (size_t i = 0; i < LP.size(); ++i)
     {
-    case	LightType::Directional:
-    {
-        cb.directionalLight.color = directioncolor * LP.power;
-        break;
-    }
-    case	LightType::Point:
-    {
-        //if (cb.pointLight.pointLightCount >= POINT_LIGHT_MAX)
-        //  break;
-        //rc.pointLightData[rc.pointLightCount].position.x = position.x;
-        //rc.pointLightData[rc.pointLightCount].position.y = position.y;
-        //rc.pointLightData[rc.pointLightCount].position.z = position.z;
-        //rc.pointLightData[rc.pointLightCount].position.w = 1.0f;
-        cb.pointLight[0].color = directioncolor * LP.power;
-        //rc.pointLightData[rc.pointLightCount].range = range;
-        //++rc.pointLightCount;
-        break;
-    }
-    case	LightType::Spot:
-    {
-        //  if (rc.spotLightCount >= SpotLightMax)
-        //    break;
-        //  DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&direction);
-        //  DirectX::XMStoreFloat3(&direction, DirectX::XMVector3Normalize(Direction));
+        const auto& param = LP[i];
 
-        //  rc.spotLightData[rc.spotLightCount].position.x = position.x;
-        //  rc.spotLightData[rc.spotLightCount].position.y = position.y;
-
-       //  rc.spotLightData[rc.spotLightCount].position.z = position.z;
-        //  rc.spotLightData[rc.spotLightCount].position.w = 1.0f;
-        //  rc.spotLightData[rc.spotLightCount].direction.x = direction.x;
-        //  rc.spotLightData[rc.spotLightCount].direction.y = direction.y;
-        //  rc.spotLightData[rc.spotLightCount].direction.z = direction.z;
-        //  rc.spotLightData[rc.spotLightCount].direction.w = 0.0f;
-        //  rc.spotLightData[rc.spotLightCount].color = color * power;
-        //  rc.spotLightData[rc.spotLightCount].range = range;
-        //  rc.spotLightData[rc.spotLightCount].innerCorn = innerCorn;
-        //  rc.spotLightData[rc.spotLightCount].outerCorn = outerCorn;
-        //  ++rc.spotLightCount;
-
-        cb.spotLight[0].color = directioncolor * LP.power;
-
-        break;
+        switch (static_cast<LightType>(param.lighttype))
+        {
+        case LightType::Directional:
+            cb.directionalLight.color = param.color * param.power;
+            cb.directionalLight.direction = { param.direction.x, param.direction.y, param.direction.z, 0.0f };
+            break;
+        case LightType::Point:
+            cb.pointLight[i].color = param.color * param.power;
+            cb.pointLight[i].position = { param.position.x, param.position.y, param.position.z, 1.0f };
+            cb.pointLight[i].range = param.range;
+            break;
+        case LightType::Spot:
+            cb.spotLight[i].color = param.color * param.power;
+            cb.spotLight[i].position = { param.position.x, param.position.y, param.position.z, 1.0f };
+            cb.spotLight[i].direction = { param.direction.x, param.direction.y, param.direction.z, 0.0f };
+            cb.spotLight[i].range = param.range;
+            cb.spotLight[i].innerCorn = param.innerCone;
+            cb.spotLight[i].outerCorn = param.outerCone;
+            break;
+        default:
+            assert("Invalid Light Type");
+        }
     }
 
-    default:
-        assert("どのLightでもありません");
-    }
-
-    // 定数バッファ設定
-    dc->VSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
-    dc->PSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
-    dc->CSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
-    dc->GSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
-
-    //定数バッファの更新
+    // 定数バッファの更新
     dc->UpdateSubresource(m_lightCb.Get(), 0, 0, &cb, 0, 0);
 
-    //デバッグ描画
+    // シェーダーにバインド
+    dc->VSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->PSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->GSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+    dc->CSSetConstantBuffers((int)CB_INDEX::LIGHT_DATA, 1, m_lightCb.GetAddressOf());
+
+    // デバッグ描画
     DebugPrimitive();
 }
 
-//imgui
+// ImGui UI
 void Light::OnGUI()
 {
     if (ImGui::Button("Save"))
@@ -250,142 +173,169 @@ void Light::OnGUI()
         LoadDesirialize();
     }
 
-    constexpr const char* lightTypeName[] = { "Directional", "Point","Spot" };
-    static_assert(ARRAYSIZE(lightTypeName) == static_cast<int>(LightType::MAX), "lightTypeName Size Error!");
-    ImGui::Combo((char*)u8"ライトタイプ", &LP.lighttype, lightTypeName, static_cast<int>(LightType::MAX));
-    m_lightType = static_cast<LightType>(LP.lighttype);
-    LP.lighttype = static_cast<int>(m_lightType);
+    if (ImGui::Button("Add Light"))
+    {
+        // 新しいライトを追加
+        LightParameter newLight;
+        newLight.lighttype = static_cast<int>(LightType::Directional); // デフォルトはDirectional
+        newLight.power = 1.0f;
+        newLight.color = { 1.0f, 1.0f, 1.0f,1.0f }; // 白色
+        newLight.position = { 0.0f, 0.0f, 0.0f };
+        newLight.direction = { 0.0f, -1.0f, -1.0f }; // デフォルト方向
+        newLight.range = 10.0f;
+        newLight.innerCone = 0.5f;
+        newLight.outerCone = 1.0f;
+        LP.push_back(newLight);
+    }
 
-    switch (m_lightType)
+    for (size_t i = 0; i < LP.size(); ++i)
     {
-    case	LightType::Directional:
-    {
-        if (ImGui::SliderFloat3((char*)u8"方向", &cb.directionalLight.direction.x, -1.0f, 1.0f))
+        ImGui::PushID(static_cast<int>(i)); // 複数のライトを区別するためのID
+        ImGui::Separator();
+
+        // ライトタイプ選択
+        constexpr const char* lightTypeNames[] = { "Directional", "Point", "Spot" };
+        ImGui::Combo("Type", reinterpret_cast<int*>(&LP[i].lighttype), lightTypeNames, static_cast<int>(LightType::MAX));
+
+        // 共通プロパティ
+        ImGui::ColorEdit3("Color", &LP[i].color.x);
+        ImGui::DragFloat("Power", &LP[i].power, 0.05f, 0.0f, 10.0f);
+
+        // タイプ別プロパティ
+        switch (static_cast<LightType>(LP[i].lighttype))
         {
-            float l = sqrtf(cb.directionalLight.direction.x * cb.directionalLight.direction.x + cb.directionalLight.direction.y * cb.directionalLight.direction.y + cb.directionalLight.direction.z * cb.directionalLight.direction.z);
+        case LightType::Directional:
+            ImGui::DragFloat3("Direction", &LP[i].direction.x, 0.01f, -1.0f, 1.0f);
+            break;
+        case LightType::Point:
+            ImGui::DragFloat3("Position", &LP[i].position.x, 0.1f);
+            ImGui::DragFloat("Range", &LP[i].range, 0.1f, 0.0f, FLT_MAX);
+            break;
+        case LightType::Spot:
+            ImGui::DragFloat3("Position", &LP[i].position.x, 0.1f);
+            ImGui::DragFloat3("Direction", &LP[i].direction.x, 0.01f, -1.0f, 1.0f);
+            ImGui::DragFloat("Range", &LP[i].range, 0.1f, 0.0f, FLT_MAX);
+            ImGui::SliderFloat("Inner Cone", &LP[i].innerCone, 0.0f, 1.0f);
+            ImGui::SliderFloat("Outer Cone", &LP[i].outerCone, 0.0f, 1.0f);
+            break;
         }
-        ImGui::ColorEdit3((char*)u8"色", &directioncolor.x, ImGuiColorEditFlags_::ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoAlpha);
-        ImGui::DragFloat((char*)u8"光の強さ", &LP.power, 0.05f, 0, 10);
-        break;
-    }
 
-    case	LightType::Point:
-    {
-        ImGui::DragFloat3((char*)u8"位置", &cb.pointLight[0].position.x);
-        ImGui::ColorEdit3((char*)u8"色", &directioncolor.x, ImGuiColorEditFlags_::ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoAlpha);
-        ImGui::DragFloat((char*)u8"大きさ", &cb.pointLight[0].range, 0.1f, 0, FLT_MAX);
-        ImGui::DragFloat((char*)u8"光の強さ", &LP.power, 0.05f, 0, 10);
+        // ライト削除ボタン
+        if (ImGui::Button("Remove Light"))
+        {
+            LP.erase(LP.begin() + i);
+            ImGui::PopID();
+            continue; // 現在のライトを削除したので次に進む
+        }
 
-        break;
-    }
-
-    case LightType::Spot:
-    {
-        ImGui::DragFloat3((char*)u8"位置", &cb.spotLight[0].position.x);
-        ImGui::DragFloat3((char*)u8"方向", &cb.spotLight[0].direction.x, 0.01f);
-        DirectX::XMStoreFloat4(&cb.spotLight[0].direction, DirectX::XMVector3Normalize(DirectX::XMLoadFloat4(&cb.spotLight[0].direction)));
-        ImGui::ColorEdit3((char*)u8"色", &directioncolor.x, ImGuiColorEditFlags_::ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoAlpha);
-        ImGui::DragFloat((char*)u8"光の強さ", &LP.power, 0.05f, 0, 10);
-        ImGui::DragFloat((char*)u8"大きさ", &cb.spotLight[0].range, 0.1f, 0, FLT_MAX);
-        ImGui::SliderFloat((char*)u8"インナー角度", &cb.spotLight[0].innerCorn, 0, 1.0f);
-        ImGui::SliderFloat((char*)u8"アウター角度", &cb.spotLight[0].outerCorn, 0, 1.0f);
-
-        break;
-    }
+        ImGui::PopID();
     }
 }
 
-//デバッグ描画
+// デバッグ描画
 void Light::DebugPrimitive()
 {
     DebugRenderer* debugRenderer = Graphics::Instance().GetDebugRenderer();
     LineRenderer* lineRenderer = Graphics::Instance().GetLineRenderer();
+    static constexpr int SplitCount = 16;
 
-    switch (m_lightType)
+    // ライトの種類によって処理を分岐
+    for (size_t i = 0; i < LP.size(); ++i)
     {
-    case LightType::Directional:
-    {
-        lineRenderer->AddVertex({ 0,0.4f,0 }, cb.directionalLight.color);
+        const auto& param = LP[i];
 
-        DirectX::XMFLOAT3 directionallight = { cb.directionalLight.direction.x,cb.directionalLight.direction.y,cb.directionalLight.direction.z };
-        DirectX::XMVECTOR lightVec = DirectX::XMLoadFloat3(&directionallight);
-        lightVec = DirectX::XMVectorScale(lightVec, -250);
-
-        DirectX::XMFLOAT3 lightDirection;
-        DirectX::XMStoreFloat3(&lightDirection, lightVec);
-
-        lineRenderer->AddVertex(lightDirection, cb.directionalLight.color);
-
-        break;
-    }
-    case LightType::Point:
-    {
-        //	点光源は全方位に光を放射する光源なので球体を描画する。
-        DirectX::XMFLOAT3 pos = { cb.pointLight[0].position.x,cb.pointLight[0].position.y,cb.pointLight[0].position.z };
-        debugRenderer->DrawSphere(pos, cb.pointLight[0].range, cb.pointLight[0].color);
-        break;
-    }
-    case LightType::Spot:
-    {
-        DirectX::XMVECTOR	Direction = DirectX::XMLoadFloat4(&cb.spotLight[0].direction);
-        float len;
-        DirectX::XMStoreFloat(&len, DirectX::XMVector3Length(Direction));
-        if (len <= 0.00001f)
-            break;
-        Direction = DirectX::XMVector3Normalize(Direction);
-
-        //	軸算出
-        DirectX::XMFLOAT3 dir;
-        DirectX::XMStoreFloat3(&dir, Direction);
-        DirectX::XMVECTOR Work = fabs(dir.y) == 1 ? DirectX::XMVectorSet(1, 0, 0, 0)
-            : DirectX::XMVectorSet(0, 1, 0, 0);
-        DirectX::XMVECTOR	XAxis = DirectX::XMVector3Cross(Direction, Work);
-        DirectX::XMVECTOR	YAxis = DirectX::XMVector3Cross(XAxis, Direction);
-        XAxis = DirectX::XMVector3Cross(Direction, YAxis);
-
-        const int SplitCount = 16;
-        for (int u = 0; u < SplitCount; u++)
+        switch (static_cast<LightType>(param.lighttype))
         {
-            float s = static_cast<float>(u) / static_cast<float>(SplitCount);
-            float r = -DirectX::XM_PI + DirectX::XM_2PI * s;
-            // 回転行列算出
-            DirectX::XMMATRIX	RotationZ = DirectX::XMMatrixRotationAxis(Direction, r);
-            // 線を算出
-            DirectX::XMFLOAT3	OldPoint;
+        case LightType::Directional:
+
+            // Directionalライトの場合、方向を示す線を描画
+            lineRenderer->AddVertex({ 0, 0.4f, 0 }, param.color); // ライトの位置（ライト源）
+
+            // ライトの方向に基づいて線の終点を計算
+            DirectX::XMFLOAT3 lightDirection = { param.direction.x, param.direction.y, param.direction.z };
+            DirectX::XMVECTOR lightVec = DirectX::XMLoadFloat3(&lightDirection);
+            lightVec = DirectX::XMVectorScale(lightVec, -250);  // ライトの方向を強調
+
+            DirectX::XMFLOAT3 lightEnd;
+            DirectX::XMStoreFloat3(&lightEnd, lightVec);
+
+            lineRenderer->AddVertex(lightEnd, param.color); // ライト方向を示す線の終点
+            break;
+
+        case LightType::Point:
+
+            // Pointライトの場合、光源位置を球で表示
+            debugRenderer->DrawSphere({ param.position.x, param.position.y, param.position.z },
+                param.range, param.color); // 範囲も表示
+            break;
+
+        case LightType::Spot:
+
+            // 方向の正規化
+            DirectX::XMVECTOR Direction = DirectX::XMLoadFloat3(&param.direction);
+            float len;
+            DirectX::XMStoreFloat(&len, DirectX::XMVector3Length(Direction));
+            if (len <= 0.00001f)
+                break;
+            Direction = DirectX::XMVector3Normalize(Direction);
+
+            // 軸算出
+            DirectX::XMFLOAT3 dir;
+            DirectX::XMStoreFloat3(&dir, Direction);
+            DirectX::XMVECTOR Work = fabs(dir.y) == 1 ? DirectX::XMVectorSet(1, 0, 0, 0)
+                : DirectX::XMVectorSet(0, 1, 0, 0);
+            DirectX::XMVECTOR XAxis = DirectX::XMVector3Cross(Direction, Work);
+            DirectX::XMVECTOR YAxis = DirectX::XMVector3Cross(XAxis, Direction);
+            XAxis = DirectX::XMVector3Cross(Direction, YAxis);
+
+            for (int u = 0; u < SplitCount; u++)
             {
-                DirectX::XMVECTOR	Point = Direction;
-                DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(cb.spotLight[0].outerCorn))
-                    * RotationZ;
-                Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(cb.spotLight[0].range, cb.spotLight[0].range, cb.spotLight[0].range, 0));
-                Point = DirectX::XMVector3TransformCoord(Point, Rotation);
-                Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat4(&cb.spotLight[0].position));
-                DirectX::XMFLOAT3	pos;
-                DirectX::XMStoreFloat3(&pos, Point);
-                DirectX::XMFLOAT3 pos1 = { cb.spotLight[0].position.x,cb.spotLight[0].position.y,cb.spotLight[0].position.z };
-                lineRenderer->AddVertex(pos1, cb.spotLight[0].color);
-                lineRenderer->AddVertex(pos1, cb.spotLight[0].color);
-                OldPoint = pos;
+                float s = static_cast<float>(u) / static_cast<float>(SplitCount);
+                float r = -DirectX::XM_PI + DirectX::XM_2PI * s;
+
+                // 回転行列算出
+                DirectX::XMMATRIX RotationZ = DirectX::XMMatrixRotationAxis(Direction, r);
+
+                // 線を算出
+                DirectX::XMFLOAT3 OldPoint;
+                {
+                    DirectX::XMVECTOR Point = Direction;
+                    DirectX::XMMATRIX Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(param.outerCone)) * RotationZ;
+                    Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(param.range, param.range, param.range, 0));
+                    Point = DirectX::XMVector3TransformCoord(Point, Rotation);
+                    Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&param.position));
+
+                    DirectX::XMFLOAT3 pos;
+                    DirectX::XMStoreFloat3(&pos, Point);
+                    lineRenderer->AddVertex(param.position, param.color);
+                    lineRenderer->AddVertex(pos, param.color);
+                    OldPoint = pos;
+                }
+
+                // 球面を算出
+                for (int v = 0; v <= SplitCount; ++v)
+                {
+                    float s = static_cast<float>(v) / static_cast<float>(SplitCount);
+                    float a = param.outerCone + (1.0f - param.outerCone) * s;
+                    DirectX::XMVECTOR Point = Direction;
+                    DirectX::XMMATRIX Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(a)) * RotationZ;
+                    Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(param.range, param.range, param.range, 0));
+                    Point = DirectX::XMVector3TransformCoord(Point, Rotation);
+                    Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat3(&param.position));
+
+                    DirectX::XMFLOAT3 pos;
+                    DirectX::XMStoreFloat3(&pos, Point);
+                    lineRenderer->AddVertex(OldPoint, param.color);
+                    lineRenderer->AddVertex(pos, param.color);
+                    OldPoint = pos;
+                }
             }
-            // 球面を算出
-            for (int v = 0; v <= SplitCount; ++v)
-            {
-                float s = static_cast<float>(v) / static_cast<float>(SplitCount);
-                float a = cb.spotLight[0].outerCorn + (1.0f - cb.spotLight[0].outerCorn) * s;
-                DirectX::XMVECTOR	Point = Direction;
-                DirectX::XMMATRIX	Rotation = DirectX::XMMatrixRotationAxis(XAxis, acosf(a))
-                    * RotationZ;
-                Point = DirectX::XMVectorMultiply(Point, DirectX::XMVectorSet(cb.spotLight[0].range, cb.spotLight[0].range, cb.spotLight[0].range, 0));
-                Point = DirectX::XMVector3TransformCoord(Point, Rotation);
-                Point = DirectX::XMVectorAdd(Point, DirectX::XMLoadFloat4(&cb.spotLight[0].position));
-                DirectX::XMFLOAT3	pos;
-                DirectX::XMStoreFloat3(&pos, Point);
-                lineRenderer->AddVertex(OldPoint, cb.spotLight[0].color);
-                lineRenderer->AddVertex(pos, cb.spotLight[0].color);
-                OldPoint = pos;
-            }
+            break;
+        default:
+            // 無効なライトタイプの場合
+            assert("Invalid Light Type");
+            break;
         }
-        break;
-    }
     }
 }
 
@@ -407,7 +357,6 @@ void Light::Serialize()
             {
                 archive
                 (
-                    CEREAL_NVP(cb),
                     CEREAL_NVP(LP)
                 );
             }
@@ -432,7 +381,6 @@ void Light::Desirialize(const char* filename)
         {
             archive
             (
-                CEREAL_NVP(cb),
                 CEREAL_NVP(LP)
             );
         }
@@ -454,8 +402,5 @@ void Light::LoadDesirialize()
     if (result == DialogResult::OK)
     {
         Desirialize(filename);
-        directioncolor = cb.directionalLight.color;
-        directioncolor = cb.pointLight[0].color;
-        directioncolor = cb.spotLight[0].color;
     }
 }

@@ -49,7 +49,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     color += BRDF(albedoColor, MRAO.x, MRAO.y, N, V, -L, directionalLight.color.rgb, indirectDiffuse, envColor).rgb * directionalLight.color.rgb;
 
     // ポイントライトの計算
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < PointLightMax; ++i)
     {
         float3 L = pointLight[i].position.xyz - wPos.xyz;
         float distance = length(L);
@@ -63,7 +63,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     }
 
     // スポットライトの計算
-    for (int k = 0; k < 2; ++k)
+    for (int k = 0; k < SpotLightMax; ++k)
     {
         float3 L = spotLight[k].position.xyz - wPos.xyz;
         float distance = length(L);

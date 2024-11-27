@@ -26,7 +26,6 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\DeferredPBR_PS.cso", m_pixelshaders[static_cast<int>(pixelshader::deferred)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ColorGradingPS.cso", m_pixelshaders[static_cast<int>(pixelshader::colorGrading)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\CascadeShadow.cso", m_pixelshaders[static_cast<int>(pixelshader::cascadeshadow)].GetAddressOf());
-    CreatePsFromCso(Graphics.GetDevice(), "Shader\\SSR.cso", m_pixelshaders[static_cast<int>(pixelshader::ssr)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\FXAA.cso", m_pixelshaders[static_cast<int>(pixelshader::fxaa)].GetAddressOf());
 
@@ -39,11 +38,6 @@ PostEffect::PostEffect()
     //コンスタントバッファ
     m_posteffect = std::make_unique<ConstantBuffer<POSTEFFECT>>(Graphics.GetDevice());
     m_shadowparameter = std::make_unique<ConstantBuffer<SHADOWPARAMETER>>(Graphics.GetDevice());
-}
-
-//初期化
-void PostEffect::Start()
-{
 }
 
 //更新処理
@@ -151,17 +145,6 @@ void PostEffect::PostEffectRender()
     m_posteffect->Activate(dc, (int)CB_INDEX::POST_EFFECT, true, true, false, false, false, false);
     m_shadowparameter->Activate(dc, (int)CB_INDEX::SHADOW_PAR, false, true, false, false, false, false);
 
-    //SSR
-    m_offScreenBuffer[static_cast<int>(offscreen::ssr)]->Clear(dc);
-    m_offScreenBuffer[static_cast<int>(offscreen::ssr)]->Activate(dc);
-    dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::ADD), nullptr, 0xFFFFFFFF);
-    dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
-    dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
-    ID3D11ShaderResourceView* ssr[]
-    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_gBuffer->GetShaderResources()[1],m_gBuffer->GetShaderResources()[4] };
-    FullScreenQuad::Instance().Blit(dc, ssr, 0, _countof(ssr), m_pixelshaders[static_cast<int>(pixelshader::ssr)].Get());
-    m_offScreenBuffer[static_cast<int>(offscreen::ssr)]->Deactivate(dc);
-
     //影
     m_offScreenBuffer[static_cast<int>(offscreen::cascadeshadow)]->Clear(dc);
     m_offScreenBuffer[static_cast<int>(offscreen::cascadeshadow)]->Activate(dc);
@@ -169,7 +152,7 @@ void PostEffect::PostEffectRender()
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
     ID3D11ShaderResourceView* shadow[]
-    { m_offScreenBuffer[static_cast<size_t>(offscreen::ssr)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get() };
+    { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() ,*m_gBuffer->GetDepthStencilSRV(),m_cascadedshadowmap->m_shaderresourceview.Get() };
     FullScreenQuad::Instance().Blit(dc, shadow, 0, _countof(shadow), m_pixelshaders[static_cast<int>(pixelshader::cascadeshadow)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::cascadeshadow)]->Deactivate(dc);
 

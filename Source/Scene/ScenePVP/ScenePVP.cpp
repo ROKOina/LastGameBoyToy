@@ -171,6 +171,11 @@ void ScenePVP::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
+    //オブジェクト生成関数
+#ifdef _DEBUG
+    NewObject();
+#endif
+
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 
@@ -388,4 +393,39 @@ void ScenePVP::CreateUiObject()
             hpMemori->AddComponent<UiFlag>("Data/SerializeData/UIData/Player/HitEffect.ui", Sprite::SpriteShader::DEFALT, false, flag);
         }
     }
+}
+
+//オブジェクト生成関数
+void ScenePVP::NewObject()
+{
+    ImGui::Begin("CreateObject");
+
+    if (ImGui::Button("gpuparticle"))
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testgpuparticle");
+        obj->AddComponent<GPUParticle>(nullptr, 10000);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("cpuparticle"))
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testcpuparticle");
+        obj->AddComponent<CPUParticle>(nullptr, 10000);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("ui"))
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testui");
+        obj->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, true);
+    }
+    if (ImGui::Button("light"))
+    {
+        std::shared_ptr<GameObject>obj = GameObjectManager::Instance().Create();
+        obj->SetName("testlight");
+        obj->AddComponent<Light>(nullptr);
+    }
+
+    ImGui::End();
 }

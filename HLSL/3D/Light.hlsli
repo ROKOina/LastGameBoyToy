@@ -1,5 +1,5 @@
-static const int PointLightMax = 10;
-static const int SpotLightMax = 10;
+static const int PointLightMax = 1;
+static const int SpotLightMax = 1;
 
 // •½sŒõŒ¹î•ñ
 struct DirectionalLightData
