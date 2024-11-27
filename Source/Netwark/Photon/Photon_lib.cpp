@@ -214,7 +214,7 @@ void PhotonLib::ImGui()
         ImGui::InputInt(("trip" + std::to_string(i)).c_str(), &trips[i]);
     }
 
-    int sendMs = SendMs();
+    //int sendMsCopy = SendMs();
     ImGui::InputInt("sendMS", &sendMs);
 
     int Delay = 0;
@@ -468,14 +468,14 @@ void PhotonLib::NetCharaInput()
         //移動
         if (s.isInputUpdate)
         {
-            static bool o[5] = { false };
-            static int oi[5] = { 0 };
+            static bool isHokan[5] = { false }; //数フレームに一回trueに
+            static int plusFrame[5] = { 0 };    //フレーム数える
             int frameAki = 2;
 
-            oi[count]++;
-            if (o[count])
+            plusFrame[count]++;
+            if (isHokan[count])
             {
-                o[count] = false;
+                isHokan[count] = false;
 
                 hoknaPos[count] = s.nextInput.pos;
                 nowPos[count] = netPlayer->transform_->GetWorldPosition();
@@ -485,10 +485,10 @@ void PhotonLib::NetCharaInput()
                     upHokan[count] = true;
                 }
             }
-            if (oi[count] > frameAki)
+            if (plusFrame[count] > frameAki)
             {
-                o[count] = true;
-                oi[count] = 0;
+                isHokan[count] = true;
+                plusFrame[count] = 0;
             }
         }
         else
@@ -496,6 +496,7 @@ void PhotonLib::NetCharaInput()
             //netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
         }
 
+        //補間移動適用
         if (upHokan[count])
         {
             float w = float(saveFrameHokan[count]) / float(frameHokan);
