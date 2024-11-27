@@ -32,9 +32,9 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         RigidBodyCom* rigid = charaCom.lock()->GetHaveBullet()->GetComponent<RigidBodyCom>().get();
         
         //球がセットされていたら発射
-        rigid->SetMass(0.1f);
-        rigid->SetRestitution(2.0f);
-        rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true);
+        rigid->SetMass(0.1f);           //質量
+        rigid->SetRestitution(2.0f);    //反発係数
+        rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); //速くても貫通しないような計算にするフラグ
 
         DirectX::XMFLOAT3 vec = owner->GetGameObject()->transform_->GetWorldFront();
         rigid->AddForce(Mathf::Normalize({vec.x, vec.y + 0.2f, vec. z}) * 1);
