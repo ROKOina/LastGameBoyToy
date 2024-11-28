@@ -32,13 +32,20 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         RigidBodyCom* rigid = charaCom.lock()->GetHaveBullet()->GetComponent<RigidBodyCom>().get();
         
         //‹…‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚½‚ç”­ŽË
-        rigid->SetMass(0.1f);           //Ž¿—Ê
-        rigid->SetRestitution(2.0f);    //”½”­ŒW”
+        rigid->SetMass(mass);           //Ž¿—Ê
+        rigid->SetRestitution(restitution);    //”½”­ŒW”
         rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); //‘¬‚­‚Ä‚àŠÑ’Ê‚µ‚È‚¢‚æ‚¤‚ÈŒvŽZ‚É‚·‚éƒtƒ‰ƒO
 
         DirectX::XMFLOAT3 vec = owner->GetGameObject()->transform_->GetWorldFront();
-        rigid->AddForce(Mathf::Normalize({vec.x, vec.y + 0.2f, vec. z}) * 1);
+        rigid->AddForce(Mathf::Normalize({vec.x, vec.y + 0.2f, vec. z}) * force);
     }
 
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+void JankratCharacter_MainAtkState::ImGui()
+{
+    ImGui::DragFloat("Mass", &mass);
+    ImGui::DragFloat("Restitution", &restitution);
+    ImGui::DragFloat("Force", &force);
 }

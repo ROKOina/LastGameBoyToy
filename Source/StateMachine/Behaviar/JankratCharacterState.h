@@ -29,8 +29,13 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override {};
-    void ImGui() override {};
+    void ImGui() override;
     virtual const char* GetName() const override { return "MainAttack"; }
+
+private:
+    float mass = 0.2f;
+    float restitution = 0.8f;
+    float force = 1.2f;
 };
 
 //class JankratCharacter_CockingState : public JankratCharacter_BaseState
