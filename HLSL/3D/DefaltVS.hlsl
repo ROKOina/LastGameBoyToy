@@ -8,22 +8,11 @@ VS_OUT main(VS_IN vin)
     float3 t = float3(0, 0, 0);
 
     // スキニング計算 (最大4つのボーンウェイトに対応)
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; ++i)
     {
-        // ボーンインデックスを取得
-        int boneIndex = vin.boneIndices[i];
-
-        // 最終ボーン行列 = offsetTransform * boneTransform
-        float4x4 finalBoneMatrix = mul(offsetTransforms[boneIndex], boneTransforms[boneIndex]);
-
-        // 頂点位置のスキニング
-        p += vin.boneWeights[i] * mul(vin.position, finalBoneMatrix).xyz;
-
-        // 法線のスキニング（平行移動成分は無視するためw = 0を使用）
-        n += vin.boneWeights[i] * mul(float4(vin.normal, 0), finalBoneMatrix).xyz;
-
-        // 接線のスキニング
-        t += vin.boneWeights[i] * mul(float4(vin.tangent, 0), finalBoneMatrix).xyz;
+        p += (vin.boneWeights[i] * mul(vin.position, boneTransforms[vin.boneIndices[i]])).xyz;
+        n += (vin.boneWeights[i] * mul(float4(vin.normal.xyz, 0), boneTransforms[vin.boneIndices[i]])).xyz;
+        t += (vin.boneWeights[i] * mul(float4(vin.tangent.xyz, 0), boneTransforms[vin.boneIndices[i]])).xyz;
     }
 
     // 出力データの作成

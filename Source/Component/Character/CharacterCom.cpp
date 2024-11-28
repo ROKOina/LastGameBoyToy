@@ -11,6 +11,7 @@
 #include "Setting/Setting.h"
 #include "Component\Audio\AudioCom.h"
 #include "Component\Sprite\Sprite.h"
+#include "Component\Renderer\RendererCom.h"
 
 void CharacterCom::Update(float elapsedTime)
 {

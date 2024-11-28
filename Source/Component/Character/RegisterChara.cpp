@@ -146,7 +146,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
-            anim->PlayAnimation(0, false);
 
             //Eskill中エフェクト
             {

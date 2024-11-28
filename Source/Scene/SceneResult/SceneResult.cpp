@@ -49,31 +49,6 @@ void SceneResult::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    //プレイヤー
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("player");
-        obj->transform_->SetWorldPosition({ 0, 0, 0 });
-        obj->transform_->SetScale({ 0.002f, 0.002f, 0.002f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS);
-        r->LoadModel("Data/Model/OneCoin/robot.mdl");
-        std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
-        std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
-        //std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        //std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
-    }
-
-    //ステージ
-    {
-        auto& obj = GameObjectManager::Instance().Create();
-        obj->SetName("stage");
-        obj->transform_->SetWorldPosition({ 0, 0.0f, 0 });
-        obj->transform_->SetScale({ 0.6f, 0.6f, 0.6f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/IKTestStage/ExampleStage.mdl");
-        obj->AddComponent<RayCollisionCom>("Data/Model/IKTestStage/ExampleStage.collision");
-    }
-
     //キャンバス
     {
         auto& obj = GameObjectManager::Instance().Create();

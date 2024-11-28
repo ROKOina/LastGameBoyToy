@@ -200,7 +200,6 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
         if (isRaycast && PhysXLib::Instance().RayCast_PhysX(
             start, Mathf::Normalize(end - start), Mathf::Length(end - start) + r, buffer))
         {
-
             DirectX::XMFLOAT3 p = {};
             p.x = buffer.block.position.x;
             p.y = buffer.block.position.y;
@@ -239,7 +238,7 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
             //    // ï«Ç…âàÇ¡ÇΩà⁄ìÆÇ∆ï‚ê≥ÇìKóp
             //    position.x = correctedPosition.x;
             //    position.z = correctedPosition.z;
-            //}         
+            //}
         }
         else
         {

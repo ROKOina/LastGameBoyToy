@@ -32,7 +32,6 @@ public:
     struct objectconstants
     {
         DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
-        DirectX::XMFLOAT4X4 OffsetTransforms[MAX_BONES] = {};
     };
 
     //サブセットのコンスタントバッファ
