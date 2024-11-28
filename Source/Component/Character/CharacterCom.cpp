@@ -438,7 +438,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
             dashGauge -= 5; //Å‰‚Íˆê‹C‚ÉŒ¸‚ç‚·
 
             //‰¹
-            GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
+            //GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
         }
         else
         {

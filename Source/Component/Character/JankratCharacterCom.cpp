@@ -14,6 +14,9 @@ void JankratCharacterCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
     //SE“o˜^
+
+    moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
 void JankratCharacterCom::Update(float elapsedTime)

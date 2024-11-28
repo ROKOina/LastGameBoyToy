@@ -80,7 +80,7 @@ void BaseCharacter_MoveState::Enter()
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), false, 0.3f);
-    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
+    //GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
 
 
     /*animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
@@ -106,7 +106,7 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
 
 void BaseCharacter_MoveState::Exit()
 {
-    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    //GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
 }
 
 #pragma endregion
