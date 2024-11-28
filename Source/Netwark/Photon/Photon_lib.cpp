@@ -461,41 +461,22 @@ void PhotonLib::NetCharaInput()
         chara->SetUserInputDown(s.nextInput.inputDown);
         chara->SetUserInputUp(s.nextInput.inputUp);
 
-        static bool upHokan[5] = { false };
-        static DirectX::XMFLOAT3 hoknaPos[5] = {};
-        static DirectX::XMFLOAT3 nowPos[5] = {};
-        static int saveFrameHokan[5] = { 0 };
-        int frameHokan = 4; //補完するフレーム
+        static bool upHokan[5] = { false }; //補間中か
+        static DirectX::XMFLOAT3 hoknaPos[5] = {};  //補間する位置
+        static DirectX::XMFLOAT3 nowPos[5] = {};    //今の位置
+        static int saveFrameHokan[5] = { 0 };       //補間用フレーム
+        int frameHokan = 6; //補完するフレーム
 
         //移動
         if (s.isInputUpdate)
         {
-            //static bool isHokan[5] = { false }; //数フレームに一回trueに
-            //static int plusFrame[5] = { 0 };    //フレーム数える
-            //int frameAki = 2;
-
-            //plusFrame[count]++;
-            //if (isHokan[count])
-            //{
-                //isHokan[count] = false;
-
-                hoknaPos[count] = s.nextInput.pos;
-                nowPos[count] = netPlayer->transform_->GetWorldPosition();
-                if (Mathf::Length(nowPos[count] - hoknaPos[count]) > 0.1f)
-                {
-                    saveFrameHokan[count] = 1;
-                    upHokan[count] = true;
-                }
-            //}
-            //if (plusFrame[count] > frameAki)
-            //{
-            //    isHokan[count] = true;
-            //    plusFrame[count] = 0;
-            //}
-        }
-        else
-        {
-            //netPlayer->GetComponent<MovementCom>()->AddForce({ 1,0,0 });
+            hoknaPos[count] = s.nextInput.pos;
+            nowPos[count] = netPlayer->transform_->GetWorldPosition();
+            if (Mathf::Length(nowPos[count] - hoknaPos[count]) > 0.1f)
+            {
+                saveFrameHokan[count] = 1;
+                upHokan[count] = true;
+            }
         }
 
         //補間移動適用
@@ -510,7 +491,7 @@ void PhotonLib::NetCharaInput()
                 netPlayer->transform_->SetWorldPosition(hoknaPos[count]);
                 upHokan[count] = false;
             }
-            if (saveFrameHokan[count] > frameHokan)upHokan[count] = false;
+            if (saveFrameHokan[count] >= frameHokan)upHokan[count] = false;
         }
 
         netPlayer->transform_->SetRotation(s.nextInput.rotato);
