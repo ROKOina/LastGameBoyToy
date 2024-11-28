@@ -24,14 +24,16 @@ InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : St
 void InazawaCharacter_AttackState::Enter()
 {
     attackPower = 0;
-    auto& chara = GetComp(CharacterCom);
 
-    auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& charge = arm->GetChildFind("chargeEff");
-    charge->GetComponent<GPUParticle>()->SetLoop(true);
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& charge = arm->GetChildFind("chargeEff");
+        charge->GetComponent<GPUParticle>()->SetLoop(true);
 
-    //‰¹
-    owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_CHARGE", false, 10);
+        //‰¹
+        owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_CHARGE", false, 10);
+    }
 }
 
 void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
@@ -39,35 +41,44 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
     auto& moveCmp = owner->GetGameObject()->GetComponent<MovementCom>();
     moveCmp->SetSubMoveMaxSpeed(attackMaxMoveSpeed);
 
-    auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    
 
     //UŒ‚ˆÐ—Í
     attackPower += elapsedTime;
     if (attackPower > maxAttackPower) {
         attackPower = maxAttackPower;
-        auto& charge = arm->GetChildFind("chargeEff");
-        charge->GetComponent<GPUParticle>()->SetLoop(false);
-        auto& chargeMax = arm->GetChildFind("chargeMaxEff");
-        chargeMax->GetComponent<GPUParticle>()->SetLoop(true);
+
+        if (std::string(owner->GetGameObject()->GetName()) == "player")
+        {
+            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+            auto& charge = arm->GetChildFind("chargeEff");
+            charge->GetComponent<GPUParticle>()->SetLoop(false);
+            auto& chargeMax = arm->GetChildFind("chargeMaxEff");
+            chargeMax->GetComponent<GPUParticle>()->SetLoop(true);
+        }
     }
 
 
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
+        if (std::string(owner->GetGameObject()->GetName()) == "player")
+        {
+            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+            auto& armAnim = arm->GetComponent<AnimationCom>();
+            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+            armAnim->SetAnimationSeconds(0.3f);
+
+            auto& charge = arm->GetChildFind("chargeEff");
+            charge->GetComponent<GPUParticle>()->SetLoop(false);
+            auto& chargeMax = arm->GetChildFind("chargeMaxEff");
+            chargeMax->GetComponent<GPUParticle>()->SetLoop(false);
+        }
 
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
 
         //UŒ‚ˆ—
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower/ maxAttackPower, maxDamage * attackPower);
-
-        auto& charge = arm->GetChildFind("chargeEff");
-        charge->GetComponent<GPUParticle>()->SetLoop(false);
-        auto& chargeMax = arm->GetChildFind("chargeMaxEff");
-        chargeMax->GetComponent<GPUParticle>()->SetLoop(false);
 
         //‰¹
         owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_CHARGE");
@@ -82,12 +93,15 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
 
 void InazawaCharacter_AttackState::Exit()
 {
-    auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
 
-    auto& charge = arm->GetChildFind("chargeEff");
-    charge->GetComponent<GPUParticle>()->SetLoop(false);
-    auto& chargeMax = arm->GetChildFind("chargeMaxEff");
-    chargeMax->GetComponent<GPUParticle>()->SetLoop(false);
+        auto& charge = arm->GetChildFind("chargeEff");
+        charge->GetComponent<GPUParticle>()->SetLoop(false);
+        auto& chargeMax = arm->GetChildFind("chargeMaxEff");
+        chargeMax->GetComponent<GPUParticle>()->SetLoop(false);
+    }
 }
 
 void InazawaCharacter_AttackState::ImGui()
@@ -105,10 +119,13 @@ void InazawaCharacter_ESkillState::Enter()
     arrowCount = 8;
     skillTimer = skillTime;
     intervalTimer = 0.0f;
-
-    auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& eff = arm->GetChildFind("eSkillEff");
-    eff->GetComponent<GPUParticle>()->SetLoop(true);
+    
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& eff = arm->GetChildFind("eSkillEff");
+        eff->GetComponent<GPUParticle>()->SetLoop(true);
+    }
 }
 
 void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
@@ -125,10 +142,13 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButton() && intervalTimer >= interval)
     {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
+        if (std::string(owner->GetGameObject()->GetName()) == "player")
+        {
+            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+            auto& armAnim = arm->GetComponent<AnimationCom>();
+            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+            armAnim->SetAnimationSeconds(0.3f);
+        }
 
         //UŒ‚ˆ—
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, 1, damage);
@@ -145,9 +165,12 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
 
 void InazawaCharacter_ESkillState::Exit()
 {
-    auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& eff = arm->GetChildFind("eSkillEff");
-    eff->GetComponent<GPUParticle>()->SetLoop(false);
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& eff = arm->GetChildFind("eSkillEff");
+        eff->GetComponent<GPUParticle>()->SetLoop(false);
+    }
 }
 
 void InazawaCharacter_ESkillState::ImGui()

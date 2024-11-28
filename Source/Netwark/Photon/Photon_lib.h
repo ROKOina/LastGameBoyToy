@@ -164,7 +164,8 @@ private:
     ExitGames::Common::Logger mLogger;
 
     //送信頻度（ms）
-    int sendMs = 35;
+    int sendMs = 1000 / 60.0f * 5;
+    //int sendMs = 35;
     int oldMs;
 
     //各クライアントインプット保存

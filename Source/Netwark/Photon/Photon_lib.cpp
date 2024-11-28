@@ -470,14 +470,14 @@ void PhotonLib::NetCharaInput()
         //移動
         if (s.isInputUpdate)
         {
-            static bool isHokan[5] = { false }; //数フレームに一回trueに
-            static int plusFrame[5] = { 0 };    //フレーム数える
-            int frameAki = 2;
+            //static bool isHokan[5] = { false }; //数フレームに一回trueに
+            //static int plusFrame[5] = { 0 };    //フレーム数える
+            //int frameAki = 2;
 
-            plusFrame[count]++;
-            if (isHokan[count])
-            {
-                isHokan[count] = false;
+            //plusFrame[count]++;
+            //if (isHokan[count])
+            //{
+                //isHokan[count] = false;
 
                 hoknaPos[count] = s.nextInput.pos;
                 nowPos[count] = netPlayer->transform_->GetWorldPosition();
@@ -486,12 +486,12 @@ void PhotonLib::NetCharaInput()
                     saveFrameHokan[count] = 1;
                     upHokan[count] = true;
                 }
-            }
-            if (plusFrame[count] > frameAki)
-            {
-                isHokan[count] = true;
-                plusFrame[count] = 0;
-            }
+            //}
+            //if (plusFrame[count] > frameAki)
+            //{
+            //    isHokan[count] = true;
+            //    plusFrame[count] = 0;
+            //}
         }
         else
         {

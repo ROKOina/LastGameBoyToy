@@ -126,16 +126,16 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
+    if (std::strcmp(obj->GetName(), "player") == 0)
     {
-        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
-        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+        std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
         cameraPost->SetName("cameraPostPlayer");
-        std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-        fpscamera->ActiveCameraChange();
+        std::shared_ptr<FPSCameraCom> fpscamera = cameraPost->AddComponent<FPSCameraCom>();
+        //fpscamera->ActiveCameraChange();
 
         //カメラ位置
         cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
-        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+        obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //腕
         {

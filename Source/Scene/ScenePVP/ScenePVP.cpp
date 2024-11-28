@@ -57,8 +57,9 @@ void ScenePVP::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        freeCamera->AddComponent<FreeCameraCom>();
+        freeCamera->AddComponent<FreeCameraCom>()->ActiveCameraChange();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 #endif

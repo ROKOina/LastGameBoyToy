@@ -127,8 +127,8 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
 
     //発射位置算出用変数定義
     DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
-    auto& cameraObj = GameObjectManager::Instance().Find("cameraPostPlayer");
-
+    auto& cameraObj = objPoint->GetChildFind("cameraPostPlayer");
+   
     //見た目部分
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
@@ -137,7 +137,12 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     trail->SetTransform(viewObj->transform_->GetWorldTransform());
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    float ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
+    float ya;
+    if (cameraObj)
+        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
+    else
+        ya = 1.5f;
+
     firePos.y += ya;
     viewObj->transform_->SetWorldPosition(firePos);
 
@@ -151,22 +156,25 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
 
     //銃口から発射する
-    auto& arm = cameraObj->GetChildFind("armChild");
-    if (arm)
+    if (cameraObj)
     {
-        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-        const auto& node = model->FindNode("gun2");
+        auto& arm = cameraObj->GetChildFind("armChild");
+        if (arm)
+        {
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& node = model->FindNode("gun2");
 
-        DirectX::XMFLOAT3 gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
-        DirectX::XMFLOAT3 cameraPos = cameraObj->transform_->GetWorldPosition();
+            DirectX::XMFLOAT3 gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+            DirectX::XMFLOAT3 cameraPos = cameraObj->transform_->GetWorldPosition();
 
-        //カメラの子供にする
-        DirectX::XMFLOAT3 cameraFromGun = gunPos - cameraPos;
-        DirectX::XMFLOAT3 fpsPos = fpsDir * 60;
+            //カメラの子供にする
+            DirectX::XMFLOAT3 cameraFromGun = gunPos - cameraPos;
+            DirectX::XMFLOAT3 fpsPos = fpsDir * 60;
 
-        DirectX::XMFLOAT3 velo = fpsPos - cameraFromGun;
-        moveCom->SetNonMaxSpeedVelocity(Mathf::Normalize(velo) * bulletSpeed);
-        viewObj->transform_->SetWorldPosition(gunPos);
+            DirectX::XMFLOAT3 velo = fpsPos - cameraFromGun;
+            moveCom->SetNonMaxSpeedVelocity(Mathf::Normalize(velo) * bulletSpeed);
+            viewObj->transform_->SetWorldPosition(gunPos);
+        }
     }
 
     moveCom->SetIsRaycast(false);
