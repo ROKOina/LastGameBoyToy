@@ -61,6 +61,9 @@ public:
     physx::PxTriangleMeshDesc& GetStlegeInMeshDesc(std::string filename) { return meshStlege[filename]; }
     //Sceneæ“¾
     PxScene* GetScene() { return gScene; }
+    //Physcsæ“¾
+    PxPhysics* GetPhysics() { return gPhysics; }
+
 private:
     //meshCollider‚Ì•Û‘¶êŠ
     std::map<std::string, physx::PxTriangleMeshDesc> meshStlege;

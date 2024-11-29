@@ -129,6 +129,7 @@ void InazawaCharacterCom::UltSkill()
 //終わってます。何故ステートマシンか何かを作らなかったの？(不思議でしかたない)by上野
 void InazawaCharacterCom::FPSArmAnimation()
 {
+    if (std::string(GetGameObject()->GetName()) != "player")return;
     auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
     auto& armAnim = arm->GetComponent<AnimationCom>();
 

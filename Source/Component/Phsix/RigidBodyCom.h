@@ -29,8 +29,6 @@ public:
     void GenerateCollider(NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 scale);
     void GenerateCollider(ModelResource* rc, bool isConvex);
 
-    
-
     NodeCollsionCom::CollsionType GetPrimitiveType() { return type; }
     void SetPrimitiveType(NodeCollsionCom::CollsionType t) { type = t; }
     float GetNormalizeScale() { return normalizeScale; }
@@ -38,8 +36,27 @@ public:
     std::string GetUseResourcePath() { return useResourcePath; }
     void SetUseResourcePath(std::string path) { useResourcePath = path; }
 
+    physx::PxRigidActor* GetRigidActor() { return rigidActor; }
     PxTransform GetPxTransform() { return rigidActor->getGlobalPose(); }
     void SetPxTransform(PxTransform trans) { rigidActor->setGlobalPose(trans); }
+
+    //SetUp関数終了後から使用可能////////////////////
+
+// 衝撃を加える(isStaticがfalseの場合のみ
+    void AddForce(DirectX::XMFLOAT3 force);
+    //質量設定(isStaticがfalseの場合のみ
+    void SetMass(float value);
+    //摩擦力設定
+    void SetFriction(float value);
+    //反発係数設定
+    void SetRestitution(float value);
+    //重力を使用するかどうか
+    void SetUseGravity(bool flag);
+    void SetRigidFlag(physx::PxRigidBodyFlag::Enum rigidFlag, bool flag);
+    void SetMaterial(float m, float r);
+
+    ////////////////////////////////////////////////
+
 
 public:
     enum class RigidType
@@ -61,4 +78,9 @@ private:
     physx::PxRigidActor* rigidActor = nullptr;
     physx::PxTransform rigidTransform = {};
     float normalizeScale = 1.0f;
+
+    float mass = 0.5f;
+    float friction = 0.5f;
+    float restitution = 0.5f;
+    bool useGravity = true;
 };

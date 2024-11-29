@@ -120,7 +120,7 @@ void ScenePVP::Initialize()
     }
 
     //UIゲームオブジェクト生成
-    CreateUiObject();
+    //CreateUiObject();
 
 #pragma endregion
 

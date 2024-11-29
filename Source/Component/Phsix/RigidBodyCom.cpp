@@ -32,6 +32,77 @@ void RigidBodyCom::Update(float elapsedTime)
     }
 }
 
+void RigidBodyCom::AddForce(DirectX::XMFLOAT3 force)
+{
+    if (!isStatic)
+    {
+        //Dynamicにキャスト
+        PxRigidDynamic* dynamicActor = rigidActor->is<PxRigidDynamic>();
+
+        PxVec3 Force = {};
+        Force.x = force.x;
+        Force.y = force.y;
+        Force.z = force.z;
+
+        dynamicActor->addForce(Force, physx::PxForceMode::eIMPULSE);
+    }
+}
+
+void RigidBodyCom::SetMass(float value)
+{
+    mass = value;
+
+    // 質量を設定
+    if (!isStatic) {
+
+        //Dynamicにキャストし設定
+        PxRigidDynamic* dynamicActor = rigidActor->is<PxRigidDynamic>();
+        PxRigidBodyExt::setMassAndUpdateInertia(*dynamicActor, mass);
+    }
+}
+
+void RigidBodyCom::SetMaterial(float f, float r)
+{
+    // アクターに関連付けられたShapeの数を取得
+    PxU32 numShapes = rigidActor->getNbShapes();
+
+    // Shapeのポインタ配列を用意
+    std::vector<PxShape*> shapes(numShapes);
+
+    // Shapeを取得
+    rigidActor->getShapes(shapes.data(), numShapes, 0);
+
+    // Shapeを処理
+    for (PxU32 i = 0; i < numShapes; ++i) {
+        PxMaterial* material = PhysXLib::Instance().GetPhysics()->createMaterial(f, f, r);
+        // Shapeの詳細を確認（例: Geometryの種類）
+        shapes[i]->setMaterials(&material, 1);
+    }
+}
+
+void RigidBodyCom::SetFriction(float value)
+{
+    friction = value;
+    SetMaterial(friction, restitution);
+}
+
+void RigidBodyCom::SetRestitution(float value)
+{
+    restitution = value;
+    SetMaterial(friction, restitution);
+}
+
+void RigidBodyCom::SetUseGravity(bool flag)
+{
+    rigidActor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, flag);
+}
+
+void RigidBodyCom::SetRigidFlag(physx::PxRigidBodyFlag::Enum rigidFlag, bool flag)
+{
+    PxRigidDynamic* dynamicActor = rigidActor->is<PxRigidDynamic>();
+    dynamicActor->setRigidBodyFlag(rigidFlag, flag);
+}
+
 void RigidBodyCom::OnGUI()
 {
     DirectX::XMFLOAT3 pos = { rigidActor->getGlobalPose().p.x,rigidActor->getGlobalPose().p.y,rigidActor->getGlobalPose().p.z };
@@ -82,7 +153,7 @@ void RigidBodyCom::SetUp()
 
     case RigidBodyCom::RigidType::PrimitiveSphere:
         //NodeCollisionを適応させる必要あり
-        GenerateCollider(NodeCollsionCom::CollsionType::SPHER, GetGameObject()->transform_->GetScale());
+        GenerateCollider(NodeCollsionCom::CollsionType::SPHER, GetGameObject()->transform_->GetScale() * normalizeScale);
         break;
 
     case RigidBodyCom::RigidType::Complex:
