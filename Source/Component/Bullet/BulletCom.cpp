@@ -11,6 +11,7 @@
 #include "Component\Particle\CPUParticle.h"
 #include <Component\MoveSystem\MovementCom.h>
 #include "Component\Renderer\TrailCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -309,4 +310,35 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
     DirectX::XMFLOAT3 knockVec = { 0,2,0 };
     hit->SetValue3(Mathf::Lerp(startpos, knockVec, 0.3f));
+}
+
+GameObj BulletCreate::JankratBombFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id)
+{
+    GameObj bullet = GameObjectManager::Instance().Create();
+    bullet->SetName("damageball");
+    bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
+    RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
+    RendererCom* r = bullet->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
+    //r->LoadModel("Data/Model/Ball/SplitBall.mdl");
+    r->LoadModel("Data/Model/Jankrat/mine.mdl");
+
+    //コライダー
+    std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
+    coll->SetMyTag(COLLIDER_TAG::Bullet);
+    coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    coll->SetRadius(1.0f);
+
+    //弾
+    std::shared_ptr<BulletCom> bulletCom = bullet->AddComponent<BulletCom>(id);
+    bulletCom->SetAliveTime(5.0f);
+    bulletCom->SetDamageValue(-1);
+    bulletCom->SetViewBullet(bullet);
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(1);
+
+    return bullet;
 }

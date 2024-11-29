@@ -85,6 +85,8 @@ void ScenePVP::Initialize()
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //判定生成
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl", 0.005f);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
@@ -98,10 +100,6 @@ void ScenePVP::Initialize()
             gate->SetUpPos({ pos.x, 1.85f, pos.z });
             gate->SetMoveSpeed(0.1f);
         }
-
-        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
-        rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
-        rigid->SetNormalizeScale(1);
     }
 
     //プレイヤー
@@ -118,6 +116,31 @@ void ScenePVP::Initialize()
         obj->SetName("snowparticle");
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
+
+    //サンドバック
+    {
+        auto& boss = GameObjectManager::Instance().Create();
+        boss->SetName("SundBug");
+        std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
+        r->SetOutlineColor({ 1,0,0 });
+        r->SetOutlineIntensity(10.0f);
+        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
+        boss->AddComponent<MovementCom>();
+        boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+        std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
+        boss->AddComponent<AnimationCom>();
+        std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
+        pushBack->SetRadius(1.5f);
+        pushBack->SetWeight(600.0f);
+        auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
+        charaStatusCom->SetInvincibleTime(0.1f);
+        charaStatusCom->SetHitPoint(2000);
+        charaStatusCom->SetMaxHitPoint(2000);
+    }
+
 
     //UIゲームオブジェクト生成
     //CreateUiObject();

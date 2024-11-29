@@ -127,9 +127,10 @@ void BaseCharacter_JumpState::Enter()
     //animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
 
     //アニメーション
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
+    // 例外処理必要
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
@@ -156,10 +157,11 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
     }
 
     //アニメーション
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    if (!armAnim->IsPlayAnimation())
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
+    // 例外処理必要 
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //if (!armAnim->IsPlayAnimation())
+    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
 }
 
 void BaseCharacter_JumpState::Exit()
@@ -167,9 +169,10 @@ void BaseCharacter_JumpState::Exit()
     HoveringTimer = 0.0f;
 
     //アニメーション
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
+    // 例外処理必要 
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
 }
 
 #pragma endregion

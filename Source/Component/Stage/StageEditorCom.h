@@ -89,6 +89,8 @@ public:
 
     //Jsonのデータを元にオブジェクト配置
     void PlaceJsonData(std::string filename);
+    //ステージのデータを元に物理オブジェクト配置
+    void PlaceStageRigidCollider(std::string file, float scale);
 
     PlaceObject& GetPlaceObject(std::string name) { return placeObjcts[name]; }
 

@@ -11,8 +11,6 @@ public:
 
     void Update(float elapsedTime) override;
 
-    void OnGUI() override {};
-
     void MainAttackDown() override;
 
     void SubAttackDown() override {};

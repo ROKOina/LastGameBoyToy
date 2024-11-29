@@ -61,4 +61,7 @@ public:
 
     //ノックバック弾生成
     static void KnockbackFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
+
+    //ジャンクラの弾
+    static GameObj JankratBombFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);
 };

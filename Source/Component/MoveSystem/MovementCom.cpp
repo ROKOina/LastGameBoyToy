@@ -143,7 +143,7 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
         // 判定
         RayCastManager::Result hit;
         PxRaycastBuffer buffer;
-        if (isRaycast && PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer))//RayCast(start, end, hit))
+        if (isRaycast && PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
         {
             // 地面に接地している
             position.y = buffer.block.position.y;
@@ -198,7 +198,7 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
 
         static bool wasColliding = false;  // 前フレームで壁に衝突していたか
         if (isRaycast && PhysXLib::Instance().RayCast_PhysX(
-            start, Mathf::Normalize(end - start), Mathf::Length(end - start) + r, buffer))
+            start, Mathf::Normalize(end - start), Mathf::Length(end - start) + r, buffer, PhysXLib::CollisionLayer::Stage))
         {
 
             DirectX::XMFLOAT3 p = {};

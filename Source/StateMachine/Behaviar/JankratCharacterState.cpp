@@ -1,5 +1,8 @@
 #include "JankratCharacterState.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Component\Collsion\ColliderCom.h"
+#include "Component\System\HitProcessCom.h"
+#include "Component\Bullet\BulletCom.h"
 
 JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -12,17 +15,7 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
 
 void JankratCharacter_MainAtkState::Enter()
 {
-    GameObj bullet = GameObjectManager::Instance().Create();
-    bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
-    DirectX::XMFLOAT3 pos = transCom.lock()->GetWorldPosition();
-    bullet->transform_->SetWorldPosition({ pos.x,pos.y + 2,pos.z });
-    RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::PrimitiveSphere).get();
-    
-    rigid->SetNormalizeScale(100);
-    RendererCom* r = bullet->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
-    r->LoadModel("Data/Model/Ball/SplitBall.mdl");
-
-    charaCom.lock()->SetHaveBullet(bullet);
+    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBombFire(owner->GetGameObject(), transCom.lock()->GetWorldPosition(), charaCom.lock()->GetCharaID()));
 }
 
 void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
@@ -35,6 +28,7 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         rigid->SetMass(mass);           //Ž¿—Ê
         rigid->SetRestitution(restitution);    //”½”­ŒW”
         rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); //‘¬‚­‚Ä‚àŠÑ’Ê‚µ‚È‚¢‚æ‚¤‚ÈŒvŽZ‚É‚·‚éƒtƒ‰ƒO
+        charaCom.lock()->haveBulletRelease();
 
         DirectX::XMFLOAT3 vec = owner->GetGameObject()->transform_->GetWorldFront();
         rigid->AddForce(Mathf::Normalize({vec.x, vec.y + 0.2f, vec. z}) * force);

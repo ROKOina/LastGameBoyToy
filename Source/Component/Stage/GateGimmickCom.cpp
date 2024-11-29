@@ -21,13 +21,6 @@ void GateGimmick::Update(float elapsedTime)
     DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
     trans.p = { pos.x, pos.y, pos.z };
 
-    //ボス登場イベントの終了に合わせてゲートを閉じる
-    //if (!downInit && PVEDirection::Instance().GetDirectionNum() == 2)
-    //{
-    //    state.ChangeState(GimmickState::DOWN);
-    //    downInit = true;
-    //}
-
     //ステート更新処理
     state.Update(elapsedTime);
 }

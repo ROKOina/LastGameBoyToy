@@ -33,19 +33,19 @@ public:
     virtual const char* GetName() const override { return "MainAttack"; }
 
 private:
-    float mass = 0.2f;
+    float mass = 0.1f;
     float restitution = 0.8f;
-    float force = 1.2f;
+    float force = 1.4f;
 };
 
-//class JankratCharacter_CockingState : public JankratCharacter_BaseState
-//{
-//public:
-//    JankratCharacter_CockingState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
-//
-//    void Enter() override;
-//    void Execute(const float& elapsedTime) override;
-//    void Exit() override;
-//    void ImGui() override;
-//    virtual const char* GetName() const override { return "Cocking"; }
-//};
+class JankratCharacter_SubSkillState : public JankratCharacter_BaseState
+{
+public:
+    //JankratCharacter_SubSkillState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
+
+    //void Enter() override;
+    //void Execute(const float& elapsedTime) override;
+    //void Exit() override;
+    //void ImGui() override;
+    //virtual const char* GetName() const override { return "SubSkill"; }
+};
