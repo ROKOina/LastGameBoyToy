@@ -121,6 +121,7 @@ static float AH = 0;
 //fps用の腕アニメーション
 void FarahCom::FPSArmAnimation()
 {
+    if (std::string(GetGameObject()->GetName()) != "player")return;
     auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
     auto& armAnim = arm->GetComponent<AnimationCom>();
 
