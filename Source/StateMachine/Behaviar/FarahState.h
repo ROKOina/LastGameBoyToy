@@ -19,3 +19,5 @@ protected:
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
 };
+
+//

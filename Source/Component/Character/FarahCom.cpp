@@ -51,7 +51,7 @@ void FarahCom::SubAttackDown()
     float currentTime = TimeManager::Instance().GetElapsedTime();
 
     // 水平方向のダッシュ力と上昇力に対する減衰設定
-    static constexpr float DASH_POWER_BASE = 57.0f;    // 初期ダッシュ力
+    static constexpr float DASH_POWER_BASE = 75.0f;    // 初期ダッシュ力
     static constexpr float DASH_DURATION = 5.0f;      // ダッシュ力が持続する時間
     static constexpr float LIFT_FORCE_BASE = 3.5f;    // 初期上昇力
     static constexpr float LIFT_DURATION = 1.0f;      // 上昇力が持続する時間
