@@ -54,7 +54,7 @@ private:
     std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
     {
         "INAZAWA",
-        "UENO",
+        "FARAH",
         "HAVE_ALL_ATTACK",
     };
     int charaID = 0;

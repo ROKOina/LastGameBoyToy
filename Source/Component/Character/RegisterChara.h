@@ -21,7 +21,7 @@ public:
     {
         INAZAWA,
         HAVE_ALL_ATTACK,
-        PICOHARD,
+        FARAH,
         MAX,
     };
 
@@ -31,6 +31,5 @@ public:
 private:
     void InazawaChara(std::shared_ptr<GameObject>& obj);
     void HaveAllAttackChara(std::shared_ptr<GameObject>& obj);
-    void UenoChara(std::shared_ptr<GameObject>& obj);
-    void PicohardChara(std::shared_ptr<GameObject>& obj);
+    void FarahCharacter(std::shared_ptr<GameObject>& obj);
 };

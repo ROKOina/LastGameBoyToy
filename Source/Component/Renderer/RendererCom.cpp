@@ -63,8 +63,8 @@ void RendererCom::Update(float elapsedTime)
     // モデルの更新
     if (model_ != nullptr)
     {
-        //GetGameObject()->transform_->UpdateTransform();
-        model_->UpdateTransform(DirectX::XMLoadFloat4x4(&GetGameObject()->transform_->GetWorldTransform()));
+        DirectX::XMFLOAT4X4 transform = GetGameObject()->GetComponent<TransformCom>()->GetWorldTransform();
+        model_->UpdateTransform(DirectX::XMLoadFloat4x4(&transform));
 
         // 定数バッファの更新
         if (variousConstant.get() != nullptr) {

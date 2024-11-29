@@ -100,7 +100,9 @@ public:
     //LeftShift (固定ダッシュ)
     void DashFewSub(float elapsedTime);
 
+    //スペーススキル(上が単発押しで下のPushingが長押し)
     virtual void SpaceSkill() {}
+    virtual void SpaceSkillPushing(float elapsedTime) {};
 
     //攻撃ウルト取得
     void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }

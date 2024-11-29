@@ -8,7 +8,7 @@ VS_OUT main(VS_IN vin)
     float3 t = float3(0, 0, 0);
 
     // スキニング計算 (最大4つのボーンウェイトに対応)
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < 4; i++)
     {
         p += (vin.boneWeights[i] * mul(vin.position, boneTransforms[vin.boneIndices[i]])).xyz;
         n += (vin.boneWeights[i] * mul(float4(vin.normal.xyz, 0), boneTransforms[vin.boneIndices[i]])).xyz;

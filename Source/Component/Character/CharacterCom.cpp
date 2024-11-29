@@ -321,6 +321,11 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SpaceSkill();
     }
 
+    if (CharacterInput::JumpButton_SPACE & GetButton())
+    {
+        SpaceSkillPushing(elapsedTime);
+    }
+
     //野村追加 Rキー
     if (CharacterInput::UltimetButton_R & GetButtonDown()
         /*&& Rcool.timer >= Rcool.time*/)
@@ -542,15 +547,20 @@ void CharacterCom::UltUpdate(float elapsedTime)
         isMaxUlt = false; // max未到達ならfalseに戻す
     }
 
-    if (isMaxUlt && !prevIsMaxUlt)
+    //例外処理
+    const auto& ultui = GameObjectManager::Instance().Find("UltFrame");
+    if (ultui != nullptr)
     {
-        GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->EasingPlay();
-    }
+        if (isMaxUlt && !prevIsMaxUlt)
+        {
+            GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->EasingPlay();
+        }
 
-    // isMaxUlt が false または変化がない場合は StopEasing を呼ぶ
-    if (!isMaxUlt)
-    {
-        GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->StopEasing();
+        // isMaxUlt が false または変化がない場合は StopEasing を呼ぶ
+        if (!isMaxUlt)
+        {
+            GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->StopEasing();
+        }
     }
 
     // 状態を記録
