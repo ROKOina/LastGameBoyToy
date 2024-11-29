@@ -10,8 +10,8 @@
 #include "CharaStatusCom.h"
 #include "InazawaCharacterCom.h"
 #include "HaveAllAttackCharacter.h"
-#include "Picohard.h"
 #include "JankratCharacterCom.h"
+#include "FarahCom.h"
 #include "Component/Particle/CPUParticle.h"
 #include "Component/Collsion/PushBackCom.h"
 #include "Component/System/HitProcessCom.h"
@@ -21,7 +21,6 @@
 #include "Component\Audio\AudioCom.h"
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Character\Prop\SetNodeWorldPosCom.h>
-#include "Component\Character\FarahCom.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
 {
@@ -398,7 +397,6 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
-
 
     std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
     cameraPost->SetName("cameraPostPlayer");

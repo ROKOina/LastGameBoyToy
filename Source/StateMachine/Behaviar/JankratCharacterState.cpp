@@ -17,9 +17,9 @@ void JankratCharacter_MainAtkState::Enter()
     DirectX::XMFLOAT3 pos = transCom.lock()->GetWorldPosition();
     bullet->transform_->SetWorldPosition({ pos.x,pos.y + 2,pos.z });
     RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::PrimitiveSphere).get();
-    
+
     rigid->SetNormalizeScale(100);
-    RendererCom* r = bullet->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
+    RendererCom* r = bullet->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
     r->LoadModel("Data/Model/Ball/SplitBall.mdl");
 
     charaCom.lock()->SetHaveBullet(bullet);
@@ -30,14 +30,14 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
     if (charaCom.lock()->GetHaveBullet())
     {
         RigidBodyCom* rigid = charaCom.lock()->GetHaveBullet()->GetComponent<RigidBodyCom>().get();
-        
+
         //球がセットされていたら発射
         rigid->SetMass(0.1f);           //質量
         rigid->SetRestitution(2.0f);    //反発係数
         rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); //速くても貫通しないような計算にするフラグ
 
         DirectX::XMFLOAT3 vec = owner->GetGameObject()->transform_->GetWorldFront();
-        rigid->AddForce(Mathf::Normalize({vec.x, vec.y + 0.2f, vec. z}) * 1);
+        rigid->AddForce(Mathf::Normalize({ vec.x, vec.y + 0.2f, vec.z }) * 1);
     }
 
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);

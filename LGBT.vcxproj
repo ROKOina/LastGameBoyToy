@@ -163,6 +163,7 @@
     <ClInclude Include="Source\Component\Character\FarahCom.h" />
     <ClInclude Include="Source\Component\Character\HaveAllAttackCharacter.h" />
     <ClInclude Include="Source\Component\Character\InazawaCharacterCom.h" />
+    <ClInclude Include="Source\Component\Character\JankratCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\Prop\SetNodeWorldPosCom.h" />
     <ClInclude Include="Source\Component\Character\RegisterChara.h" />
     <ClInclude Include="Source\Component\Character\RemoveTimerCom.h" />
@@ -253,6 +254,7 @@
     <ClInclude Include="Source\StateMachine\Behaviar\FarahState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\GateGimmickState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
+    <ClInclude Include="Source\StateMachine\Behaviar\JankratCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\StageGimmickState.h" />
     <ClInclude Include="Source\StateMachine\State.h" />
     <ClInclude Include="Source\StateMachine\StateMachine.h" />
@@ -304,6 +306,7 @@
     <ClCompile Include="Source\Component\Character\FarahCom.cpp" />
     <ClCompile Include="Source\Component\Character\HaveAllAttackCharacter.cpp" />
     <ClCompile Include="Source\Component\Character\InazawaCharacterCom.cpp" />
+    <ClCompile Include="Source\Component\Character\JankratCharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\Prop\SetNodeWorldPosCom.cpp" />
     <ClCompile Include="Source\Component\Character\RegisterChara.cpp" />
     <ClCompile Include="Source\Component\Collsion\ColliderCom.cpp" />
@@ -384,6 +387,7 @@
     <ClCompile Include="Source\StateMachine\Behaviar\FarahState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\GateGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
+    <ClCompile Include="Source\StateMachine\Behaviar\JankratCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\StageGimmickState.cpp" />
     <ClCompile Include="Source\SystemStruct\Dialog.cpp" />
     <ClCompile Include="Source\SystemStruct\Framework.cpp" />
