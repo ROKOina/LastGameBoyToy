@@ -480,7 +480,8 @@ void CharacterCom::Vinetto(float elapsedTime)
             posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
 
             //イージングプレイ
-            GameObjectManager::Instance().Find("HpGauge")->GetComponent<Sprite>()->EasingPlay();
+            if (GameObjectManager::Instance().Find("HpGauge"))
+                GameObjectManager::Instance().Find("HpGauge")->GetComponent<Sprite>()->EasingPlay();
 
             //音
             GetGameObject()->GetComponent<AudioCom>()->Play("P_DAMAGE", false, 10);
