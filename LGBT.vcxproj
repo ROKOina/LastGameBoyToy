@@ -263,6 +263,7 @@
     <ClInclude Include="Source\SystemStruct\Misc.h" />
     <ClInclude Include="Source\SystemStruct\MySequence.h" />
     <ClInclude Include="Source\SystemStruct\ThreadPool.h" />
+    <ClInclude Include="Source\SystemStruct\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />
@@ -388,6 +389,7 @@
     <ClCompile Include="Source\SystemStruct\Framework.cpp" />
     <ClCompile Include="Source\SystemStruct\Logger.cpp" />
     <ClCompile Include="Source\SystemStruct\Main.cpp" />
+    <ClCompile Include="Source\SystemStruct\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

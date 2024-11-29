@@ -2,6 +2,7 @@
 #include "StateMachine\Behaviar\BaseCharacterState.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Math\Mathf.h"
+#include "SystemStruct\TimeManager.h"
 
 //初期化
 void FarahCom::Start()
@@ -35,7 +36,6 @@ void FarahCom::Update(float elapsedTime)
 void FarahCom::OnGUI()
 {
     CharacterCom::OnGUI();
-    ImGui::DragFloat("frontvecpower", &frontvecpower);
 }
 
 //右クリック単発押し処理
@@ -44,30 +44,48 @@ void FarahCom::SubAttackDown()
     // ステート変更
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
 
-    // movecomp取得
+    // 移動コンポーネント取得
     const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
 
-    // 前方向ベクトルを取得（左スティック入力による方向か、ワールド前方向か）
+    // 現在の時間を取得
+    float currentTime = TimeManager::Instance().GetElapsedTime();
+
+    // 水平方向のダッシュ力と上昇力に対する減衰設定
+    static constexpr float DASH_POWER_BASE = 57.0f;    // 初期ダッシュ力
+    static constexpr float DASH_DURATION = 5.0f;      // ダッシュ力が持続する時間
+    static constexpr float LIFT_FORCE_BASE = 3.5f;    // 初期上昇力
+    static constexpr float LIFT_DURATION = 1.0f;      // 上昇力が持続する時間
+    static constexpr float GRAVITY = 9.8f;            // 重力加速度
+
+    // 時間経過に応じたダッシュ力の減衰計算
+    float dashPower = DASH_POWER_BASE * (1.0f - (currentTime / DASH_DURATION));
+    dashPower = (std::max)(dashPower, 0.0f); // 力が負にならないよう制限
+
+    // 前方向ベクトル（入力方向またはワールド前方向）
     DirectX::XMVECTOR frontVec = IsPushLeftStick()
         ? DirectX::XMLoadFloat3(&SceneManager::Instance().InputVec(GetGameObject()))
         : DirectX::XMLoadFloat3(&GetGameObject()->transform_->GetWorldFront());
     frontVec = DirectX::XMVector3Normalize(frontVec); // 正規化
 
-    // ダッシュ力を計算
-    DirectX::XMVECTOR dashForce = DirectX::XMVectorScale(frontVec, dashProgress * frontvecpower);
+    // 減衰後のダッシュ力を計算
+    DirectX::XMVECTOR dashForce = DirectX::XMVectorScale(frontVec, dashPower);
     DirectX::XMFLOAT3 dashForceFloat3;
     DirectX::XMStoreFloat3(&dashForceFloat3, dashForce);
 
-    DirectX::XMFLOAT3 liftForce =
-    {
-        GetGameObject()->transform_->GetWorldPosition().x,
-        dashProgress, // 上昇力を更新
-        GetGameObject()->transform_->GetWorldPosition().z
+    // 時間経過に応じた上昇力の減衰計算
+    float verticalForce = LIFT_FORCE_BASE - (GRAVITY * currentTime);
+    verticalForce = (std::max)(verticalForce, 0.0f); // 力が負にならないよう制限
+
+    // 最終的な力を計算
+    DirectX::XMFLOAT3 liftForce = {
+        0.0f, // X方向は無し
+        verticalForce, // 上昇力
+        0.0f  // Z方向は無し
     };
 
     // 力を移動コンポーネントに加える
-    moveCom->AddForce(liftForce); // 空中の挙動
-    moveCom->AddNonMaxSpeedForce({ dashForceFloat3.x,0.0f,dashForceFloat3.z }); // 前方向の移動
+    moveCom->AddForce(liftForce); // 上昇力
+    moveCom->AddNonMaxSpeedForce({ dashForceFloat3.x, 0.0f, dashForceFloat3.z }); // 水平移動
 }
 
 //スペーススキル長押し

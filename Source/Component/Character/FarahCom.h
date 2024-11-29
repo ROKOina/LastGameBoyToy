@@ -30,9 +30,4 @@ private:
 
     //fps用の腕アニメーション
     void FPSArmAnimation();
-
-private:
-
-    float frontvecpower = 50.0f;
-    float dashProgress = 3.0f;
 };
