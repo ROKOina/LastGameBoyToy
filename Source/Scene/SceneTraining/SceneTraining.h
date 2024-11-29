@@ -30,4 +30,8 @@ public:
 
     //–¼‘OŽæ“¾
     std::string GetName() const override { return "SceneTraining"; };
+
+    GameObj audioObj;
+private:
+    std::unique_ptr<BasicsApplication> photonNet;
 };
