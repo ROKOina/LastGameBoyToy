@@ -160,9 +160,10 @@
     <ClInclude Include="Source\Component\Camera\FreeCameraCom.h" />
     <ClInclude Include="Source\Component\Character\CharacterCom.h" />
     <ClInclude Include="Source\Component\Character\CharaStatusCom.h" />
+    <ClInclude Include="Source\Component\Character\FarahCom.h" />
     <ClInclude Include="Source\Component\Character\HaveAllAttackCharacter.h" />
     <ClInclude Include="Source\Component\Character\InazawaCharacterCom.h" />
-    <ClInclude Include="Source\Component\Character\Picohard.h" />
+    <ClInclude Include="Source\Component\Character\JankratCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\Prop\SetNodeWorldPosCom.h" />
     <ClInclude Include="Source\Component\Character\RegisterChara.h" />
     <ClInclude Include="Source\Component\Character\RemoveTimerCom.h" />
@@ -250,9 +251,10 @@
     <ClInclude Include="Source\Setting\Setting.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BaseCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
+    <ClInclude Include="Source\StateMachine\Behaviar\FarahState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\GateGimmickState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
-    <ClInclude Include="Source\StateMachine\Behaviar\PicohardState.h" />
+    <ClInclude Include="Source\StateMachine\Behaviar\JankratCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\StageGimmickState.h" />
     <ClInclude Include="Source\StateMachine\State.h" />
     <ClInclude Include="Source\StateMachine\StateMachine.h" />
@@ -263,6 +265,7 @@
     <ClInclude Include="Source\SystemStruct\Misc.h" />
     <ClInclude Include="Source\SystemStruct\MySequence.h" />
     <ClInclude Include="Source\SystemStruct\ThreadPool.h" />
+    <ClInclude Include="Source\SystemStruct\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />
@@ -300,9 +303,10 @@
     <ClCompile Include="Source\Component\Camera\FreeCameraCom.cpp" />
     <ClCompile Include="Source\Component\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\CharaStatusCom.cpp" />
+    <ClCompile Include="Source\Component\Character\FarahCom.cpp" />
     <ClCompile Include="Source\Component\Character\HaveAllAttackCharacter.cpp" />
     <ClCompile Include="Source\Component\Character\InazawaCharacterCom.cpp" />
-    <ClCompile Include="Source\Component\Character\Picohard.cpp" />
+    <ClCompile Include="Source\Component\Character\JankratCharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\Prop\SetNodeWorldPosCom.cpp" />
     <ClCompile Include="Source\Component\Character\RegisterChara.cpp" />
     <ClCompile Include="Source\Component\Collsion\ColliderCom.cpp" />
@@ -380,14 +384,16 @@
     <ClCompile Include="Source\Setting\Setting.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BaseCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />
+    <ClCompile Include="Source\StateMachine\Behaviar\FarahState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\GateGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
-    <ClCompile Include="Source\StateMachine\Behaviar\PicohardState.cpp" />
+    <ClCompile Include="Source\StateMachine\Behaviar\JankratCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\StageGimmickState.cpp" />
     <ClCompile Include="Source\SystemStruct\Dialog.cpp" />
     <ClCompile Include="Source\SystemStruct\Framework.cpp" />
     <ClCompile Include="Source\SystemStruct\Logger.cpp" />
     <ClCompile Include="Source\SystemStruct\Main.cpp" />
+    <ClCompile Include="Source\SystemStruct\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -553,10 +559,6 @@
     <FxCompile Include="HLSL\3D\SilhouettePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\3D\StageVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\ToonPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

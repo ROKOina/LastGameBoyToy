@@ -14,6 +14,7 @@
 #include <imgui.h>
 #include <ImGuizmo.h>
 #include "Phsix\Physxlib.h"
+#include "TimeManager.h"
 
 // 垂直同期間隔設定
 static const int syncInterval = 1;
@@ -64,11 +65,16 @@ void Framework::Update(float elapsedTime/*Elapsed seconds from last frame*/, flo
     // 入力更新処理
     input_.Update();
 
+    //時間の更新処理
+    TimeManager& timeManager = TimeManager::Instance();
+    timeManager.Update(elapsedTime);
+    const float& managedTime = timeManager.GetElapsedTime(elapsedTime);
+
     // フィジックス更新
-    PhysXLib::Instance().Update(elapsedTime);
+    PhysXLib::Instance().Update(managedTime);
 
     // シーン更新処理
-    SceneManager::Instance().Update(elapsedTime);
+    SceneManager::Instance().Update(managedTime);
 
 #ifdef _DEBUG
     //IMGUI更新

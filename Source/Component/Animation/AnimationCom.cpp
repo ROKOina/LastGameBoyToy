@@ -560,8 +560,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
             //再生時間とキーフレームの時間から補完率を算出する
             float rate = (lowerCurrentAnimationSeconds - keyframe0.seconds) / (keyframe1.seconds - keyframe0.seconds);
 
-            
-
             int lowerNodeCount = static_cast<int>(lowerNodes.size());
             for (int nodeIndex = 0, lowerNodeIndex = 0; lowerNodeIndex < lowerNodeCount; ++nodeIndex)
             {

@@ -35,7 +35,6 @@ struct INSTANCE_VS_IN
 cbuffer CbMesh : register(b1)
 {
     row_major float4x4 boneTransforms[MAX_BONES];
-    row_major float4x4 offsetTransforms[MAX_BONES];
 };
 
 cbuffer MaterialInformation : register(b2)

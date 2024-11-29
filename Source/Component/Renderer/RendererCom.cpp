@@ -103,24 +103,14 @@ void RendererCom::Update(float elapsedTime)
         BoundsMax.x = (std::max)(BoundsMax.x, worldBoundsMax.x);
         BoundsMax.y = (std::max)(BoundsMax.y, worldBoundsMax.y);
         BoundsMax.z = (std::max)(BoundsMax.z, worldBoundsMax.z);
-
-        /*if (std::string(GetGameObject()->GetName()) == "Reactar0")
-        {
-            auto s = GetGameObject()->transform_->GetScale();
-            DirectX::XMFLOAT3 a = (mesh.boundsMax - mesh.boundsMin) * s / 2;
-            DirectX::XMFLOAT3 b = { 0,0,0 };
-            b = (((mesh.boundsMax - mesh.boundsMin) / 2) + mesh.boundsMin) * s;
-            DirectX::XMFLOAT3 wPos = b + GetGameObject()->transform_->GetWorldPosition();
-            Graphics::Instance().GetDebugRenderer()->DrawBox(wPos, a, { 1.0f,1.0f,0.0f,1.0f });
-        }*/
     }
 
     DirectX::XMFLOAT3 boundsMax = BoundsMax;
     DirectX::XMFLOAT3 boundsMin = BoundsMin;
 
-    bounds.x = (boundsMax.x - boundsMin.x) / 2.0f;  // GetGameObject()->transform_->GetScale().x;
-    bounds.y = (boundsMax.y - boundsMin.y) / 2.0f;                           //GetGameObject()->transform_->GetScale().y;
-    bounds.z = (boundsMax.z - boundsMin.z) / 2.0f;                           //GetGameObject()->transform_->GetScale().z;
+    bounds.x = (boundsMax.x - boundsMin.x) / 2.0f;
+    bounds.y = (boundsMax.y - boundsMin.y) / 2.0f;
+    bounds.z = (boundsMax.z - boundsMin.z) / 2.0f;
 
     DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
 

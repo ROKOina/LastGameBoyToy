@@ -57,9 +57,8 @@ void ScenePVP::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        freeCamera->AddComponent<FreeCameraCom>()->ActiveCameraChange();
-        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-        
+        freeCamera->AddComponent<FreeCameraCom>();
+        freeCamera->transform_->SetWorldPosition({ 0, 5, -103 });
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 #endif
@@ -78,7 +77,7 @@ void ScenePVP::Initialize()
         stageObj->SetName("stage");
         stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
         stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
-        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
         r->SetOutlineIntensity(5.5f);
@@ -110,7 +109,7 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::FARAH, obj);
     }
 
     //snowparticle
@@ -121,7 +120,7 @@ void ScenePVP::Initialize()
     }
 
     //UIゲームオブジェクト生成
-    CreateUiObject();
+    //CreateUiObject();
 
 #pragma endregion
 
@@ -150,6 +149,7 @@ void ScenePVP::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
+    //ゲームオブジェクトの行列更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }

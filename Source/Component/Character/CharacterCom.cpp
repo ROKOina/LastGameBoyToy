@@ -11,6 +11,7 @@
 #include "Setting/Setting.h"
 #include "Component\Audio\AudioCom.h"
 #include "Component\Sprite\Sprite.h"
+#include "Component\Renderer\RendererCom.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -78,21 +79,21 @@ void CharacterCom::Update(float elapsedTime)
             }
 
             //ゲージ増やす
-            dashGauge += dashGaugePlus * elapsedTime;
-            if (dashGauge > dashGaugeMax)
-            {
-                dashGauge = dashGaugeMax;
-            }
+            //dashGauge += dashGaugePlus * elapsedTime;
+            //if (dashGauge > dashGaugeMax)
+            //{
+            //    dashGauge = dashGaugeMax;
+            //}
         }
     }
     else
         dashDraceTimer = dashDraceTime; //ダッシュ猶予時間
 
-    //ウルト更新
-    UltUpdate(elapsedTime);
+    ////ウルト更新
+    //UltUpdate(elapsedTime);
 
-    //クールダウン更新
-    CoolUpdate(elapsedTime);
+    ////クールダウン更新
+    //CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
     Vinetto(elapsedTime);
@@ -224,7 +225,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
 #ifdef _DEBUG
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()
-        && GamePad::BTN_LEFT_SHOULDER & GetButton())
+        && GamePad::BTN_A & GetButton())
     {
         //ウルト中は攻撃が変わる
         if (!isUseUlt)
@@ -248,7 +249,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
-        && GamePad::BTN_LEFT_SHOULDER & GetButton())
+        && GamePad::BTN_A & GetButton())
     {
         if (!isUseUlt)
             MainAttackPushing();
@@ -318,6 +319,11 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     {
         Spacecool.timer = 0;
         SpaceSkill();
+    }
+
+    if (CharacterInput::JumpButton_SPACE & GetButton())
+    {
+        SpaceSkillPushing(elapsedTime);
     }
 
     //野村追加 Rキー
@@ -541,15 +547,20 @@ void CharacterCom::UltUpdate(float elapsedTime)
         isMaxUlt = false; // max未到達ならfalseに戻す
     }
 
-    if (isMaxUlt && !prevIsMaxUlt)
+    //例外処理
+    const auto& ultui = GameObjectManager::Instance().Find("UltFrame");
+    if (ultui != nullptr)
     {
-        GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->EasingPlay();
-    }
+        if (isMaxUlt && !prevIsMaxUlt)
+        {
+            GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->EasingPlay();
+        }
 
-    // isMaxUlt が false または変化がない場合は StopEasing を呼ぶ
-    if (!isMaxUlt)
-    {
-        GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->StopEasing();
+        // isMaxUlt が false または変化がない場合は StopEasing を呼ぶ
+        if (!isMaxUlt)
+        {
+            GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->StopEasing();
+        }
     }
 
     // 状態を記録
