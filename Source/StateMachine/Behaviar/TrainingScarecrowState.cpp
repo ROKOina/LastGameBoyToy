@@ -22,9 +22,19 @@ void Scarecrow_BaseState::RandomMove(float moveSpeed)
 {
     float posX = transCom.lock()->GetWorldPosition().x;
 
-    randomPos.x = Mathf::RandomRange(limitLeftX, limitRightX);
+    randomPos.x = Mathf::RandomRange(-28.0f, -10.0f);
     randomPos.y = 0.0f;
-    randomPos.z = transCom.lock()->GetWorldPosition().z;
+    randomPos.z = 0.0f;
+
+
+    DirectX::XMVECTOR Vec = DirectX::XMLoadFloat3(&randomPos);
+    DirectX::XMVECTOR Vec1 = DirectX::XMLoadFloat3(&transCom.lock()->GetWorldPosition());
+
+    DirectX::XMVECTOR Vec2 = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(Vec, Vec1));
+
+    DirectX::XMStoreFloat3(&VEC, Vec2);
+    VEC.y = 0.0;
+    VEC.z = 0.0;
 }
 
 #pragma region ‘Ò‹@
@@ -75,11 +85,24 @@ void Scarecrow_MoveState::Enter()
 
 void Scarecrow_MoveState::Execute(const float& elapsedTime)
 {
+    
+    DirectX::XMVECTOR Vec = DirectX::XMLoadFloat3(&randomPos);
+    DirectX::XMFLOAT3 pos = transCom.lock()->GetWorldPosition();
+    pos.y = 0.0;
+    pos.z = 0.0;
+    DirectX::XMVECTOR Vec1 = DirectX::XMLoadFloat3(&pos);
 
-    moveCom.lock()->AddForce(randomPos * moveSpeed);
+    DirectX::XMVECTOR Vec2 = DirectX::XMVectorSubtract(Vec1, Vec);
 
 
-    if (randomPos.x == transCom.lock()->GetWorldPosition().x)
+
+    moveCom.lock()->AddForce(VEC * moveSpeed);
+
+    
+
+    float Distanc=DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec2));
+
+    if (Distanc<0.1f)
     {
         scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::RANDOMIDLE);
     }

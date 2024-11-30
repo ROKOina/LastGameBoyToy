@@ -143,8 +143,8 @@ void TrainingSystem::TrainingSystemStart()
         r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
         r->SetOutlineColor({ 1,0,0 });
         r->SetOutlineIntensity(10.0f);
-        scarecrow3->transform_->SetWorldPosition({ -10.0f,0.0f,-19.323f });
-        scarecrow3->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
+        scarecrow3->transform_->SetWorldPosition({ -18.0f,0.0f,-19.323f });
+        scarecrow3->transform_->SetScale({ 0.08f, 0.08f, 0.08f });
         scarecrow3->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = scarecrow3->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
@@ -160,7 +160,32 @@ void TrainingSystem::TrainingSystemStart()
         std::shared_ptr<PushBackCom>pushBack = scarecrow3->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
+    }
 
+    {
+        auto& scarecrow4 = GameObjectManager::Instance().Create();
+        scarecrow4->SetName("scarecrow4");
+        std::shared_ptr<RendererCom> r = scarecrow4->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
+        r->SetOutlineColor({ 1,0,0 });
+        r->SetOutlineIntensity(10.0f);
+        scarecrow4->transform_->SetWorldPosition({ -18.0f,0.0f,-20.0f });
+        scarecrow4->transform_->SetScale({ 0.08f, 0.08f, 0.08f });
+        scarecrow4->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+        std::shared_ptr<SphereColliderCom> collider = scarecrow4->AddComponent<SphereColliderCom>();
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
+        scarecrow4->AddComponent<AnimationCom>();
+        scarecrow4->AddComponent<MovementCom>();
+        scarecrow4->AddComponent<ScarecrowCom>();
+
+        auto& charaStatusCom = scarecrow4->AddComponent<CharaStatusCom>();
+        charaStatusCom->SetInvincibleTime(0.1f);
+        charaStatusCom->SetHitPoint(100);
+        charaStatusCom->SetMaxHitPoint(100);
+        scarecrow4->AddComponent<AudioCom>();
+        std::shared_ptr<PushBackCom>pushBack = scarecrow4->AddComponent<PushBackCom>();
+        pushBack->SetRadius(1.5f);
+        pushBack->SetWeight(600.0f);
     }
 }
 

@@ -25,11 +25,13 @@ public:
     //ランダムで右左に行って制限値を超えたら　ゼッタイ逆向きに進むようにする
 
     DirectX::XMFLOAT3 randomPos = { 0,0,0 };
-
-    float limitRightX = 10.0f;
+    DirectX::XMFLOAT3 VEC = { 0,0,0 };
+    
+    float limitRightX = -28.0f;
     float limitLeftX = -10.0f;
-    float moveSpeed = 0.5f;
+    float moveSpeed = 2.0f;
 
+    
     // 0=右 1=左
     int rightleftIndex = 0;
 
