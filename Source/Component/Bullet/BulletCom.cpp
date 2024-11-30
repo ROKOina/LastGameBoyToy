@@ -128,7 +128,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     //発射位置算出用変数定義
     DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
     auto& cameraObj = objPoint->GetChildFind("cameraPostPlayer");
-   
+
     //見た目部分
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
@@ -317,4 +317,102 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
     DirectX::XMFLOAT3 knockVec = { 0,2,0 };
     hit->SetValue3(Mathf::Lerp(startpos, knockVec, 0.3f));
+}
+
+//ファラ通常弾
+void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power, int damageValue)
+{
+    //発射位置算出用変数定義
+    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
+    auto& cameraObj = objPoint->GetChildFind("cameraPostPlayer");
+
+    //見た目部分
+    GameObj viewObj = GameObjectManager::Instance().Create();
+    viewObj->SetName("damageballView");
+
+    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
+    trail->SetTransform(viewObj->transform_->GetWorldTransform());
+
+    DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
+    float ya;
+    if (cameraObj)
+        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
+    else
+        ya = 1.5f;
+
+    firePos.y += ya;
+    viewObj->transform_->SetWorldPosition(firePos);
+
+    //弾発射
+    std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
+    moveCom->SetGravity(0.0f);
+    moveCom->SetFriction(0.0f);
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+
+    //銃口から発射する
+    if (cameraObj)
+    {
+        auto& arm = cameraObj->GetChildFind("armChild");
+        if (arm)
+        {
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& node = model->FindNode("gun2");
+
+            DirectX::XMFLOAT3 gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+            DirectX::XMFLOAT3 cameraPos = cameraObj->transform_->GetWorldPosition();
+
+            //カメラの子供にする
+            DirectX::XMFLOAT3 cameraFromGun = gunPos - cameraPos;
+            DirectX::XMFLOAT3 fpsPos = fpsDir * 60;
+
+            DirectX::XMFLOAT3 velo = fpsPos - cameraFromGun;
+            moveCom->SetNonMaxSpeedVelocity(Mathf::Normalize(velo) * bulletSpeed);
+            viewObj->transform_->SetWorldPosition(gunPos);
+        }
+    }
+
+    moveCom->SetIsRaycast(false);
+
+    //パーティクル
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    bulletgpuparticle->Play();
+    std::shared_ptr<GameObject>bullettrajectory = viewObj->AddChildObject();
+    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
+    bullettrajectoryparticle->Play();
+
+    //判定部分
+    GameObj colObj = GameObjectManager::Instance().Create();
+    colObj->SetName("damageball");
+
+    colObj->transform_->SetWorldPosition(firePos);
+
+    ///////////////////////////////
+
+    //弾発射
+    moveCom = colObj->AddComponent<MovementCom>();
+    moveCom->SetGravity(0.0f);
+    moveCom->SetFriction(0.0f);
+
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+    moveCom->SetIsRaycast(false);
+
+    std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
+    coll->SetMyTag(COLLIDER_TAG::Bullet);
+    if (std::strcmp(objPoint->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.6f);
+
+    //弾
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
+    bulletCom->SetAliveTime(5.0f);
+    bulletCom->SetDamageValue(-damageValue);
+    bulletCom->SetViewBullet(viewObj);
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(damageValue);
 }

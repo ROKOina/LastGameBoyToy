@@ -26,6 +26,9 @@ public:
     //Eスキル
     void SubSkill() override;
 
+    //メインの攻撃
+    void MainAttackDown() override;
+
 private:
 
     //fps用の腕アニメーション

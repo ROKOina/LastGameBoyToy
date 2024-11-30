@@ -120,7 +120,7 @@ void ScenePVP::Initialize()
     }
 
     //UIゲームオブジェクト生成
-    //CreateUiObject();
+    CreateUiObject();
 
 #pragma endregion
 
@@ -175,6 +175,7 @@ void ScenePVP::Render(float elapsedTime)
     //オブジェクト生成関数
 #ifdef _DEBUG
     NewObject();
+    RegisterChara::Instance().ImGui();
 #endif
 
     //オブジェクト描画

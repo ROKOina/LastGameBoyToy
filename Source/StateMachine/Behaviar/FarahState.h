@@ -20,4 +20,15 @@ protected:
     std::weak_ptr<AnimationCom> animationCom;
 };
 
-//
+//ƒƒCƒ“UŒ‚
+class Farah_MainAttackState : public Farah_BaseState
+{
+public:
+    Farah_MainAttackState(CharacterCom* owner) :Farah_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "MainAttack"; }
+};

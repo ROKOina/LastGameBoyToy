@@ -43,6 +43,11 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     }
 }
 
+//imgui
+void RegisterChara::ImGui()
+{
+}
+
 //稲澤キャラ
 void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 {
@@ -362,6 +367,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
+    if (std::strcmp(obj->GetName(), "player") == 0)
     {
         std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
         std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();

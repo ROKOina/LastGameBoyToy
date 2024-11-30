@@ -3,6 +3,7 @@
 #include "Component\Renderer\RendererCom.h"
 #include "Math\Mathf.h"
 #include "SystemStruct\TimeManager.h"
+#include "StateMachine\Behaviar\FarahState.h"
 
 //初期化
 void FarahCom::Start()
@@ -17,6 +18,7 @@ void FarahCom::Start()
 
     //ステート登録(攻撃関係)
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<Farah_MainAttackState>(this));
 
     //初期ステート
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
@@ -101,20 +103,34 @@ void FarahCom::SpaceSkillPushing(float elapsedTime)
 //Eスキル
 void FarahCom::SubSkill()
 {
-    //ステート変更
-    moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
+    if (!UseUlt())
+    {
+        //ステート変更
+        moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
 
-    const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
+        const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
 
-    //一瞬の飛び
-    DirectX::XMFLOAT3 power = {
-        0.0f,
-        Mathf::Lerp(0.0f,10.0f,0.8f),
-        0.0f
-    };
+        //一瞬の飛び
+        DirectX::XMFLOAT3 power = {
+            0.0f,
+            Mathf::Lerp(0.0f,10.0f,0.8f),
+            0.0f
+        };
 
-    // 力を移動コンポーネントに加える
-    moveCom->AddForce(power);
+        // 力を移動コンポーネントに加える
+        moveCom->AddForce(power);
+    }
+    else
+    {
+        ResetESkillCool();
+    }
+}
+
+//メインの攻撃
+void FarahCom::MainAttackDown()
+{
+    //弾丸発射
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
 }
 
 static float AH = 0;

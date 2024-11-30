@@ -60,13 +60,6 @@ public:
         MAX,
     };
 
-    //状態異常の種類
-    enum class AbnormalCondition
-    {
-        STAN,
-        MAX
-    };
-
 public:
     CharacterCom() {};
     ~CharacterCom() override {};
@@ -287,8 +280,6 @@ private:
     int attackUltCountMax = 5;  //ウルトを打てる数
     int attackUltCounter;
     std::weak_ptr<GameObject> attackUltRayObj;  //ウルトレイ
-
-    AbnormalCondition abnormalcondition;
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;
