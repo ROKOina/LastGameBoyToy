@@ -101,6 +101,11 @@ void TrainingSystem::TrainingSystemStart()
         std::shared_ptr<SphereColliderCom> collider = scarecrow1->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         scarecrow1->AddComponent<AnimationCom>();
+        scarecrow1->AddComponent<MovementCom>();
+        
+        auto& scareCom = scarecrow1->AddComponent<ScarecrowCom>();
+        scareCom->SetCrowMode(0);
+
         auto& charaStatusCom = scarecrow1->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
         charaStatusCom->SetHitPoint(100);
@@ -124,6 +129,10 @@ void TrainingSystem::TrainingSystemStart()
         std::shared_ptr<SphereColliderCom> collider = scarecrow2->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         scarecrow2->AddComponent<AnimationCom>();
+        scarecrow2->AddComponent<MovementCom>();
+        auto& scareCom = scarecrow2->AddComponent<ScarecrowCom>();
+        scareCom->SetCrowMode(0);
+
         auto& charaStatusCom = scarecrow2->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
         charaStatusCom->SetHitPoint(100);

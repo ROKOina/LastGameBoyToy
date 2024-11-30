@@ -124,6 +124,23 @@ void Scarecrow_DeathState::Enter()
 
 void Scarecrow_DeathState::Execute(const float& elapsedTime)
 {
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        owner->GetGameObject()->GetComponent<RendererCom>()->SetEnabled(false);
+        reSpawn = true;
+    }
 
+    if (reSpawn)
+    {
+        reSpawnTimer += elapsedTime;
+        if (reSpawnTimer > reSpawnTime)
+        {
+            reSpawn = false;
+            reSpawnTimer = 0.0f;
+            owner->GetGameObject()->GetComponent<RendererCom>()->SetEnabled(true);
+            characterstatas.lock()->ReSpawn(100);
+            scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::IDLE);
+        }
+    }
 }
 

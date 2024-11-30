@@ -34,6 +34,15 @@ void CharaStatusCom::AddDamagePoint(float value)
     }
 }
 
+void CharaStatusCom::ReSpawn(int HP)
+{
+    //復活後のHP
+    hitPoint = HP;
+
+    //デスフラグを撤回
+    isDeath = false;
+}
+
 //GUI
 void CharaStatusCom::OnGUI()
 {

@@ -25,7 +25,7 @@ public:
 public:
     //モードのゲッター
     int GetCrowMode() { return scareCrowMode; }
-
+    void SetCrowMode(int Index) { scareCrowMode = Index; }
 public:
     //ステート
     enum class ScareCrowState

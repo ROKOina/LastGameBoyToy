@@ -20,9 +20,7 @@ public:
     Scarecrow_BaseState(ScarecrowCom* owner);
 
     void RandomMove(float moveSpeed);
-    //ルール
-    //メモ帳に書くとなくすからここに書きます
-    //ランダムで右左に行って制限値を超えたら　ゼッタイ逆向きに進むようにする
+  
 
     DirectX::XMFLOAT3 randomPos = { 0,0,0 };
     DirectX::XMFLOAT3 VEC = { 0,0,0 };
@@ -32,9 +30,8 @@ public:
     float moveSpeed = 2.0f;
 
     
-    // 0=右 1=左
-    int rightleftIndex = 0;
-
+    bool reSpawn = false;
+  
 protected:
     std::weak_ptr<ScarecrowCom> scarecrowCom;
     std::weak_ptr<MovementCom> moveCom;
@@ -105,5 +102,7 @@ public:
     //void Exit()override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "Death"; }
-
+private:
+    float reSpawnTime = 1.0f;
+    float reSpawnTimer = 0.0f;
 };
