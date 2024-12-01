@@ -38,6 +38,8 @@ public:
 
         DEATH,
 
+        SHOOTINGDEATH,
+
         MAX
     };
 
@@ -54,7 +56,7 @@ private:
     StateMachine<ScarecrowCom, ScareCrowState> state;
 
     //案山子のモード
-    //0=棒立ち　1＝ランダム移動
+    //0=棒立ち　1＝ランダム移動　2=射的
     int scareCrowMode = 1;
 
 };

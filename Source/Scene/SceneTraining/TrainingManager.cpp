@@ -52,7 +52,7 @@ TutorialSystem::~TutorialSystem()
 }
 
 
-
+#pragma region トレーニング統括
 void TrainingManager::TrainingManagerStart()
 {
     TrainingSystem::Instance().TrainingSystemStart();
@@ -78,7 +78,13 @@ void TrainingManager::TrainingManagerClear()
     TutorialSystem::Instance().TutorialSystemClear();
     TrainingSystem::Instance().TrainingSystemClear();
 }
+#pragma endregion
 
+
+
+
+
+#pragma region トレーニングモード
 void TrainingSystem::TrainingSystemStart()
 {
     ////棒立ち案山子
@@ -87,7 +93,7 @@ void TrainingSystem::TrainingSystemStart()
     //    GameObjectManager::Instance().Find("scarecrow2")->GetComponent<AnimationCom>()->PlayAnimation(GameObjectManager::Instance().Find("scarecrow2")->GetComponent<AnimationCom>()->FindAnimation("Boss_idol"), true, false, 0.1f);
     //}
 
-        //棒立ち案山子君
+    //棒立ち案山子君
     {
         auto& scarecrow1 = GameObjectManager::Instance().Create();
         scarecrow1->SetName("scarecrow1");
@@ -144,7 +150,6 @@ void TrainingSystem::TrainingSystemStart()
 
     }
 
-
     {
         auto& scarecrow3 = GameObjectManager::Instance().Create();
         scarecrow3->SetName("scarecrow3");
@@ -196,11 +201,42 @@ void TrainingSystem::TrainingSystemStart()
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
     }
+
+    {
+        auto& scarecrow5 = GameObjectManager::Instance().Create();
+        scarecrow5->SetName("scarecrow5");
+        std::shared_ptr<RendererCom> r = scarecrow5->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
+        r->SetOutlineColor({ 1,0,0 });
+        r->SetOutlineIntensity(10.0f);
+        scarecrow5->transform_->SetWorldPosition({-2.656f, 0.0f, -46.567f});
+        scarecrow5->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
+        scarecrow5->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+        std::shared_ptr<SphereColliderCom> collider = scarecrow5->AddComponent<SphereColliderCom>();
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
+        scarecrow5->AddComponent<AnimationCom>();
+        scarecrow5->AddComponent<MovementCom>();
+
+        auto& scareCom = scarecrow5->AddComponent<ScarecrowCom>();
+        scareCom->SetCrowMode(0);
+
+        auto& charaStatusCom = scarecrow5->AddComponent<CharaStatusCom>();
+        charaStatusCom->SetInvincibleTime(0.1f);
+        charaStatusCom->SetHitPoint(10);
+        charaStatusCom->SetMaxHitPoint(10);
+        scarecrow5->AddComponent<AudioCom>();
+        std::shared_ptr<PushBackCom>pushBack = scarecrow5->AddComponent<PushBackCom>();
+        pushBack->SetRadius(1.5f);
+        pushBack->SetWeight(600.0f);
+    }
 }
 
 void TrainingSystem::TrainingSystemUpdate(float elapsedTime)
 {
-
+    if (shootingStartFlag)
+    {
+        ShootingSystem(elapsedTime);
+    }
 }
 
 void TrainingSystem::TrainingSystemClear()
@@ -208,6 +244,49 @@ void TrainingSystem::TrainingSystemClear()
 
 }
 
+
+void TrainingSystem::ShootingRandomSpawn()
+{
+    DirectX::XMFLOAT3 randomPos;
+    randomPos.x = Mathf::RandomRange(-23.737f, 19.528f);
+    randomPos.y = 0.0f;
+    randomPos.z = Mathf::RandomRange(-65.607f, -46.164f);
+    GameObjectManager::Instance().Find("scarecrow5")->transform_->SetWorldPosition(randomPos);
+
+}
+
+void TrainingSystem::ShootingSystem(float elapsdTime)
+{
+    scarecrowLifeTimer += elapsdTime;
+    if (scarecrowLifeTime < scarecrowLifeTimer)
+    {
+        ShootingRandomSpawn();
+        scarecrowLifeTimer = 0.0f;
+    }
+
+    if (GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->IsDeath())
+    {
+        shootingIntervalFlag = true;
+        scarecrowLifeTimer = 0.0f;
+    }
+
+    if (shootingIntervalFlag)
+    {
+        scarecrowSpawnIntervalTimer += elapsdTime;
+        if (scarecrowSpawnIntervalTime < scarecrowSpawnIntervalTimer)
+        {
+            shootingIntervalFlag = false;
+        }
+    }
+    
+}
+#pragma endregion
+
+
+
+
+
+#pragma region チュートリアルモード
 void TutorialSystem::TutorialSystemStart()
 {
     
@@ -223,4 +302,5 @@ void TutorialSystem::TutorialSystemClear()
 {
 
 }
+#pragma endregion
 

@@ -48,6 +48,32 @@ public:
     void TrainingSystemStart();
     void TrainingSystemClear();
 
+public:
+
+    bool GetShootingIntervalFlag() { return shootingIntervalFlag; }
+
+private:
+    //射撃のロジック？
+    void ShootingSystem(float elapsdTime);
+
+    void ShootingRandomSpawn();
+
+private:
+    int     shootingScore = 0;
+    float   scarecrowSpawnTime = 1.0f;  //倒してから1秒間待つ
+    float   scarecrowSpawnTimer = 0.0f;
+    float   scarecrowLifeTime = 1.0f;
+    float   scarecrowLifeTimer = 0.0f;
+    float   scarecrowSpawnIntervalTime  = 1.0f;
+    float   scarecrowSpawnIntervalTimer = 0.0f;
+    DirectX::XMFLOAT3 randomPos = { 0,0,0 };
+    bool    shootingStartFlag = true;
+    bool    shootingIntervalFlag = false;
+
+
+    //難易度変化させるか？
+    //分からん
+
 };
 
 class TutorialSystem

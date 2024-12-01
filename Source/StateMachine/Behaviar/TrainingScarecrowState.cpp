@@ -5,6 +5,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\System\SpawnCom.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Scene/SceneTraining/TrainingManager.h"
 
 
 //基底コンストラクタ
@@ -55,6 +56,11 @@ void Scarecrow_IdleState::Execute(const float& elapsedTime)
     if (characterstatas.lock()->IsDeath())
     {
         scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::DEATH);
+    }
+
+    if (owner->GetCrowMode() == 2 && characterstatas.lock()->IsDeath())
+    {
+        scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::SHOOTINGDEATH);
     }
 }
 #pragma endregion
@@ -114,7 +120,7 @@ void Scarecrow_MoveState::Execute(const float& elapsedTime)
         scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::DEATH);
     }
 }
-
+#pragma endregion
 
 #pragma region 死亡
 void Scarecrow_DeathState::Enter()
@@ -143,4 +149,22 @@ void Scarecrow_DeathState::Execute(const float& elapsedTime)
         }
     }
 }
+#pragma endregion
 
+
+#pragma region 射撃死亡
+void Scarecrow_Shooting::Enter()
+{
+
+}
+
+void Scarecrow_Shooting::Execute(const float& elapsedTime)
+{
+    if (TrainingSystem::Instance().GetShootingIntervalFlag())
+    {
+        //いつもここから
+
+    }
+}
+
+#pragma endregion
