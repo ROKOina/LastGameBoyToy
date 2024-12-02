@@ -240,7 +240,7 @@ private:
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>   moveStateMachine;
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
-    GameObject* cameraObj = nullptr;
+    GameObject* cameraObj = nullptr;    //©•ª‚ÌƒLƒƒƒ‰‚Ìê‡‚¾‚¯“ü‚é
 
     bool useMoveFlag = true;//false‚É‚·‚é‚ÆmoveState‚ğg‚í‚È‚¢
     float jumpPower = 3.0f;

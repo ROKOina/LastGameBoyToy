@@ -6,8 +6,9 @@
 class HitProcessCom : public Component
 {
 public:
-    HitProcessCom(std::shared_ptr<GameObject> obj)
-        : hitIntervalTimer(0), myObj(obj)
+    //myObjにキャラクターコンポーネントを入れる
+    HitProcessCom(std::shared_ptr<GameObject> charaObj)
+        : hitIntervalTimer(0), myObj(charaObj)
     {}
     ~HitProcessCom() override {}
 
