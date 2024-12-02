@@ -426,7 +426,6 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(damageValue);
 }
-}
 
 GameObj BulletCreate::JankratBombFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id)
 {
@@ -435,7 +434,7 @@ GameObj BulletCreate::JankratBombFire(std::shared_ptr<GameObject> parent, Direct
     bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
     bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
     RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
-    RendererCom* r = bullet->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
+    RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
     //r->LoadModel("Data/Model/Ball/SplitBall.mdl");
     r->LoadModel("Data/Model/Jankrat/mine.mdl");
 
