@@ -14,12 +14,6 @@ void SettingScreen::CreateSettingUiObject()
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("settingCanvas");
 
-    //Ý’è
-    {
-        auto& settingTitle = obj->AddChildObject();
-        settingTitle->SetName("settingTitle");
-        settingTitle->AddComponent<Sprite>("Data/SerializeData/UIData/setting/settingTitle.ui", Sprite::SpriteShader::DEFALT, false);
-    }
 
     //ŠO˜g
     {
@@ -31,8 +25,14 @@ void SettingScreen::CreateSettingUiObject()
 
     }
 
-    std::vector<int> barInitial;
+    //Ý’è
+    {
+        auto& settingTitle = obj->AddChildObject();
+        settingTitle->SetName("settingTitle");
+        settingTitle->AddComponent<Sprite>("Data/SerializeData/UIData/setting/settingTitle.ui", Sprite::SpriteShader::DEFALT, false);
+    }
 
+    std::vector<int> barInitial;
     //Š´“x
     {
         auto& mouseSen = obj->AddChildObject();
