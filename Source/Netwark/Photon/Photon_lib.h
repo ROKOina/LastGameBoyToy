@@ -176,6 +176,7 @@ private:
             inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
         }
 
+        std::string name = {};
         int id;
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 

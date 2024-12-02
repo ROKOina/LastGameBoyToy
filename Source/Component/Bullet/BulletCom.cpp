@@ -96,7 +96,7 @@ void BulletCom::BulletVSEnemyMissile()
         // "BOSS" でないオブジェクトのみ削除リストに追加
         if (gameObject)
         {
-            if (hitobject.gameObject.lock()->GetComponent<SphereColliderCom>()->GetMyTag() == COLLIDER_TAG::EnemyBullet)
+            if (hitobject.gameObject.lock()->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::EnemyBullet)
             {
                 //爆破エフェクト再生
                 GameObj obj = GameObjectManager::Instance().Create();

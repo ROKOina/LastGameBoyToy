@@ -150,6 +150,8 @@ struct NetData
 {
     bool isMasterClient;
     int id;
+    char name[50];
+    int startTime;
 
     std::vector<SaveBuffer> saveInputBuf;
 
@@ -168,6 +170,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
     out << h.isMasterClient << " ";
     out << h.id << " ";
+    out << h.name << " ";
+    out << h.startTime << " ";
     out << h.damageData << " ";
     out << h.healData << " ";
     out << h.stanData << " ";
@@ -189,6 +193,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
     in >> h.isMasterClient;
     in >> h.id;
+    in >> h.name;
+    in >> h.startTime;
     in >> h.damageData;
     in >> h.healData;
     in >> h.stanData;

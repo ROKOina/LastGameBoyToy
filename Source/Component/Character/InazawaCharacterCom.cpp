@@ -7,6 +7,10 @@
 #include "CharaStatusCom.h"
 #include "Component\UI\PlayerUI.h"
 #include "Component\Sprite\Sprite.h"
+#include "Component\Particle\GPUParticle.h"
+#include "Component\Collsion\ColliderCom.h"
+#include "Component\Character\RemoveTimerCom.h"
+#include "Component\Audio\AudioCom.h"
 
 void InazawaCharacterCom::Start()
 {
@@ -50,19 +54,52 @@ void InazawaCharacterCom::Update(float elapsedTime)
         if (CharacterInput::MainAttackButton & GetButtonUp())
             attackInputSave = false;
     }
-}
 
-static float AH = 0;
+    //ウルトエフェクト
+    if (attackUltRayObj.lock())
+    {
+        auto& rayCol = attackUltRayObj.lock()->GetComponent<Collider>();
+        if (rayCol)
+        {
+            for (auto& obj : rayCol->OnHitGameObject())
+            {
+                {
+                    std::shared_ptr<GameObject> attackUltEffBomb = GameObjectManager::Instance().Create();
+                    attackUltEffBomb->SetName("attackUltEffBomb");
+                    attackUltEffBomb->transform_->SetWorldPosition(obj.hitPos);
+                    std::shared_ptr<GPUParticle> eff = attackUltEffBomb->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircle.gpuparticle", 300);
+                    eff->Play();
+                    attackUltEffBomb->AddComponent<RemoveTimerCom>(3);
+                    {
+                        std::shared_ptr<GameObject> attackUltEffBomb02 = attackUltEffBomb->AddChildObject();
+                        attackUltEffBomb02->SetName("attackUltEffBomb02");
+                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb02->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircleLight.gpuparticle", 100);
+                        eff->Play();
+                    }
+                    {
+                        std::shared_ptr<GameObject> attackUltEffBomb03 = attackUltEffBomb->AddChildObject();
+                        attackUltEffBomb03->SetName("attackUltEffBomb03");
+                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb03->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombFire.gpuparticle", 50);
+                        eff->Play();
+                    }
+
+                    //音
+                    GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACK_ULT_BOOM");
+                    GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACK_ULT_BOOM", false, 10);
+                }
+            }
+        }
+    }
+}
 
 void InazawaCharacterCom::OnGUI()
 {
     CharacterCom::OnGUI();
     ImGui::DragFloat("shootTime", &shootTime);
     ImGui::DragFloat("shootTimer", &shootTimer);
-    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
 
-    ImGui::DragFloat("A", &AH);
+    ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
+    ImGui::DragInt("attackUltCounter", &attackUltCounter);
 }
 
 void InazawaCharacterCom::MainAttackDown()
@@ -78,6 +115,23 @@ void InazawaCharacterCom::MainAttackDown()
     //    attackInputSave = true; //先行入力保存
     //    return;
     //}
+
+    //ウルト発動中
+    if (UseUlt())
+    {
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
+
+        attackUltCounter++;
+        if (attackUltCounter >= attackUltCountMax)
+        {
+            //エフェクト切る
+            GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
+            GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
+            FinishUlt();
+        }
+
+        return;
+    }
 
     if (shootTimer < shootTime)
     {
@@ -107,7 +161,7 @@ void InazawaCharacterCom::SubSkill()
     if (!UseUlt())
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
     else
-        ResetESkillCool();
+        ResetSkillCoolTimer(SkillCoolID::E);
 }
 
 void InazawaCharacterCom::UltSkill()
@@ -123,7 +177,14 @@ void InazawaCharacterCom::UltSkill()
         }
     }
 
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
+    attackUltCounter = 0;
+
+    //エフェクト起動
+    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
+    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
+    //ステートを初期化
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+
 }
 
 //終わってます。何故ステートマシンか何かを作らなかったの？(不思議でしかたない)by上野
@@ -162,7 +223,6 @@ void InazawaCharacterCom::FPSArmAnimation()
     float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
 
     float v = max - fmax;
-    AH = max;
     if (v < 0)v = 0;
 
     arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed

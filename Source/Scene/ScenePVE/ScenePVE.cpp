@@ -406,7 +406,7 @@ void ScenePVE::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> ultCore = canvas->AddChildObject();
             ultCore->SetName("ultCore");
-            int value = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetRMaxCount();
+            int value = GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
             ultCore->AddComponent<UI_Ult_Count>(value);
         }
 
@@ -443,8 +443,8 @@ void ScenePVE::CreateUiObject()
             std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge1.ui", Sprite::SpriteShader::DEFALT, false, 1084, 997);
             std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
 
-            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetESkillCoolTime());
-            float* i = player->GetComponent<CharacterCom>()->GetESkillCoolTimer();
+            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(CharacterCom::SkillCoolID::E));
+            float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(CharacterCom::SkillCoolID::E);
             skillGauge->SetVariableValue(i);
         }
 
@@ -497,8 +497,8 @@ void ScenePVE::CreateUiObject()
             skillFrame->SetName("SkillGauge");
             std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge2.ui", Sprite::SpriteShader::DEFALT, false, 1030, 937);
             std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
-            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetSpaceSkillCoolTime());
-            float* i = player->GetComponent<CharacterCom>()->GetSpaceSkillCoolTimer();
+            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(CharacterCom::SkillCoolID::Space));
+            float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(CharacterCom::SkillCoolID::Space);
             skillGauge->SetVariableValue(i);
         }
 
