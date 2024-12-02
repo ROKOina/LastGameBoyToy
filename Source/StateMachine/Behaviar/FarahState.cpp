@@ -40,3 +40,12 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
     }
 }
 #pragma endregion
+
+#pragma region ultUŒ‚
+void Farah_UltState::Enter()
+{
+}
+void Farah_UltState::Execute(const float& elapsedTime)
+{
+}
+#pragma endregion

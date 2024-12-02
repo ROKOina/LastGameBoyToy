@@ -42,6 +42,11 @@ public:
     void SetViewBullet(std::shared_ptr<GameObject> obj) { viewBullet = obj; }
 
 private:
+
+    //ヒットエフェクト生成削除
+    void HitEffect();
+
+private:
     float timer = 0.0f;
     float aliveTime = 1.0f;
     int ownerID;

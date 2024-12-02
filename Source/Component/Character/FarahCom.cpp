@@ -19,6 +19,7 @@ void FarahCom::Start()
     //ステート登録(攻撃関係)
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<Farah_MainAttackState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::ULT, std::make_shared<Farah_UltState>(this));
 
     //初期ステート
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);

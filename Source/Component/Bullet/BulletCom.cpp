@@ -46,31 +46,13 @@ void BulletCom::Update(float elapsedTime)
         std::shared_ptr<GameObject> nonCharaObj;
         if (GetGameObject()->GetComponent<HitProcessCom>()->IsHit())
         {
-            //ヒットエフェクト生成
-            std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
-            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
-            hiteffectobject->SetName("HitEffect");
-            std::shared_ptr<GPUParticle>Chiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
-            Chiteffct->Play();
-            std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
-            Ghiteffct->SetActive(true);
-
-            GameObjectManager::Instance().Remove(this->GetGameObject());
-            GameObjectManager::Instance().Remove(viewBullet.lock());
+            //ヒットエフェクト生成削除
+            HitEffect();
         }
         else if (GetGameObject()->GetComponent<HitProcessCom>()->IsHitNonChara(nonCharaObj))
         {
-            //ヒットエフェクト生成
-            std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
-            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
-            hiteffectobject->SetName("HitEffect");
-            std::shared_ptr<GPUParticle>Chiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
-            Chiteffct->Play();
-            std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
-            Ghiteffct->SetActive(true);
-
-            GameObjectManager::Instance().Remove(this->GetGameObject());
-            GameObjectManager::Instance().Remove(viewBullet.lock());
+            //ヒットエフェクト生成削除
+            HitEffect();
         }
     }
 
@@ -127,6 +109,22 @@ void BulletCom::BulletVSEnemyMissile()
         GameObjectManager::Instance().Remove(this->GetGameObject());
         GameObjectManager::Instance().Remove(viewBullet.lock());
     }
+}
+
+//ヒットエフェクト生成削除
+void BulletCom::HitEffect()
+{
+    //ヒットエフェクト生成
+    std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
+    hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+    hiteffectobject->SetName("HitEffect");
+    std::shared_ptr<GPUParticle>Chiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
+    Chiteffct->Play();
+    std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
+    Ghiteffct->SetActive(true);
+
+    GameObjectManager::Instance().Remove(this->GetGameObject());
+    GameObjectManager::Instance().Remove(viewBullet.lock());
 }
 
 //ダメージ弾生成
