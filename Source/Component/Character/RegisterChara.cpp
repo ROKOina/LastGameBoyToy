@@ -64,6 +64,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
     c->SetESkillCoolTime(8.0f);
     c->SetLeftClickSkillCoolTime(5.0f);
+    c->SetUseSkill(USE_SKILL::E | USE_SKILL::LEFT_CLICK);
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();

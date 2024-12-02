@@ -289,19 +289,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     if (CharacterInput::UltimetButton_R & GetButtonDown()
         /*&& Rcool.timer >= Rcool.time*/)
     {
-        //Rcool.timer = 0;
-        //UltSkill();
-
         //ウルト発動フラグON
         if (isMaxUlt)
         {
             UltSkill();
-            //SetRSkillCoolTime(0.5f);
             isUseUlt = true;
             isMaxUlt = false;
             ultGauge = 0;
-            ////ステートを初期化
-            //attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 
         }
     }

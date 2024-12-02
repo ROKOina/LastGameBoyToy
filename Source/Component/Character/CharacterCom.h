@@ -25,6 +25,37 @@ public:
 #define ChangeMoveState(State) charaCom.lock()->GetMoveStateMachine().ChangeState(State);
 #define ChangeAttackState(State) charaCom.lock()->GetAttackStateMachine().ChangeState(State);
 
+//使用スキルのタグ
+enum USE_SKILL : uint64_t
+{
+    NONE = 1 << 0,
+
+    Q = 1 << 1,
+    E = 1 << 2,
+    LEFT_CLICK = 1 << 3,
+};
+static USE_SKILL operator| (USE_SKILL L, USE_SKILL R)
+{
+    return static_cast<USE_SKILL>(static_cast<uint64_t>(L) | static_cast<uint64_t>(R));
+}
+static USE_SKILL operator& (USE_SKILL L, USE_SKILL R)
+{
+    return static_cast<USE_SKILL>(static_cast<uint64_t>(L) & static_cast<uint64_t>(R));
+}
+static bool operator== (USE_SKILL L, USE_SKILL R)
+{
+    if (static_cast<uint64_t>((static_cast<USE_SKILL>(L) & static_cast<USE_SKILL>(R))) == 0)
+        return false;
+    return true;
+}
+static bool operator!= (USE_SKILL L, USE_SKILL R)
+{
+    if (static_cast<uint64_t>((static_cast<USE_SKILL>(L) & static_cast<USE_SKILL>(R))) == 0)
+        return true;
+    return false;
+}
+
+
 class CharacterCom : public Component
 {
 public:
@@ -185,6 +216,10 @@ public:
     bool UseUlt() { return isUseUlt; }
     void FinishUlt() { isUseUlt = false; }
 
+    //使用スキル登録
+    void SetUseSkill(USE_SKILL use) { myUseSkill = use; }
+    USE_SKILL GetUseSkill() { return myUseSkill; }
+
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);
@@ -243,6 +278,9 @@ protected:
     SkillCoolTime LeftClickcool;
 
     CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
+
+    //使用スキル
+    USE_SKILL myUseSkill = USE_SKILL::NONE;
 
 private:
 
