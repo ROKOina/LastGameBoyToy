@@ -19,6 +19,8 @@
 
 #include "imgui.h"
 
+#include <fstream>
+
 static const ExitGames::Common::JString appID = L"0d572336-477d-43ad-895e-59f4eeebbca9"; // set your app id here
 static const ExitGames::Common::JString appVersion = L"1.0";
 
@@ -43,6 +45,17 @@ PhotonLib::PhotonLib(UIListener* uiListener)
     mLogger.setDebugOutputLevel(DEBUG_RELEASE(ExitGames::Common::DebugLevel::INFO, ExitGames::Common::DebugLevel::WARNINGS)); // this class
     ExitGames::Common::Base::setListener(this);
     ExitGames::Common::Base::setDebugOutputLevel(DEBUG_RELEASE(ExitGames::Common::DebugLevel::INFO, ExitGames::Common::DebugLevel::WARNINGS)); // all classes that inherit from Base
+
+    //ネット使用名前取得
+    std::ifstream ifs("Data/NETNAME.txt");
+    if (ifs.fail()) {
+        mpOutputListener->writeString(L"名前ファイルがありません");
+        exit(0);
+    }
+    else
+    {
+        getline(ifs, netName);  //一行だけしか見ない
+    }
 }
 
 void PhotonLib::update(float elapsedTime)
@@ -79,6 +92,12 @@ void PhotonLib::update(float elapsedTime)
 
         //ちーむID保存
         myPlayer->GetComponent<CharacterCom>()->SetTeamID(s.teamID);
+
+        //名前登録
+        if (s.name.size() <= 0)
+        {
+            s.name = netName;
+        }
 
         break;
     }
@@ -150,6 +169,11 @@ void PhotonLib::ImGui()
 
     ImGui::Begin("PhotonNet", nullptr, ImGuiWindowFlags_None);
 
+    //ネットネーム表示
+    char name[256];
+    ::strncpy_s(name, sizeof(name), netName.c_str(), sizeof(name));
+    ImGui::InputText("netName", name, sizeof(name));
+
     //ID表示
     int photonID = GetPlayerNum();
     ImGui::InputInt("photonID", &photonID);
@@ -164,7 +188,7 @@ void PhotonLib::ImGui()
         {
             for (auto& s : saveInputPhoton)
             {
-                ImGui::InputInt(std::string("player" + std::to_string(s.id) + "teamID").c_str(), &s.teamID);
+                ImGui::InputInt(std::string(s.name + "  " + std::to_string(s.id)).c_str(), &s.teamID);
             }
 
             ImGui::TreePop();
@@ -177,7 +201,7 @@ void PhotonLib::ImGui()
             for (auto& s : saveInputPhoton)
             {
                 int tem = s.teamID;
-                ImGui::InputInt(std::string("player" + std::to_string(s.id) + "teamID").c_str(), &tem);
+                ImGui::InputInt(std::string(s.name + "  " + std::to_string(s.id)).c_str(), &tem);
             }
 
             ImGui::TreePop();
@@ -308,16 +332,16 @@ void PhotonLib::LobbyImGui()
         {
             roomName = name;
         }
-
+        //ネットネーム表示
         ::strncpy_s(name, sizeof(name), netName.c_str(), sizeof(name));
-        if (ImGui::InputText("netName", name, sizeof(name)))
+        if(ImGui::InputText("netName", name, sizeof(name)))
         {
             netName = name;
         }
 
         if (ImGui::Button("CreateOrJoinRoom"))
         {
-            if (roomName.size() > 0 && netName.size() > 0)
+            if (roomName.size() > 0)
                 joinPermission = true;
         }
 
@@ -659,6 +683,12 @@ void PhotonLib::sendData(void)
         break;
     }
 
+    //名前
+    ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
+
+    //タイマー
+    netD.startTime = startTime;
+
     std::stringstream s = NetDataSendCast(n);
     event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
     int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
@@ -732,6 +762,18 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             s = ((ExitGames::Common::ValueObject<ExitGames::Common::JString>*)(eventContent.getValue((nByte)0)))->getDataCopy();
             auto ne = NetDataRecvCast(WStringToString(s.cstr()));
 
+            //名前保存
+            for (auto& s : saveInputPhoton)
+            {
+                if (s.id != playerNr)continue;
+
+                if (s.name.size() <= 0)
+                {
+                    s.name = ne[0].name;
+                }
+                break;
+            }
+
             //マスタークライアント以外はチームを保存
             if (ne[0].isMasterClient)
             {
@@ -739,6 +781,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 {
                     s.teamID = ne[0].teamID[s.id];
                 }
+                startTime = ne[0].startTime;
             }
 
             //仮オブジェ
