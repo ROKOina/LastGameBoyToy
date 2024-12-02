@@ -161,7 +161,7 @@ void InazawaCharacterCom::SubSkill()
     if (!UseUlt())
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
     else
-        ResetESkillCool();
+        ResetSkillCoolTimer(SkillCoolID::E);
 }
 
 void InazawaCharacterCom::UltSkill()

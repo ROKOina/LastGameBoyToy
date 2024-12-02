@@ -179,26 +179,7 @@ public:
     int GetCharaID() { return charaID; }
     void  SetCharaID(const int id) { charaID = id; }
 
-    void SetQSkillCoolTime(float time) { Qcool.time = time; }
-    float GetQSkillCoolTime() { return Qcool.time; }
-    float GetQSkillCoolTimer() { return Qcool.timer; }
 
-    void SetESkillCoolTime(float time) { Ecool.time = time; }
-    float GetESkillCoolTime() { return Ecool.time; }
-    float* GetESkillCoolTimer() { return &Ecool.timer; }
-    void ResetESkillCool() { Ecool.timer = Ecool.time; }    //マックスの状態にする
-
-    void SetRSkillCoolTime(float time) { Rcool.time = time; }
-    float GetRSkillCoolTime() { return Rcool.time; }
-    float GetRSkillCoolTimer() { return Rcool.timer; }
-
-    void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
-    float GetSpaceSkillCoolTime() { return Spacecool.time; }
-    float* GetSpaceSkillCoolTimer() { return &Spacecool.timer; }
-
-    void SetLeftClickSkillCoolTime(float time) { LeftClickcool.time = time; }
-    float GetLeftClickSkillCoolTime() { return LeftClickcool.time; }
-    float* GetLeftClickSkillCoolTimer() { return &LeftClickcool.timer; }
 
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
@@ -220,6 +201,16 @@ public:
     void SetUseSkill(USE_SKILL use) { myUseSkill = use; }
     USE_SKILL GetUseSkill() { return myUseSkill; }
 
+    //スキルクールダウン系
+    enum SkillCoolID
+    {
+        Q, E, R, LeftShift, Space, LeftClick,MAX
+    };
+    void SetSkillCoolTime(SkillCoolID id, float time) { skillCools[id].time = time; }
+    float GetSkillCoolTime(SkillCoolID id) { return skillCools[id].time; }
+    float* GetSkillCoolTimerPointer(SkillCoolID id) { return &skillCools[id].timer; }
+    void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
+    bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);
@@ -238,9 +229,6 @@ private:
 
     //クールダウン更新
     void CoolUpdate(float elapsedTime);
-
-    void SetLSSkillCoolTime(float time) { LScool.time = time; }
-    float GetLSSkillCoolTime() { return LScool.time; }
 
     //アニメーションに使用する角度の補完
     float InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed);
@@ -270,12 +258,13 @@ protected:
         float time = 0;
         float timer = 100;
     };
-    SkillCoolTime Qcool;
-    SkillCoolTime Ecool;
-    SkillCoolTime Rcool;
-    SkillCoolTime LScool;
-    SkillCoolTime Spacecool;
-    SkillCoolTime LeftClickcool;
+    //SkillCoolTime Qcool;
+    //SkillCoolTime Ecool;
+    //SkillCoolTime Rcool;
+    //SkillCoolTime LScool;
+    //SkillCoolTime Spacecool;
+    //SkillCoolTime LeftClickcool;
+    SkillCoolTime skillCools[SkillCoolID::MAX];
 
     CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
 

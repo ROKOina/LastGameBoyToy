@@ -62,8 +62,8 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     status->SetInvincibleTime(0.3f);
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
-    c->SetESkillCoolTime(8.0f);
-    c->SetLeftClickSkillCoolTime(5.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 5.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::LEFT_CLICK);
 
     //ボックスコライダー
