@@ -117,7 +117,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
         hitDamage->SetValue(100);
 
         //キャラクターに登録
-        obj->GetComponent<CharacterCom>()->SetAttackUltRayObj(ultAttckChild);
+        obj->GetComponent<InazawaCharacterCom>()->SetAttackUltRayObj(ultAttckChild);
     }
     //アタックウルトのエフェクト
     {

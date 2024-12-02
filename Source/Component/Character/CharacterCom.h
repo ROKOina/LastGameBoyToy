@@ -104,9 +104,6 @@ public:
     virtual void SpaceSkill() {}
     virtual void SpaceSkillPushing(float elapsedTime) {};
 
-    //攻撃ウルト取得
-    void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }
-
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS>& GetAttackStateMachine() { return attackStateMachine; }
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>& GetMoveStateMachine() { return moveStateMachine; }
     GameObject* GetCameraObj() { return cameraObj; }
@@ -163,8 +160,7 @@ public:
     void SetRSkillCoolTime(float time) { Rcool.time = time; }
     float GetRSkillCoolTime() { return Rcool.time; }
     float GetRSkillCoolTimer() { return Rcool.timer; }
-    int* GetRCounter() { return &attackUltCounter; }
-    int GetRMaxCount() { return attackUltCountMax; }
+
     void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
     float GetSpaceSkillCoolTime() { return Spacecool.time; }
     float* GetSpaceSkillCoolTimer() { return &Spacecool.timer; }
@@ -187,6 +183,7 @@ public:
 
     void SetULTID(CHARACTER_ULT ult) { ultID = ult; }
     bool UseUlt() { return isUseUlt; }
+    void FinishUlt() { isUseUlt = false; }
 
 private:
     //入力ステート更新
@@ -283,10 +280,6 @@ private:
     bool prevIsMaxUlt = false;
     float ultGauge = 0;
     float ultGaugeMax = 100;
-    //アタックULT
-    int attackUltCountMax = 5;  //ウルトを打てる数
-    int attackUltCounter;
-    std::weak_ptr<GameObject> attackUltRayObj;  //ウルトレイ
 
     AbnormalCondition abnormalcondition;
 

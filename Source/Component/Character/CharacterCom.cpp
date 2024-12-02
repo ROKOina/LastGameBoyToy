@@ -89,11 +89,11 @@ void CharacterCom::Update(float elapsedTime)
     else
         dashDraceTimer = dashDraceTime; //ダッシュ猶予時間
 
-    ////ウルト更新
-    //UltUpdate(elapsedTime);
+    //ウルト更新
+    UltUpdate(elapsedTime);
 
-    ////クールダウン更新
-    //CoolUpdate(elapsedTime);
+    //クールダウン更新
+    CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
     Vinetto(elapsedTime);
@@ -112,9 +112,6 @@ void CharacterCom::OnGUI()
         ImGui::DragFloat("ultGauge", &ultGauge, 0.1f);
 
         ImGui::Separator();
-
-        ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
-        ImGui::DragInt("attackUltCounter", &attackUltCounter);
 
         ImGui::TreePop();
     }
@@ -227,26 +224,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_A & GetButton())
     {
-        //ウルト中は攻撃が変わる
-        if (!isUseUlt)
-            MainAttackDown();
-        else
-        {
-            //ウルト中
-            if (Rcool.timer >= Rcool.time)
-            {
-                Rcool.timer = 0;
-                UltSkill();
-                attackUltCounter++;
-                if (attackUltCounter >= attackUltCountMax)
-                {
-                    //エフェクト切る
-                    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
-                    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
-                    isUseUlt = false;
-                }
-            }
-        }
+        MainAttackDown();
     }
     else if (CharacterInput::MainAttackButton & GetButton()
         && GamePad::BTN_A & GetButton())
@@ -258,26 +236,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
-        //ウルト中は攻撃が変わる
-        if (!isUseUlt)
-            MainAttackDown();
-        else
-        {
-            //ウルト中
-            if (Rcool.timer >= Rcool.time)
-            {
-                Rcool.timer = 0;
-                UltSkill();
-                attackUltCounter++;
-                if (attackUltCounter >= attackUltCountMax)
-                {
-                    //エフェクト切る
-                    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
-                    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
-                    isUseUlt = false;
-                }
-            }
-        }
+        MainAttackDown();
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
@@ -336,17 +295,14 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         //ウルト発動フラグON
         if (isMaxUlt)
         {
-            SetRSkillCoolTime(0.5f);
+            UltSkill();
+            //SetRSkillCoolTime(0.5f);
             isUseUlt = true;
             isMaxUlt = false;
-            attackUltCounter = 0;
             ultGauge = 0;
-            //ステートを初期化
-            attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+            ////ステートを初期化
+            //attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 
-            //エフェクト起動
-            GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
-            GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
         }
     }
 }
@@ -566,42 +522,6 @@ void CharacterCom::UltUpdate(float elapsedTime)
 
     // 状態を記録
     prevIsMaxUlt = isMaxUlt;
-
-    //ウルトエフェクト
-    if (attackUltRayObj.lock())
-    {
-        auto& rayCol = attackUltRayObj.lock()->GetComponent<RayColliderCom>();
-        if (rayCol)
-        {
-            for (auto& obj : rayCol->OnHitGameObject())
-            {
-                {
-                    std::shared_ptr<GameObject> attackUltEffBomb = GameObjectManager::Instance().Create();
-                    attackUltEffBomb->SetName("attackUltEffBomb");
-                    attackUltEffBomb->transform_->SetWorldPosition(obj.hitPos);
-                    std::shared_ptr<GPUParticle> eff = attackUltEffBomb->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircle.gpuparticle", 300);
-                    eff->Play();
-                    attackUltEffBomb->AddComponent<RemoveTimerCom>(3);
-                    {
-                        std::shared_ptr<GameObject> attackUltEffBomb02 = attackUltEffBomb->AddChildObject();
-                        attackUltEffBomb02->SetName("attackUltEffBomb02");
-                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb02->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombCircleLight.gpuparticle", 100);
-                        eff->Play();
-                    }
-                    {
-                        std::shared_ptr<GameObject> attackUltEffBomb03 = attackUltEffBomb->AddChildObject();
-                        attackUltEffBomb03->SetName("attackUltEffBomb03");
-                        std::shared_ptr<GPUParticle> eff = attackUltEffBomb03->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltBombFire.gpuparticle", 50);
-                        eff->Play();
-                    }
-
-                    //音
-                    GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACK_ULT_BOOM");
-                    GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACK_ULT_BOOM", false, 10);
-                }
-            }
-        }
-    }
 }
 
 float CharacterCom::InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed)

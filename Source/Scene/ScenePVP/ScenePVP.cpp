@@ -109,7 +109,7 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::FARAH, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
     }
 
     //snowparticle
@@ -255,7 +255,7 @@ void ScenePVP::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> ultCore = canvas->AddChildObject();
             ultCore->SetName("ultCore");
-            int value = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetRMaxCount();
+            int value = GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
             ultCore->AddComponent<UI_Ult_Count>(value);
         }
 
