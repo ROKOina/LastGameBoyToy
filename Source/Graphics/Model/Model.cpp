@@ -113,6 +113,9 @@ Model::Model(std::shared_ptr<ModelResource> resource)
             dst.parent->children.emplace_back(&dst);
         }
     }
+
+    // 単位行列を初期姿勢として設定
+    UpdateTransform(DirectX::XMMatrixIdentity());
 }
 
 // 変換行列計算

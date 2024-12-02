@@ -20,6 +20,56 @@ BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(ow
     animationCom = GetComp(AnimationCom);
 }
 
+//ホバリング
+void BaseCharacter_BaseState::Hovering(float elapsedTime)
+{
+    moveVec = SceneManager::Instance().InputVec(owner->GetGameObject());
+
+    // 空中での速度制御
+    const auto& moveComponent = moveCom.lock(); // moveComのロック
+    if (moveComponent)
+    {
+        DirectX::XMFLOAT3 velocity = moveComponent->GetVelocity();
+
+        // ホバリング中の上下方向の速度を管理
+        if (velocity.y < 0.05f && HoveringTimer < HoveringTime)
+        {
+            // 重力の影響を軽減
+            velocity.y = -GRAVITY_NORMAL * 0.5f * elapsedTime;
+
+            // ホバリングタイマーを加算
+            HoveringTimer += elapsedTime;
+
+            // 微細な上下動を追加（浮遊感を演出）
+            float hoverOscillation = sin(HoveringTimer * 3.0f) * 0.1f; // 振幅0.1、周波数3.0
+            velocity.y += hoverOscillation;
+        }
+        else if (HoveringTimer >= HoveringTime)
+        {
+            // ホバリング終了後、通常の落下挙動
+            velocity.y -= GRAVITY_NORMAL * elapsedTime; // 重力を適用
+        }
+
+        // 上下方向の速度を更新
+        moveComponent->SetVelocity(velocity);
+
+        // 移動力を計算
+        DirectX::XMFLOAT3 force = {
+            moveVec.x * moveComponent->GetMoveAcceleration(),
+            0.0f, // 水平方向のみ力を加える
+            moveVec.z * moveComponent->GetMoveAcceleration()
+        };
+
+        // 移動力を制限して滑らかさを保つ
+        float maxForce = 10.0f; // 最大移動力
+        force.x = Mathf::Clamp(force.x, -maxForce, maxForce);
+        force.z = Mathf::Clamp(force.z, -maxForce, maxForce);
+
+        // 移動力を適用
+        moveComponent->AddNonMaxSpeedForce(force);
+    }
+}
+
 #pragma region Idle
 
 void BaseCharacter_IdleState::Enter()
@@ -67,10 +117,10 @@ void BaseCharacter_MoveState::Enter()
         param.lowerAnimeTwoId = animationCom.lock()->FindAnimation("Walk_Back"),
         param.lowerAnimeThreeId = animationCom.lock()->FindAnimation("Walk_Right"),
         param.lowerAnimeFourId = animationCom.lock()->FindAnimation("Walk_Left"),
-        param.lowerAnimeFiveId= animationCom.lock()->FindAnimation("Walk_RF"),
-        param.lowerAnimaSixId= animationCom.lock()->FindAnimation("Walk_LF"),
-        param.lowerAnimaSevenId= animationCom.lock()->FindAnimation("Walk_RB"),
-        param.lowerAnimaEightId= animationCom.lock()->FindAnimation("Walk_LB"),
+        param.lowerAnimeFiveId = animationCom.lock()->FindAnimation("Walk_RF"),
+        param.lowerAnimaSixId = animationCom.lock()->FindAnimation("Walk_LF"),
+        param.lowerAnimaSevenId = animationCom.lock()->FindAnimation("Walk_RB"),
+        param.lowerAnimaEightId = animationCom.lock()->FindAnimation("Walk_LB"),
         param.loop = true,
         param.rootFlag = false,
         param.blendType = 2,
@@ -81,7 +131,6 @@ void BaseCharacter_MoveState::Enter()
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), false, 0.3f);
     //GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
-
 
     /*animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);*/
@@ -116,15 +165,10 @@ void BaseCharacter_MoveState::Exit()
 void BaseCharacter_JumpState::Enter()
 {
     //ジャンプ
-    if (!moveCom.lock()->OnGround())
-        return;
-
     JumpInput(owner->GetGameObject());
-    moveVec = SceneManager::Instance().InputVec(owner->GetGameObject());
-    moveCom.lock()->SetOnGround(false);
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    //animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_Enter"), false);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
 
     //アニメーション
     // 例外処理必要
@@ -135,26 +179,20 @@ void BaseCharacter_JumpState::Enter()
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 {
-    //空中制御
-    DirectX::XMFLOAT3 inputVec = SceneManager::Instance().InputVec(owner->GetGameObject());
-    moveVec = Mathf::Lerp(moveVec, inputVec, 0.1f);
+    //ホバリング
+    Hovering(elapsedTime);
 
-    if (moveCom.lock()->GetVelocity().y < 0.05f && HoveringTimer < HoveringTime)
+    if (!animationCom.lock()->IsPlayAnimation())
     {
-        DirectX::XMFLOAT3 verocity = moveCom.lock()->GetVelocity();
-        verocity.y = -GRAVITY_NORMAL * elapsedTime;
-        moveCom.lock()->SetVelocity(verocity);
-
-        HoveringTimer += elapsedTime;
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
     }
+}
+#pragma endregion
 
-    DirectX::XMFLOAT3 v = moveVec * moveCom.lock()->GetMoveAcceleration();
-    moveCom.lock()->AddForce(v);
-
-    if (moveCom.lock()->OnGround())
-    {
-        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
-    }
+#pragma region JumpLoop
+void BaseCharacter_JumpLoop::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), true);
 
     //アニメーション
     // 例外処理必要 
@@ -163,10 +201,22 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
     //if (!armAnim->IsPlayAnimation())
     //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
 }
-
-void BaseCharacter_JumpState::Exit()
+void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 {
-    HoveringTimer = 0.0f;
+    //ホバリング
+    Hovering(elapsedTime);
+
+    if (moveCom.lock()->OnGround())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::LANDING);
+    }
+}
+#pragma endregion
+
+#pragma region Landing
+void BaseCharacter_Landing::Enter()
+{
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_end"), false, false, 1.0f);
 
     //アニメーション
     // 例外処理必要 
@@ -174,7 +224,27 @@ void BaseCharacter_JumpState::Exit()
     //auto& armAnim = arm->GetComponent<AnimationCom>();
     //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
 }
+void BaseCharacter_Landing::Execute(const float& elapsedTime)
+{
+    //ホバリング
+    Hovering(elapsedTime);
 
+    //アニメーションが終われば
+    if (!animationCom.lock()->IsPlayAnimation())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+    }
+
+    //移動
+    if (owner->IsPushLeftStick() && !animationCom.lock()->IsPlayAnimation())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
+    }
+}
+void BaseCharacter_Landing::Exit()
+{
+    HoveringTimer = 0.0f;
+}
 #pragma endregion
 
 #pragma region Death
@@ -439,4 +509,3 @@ void BaseCharacter_NoneAttack::Enter()
     //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
 }
-

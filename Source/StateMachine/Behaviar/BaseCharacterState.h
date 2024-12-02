@@ -41,10 +41,21 @@ public:
     BaseCharacter_BaseState(CharacterCom* owner);
 
 protected:
+
+    //ホバリング
+    void Hovering(float elapsedTime);
+
+protected:
     std::weak_ptr<CharacterCom> charaCom;
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
+    float HoveringTimer = 0.0f;
+
+private:
+
+    DirectX::XMFLOAT3 moveVec = {};
+    float HoveringTime = 0.05f;
 };
 
 class BaseCharacter_IdleState : public BaseCharacter_BaseState
@@ -75,14 +86,32 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit() override;
+    void Exit() override {};
     virtual const char* GetName() const override { return "Jump"; }
+};
 
-private:
+//ジャンプループ
+class BaseCharacter_JumpLoop : public BaseCharacter_BaseState
+{
+public:
+    BaseCharacter_JumpLoop(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
-    DirectX::XMFLOAT3 moveVec = {};
-    float HoveringTimer = 0.0f;
-    float HoveringTime = 0.05f;
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    virtual const char* GetName() const override { return "JumpLoop"; }
+};
+
+//着地
+class BaseCharacter_Landing : public BaseCharacter_BaseState
+{
+public:
+    BaseCharacter_Landing(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    virtual const char* GetName() const override { return "Landing"; }
 };
 
 class BaseCharacter_DeathState : public BaseCharacter_BaseState

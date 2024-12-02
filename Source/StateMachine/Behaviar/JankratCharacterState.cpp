@@ -23,7 +23,7 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
     if (charaCom.lock()->GetHaveBullet())
     {
         RigidBodyCom* rigid = charaCom.lock()->GetHaveBullet()->GetComponent<RigidBodyCom>().get();
-        
+
         //‹…‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚½‚ç”­Ë
         rigid->SetMass(mass);           //¿—Ê
         rigid->SetRestitution(restitution);    //”½”­ŒW”

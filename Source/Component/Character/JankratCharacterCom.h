@@ -31,4 +31,3 @@ private:
 
     GameObj haveBullet; //ŽËŒ‚‘Ò‹@’†‚Ì’eŠÛ
 };
-
