@@ -167,7 +167,6 @@ void CharacterCom::OnGUI()
 
     if (ImGui::TreeNode("SkillCool"))
     {
-
         ImGui::DragFloat("QTime", &skillCools[SkillCoolID::Q].time);
         ImGui::DragFloat("QTimer", &skillCools[SkillCoolID::Q].timer);
         ImGui::Separator();
@@ -297,7 +296,6 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             isUseUlt = true;
             isMaxUlt = false;
             ultGauge = 0;
-
         }
     }
 }

@@ -55,7 +55,6 @@ static bool operator!= (USE_SKILL L, USE_SKILL R)
     return false;
 }
 
-
 class CharacterCom : public Component
 {
 public:
@@ -172,8 +171,6 @@ public:
     int GetCharaID() { return charaID; }
     void  SetCharaID(const int id) { charaID = id; }
 
-
-
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
     float GetUltGaugeMax() { return ultGaugeMax; }
@@ -197,7 +194,7 @@ public:
     //スキルクールダウン系
     enum SkillCoolID
     {
-        Q, E, R, LeftShift, Space, LeftClick,MAX
+        Q, E, R, LeftShift, Space, LeftClick, MAX
     };
     void SetSkillCoolTime(SkillCoolID id, float time) { skillCools[id].time = time; }
     float GetSkillCoolTime(SkillCoolID id) { return skillCools[id].time; }

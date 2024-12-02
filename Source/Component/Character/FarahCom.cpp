@@ -103,27 +103,20 @@ void FarahCom::SpaceSkillPushing(float elapsedTime)
 //Eスキル
 void FarahCom::SubSkill()
 {
-    if (!UseUlt())
-    {
-        //ステート変更
-        moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
+    //ステート変更
+    moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
 
-        const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
+    const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
 
-        //一瞬の飛び
-        DirectX::XMFLOAT3 power = {
-            0.0f,
-            Mathf::Lerp(0.0f,10.0f,0.8f),
-            0.0f
-        };
+    //一瞬の飛び
+    DirectX::XMFLOAT3 power = {
+        0.0f,
+        Mathf::Lerp(0.0f,10.0f,0.8f),
+        0.0f
+    };
 
-        // 力を移動コンポーネントに加える
-        moveCom->AddForce(power);
-    }
-    else
-    {
-        ResetESkillCool();
-    }
+    // 力を移動コンポーネントに加える
+    moveCom->AddForce(power);
 }
 
 //メインの攻撃
@@ -131,6 +124,11 @@ void FarahCom::MainAttackDown()
 {
     //弾丸発射
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+}
+
+//ULT
+void FarahCom::UltSkill()
+{
 }
 
 static float AH = 0;

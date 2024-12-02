@@ -29,6 +29,9 @@ public:
     //メインの攻撃
     void MainAttackDown() override;
 
+    //ULT
+    void UltSkill()override;
+
 private:
 
     //fps用の腕アニメーション
