@@ -540,13 +540,22 @@ void PhotonLib::DelayUpdate()
     int myID = GetPlayerNum();
     for (int i = 0; i < saveInputPhoton.size(); ++i)
     {
+        if (myID != saveInputPhoton[i].id)continue;
+        saveInputPhoton[i].myDelay = 0;
+        break;
+    }
+
+    for (int i = 0; i < saveInputPhoton.size(); ++i)    //Ž©•ªˆÈŠO
+    {
         if (myID == saveInputPhoton[i].id)continue;
 
-        for (int j = 0; j < saveInputPhoton.size(); ++j)
+        for (int j = 0; j < saveInputPhoton.size(); ++j)    //Ž©•ª‚ð’T‚·
         {
             if (myID != saveInputPhoton[j].id)continue;
             //æ“ªƒtƒŒ[ƒ€‚Ì·‚ð•Û‘¶
-            saveInputPhoton[i].myDelay = saveInputPhoton[j].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
+            int d = saveInputPhoton[j].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
+            if (d > saveInputPhoton[i].myDelay)
+                saveInputPhoton[i].myDelay = d;
             break;
         }
     }
