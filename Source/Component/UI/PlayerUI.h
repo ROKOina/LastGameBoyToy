@@ -1,6 +1,8 @@
 #pragma once
 #include "Component\UI\UiSystem.h"
 #include "Component\UI\UiGauge.h"
+#include "Component\Character\RegisterChara.h"
+
 class UI_Skill : public UiSystem
 {
     //コンポーネントオーバーライド
@@ -22,25 +24,6 @@ private:
     DirectX::XMFLOAT2 originalPos = {};
     DirectX::XMFLOAT2 maxPos = {};
 };
-
-//class UI_SkillManager : public Component
-//{
-//    //コンポーネントオーバーライド
-//public:
-//    UI_SkillManager(int num);
-//    ~UI_SkillManager() {}
-//
-//    // 名前取得
-//    const char* GetName() const override { return "UI_BoostGauge"; }
-//
-//    // 開始処理
-//    void Start() override;
-//
-//    // 更新処理
-//    void Update(float elapsedTime) override;
-//
-//private:
-//};
 
 class UI_BoosGauge : public Component
 {
@@ -196,31 +179,25 @@ private:
     std::weak_ptr<GameObject> player;
 };
 
-class UI_Reticle : public Component
+
+//PlayerUIのマネージャー
+class PlayerUIManager
 {
     //コンポーネントオーバーライド
 public:
-    UI_Reticle();
-    ~UI_Reticle() {}
+    PlayerUIManager() {};
+    ~PlayerUIManager() {};
 
-    // 名前取得
-    const char* GetName() const override { return "UI_BoostGauge"; }
+    void Initialize(RegisterChara::CHARA_LIST selectChara);
 
-    // 開始処理
-    void Start() override;
+    void UI_SkillUpdate(float elapsedTime) {};
 
-    // 更新処理
-    void Update(float elapsedTime) override;
+    void CreateInazawaCharaUI();
 
 private:
+    int    boostCount = 0;    //ブースト回数
+    float* boostValue = 0;    //ブースト量   
+    float* charaHp = 0;      //キャラHP
+    
     std::weak_ptr<GameObject> player;
-
-    std::shared_ptr<GameObject> reticleFrame;
-    std::shared_ptr<GameObject> reticleCircle;
-
-    std::shared_ptr<UiSystem> reticleFrameUi;         //外枠
-    std::shared_ptr<UiSystem> reticleCircleUi;        //真ん中
-
-    float* attackPower;  //現在のチャージ率
-    float maxAttackPower = 0.0f; //チャージの最大
 };
