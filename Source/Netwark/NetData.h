@@ -14,10 +14,10 @@ static std::stringstream& operator<<(std::stringstream& out, const DirectX::XMFL
     return out;
 }
 static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT4& h)
-    {
-        in >> float(h.x) >> float(h.y) >> float(h.z) >> float(h.w);
-        return in;
-    }
+{
+    in >> float(h.x) >> float(h.y) >> float(h.z) >> float(h.w);
+    return in;
+}
 //XMFLOAT3
 static std::stringstream& operator<<(std::stringstream& out, const DirectX::XMFLOAT3& h)
 {
@@ -31,15 +31,15 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT3& h
 }
 //XMFLOAT2
 static std::stringstream& operator<<(std::stringstream& out, const DirectX::XMFLOAT2& h)
-    {
-        out << h.x << " " << h.y;
-        return out;
-    }
+{
+    out << h.x << " " << h.y;
+    return out;
+}
 static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h)
-    {
-        in >> float(h.x) >> float(h.y);
-        return in;
-    }
+{
+    in >> float(h.x) >> float(h.y);
+    return in;
+}
 
 //array
 //float
@@ -64,7 +64,6 @@ static std::stringstream& operator<<(std::stringstream& out, const std::array<in
     out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
     return out;
 }
-
 
 ////ƒtƒŒ[ƒ€‚Æ“ü—Í
 //struct InputFrame
@@ -147,11 +146,12 @@ static void Vector3In(std::stringstream& in, std::array<DirectX::XMFLOAT3, 6>& v
     in >> vec[5];
 }
 
-
 struct NetData
 {
     bool isMasterClient;
     int id;
+    char name[50];
+    int startTime;
 
     std::vector<SaveBuffer> saveInputBuf;
 
@@ -169,7 +169,9 @@ struct NetData
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
     out << h.isMasterClient << " ";
-    out << h.id << " " ;
+    out << h.id << " ";
+    out << h.name << " ";
+    out << h.startTime << " ";
     out << h.damageData << " ";
     out << h.healData << " ";
     out << h.stanData << " ";
@@ -184,7 +186,6 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 
     //for (auto& i : h.p)
     //{
-
     //}
     return out;
 }
@@ -192,6 +193,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
     in >> h.isMasterClient;
     in >> h.id;
+    in >> h.name;
+    in >> h.startTime;
     in >> h.damageData;
     in >> h.healData;
     in >> h.stanData;
@@ -234,5 +237,3 @@ static std::vector<NetData> NetDataRecvCast(std::string& recvData)
 
     return data;
 }
-
-

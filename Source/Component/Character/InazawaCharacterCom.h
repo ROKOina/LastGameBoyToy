@@ -22,6 +22,11 @@ public:
 
     void ResetShootTimer() { shootTimer = 0; }
 
+    int* GetRCounter() { return &attackUltCounter; }
+    int GetRMaxCount() { return attackUltCountMax; }
+
+    //攻撃ウルト取得
+    void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }
 private:
     void FPSArmAnimation();
 
@@ -31,4 +36,9 @@ private:
     float shootTimer = 0;
 
     bool attackInputSave = false;   //先行入力
+
+    //アタックULT
+    int attackUltCountMax = 5;  //ウルトを打てる数
+    int attackUltCounter;
+    std::weak_ptr<GameObject> attackUltRayObj;  //ウルトレイ
 };

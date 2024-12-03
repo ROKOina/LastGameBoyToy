@@ -12,10 +12,10 @@ using namespace ExitGames::Common;
 
 int EG_kbhit()
 {
-	int res = _kbhit();
-	if(res)
-		return _getch();
-	return res;
+    int res = _kbhit();
+    if (res)
+        return _getch();
+    return res;
 }
 
 #else
@@ -25,48 +25,48 @@ int EG_kbhit()
 
 int EG_kbhit()
 {
-	struct termios oldt, newt;
-	int ch;
-	int oldf;
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
 
-	tcgetattr(STDIN_FILENO, &oldt);
-	newt = oldt;
-	newt.c_lflag &= ~(ICANON | ECHO);
-	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
-	ch = getchar();
+    ch = getchar();
 
-	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-	fcntl(STDIN_FILENO, F_SETFL, oldf);
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
 
-	if(ch != EOF)
-		return ch;
+    if (ch != EOF)
+        return ch;
 
-	return 0;
+    return 0;
 }
 #endif
 
 void StdIO_UIListener::writeString(const JString& str)
 {
-	std::lock_guard<std::mutex> lock(mLastString);
-	if(mLastString != str)
-		wprintf(L"%ls\n", (mLastString=str).cstr());
+    std::lock_guard<std::mutex> lock(mLastString);
+    if (mLastString != str)
+        wprintf(L"%ls\n", (mLastString = str).cstr());
 }
 
 bool StdIO_UIListener::anyKeyPressed(void) const
 {
-	return !!EG_kbhit();
+    return !!EG_kbhit();
 }
 
 int StdIO_UIListener::getKeyPressed(void) const
 {
-	return EG_kbhit();
+    return EG_kbhit();
 }
 
 void StdIO_UIListener::onLibClosed(void)
 {
-	writeString(L"- -Press any key to quit- ------------------\n");
-	//while(!anyKeyPressed());
+    writeString(L"- -Press any key to quit- ------------------\n");
+    //while(!anyKeyPressed());
 }

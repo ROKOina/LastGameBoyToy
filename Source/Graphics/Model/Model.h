@@ -20,13 +20,13 @@ public:
         int nodeIndex;
         const char* name;
         Node* parent;
-        DirectX::XMFLOAT3	scale;
-        DirectX::XMFLOAT4	rotate;
-        DirectX::XMFLOAT3	translate;
-        DirectX::XMFLOAT4X4	localTransform;
-        DirectX::XMFLOAT4X4	worldTransform;
-        std::vector<int>    layer;
-        std::vector<Node*>	children;
+        DirectX::XMFLOAT3	scale = {};
+        DirectX::XMFLOAT4	rotate = {};
+        DirectX::XMFLOAT3	translate = {};
+        DirectX::XMFLOAT4X4	localTransform = {};
+        DirectX::XMFLOAT4X4	worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+        std::vector<int>    layer = {};
+        std::vector<Node*>	children = {};
     };
 
     //コリジョンのパラメータ

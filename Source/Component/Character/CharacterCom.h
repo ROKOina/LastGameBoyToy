@@ -25,6 +25,36 @@ public:
 #define ChangeMoveState(State) charaCom.lock()->GetMoveStateMachine().ChangeState(State);
 #define ChangeAttackState(State) charaCom.lock()->GetAttackStateMachine().ChangeState(State);
 
+//使用スキルのタグ
+enum USE_SKILL : uint64_t
+{
+    NONE = 1 << 0,
+
+    Q = 1 << 1,
+    E = 1 << 2,
+    LEFT_CLICK = 1 << 3,
+};
+static USE_SKILL operator| (USE_SKILL L, USE_SKILL R)
+{
+    return static_cast<USE_SKILL>(static_cast<uint64_t>(L) | static_cast<uint64_t>(R));
+}
+static USE_SKILL operator& (USE_SKILL L, USE_SKILL R)
+{
+    return static_cast<USE_SKILL>(static_cast<uint64_t>(L) & static_cast<uint64_t>(R));
+}
+static bool operator== (USE_SKILL L, USE_SKILL R)
+{
+    if (static_cast<uint64_t>((static_cast<USE_SKILL>(L) & static_cast<USE_SKILL>(R))) == 0)
+        return false;
+    return true;
+}
+static bool operator!= (USE_SKILL L, USE_SKILL R)
+{
+    if (static_cast<uint64_t>((static_cast<USE_SKILL>(L) & static_cast<USE_SKILL>(R))) == 0)
+        return true;
+    return false;
+}
+
 class CharacterCom : public Component
 {
 public:
@@ -60,13 +90,6 @@ public:
         MAX,
     };
 
-    //状態異常の種類
-    enum class AbnormalCondition
-    {
-        STAN,
-        MAX
-    };
-
 public:
     CharacterCom() {};
     ~CharacterCom() override {};
@@ -100,10 +123,9 @@ public:
     //LeftShift (固定ダッシュ)
     void DashFewSub(float elapsedTime);
 
+    //スペーススキル(上が単発押しで下のPushingが長押し)
     virtual void SpaceSkill() {}
-
-    //攻撃ウルト取得
-    void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }
+    virtual void SpaceSkillPushing(float elapsedTime) {};
 
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS>& GetAttackStateMachine() { return attackStateMachine; }
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>& GetMoveStateMachine() { return moveStateMachine; }
@@ -149,28 +171,6 @@ public:
     int GetCharaID() { return charaID; }
     void  SetCharaID(const int id) { charaID = id; }
 
-    void SetQSkillCoolTime(float time) { Qcool.time = time; }
-    float GetQSkillCoolTime() { return Qcool.time; }
-    float GetQSkillCoolTimer() { return Qcool.timer; }
-
-    void SetESkillCoolTime(float time) { Ecool.time = time; }
-    float GetESkillCoolTime() { return Ecool.time; }
-    float* GetESkillCoolTimer() { return &Ecool.timer; }
-    void ResetESkillCool() { Ecool.timer = Ecool.time; }    //マックスの状態にする
-
-    void SetRSkillCoolTime(float time) { Rcool.time = time; }
-    float GetRSkillCoolTime() { return Rcool.time; }
-    float GetRSkillCoolTimer() { return Rcool.timer; }
-    int* GetRCounter() { return &attackUltCounter; }
-    int GetRMaxCount() { return attackUltCountMax; }
-    void SetSpaceSkillCoolTime(float time) { Spacecool.time = time; }
-    float GetSpaceSkillCoolTime() { return Spacecool.time; }
-    float* GetSpaceSkillCoolTimer() { return &Spacecool.timer; }
-
-    void SetLeftClickSkillCoolTime(float time) { LeftClickcool.time = time; }
-    float GetLeftClickSkillCoolTime() { return LeftClickcool.time; }
-    float* GetLeftClickSkillCoolTimer() { return &LeftClickcool.timer; }
-
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
     float GetUltGaugeMax() { return ultGaugeMax; }
@@ -185,7 +185,22 @@ public:
 
     void SetULTID(CHARACTER_ULT ult) { ultID = ult; }
     bool UseUlt() { return isUseUlt; }
+    void FinishUlt() { isUseUlt = false; }
 
+    //使用スキル登録
+    void SetUseSkill(USE_SKILL use) { myUseSkill = use; }
+    USE_SKILL GetUseSkill() { return myUseSkill; }
+
+    //スキルクールダウン系
+    enum SkillCoolID
+    {
+        Q, E, R, LeftShift, Space, LeftClick, MAX
+    };
+    void SetSkillCoolTime(SkillCoolID id, float time) { skillCools[id].time = time; }
+    float GetSkillCoolTime(SkillCoolID id) { return skillCools[id].time; }
+    float* GetSkillCoolTimerPointer(SkillCoolID id) { return &skillCools[id].timer; }
+    void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
+    bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);
@@ -204,9 +219,6 @@ private:
 
     //クールダウン更新
     void CoolUpdate(float elapsedTime);
-
-    void SetLSSkillCoolTime(float time) { LScool.time = time; }
-    float GetLSSkillCoolTime() { return LScool.time; }
 
     //アニメーションに使用する角度の補完
     float InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed);
@@ -236,14 +248,18 @@ protected:
         float time = 0;
         float timer = 100;
     };
-    SkillCoolTime Qcool;
-    SkillCoolTime Ecool;
-    SkillCoolTime Rcool;
-    SkillCoolTime LScool;
-    SkillCoolTime Spacecool;
-    SkillCoolTime LeftClickcool;
+    //SkillCoolTime Qcool;
+    //SkillCoolTime Ecool;
+    //SkillCoolTime Rcool;
+    //SkillCoolTime LScool;
+    //SkillCoolTime Spacecool;
+    //SkillCoolTime LeftClickcool;
+    SkillCoolTime skillCools[SkillCoolID::MAX];
 
     CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
+
+    //使用スキル
+    USE_SKILL myUseSkill = USE_SKILL::NONE;
 
 private:
 
@@ -281,12 +297,6 @@ private:
     bool prevIsMaxUlt = false;
     float ultGauge = 0;
     float ultGaugeMax = 100;
-    //アタックULT
-    int attackUltCountMax = 5;  //ウルトを打てる数
-    int attackUltCounter;
-    std::weak_ptr<GameObject> attackUltRayObj;  //ウルトレイ
-
-    AbnormalCondition abnormalcondition;
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;

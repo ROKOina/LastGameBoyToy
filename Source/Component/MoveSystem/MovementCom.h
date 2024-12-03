@@ -33,6 +33,9 @@ public:
     //nonMaxSpeedVelocity
     void AddNonMaxSpeedForce(const DirectX::XMFLOAT3& force);
 
+    //上昇関数
+    void Rising(float elapsedTime);
+
 private:
 
     //縦方向移動更新
@@ -112,8 +115,10 @@ private:
     bool justLanded_ = false;                  // 今フレームで着地した瞬間かどうか
     float friction_ = 12.620f;                 //摩擦
     float moveMaxSpeed_ = 9.5f;                //最大速度
-    float firstMoveMaxSpeed = 8.0f;             //初期最大速度
+    float firstMoveMaxSpeed = 8.0f;            //初期最大速度
     float moveAcceleration_ = 3.0f;            //加速度
     inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット
-    bool isRaycast = true;                      //レイキャストをするか（true：使用する）
+    bool isRaycast = true;                     //レイキャストをするか（true：使用する）
+    float risespeed = 1.5f;                    //上昇速度
+    float maxrisespeed = 8.0f;                 //最大上昇速度
 };
