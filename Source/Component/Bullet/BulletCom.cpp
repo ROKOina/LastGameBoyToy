@@ -14,6 +14,7 @@
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\SkillObj\JankratMineCom.h"
+#include "KnockBackCom.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -375,9 +376,9 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
-    DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
-    DirectX::XMFLOAT3 knockVec = { 0,2,0 };
-    hit->SetValue3(Mathf::Lerp(startpos, knockVec, 0.3f));
+    colObj->AddComponent<KnockBackCom>();
+    //DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
+    //hit->SetValue3(Mathf::Lerp(startpos, knockbackvec, 0.3f));
 }
 
 //ƒtƒ@ƒ‰’Êí’e
