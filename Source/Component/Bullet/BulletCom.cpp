@@ -366,7 +366,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
-    bulletCom->SetDamageValue(0);
+    bulletCom->SetDamageValue(power);
     bulletCom->SetViewBullet(viewObj);
 
     //”»’è—p

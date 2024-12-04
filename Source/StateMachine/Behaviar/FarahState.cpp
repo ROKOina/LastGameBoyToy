@@ -66,7 +66,7 @@ void Farah_ESkillState::Execute(const float& elapsedTime)
     }
 
     //攻撃処理
-    BulletCreate::KnockbackFire(owner->GetGameObject(), 30.0f, 3);
+    BulletCreate::KnockbackFire(owner->GetGameObject(), 30.0f, 2);
 
     //ステート変更
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
