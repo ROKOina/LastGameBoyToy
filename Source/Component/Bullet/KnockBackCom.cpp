@@ -16,6 +16,6 @@ void KnockBackCom::Update(float elapsedTime)
         DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
         DirectX::XMFLOAT3 enemy = obj.gameObject.lock()->transform_->GetWorldPosition();
 
-        hitProcess->SetValue3(Mathf::Normalize(enemy - pos) * 3.0f);
+        hitProcess->SetValue3(Mathf::Normalize(enemy - pos) * knockbackforce / elapsedTime);
     }
 }

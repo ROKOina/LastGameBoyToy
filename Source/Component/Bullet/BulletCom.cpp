@@ -372,13 +372,12 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(power);
     bulletCom->SetViewBullet(viewObj);
+    std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
+    k->SetKnockBackForce({ 3,5,3 });
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
-    colObj->AddComponent<KnockBackCom>();
-    //DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
-    //hit->SetValue3(Mathf::Lerp(startpos, knockbackvec, 0.3f));
 }
 
 //ƒtƒ@ƒ‰’Êí’e
