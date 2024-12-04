@@ -327,12 +327,22 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
+    //生成コンポーネント
+    {
+        std::shared_ptr<GameObject>spawn = obj->AddChildObject();
+        spawn->SetName("ultspawn");
+        spawn->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/farahult.spawn");
+    }
+
     //HPの初期設定
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
     std::shared_ptr<FarahCom> c = obj->AddComponent<FarahCom>();
     c->SetCharaID(int(CHARA_LIST::FARAH));
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
+    c->SetUseSkill(USE_SKILL::E | USE_SKILL::LEFT_CLICK);
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();

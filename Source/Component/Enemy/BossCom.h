@@ -88,5 +88,4 @@ public:
 private:
     StateMachine<BossCom, BossState> state;
     DirectX::XMFLOAT3 targetposition = {};
-    DirectX::XMFLOAT3 righthandnodepos = {};
 };

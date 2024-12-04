@@ -280,46 +280,97 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
 //ノックバック弾生成
 void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
 {
-    //弾丸オブジェクトを生成///////
-    GameObj obj = GameObjectManager::Instance().Create();
-    obj->SetName("knockbackball");
-    obj->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    //発射位置算出用変数定義
+    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
+    auto& cameraObj = objPoint->GetChildFind("cameraPostPlayer");
+
+    //見た目部分
+    GameObj viewObj = GameObjectManager::Instance().Create();
+    viewObj->SetName("damageballView");
+
+    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
+    trail->SetTransform(viewObj->transform_->GetWorldTransform());
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    firePos.y += 1.0f;
-    obj->transform_->SetWorldPosition(firePos);
+    float ya;
+    if (cameraObj)
+        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
+    else
+        ya = 1.5f;
 
-    std::shared_ptr<RendererCom> renderCom = obj->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS));
-    renderCom->LoadModel("Data/Model/cube/cube.mdl");
+    firePos.y += ya;
+    viewObj->transform_->SetWorldPosition(firePos);
+
+    //弾発射
+    std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
+    moveCom->SetGravity(0.0f);
+    moveCom->SetFriction(0.0f);
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+
+    //銃口から発射する
+    if (cameraObj)
+    {
+        auto& arm = cameraObj->GetChildFind("armChild");
+        if (arm)
+        {
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& node = model->FindNode("gun2");
+
+            DirectX::XMFLOAT3 gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+            DirectX::XMFLOAT3 cameraPos = cameraObj->transform_->GetWorldPosition();
+
+            //カメラの子供にする
+            DirectX::XMFLOAT3 cameraFromGun = gunPos - cameraPos;
+            DirectX::XMFLOAT3 fpsPos = fpsDir * 60;
+
+            DirectX::XMFLOAT3 velo = fpsPos - cameraFromGun;
+            moveCom->SetNonMaxSpeedVelocity(Mathf::Normalize(velo) * bulletSpeed);
+            viewObj->transform_->SetWorldPosition(gunPos);
+        }
+    }
+
+    moveCom->SetIsRaycast(false);
+
+    //パーティクル
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    bulletgpuparticle->Play();
+    std::shared_ptr<GameObject>bullettrajectory = viewObj->AddChildObject();
+    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
+    bullettrajectoryparticle->Play();
+
+    //判定部分
+    GameObj colObj = GameObjectManager::Instance().Create();
+    colObj->SetName("damageball");
+
+    colObj->transform_->SetWorldPosition(firePos);
 
     ///////////////////////////////
 
     //弾発射
-    std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
-    float gravity = 0.98f - 0.95f * power;
-    moveCom->SetGravity(gravity);
+    moveCom = colObj->AddComponent<MovementCom>();
+    moveCom->SetGravity(0.0f);
     moveCom->SetFriction(0.0f);
-
-    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
 
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
 
-    std::shared_ptr<SphereColliderCom> coll = obj->AddComponent<SphereColliderCom>();
+    std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(objPoint->GetName(), "player") == 0)
-        coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.6f);
 
     //弾
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
-    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
-    bulletCom->SetAliveTime(2.0f);
+    std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
+    bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(0);
+    bulletCom->SetViewBullet(viewObj);
 
     //判定用
-    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(objPoint);
+    std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
     DirectX::XMFLOAT3 startpos = { hit->GetGameObject()->transform_->GetWorldPosition() };
     DirectX::XMFLOAT3 knockVec = { 0,2,0 };

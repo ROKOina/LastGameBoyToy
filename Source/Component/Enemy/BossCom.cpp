@@ -61,11 +61,6 @@ void BossCom::Update(float elapsedTime)
 
     //ƒ_ƒ[ƒWˆ—
     DamegaEvent(elapsedTime);
-
-    //DebugPrimitive
-    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), meleerange, 0.1f, { 1.0f,0.0f,0.0f,1.0f });
-    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), longrange, 0.1f, { 0.0f,1.0f,0.0f,1.0f });
-    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), walkrange, 0.1f, { 0.0f,0.0f,1.0f,1.0f });
 }
 
 //imgui
@@ -74,6 +69,11 @@ void BossCom::OnGUI()
     ImGui::DragFloat("meleerange", &meleerange, 1.0f, 0.0f, 50.0f);
     ImGui::DragFloat("longrange", &longrange, 1.0f, 0.0f, 50.0f);
     ImGui::DragFloat("walkrange", &walkrange, 1.0f, 0.0f, 50.0f);
+
+    //DebugPrimitive
+    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), meleerange, 0.1f, { 1.0f,0.0f,0.0f,1.0f });
+    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), longrange, 0.1f, { 0.0f,1.0f,0.0f,1.0f });
+    Graphics::Instance().GetDebugRenderer()->DrawCylinder(GetGameObject()->transform_->GetWorldPosition(), GetGameObject()->transform_->GetWorldPosition(), walkrange, 0.1f, { 0.0f,0.0f,1.0f,1.0f });
 
     state.ImGui();
 }
