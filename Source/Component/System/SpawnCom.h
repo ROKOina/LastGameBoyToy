@@ -24,7 +24,7 @@ public:
     const char* GetName() const override { return "Spawn"; }
 
     //複製機能
-    void SpawnGameObject();
+    void SpawnGameObject(float elapsedTime);
 
 private:
 
@@ -59,6 +59,9 @@ private:
     //ギミックミサイル生成関数
     void CreateGimmickMissile(const std::shared_ptr<GameObject>& obj);
 
+    //ファラのウルト
+    void CreateFarahUlt(const std::shared_ptr<GameObject>& obj);
+
     //当たり判定
     void HitObject();
 
@@ -85,6 +88,7 @@ public:
         EXPLOSION,
         BEEM,
         GIMMICKMISSILE,
+        FARAHULT,
         MAX
     };
     ObjectType objtype = ObjectType::ENEMY;

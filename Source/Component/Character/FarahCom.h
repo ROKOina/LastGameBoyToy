@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CharacterCom.h"
+#include <algorithm>
 
 class FarahCom : public CharacterCom
 {
@@ -36,4 +37,8 @@ private:
 
     //fps用の腕アニメーション
     void FPSArmAnimation();
+
+private:
+    float cooldownTimer = 0.0f;  // クールタイムの残り時間（秒）
+    float dashgaugemin = 4.0f;
 };

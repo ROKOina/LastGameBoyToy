@@ -6,6 +6,7 @@
 #include "Graphics/Graphics.h"
 #include "Phsix\Physxlib.h"
 #include <random>
+#include "SystemStruct\TimeManager.h"
 
 // 更新処理
 void MovementCom::Update(float elapsedTime)
@@ -233,14 +234,6 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
 
             position.x = correctedPosition.x;
             position.z = correctedPosition.z;
-
-            //if (!PhysXLib::Instance().RayCast_PhysX(
-            //    position, Mathf::Normalize(correctedPosition - p), Mathf::Length(correctedPosition - p) + r, buffer))
-            //{
-            //    // 壁に沿った移動と補正を適用
-            //    position.x = correctedPosition.x;
-            //    position.z = correctedPosition.z;
-            //}
         }
         else
         {

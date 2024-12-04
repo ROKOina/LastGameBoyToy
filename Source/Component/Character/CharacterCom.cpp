@@ -79,7 +79,10 @@ void CharacterCom::Update(float elapsedTime)
             }
 
             //ƒQ[ƒW‘‚â‚·
-            dashGauge += dashGaugePlus * elapsedTime;
+            if (!boostflag)
+            {
+                dashGauge += dashGaugePlus * elapsedTime;
+            }
             if (dashGauge > dashGaugeMax)
             {
                 dashGauge = dashGaugeMax;
@@ -102,6 +105,7 @@ void CharacterCom::Update(float elapsedTime)
 void CharacterCom::OnGUI()
 {
     ImGui::Checkbox("isHitAttack", &isHitAttack);
+    ImGui::Checkbox("boostflag", &boostflag);
     ImGui::DragFloat("jump", &jumpPower, 0.1f);
 
     if (ImGui::TreeNode("ult"))

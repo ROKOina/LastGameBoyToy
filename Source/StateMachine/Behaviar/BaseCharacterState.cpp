@@ -191,7 +191,7 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 #pragma region JumpLoop
 void BaseCharacter_JumpLoop::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), false);
 
     //アニメーション
     auto& arm = GameObjectManager::Instance().Find("armChild");
@@ -225,6 +225,12 @@ void BaseCharacter_Landing::Execute(const float& elapsedTime)
 {
     //ホバリング
     Hovering(elapsedTime);
+
+    //ジャンプ
+    if (GamePad::BTN_A & owner->GetButtonDown())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
+    }
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())

@@ -14,6 +14,7 @@ public:
     static DirectX::XMFLOAT2 Lerp(const DirectX::XMFLOAT2& start, const DirectX::XMFLOAT2& end, const  float& time);
     static DirectX::XMFLOAT3 Lerp(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const  float& time);
     static DirectX::XMFLOAT4 Lerp(const DirectX::XMFLOAT4& start, const DirectX::XMFLOAT4& end, const  float& time);
+
     // ‹…–Ê•âŠÔ
     static DirectX::XMFLOAT4 Slerp(const DirectX::XMFLOAT4& start, const DirectX::XMFLOAT4& end, const  float& time);
 
