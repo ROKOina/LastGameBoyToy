@@ -36,8 +36,8 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
 
 
         //TODO 発射地点を銃の位置に変更
-        DirectX::XMFLOAT3 vec = owner->GetGameObject()->transform_->GetWorldFront();
-        rigid->AddForce(Mathf::Normalize({vec.x, vec.y + 0.2f, vec. z}) * force);
+        DirectX::XMFLOAT3 vec = owner->GetFpsCameraDir();
+        rigid->AddForce(Mathf::Normalize({vec.x, vec.y + vecY, vec. z}) * force);
     }
 
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
@@ -48,6 +48,7 @@ void JankratCharacter_MainAtkState::ImGui()
     ImGui::DragFloat("Mass", &mass);
     ImGui::DragFloat("Restitution", &restitution);
     ImGui::DragFloat("Force", &force);
+    ImGui::DragFloat("VecY", &vecY);
 }
 
 void JankratCharacter_MainSkillState::Enter()

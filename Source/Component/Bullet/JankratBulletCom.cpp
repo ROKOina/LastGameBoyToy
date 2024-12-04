@@ -28,5 +28,8 @@ void JankratBulletCom::Update(float elapsedTime)
         GameObjectManager::Instance().Remove(this->GetGameObject());
     }
 
+    //‹ó‹C’ïR‚âd—Í‚ð‹­‚ß‚É‚©‚¯‚é
+    GetGameObject()->GetComponent<RigidBodyCom>()->AddForce({ 0, addGravity, 0 });
+
     lifeTimer += elapsedTime;
 }

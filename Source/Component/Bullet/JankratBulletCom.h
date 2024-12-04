@@ -39,4 +39,6 @@ private:
 
     bool explosionFlag = false;
     int damageValue = 10;
+
+    float addGravity = 0.0f;
 };

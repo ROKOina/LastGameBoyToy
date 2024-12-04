@@ -416,9 +416,25 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->SetCharaID(int(CHARA_LIST::JANKRAT));
 
-    //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
+    //HPの初期設定
+    status->SetMaxHitPoint(200);
+    status->SetHitPoint(status->GetMaxHitpoint());
+    status->SetInvincibleTime(0.3f);
+
+    //ボックスコライダー
+    std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
+    box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
+    box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
+    if (std::strcmp(obj->GetName(), "player") == 0)
+        box->SetMyTag(COLLIDER_TAG::Player);
+    else
+        box->SetMyTag(COLLIDER_TAG::Enemy);
+
+    
+    //自分かネットのプレイヤーで
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
+        //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
         std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
         std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
         cameraPost->SetName("cameraPostPlayer");
