@@ -61,7 +61,7 @@ void SceneTraining::Initialize()
         obj->SetName("stage");
         obj->transform_->SetWorldPosition({ 0, 0, 0 });
         obj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();

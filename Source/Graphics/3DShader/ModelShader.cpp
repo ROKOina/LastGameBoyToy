@@ -14,10 +14,6 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
     //選択されたのが指定される
     switch (shader)
     {
-    case SHADER_ID_MODEL::STAGEDEFERRED:
-        VSPath = { "Shader\\StageVS.cso" };
-        PSPath = { "Shader\\DeferredSetupPS.cso" };
-        break;
     case SHADER_ID_MODEL::DEFERRED:
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\DeferredSetupPS.cso" };
@@ -52,13 +48,13 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
     D3D11_INPUT_ELEMENT_DESC IED[] =
     {
         // 入力要素の設定
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "WEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "BONES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "WEIGHTS",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    { "BONES",    0, DXGI_FORMAT_R32G32B32A32_UINT,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
     CreateVsFromCso(Graphics.GetDevice(), VSPath, m_vertexshader.GetAddressOf(), m_inputlayout.ReleaseAndGetAddressOf(), IED, ARRAYSIZE(IED));
 
@@ -126,27 +122,20 @@ void ModelShader::SetBuffer(ID3D11DeviceContext* dc, const std::vector<Model::No
 {
     if (mesh.nodeIndices.size() > 0)
     {
-        for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
+        const auto& offsetTransforms = mesh.offsetTransforms;
+        const auto& nodeIndices = mesh.nodeIndices;
+
+        for (size_t i = 0; i < nodeIndices.size(); ++i)
         {
-            // オフセット行列を読み込む
-            DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-
-            // ボーンのワールド変換行列を取得
-            DirectX::XMMATRIX boneTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
-
-            // 定数バッファーに送るため、それぞれ保存
-            DirectX::XMStoreFloat4x4(&m_objectconstants->data.OffsetTransforms[i], offsetTransform);
+            DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&offsetTransforms[i]);
+            DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(nodeIndices[i]).worldTransform);
+            DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
             DirectX::XMStoreFloat4x4(&m_objectconstants->data.BoneTransforms[i], boneTransform);
         }
     }
     else
     {
-        // ボーンが1つの場合の処理
-        DirectX::XMMATRIX offsetTransform = DirectX::XMMatrixIdentity(); // オフセット行列は単位行列
-        DirectX::XMMATRIX boneTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndex).worldTransform);
-
-        DirectX::XMStoreFloat4x4(&m_objectconstants->data.OffsetTransforms[0], offsetTransform);
-        DirectX::XMStoreFloat4x4(&m_objectconstants->data.BoneTransforms[0], boneTransform);
+        m_objectconstants->data.BoneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
     }
 
     //コンスタントバッファの更新

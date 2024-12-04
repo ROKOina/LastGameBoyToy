@@ -109,7 +109,6 @@ enum SAMPLEMODE
 enum class SHADER_ID_MODEL
 {
     // デファード描画
-    STAGEDEFERRED,
     DEFERRED,
 
     // 以降、フォワード描画

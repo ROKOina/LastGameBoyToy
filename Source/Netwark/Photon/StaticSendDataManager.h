@@ -9,7 +9,8 @@ class StaticSendDataManager
 public:
     StaticSendDataManager()
         : sendData(std::make_unique<RingBuffer<NetSendData>>(100))
-    {}
+    {
+    }
     ~StaticSendDataManager() {}
 
     // インスタンス取得

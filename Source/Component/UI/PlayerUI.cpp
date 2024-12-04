@@ -379,11 +379,16 @@ void UI_E_SkillCount::Start()
     this->GetGameObject()->AddChildObject(gaugeFrame);
     this->GetGameObject()->AddChildObject(gauge);
     //各パラメーター設定
+
+    //例外処理クソ過ぎ
     player = GameObjectManager::Instance().Find("player");
-    arrowCount = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->arrowCount;
-    skillTimer = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->skillTimer;
-    skillTime = player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->skillTime;
-    isShot = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->isShot;
+    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>() != nullptr)
+    {
+        arrowCount = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->arrowCount;
+        skillTimer = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->skillTimer;
+        skillTime = player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->skillTime;
+        isShot = &player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->isShot;
+    }
 }
 
 void UI_E_SkillCount::Update(float elapsedTime)
@@ -479,13 +484,20 @@ void UI_Ult_Count::Start()
 
 void UI_Ult_Count::Update(float elapsedTime)
 {
-    if (player.lock()->GetComponent<InazawaCharacterCom>()->UseUlt()) {
-        UpdateCore(elapsedTime);
-    }
-    else {
-        for (int i = 0; i < num; i++) {
-            coresUi.at(i).coreFrameUi->spc.color.w = 0.0f;
-            coresUi.at(i).coreUi->spc.color.w = 0.0f;
+    //例外処理クソ過ぎ
+    if (player.lock()->GetComponent<InazawaCharacterCom>() != nullptr)
+    {
+        if (player.lock()->GetComponent<InazawaCharacterCom>()->UseUlt())
+        {
+            UpdateCore(elapsedTime);
+        }
+        else
+        {
+            for (int i = 0; i < num; i++)
+            {
+                coresUi.at(i).coreFrameUi->spc.color.w = 0.0f;
+                coresUi.at(i).coreUi->spc.color.w = 0.0f;
+            }
         }
     }
 }

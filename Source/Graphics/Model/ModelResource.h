@@ -19,14 +19,14 @@ public:
     //ノード
     struct Node
     {
-        NodeId				id;
-        std::string			name;
-        std::string			path;
-        int					parentIndex;
-        DirectX::XMFLOAT3	scale;
-        DirectX::XMFLOAT4	rotate;
-        DirectX::XMFLOAT3	translate;
-        std::vector<int>    layer;
+        NodeId				id = {};
+        std::string			name = {};
+        std::string			path = {};
+        int					parentIndex = {};
+        DirectX::XMFLOAT3	scale = {};
+        DirectX::XMFLOAT4	rotate = {};
+        DirectX::XMFLOAT3	translate = {};
+        std::vector<int>    layer = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -35,8 +35,8 @@ public:
     //マテリアル
     struct Material
     {
-        std::string			name;
-        std::string			textureFilename[6];
+        std::string			name = {};
+        std::string			textureFilename[6] = {};
         DirectX::XMFLOAT4	color = { 1.0f, 1.0f, 1.0f, 1.0f };
         DirectX::XMFLOAT3   emissivecolor = { 1.0f,1.0f,1.0f };
         float               emissiveintensity = 0;
@@ -89,17 +89,17 @@ public:
     //メッシュ
     struct Mesh
     {
-        std::vector<Vertex>						vertices;
-        std::vector<UINT>						indices;
-        std::vector<Subset>						subsets;
+        std::vector<Vertex>						vertices = {};
+        std::vector<UINT>						indices = {};
+        std::vector<Subset>						subsets = {};
 
-        int										nodeIndex;
-        std::vector<int>						nodeIndices;
+        int										nodeIndex = {};
+        std::vector<int>						nodeIndices = {};
 
-        std::vector<DirectX::XMFLOAT4X4>		offsetTransforms;
+        std::vector<DirectX::XMFLOAT4X4>		offsetTransforms = {};
 
-        DirectX::XMFLOAT3						boundsMin;
-        DirectX::XMFLOAT3						boundsMax;
+        DirectX::XMFLOAT3						boundsMin = {};
+        DirectX::XMFLOAT3						boundsMax = {};
 
         Microsoft::WRL::ComPtr<ID3D11Buffer>	vertexBuffer;
         Microsoft::WRL::ComPtr<ID3D11Buffer>	indexBuffer;
@@ -111,9 +111,9 @@ public:
     //ノード情報
     struct NodeKeyData
     {
-        DirectX::XMFLOAT3	scale;
-        DirectX::XMFLOAT4	rotate;
-        DirectX::XMFLOAT3	translate;
+        DirectX::XMFLOAT3	scale = {};
+        DirectX::XMFLOAT4	rotate = {};
+        DirectX::XMFLOAT3	translate = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -122,8 +122,8 @@ public:
     //キーフレーム
     struct Keyframe
     {
-        float						seconds;
-        std::vector<NodeKeyData>	nodeKeys;
+        float						seconds = {};
+        std::vector<NodeKeyData>	nodeKeys = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -132,9 +132,9 @@ public:
     //アニメーションイベント
     struct AnimationEvent
     {
-        std::string name;
-        float startframe;
-        float endframe;
+        std::string name = {};
+        float startframe = {};
+        float endframe = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -143,8 +143,8 @@ public:
     //ルート位置
     struct RootPosition
     {
-        float frame;
-        DirectX::XMFLOAT3 position;
+        float frame = {};
+        DirectX::XMFLOAT3 position = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -153,12 +153,12 @@ public:
     //アニメーション
     struct Animation
     {
-        std::string					name;
-        float						secondsLength;
+        std::string					name = {};
+        float						secondsLength = {};
         float                       animationspeed = 1.0f;
-        std::vector<Keyframe>		keyframes;
-        std::vector<AnimationEvent>	animationevents;
-        std::vector<RootPosition>   rootpositions;
+        std::vector<Keyframe>		keyframes = {};
+        std::vector<AnimationEvent>	animationevents = {};
+        std::vector<RootPosition>   rootpositions = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);

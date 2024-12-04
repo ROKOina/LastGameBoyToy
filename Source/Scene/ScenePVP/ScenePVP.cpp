@@ -58,7 +58,7 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
-        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        freeCamera->transform_->SetWorldPosition({ 0, 5, -103 });
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 #endif
@@ -77,7 +77,7 @@ void ScenePVP::Initialize()
         stageObj->SetName("stage");
         stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
         stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
-        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::STAGEDEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
         r->SetOutlineIntensity(5.5f);
@@ -109,7 +109,7 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
     }
 
     //snowparticle
@@ -120,7 +120,7 @@ void ScenePVP::Initialize()
     }
 
     //UIゲームオブジェクト生成
-    //CreateUiObject();
+    CreateUiObject();
 
 #pragma endregion
 
@@ -149,6 +149,7 @@ void ScenePVP::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
+    //ゲームオブジェクトの行列更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 }
@@ -174,6 +175,7 @@ void ScenePVP::Render(float elapsedTime)
     //オブジェクト生成関数
 #ifdef _DEBUG
     NewObject();
+    RegisterChara::Instance().ImGui();
 #endif
 
     //オブジェクト描画
@@ -254,7 +256,7 @@ void ScenePVP::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> ultCore = canvas->AddChildObject();
             ultCore->SetName("ultCore");
-            int value = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetRMaxCount();
+            int value = GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
             ultCore->AddComponent<UI_Ult_Count>(value);
         }
 
@@ -291,8 +293,8 @@ void ScenePVP::CreateUiObject()
             std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge1.ui", Sprite::SpriteShader::DEFALT, false, 1084, 997);
             std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
 
-            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetESkillCoolTime());
-            float* i = player->GetComponent<CharacterCom>()->GetESkillCoolTimer();
+            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(CharacterCom::SkillCoolID::E));
+            float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(CharacterCom::SkillCoolID::E);
             skillGauge->SetVariableValue(i);
         }
 
@@ -345,8 +347,8 @@ void ScenePVP::CreateUiObject()
             skillFrame->SetName("SkillGauge");
             std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge2.ui", Sprite::SpriteShader::DEFALT, false, 1030, 937);
             std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
-            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetSpaceSkillCoolTime());
-            float* i = player->GetComponent<CharacterCom>()->GetSpaceSkillCoolTimer();
+            skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(CharacterCom::SkillCoolID::Space));
+            float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(CharacterCom::SkillCoolID::Space);
             skillGauge->SetVariableValue(i);
         }
 

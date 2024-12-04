@@ -46,6 +46,8 @@ void MovementCom::OnGUI()
     ImGui::DragFloat((char*)u8"摩擦", &friction_, 0.01f, 0.0f, 40.0f);
     ImGui::DragFloat((char*)u8"最大速度", &moveMaxSpeed_, 0.1f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"加速度", &moveAcceleration_, 0.01f, 0.0f, 10.0f);
+    ImGui::DragFloat((char*)u8"上昇速度", &risespeed, 0.01f, 0.0f, 30.0f);
+    ImGui::DragFloat((char*)u8"最大上昇速度", &maxrisespeed, 0.01f, 0.0f, 70.0f);
     ImGui::Checkbox((char*)u8"接地", &onGround_);
     ImGui::Checkbox((char*)u8"レイキャスト", &isRaycast);
 }
@@ -200,7 +202,6 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
         if (isRaycast && PhysXLib::Instance().RayCast_PhysX(
             start, Mathf::Normalize(end - start), Mathf::Length(end - start) + r, buffer))
         {
-
             DirectX::XMFLOAT3 p = {};
             p.x = buffer.block.position.x;
             p.y = buffer.block.position.y;
@@ -239,7 +240,7 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
             //    // 壁に沿った移動と補正を適用
             //    position.x = correctedPosition.x;
             //    position.z = correctedPosition.z;
-            //}         
+            //}
         }
         else
         {
@@ -258,6 +259,15 @@ void MovementCom::AddNonMaxSpeedForce(const DirectX::XMFLOAT3& force)
 {
     nonMaxSpeedVelocity_.x += force.x;
     nonMaxSpeedVelocity_.z += force.z;
+}
+
+//上昇関数
+void MovementCom::Rising(float elapsedTime)
+{
+    // 経過フレーム
+    float elapsedFrame = 60.0f * elapsedTime;
+    velocity_.y += risespeed * elapsedFrame;
+    velocity_.y = (std::min)(velocity_.y, maxrisespeed);
 }
 
 // 力を追加

@@ -54,7 +54,7 @@ private:
     std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
     {
         "INAZAWA",
-        "UENO",
+        "FARAH",
         "HAVE_ALL_ATTACK",
     };
     int charaID = 0;
@@ -164,7 +164,8 @@ private:
     ExitGames::Common::Logger mLogger;
 
     //送信頻度（ms）
-    int sendMs = 35;
+    int sendMs = 1000 / 60.0f * 5;
+    //int sendMs = 35;
     int oldMs;
 
     //各クライアントインプット保存
@@ -175,6 +176,7 @@ private:
             inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
         }
 
+        std::string name = {};
         int id;
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
