@@ -414,6 +414,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
+    charaCom->SetCharaID(int(CHARA_LIST::JANKRAT));
 
     std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
     cameraPost->SetName("cameraPostPlayer");
