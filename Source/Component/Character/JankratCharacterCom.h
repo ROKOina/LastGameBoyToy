@@ -14,7 +14,7 @@ public:
     void MainAttackDown() override;
     void MainSkill() override;
 
-    void SubAttackDown() override {};
+    void SubAttackDown() override;
     void SubSkill() override {};
 
     void UltSkill() override {};

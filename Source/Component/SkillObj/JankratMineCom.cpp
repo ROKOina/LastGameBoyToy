@@ -9,24 +9,16 @@ void JankratMineCom::Update(float elapsedTime)
     //起爆
     if (explosionFlag)
     {
-        //当たり判定の半径増やす
-        SphereColliderCom* sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
-        sphere->SetRadius(sphere->GetRadius() * 2.5f);
+        //TODO ここで爆発エフェクト再生
 
-        //直撃よりダメージ減らす
-        HitProcessCom* hit = GetGameObject()->GetComponent<HitProcessCom>().get();
-        hit->SetValue(hit->GetValue() * 0.8f);
 
-        //TODO エフェクト再生
-
-        if (lifeTime >= lifeTimer)
+        //爆発から一定時間で消去
+        if (lifeTimer >= lifeTime)
         {
             GameObjectManager::Instance().Remove(this->GetGameObject());
         }
         lifeTimer += elapsedTime;
     }
-
-
 
     //壁に当たれば設置
     if (!isPlant && (moveCom->GetJustHitWall() || moveCom->JustLanded()))
@@ -40,4 +32,18 @@ void JankratMineCom::Update(float elapsedTime)
         SphereColliderCom* sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
         sphere->SetJudgeTag(COLLIDER_TAG::NONE_COL);
     }
+}
+
+void JankratMineCom::Fire()
+{
+    explosionFlag = true;
+
+    //当たり判定の半径増やす
+    SphereColliderCom* sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
+    sphere->SetRadius(sphere->GetRadius() * 2.5f);
+    sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
+
+    //直撃よりダメージ減らす
+    HitProcessCom* hit = GetGameObject()->GetComponent<HitProcessCom>().get();
+    hit->SetValue(hit->GetValue() * 0.8f);
 }

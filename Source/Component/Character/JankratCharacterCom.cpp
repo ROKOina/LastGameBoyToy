@@ -43,6 +43,12 @@ void JankratCharacterCom::MainSkill()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
 }
 
+void JankratCharacterCom::SubAttackDown()
+{
+    //’n—‹‹N”š
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
+}
+
 void JankratCharacterCom::EraseHaveObjects()
 {
     std::vector<GameObj> eraseObjs;

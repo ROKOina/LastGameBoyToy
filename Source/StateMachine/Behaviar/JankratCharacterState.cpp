@@ -16,7 +16,10 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
 
 void JankratCharacter_MainAtkState::Enter()
 {
-    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBulletFire(owner->GetGameObject(), transCom.lock()->GetWorldPosition(), charaCom.lock()->GetCharaID()));
+    DirectX::XMFLOAT3 pos = transCom.lock()->GetWorldPosition();
+    pos.y += 2.0f;
+
+    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBulletFire(owner->GetGameObject(), pos, charaCom.lock()->GetCharaID()));
 }
 
 void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
@@ -66,7 +69,8 @@ void JankratCharacter_SubAttackState::Execute(const float& elapsedTime)
 {
     for (auto& mine : charaCom.lock()->GetHaveMine())
     {
-        mine->GetComponent<JankratMineCom>()->SetExplosionFlag(true);
+        //全ての設置中の地雷を起爆
+        mine->GetComponent<JankratMineCom>()->Fire();
     }
 
     //TODO アニメーション終わってから遷移

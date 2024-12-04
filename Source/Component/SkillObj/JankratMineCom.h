@@ -25,6 +25,10 @@ public:
     // GUI描画
     void OnGUI() override {};
 
+    //起爆
+    void Fire();
+
+
     //セッター・ゲッター
     void SetLifeTime(float time) { lifeTime = time; };
 
@@ -42,9 +46,8 @@ private:
     float lifeTimer = 0.0f;
     float lifeTime = 2.0f;
 
-    //設置フラグ
-    bool isPlant = false;
+    bool isPlant = false;    //設置フラグ
+    bool explosionFlag = false; //爆発中フラグ
 
-    bool explosionFlag = false;
     int damageValue = 10;
 };

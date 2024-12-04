@@ -33,7 +33,7 @@ public:
     virtual const char* GetName() const override { return "MainAttack"; }
 
 private:
-    float mass = 0.1f;
+    float mass = 0.08f;
     float restitution = 0.8f;
     float force = 1.4f;
 };
