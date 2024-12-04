@@ -21,6 +21,7 @@
 #include "Component\Audio\AudioCom.h"
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Character\Prop\SetNodeWorldPosCom.h>
+#include "Component\UI\PlayerUI.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
 {
@@ -41,6 +42,14 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     default:
         break;
     }
+
+    //自キャラの場合
+    if (std::strcmp(obj->GetName(), "player") == 0)
+    {
+        PlayerUIManager::Instance().BookingRegistrationUI(obj);
+        
+    }
+
 }
 
 //imgui
@@ -69,6 +78,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     c->SetCharaID(int(CHARA_LIST::INAZAWA));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 5.0f);
+    //c->SetUseSkill(USE_SKILL::E );
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::LEFT_CLICK);
 
     //ボックスコライダー

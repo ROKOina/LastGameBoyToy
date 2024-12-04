@@ -38,6 +38,8 @@ public:
     //imgui
     void OnGUI()override;
 
+    void LoadTexture(std::string filename);
+
     //名前設定
     const char* GetName() const override { return "Sprite"; }
 
@@ -46,6 +48,8 @@ public:
 
     //イージング停止
     void StopEasing();
+
+
 
 private:
 

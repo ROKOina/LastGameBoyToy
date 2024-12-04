@@ -309,4 +309,5 @@ private:
     float lerpSpeed = 4.0f;
 
     bool isHitAttack = false;   //UŒ‚‚ª“–‚½‚Á‚½ƒtƒŒ[ƒ€‚Étrue
+
 };

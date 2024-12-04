@@ -2,6 +2,8 @@
 #include "Component\UI\UiSystem.h"
 #include "Component\UI\UiGauge.h"
 #include "Component\Character\RegisterChara.h"
+#include "Component\Character\CharacterCom.h"
+#include <map>
 
 class UI_Skill : public UiSystem
 {
@@ -179,25 +181,39 @@ private:
     std::weak_ptr<GameObject> player;
 };
 
-
 //PlayerUIのマネージャー
 class PlayerUIManager
 {
     //コンポーネントオーバーライド
+
 public:
     PlayerUIManager() {};
     ~PlayerUIManager() {};
 
-    void Initialize(RegisterChara::CHARA_LIST selectChara);
+    // インスタンス取得
+    static PlayerUIManager& Instance()
+    {
+        static PlayerUIManager instance;
+        return instance;
+    }
 
-    void UI_SkillUpdate(float elapsedTime) {};
 
-    void CreateInazawaCharaUI();
+    void Register();
 
+    void UIUpdate(float elapsedTime);
+
+
+    void CreateInazawaCharaUI(USE_SKILL use_skill,int count);
+
+    void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
+  
 private:
     int    boostCount = 0;    //ブースト回数
     float* boostValue = 0;    //ブースト量   
     float* charaHp = 0;      //キャラHP
+    bool bookingRegister = false;
     
     std::weak_ptr<GameObject> player;
+
+
 };

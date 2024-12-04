@@ -11,8 +11,7 @@ UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsio
     //もしマイナスなら整数値に変える
     if (changePosValue <= 0.0f) {
         changePosValue *= -1.0f;
-    }
-    originalPos.y = min;
+    }    originalPos.y = min;
     maxPos.y = max;
 }
 
@@ -29,9 +28,11 @@ void UI_Skill::Update(float elapsedTime)
     valueRate = *variableValue / maxValue;
     float addPos = changePosValue * valueRate;
     if (!isDebug) {
-        spc.position = { spc.position.x,originalPos.y - addPos };
-    }
+        GetGameObject()->transform_->SetWorldPosition({ GetGameObject()->transform_->GetWorldPosition().x ,originalPos.y - addPos,0 });
+    }  
+    this->UiSystem::Update(elapsedTime);
 }
+
 
 UI_BoosGauge::UI_BoosGauge(int num)
 {
@@ -381,7 +382,6 @@ void UI_E_SkillCount::Start()
     this->GetGameObject()->AddChildObject(gauge);
     //各パラメーター設定
 
-    //例外処理クソ過ぎ
     player = GameObjectManager::Instance().Find("player");
     if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>() != nullptr)
     {
@@ -517,126 +517,114 @@ void UI_Ult_Count::UpdateCore(float elapsedTime)
 }
 
 
-void PlayerUIManager::Initialize(RegisterChara::CHARA_LIST selectChara)
-{
-    //プレイヤーを保持
-    player = GameObjectManager::Instance().Find("player");
+void PlayerUIManager::Register()
+{  
     //パラメーター設定
     charaHp = player.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
     boostCount = 3;
     
     //キャンバス
-    auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("Canvas");
-
-    //キャラごとのUIにする
-    switch (selectChara)
-    {
-    case RegisterChara::CHARA_LIST::INAZAWA:
-        CreateInazawaCharaUI();
-        break;
+    auto& canvas = GameObjectManager::Instance().Create();
+    canvas->SetName("Canvas");
+    USE_SKILL use_skill[2];
+    use_skill[0] = USE_SKILL::E;
+    use_skill[1] = USE_SKILL::LEFT_CLICK;
+    int count = 0;
+    for (int i = 0; i < sizeof(use_skill)/ sizeof(USE_SKILL); i++) {
+        if (player.lock()->GetComponent<CharacterCom>()->GetUseSkill() == use_skill[i]) {
+            CreateInazawaCharaUI(use_skill[i],count);
+            count++;
+        }
     }
 }
 
-void PlayerUIManager::CreateInazawaCharaUI()
+void PlayerUIManager::UIUpdate(float elapsedTime)
 {
+    if (!bookingRegister) return;
+
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+    if (canvas) {
+        GameObjectManager::Instance().Remove(canvas);
+    }
+    else {
+        Register();
+        bookingRegister = false;
+    }
+}
+
+void PlayerUIManager::CreateInazawaCharaUI(USE_SKILL use_skill,int count)
+{
+
+   std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/";
+   CharacterCom::SkillCoolID skillNum;
+   switch (use_skill)
+   {
+   case Q:
+       skillNum = CharacterCom::SkillCoolID::Q;
+       break;
+   case E:
+       name += "skill_Q.png";
+       skillNum = CharacterCom::SkillCoolID::E;
+       break;
+   case LEFT_CLICK:
+       name += "skill_Q.png";
+       skillNum = CharacterCom::SkillCoolID::LeftClick;
+       break;
+   default:
+       break;
+   }
+
+
+  //SkillFrame
+   
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+    std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
+    skillFrame->SetName("SkillFrame");
+    auto& a =  skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
+    skillFrame->transform_->SetWorldPosition({ skillFrame->transform_->GetWorldPosition().x - (count * 90),skillFrame->transform_->GetWorldPosition().y,0});
+    a->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y};
+
+   //SkillFrame2
+   {
+       std::shared_ptr<GameObject> skill_Q = skillFrame->AddChildObject();
+       skill_Q->SetName("Skill_Frame2");
+       skill_Q->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_02.ui", Sprite::SpriteShader::DEFALT, false);
+   }
   
-    ////////////<SKill_E>////////////////////////////
-   //SkillFrame
-    {
-        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-        std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
-        skillFrame->SetName("SkillFrame");
-        skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
-    }
-    //SkillFrame2
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
-        std::shared_ptr<GameObject> skill_Q = SkillFrame->AddChildObject();
-        skill_Q->SetName("Skill_Frame2");
-        skill_Q->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_02.ui", Sprite::SpriteShader::DEFALT, false);
-    }
+   //SkillMask
+   {
+       std::shared_ptr<GameObject> skillGaueHide = skillFrame->AddChildObject();
+       skillGaueHide->SetName("SkillGaugeHide");
+       auto& a = skillGaueHide->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide1.ui", Sprite::SpriteShader::DEFALT, false);
+       a->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y };
+   }
+  
+   //SkillGauge
+   {
+       std::shared_ptr<GameObject> skillGauge = skillFrame->AddChildObject();
+       skillGauge->SetName("SkillGauge");
+       std::shared_ptr<UI_Skill>skillGaugeCmp = skillGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge1.ui", Sprite::SpriteShader::DEFALT, false, 997, 908);
+       std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+       skillGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(skillNum));
+       float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(skillNum);
+       skillGaugeCmp->SetVariableValue(i);
+       skillGaugeCmp->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y };
 
-    //SkillMask
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
-        std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
-        skillFrame->SetName("SkillGaugeHide");
-        skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide1.ui", Sprite::SpriteShader::DEFALT, false);
-    }
+   }
 
-    //SkillGauge
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
-        std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
-        skillFrame->SetName("SkillGauge");
-        std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge1.ui", Sprite::SpriteShader::DEFALT, false, 1084, 997);
-        std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+   //Skill_E
+   {
+       std::shared_ptr<GameObject> skillIcon = skillFrame->AddChildObject();
+       skillIcon->SetName("Skill_E");
+       auto& a = skillIcon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_E.ui", Sprite::SpriteShader::DEFALT, false);
+       skillIcon->GetComponent<UiSystem>()->LoadTexture(name);
+       a->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y };
 
-        skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetESkillCoolTime());
-        float* i = player->GetComponent<CharacterCom>()->GetESkillCoolTimer();
-        skillGauge->SetVariableValue(i);
-    }
+   }
+}
 
-    
-    //Skill_E
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame");
-        std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
-        skillGauge->SetName("Skill_E");
-        skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_E.ui", Sprite::SpriteShader::DEFALT, false);
-    }
-
-    //Skillカウント
-    {
-        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-        std::shared_ptr<GameObject> skillGauge = canvas->AddChildObject();
-        skillGauge->SetName("SkillCore");
-        skillGauge->AddComponent<UI_E_SkillCount>(8);
-    }
-
-    ////////////////<Skill_Space>/////////////////////////////////////
-    //SkillFrame
-    {
-        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-        std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
-        skillFrame->SetName("SkillFrame2");
-        skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame2_01.ui", Sprite::SpriteShader::DEFALT, false);
-    }
-
-    //SkillFrame2
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame2");
-        std::shared_ptr<GameObject> skill_Q = SkillFrame->AddChildObject();
-        skill_Q->SetName("Skill_Frame2");
-        skill_Q->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame2_02.ui", Sprite::SpriteShader::DEFALT, false);
-    }
-
-    //SkillMask
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame2");
-        std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
-        skillFrame->SetName("SkillGaugeHide");
-        skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide2.ui", Sprite::SpriteShader::DEFALT, false);
-    }
-
-    //SkillGauge
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame2");
-        std::shared_ptr<GameObject> skillFrame = SkillFrame->AddChildObject();
-        skillFrame->SetName("SkillGauge");
-        std::shared_ptr<UI_Skill>skillGauge = skillFrame->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge2.ui", Sprite::SpriteShader::DEFALT, false, 1030, 937);
-        std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
-        skillGauge->SetMaxValue(player->GetComponent<CharacterCom>()->GetSpaceSkillCoolTime());
-        float* i = player->GetComponent<CharacterCom>()->GetSpaceSkillCoolTimer();
-        skillGauge->SetVariableValue(i);
-    }
-
-    //Skill_Space
-    {
-        std::shared_ptr<GameObject> SkillFrame = GameObjectManager::Instance().Find("SkillFrame2");
-        std::shared_ptr<GameObject> skillGauge = SkillFrame->AddChildObject();
-        skillGauge->SetName("Skill_SPACE");
-        skillGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_SPACE.ui", Sprite::SpriteShader::DEFALT, false);
-    }
+void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
+{
+    player = obj;
+    bookingRegister = true;
 }

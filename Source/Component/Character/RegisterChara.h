@@ -3,7 +3,6 @@
 #include <memory>
 
 class GameObject;
-
 class RegisterChara
 {
 public:
@@ -37,4 +36,6 @@ private:
     void HaveAllAttackChara(std::shared_ptr<GameObject>& obj);
     void FarahCharacter(std::shared_ptr<GameObject>& obj);
     void JankratChara(std::shared_ptr<GameObject>& obj);
+
+
 };
