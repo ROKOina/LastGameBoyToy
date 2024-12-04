@@ -12,6 +12,7 @@
 #include <Component\MoveSystem\MovementCom.h>
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "JankratBullet.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -433,9 +434,10 @@ GameObj BulletCreate::JankratBombFire(std::shared_ptr<GameObject> parent, Direct
     bullet->SetName("damageball");
     bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
     bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
+
+    //物理
     RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
     RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
-    //r->LoadModel("Data/Model/Ball/SplitBall.mdl");
     r->LoadModel("Data/Model/Jankrat/mine.mdl");
 
     //コライダー
@@ -445,15 +447,41 @@ GameObj BulletCreate::JankratBombFire(std::shared_ptr<GameObject> parent, Direct
     coll->SetRadius(1.0f);
 
     //弾
-    std::shared_ptr<BulletCom> bulletCom = bullet->AddComponent<BulletCom>(id);
-    bulletCom->SetAliveTime(5.0f);
-    bulletCom->SetDamageValue(-1);
-    bulletCom->SetViewBullet(bullet);
+    std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(1);
+
+    //RigidBodyのAddForceが生成時に使えないのでここで返す
+    return bullet;
+}
+
+GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, float force, float damage, int id)
+{
+    //発射位置算出用変数定義
+    DirectX::XMFLOAT3 fpsDir = parent->GetComponent<CharacterCom>()->GetFpsCameraDir();
+
+    //弾丸オブジェクト生成
+    GameObj bullet = GameObjectManager::Instance().Create();
+    bullet->SetName("damageball");
+    bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
+
+    //速度設定
+    std::shared_ptr<MovementCom> moveCom = bullet->AddComponent<MovementCom>();
+    moveCom->SetGravity(0.0f);
+    moveCom->SetFriction(0.0f);
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * force);
+
+    //Render
+    std::shared_ptr<RendererCom> renderCom = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS));
+    renderCom->LoadModel("Data/Model/Jankrat/mine.mdl");
+
+    //地雷のコンポーネント作って付ける
+
+
 
     return bullet;
 }

@@ -483,5 +483,5 @@ void StageEditorCom::GateGimic(GameObj& place)
 {
     place->AddComponent<GateGimmick>();
     RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Convex).get();
-    rigid->SetNormalizeScale(1);
+    rigid->SetRigidScale(1);
 }

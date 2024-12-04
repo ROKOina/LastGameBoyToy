@@ -41,11 +41,11 @@ private:
 class JankratCharacter_SubSkillState : public JankratCharacter_BaseState
 {
 public:
-    //JankratCharacter_SubSkillState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
+    JankratCharacter_SubSkillState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
 
-    //void Enter() override;
-    //void Execute(const float& elapsedTime) override;
-    //void Exit() override;
-    //void ImGui() override;
-    //virtual const char* GetName() const override { return "SubSkill"; }
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "SubSkill"; }
 };

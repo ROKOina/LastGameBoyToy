@@ -25,8 +25,8 @@ public:
 
     void SetUp();
 
-    float GetNormalizeScale() { return normalizeScale; }
-    void SetNormalizeScale(float scale) { normalizeScale = scale; }
+    float GetRigidScale() { return rigidScale; }
+    void SetRigidScale(float scale) { rigidScale = scale; }
     std::string GetUseResourcePath() { return useResourcePath; }
     void SetUseResourcePath(std::string path) { useResourcePath = path; }
 
@@ -36,8 +36,10 @@ public:
 
     void SetLayer(PhysXLib::CollisionLayer pLayer);
 
-    // 衝撃を加える(isStaticがfalseの場合のみ
+    // 衝撃を加える(isStaticがfalseの場合のみ,SetUp関数終わったら使える
     void AddForce(DirectX::XMFLOAT3 force);
+
+
     //質量設定(isStaticがfalseの場合のみ
     void SetMass(float value);
     //摩擦力設定
@@ -55,7 +57,7 @@ private:
     physx::PxTransform rigidTransform = {};
 
     PhysXLib::CollisionLayer layer = PhysXLib::CollisionLayer::Public;
-    float normalizeScale = 0.005f;//物理世界の大きさを調整するよう（生成時にしか使用しない
+    float rigidScale = 0.005f;//物理世界の大きさを調整するよう（生成時にしか使用しない
 
     physx::PxRigidBodyFlag::Enum rigidBodyFlag = physx::PxRigidBodyFlag::eENABLE_CCD;
 

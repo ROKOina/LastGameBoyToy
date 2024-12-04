@@ -63,7 +63,7 @@ public:
 
         bool isStatic = true;
         ShapeType type = ShapeType::None;
-        ModelResource* model = nullptr;
+        std::shared_ptr<ModelResource> model = nullptr;
         CollisionLayer layer = CollisionLayer::Public;
 
         float mass = 0.5f;

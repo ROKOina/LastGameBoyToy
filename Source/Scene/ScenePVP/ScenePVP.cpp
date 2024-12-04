@@ -125,7 +125,7 @@ void ScenePVP::Initialize()
         r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
         r->SetOutlineColor({ 1,0,0 });
         r->SetOutlineIntensity(10.0f);
-        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        boss->transform_->SetWorldPosition({ 0.0f,0.0f,0.0f });
         boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
@@ -140,7 +140,6 @@ void ScenePVP::Initialize()
         charaStatusCom->SetHitPoint(2000);
         charaStatusCom->SetMaxHitPoint(2000);
     }
-
 
     //UIゲームオブジェクト生成
     CreateUiObject();

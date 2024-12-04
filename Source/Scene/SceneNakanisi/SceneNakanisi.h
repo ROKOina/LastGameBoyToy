@@ -1,0 +1,40 @@
+#pragma once
+#pragma once
+
+#include "Scene/Scene.h"
+#include "Netwark/Photon/BasicsApplication.h"
+
+//リザルトシーン
+class SceneNakanisi :public Scene
+{
+public:
+    SceneNakanisi() {};
+    ~SceneNakanisi()override {};
+
+    // 初期化
+    void Initialize()override;
+
+    // 終了化
+    void Finalize()override;
+
+    // 更新処理
+    void Update(float elapsedTime)override;
+
+    // 描画処理
+    void Render(float elapsedTime)override;
+
+    //名前取得
+    std::string GetName() const override { return "SceneNakanisi"; };
+
+    //UIのゲームオブジェクト生成
+    void CreateUiObject();
+
+private:
+
+    //オブジェクト生成関数
+    void NewObject();
+
+private:
+
+    std::unique_ptr<BasicsApplication> photonNet;
+};

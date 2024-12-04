@@ -34,6 +34,7 @@ public:
 
     void SetHitInterval(float sec) { hitIntervalTime = sec; }
 
+    float GetValue() { return value; }
     void SetValue(float value) { this->value = value; }
     void SetValue3(DirectX::XMFLOAT3 value3) { this->value3 = value3; }
 

@@ -67,4 +67,5 @@ public:
 
     //ƒWƒƒƒ“ƒNƒ‰‚Ì’e
     static GameObj JankratBombFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);
+    static GameObj JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, float force, float damage, int id);
 };

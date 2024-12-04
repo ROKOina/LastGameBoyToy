@@ -158,14 +158,14 @@ void RigidBodyCom::SetUp()
     data.rotate = GetGameObject()->transform_->GetRotation();  
 
     DirectX::XMFLOAT3 scaleV = GetGameObject().get()->transform_->GetScale();
-    data.scale.x = normalizeScale / scaleV.x;
-    data.scale.y = normalizeScale / scaleV.y;
-    data.scale.z = normalizeScale / scaleV.z;
+    data.scale.x = rigidScale / scaleV.x;
+    data.scale.y = rigidScale / scaleV.y;
+    data.scale.z = rigidScale / scaleV.z;
 
     //ƒ‚ƒfƒ‹
     !useResourcePath.empty()
-    ? data.model = ResourceManager::Instance().GetModelResource(useResourcePath.c_str()).get()
-    : data.model = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource();
+    ? data.model = ResourceManager::Instance().GetModelResource(useResourcePath.c_str())
+    : data.model = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource_shared();
 
     rigidActor = PhysXLib::Instance().GenerateCollider(data);
 }

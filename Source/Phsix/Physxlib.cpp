@@ -164,7 +164,7 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, float worldScale, C
             RigidData data;
             data.isStatic = true;
             data.type = shapeType;
-            data.model = m.get();
+            data.model = m;
 
             //親ノードを元にトランスフォームを更新
             DirectX::XMMATRIX transVec = DirectX::XMLoadFloat4x4(&Mathf::GenerateTransform(node.translate, node.rotate, node.scale));
