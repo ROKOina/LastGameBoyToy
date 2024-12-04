@@ -4,7 +4,7 @@
 
 
 
-
+//トレーニングの統括
 class TrainingManager
 {
 private:
@@ -31,6 +31,7 @@ private:
 
 };
 
+//トレーニングモード
 class TrainingSystem
 {
 private:
@@ -48,34 +49,32 @@ public:
     void TrainingSystemStart();
     void TrainingSystemClear();
 
-public:
-
-    bool GetShootingIntervalFlag() { return shootingIntervalFlag; }
-
 private:
+    //射撃の開始処理と終了処理
+    void ShootingStartEndSystem();
+
     //射撃のロジック？
     void ShootingSystem(float elapsdTime);
 
-    void ShootingRandomSpawn();
+    //射撃時の案山子スポーン
+    void ShootingSpawnCrow();
 
 private:
-    int     shootingScore = 0;
-    float   scarecrowSpawnTime = 1.0f;  //倒してから1秒間待つ
-    float   scarecrowSpawnTimer = 0.0f;
-    float   scarecrowLifeTime = 1.0f;
-    float   scarecrowLifeTimer = 0.0f;
-    float   scarecrowSpawnIntervalTime  = 1.0f;
-    float   scarecrowSpawnIntervalTimer = 0.0f;
-    DirectX::XMFLOAT3 randomPos = { 0,0,0 };
-    bool    shootingStartFlag = true;
-    bool    shootingIntervalFlag = false;
-
-
-    //難易度変化させるか？
-    //分からん
+    int     shootingScore = 0;                     //射撃のスコア
+    int     scarecrowMaxTotal = 30;                //射撃時の最大案山子スポーン数
+    int     scarecrowCount = 0;                    //射撃時の案山子スポーン
+          
+    float   scarecrowLifeTime = 1.0f;              //スポーンしてからの生存時間
+    float   scarecrowLifeTimer = 0.0f;             //生存時間タイマー
+    float   scarecrowSpawnIntervalTime  = 1.0f;    //案山子が倒されてからの次の案山子をスポーンの間隔
+    float   scarecrowSpawnIntervalTimer = 0.0f;    //↑のタイマー
+    
+    bool    shootingStartFlag = false;             //射撃が開始か終了か　false=終了　True＝開始
+    bool    shootingIntervalFlag = false;          //次の案山子をスポーンさせる信号
 
 };
 
+//チュートリアルモード
 class TutorialSystem
 {
 private:

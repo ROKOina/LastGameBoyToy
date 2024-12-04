@@ -107,15 +107,3 @@ private:
     float reSpawnTimer = 0.0f;
 };
 
-//ŽËŒ‚Ž€–S
-class Scarecrow_Shooting :public Scarecrow_BaseState
-{
-public:
-    Scarecrow_Shooting(ScarecrowCom* owner):Scarecrow_BaseState(owner){}
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    //void Exit()override;
-    void ImGui() override {};
-    virtual const char* GetName() const override { return "ShootingDeath"; }
-};

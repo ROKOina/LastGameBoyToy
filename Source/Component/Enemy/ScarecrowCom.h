@@ -27,6 +27,7 @@ public:
     int GetCrowMode() { return scareCrowMode; }
     void SetCrowMode(int Index) { scareCrowMode = Index; }
 public:
+
     //ステート
     enum class ScareCrowState
     {
@@ -38,8 +39,6 @@ public:
 
         DEATH,
 
-        SHOOTINGDEATH,
-
         MAX
     };
 
@@ -47,16 +46,12 @@ public:
 
     StateMachine<ScarecrowCom, ScareCrowState>& GetStateMachine() { return state; }
 
-public:
-
-    //void RandomMove(DirectX::XMFLOAT2 limitPosX,float moveSpeed)
-
 private:
 
     StateMachine<ScarecrowCom, ScareCrowState> state;
 
     //案山子のモード
-    //0=棒立ち　1＝ランダム移動　2=射的
+    //0=棒立ち　1＝ランダム移動　
     int scareCrowMode = 1;
 
 };

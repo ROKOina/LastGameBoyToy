@@ -58,10 +58,6 @@ void Scarecrow_IdleState::Execute(const float& elapsedTime)
         scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::DEATH);
     }
 
-    if (owner->GetCrowMode() == 2 && characterstatas.lock()->IsDeath())
-    {
-        scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::SHOOTINGDEATH);
-    }
 }
 #pragma endregion
 
@@ -152,19 +148,4 @@ void Scarecrow_DeathState::Execute(const float& elapsedTime)
 #pragma endregion
 
 
-#pragma region ŽËŒ‚Ž€–S
-void Scarecrow_Shooting::Enter()
-{
 
-}
-
-void Scarecrow_Shooting::Execute(const float& elapsedTime)
-{
-    if (TrainingSystem::Instance().GetShootingIntervalFlag())
-    {
-        //‚¢‚Â‚à‚±‚±‚©‚ç
-
-    }
-}
-
-#pragma endregion

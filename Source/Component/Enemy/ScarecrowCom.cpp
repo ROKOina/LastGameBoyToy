@@ -14,6 +14,7 @@ void ScarecrowCom::Start()
     state.AddState(ScareCrowState::RANDOMIDLE, std::make_shared<Scarecrow_RandomIdleState>(this));
     state.AddState(ScareCrowState::MOVE, std::make_shared<Scarecrow_MoveState>(this));
     state.AddState(ScareCrowState::DEATH, std::make_shared<Scarecrow_DeathState>(this));
+    
 
     //初期ステート登録
     state.ChangeState(ScareCrowState::IDLE);
