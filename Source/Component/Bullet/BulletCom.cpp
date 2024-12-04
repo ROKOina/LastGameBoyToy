@@ -1,4 +1,5 @@
 #include "BulletCom.h"
+#include "JankratBulletCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\System\TransformCom.h"
 #include "Component\Renderer\RendererCom.h"
@@ -12,7 +13,7 @@
 #include <Component\MoveSystem\MovementCom.h>
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
-#include "JankratBullet.h"
+#include "Component\SkillObj\JankratMineCom.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -428,7 +429,7 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     hit->SetValue(damageValue);
 }
 
-GameObj BulletCreate::JankratBombFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id)
+GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id)
 {
     GameObj bullet = GameObjectManager::Instance().Create();
     bullet->SetName("damageball");
@@ -474,14 +475,27 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     moveCom->SetGravity(0.0f);
     moveCom->SetFriction(0.0f);
     moveCom->SetNonMaxSpeedVelocity(fpsDir * force);
+    moveCom->SetAdvanceOffset(0.2f);
+    moveCom->SetStepOffset(0.0f);
+    moveCom->SetUseWallSride(false);
 
     //Render
     std::shared_ptr<RendererCom> renderCom = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS));
     renderCom->LoadModel("Data/Model/Jankrat/mine.mdl");
 
     //地雷のコンポーネント作って付ける
+    bullet->AddComponent<JankratMineCom>();
 
+    //コライダー
+    std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
+    coll->SetMyTag(COLLIDER_TAG::Bullet);
+    coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+    coll->SetRadius(1.0f);
 
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(damage);
 
     return bullet;
 }

@@ -1,5 +1,6 @@
 #include "JankratBulletCom.h"
 #include "Component\Collsion\ColliderCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 void JankratBulletCom::Update(float elapsedTime)
 {
@@ -13,6 +14,11 @@ void JankratBulletCom::Update(float elapsedTime)
         //直撃よりダメージ減らす
         HitProcessCom* hit = GetGameObject()->GetComponent<HitProcessCom>().get();
         hit->SetValue(hit->GetValue() * 0.8f);
+
+        RigidBodyCom* rigid = GetGameObject()->GetComponent<RigidBodyCom>().get();
+        rigid->SetRigidFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+
+        //TODO ここで爆発のエフェクト再生
 
         explosionFlag = true;
     }

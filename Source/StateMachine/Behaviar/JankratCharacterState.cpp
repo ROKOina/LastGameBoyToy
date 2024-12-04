@@ -3,6 +3,7 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\System\HitProcessCom.h"
 #include "Component\Bullet\BulletCom.h"
+#include "Component\SkillObj\JankratMineCom.h"
 
 JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -15,7 +16,7 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
 
 void JankratCharacter_MainAtkState::Enter()
 {
-    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBombFire(owner->GetGameObject(), transCom.lock()->GetWorldPosition(), charaCom.lock()->GetCharaID()));
+    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBulletFire(owner->GetGameObject(), transCom.lock()->GetWorldPosition(), charaCom.lock()->GetCharaID()));
 }
 
 void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
@@ -28,8 +29,10 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         rigid->SetMass(mass);           //質量
         rigid->SetRestitution(restitution);    //反発係数
         rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); //速くても貫通しないような計算にするフラグ
-        charaCom.lock()->haveBulletRelease();
+        charaCom.lock()->ReleaseHaveBullet();
 
+
+        //TODO 発射地点を銃の位置に変更
         DirectX::XMFLOAT3 vec = owner->GetGameObject()->transform_->GetWorldFront();
         rigid->AddForce(Mathf::Normalize({vec.x, vec.y + 0.2f, vec. z}) * force);
     }
@@ -44,11 +47,28 @@ void JankratCharacter_MainAtkState::ImGui()
     ImGui::DragFloat("Force", &force);
 }
 
-void JankratCharacter_SubSkillState::Enter()
+void JankratCharacter_MainSkillState::Enter()
 {
+    
 }
 
-void JankratCharacter_SubSkillState::Execute(const float& elapsedTime)
+void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
 {
+    //TODO 発射地点を銃の位置に変更
+    DirectX::XMFLOAT3 firePos = owner->GetGameObject()->transform_->GetWorldPosition();
+    firePos.y += 2;
 
+    charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), firePos, 100.0f, 20, owner->GetCharaID()));
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+void JankratCharacter_SubAttackState::Execute(const float& elapsedTime)
+{
+    for (auto& mine : charaCom.lock()->GetHaveMine())
+    {
+        mine->GetComponent<JankratMineCom>()->SetExplosionFlag(true);
+    }
+
+    //TODO アニメーション終わってから遷移
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }

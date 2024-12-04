@@ -31,11 +31,19 @@ public:
     void SetDamageValue(int value) { damageValue = value; }
     int GetDamageValue() { return damageValue; }
 
+    bool GetIsPlant() { return isPlant; }
+
+    bool GetExplosionFlag() { return explosionFlag; }
+    void SetExplosionFlag(bool flag) { explosionFlag = flag; }
+
 private:
-    float lifeTimer = 0.0f;
 
     float explosionTime = 1.5f;
+    float lifeTimer = 0.0f;
     float lifeTime = 2.0f;
+
+    //ê›íuÉtÉâÉO
+    bool isPlant = false;
 
     bool explosionFlag = false;
     int damageValue = 10;

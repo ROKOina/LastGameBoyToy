@@ -12,6 +12,7 @@ public:
     void Update(float elapsedTime) override;
 
     void MainAttackDown() override;
+    void MainSkill() override;
 
     void SubAttackDown() override {};
     void SubSkill() override {};
@@ -20,9 +21,27 @@ public:
 
     void ResetShootTimer() { shootTimer = 0; }
 
+
+private:
+    //Á‹‚³‚ê‚Ä‚¢‚é’e‚â’n—‹‚ğè•ú‚·
+    void EraseHaveObjects();
+
+public:
     GameObj GetHaveBullet() { return haveBullet; }
     void SetHaveBullet(GameObj obj) { haveBullet = obj; }
-    void haveBulletRelease() { haveBullet.reset(); }
+    void ReleaseHaveBullet() { haveBullet.reset(); }
+
+    std::vector<GameObj> GetHaveMine() { return haveMine; }
+    void AddHaveMine(GameObj obj) { haveMine.emplace_back(obj); }
+    void ReleaseHaveMine(GameObj obj) { haveMine.erase(std::remove(haveMine.begin(), haveMine.end(), obj), haveMine.end()); }
+    void AllReleaseHaveMine()
+    { 
+        for (auto& mine : haveMine)
+        {
+            mine.reset();
+        }
+        haveMine.clear();
+    }
 
 private:
     //”­ËŠÔŠu
@@ -30,4 +49,5 @@ private:
     float shootTimer = 0;
 
     GameObj haveBullet; //ËŒ‚‘Ò‹@’†‚Ì’eŠÛ
+    std::vector<GameObj> haveMine; //g—p’†‚Ì’n—‹
 };
