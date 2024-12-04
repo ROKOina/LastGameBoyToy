@@ -19,3 +19,9 @@ void KnockBackCom::Update(float elapsedTime)
         hitProcess->SetValue3(Mathf::Normalize(enemy - pos) * knockbackforce / elapsedTime);
     }
 }
+
+//gui
+void KnockBackCom::OnGUI()
+{
+    ImGui::DragFloat3("knockbackforce", &knockbackforce.x);
+}

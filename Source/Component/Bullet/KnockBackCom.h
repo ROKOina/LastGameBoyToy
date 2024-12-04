@@ -18,12 +18,12 @@ public:
     void Update(float elapsedTime) override;
 
     // GUI描画
-    void OnGUI() override {};
+    void OnGUI() override;
 
 public:
 
     //ノックバックの係数
-    void SetKnockBackForce(DirectX::XMFLOAT3& knockbackforce_) { knockbackforce = knockbackforce_; }
+    void SetKnockBackForce(DirectX::XMFLOAT3 knockbackforce_) { knockbackforce = knockbackforce_; }
 
 private:
 
