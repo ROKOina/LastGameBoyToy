@@ -211,7 +211,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     coll->SetRadius(0.6f);
 
     //’e
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(-damageValue);
@@ -259,7 +259,7 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
         coll->SetJudgeTag(COLLIDER_TAG::Player);
 
     //’e
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(2.0f);
     bulletCom->SetDamageValue(0);
@@ -306,7 +306,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
         coll->SetJudgeTag(COLLIDER_TAG::Player);
 
     //’e
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(2.0f);
     bulletCom->SetDamageValue(0);

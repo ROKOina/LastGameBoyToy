@@ -296,8 +296,8 @@ void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
 
             //Ž©•ª‚©”»’f‚·‚é
             DirectX::XMFLOAT3 front;
-            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-            if (playerNetID == charaCom.lock()->GetNetID())
+            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetNetID();
+            if (playerNetID == charaCom.lock()->GetNetCharaData().GetNetID())
                 front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
             else
                 front = charaCom.lock()->GetFpsCameraDir();
@@ -349,8 +349,8 @@ void BaseCharacter_CapsuleState::Execute(const float& elapsedTime)
 
             //Ž©•ª‚©”»’f‚·‚é
             DirectX::XMFLOAT3 front;
-            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-            if (playerNetID == charaCom.lock()->GetNetID())
+            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetNetID();
+            if (playerNetID == charaCom.lock()->GetNetCharaData().GetNetID())
                 front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
             else
                 front = charaCom.lock()->GetFpsCameraDir();

@@ -91,7 +91,7 @@ void PhotonLib::update(float elapsedTime)
         s.inputBuf->Enqueue(save);
 
         //ちーむID保存
-        myPlayer->GetComponent<CharacterCom>()->SetTeamID(s.teamID);
+        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetTeamID(s.teamID);
 
         //名前登録
         if (s.name.size() <= 0)
@@ -101,7 +101,7 @@ void PhotonLib::update(float elapsedTime)
 
         break;
     }
-    myPlayer->GetComponent<CharacterCom>()->SetNetID(myID);
+    myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(myID);
 
     switch (mState)
     {
@@ -922,7 +922,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 net1->SetName(name.c_str());
 
                 RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(ne[0].charaID), net1);
-                net1->GetComponent<CharacterCom>()->SetNetID(playerNr);
+                net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(playerNr);
             }
 
             //ダメージ情報
@@ -1049,7 +1049,7 @@ void PhotonLib::sendData(void)
     }
 
     //キャラIDを送る
-    netD.charaID = obj->GetComponent<CharacterCom>()->GetCharaID();
+    netD.charaID = obj->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();
 
     //自分の入力を送る
     int myID = GetPlayerNum();

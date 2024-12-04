@@ -51,7 +51,7 @@ void HitProcessCom::Update(float elapsedTime)
         chara->SetIsHitAttack(true);
 
         //ƒqƒbƒgˆ—
-        HitProcess(chara->GetNetID(), hitChara->GetNetID());
+        HitProcess(chara->GetNetCharaData().GetNetID(), hitChara->GetNetCharaData().GetNetID());
 
         hitIntervalTimer = 0;
 

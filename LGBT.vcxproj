@@ -164,6 +164,7 @@
     <ClInclude Include="Source\Component\Character\HaveAllAttackCharacter.h" />
     <ClInclude Include="Source\Component\Character\InazawaCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\JankratCharacterCom.h" />
+    <ClInclude Include="Source\Component\Character\Prop\NetCharaData.h" />
     <ClInclude Include="Source\Component\Character\Prop\SetNodeWorldPosCom.h" />
     <ClInclude Include="Source\Component\Character\RegisterChara.h" />
     <ClInclude Include="Source\Component\Character\RemoveTimerCom.h" />

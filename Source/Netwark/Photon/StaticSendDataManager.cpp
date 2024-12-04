@@ -8,7 +8,7 @@ void StaticSendDataManager::SetSendDamage(int myID, int sendID, float damage)
     auto& player = GameObjectManager::Instance().Find("player");
     auto& chara = player->GetComponent<CharacterCom>();
 
-    if (chara->GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
+    if (chara->GetNetCharaData().GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
 
     NetSendData data;
     data.sendType = 0;
@@ -22,7 +22,7 @@ void StaticSendDataManager::SetSendHeal(int myID, int sendID, float heal)
     auto& player = GameObjectManager::Instance().Find("player");
     auto& chara = player->GetComponent<CharacterCom>();
 
-    if (chara->GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
+    if (chara->GetNetCharaData().GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
 
     NetSendData data;
     data.sendType = 1;
@@ -36,7 +36,7 @@ void StaticSendDataManager::SetSendStan(int myID, int sendID, float stanSec)
     auto& player = GameObjectManager::Instance().Find("player");
     auto& chara = player->GetComponent<CharacterCom>();
 
-    if (chara->GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
+    if (chara->GetNetCharaData().GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
 
     NetSendData data;
     data.sendType = 2;
@@ -50,7 +50,7 @@ void StaticSendDataManager::SetSendKnockback(int myID, int sendID, DirectX::XMFL
     auto& player = GameObjectManager::Instance().Find("player");
     auto& chara = player->GetComponent<CharacterCom>();
 
-    if (chara->GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
+    if (chara->GetNetCharaData().GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
 
     NetSendData data;
     data.sendType = 3;
@@ -64,7 +64,7 @@ void StaticSendDataManager::SetSendMovePos(int myID, int sendID, DirectX::XMFLOA
     auto& player = GameObjectManager::Instance().Find("player");
     auto& chara = player->GetComponent<CharacterCom>();
 
-    if (chara->GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
+    if (chara->GetNetCharaData().GetNetID() == sendID)return;   //©•ª‚É‘—‚ç‚ê‚Ä‚¢‚éê‡‚Íreturn
 
     NetSendData data;
     data.sendType = 4;
