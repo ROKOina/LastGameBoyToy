@@ -416,12 +416,28 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->SetCharaID(int(CHARA_LIST::JANKRAT));
 
-    std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
-    cameraPost->SetName("cameraPostPlayer");
-    std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-    fpscamera->ActiveCameraChange();
+    //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
+    if (std::strcmp(obj->GetName(), "player") == 0)
+    {
+        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
+        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+        cameraPost->SetName("cameraPostPlayer");
+        std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
+        fpscamera->ActiveCameraChange();
 
-    //カメラ位置
-    cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
-    obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+        //カメラ位置
+        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
+        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+
+        //腕
+        {
+            std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
+            armChild->SetName("armChild");
+            armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            armChild->AddComponent<AnimationCom>();
+        }
+    }
 }
