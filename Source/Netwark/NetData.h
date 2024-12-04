@@ -43,23 +43,23 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
 
 //array
 //float
-static std::stringstream& operator>>(std::stringstream& in, std::array<float, 6>& h)
+static std::stringstream& operator>>(std::stringstream& in, std::array<float, 4>& h)
 {
     in >> float(h[0]) >> float(h[1]) >> float(h[2]) >> float(h[3]) >> float(h[4]) >> float(h[5]);
     return in;
 }
-static std::stringstream& operator<<(std::stringstream& out, const std::array<float, 6>& h)
+static std::stringstream& operator<<(std::stringstream& out, const std::array<float, 4>& h)
 {
     out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
     return out;
 }
 //int
-static std::stringstream& operator>>(std::stringstream& in, std::array<int, 6>& h)
+static std::stringstream& operator>>(std::stringstream& in, std::array<int, 4>& h)
 {
     in >> int(h[0]) >> int(h[1]) >> int(h[2]) >> int(h[3]) >> int(h[4]) >> int(h[5]);
     return in;
 }
-static std::stringstream& operator<<(std::stringstream& out, const std::array<int, 6>& h)
+static std::stringstream& operator<<(std::stringstream& out, const std::array<int, 4>& h)
 {
     out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
     return out;
@@ -127,7 +127,7 @@ static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& v
     }
 }
 //Vector3
-static void Vector3Out(std::stringstream& out, std::array<DirectX::XMFLOAT3, 6>& vec)
+static void Vector3Out(std::stringstream& out, std::array<DirectX::XMFLOAT3, 4>& vec)
 {
     out << vec[0] << " ";
     out << vec[1] << " ";
@@ -136,7 +136,7 @@ static void Vector3Out(std::stringstream& out, std::array<DirectX::XMFLOAT3, 6>&
     out << vec[4] << " ";
     out << vec[5] << " ";
 }
-static void Vector3In(std::stringstream& in, std::array<DirectX::XMFLOAT3, 6>& vec)
+static void Vector3In(std::stringstream& in, std::array<DirectX::XMFLOAT3, 4>& vec)
 {
     in >> vec[0];
     in >> vec[1];
@@ -155,12 +155,12 @@ struct NetData
 
     std::vector<SaveBuffer> saveInputBuf;
 
-    std::array<int, 6> damageData;//キャラに与えたダメージ
-    std::array<int, 6> healData;//キャラに与えたヒール
-    std::array<float, 6> stanData;//キャラに与えたスタン
-    std::array<DirectX::XMFLOAT3, 6> knockbackData = {};//ノックバックを与える
-    std::array<DirectX::XMFLOAT3, 6> movePosData = {};//移動位置を与える
-    std::array<int, 6> teamID;//チームのID
+    std::array<int, 4> damageData;//キャラに与えたダメージ
+    std::array<int, 4> healData;//キャラに与えたヒール
+    std::array<float, 4> stanData;//キャラに与えたスタン
+    std::array<DirectX::XMFLOAT3, 4> knockbackData = {};//ノックバックを与える
+    std::array<DirectX::XMFLOAT3, 4> movePosData = {};//移動位置を与える
+    std::array<int, 4> teamID;//チームのID
     int charaID;    //キャラのID
 
     //int pSize;

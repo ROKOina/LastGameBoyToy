@@ -485,10 +485,10 @@ void PhotonLib::NetCharaInput()
         chara->SetUserInputDown(s.nextInput.inputDown);
         chara->SetUserInputUp(s.nextInput.inputUp);
 
-        static bool upHokan[5] = { false }; //補間中か
-        static DirectX::XMFLOAT3 hoknaPos[5] = {};  //補間する位置
-        static DirectX::XMFLOAT3 nowPos[5] = {};    //今の位置
-        static int saveFrameHokan[5] = { 0 };       //補間用フレーム
+        static bool upHokan[4] = { false }; //補間中か
+        static DirectX::XMFLOAT3 hoknaPos[4] = {};  //補間する位置
+        static DirectX::XMFLOAT3 nowPos[4] = {};    //今の位置
+        static int saveFrameHokan[4] = { 0 };       //補間用フレーム
         int frameHokan = 6; //補完するフレーム
 
         //移動
