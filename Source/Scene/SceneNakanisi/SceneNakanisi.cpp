@@ -1,4 +1,4 @@
-#include "ScenePVE.h"
+#include "SceneNakanisi.h"
 #include <Graphics\Graphics.h>
 #include <Component\Camera\FreeCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
@@ -8,9 +8,7 @@
 #include <Input\Input.h>
 #include <Component\Character\CharacterCom.h>
 #include <Component\Animation\AnimationCom.h>
-#include <StateMachine\Behaviar\BossState.h>
 #include <Component\System\SpawnCom.h>
-#include "PVEDirection.h"
 #include <Component\Stage\StageEditorCom.h>
 #include "Component\Phsix\RigidBodyCom.h"
 #include <Component\Collsion\RayCollisionCom.h>
@@ -26,19 +24,15 @@
 #include <Component/UI/PlayerUI.h>
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
-#include "Component\Audio\AudioCom.h"
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
+#include "Component\Sprite\Sprite.h"
+#include "Component\System\GameObject.h"
+#include "Component/Collsion/NodeCollsionCom.h"
 
-
-
-ScenePVE::~ScenePVE()
-{
-}
-
-void ScenePVE::Initialize()
+void SceneNakanisi::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -64,7 +58,7 @@ void ScenePVE::Initialize()
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
-        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        freeCamera->transform_->SetWorldPosition({ 0, 5, -103 });
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 #endif
@@ -91,6 +85,8 @@ void ScenePVE::Initialize()
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //判定生成
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl", 0.005f);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
@@ -104,18 +100,14 @@ void ScenePVE::Initialize()
             gate->SetUpPos({ pos.x, 1.85f, pos.z });
             gate->SetMoveSpeed(0.1f);
         }
-
-        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Complex).get();
-        rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
-        rigid->SetRigidScale(1);
     }
 
     //プレイヤー
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        obj->transform_->SetWorldPosition({ 0,-1,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        obj->transform_->SetWorldPosition({ 0,0,0 });
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj);
     }
 
     //snowparticle
@@ -125,144 +117,32 @@ void ScenePVE::Initialize()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
-    //BOSS
+    //サンドバック
     {
         auto& boss = GameObjectManager::Instance().Create();
-        boss->SetName("BOSS");
+        boss->SetName("SundBug");
         std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
         r->SetOutlineColor({ 1,0,0 });
         r->SetOutlineIntensity(10.0f);
-        boss->transform_->SetWorldPosition({ 0.0f,0.0f,14.0f });
+        boss->transform_->SetWorldPosition({ 0.0f,0.0f,0.0f });
         boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
         boss->AddComponent<MovementCom>();
         boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         boss->AddComponent<AnimationCom>();
+        std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
+        pushBack->SetRadius(1.5f);
+        pushBack->SetWeight(600.0f);
         auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
         charaStatusCom->SetInvincibleTime(0.1f);
         charaStatusCom->SetHitPoint(2000);
         charaStatusCom->SetMaxHitPoint(2000);
-        boss->AddComponent<BossCom>();
-        boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
-        boss->AddComponent<AudioCom>();
-        std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
-        pushBack->SetRadius(1.5f);
-        pushBack->SetWeight(600.0f);
-
-        //右足の煙エフェクト
-        {
-            std::shared_ptr<GameObject>rightfootsmokeobject = boss->AddChildObject();
-            rightfootsmokeobject->SetName("rightfootsmokeeffect");
-            std::shared_ptr<CPUParticle>rightfootsmokeeffect = rightfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 400);
-            rightfootsmokeeffect->SetActive(false);
-        }
-
-        //左足の煙エフェクト
-        {
-            std::shared_ptr<GameObject>leftfootsmokeobject = boss->AddChildObject();
-            leftfootsmokeobject->SetName("leftfootsmokeeffect");
-            std::shared_ptr<CPUParticle>leftfootsmokeeffect = leftfootsmokeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/enemyfootsmoke.cpuparticle", 400);
-            leftfootsmokeeffect->SetActive(false);
-        }
-
-        //左手のゲームオブジェクト達
-        {
-            std::shared_ptr<GameObject> lefthandobject = boss->AddChildObject();
-            lefthandobject->SetName("lefthand");
-            std::shared_ptr<SphereColliderCom> lefthandcollider = lefthandobject->AddComponent<SphereColliderCom>();
-            lefthandcollider->SetEnabled(false);
-            lefthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
-            lefthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
-            lefthandcollider->SetRadius(1.0f);
-            std::shared_ptr<CPUParticle>fireeffect = lefthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 400);
-            fireeffect->SetActive(false);
-            std::shared_ptr<GPUParticle>gpufireeffect = lefthandobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/firespark.gpuparticle", 4000);
-            gpufireeffect->SetStop(true);
-        }
-
-        //右手のゲームオブジェクト達
-        {
-            std::shared_ptr<GameObject> righthandobject = boss->AddChildObject();
-            righthandobject->SetName("righthand");
-            std::shared_ptr<SphereColliderCom> righthandcollider = righthandobject->AddComponent<SphereColliderCom>();
-            righthandcollider->SetEnabled(false);
-            righthandcollider->SetMyTag(COLLIDER_TAG::Enemy);
-            righthandcollider->SetJudgeTag(COLLIDER_TAG::Player);
-            righthandcollider->SetRadius(1.0f);
-            std::shared_ptr<CPUParticle>fireeffect = righthandobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/fire.cpuparticle", 400);
-            fireeffect->SetActive(false);
-            std::shared_ptr<GPUParticle>gpufireeffect = righthandobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/firespark.gpuparticle", 4000);
-            gpufireeffect->SetStop(true);
-        }
-
-        //生成オブジェクト
-        {
-            std::shared_ptr<GameObject> spawnobject = boss->AddChildObject();
-            spawnobject->SetName("spawn");
-            spawnobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/missile.spawn");
-            std::shared_ptr<GPUParticle>gpuparticle = spawnobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 4000);
-            gpuparticle->SetStop(true);
-            std::shared_ptr<CPUParticle>shotsmoke = spawnobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/upshotsmoke.cpuparticle", 800);
-            shotsmoke->SetActive(false);
-
-            std::shared_ptr<GameObject> muzzleflashobject = spawnobject->AddChildObject();
-            muzzleflashobject->SetName("muzzleflashleft");
-            std::shared_ptr<CPUParticle>muzzleflash = muzzleflashobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/muzzleflash.cpuparticle", 500);
-            muzzleflash->SetActive(false);
-        }
-
-        //チャージ攻撃
-        {
-            std::shared_ptr<GameObject> chargeobject = boss->AddChildObject();
-            chargeobject->SetName("charge");
-            std::shared_ptr<GPUParticle>gpuparticle = chargeobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/gathermiddle.gpuparticle", 4000);
-            gpuparticle->SetStop(true);
-            chargeobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/beem.spawn");
-            std::shared_ptr<CPUParticle>shotsmoke = chargeobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/strateshotsmoke.cpuparticle", 800);
-            shotsmoke->SetActive(false);
-
-            std::shared_ptr<GameObject> muzzleflashobject = chargeobject->AddChildObject();
-            muzzleflashobject->SetName("muzzleflash");
-            std::shared_ptr<CPUParticle>muzzleflash = muzzleflashobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/muzzleflash.cpuparticle", 500);
-            muzzleflash->SetActive(false);
-        }
-
-        //地面を叩き付ける攻撃
-        {
-            std::shared_ptr<GameObject> groundobject = boss->AddChildObject();
-            groundobject->SetName("groundsmoke");
-            std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 300);
-            smoke->SetActive(false);
-        }
-    }
-
-    //大技的なやつ
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("bomberexplosion");
-        obj->transform_->SetWorldPosition({ -1.917f,23.375f,-32.530f });
-        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomberexplosion.gpuparticle", 6000);
-        obj->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/energyspawn.spawn");
-    }
-
-    //オーディオ
-    {
-        audioObj = GameObjectManager::Instance().Create();
-        audioObj->SetName("audio");
-        AudioCom* audio = audioObj->AddComponent<AudioCom>().get();
-        audio->RegisterSource(AUDIOID::SCENE_GAME1, "BGM1");
-        audio->RegisterSource(AUDIOID::SCENE_GAME2, "BGM2");
-        audio->RegisterSource(AUDIOID::CURSOR, "Cursor");
-        audio->RegisterSource(AUDIOID::ENTER, "Enter");
-
-        audioObj->GetComponent<AudioCom>()->Play("BGM1", true, 0.0f);
-        audioObj->GetComponent<AudioCom>()->FeedStart("BGM1", 0.6f, 0.01f);
     }
 
     //UIゲームオブジェクト生成
-    CreateUiObject();
+    //CreateUiObject();
 
 #pragma endregion
 
@@ -271,21 +151,17 @@ void ScenePVE::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    //ボスのイベントシーン
-    PVEDirection::Instance().DirectionStart();
-
     //ネット大事
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
 }
 
-void ScenePVE::Finalize()
+void SceneNakanisi::Finalize()
 {
     photonNet->close();
-    PVEDirection::Instance().DirectionEnd();
 }
 
-void ScenePVE::Update(float elapsedTime)
+void SceneNakanisi::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -295,23 +171,12 @@ void ScenePVE::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
+    //ゲームオブジェクトの行列更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-    PVEDirection::Instance().Update(elapsedTime);
-
-    GameObj boss = GameObjectManager::Instance().Find("BOSS");
-    if (!battleClymax && boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)
-    {
-        audioObj->GetComponent<AudioCom>()->FeedStart("BGM1", 0.0f, elapsedTime);
-
-        audioObj->GetComponent<AudioCom>()->Play("BGM2", true, 0.0f);
-        audioObj->GetComponent<AudioCom>()->FeedStart("BGM2", 1.0f, elapsedTime / 2);
-
-        battleClymax = true;
-    }
 }
 
-void ScenePVE::Render(float elapsedTime)
+void SceneNakanisi::Render(float elapsedTime)
 {
     // 画面クリア＆レンダーターゲット設定
     Graphics& graphics = Graphics::Instance();
@@ -329,6 +194,12 @@ void ScenePVE::Render(float elapsedTime)
     //サンプラーステートの設定
     Graphics::Instance().SetSamplerState();
 
+    //オブジェクト生成関数
+#ifdef _DEBUG
+    NewObject();
+    RegisterChara::Instance().ImGui();
+#endif
+
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 
@@ -339,14 +210,13 @@ void ScenePVE::Render(float elapsedTime)
     EventCameraManager::Instance().EventCameraImGui();
 }
 
-void ScenePVE::CreateUiObject()
+void SceneNakanisi::CreateUiObject()
 {
     //UI
     {
         //キャンバス
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("Canvas");
-        obj->SetEnabled(false);
 
         //レティクル
         {
@@ -520,23 +390,6 @@ void ScenePVE::CreateUiObject()
 
             hpMemori->AddComponent<UI_BoosGauge>(2);
         }
-        //BossHpFrame
-        {
-            std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-            std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
-            hpFrame->SetName("BossHpFrame");
-            hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHpFrame.ui", Sprite::SpriteShader::DEFALT, false);
-        }
-        //BossHpGauge
-        {
-            std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("BossHpFrame");
-            std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
-            hpGauge->SetName("BossHpGauge");
-            std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
-            gauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
-            float* i = GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint();
-            gauge->SetVariableValue(i);
-        }
 
         //LockOn
         {
@@ -564,4 +417,39 @@ void ScenePVE::CreateUiObject()
             hpMemori->AddComponent<UiFlag>("Data/SerializeData/UIData/Player/HitEffect.ui", Sprite::SpriteShader::DEFALT, false, flag);
         }
     }
+}
+
+//オブジェクト生成関数
+void SceneNakanisi::NewObject()
+{
+    ImGui::Begin("CreateObject");
+
+    if (ImGui::Button("gpuparticle"))
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testgpuparticle");
+        obj->AddComponent<GPUParticle>(nullptr, 10000);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("cpuparticle"))
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testcpuparticle");
+        obj->AddComponent<CPUParticle>(nullptr, 10000);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("ui"))
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testui");
+        obj->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, true);
+    }
+    if (ImGui::Button("light"))
+    {
+        std::shared_ptr<GameObject>obj = GameObjectManager::Instance().Create();
+        obj->SetName("testlight");
+        obj->AddComponent<Light>(nullptr);
+    }
+
+    ImGui::End();
 }

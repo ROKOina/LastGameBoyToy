@@ -69,4 +69,8 @@ public:
 
     //ファラ通常弾
     static void FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = 10);
+
+    //ジャンクラの弾
+    static GameObj JankratBulletFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);
+    static GameObj JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, float force, float damage, int id);
 };

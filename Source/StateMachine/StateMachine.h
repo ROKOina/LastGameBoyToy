@@ -85,7 +85,7 @@ public:
         currentState->Enter();
     }
 
-    bool CurrentStateImGui(Enum index)
+      bool CurrentStateImGui(Enum index)
     {
         if (stateList.count(index) != 0)
         {

@@ -66,9 +66,8 @@ void SceneTraining::Initialize()
         obj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
         StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/StageGimic.json");
-        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
+        RigidBodyCom* rigid = obj->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
-        rigid->SetNormalizeScale(1);
     }
 
     //ƒvƒŒƒCƒ„[
