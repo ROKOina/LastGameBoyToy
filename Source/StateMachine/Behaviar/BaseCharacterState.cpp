@@ -179,7 +179,10 @@ void BaseCharacter_JumpState::Enter()
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 {
     //ホバリング
-    Hovering(elapsedTime);
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        Hovering(elapsedTime);
+    }
 
     if (!animationCom.lock()->IsPlayAnimation())
     {
@@ -202,7 +205,10 @@ void BaseCharacter_JumpLoop::Enter()
 void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 {
     //ホバリング
-    Hovering(elapsedTime);
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        Hovering(elapsedTime);
+    }
 
     if (moveCom.lock()->OnGround())
     {
@@ -224,7 +230,10 @@ void BaseCharacter_Landing::Enter()
 void BaseCharacter_Landing::Execute(const float& elapsedTime)
 {
     //ホバリング
-    Hovering(elapsedTime);
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        Hovering(elapsedTime);
+    }
 
     //ジャンプ
     if (GamePad::BTN_A & owner->GetButtonDown())
