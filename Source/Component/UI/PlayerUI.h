@@ -203,7 +203,11 @@ public:
     void UIUpdate(float elapsedTime);
 
 
-    void CreateInazawaCharaUI(USE_SKILL use_skill,int count);
+    void CreateSkillUI(USE_SKILL use_skill,int count);
+
+    void CreateReticleUI();
+
+    void CreateUltUI();
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
   

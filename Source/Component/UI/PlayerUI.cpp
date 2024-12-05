@@ -28,6 +28,7 @@ void UI_Skill::Update(float elapsedTime)
     valueRate = *variableValue / maxValue;
     float addPos = changePosValue * valueRate;
     if (!isDebug) {
+        GetGameObject()->transform_->SetLocalPosition({ 0,0,0 });
         GetGameObject()->transform_->SetWorldPosition({ GetGameObject()->transform_->GetWorldPosition().x ,originalPos.y - addPos,0 });
     }  
     this->UiSystem::Update(elapsedTime);
@@ -532,10 +533,13 @@ void PlayerUIManager::Register()
     int count = 0;
     for (int i = 0; i < sizeof(use_skill)/ sizeof(USE_SKILL); i++) {
         if (player.lock()->GetComponent<CharacterCom>()->GetUseSkill() == use_skill[i]) {
-            CreateInazawaCharaUI(use_skill[i],count);
+            CreateSkillUI(use_skill[i],count);
             count++;
         }
     }
+
+    //レティクル
+    CreateReticleUI();
 }
 
 void PlayerUIManager::UIUpdate(float elapsedTime)
@@ -552,11 +556,13 @@ void PlayerUIManager::UIUpdate(float elapsedTime)
     }
 }
 
-void PlayerUIManager::CreateInazawaCharaUI(USE_SKILL use_skill,int count)
+void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill,int count)
 {
 
    std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/";
    CharacterCom::SkillCoolID skillNum;
+   //位置をずらす定数
+   const float offset  = 150.0f;
    switch (use_skill)
    {
    case Q:
@@ -582,7 +588,7 @@ void PlayerUIManager::CreateInazawaCharaUI(USE_SKILL use_skill,int count)
     skillFrame->SetName("SkillFrame");
     auto& a =  skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
     skillFrame->transform_->SetWorldPosition({ skillFrame->transform_->GetWorldPosition().x - (count * 90),skillFrame->transform_->GetWorldPosition().y,0});
-    a->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y};
+    a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y};
 
    //SkillFrame2
    {
@@ -596,7 +602,7 @@ void PlayerUIManager::CreateInazawaCharaUI(USE_SKILL use_skill,int count)
        std::shared_ptr<GameObject> skillGaueHide = skillFrame->AddChildObject();
        skillGaueHide->SetName("SkillGaugeHide");
        auto& a = skillGaueHide->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide1.ui", Sprite::SpriteShader::DEFALT, false);
-       a->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y };
+       a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
    }
   
    //SkillGauge
@@ -608,7 +614,7 @@ void PlayerUIManager::CreateInazawaCharaUI(USE_SKILL use_skill,int count)
        skillGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(skillNum));
        float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(skillNum);
        skillGaugeCmp->SetVariableValue(i);
-       skillGaugeCmp->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y };
+       skillGaugeCmp->spc.position = { skillGaugeCmp->spc.position.x - (count * offset),skillGaugeCmp->spc.position.y };
 
    }
 
@@ -618,9 +624,55 @@ void PlayerUIManager::CreateInazawaCharaUI(USE_SKILL use_skill,int count)
        skillIcon->SetName("Skill_E");
        auto& a = skillIcon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_E.ui", Sprite::SpriteShader::DEFALT, false);
        skillIcon->GetComponent<UiSystem>()->LoadTexture(name);
-       a->spc.position = { a->spc.position.x - (count * 90),a->spc.position.y };
+       a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
 
    }
+}
+
+void PlayerUIManager::CreateReticleUI()
+{
+    //ロードするテクスチャを設定
+    std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/Sight.png";
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+    std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
+    auto& a = reticle->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Reticle.ui", Sprite::SpriteShader::DEFALT, false);
+    a->LoadTexture(name);
+
+}
+
+void PlayerUIManager::CreateUltUI()
+{
+    //ロードするテクスチャを設定
+    std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/Sight.png";
+
+    //UltFrame
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+        hpMemori->SetName("UltFrame");
+        std::shared_ptr<UiSystem> fade = hpMemori->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltFrame.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+
+    //UltHideGauge
+    {
+        std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+        std::shared_ptr<GameObject> ultHideGauge = ultFrame->AddChildObject();
+        ultHideGauge->SetName("UltHideGauge");
+        ultHideGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/UltHideGauge.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+
+    //UltGauge
+    {
+        std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+        std::shared_ptr<GameObject> ultGauge = ultFrame->AddChildObject();
+        ultGauge->SetName("UltGauge");
+
+        std::shared_ptr<UI_Skill>ultGaugeCmp = ultGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false, 1084, 890);
+        std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+        ultGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
+        float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
+        ultGaugeCmp->SetVariableValue(i);
+    }
 }
 
 void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
