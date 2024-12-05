@@ -846,14 +846,12 @@ void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVect
     mpOutputListener->writeString(L"");
     mpOutputListener->writeString(ExitGames::Common::JString(L"player ") + playerNr + L" " + player.getName() + L" has joined the game");
 
+    //自分の枠を確保
     int myID = GetPlayerNum();
     if (playerNr == myID)
     {
-        if (GetIsMasterPlayer())
-        {
-            //追加
-            AddPlayer(myID);
-        }
+        //追加
+        AddPlayer(myID);
     }
 }
 //退出時
@@ -948,9 +946,9 @@ void PhotonLib::GameRecv(NetData recvData)
     //プレイヤー追加
     if (!net1)
     {
-        for (auto& s : saveInputPhoton)
-        {
-            if (!joinPermission && !GetIsMasterPlayer())break;
+        //for (auto& s : saveInputPhoton)
+        //{
+            //if (!joinPermission && !GetIsMasterPlayer())break;
             AddPlayer(recvData.id);
 
             //netプレイヤー
@@ -960,8 +958,8 @@ void PhotonLib::GameRecv(NetData recvData)
             RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1);
             net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(recvData.id);
 
-            break;
-        }
+            //break;
+        //}
     }
 
     int myID = GetPlayerNum();
@@ -1060,6 +1058,7 @@ void PhotonLib::JoinRecv(NetData recvData)
         //入室許可を見てリストに追加
         for (auto& j : recvData.joinData)
         {
+            //自分だけの処理
             if (j.id == GetPlayerNum())
             {
                 //入室許可が下りない場合
@@ -1085,11 +1084,11 @@ void PhotonLib::JoinRecv(NetData recvData)
                 joinPermission = true;
             }
 
-            //入室許可が降りていないならcontinue
-            if (!j.joinPermission)continue;
+            ////入室許可が降りていないならcontinue
+            //if (!j.joinPermission)continue;
 
-            //追加
-            AddPlayer(j.id);
+            ////追加
+            //AddPlayer(j.id);
         }
     }
 }
@@ -1206,9 +1205,9 @@ void PhotonLib::sendJoinPermissionData(bool request)
             //４人まで追加
             if (saveInputPhoton.size() < 4)
             {
-                //追加
-                AddPlayer(j.id);
-                join.joinPermission = true;
+                ////追加
+                //AddPlayer(j.id);
+                join.joinPermission = true; //入室を許可
             }
         }
         joinManager.clear();
