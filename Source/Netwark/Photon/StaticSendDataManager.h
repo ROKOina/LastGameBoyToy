@@ -23,7 +23,7 @@ public:
     //‘—Mî•ñ
     struct NetSendData
     {
-        int id; //‘—M‘Šè
+        int playerID; //‘—M‘Šè
 
         int sendType;   //0:damage 1:heal 2:stan 3:knockback 4:movePos
 

@@ -8,8 +8,8 @@ public:
     NetCharaData() {}
     ~NetCharaData() {}
 
-    void SetNetID(int id) { netID = id; }
-    int GetNetID() { return netID; }
+    void SetNetPlayerID(int id) { netPlayerID = id; }
+    int GetNetPlayerID() { return netPlayerID; }
 
     void SetTeamID(int id) { teamID = id; }
     int GetTeamID() { return teamID; }
@@ -19,6 +19,6 @@ public:
 
 private:
     int teamID = 0;   //自分のチーム
-    int netID = 0;//どのクライアントがこのキャラを担当するか
+    int netPlayerID = 0;//どのクライアントがこのキャラを担当するか
     int charaID;    //キャラクター識別用
 };

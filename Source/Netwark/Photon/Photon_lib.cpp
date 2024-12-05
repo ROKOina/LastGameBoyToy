@@ -101,7 +101,8 @@ void PhotonLib::update(float elapsedTime)
 
         break;
     }
-    myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(myPhotonID);
+    int myPlayerID = GetMyPlayerID();
+    myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(myPlayerID);
 
     switch (mState)
     {
@@ -924,7 +925,7 @@ void PhotonLib::GameRecv(NetData recvData)
         net1->SetName(name.c_str());
 
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1);
-        net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(recvData.photonId);
+        net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
     }
 
     int myPlayerID = GetMyPlayerID();
@@ -1095,19 +1096,19 @@ void PhotonLib::sendGameData(void)
     for (auto& data : sendDatas)
     {
         if (data.sendType == 0)	//ダメージ
-            netD.gameData.damageData[data.id] += data.valueI;
+            netD.gameData.damageData[data.playerID] += data.valueI;
         else if (data.sendType == 1)	//ヒール
-            netD.gameData.healData[data.id] += data.valueI;
+            netD.gameData.healData[data.playerID] += data.valueI;
         else if (data.sendType == 2)	//スタン
         {
             //一番長いスタン時間を与える
-            if (netD.gameData.stanData[data.id] < data.valueF)
-                netD.gameData.stanData[data.id] = data.valueF;
+            if (netD.gameData.stanData[data.playerID] < data.valueF)
+                netD.gameData.stanData[data.playerID] = data.valueF;
         }
         else if (data.sendType == 3)	//ノックバック
-            netD.gameData.knockbackData[data.id] += data.valueF3;
+            netD.gameData.knockbackData[data.playerID] += data.valueF3;
         else if (data.sendType == 4)	//移動位置
-            netD.gameData.movePosData[data.id] = data.valueF3;
+            netD.gameData.movePosData[data.playerID] = data.valueF3;
     }
 
     //マスタークライアントの場合はチームIDを送る
@@ -1228,7 +1229,7 @@ void PhotonLib::AddPlayer(int photonID, int playerID)
     saveInputJoin.photonId = photonID;
 
     //プレイヤーID決定
-    if (GetIsMasterPlayer())
+    if (GetIsMasterPlayer() && photonID == GetMyPhotonID())
         saveInputJoin.playerId = 0;
     else
         saveInputJoin.playerId = playerID;

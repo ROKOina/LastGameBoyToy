@@ -160,7 +160,7 @@ void CharacterCom::OnGUI()
         ImGui::InputInt("userInputUp", &i);
 
         ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
-        ImGui::InputInt("netID", &netCharaData.netID);
+        ImGui::InputInt("netID", &netCharaData.netPlayerID);
 
         ImGui::TreePop();
     }
