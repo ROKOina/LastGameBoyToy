@@ -520,10 +520,8 @@ void UI_Ult_Count::UpdateCore(float elapsedTime)
 
 void PlayerUIManager::Register()
 {  
-    //パラメーター設定
-    charaHp = player.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
-    boostCount = 3;
     
+////共通のUI///
     //キャンバス
     auto& canvas = GameObjectManager::Instance().Create();
     canvas->SetName("Canvas");
@@ -536,10 +534,31 @@ void PlayerUIManager::Register()
             CreateSkillUI(use_skill[i],count);
             count++;
         }
-    }
+    } 
 
     //レティクル
     CreateReticleUI();
+    //ULT
+    CreateUltUI();
+    //Hp
+    createHpUI();
+    //Boost
+    createBoostUI();
+////////////////////////////////
+
+//キャラ固有のUI
+    switch (player.lock()->GetComponent<CharacterCom>()->GetCharaID())
+    {
+    case (int)RegisterChara::CHARA_LIST::INAZAWA:
+
+        break;
+
+    case (int)RegisterChara::CHARA_LIST::FARAH:
+        break;
+
+    case (int)RegisterChara::CHARA_LIST::JANKRAT:
+        break;
+    }
 }
 
 void PlayerUIManager::UIUpdate(float elapsedTime)
@@ -642,8 +661,8 @@ void PlayerUIManager::CreateReticleUI()
 
 void PlayerUIManager::CreateUltUI()
 {
-    //ロードするテクスチャを設定
-    std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/Sight.png";
+    //ロードするテクスチャを設定(アイコンができてから)
+    std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/UltIcon.png";
 
     //UltFrame
     {
@@ -672,6 +691,43 @@ void PlayerUIManager::CreateUltUI()
         ultGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
         float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
         ultGaugeCmp->SetVariableValue(i);
+    }
+}
+
+void PlayerUIManager::createHpUI()
+{
+    //ロードするテクスチャを設定(アイコンができてから)
+    std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/CharaIcon.png";
+
+    //HpFrame
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
+        hpFrame->SetName("HpFrame");
+        hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpFrame.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+    //HpGauge
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
+        hpGauge->SetName("HpGauge");
+        std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
+        gauge->SetMaxValue(GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
+        float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
+        gauge->SetVariableValue(i);
+    }
+}
+
+void PlayerUIManager::createBoostUI()
+{
+    int boostCount = player.lock()->GetComponent<CharacterCom>()->GetDahsGaugeMax()/5;
+    //Boost
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
+        hpMemori->SetName("boostGauge2");
+
+        hpMemori->AddComponent<UI_BoosGauge>(boostCount); 
     }
 }
 

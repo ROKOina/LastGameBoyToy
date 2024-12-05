@@ -202,19 +202,24 @@ public:
 
     void UIUpdate(float elapsedTime);
 
-
+    //スキルUI
     void CreateSkillUI(USE_SKILL use_skill,int count);
 
+    //レティクルUI
     void CreateReticleUI();
 
+    //ウルトUI
     void CreateUltUI();
+
+    //HPUI
+    void createHpUI();
+
+    //ブーストUI
+    void createBoostUI();
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
   
 private:
-    int    boostCount = 0;    //ブースト回数
-    float* boostValue = 0;    //ブースト量   
-    float* charaHp = 0;      //キャラHP
     bool bookingRegister = false;
     
     std::weak_ptr<GameObject> player;
