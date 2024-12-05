@@ -405,7 +405,7 @@ void PhotonLib::NetInputUpdate()
         for (auto& b : saveB)
         {
             //前回のフレームから今回のフレームからディレイした分までの入力を保存
-            if (b.frame < s.nextInput.oldFrame)break;
+            if (b.frame <= s.nextInput.oldFrame)break;
             if (b.frame > nowTime - s.myDelay)continue;
 
             if (!isInputInit)	//最初に入った時に入力初期化
@@ -571,8 +571,10 @@ void PhotonLib::DelayUpdate()
             if (myID != saveInputPhoton[j].id)continue;
             //先頭フレームの差を保存
             int d = saveInputPhoton[j].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
-            if (d > saveInputPhoton[j].myDelay)
+            if (d > saveInputPhoton[j].myDelay) //一番大きい遅延を保存
+            {
                 saveInputPhoton[j].myDelay = d;
+            }
             break;
         }
     }
@@ -1155,7 +1157,7 @@ void PhotonLib::sendGameData(void)
         if (s.id != myID)continue;
 
         //先頭10フレームの入力を送る
-        netD.gameData.saveInputBuf = s.inputBuf->GetHeadFromSize(10);
+        netD.gameData.saveInputBuf = s.inputBuf->GetHeadFromSize(20);
 
         break;
     }
