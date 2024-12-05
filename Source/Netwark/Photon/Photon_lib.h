@@ -68,7 +68,7 @@ public:
     //他の入室者との差を保存
     void DelayUpdate();
 
-    int GetPlayerNum();
+    int GetMyPhotonID();
 
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
@@ -123,7 +123,7 @@ public:
 
 private:
     //プレイヤー追加
-    void AddPlayer(int id);
+    void AddPlayer(int photonID, int playerID);
 
     //ゲームデータ送信
     void sendGameData(void);
@@ -179,6 +179,8 @@ private:
     std::vector<NetData::JoinData> joinManager;
     bool joinPermission = false;    //入室許可
 
+    int myPlayerID = -1;
+
     //各クライアントインプット保存
     struct SaveInput
     {
@@ -188,7 +190,8 @@ private:
         }
 
         std::string name = {};
-        int id;
+        int photonId;
+        int playerId;
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
         ////自分のIDから見たディレイ

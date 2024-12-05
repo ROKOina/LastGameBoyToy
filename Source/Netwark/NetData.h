@@ -152,7 +152,8 @@ struct NetData
     };
     int dataKind;
     bool isMasterClient;
-    int id;
+    int photonId;   //ネット識別(入ってきた順番)
+    int playerId;   //プレイヤー識別(ホストが0~3を振り分け)
     char name[50];
 
     //ゲーム中
@@ -162,6 +163,7 @@ struct NetData
 
         std::vector<SaveBuffer> saveInputBuf;
 
+        //要素番号をplayerIdと合わせる
         std::array<int, 4> damageData;//キャラに与えたダメージ
         std::array<int, 4> healData;//キャラに与えたヒール
         std::array<float, 4> stanData;//キャラに与えたスタン
@@ -180,7 +182,8 @@ struct NetData
 
         //入室許可(ホストのみ)
         bool joinPermission;
-        int id;
+        int photonId;
+        int playerId;
     };
     std::vector<JoinData> joinData;
 
@@ -191,7 +194,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
     out << h.dataKind << " ";
     out << h.isMasterClient << " ";
-    out << h.id << " ";
+    out << h.photonId << " ";   
+    out << h.playerId << " ";      
     out << h.name << " ";
 
     if (h.dataKind == NetData::DATA_KIND::GAME)
@@ -216,7 +220,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         for (auto& j : h.joinData) {
             out << j.joinRequest << " ";
             out << j.joinPermission << " ";
-            out << j.id << " ";
+            out << j.photonId << " ";
+            out << j.playerId << " ";
         }
     }
 
@@ -229,7 +234,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
     in >> h.dataKind;
     in >> h.isMasterClient;
-    in >> h.id;
+    in >> h.photonId;
+    in >> h.playerId;
     in >> h.name;
 
     if (h.dataKind == NetData::DATA_KIND::GAME)
@@ -255,7 +261,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
             auto& join = h.joinData.emplace_back();
             in >> join.joinRequest;
             in >> join.joinPermission;
-            in >> join.id;
+            in >> join.photonId;
+            in >> join.playerId;
         }
     }
 
