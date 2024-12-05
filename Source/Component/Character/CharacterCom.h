@@ -33,7 +33,7 @@ enum USE_SKILL : uint64_t
 
     Q = 1 << 1,
     E = 1 << 2,
-    LEFT_CLICK = 1 << 3,
+    RIGHT_CLICK = 1 << 3,
 };
 static USE_SKILL operator| (USE_SKILL L, USE_SKILL R)
 {

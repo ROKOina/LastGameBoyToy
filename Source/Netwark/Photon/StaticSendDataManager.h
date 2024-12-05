@@ -8,7 +8,7 @@ class StaticSendDataManager
 {
 public:
     StaticSendDataManager()
-        : sendData(std::make_unique<RingBuffer<NetSendData>>(100))
+        : sendGameData(std::make_unique<RingBuffer<NetSendData>>(100))
     {
     }
     ~StaticSendDataManager() {}
@@ -53,9 +53,9 @@ public:
         std::vector<NetSendData> netDatas;
         while (1)
         {
-            if (sendData->GetSize() > 0)
+            if (sendGameData->GetSize() > 0)
             {
-                auto n = sendData->Dequeue();
+                auto n = sendGameData->Dequeue();
                 netDatas.emplace_back(n);
             }
             else
@@ -67,5 +67,5 @@ public:
     }
 
 private:
-    std::unique_ptr<RingBuffer<NetSendData>> sendData;
+    std::unique_ptr<RingBuffer<NetSendData>> sendGameData;
 };

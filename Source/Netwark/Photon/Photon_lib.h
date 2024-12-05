@@ -46,8 +46,8 @@ public:
     void LobbyImGui();
 
 private:
-    //入室許可
-    bool joinPermission = false;
+    //接続開始フラグ
+    bool connectFlg = false;
     //部屋名
     std::string roomName;
     //charaID
@@ -69,6 +69,7 @@ public:
     void DelayUpdate();
 
     int GetPlayerNum();
+
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
 
@@ -124,7 +125,14 @@ public:
     PhotonState::States GetPhotonState() { return mState; }
 
 private:
-    void sendData(void);
+    //プレイヤー追加
+    void AddPlayer(int id);
+
+    //ゲームデータ送信
+    void sendGameData(void);
+
+    //入室許可送信(申請の場合はtrue)
+    void sendJoinPermissionData(bool request);
 
     // events, triggered by certain operations of all players in the same room
     //入室時に入る
@@ -132,6 +140,8 @@ private:
     virtual void leaveRoomEventAction(int playerNr, bool isInactive);
     //データ受信
     virtual void customEventAction(int playerNr, nByte eventCode, const ExitGames::Common::Object& eventContent);
+    void GameRecv(NetData recvData);    //ゲーム中受信
+    void JoinRecv(NetData recvData);    //入室受信
 
     // receive and print out debug out here
     virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);
@@ -167,6 +177,10 @@ private:
     int sendMs = 1000 / 60.0f * 5;
     //int sendMs = 35;
     int oldMs;
+
+    //入室申請リスト(ホストのみ使用)
+    std::vector<NetData::JoinData> joinManager;
+    bool joinPermission = false;    //入室許可
 
     //各クライアントインプット保存
     struct SaveInput

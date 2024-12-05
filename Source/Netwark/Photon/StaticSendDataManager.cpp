@@ -14,7 +14,7 @@ void StaticSendDataManager::SetSendDamage(int myID, int sendID, float damage)
     data.sendType = 0;
     data.id = sendID;
     data.valueI = int(damage);
-    sendData->Enqueue(data);
+    sendGameData->Enqueue(data);
 }
 
 void StaticSendDataManager::SetSendHeal(int myID, int sendID, float heal)
@@ -28,7 +28,7 @@ void StaticSendDataManager::SetSendHeal(int myID, int sendID, float heal)
     data.sendType = 1;
     data.id = sendID;
     data.valueI = int(heal);
-    sendData->Enqueue(data);
+    sendGameData->Enqueue(data);
 }
 
 void StaticSendDataManager::SetSendStan(int myID, int sendID, float stanSec)
@@ -42,7 +42,7 @@ void StaticSendDataManager::SetSendStan(int myID, int sendID, float stanSec)
     data.sendType = 2;
     data.id = sendID;
     data.valueF = stanSec;
-    sendData->Enqueue(data);
+    sendGameData->Enqueue(data);
 }
 
 void StaticSendDataManager::SetSendKnockback(int myID, int sendID, DirectX::XMFLOAT3 knockbackVec)
@@ -56,7 +56,7 @@ void StaticSendDataManager::SetSendKnockback(int myID, int sendID, DirectX::XMFL
     data.sendType = 3;
     data.id = sendID;
     data.valueF3 = knockbackVec;
-    sendData->Enqueue(data);
+    sendGameData->Enqueue(data);
 }
 
 void StaticSendDataManager::SetSendMovePos(int myID, int sendID, DirectX::XMFLOAT3 movePos)
@@ -70,5 +70,5 @@ void StaticSendDataManager::SetSendMovePos(int myID, int sendID, DirectX::XMFLOA
     data.sendType = 4;
     data.id = sendID;
     data.valueF3 = movePos;
-    sendData->Enqueue(data);
+    sendGameData->Enqueue(data);
 }
