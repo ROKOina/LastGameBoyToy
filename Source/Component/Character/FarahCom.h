@@ -33,12 +33,21 @@ public:
     //ULT
     void UltSkill()override;
 
-private:
-
     //fps用の腕アニメーション
     void FPSArmAnimation();
+
+public:
+
+    //ウルト更新
+    void UltUpdate(float elapsedTime);
+
+public:
+
+    //ゲージ減る速度セット
+    void SetDashuGaugeMins(const float& dashgaugemin_) { dashgaugemin = dashgaugemin_; }
 
 private:
     float cooldownTimer = 0.0f;  // クールタイムの残り時間（秒）
     float dashgaugemin = 4.0f;
+    float ulttimer = 0.0f;
 };

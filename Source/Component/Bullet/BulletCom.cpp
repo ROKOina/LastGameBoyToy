@@ -292,9 +292,6 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
 
-    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
-    trail->SetTransform(viewObj->transform_->GetWorldTransform());
-
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     float ya;
     if (cameraObj)
@@ -336,10 +333,10 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     moveCom->SetIsRaycast(false);
 
     //パーティクル
-    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Eskill.gpuparticle", 300);
     bulletgpuparticle->Play();
     std::shared_ptr<GameObject>bullettrajectory = viewObj->AddChildObject();
-    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
+    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Eskill_trail.gpuparticle", 400);
     bullettrajectoryparticle->Play();
 
     //判定部分
@@ -373,7 +370,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     bulletCom->SetDamageValue(power);
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
-    k->SetKnockBackForce({ 13,5,13 });
+    k->SetKnockBackForce({ 6,30,6 });
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
@@ -390,9 +387,6 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     //見た目部分
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
-
-    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
-    trail->SetTransform(viewObj->transform_->GetWorldTransform());
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     float ya;
@@ -435,11 +429,10 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     moveCom->SetIsRaycast(false);
 
     //パーティクル
-    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_normalattack.gpuparticle", 200);
     bulletgpuparticle->Play();
-    std::shared_ptr<GameObject>bullettrajectory = viewObj->AddChildObject();
-    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
-    bullettrajectoryparticle->Play();
+    std::shared_ptr<CPUParticle>bullettrajectoryparticle = viewObj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/farah_normalattack.cpuparticle", 200);
+    bullettrajectoryparticle->SetActive(true);
 
     //判定部分
     GameObj colObj = GameObjectManager::Instance().Create();
