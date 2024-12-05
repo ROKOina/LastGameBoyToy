@@ -572,6 +572,16 @@ int PhotonLib::GetMyPhotonID()
     return myPlayerNumber;
 }
 
+int PhotonLib::GetMyPlayerID()
+{
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.photonId == GetMyPhotonID())
+            return s.playerId;
+    }
+    return -1;
+}
+
 bool PhotonLib::GetIsMasterPlayer()
 {
     bool isMaster = mLoadBalancingClient.getLocalPlayer().getIsMasterClient();
@@ -916,6 +926,7 @@ void PhotonLib::GameRecv(NetData recvData)
         net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(recvData.photonId);
     }
 
+    int myPlayerID = GetMyPlayerID();
     //ダメージ情報
     for (int id = 0; id < recvData.gameData.damageData.size(); ++id)
     {
@@ -1035,8 +1046,15 @@ void PhotonLib::JoinRecv(NetData recvData)
                 }
 
                 //入室処理
-                joinPermission = true;
-                myPlayerID = j.playerId;
+                joinPermission = true;  //入室
+                for (auto& s : saveInputPhoton) //自分のプレイヤーID決定
+                {
+                    if (s.photonId == GetMyPhotonID())
+                    {
+                        s.playerId = j.playerId;
+                        break;
+                    }
+                }
 
             }
         }
@@ -1064,6 +1082,7 @@ void PhotonLib::sendGameData(void)
     netD.photonId = myPhotonID;
 
     //ID
+    int myPlayerID = GetMyPlayerID();
     netD.playerId = myPlayerID;
 
     //名前

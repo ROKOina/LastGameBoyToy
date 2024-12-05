@@ -69,6 +69,7 @@ public:
     void DelayUpdate();
 
     int GetMyPhotonID();
+    int GetMyPlayerID();
 
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
@@ -178,8 +179,6 @@ private:
     //入室申請リスト(ホストのみ使用)
     std::vector<NetData::JoinData> joinManager;
     bool joinPermission = false;    //入室許可
-
-    int myPlayerID = -1;
 
     //各クライアントインプット保存
     struct SaveInput
