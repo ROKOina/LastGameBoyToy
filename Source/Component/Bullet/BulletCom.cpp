@@ -539,7 +539,7 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     coll->SetJudgeTag(COLLIDER_TAG::Enemy);
-    coll->SetRadius(1.0f);
+    coll->SetRadius(0.1f);
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);

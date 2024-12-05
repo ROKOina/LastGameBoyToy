@@ -23,7 +23,7 @@ public:
 public:
 
     //ノックバックの係数
-    void SetKnockBackForce(DirectX::XMFLOAT3& knockbackforce_) { knockbackforce = knockbackforce_; }
+    void SetKnockBackForce(DirectX::XMFLOAT3 knockbackforce_) { knockbackforce = knockbackforce_; }
 
 private:
 
