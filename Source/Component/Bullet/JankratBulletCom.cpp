@@ -5,7 +5,7 @@
 void JankratBulletCom::Update(float elapsedTime)
 {
     //”š”­
-    if (!explosionFlag && lifeTimer >= explosionTime)
+    if (!explosionFlag && lifeTimer >= lifeTime)
     {
         //“–‚½‚è”»’è‚Ì”¼Œa‘‚â‚·
         SphereColliderCom* sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
@@ -23,7 +23,7 @@ void JankratBulletCom::Update(float elapsedTime)
         explosionFlag = true;
     }
     //Á‹Ž
-    if (lifeTimer >= lifeTime)
+    if (lifeTimer >= lifeTime + explosionTime)
     {
         GameObjectManager::Instance().Remove(this->GetGameObject());
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component/System/Component.h"
+#include "Math/Mathf.h"
 
 #define GRAVITY_NORMAL 0.98
 
@@ -66,6 +67,7 @@ public:
     void ZeroNonMaxSpeedVelocity() { nonMaxSpeedVelocity_ = { 0,0,0 }; }
     const DirectX::XMFLOAT3& GetNonMaxSpeedVelocity()const { return nonMaxSpeedVelocity_; }
     void SetNonMaxSpeedVelocity(DirectX::XMFLOAT3 velo) { nonMaxSpeedVelocity_ = velo; }
+    void AddNonMaxSpeedVelocity(DirectX::XMFLOAT3 velo) { nonMaxSpeedVelocity_ += velo; }
 
     //重力
     const float& GetGravity()const { return gravity_; }
@@ -95,6 +97,9 @@ public:
     //摩擦
     const float& GetFriction()const { return friction_; }
     void SetFriction(float friction) { friction_ = friction; }
+
+    const float& GetAirForce()const { return airForce; }
+    void SetAirForce(float force) { airForce = force; }
 
     //最大速度
     const float& GetFisrtMoveMaxSpeed()const { return firstMoveMaxSpeed; }  //初期最大速度（基準）
@@ -131,6 +136,7 @@ private:
     bool justHitWall_ = false;                  //今フレームで壁に当たったかどうか
     bool useWallSride_ = true;                 //壁擦り使用フラグ
     float friction_ = 12.620f;                 //摩擦
+    float airForce = 12.620f;                  //空気抵抗
     float moveMaxSpeed_ = 9.5f;                //最大速度
     float firstMoveMaxSpeed = 8.0f;            //初期最大速度
     float moveAcceleration_ = 3.0f;            //加速度

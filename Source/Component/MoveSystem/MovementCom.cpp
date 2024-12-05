@@ -1,6 +1,6 @@
 #include "MovementCom.h"
 #include <imgui.h>
-#include "Math/Mathf.h"
+
 #include "Component/System/TransformCom.h"
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
@@ -90,8 +90,11 @@ void MovementCom::HorizonUpdate(float elapsedTime)
     HorizonVelocity = DirectX::XMLoadFloat3(&horizonVelocity);
     horiLengthSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(HorizonVelocity));
 
-    // –€ŽC—Í
-    float friction = friction_ * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed());
+    // –€ŽC—Íor‹ó‹C’ïR
+    float friction;
+    onGround_
+    ? friction = friction_ * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed())
+    : friction = airForce * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed());
 
     // –€ŽC—Í“K—p
     if (horiLengthSq > 0.0f)
