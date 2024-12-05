@@ -175,7 +175,9 @@ void PhotonLib::update(float elapsedTime)
     NetInputUpdate();
     MyCharaInput();
     NetCharaInput();
+
 }
+
 
 void PhotonLib::ImGui()
 {
@@ -249,24 +251,10 @@ void PhotonLib::ImGui()
     int roundTimeV = GetRoundTripTimeVariance();
     ImGui::InputInt("roundTime", &roundTime);
 
-    std::vector<int> trips = GetTrips();
-    for (int i = 0; i < trips.size(); ++i)
-    {
-        ImGui::InputInt(("trip" + std::to_string(i)).c_str(), &trips[i]);
-    }
-
     //int sendMsCopy = SendMs();
     ImGui::InputInt("sendMS", &sendMs);
 
-    int Delay = 0;
-    int myID = GetPlayerNum();
-    int netcount = 0;
-    for (auto& s : saveInputPhoton)
-    {
-        Delay = s.myDelay;
-        ImGui::InputInt(("Delay" + std::to_string(netcount)).c_str(), &Delay);
-        netcount++;
-    }
+    ImGui::InputInt("delyaFrame", &delayFrame);
 
     ImGui::End();
 
@@ -405,8 +393,8 @@ void PhotonLib::NetInputUpdate()
         for (auto& b : saveB)
         {
             //前回のフレームから今回のフレームからディレイした分までの入力を保存
-            if (b.frame <= s.nextInput.oldFrame)break;
-            if (b.frame > nowTime - s.myDelay)continue;
+            if (b.frame < s.nextInput.oldFrame)break;
+            if (b.frame > nowTime - delayFrame)continue;
 
             if (!isInputInit)	//最初に入った時に入力初期化
             {
@@ -433,7 +421,7 @@ void PhotonLib::NetInputUpdate()
             s.isInputUpdate = true;
         }
 
-        s.nextInput.oldFrame = nowTime - s.myDelay;
+        s.nextInput.oldFrame = nowTime - delayFrame;
     }
 }
 
@@ -558,7 +546,7 @@ void PhotonLib::DelayUpdate()
     for (int i = 0; i < saveInputPhoton.size(); ++i)
     {
         if (myID != saveInputPhoton[i].id)continue;
-        saveInputPhoton[i].myDelay = 0;
+        delayFrame = 0;
         break;
     }
 
@@ -571,9 +559,9 @@ void PhotonLib::DelayUpdate()
             if (myID != saveInputPhoton[j].id)continue;
             //先頭フレームの差を保存
             int d = saveInputPhoton[j].inputBuf->GetHead().frame - saveInputPhoton[i].inputBuf->GetHead().frame;
-            if (d > saveInputPhoton[j].myDelay) //一番大きい遅延を保存
+            if (d > delayFrame) //一番大きい遅延を保存
             {
-                saveInputPhoton[j].myDelay = d;
+                delayFrame = d;
             }
             break;
         }
@@ -616,25 +604,6 @@ int PhotonLib::GetRoundTripTime()
 int PhotonLib::GetRoundTripTimeVariance()
 {
     return mLoadBalancingClient.getRoundTripTimeVariance();
-}
-
-std::vector<int> PhotonLib::GetTrips()
-{
-    if (saveInputPhoton.size() <= 0)return std::vector<int>();
-    std::vector<int> trips;
-    trips.resize(saveInputPhoton.size() - 1);
-
-    int myID = GetPlayerNum();
-    int count = 0;
-    for (auto& s : saveInputPhoton)
-    {
-        if (myID == s.id)continue;
-        if (trips.size() <= count)break;
-        trips[count] = s.myDelay;
-        count++;
-    }
-
-    return trips;
 }
 
 int PhotonLib::GetRoomPlayersNum()
@@ -951,17 +920,17 @@ void PhotonLib::GameRecv(NetData recvData)
         //for (auto& s : saveInputPhoton)
         //{
             //if (!joinPermission && !GetIsMasterPlayer())break;
-            AddPlayer(recvData.id);
+        AddPlayer(recvData.id);
 
-            //netプレイヤー
-            net1 = GameObjectManager::Instance().Create();
-            net1->SetName(name.c_str());
+        //netプレイヤー
+        net1 = GameObjectManager::Instance().Create();
+        net1->SetName(name.c_str());
 
-            RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1);
-            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(recvData.id);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1);
+        net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetID(recvData.id);
 
-            //break;
-        //}
+        //break;
+    //}
     }
 
     int myID = GetPlayerNum();
@@ -1027,17 +996,18 @@ void PhotonLib::GameRecv(NetData recvData)
     }
 
     //入力を保存
-    for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
+    for (auto& s : saveInputPhoton)
     {
-        SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
-
-        for (auto& s : saveInputPhoton)
+        if (s.id != recvData.id)continue;
+        for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
         {
-            if (s.id != recvData.id)continue;
+            SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
+
             SaveBuffer currentInput = s.inputBuf->GetHead();
             if (currentInput.frame < newInput.frame)	//新しいフレームから始める
                 s.inputBuf->Enqueue(newInput);
         }
+        break;
     }
 }
 

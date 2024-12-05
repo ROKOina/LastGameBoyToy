@@ -80,9 +80,6 @@ public:
     int GetRoundTripTime();
     int GetRoundTripTimeVariance();
 
-    //他の入室者との最新フレーム差
-    std::vector<int> GetTrips();
-
     int GetRoomPlayersNum();
     std::string GetRoomName();
 
@@ -194,8 +191,8 @@ private:
         int id;
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
-        //自分のIDから見たディレイ
-        int myDelay = 50;
+        ////自分のIDから見たディレイ
+        //int myDelay = 50;
 
         int teamID = 0;
 
@@ -220,6 +217,8 @@ private:
         };
         NextInput nextInput;
     };
+
+    int delayFrame = 0;
 
     std::string netName = {};
 
