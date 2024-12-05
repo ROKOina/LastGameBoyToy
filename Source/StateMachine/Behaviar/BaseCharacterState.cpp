@@ -54,7 +54,8 @@ void BaseCharacter_BaseState::Hovering(float elapsedTime)
         moveComponent->SetVelocity(velocity);
 
         // 移動力を計算
-        DirectX::XMFLOAT3 force = {
+        DirectX::XMFLOAT3 force =
+        {
             moveVec.x * moveComponent->GetMoveAcceleration(),
             0.0f, // 水平方向のみ力を加える
             moveVec.z * moveComponent->GetMoveAcceleration()
@@ -198,7 +199,7 @@ void BaseCharacter_JumpLoop::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), false);
 
     //アニメーション
-    // 例外処理必要 
+    // 例外処理必要
     //auto& arm = GameObjectManager::Instance().Find("armChild");
     //auto& armAnim = arm->GetComponent<AnimationCom>();
     //if (!armAnim->IsPlayAnimation())
@@ -225,7 +226,7 @@ void BaseCharacter_Landing::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_end"), false, false, 1.0f);
 
     //アニメーション
-    // 例外処理必要 
+    // 例外処理必要
     //auto& arm = GameObjectManager::Instance().Find("armChild");
     //auto& armAnim = arm->GetComponent<AnimationCom>();
     //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
