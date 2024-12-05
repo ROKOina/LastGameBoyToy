@@ -421,6 +421,14 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
 
+    auto& au = obj->AddComponent<AudioCom>();
+    au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
+    au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
+    au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
+    au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
+    au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
+    au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
+
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));

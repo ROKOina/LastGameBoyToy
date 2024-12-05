@@ -18,7 +18,7 @@ public:
     void Update(float elapsedTime) override;
 
     // GUI•`‰æ
-    void OnGUI() override {};
+    void OnGUI() override;
 
 public:
 

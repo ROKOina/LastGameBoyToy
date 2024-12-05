@@ -373,7 +373,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     bulletCom->SetDamageValue(power);
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
-    k->SetKnockBackForce({ 3,5,3 });
+    k->SetKnockBackForce({ 13,15,13 });
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
