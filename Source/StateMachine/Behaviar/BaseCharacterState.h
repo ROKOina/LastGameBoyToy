@@ -52,8 +52,6 @@ protected:
     std::weak_ptr<AnimationCom> animationCom;
     float HoveringTimer = 0.0f;
 
-private:
-
     DirectX::XMFLOAT3 moveVec = {};
     float HoveringTime = 0.05f;
 };
