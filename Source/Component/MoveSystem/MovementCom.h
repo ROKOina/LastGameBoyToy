@@ -96,7 +96,7 @@ public:
 
     //–€ŽC
     const float& GetFriction()const { return friction_; }
-    void SetFriction(float friction) { friction_ = friction; }
+    void SetFriction(float friction) { friction_ = friction; airForce = friction; }
 
     const float& GetAirForce()const { return airForce; }
     void SetAirForce(float force) { airForce = force; }
