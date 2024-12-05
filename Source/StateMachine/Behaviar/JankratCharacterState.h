@@ -33,11 +33,13 @@ public:
     virtual const char* GetName() const override { return "MainAttack"; }
 
 private:
-    float mass = 1.5f;
-    float restitution = 0.8f;
-    float force = 30.0f;
+    float mass = 1.0f;
+    float restitution = 0.0f;
+    float force = 50.0f;
 
-    float vecY = 0.0f;
+    float bulletLifeTimer = 5.0f;
+    float addGravity = -0.8f;
+    float fireVecY = 0.35f;
 };
 
 class JankratCharacter_SubAttackState : public JankratCharacter_BaseState

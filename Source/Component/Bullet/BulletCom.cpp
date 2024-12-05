@@ -12,6 +12,7 @@
 #include "Component\Particle\CPUParticle.h"
 #include <Component\MoveSystem\MovementCom.h>
 #include "Component\Renderer\TrailCom.h"
+#include "Component\Renderer\InstanceRendererCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\SkillObj\JankratMineCom.h"
 #include "KnockBackCom.h"
@@ -487,14 +488,21 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 
     //物理
     RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
+    
+    //レンダー
     RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
     r->LoadModel("Data/Model/Jankrat/mine.mdl");
+
+    //InstanceRenderer* instanceRender = bullet->AddComponent<InstanceRenderer>();
 
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
-    coll->SetRadius(1.0f);
+    if (std::strcmp(parent->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.5f);
 
     //弾
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
@@ -538,13 +546,39 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    coll->SetJudgeTag(COLLIDER_TAG::Enemy);
-    coll->SetRadius(0.1f);
+    if (std::strcmp(parent->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.5f);
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(damage);
+
+
+    //吹き飛ばし用子供オブジェクト
+    GameObj kcockBack = bullet->AddChildObject();
+
+    //コライダー
+    std::shared_ptr<SphereColliderCom> childColl = kcockBack->AddComponent<SphereColliderCom>();
+    childColl->SetMyTag(COLLIDER_TAG::Impact);
+    if (std::strcmp(parent->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    childColl->SetRadius(2.5f);
+
+    float knockBackForce = 5.0f;
+    KnockBackCom* childKcockBack = kcockBack->AddComponent<KnockBackCom>().get();
+    childKcockBack->SetKnockBackForce({ 30,10,30 });
+    childKcockBack->useTestCoad = true;
+
+    ////判定用
+    //std::shared_ptr<HitProcessCom> childHit = kcockBack->AddComponent<HitProcessCom>(parent);
+    //childHit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
+    //childHit->SetValue3(fpsDir * knockBackForce);
 
     return bullet;
 }

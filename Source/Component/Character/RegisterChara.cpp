@@ -412,6 +412,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+    m->SetAirForce(1);
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->SetCharaID(int(CHARA_LIST::JANKRAT));
