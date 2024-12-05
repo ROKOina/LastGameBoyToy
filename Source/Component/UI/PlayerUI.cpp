@@ -395,18 +395,19 @@ void UI_E_SkillCount::Start()
 
 void UI_E_SkillCount::Update(float elapsedTime)
 {
-    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
-        UpdateCore(elapsedTime);
-        UpdateGauge(elapsedTime);
-    }
-    else {
-        for (int i = 0; i < num; i++) {
-            coresUi.at(i).coreFrameUi->spc.color.w = 0.0f;
-            coresUi.at(i).coreUi->spc.color.w = 0.0f;
-        }
-        gaugeUi->spc.color.w = 0.0f;
-        gaugeFrameUi->spc.color.w = 0.0f;
-    }
+    //‚²‚ß‚ñÁ‚µ‚Ü‚µ‚½byã–ì
+    //if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
+    //    UpdateCore(elapsedTime);
+    //    UpdateGauge(elapsedTime);
+    //}
+    //else {
+    //    for (int                                                                               i = 0; i < num; i++) {
+    //        coresUi.at(i).coreFrameUi->spc.color.w                                             = 0.0f;
+    //        coresUi.at(i).coreUi->spc.color.w                                                  = 0.0f;
+    //    }
+    //    gaugeUi->spc.color.w                                                                   = 0.0f;
+    //    gaugeFrameUi->spc.color.w                                                              = 0.0f;
+    //}
 }
 
 void UI_E_SkillCount::UpdateGauge(float elapsedTime)

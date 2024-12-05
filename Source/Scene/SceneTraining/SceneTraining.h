@@ -30,4 +30,11 @@ public:
 
     //名前取得
     std::string GetName() const override { return "SceneTraining"; };
+
+    //UIのゲームオブジェクト生成
+    void CreateUiObject();
+
+    GameObj audioObj;
+private:
+    std::unique_ptr<BasicsApplication> photonNet;
 };

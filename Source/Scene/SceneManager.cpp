@@ -12,6 +12,7 @@
 #include "SceneResult/SceneResult.h"
 #include "SceneTraining/SceneTraining.h"
 #include "Scene\SceneLGBT\SceneLGBT.h"
+#include "Scene\SceneNakanisi\SceneNakanisi.h"
 
 #include "Setting/Setting.h"
 
@@ -132,6 +133,7 @@ void SceneManager::ImGui()
                 "SceneTraining",
                 "SceneLobby",
                 "SceneResult",
+                "SceneNakanisi",
             };
             int scene_id = 0;
             int last_index = sizeof(scene_names) / sizeof(const char*);
@@ -150,7 +152,8 @@ void SceneManager::ImGui()
                     new ScenePVP,
                     new SceneTraining,
                     new SceneLobby,
-                    new SceneResult
+                    new SceneResult,
+                    new SceneNakanisi,
                 };
                 ChangeScene((scenes[scene_id]));
                 for (int i = 0; i < _countof(scenes); i++)

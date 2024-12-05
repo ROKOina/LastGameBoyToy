@@ -22,6 +22,8 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Bullet\MissileCom.h"
 #include "Component\Audio\AudioCom.h"
+#include "Component\Character\CharacterCom.h"
+#include "SystemStruct\TimeManager.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -125,7 +127,7 @@ void SpawnCom::Update(float elapsedTime)
         //複数オブジェクトを生成
         for (int i = 0; i < sp.spawnCount; ++i)
         {
-            SpawnGameObject();
+            SpawnGameObject(elapsedTime);
             spawnflag = true;  // オブジェクト生成が行われたタイミングでフラグを true に
         }
 
@@ -172,7 +174,7 @@ void SpawnCom::OnGUI()
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
-        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION","BEEM","GIMMICKMISSILE" };
+        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION","BEEM","GIMMICKMISSILE","FARAHULT" };
         static_assert(ARRAYSIZE(objectTypeItems) == static_cast<int>(ObjectType::MAX), "objectTypeItems Size Error!");
         ImGui::Combo((char*)u8"オブジェクトタイプ", &sp.objecttype, objectTypeItems, static_cast<int>(ObjectType::MAX));
         objtype = static_cast<ObjectType>(sp.objecttype);
@@ -188,7 +190,7 @@ void SpawnCom::OnGUI()
 }
 
 //ゲームオブジェクトを複製する処理
-void SpawnCom::SpawnGameObject()
+void SpawnCom::SpawnGameObject(float elapsedTime)
 {
     // 新しいオブジェクトを作成
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -219,6 +221,9 @@ void SpawnCom::SpawnGameObject()
         break;
     case ObjectType::GIMMICKMISSILE:
         CreateGimmickMissile(obj);
+        break;
+    case ObjectType::FARAHULT:
+        CreateFarahUlt(obj);
         break;
     default:
         break;
@@ -381,6 +386,20 @@ void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
     chiledobj->SetName("explosionchildren");
     std::shared_ptr<CPUParticle>cpuchilld = chiledobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/explosionsmokeparple.cpuparticle", 500);
     cpuchilld->SetActive(false);
+}
+
+//ファラのウルト
+void SpawnCom::CreateFarahUlt(const std::shared_ptr<GameObject>& obj)
+{
+    obj->SetName("farahult");
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    obj->AddComponent<EasingMoveCom>(nullptr);
+    std::shared_ptr<MovementCom>m = obj->AddComponent<MovementCom>();
+    DirectX::XMFLOAT3 cameradirection = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetFpsCameraDir();
+    m->SetGravity(0.0f);
+    m->SetFriction(0.0f);
+    m->SetIsRaycast(false);
+    m->AddNonMaxSpeedForce(cameradirection * 20.0f);
 }
 
 //当たり判定

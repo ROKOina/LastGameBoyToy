@@ -130,7 +130,7 @@ void BaseCharacter_MoveState::Enter()
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
     //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), false, 0.3f);
-    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
+    //GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
 
     /*animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);*/
@@ -155,7 +155,7 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
 
 void BaseCharacter_MoveState::Exit()
 {
-    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    //GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
 }
 
 #pragma endregion
@@ -171,15 +171,19 @@ void BaseCharacter_JumpState::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
 
     //アニメーション
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
+    // 例外処理必要
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 {
     //ホバリング
-    Hovering(elapsedTime);
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        Hovering(elapsedTime);
+    }
 
     if (!animationCom.lock()->IsPlayAnimation())
     {
@@ -191,18 +195,22 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 #pragma region JumpLoop
 void BaseCharacter_JumpLoop::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), true);
+    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), false);
 
     //アニメーション
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    if (!armAnim->IsPlayAnimation())
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
+    // 例外処理必要 
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //if (!armAnim->IsPlayAnimation())
+    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
 }
 void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 {
     //ホバリング
-    Hovering(elapsedTime);
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        Hovering(elapsedTime);
+    }
 
     if (moveCom.lock()->OnGround())
     {
@@ -217,14 +225,24 @@ void BaseCharacter_Landing::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_end"), false, false, 1.0f);
 
     //アニメーション
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
+    // 例外処理必要 
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
 }
 void BaseCharacter_Landing::Execute(const float& elapsedTime)
 {
     //ホバリング
-    Hovering(elapsedTime);
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        Hovering(elapsedTime);
+    }
+
+    //ジャンプ
+    if (GamePad::BTN_A & owner->GetButtonDown())
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
+    }
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())

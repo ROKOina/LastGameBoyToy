@@ -261,6 +261,11 @@ protected:
     //使用スキル
     USE_SKILL myUseSkill = USE_SKILL::NONE;
 
+protected:
+
+    bool boostflag = false;
+    float dashGauge = 10;
+
 private:
 
     // キャラクターの操作入力情報
@@ -272,10 +277,8 @@ private:
 
     //ダッシュ関係
     bool dashFlag = false;
-
-    float dashGauge = 10;
-    float dashGaugeMax = 10;
     float dashGaugeMinus = 1;   //一秒間減る数
+    float dashGaugeMax = 10;
     float dashGaugePlus = 2;
 
     float dashSpeed = 58;

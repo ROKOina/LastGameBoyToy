@@ -79,7 +79,10 @@ void CharacterCom::Update(float elapsedTime)
             }
 
             //ƒQ[ƒW‘‚â‚·
-            dashGauge += dashGaugePlus * elapsedTime;
+            if (!boostflag)
+            {
+                dashGauge += dashGaugePlus * elapsedTime;
+            }
             if (dashGauge > dashGaugeMax)
             {
                 dashGauge = dashGaugeMax;
@@ -102,6 +105,7 @@ void CharacterCom::Update(float elapsedTime)
 void CharacterCom::OnGUI()
 {
     ImGui::Checkbox("isHitAttack", &isHitAttack);
+    ImGui::Checkbox("boostflag", &boostflag);
     ImGui::DragFloat("jump", &jumpPower, 0.1f);
 
     if (ImGui::TreeNode("ult"))
@@ -393,7 +397,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
             dashGauge -= 5; //Å‰‚Íˆê‹C‚ÉŒ¸‚ç‚·
 
             //‰¹
-            GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
+            //GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
         }
         else
         {

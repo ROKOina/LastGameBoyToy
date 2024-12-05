@@ -33,6 +33,12 @@ public:
 
     float GetElapsedTime() { return m_elapsedtime; }
 
+    // GetDeltaTimeメソッド
+    float TimeManager::GetDeltaTime() const
+    {
+        return m_elapsedtime * m_timescale; // タイムスケールを考慮して返す
+    }
+
 private:
     float m_timescale = 1.0f;
     float m_effecttime = 0.0f;
