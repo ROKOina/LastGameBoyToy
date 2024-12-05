@@ -30,6 +30,7 @@
 #include "Component/Enemy/ScarecrowCom.h"
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
+#include "Component/Item/UltSkillMaxItem.h"
 
 
 TrainingManager::TrainingManager()
@@ -230,6 +231,33 @@ void TrainingSystem::TrainingSystemStart()
         pushBack->SetWeight(600.0f);
     }
     
+    //ULTのアイテム
+    {
+        auto& scarecrow1 = GameObjectManager::Instance().Create();
+        scarecrow1->SetName("ULTSKILLMAXITEM");
+        std::shared_ptr<RendererCom> r = scarecrow1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Enemy/Enemy.mdl");
+        r->SetOutlineColor({ 1,0,0 });
+        r->SetOutlineIntensity(10.0f);
+        scarecrow1->transform_->SetWorldPosition({ 0.0f,0.0f,-2.0f });
+        scarecrow1->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
+        scarecrow1->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+        std::shared_ptr<SphereColliderCom> collider = scarecrow1->AddComponent<SphereColliderCom>();
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
+        collider->SetJudgeTag(COLLIDER_TAG::Player);
+        collider->SetEnabled(true);
+        collider->SetRadius(1.0f);
+        scarecrow1->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/noobenemy.nodecollsion");
+        scarecrow1->AddComponent<AnimationCom>();
+        scarecrow1->AddComponent<MovementCom>();
+        scarecrow1->AddComponent<UltSkillMaxItem>();
+
+
+
+        scarecrow1->AddComponent<AudioCom>();
+
+    }
+
 }
 
 //更新処理
@@ -237,6 +265,9 @@ void TrainingSystem::TrainingSystemUpdate(float elapsedTime)
 {
     //射撃の開始処理と終了処理
     ShootingStartEndSystem();
+
+    //アイテムスポーンシステム
+    SpawnItemSystem(elapsedTime);
 
     if (shootingStartFlag)
     {
@@ -287,6 +318,37 @@ void TrainingSystem::ShootingSpawnCrow()
         std::shared_ptr<PushBackCom>pushBack = scarecrow5->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
+    }
+}
+
+//アイテムのスポーン
+void TrainingSystem::SpawnItem()
+{
+    //ULTのアイテム
+    {
+        auto& scarecrow1 = GameObjectManager::Instance().Create();
+        scarecrow1->SetName("ULTSKILLMAXITEM");
+        std::shared_ptr<RendererCom> r = scarecrow1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/Enemy/Enemy.mdl");
+        r->SetOutlineColor({ 1,0,0 });
+        r->SetOutlineIntensity(10.0f);
+        scarecrow1->transform_->SetWorldPosition({ 0.0f,0.0f,-2.0f });
+        scarecrow1->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
+        scarecrow1->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+        std::shared_ptr<SphereColliderCom> collider = scarecrow1->AddComponent<SphereColliderCom>();
+        collider->SetMyTag(COLLIDER_TAG::Enemy);
+        collider->SetJudgeTag(COLLIDER_TAG::Player);
+        collider->SetEnabled(true);
+        collider->SetRadius(1.0f);
+        scarecrow1->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/noobenemy.nodecollsion");
+        scarecrow1->AddComponent<AnimationCom>();
+        scarecrow1->AddComponent<MovementCom>();
+        scarecrow1->AddComponent<UltSkillMaxItem>();
+
+
+
+        scarecrow1->AddComponent<AudioCom>();
+
     }
 }
 
@@ -364,6 +426,21 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         }
     }
     
+}
+
+//アイテムスポーンシステム
+void TrainingSystem::SpawnItemSystem(float elapsdTime)
+{
+    if (!itemFlag)
+    {
+        spawnItemIntervalTimer += elapsdTime;
+        if (spawnItemIntervalTimer > spawnItemIntervalTime)
+        {
+            spawnItemIntervalTimer = 0.0f;
+            itemFlag = true;
+            SpawnItem();
+        }
+    }
 }
 #pragma endregion
 

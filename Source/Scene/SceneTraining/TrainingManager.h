@@ -49,6 +49,10 @@ public:
     void TrainingSystemStart();
     void TrainingSystemClear();
 
+public:
+
+    void SetItemFlag(bool flag) { itemFlag = flag; }
+
 private:
     //射撃の開始処理と終了処理
     void ShootingStartEndSystem();
@@ -59,6 +63,10 @@ private:
     //射撃時の案山子スポーン
     void ShootingSpawnCrow();
 
+    void SpawnItem();
+
+    void SpawnItemSystem(float elapsdTime);
+
 private:
     int     shootingScore = 0;                     //射撃のスコア
     int     scarecrowMaxTotal = 30;                //射撃時の最大案山子スポーン数
@@ -68,10 +76,12 @@ private:
     float   scarecrowLifeTimer = 0.0f;             //生存時間タイマー
     float   scarecrowSpawnIntervalTime  = 1.0f;    //案山子が倒されてからの次の案山子をスポーンの間隔
     float   scarecrowSpawnIntervalTimer = 0.0f;    //↑のタイマー
-    
+    float   spawnItemIntervalTime = 2.0f;          //アイテムが取得されてからの次のアイテムをスポーンさせる間隔
+    float   spawnItemIntervalTimer = 0.0f;         //↑のタイマー
+
     bool    shootingStartFlag = false;             //射撃が開始か終了か　false=終了　True＝開始
     bool    shootingIntervalFlag = false;          //次の案山子をスポーンさせる信号
-
+    bool    itemFlag = true;                      //アイテムがあるかどうか
 };
 
 //チュートリアルモード
