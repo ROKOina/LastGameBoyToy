@@ -282,6 +282,12 @@ void MovementCom::AddForce(const DirectX::XMFLOAT3& force)
     velocity_.z += force.z * moveAcceleration_;
 }
 
+//yŽ²‚¾‚¯velocity
+void MovementCom::AddForceY(const float& forceY)
+{
+    velocity_.y += forceY * moveAcceleration_;
+}
+
 //ƒ‰ƒ“ƒ_ƒ€•ûŒü‚É”ò‚Î‚·
 void MovementCom::ApplyRandomForce(float forcestrength, float yforce)
 {

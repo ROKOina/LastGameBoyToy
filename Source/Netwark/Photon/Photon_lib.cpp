@@ -334,7 +334,7 @@ void PhotonLib::LobbyImGui()
         }
         //ネットネーム表示
         ::strncpy_s(name, sizeof(name), netName.c_str(), sizeof(name));
-        if(ImGui::InputText("netName", name, sizeof(name)))
+        if (ImGui::InputText("netName", name, sizeof(name)))
         {
             netName = name;
         }
@@ -357,7 +357,6 @@ void PhotonLib::LobbyImGui()
             std::string selectRoom = WStringToString(rooms[i]->getName().cstr());
             if (ImGui::TreeNodeEx(&rooms[i], nodeFlags, selectRoom.c_str()))
             {
-
                 // クリックすると選択
                 if (ImGui::IsItemClicked())
                 {
@@ -552,8 +551,6 @@ void PhotonLib::DelayUpdate()
     }
 }
 
-
-
 int PhotonLib::GetPlayerNum()
 {
     int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
@@ -628,9 +625,6 @@ int PhotonLib::SendMs()
 {
     return GetServerTime() - oldMs;
 }
-
-
-
 
 void PhotonLib::debugReturn(int /*debugLevel*/, const ExitGames::Common::JString& string)
 {
@@ -808,7 +802,6 @@ void PhotonLib::onAvailableRegions(const ExitGames::Common::JVector<ExitGames::C
 
 ///////////////↓↓↓↓↓           ↓よく使う関数↓           ↓↓↓↓↓///////////////
 
-
 //入室時
 void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player)
 {
@@ -960,6 +953,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 if (Mathf::Length(ne[0].knockbackData[id]) >= 0.1f)
                 {
                     auto& obj = GameObjectManager::Instance().Find("player");
+                    obj->GetComponent<MovementCom>()->AddForceY(ne[0].knockbackData[id].y);
                     obj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(ne[0].knockbackData[id]);
                     break;
                 }

@@ -28,7 +28,7 @@ void JankratCharacterCom::Update(float elapsedTime)
 {
     //XV
     CharacterCom::Update(elapsedTime);
-    
+
     //Œãˆ—
     EraseHaveObjects();
 }

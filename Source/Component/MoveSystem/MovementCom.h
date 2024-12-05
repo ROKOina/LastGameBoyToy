@@ -27,6 +27,9 @@ public:
     //velocity
     void AddForce(const DirectX::XMFLOAT3& force);
 
+    //yŽ²‚¾‚¯velocity
+    void AddForceY(const float& forceY);
+
     //ƒ‰ƒ“ƒ_ƒ€•ûŒü‚É”ò‚Î‚·
     void ApplyRandomForce(float forcestrength, float yforce);
 
