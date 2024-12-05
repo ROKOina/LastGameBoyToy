@@ -105,9 +105,9 @@ void ScenePVE::Initialize()
             gate->SetMoveSpeed(0.1f);
         }
 
-        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
+        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Complex).get();
         rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
-        rigid->SetNormalizeScale(1);
+        rigid->SetRigidScale(1);
     }
 
     //ƒvƒŒƒCƒ„[

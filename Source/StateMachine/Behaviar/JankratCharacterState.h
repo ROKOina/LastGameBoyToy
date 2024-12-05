@@ -29,18 +29,37 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override {};
-    void ImGui() override {};
+    void ImGui() override;
     virtual const char* GetName() const override { return "MainAttack"; }
+
+private:
+    float mass = 1.5f;
+    float restitution = 0.8f;
+    float force = 30.0f;
+
+    float vecY = 0.0f;
 };
 
-//class JankratCharacter_CockingState : public JankratCharacter_BaseState
-//{
-//public:
-//    JankratCharacter_CockingState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
-//
-//    void Enter() override;
-//    void Execute(const float& elapsedTime) override;
-//    void Exit() override;
-//    void ImGui() override;
-//    virtual const char* GetName() const override { return "Cocking"; }
-//};
+class JankratCharacter_SubAttackState : public JankratCharacter_BaseState
+{
+public:
+    JankratCharacter_SubAttackState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
+
+    void Enter() override {};
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "SubAttack"; }
+};
+
+class JankratCharacter_MainSkillState : public JankratCharacter_BaseState
+{
+public:
+    JankratCharacter_MainSkillState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "SubSkill"; }
+};

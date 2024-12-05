@@ -18,7 +18,7 @@ void HitProcessCom::Update(float elapsedTime)
     //ƒqƒbƒg‚ğ‘—M
     std::shared_ptr<Collider> col = GetGameObject()->GetComponent<Collider>();
     if (!col)return;
-    std::shared_ptr<CharacterCom> parentChara = myObj.lock()->GetComponent<CharacterCom>();
+     std::shared_ptr<CharacterCom> parentChara = myObj.lock()->GetComponent<CharacterCom>();
     if (!parentChara)return;
 
     for (auto& hit : col->OnHitGameObject())

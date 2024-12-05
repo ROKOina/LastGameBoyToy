@@ -41,7 +41,7 @@ void PVEDirection::DirectionStart()
         armParts->transform_->SetEulerRotation({ 0.0f,-155.999f, -32.0f });
         armParts->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
         armParts->AddComponent<MovementCom>();
-        RigidBodyCom* rigid = armParts->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Mesh).get();
+        RigidBodyCom* rigid = armParts->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Convex).get();
         armParts->GetComponent<MovementCom>()->SetGravity(0.0);
         armParts->SetEnabled(false);
     }
@@ -55,7 +55,7 @@ void PVEDirection::DirectionStart()
         headParts->transform_->SetWorldPosition({ 12.721f,30.0f,-33.909f });
         headParts->transform_->SetEulerRotation({ -10.00f,-210.998f, 42.0f });
         headParts->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
-        RigidBodyCom* rigid = headParts->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Mesh).get();
+        RigidBodyCom* rigid = headParts->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Convex).get();
         headParts->GetComponent<MovementCom>()->SetGravity(0.0);
         headParts->SetEnabled(false);
     }
@@ -69,7 +69,7 @@ void PVEDirection::DirectionStart()
         shoulderParts->transform_->SetWorldPosition({ 13.378f, 25.0f,-29.444f });
         shoulderParts->transform_->SetEulerRotation({ 0.0f,-33.0f, -30.0f });
         shoulderParts->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
-        RigidBodyCom* rigid = shoulderParts->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Mesh).get();
+        RigidBodyCom* rigid = shoulderParts->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Convex).get();
         shoulderParts->GetComponent<MovementCom>()->SetGravity(0.0);
         shoulderParts->SetEnabled(false);
     }

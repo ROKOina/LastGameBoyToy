@@ -6,6 +6,7 @@
 #include "Graphics/Graphics.h"
 #include "Phsix\Physxlib.h"
 #include <random>
+#include "SystemStruct\TimeManager.h"
 
 // 更新処理
 void MovementCom::Update(float elapsedTime)
@@ -145,7 +146,7 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
         // 判定
         RayCastManager::Result hit;
         PxRaycastBuffer buffer;
-        if (isRaycast && PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer))//RayCast(start, end, hit))
+        if (isRaycast && PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
         {
             // 地面に接地している
             position.y = buffer.block.position.y;
@@ -187,20 +188,22 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
     if (velocityLengthXZ > 0.0f)
     {
         // レイの始点位置と終点位置
-        DirectX::XMFLOAT3 start = { position.x, position.y + 2.0f, position.z };
+        DirectX::XMFLOAT3 start = { position.x, position.y + stepOffset, position.z };
         DirectX::XMFLOAT3 end = {
             position.x + moveVec.x * elapsedTime,
-            position.y + 2.0f,
+            position.y + stepOffset,
             position.z + moveVec.z * elapsedTime
         };
 
+        //前回の結果を保持
+        wasOnGround_ = onWall_;
+
         // SphereCastによる壁判定
         PxRaycastBuffer buffer;
-        float r = 1.0f;
 
         static bool wasColliding = false;  // 前フレームで壁に衝突していたか
         if (isRaycast && PhysXLib::Instance().RayCast_PhysX(
-            start, Mathf::Normalize(end - start), Mathf::Length(end - start) + r, buffer))
+            start, Mathf::Normalize(end - start), Mathf::Length(end - start) + advanceOffset, buffer, PhysXLib::CollisionLayer::Stage))
         {
             DirectX::XMFLOAT3 p = {};
             p.x = buffer.block.position.x;
@@ -209,38 +212,34 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
 
             DirectX::XMFLOAT3 n = {};
             n = Mathf::Normalize(start - end);
-            p = p + (n * r);
+            p = p + (n * advanceOffset);
 
             position.x = p.x;
             position.z = p.z;
 
-            // 壁に衝突した場合、壁に沿ったスライドベクトルを計算
-            DirectX::XMVECTOR Start = XMLoadFloat3(&start);
-            DirectX::XMVECTOR End = XMLoadFloat3(&end);
-            DirectX::XMVECTOR MoveVec = DirectX::XMVectorSubtract(End, Start);
+            if (useWallSride_)
+            {
+                // 壁に衝突した場合、壁に沿ったスライドベクトルを計算
+                DirectX::XMVECTOR Start = XMLoadFloat3(&start);
+                DirectX::XMVECTOR End = XMLoadFloat3(&end);
+                DirectX::XMVECTOR MoveVec = DirectX::XMVectorSubtract(End, Start);
 
-            // 壁の法線を取得
-            DirectX::XMFLOAT3 normal = { buffer.block.normal.x, buffer.block.normal.y, buffer.block.normal.z };
-            DirectX::XMVECTOR Normal = XMLoadFloat3(&normal);
+                // 壁の法線を取得
+                DirectX::XMFLOAT3 normal = { buffer.block.normal.x, buffer.block.normal.y, buffer.block.normal.z };
+                DirectX::XMVECTOR Normal = XMLoadFloat3(&normal);
 
-            // 壁に沿ったスライドベクトルの計算
-            DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(MoveVec, Normal);
-            DirectX::XMVECTOR SlideVec = DirectX::XMVectorSubtract(MoveVec, DirectX::XMVectorMultiply(Normal, Dot));
+                // 壁に沿ったスライドベクトルの計算
+                DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(MoveVec, Normal);
+                DirectX::XMVECTOR SlideVec = DirectX::XMVectorSubtract(MoveVec, DirectX::XMVectorMultiply(Normal, Dot));
 
-            // スライドベクトルと補正ベクトルを加算して補正位置を計算
-            DirectX::XMFLOAT3 correctedPosition;
-            DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&p), SlideVec));
+                // スライドベクトルと補正ベクトルを加算して補正位置を計算
+                DirectX::XMFLOAT3 correctedPosition;
+                DirectX::XMStoreFloat3(&correctedPosition, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&p), SlideVec));
 
-            position.x = correctedPosition.x;
-            position.z = correctedPosition.z;
-
-            //if (!PhysXLib::Instance().RayCast_PhysX(
-            //    position, Mathf::Normalize(correctedPosition - p), Mathf::Length(correctedPosition - p) + r, buffer))
-            //{
-            //    // 壁に沿った移動と補正を適用
-            //    position.x = correctedPosition.x;
-            //    position.z = correctedPosition.z;
-            //}
+                position.x = correctedPosition.x;
+                position.z = correctedPosition.z;
+            }
+            onWall_ = true;
         }
         else
         {
@@ -248,8 +247,13 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
             position.x += moveVec.x * elapsedTime;
             position.z += moveVec.z * elapsedTime;
             wasColliding = false;  // 壁に衝突していないので、補正をリセット
+
+            onWall_ = false;
         }
     }
+
+    // 着地した瞬間を判定
+    justHitWall_ = !wasOnWall_ && onWall_;
 
     GetGameObject()->transform_->SetWorldPosition(position);
 }
@@ -276,6 +280,12 @@ void MovementCom::AddForce(const DirectX::XMFLOAT3& force)
     velocity_.x += force.x * moveAcceleration_;
     velocity_.y += force.y * moveAcceleration_;
     velocity_.z += force.z * moveAcceleration_;
+}
+
+//y軸だけvelocity
+void MovementCom::AddForceY(const float& forceY)
+{
+    velocity_.y += forceY * moveAcceleration_;
 }
 
 //ランダム方向に飛ばす

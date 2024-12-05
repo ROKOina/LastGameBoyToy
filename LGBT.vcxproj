@@ -151,6 +151,8 @@
     <ClInclude Include="Source\Component\Animation\FootIKcom.h" />
     <ClInclude Include="Source\Component\Audio\AudioCom.h" />
     <ClInclude Include="Source\Component\Bullet\BulletCom.h" />
+    <ClInclude Include="Source\Component\Bullet\KnockBackCom.h" />
+    <ClInclude Include="Source\Component\Bullet\JankratBulletCom.h" />
     <ClInclude Include="Source\Component\Bullet\MissileCom.h" />
     <ClInclude Include="Source\Component\Bullet\ProjectileCom.h" />
     <ClInclude Include="Source\Component\Camera\CameraCom.h" />
@@ -187,6 +189,7 @@
     <ClInclude Include="Source\Component\Renderer\InstanceRendererCom.h" />
     <ClInclude Include="Source\Component\Renderer\RendererCom.h" />
     <ClInclude Include="Source\Component\Renderer\TrailCom.h" />
+    <ClInclude Include="Source\Component\SkillObj\JankratMineCom.h" />
     <ClInclude Include="Source\Component\Sprite\Sprite.h" />
     <ClInclude Include="Source\Component\Stage\GateGimmickCom.h" />
     <ClInclude Include="Source\Component\Stage\StageEditorCom.h" />
@@ -244,6 +247,7 @@
     <ClInclude Include="Source\Scene\SceneLoading\SceneLoading.h" />
     <ClInclude Include="Source\Scene\SceneLobby\SceneLobby.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
+    <ClInclude Include="Source\Scene\SceneNakanisi\SceneNakanisi.h" />
     <ClInclude Include="Source\Scene\ScenePVE\PVEDirection.h" />
     <ClInclude Include="Source\Scene\ScenePVE\ScenePVE.h" />
     <ClInclude Include="Source\Scene\ScenePVP\ScenePVP.h" />
@@ -298,6 +302,8 @@
     <ClCompile Include="Source\Component\Animation\FootIKCom.cpp" />
     <ClCompile Include="Source\Component\Audio\AudioCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\BulletCom.cpp" />
+    <ClCompile Include="Source\Component\Bullet\JankratBulletCom.cpp" />
+    <ClCompile Include="Source\Component\Bullet\KnockBackCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\MissileCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\ProjectileCom.cpp" />
     <ClCompile Include="Source\Component\Camera\CameraCom.cpp" />
@@ -333,6 +339,7 @@
     <ClCompile Include="Source\Component\Renderer\InstanceRendererCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\RendererCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\TrailCom.cpp" />
+    <ClCompile Include="Source\Component\SkillObj\JankratMineCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Component\Stage\GateGimmickCom.cpp" />
     <ClCompile Include="Source\Component\Stage\StageEditorCom.cpp" />
@@ -381,6 +388,7 @@
     <ClCompile Include="Source\Scene\SceneLoading\SceneLoading.cpp" />
     <ClCompile Include="Source\Scene\SceneLobby\SceneLobby.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Scene\SceneNakanisi\SceneNakanisi.cpp" />
     <ClCompile Include="Source\Scene\ScenePVE\PVEDirection.cpp" />
     <ClCompile Include="Source\Scene\ScenePVE\ScenePVE.cpp" />
     <ClCompile Include="Source\Scene\ScenePVP\ScenePVP.cpp" />

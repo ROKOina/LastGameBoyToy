@@ -248,6 +248,14 @@ GameObj StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 posit
     return obj;
 }
 
+//ステージの物理判定生成
+void StageEditorCom::PlaceStageRigidCollider(std::string file, float scale)
+{
+    PhysXLib::Instance().GenerateComplexCollider(
+        ResourceManager::Instance().GetModelResource(file.c_str()).get(),
+        scale, PhysXLib::CollisionLayer::Stage);
+}
+
 void StageEditorCom::FileRead(std::string& path)
 {
     //ステージモデルの設定
@@ -437,7 +445,7 @@ void StageEditorCom::PlaceJsonData(std::string filename)
 
 void StageEditorCom::TestNakanisi(GameObj& place)
 {
-    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, RigidBodyCom::RigidType::Convex).get();
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Convex).get();
 
     std::string path = place->GetComponent<RendererCom>()->GetModelPath();
     rigid->SetUseResourcePath(path);
@@ -474,5 +482,6 @@ void StageEditorCom::TowerGimic(GameObj& place)
 void StageEditorCom::GateGimic(GameObj& place)
 {
     place->AddComponent<GateGimmick>();
-    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Convex).get();
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Convex).get();
+    rigid->SetRigidScale(1);
 }

@@ -237,5 +237,5 @@ DirectX::XMFLOAT4X4 Mathf::GenerateTransform(const DirectX::XMFLOAT3 position, c
 
 DirectX::XMFLOAT4X4 Mathf::GenerateTransform(const DirectX::XMFLOAT3 position, const DirectX::XMFLOAT3 scale)
 {
-    return GenerateTransform(position, {0,0,0,1}, scale);
+    return GenerateTransform(position, { 0,0,0,1 }, scale);
 }

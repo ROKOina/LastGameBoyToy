@@ -40,3 +40,35 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
     }
 }
 #pragma endregion
+
+#pragma region ult攻撃
+void Farah_UltState::Enter()
+{
+}
+void Farah_UltState::Execute(const float& elapsedTime)
+{
+}
+#pragma endregion
+
+#pragma region Eskill
+void Farah_ESkillState::Enter()
+{
+}
+void Farah_ESkillState::Execute(const float& elapsedTime)
+{
+    //攻撃終了処理＆攻撃処理
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        armAnim->SetAnimationSeconds(0.3f);
+    }
+
+    //攻撃処理
+    BulletCreate::KnockbackFire(owner->GetGameObject(), 30.0f, 2);
+
+    //ステート変更
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+#pragma endregion

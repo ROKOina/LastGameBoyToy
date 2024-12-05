@@ -327,12 +327,22 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
+    //生成コンポーネント
+    {
+        std::shared_ptr<GameObject>spawn = obj->AddChildObject();
+        spawn->SetName("ultspawn");
+        spawn->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/farahult.spawn");
+    }
+
     //HPの初期設定
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
     std::shared_ptr<FarahCom> c = obj->AddComponent<FarahCom>();
     c->SetCharaID(int(CHARA_LIST::FARAH));
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
+    c->SetUseSkill(USE_SKILL::E | USE_SKILL::LEFT_CLICK);
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
@@ -404,13 +414,54 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
+    charaCom->SetCharaID(int(CHARA_LIST::JANKRAT));
 
-    std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
-    cameraPost->SetName("cameraPostPlayer");
-    std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-    fpscamera->ActiveCameraChange();
+    //HPの初期設定
+    status->SetMaxHitPoint(200);
+    status->SetHitPoint(status->GetMaxHitpoint());
+    status->SetInvincibleTime(0.3f);
 
-    //カメラ位置
-    cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
-    obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+    auto& au = obj->AddComponent<AudioCom>();
+    au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
+    au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
+    au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
+    au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
+    au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
+    au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
+
+    //ボックスコライダー
+    std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
+    box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
+    box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
+    if (std::strcmp(obj->GetName(), "player") == 0)
+        box->SetMyTag(COLLIDER_TAG::Player);
+    else
+        box->SetMyTag(COLLIDER_TAG::Enemy);
+
+    
+    //自分かネットのプレイヤーで
+    if (std::strcmp(obj->GetName(), "player") == 0)
+    {
+        //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
+        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
+        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+        cameraPost->SetName("cameraPostPlayer");
+        std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
+        fpscamera->ActiveCameraChange();
+
+        //カメラ位置
+        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
+        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+
+        //腕
+        {
+            std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
+            armChild->SetName("armChild");
+            armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            armChild->AddComponent<AnimationCom>();
+        }
+    }
 }
