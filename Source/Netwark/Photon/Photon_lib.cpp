@@ -881,7 +881,8 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             switch (ne[0].dataKind)
             {
             case NetData::DATA_KIND::GAME:
-                GameRecv(ne[0]);
+                if (joinPermission || GetIsMasterPlayer())
+                    GameRecv(ne[0]);
                 break;
 
             case NetData::DATA_KIND::JOIN:
@@ -1182,14 +1183,14 @@ void PhotonLib::sendJoinPermissionData(bool request)
                 join.joinPermission = true; //“üº‚ğ‹–‰Â
 
                 //‹ó‚«‚ğ’T‚µ‚ÄƒvƒŒƒCƒ„[ID‚ğŒˆ’è‚·‚é
-                bool playerID[4] = { false };
+                bool usedPlayerID[4] = { false };
                 for (auto& s : saveInputPhoton)
                 {
-                    playerID[s.playerId] = true;
+                    usedPlayerID[s.playerId] = true;
                 }
                 for (int pID = 0; pID < 4; ++pID)
                 {
-                    if (playerID[pID])
+                    if (!usedPlayerID[pID])
                     {
                         join.playerId = pID;
                         break;
