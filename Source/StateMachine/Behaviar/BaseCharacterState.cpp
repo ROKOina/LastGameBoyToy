@@ -166,7 +166,7 @@ void BaseCharacter_MoveState::Exit()
 void BaseCharacter_JumpState::Enter()
 {
     //ƒWƒƒƒ“ƒv
-    JumpInput(owner->GetGameObject());
+    JumpInput(owner->GetGameObject(), 1.5f);
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);

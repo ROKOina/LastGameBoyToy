@@ -32,7 +32,6 @@
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 
-
 void ScenePVP::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -117,8 +116,6 @@ void ScenePVP::Initialize()
         obj->SetName("snowparticle");
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
-
-    
 
     //UIゲームオブジェクト生成
    // CreateUiObject();

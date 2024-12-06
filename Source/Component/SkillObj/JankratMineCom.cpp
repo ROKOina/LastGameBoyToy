@@ -34,9 +34,7 @@ void JankratMineCom::Update(float elapsedTime)
         SphereColliderCom* childCollder = GetGameObject()->GetChildren()[0].lock()->GetComponent<SphereColliderCom>().get();
         childCollder->SetMyTag(COLLIDER_TAG::NONE_COL);
 
-
         //TODO ここで爆発エフェクト再生
-
 
         //爆発から一定時間で消去
         if (lifeTimer >= lifeTime)

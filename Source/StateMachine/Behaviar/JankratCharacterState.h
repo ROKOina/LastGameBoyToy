@@ -8,8 +8,7 @@
 #include "Component\Character\JankratCharacterCom.h"
 #include "BaseCharacterState.h"
 
-//ハンゾー
-
+//ジャンクラット
 class JankratCharacter_BaseState : public State<CharacterCom>
 {
 public:
@@ -65,12 +64,4 @@ public:
     void Exit() override {};
     void ImGui() override {};
     virtual const char* GetName() const override { return "SubSkill"; }
-};
-
-class JankratCharacter_JumpLoop : public BaseCharacter_JumpLoop
-{
-public:
-    JankratCharacter_JumpLoop(CharacterCom* owner) : BaseCharacter_JumpLoop(owner) {};
-
-    void Execute(const float& elapsedTime) override;
 };

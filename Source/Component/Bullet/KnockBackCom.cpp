@@ -10,7 +10,6 @@ void KnockBackCom::Update(float elapsedTime)
 {
     const auto& collider = GetGameObject()->GetComponent<Collider>();
 
-
     for (auto& obj : collider->OnHitGameObject())
     {
         DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
@@ -25,6 +24,7 @@ void KnockBackCom::Update(float elapsedTime)
             obj.gameObject.lock()->GetComponent<MovementCom>()->AddNonMaxSpeedVelocity(force);
             obj.gameObject.lock()->GetComponent<MovementCom>()->AddForce(forceY);
             obj.gameObject.lock()->GetComponent<MovementCom>()->SetOnGround(false);
+            obj.gameObject.lock()->GetComponent<MovementCom>()->SetAirForce(1.0f);
         }
         else
         {
