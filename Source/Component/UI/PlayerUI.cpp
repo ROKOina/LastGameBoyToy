@@ -582,14 +582,14 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill,int count)
    std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/";
    CharacterCom::SkillCoolID skillNum;
    //à íuÇÇ∏ÇÁÇ∑íËêî
-   const float offset  = 150.0f;
+   const float offset  = 120.0f;
    switch (use_skill)
    {
    case Q:
        skillNum = CharacterCom::SkillCoolID::Q;
        break;
    case E:
-       name += "skill_Q.png";
+       name += "skill_E.png";
        skillNum = CharacterCom::SkillCoolID::E;
        break;
    case LEFT_CLICK:
@@ -601,27 +601,19 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill,int count)
    }
 
 
-  //SkillFrame
-   
-    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-    std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
-    skillFrame->SetName("SkillFrame");
-    auto& a =  skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
-    skillFrame->transform_->SetWorldPosition({ skillFrame->transform_->GetWorldPosition().x - (count * 90),skillFrame->transform_->GetWorldPosition().y,0});
-    a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y};
+   std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
 
-   //SkillFrame2
-   {
-       std::shared_ptr<GameObject> skill_Q = skillFrame->AddChildObject();
-       skill_Q->SetName("Skill_Frame2");
-       skill_Q->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_02.ui", Sprite::SpriteShader::DEFALT, false);
-   }
-  
+   //SkillFrame2 
+   std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
+   skillFrame->SetName("Skill_Frame");
+   auto& a = skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_02.ui", Sprite::SpriteShader::DEFALT, false);
+   a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+ 
    //SkillMask
    {
        std::shared_ptr<GameObject> skillGaueHide = skillFrame->AddChildObject();
        skillGaueHide->SetName("SkillGaugeHide");
-       auto& a = skillGaueHide->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrameHide1.ui", Sprite::SpriteShader::DEFALT, false);
+       auto& a = skillGaueHide->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillGaugeMask.ui", Sprite::SpriteShader::DEFALT, false);
        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
    }
   
@@ -636,6 +628,16 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill,int count)
        skillGaugeCmp->SetVariableValue(i);
        skillGaugeCmp->spc.position = { skillGaugeCmp->spc.position.x - (count * offset),skillGaugeCmp->spc.position.y };
 
+   }
+
+      //SkillFrame
+   {
+
+    std::shared_ptr<GameObject> skillFrame2 = skillFrame->AddChildObject();
+    skillFrame2->SetName("SkillFrame2");
+    auto& a =  skillFrame2->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
+    skillFrame2->transform_->SetWorldPosition({ skillFrame2->transform_->GetWorldPosition().x - (count * offset),skillFrame2->transform_->GetWorldPosition().y,0});
+    a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y};
    }
 
    //Skill_E
