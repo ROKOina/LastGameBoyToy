@@ -477,7 +477,7 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 {
     GameObj bullet = GameObjectManager::Instance().Create();
     bullet->SetName("damageball");
-    bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    bullet->transform_->SetScale({ 0.004f,0.004f,0.004f });
     bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
 
     //ï®óù
@@ -496,7 +496,7 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
-    coll->SetRadius(0.5f);
+    coll->SetRadius(0.3f);
 
     //íe
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
