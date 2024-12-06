@@ -371,7 +371,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     bulletCom->SetDamageValue(power);
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
-    k->SetKnockBackForce({ 20,5,20 });
+    k->SetKnockBackForce({ 18,5,18 });
     k->useTestCoad = true;
 
     //”»’è—p
@@ -565,7 +565,7 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
 
     float knockBackForce = 5.0f;
     KnockBackCom* childKcockBack = kcockBack->AddComponent<KnockBackCom>().get();
-    childKcockBack->SetKnockBackForce({ 30,10,30 });
+    childKcockBack->SetKnockBackForce({ 18,7,18 });
     childKcockBack->useTestCoad = true;
 
     ////”»’è—p

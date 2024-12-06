@@ -45,6 +45,7 @@ void MovementCom::OnGUI()
     ImGui::DragFloat((char*)u8"d—Í‰e‹¿“x", &gravityeffect, 0.01f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"—Ž‰ºƒXƒs[ƒh", &fallspeed, 0.1f, -100.0f, 0.0f);
     ImGui::DragFloat((char*)u8"–€ŽC", &friction_, 0.01f, 0.0f, 40.0f);
+    ImGui::DragFloat((char*)u8"‹ó‹C’ïR", &airForce, 0.01f, 0.0f, 40.0f);
     ImGui::DragFloat((char*)u8"Å‘å‘¬“x", &moveMaxSpeed_, 0.1f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"‰Á‘¬“x", &moveAcceleration_, 0.01f, 0.0f, 10.0f);
     ImGui::DragFloat((char*)u8"ã¸‘¬“x", &risespeed, 0.01f, 0.0f, 30.0f);
@@ -93,8 +94,8 @@ void MovementCom::HorizonUpdate(float elapsedTime)
     // –€ŽC—Íor‹ó‹C’ïR
     float friction;
     onGround_
-    ? friction = friction_ * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed())
-    : friction = airForce * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed());
+        ? friction = friction_ * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed())
+        : friction = airForce * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed());
 
     // –€ŽC—Í“K—p
     if (horiLengthSq > 0.0f)

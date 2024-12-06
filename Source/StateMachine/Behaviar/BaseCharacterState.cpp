@@ -165,11 +165,11 @@ void BaseCharacter_MoveState::Exit()
 
 void BaseCharacter_JumpState::Enter()
 {
+    //‰ŠúÝ’è
+    moveCom.lock()->SetAirForce(12.620);
+
     //ƒWƒƒƒ“ƒv
     JumpInput(owner->GetGameObject(), 1.5f);
-
-    //‰ŠúÝ’è
-    moveCom.lock()->SetAirForce(0.0f);
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
