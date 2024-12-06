@@ -75,17 +75,17 @@ void SceneNakanisi::Initialize()
     {
         auto& stageObj = GameObjectManager::Instance().Create();
         stageObj->SetName("stage");
-        stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
+        stageObj->transform_->SetWorldPosition({ 0.00f, 0.00f, 0.000f });
         stageObj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/AbeStage/TestStage.mdl");
-        r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
-        r->SetOutlineIntensity(5.5f);
+        //r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
+        //r->SetOutlineIntensity(5.5f);
         
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/","testStage.mdl", " ", 0.05);
+        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/","testStage.mdl", "__", 0.05);
         //Jsonからオブジェクト配置
         //stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
