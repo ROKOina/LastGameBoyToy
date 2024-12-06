@@ -17,10 +17,26 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
 
 void JankratCharacter_MainAtkState::Enter()
 {
-    DirectX::XMFLOAT3 pos = transCom.lock()->GetWorldPosition();
-    pos.y += 2.0f;
+    auto& cameraObj = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
+    auto& arm = cameraObj->GetChildFind("armChild");
+    if (arm)
+    {
+        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+        const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
 
-    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBulletFire(owner->GetGameObject(), pos, charaCom.lock()->GetCharaID()));
+        if (gunNode)
+        {
+            // 銃先端ボーンのワールド位置を取得
+            DirectX::XMFLOAT3 gunPos =
+            {
+                gunNode->worldTransform._41,
+                gunNode->worldTransform._42,
+                gunNode->worldTransform._43
+            };
+
+            charaCom.lock()->SetHaveBullet(BulletCreate::JankratBulletFire(owner->GetGameObject(), gunPos, charaCom.lock()->GetCharaID()));
+        }
+    }
 }
 
 void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
@@ -31,18 +47,49 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         RigidBodyCom* rigid = bullet->GetComponent<RigidBodyCom>().get();
         JankratBulletCom* jankratBullet = bullet->GetComponent<JankratBulletCom>().get();
 
-        //弾がセットされていたら発射
-        rigid->SetMass(mass);           //質量
-        rigid->SetRestitution(restitution);    //反発係数
-        rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); //速くても貫通しないような計算にするフラグ
+        // 弾がセットされていたら発射
+        rigid->SetMass(mass);           // 質量
+        rigid->SetRestitution(restitution);    // 反発係数
+        rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); // 貫通防止フラグ
         charaCom.lock()->ReleaseHaveBullet();
 
-        jankratBullet->SetLifeTime(bulletLifeTimer);//弾の寿命
+        jankratBullet->SetLifeTime(bulletLifeTimer); // 弾の寿命
         jankratBullet->SetAddGravity(addGravity);
 
-        //TODO 発射地点を銃の位置に変更
-        DirectX::XMFLOAT3 vec = owner->GetFpsCameraDir();
-        rigid->AddForce(Mathf::Normalize({ vec.x, vec.y + fireVecY, vec.z }) * force);
+        auto& cameraObj = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
+        auto& arm = cameraObj->GetChildFind("armChild");
+        if (arm)
+        {
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
+
+            if (gunNode)
+            {
+                // 銃先端ボーンのワールド位置を取得
+                DirectX::XMFLOAT3 gunPos =
+                {
+                    gunNode->worldTransform._41,
+                    gunNode->worldTransform._42,
+                    gunNode->worldTransform._43
+                };
+
+                // カメラの方向ベクトルを取得
+                DirectX::XMFLOAT3 cameraDir = owner->GetFpsCameraDir();
+
+                // 発射方向ベクトルの計算 (正規化 + Y軸補正)
+                DirectX::XMFLOAT3 fireDir = Mathf::Normalize({
+                    cameraDir.x,
+                    cameraDir.y + fireVecY,
+                    cameraDir.z
+                    });
+
+                // 弾の初期位置を設定
+                bullet->transform_->SetWorldPosition(gunPos);
+
+                // 弾の初速度を設定 (方向ベクトルに速度を乗算)
+                rigid->AddForce(fireDir * force);
+            }
+        }
     }
 
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
