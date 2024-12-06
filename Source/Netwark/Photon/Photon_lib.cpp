@@ -180,12 +180,13 @@ void PhotonLib::update(float elapsedTime)
     }
     mLoadBalancingClient.service();
 
+    //追加リストにあれば追加する
     for (int i = 0; i < 4; ++i)
     {
-        if (addPhotonID[i] >= 0)
+        if (addSavePhotonID[i] >= 0)
         {
-            AddPlayer(addPhotonID[i], i);
-            addPhotonID[i] = -1;
+            AddPlayer(addSavePhotonID[i], i);
+            addSavePhotonID[i] = -1;
         }
     }
 
@@ -542,10 +543,10 @@ void PhotonLib::NetCharaInput()
         chara->SetUserInputDown(s.nextInput.inputDown);
         chara->SetUserInputUp(s.nextInput.inputUp);
 
-        static bool upHokan[4] = { false }; //補間中か
+        static bool upHokan[4] = { false,false,false,false }; //補間中か
         static DirectX::XMFLOAT3 hoknaPos[4] = {};  //補間する位置
         static DirectX::XMFLOAT3 nowPos[4] = {};    //今の位置
-        static int saveFrameHokan[4] = { 0 };       //補間用フレーム
+        static int saveFrameHokan[4] = { 0,0,0,0 };       //補間用フレーム
         int frameHokan = 6; //補完するフレーム
 
         //移動
@@ -1129,7 +1130,8 @@ void PhotonLib::LobbyRecv(NetData recvData)
     {
         if (s.photonId == recvData.photonId)add = false;
     }
-    if (add)addPhotonID[recvData.playerId] = recvData.photonId;
+    //キャラ追加リストに追加
+    if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
     
     //AddPlayer(recvData.photonId, recvData.playerId);
 
@@ -1297,11 +1299,11 @@ void PhotonLib::sendJoinPermissionData(bool request)
 
                     for (auto& s : saveInputPhoton)
                     {
-                        usedPlayerID[s.playerId] = true;
+                        usedPlayerID[s.playerId] = true;    //使われているならtrue
                     }
                     for (int pID = 0; pID < 4; ++pID)
                     {
-                        if (!usedPlayerID[pID])
+                        if (!usedPlayerID[pID]) //使われていない番号を送る
                         {
                             join.playerId = pID;
                             break;

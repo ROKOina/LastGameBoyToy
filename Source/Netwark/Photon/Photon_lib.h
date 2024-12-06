@@ -221,7 +221,7 @@ private:
     };
     std::vector<SaveInput> saveInputPhoton;
     //追加予約
-    int addPhotonID[4] = { -1,-1,-1,-1 };
+    int addSavePhotonID[4] = { -1,-1,-1,-1 };   //要素がプレイヤーID、値がフォトンIDになる
 
     //ロビーで名前とIDを紐づけする
     std::string savePlayerName[4];
