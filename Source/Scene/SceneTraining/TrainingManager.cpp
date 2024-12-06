@@ -457,12 +457,69 @@ void TutorialSystem::TutorialSystemStart()
 
 void TutorialSystem::TutorialSystemUpdate(float elapsedTime)
 {
-
+    TutorialManagerSystem(elapsedTime);
 }
 
 void TutorialSystem::TutorialSystemClear()
 {
 
 }
+
+void TutorialSystem::TutorialManagerSystem(float elapsedTime)
+{
+    switch (tutorialID)
+    {
+    case TutorialID::MOVE:
+        MoveTutorialManager(elapsedTime);
+        break;
+    case TutorialID::GUN:
+        GunTutorialManager(elapsedTime);
+        break;
+    case TutorialID::SKILL:
+        SkillTutorialManager(elapsedTime);
+        break;
+    case TutorialID::ULT:
+        UltTutorialManager(elapsedTime);
+        break;
+    }
+}
+
+void TutorialSystem::NextTutorial(TutorialID id)
+{
+    tutorialID = id;
+}
+
+void TutorialSystem::MoveTutorialManager(float elapsedTime)
+{
+    if (moveInspectionFlag)
+    {
+        NextTutorial(TutorialID::GUN);
+    }
+}
+
+void TutorialSystem::GunTutorialManager(float elapsedTime)
+{
+    if (gunInspectionFlag)
+    {
+        NextTutorial(TutorialID::SKILL);
+    }
+}
+
+void TutorialSystem::SkillTutorialManager(float elapsedTime)
+{
+    if (skillInspectionFlag)
+    {
+        NextTutorial(TutorialID::ULT);
+    }
+}
+
+void TutorialSystem::UltTutorialManager(float elapsedTime)
+{
+    if (ultInspectionFlag)
+    {
+        NextTutorial(TutorialID::END);
+    }
+}
+
 #pragma endregion
 
