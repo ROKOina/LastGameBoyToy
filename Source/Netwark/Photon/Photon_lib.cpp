@@ -133,8 +133,16 @@ void PhotonLib::update(float elapsedTime)
                 break;
             }
 
-            //ゲーム中情報送信
-            sendGameData();
+            if (isGamePlay) //ゲーム中か
+            {
+                //ゲーム中情報送信
+                sendGameData();
+            }
+            else
+            {
+                //ロビー中情報送信
+                sendLobbyData();
+            }
 
             //ホスト時の処理
             if (GetIsMasterPlayer())
@@ -204,6 +212,12 @@ void PhotonLib::ImGui()
 
     if (isMaster)
     {
+        //ゲーム開始
+        bool g = isGamePlay;
+        ImGui::Checkbox("PlayGame", &g);
+        if (g)isGamePlay = g;
+
+        //チーム分け
         if (ImGui::TreeNode("teamWake"))
         {
             for (auto& s : saveInputPhoton)
@@ -216,6 +230,7 @@ void PhotonLib::ImGui()
     }
     else
     {
+        //チーム表示
         if (ImGui::TreeNode("team"))
         {
             for (auto& s : saveInputPhoton)
@@ -260,6 +275,7 @@ void PhotonLib::ImGui()
     ImGui::End();
 
     LobbyImGui();
+    ChatImGui();
 #endif
 }
 
@@ -376,6 +392,32 @@ void PhotonLib::LobbyImGui()
 
         ImGui::End();
     }
+}
+
+void PhotonLib::ChatImGui()
+{
+    //ネットワーク決定仮ボタン
+    ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("ChatPhotonNet", nullptr, ImGuiWindowFlags_None);
+
+    char name[500];
+    ::strncpy_s(name, sizeof(name), chat.c_str(), sizeof(name));
+    if (ImGui::InputText("roomName", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        isSendChat = true;
+        chat = name;
+        chatList.emplace_back(chat);
+    }
+
+    for (auto& c : chatList)
+    {
+        ImGui::Text(c.c_str());
+    }
+
+    ImGui::End();
+
 }
 
 void PhotonLib::NetInputUpdate()
@@ -564,7 +606,7 @@ void PhotonLib::DelayUpdate()
     }
 }
 
-
+#pragma region ゲッターセッター
 
 int PhotonLib::GetMyPhotonID()
 {
@@ -632,6 +674,7 @@ int PhotonLib::SendMs()
     return GetServerTime() - oldMs;
 }
 
+#pragma endregion
 
 #pragma region ライブラリ関数
 
@@ -889,6 +932,11 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             case NetData::DATA_KIND::JOIN:
                 JoinRecv(ne[0]);
                 break;
+
+            case NetData::DATA_KIND::LOBBY:
+                if (joinPermission || GetIsMasterPlayer())
+                LobbyRecv(ne[0]);
+                break;
             }
 
 
@@ -904,10 +952,7 @@ void PhotonLib::GameRecv(NetData recvData)
     //マスタークライアント以外はチームを保存
     if (recvData.isMasterClient)
     {
-        for (auto& s : saveInputPhoton)
-        {
-            s.teamID = recvData.gameData.teamID[s.playerId];
-        }
+        //タイマー合わせる
         startTime = recvData.gameData.startTime;
     }
 
@@ -1016,7 +1061,8 @@ void PhotonLib::JoinRecv(NetData recvData)
             if (j.joinRequest)
             {
                 auto& joinM = joinManager.emplace_back();
-                joinM.photonId = recvData.photonId;
+                joinM.jData.photonId = recvData.photonId;
+                joinM.joinName = recvData.name;
             }
         }
     }
@@ -1063,9 +1109,35 @@ void PhotonLib::JoinRecv(NetData recvData)
     }
 }
 
+void PhotonLib::LobbyRecv(NetData recvData)
+{
+    //マスタークライアント以外
+    if (recvData.isMasterClient)
+    {
+        //チームを保存
+        for (auto& s : saveInputPhoton)
+        {
+            s.teamID = recvData.lobbyData.teamID[s.playerId];
+        }
+    }
+
+    //チャットに文字が入っているなら
+    if (((std::string)recvData.lobbyData.chat) != "0")
+    {
+        chatList.emplace_back(recvData.lobbyData.chat);
+    }
+
+    //名前を保存
+    savePlayerName[recvData.playerId] = recvData.name;
+
+}
+
 //送信
 void PhotonLib::sendGameData(void)
 {
+    //ゲーム開始フラグ
+    isGamePlay = true;
+
     ExitGames::Common::Hashtable event;
 
     auto& obj = GameObjectManager::Instance().Find("player");
@@ -1111,15 +1183,6 @@ void PhotonLib::sendGameData(void)
             netD.gameData.movePosData[data.playerID] = data.valueF3;
     }
 
-    //マスタークライアントの場合はチームIDを送る
-    if (GetIsMasterPlayer())
-    {
-        for (auto& s : saveInputPhoton)
-        {
-            netD.gameData.teamID[s.playerId] = s.teamID;
-        }
-    }
-
     //キャラIDを送る
     netD.gameData.charaID = obj->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();
 
@@ -1146,6 +1209,7 @@ void PhotonLib::sendGameData(void)
     //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
 }
 
+//入室許可送信(申請の場合はtrue)
 void PhotonLib::sendJoinPermissionData(bool request)
 {
     ExitGames::Common::Hashtable event;
@@ -1174,27 +1238,41 @@ void PhotonLib::sendJoinPermissionData(bool request)
         for (auto& j : joinManager) //申請リストから審議
         {
             auto& join = netD.joinData.emplace_back();
-            join.photonId = j.photonId;
-            join.playerId = j.playerId;
+            join.photonId = j.jData.photonId;
+            join.playerId = j.jData.playerId;
             join.joinPermission = false;
             join.joinRequest =false;
             //４人まで追加
             if (saveInputPhoton.size() < 4)
             {
-                join.joinPermission = true; //入室を許可
-
-                //空きを探してプレイヤーIDを決定する
-                bool usedPlayerID[4] = { false };
-                for (auto& s : saveInputPhoton)
+                if (isGamePlay)  //プレイ中の場合
                 {
-                    usedPlayerID[s.playerId] = true;
-                }
-                for (int pID = 0; pID < 4; ++pID)
-                {
-                    if (!usedPlayerID[pID])
+                    for (int sP = 0; sP < 4; ++sP)
                     {
-                        join.playerId = pID;
+                        if (savePlayerName[sP] != j.joinName)continue;
+
+                        join.joinPermission = true; //入室を許可
+                        join.playerId = sP;
                         break;
+                    }
+                }
+                else    //ロビーの場合
+                {
+                    join.joinPermission = true; //入室を許可
+
+                    //空きを探してプレイヤーIDを決定する
+                    bool usedPlayerID[4] = { false };
+                    for (auto& s : saveInputPhoton)
+                    {
+                        usedPlayerID[s.playerId] = true;
+                    }
+                    for (int pID = 0; pID < 4; ++pID)
+                    {
+                        if (!usedPlayerID[pID])
+                        {
+                            join.playerId = pID;
+                            break;
+                        }
                     }
                 }
             }
@@ -1211,6 +1289,47 @@ void PhotonLib::sendJoinPermissionData(bool request)
     //特定のナンバーに送信
     //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
 
+}
+
+void PhotonLib::sendLobbyData(void)
+{
+    ExitGames::Common::Hashtable event;
+    std::vector<NetData> n;
+    NetData& netD = n.emplace_back(NetData());
+    int myPhotonID = GetMyPhotonID();
+    netD.photonId = myPhotonID;
+    netD.isMasterClient = GetIsMasterPlayer();
+    ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
+
+    //種別をロビーに
+    netD.dataKind = NetData::DATA_KIND::LOBBY;
+
+    //マスタークライアントの場合はチームIDを送る
+    if (GetIsMasterPlayer())
+    {
+        for (auto& s : saveInputPhoton)
+        {
+            netD.lobbyData.teamID[s.playerId] = s.teamID;
+        }
+    }
+
+    //チャットを送る
+    ::strncpy_s(netD.lobbyData.chat, sizeof(netD.lobbyData.chat), "0", sizeof(netD.lobbyData.chat));
+    if (isSendChat)
+    {
+        ::strncpy_s(netD.lobbyData.chat, sizeof(netD.lobbyData.chat), chat.c_str(), sizeof(netD.lobbyData.chat));
+        isSendChat = false;
+        chat.clear();
+    }
+
+    std::stringstream s = NetDataSendCast(n);
+    auto ne = NetDataRecvCast(s.str());
+    event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
+    int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
+    //自分以外全員に送信
+    mLoadBalancingClient.opRaiseEvent(true, event, 0);
+    //特定のナンバーに送信
+    //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
 }
 
 //プレイヤー追加

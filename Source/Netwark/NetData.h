@@ -65,21 +65,6 @@ static std::stringstream& operator<<(std::stringstream& out, const std::array<in
     return out;
 }
 
-////フレームと入力
-//struct InputFrame
-//{
-//    int progressFrame;  //経過フレーム
-//    unsigned int input; //入力
-//};
-
-//struct InputData
-//{
-//    std::vector<unsigned int> input;
-//    std::vector<unsigned int> inputDown;
-//    std::vector<unsigned int> inputUp;
-//};
-//
-
 struct SaveBuffer
 {
     int frame;
@@ -149,6 +134,7 @@ struct NetData
     enum DATA_KIND {
         GAME,
         JOIN,
+        LOBBY,
     };
     int dataKind;
     bool isMasterClient;
@@ -169,7 +155,7 @@ struct NetData
         std::array<float, 4> stanData;//キャラに与えたスタン
         std::array<DirectX::XMFLOAT3, 4> knockbackData = {};//ノックバックを与える
         std::array<DirectX::XMFLOAT3, 4> movePosData = {};//移動位置を与える
-        std::array<int, 4> teamID;//チームのID
+        //std::array<int, 4> teamID;//チームのID
         int charaID;    //キャラのID
     }gameData;
 
@@ -187,8 +173,12 @@ struct NetData
     };
     std::vector<JoinData> joinData;
 
-    //int pSize;
-    //std::vector<int> p;
+    //ロビー中
+    struct LobbyData    //2
+    {
+        std::array<int, 4> teamID;//チームのID
+        char chat[500];
+    }lobbyData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
@@ -209,7 +199,6 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 
         Vector3Out(out, h.gameData.movePosData);
 
-        out << h.gameData.teamID << " ";
         out << h.gameData.charaID << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
     }
@@ -225,9 +214,12 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         }
     }
 
-    //for (auto& i : h.p)
-    //{
-    //}
+    if (h.dataKind == NetData::DATA_KIND::LOBBY)
+    {
+        out << h.lobbyData.chat << " ";
+        out << h.lobbyData.teamID << " ";
+    }
+
     return out;
 }
 static std::stringstream& operator>>(std::stringstream& in, NetData& h)
@@ -249,7 +241,6 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 
         Vector3In(in, h.gameData.movePosData);
 
-        in >> h.gameData.teamID;
         in >> h.gameData.charaID;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
     }
@@ -264,6 +255,12 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
             in >> join.photonId;
             in >> join.playerId;
         }
+    }
+
+    if (h.dataKind == NetData::DATA_KIND::LOBBY)
+    {
+        in >> h.lobbyData.chat;
+        in >> h.lobbyData.teamID;
     }
 
     return in;
@@ -289,11 +286,6 @@ static std::vector<NetData> NetDataRecvCast(std::string& recvData)
     NetData n;
     std::vector<NetData> data;
     std::stringstream ss(recvData);
-    //while (ss)
-    //{
-    //    ss >> n;
-    //    data.emplace_back(n);
-    //}
     while (ss >> n)
     {
         data.emplace_back(n);

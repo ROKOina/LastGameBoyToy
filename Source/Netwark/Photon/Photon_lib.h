@@ -44,6 +44,7 @@ public:
     ExitGames::Common::JString getStateString(void);
 
     void LobbyImGui();
+    void ChatImGui();
 
 private:
     //接続開始フラグ
@@ -132,6 +133,9 @@ private:
     //入室許可送信(申請の場合はtrue)
     void sendJoinPermissionData(bool request);
 
+    //入室許可送信(申請の場合はtrue)
+    void sendLobbyData(void);
+
     // events, triggered by certain operations of all players in the same room
     //入室時に入る
     virtual void joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player);
@@ -140,6 +144,7 @@ private:
     virtual void customEventAction(int playerNr, nByte eventCode, const ExitGames::Common::Object& eventContent);
     void GameRecv(NetData recvData);    //ゲーム中受信
     void JoinRecv(NetData recvData);    //入室受信
+    void LobbyRecv(NetData recvData);    //ロビー受信
 
     // receive and print out debug out here
     virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);
@@ -163,7 +168,6 @@ private:
     //地域を決める
     virtual void onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegions*/, const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegionServers*/);
 
-    int startTime = 0;
 
     PhotonState::States mState;
 
@@ -175,10 +179,6 @@ private:
     int sendMs = 1000 / 60.0f * 5;
     //int sendMs = 35;
     int oldMs;
-
-    //入室申請リスト(ホストのみ使用)
-    std::vector<NetData::JoinData> joinManager;
-    bool joinPermission = false;    //入室許可
 
     //各クライアントインプット保存
     struct SaveInput
@@ -219,10 +219,33 @@ private:
         };
         NextInput nextInput;
     };
+    std::vector<SaveInput> saveInputPhoton;
 
+    //ロビーで名前とIDを紐づけする
+    std::string savePlayerName[4];
+
+    //タイマースタート時間
+    int startTime = 0;
+
+    //ゲーム中か
+    bool isGamePlay = false;
+
+    //入室申請リスト(ホストのみ使用)
+    struct JoinManager
+    {
+        NetData::JoinData jData;
+        std::string joinName;
+    };
+    std::vector<JoinManager> joinManager;
+    bool joinPermission = false;    //入室許可
+
+    //遅延フレーム
     int delayFrame = 0;
-
+    //プレイヤーの名前
     std::string netName = {};
 
-    std::vector<SaveInput> saveInputPhoton;
+    //仮機能
+    bool isSendChat = false;    //チャット送信フラグ
+    std::string chat;   //チャット
+    std::vector<std::string> chatList;
 };
