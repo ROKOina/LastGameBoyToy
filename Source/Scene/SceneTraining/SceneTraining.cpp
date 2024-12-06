@@ -71,7 +71,7 @@ void SceneTraining::Initialize()
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/","StageJson / ColliderStage.mdl", "__", 0.005f);
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/","StageJson/ColliderStage.mdl", "__", 0.005f);
     }
 
     //プレイヤー
