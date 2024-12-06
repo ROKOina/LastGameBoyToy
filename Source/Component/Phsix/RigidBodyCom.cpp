@@ -158,9 +158,9 @@ void RigidBodyCom::SetUp()
     data.rotate = GetGameObject()->transform_->GetRotation();  
 
     DirectX::XMFLOAT3 scaleV = GetGameObject().get()->transform_->GetScale();
-    data.scale.x = rigidScale / scaleV.x;
-    data.scale.y = rigidScale / scaleV.y;
-    data.scale.z = rigidScale / scaleV.z;
+    data.scale.x = scaleV.x * rigidScale;
+    data.scale.y = scaleV.y * rigidScale;
+    data.scale.z = scaleV.z * rigidScale;
 
     //ƒ‚ƒfƒ‹
     !useResourcePath.empty()

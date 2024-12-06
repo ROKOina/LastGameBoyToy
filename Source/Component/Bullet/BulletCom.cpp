@@ -481,7 +481,8 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 
     //•¨—
     RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
-    
+    rigid->SetRigidScale(100);
+
     //ƒŒƒ“ƒ_[
     RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
     r->LoadModel("Data/Model/Jankrat/mine.mdl");

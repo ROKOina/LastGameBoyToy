@@ -76,30 +76,31 @@ void SceneNakanisi::Initialize()
         auto& stageObj = GameObjectManager::Instance().Create();
         stageObj->SetName("stage");
         stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
-        stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+        stageObj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        r->LoadModel("Data/Model/AbeStage/mainStage_ver1.mdl");
         r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
         r->SetOutlineIntensity(5.5f);
-        stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+        
+        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Triangle).get();
 
-        //ステージ
-        StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
-        //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl", 0.005f);
-        //Jsonからオブジェクト配置
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
-        //配置したステージオブジェクトの中からGateを取得
-        StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
-        for (auto& obj : placeObj.objList)
-        {
-            DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+        ////ステージ
+        //StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        ////判定生成
+        //stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl", 0.005f);
+        ////Jsonからオブジェクト配置
+        //stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
+        ////配置したステージオブジェクトの中からGateを取得
+        //StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
+        //for (auto& obj : placeObj.objList)
+        //{
+        //    DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
 
-            GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
-            gate->SetDownPos(pos);
-            gate->SetUpPos({ pos.x, 1.85f, pos.z });
-            gate->SetMoveSpeed(0.1f);
-        }
+        //    GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
+        //    gate->SetDownPos(pos);
+        //    gate->SetUpPos({ pos.x, 1.85f, pos.z });
+        //    gate->SetMoveSpeed(0.1f);
+        //}
     }
 
     //プレイヤー
