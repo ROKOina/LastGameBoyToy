@@ -94,6 +94,9 @@ void FarahCom::SubAttackDown()
 //スペーススキル長押し
 void FarahCom::SpaceSkillPushing(float elapsedTime)
 {
+    //初期化
+    GetGameObject()->GetComponent<MovementCom>()->SetAirForce(0.0f);
+
     // クールタイム中は処理を無効化
     if (cooldownTimer > 0.0f)
     {
