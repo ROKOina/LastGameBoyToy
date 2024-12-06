@@ -180,6 +180,15 @@ void PhotonLib::update(float elapsedTime)
     }
     mLoadBalancingClient.service();
 
+    for (int i = 0; i < 4; ++i)
+    {
+        if (addPhotonID[i] >= 0)
+        {
+            AddPlayer(addPhotonID[i], i);
+            addPhotonID[i] = -1;
+        }
+    }
+
     DelayUpdate();
     NetInputUpdate();
     MyCharaInput();
@@ -935,7 +944,7 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 
             case NetData::DATA_KIND::LOBBY:
                 if (joinPermission || GetIsMasterPlayer())
-                LobbyRecv(ne[0]);
+                    LobbyRecv(ne[0]);
                 break;
             }
 
@@ -1115,7 +1124,14 @@ void PhotonLib::JoinRecv(NetData recvData)
 void PhotonLib::LobbyRecv(NetData recvData)
 {
     //キャラ追加
-    AddPlayer(recvData.photonId, recvData.playerId);
+    bool add = true;
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.photonId == recvData.photonId)add = false;
+    }
+    if (add)addPhotonID[recvData.playerId] = recvData.photonId;
+    
+    //AddPlayer(recvData.photonId, recvData.playerId);
 
     //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
@@ -1220,7 +1236,7 @@ void PhotonLib::sendJoinPermissionData(bool request)
     NetData& netD = n.emplace_back(NetData());
     int myPhotonID = GetMyPhotonID();
     netD.photonId = myPhotonID;
-    netD.isMasterClient = GetIsMasterPlayer();    
+    netD.isMasterClient = GetIsMasterPlayer();
     ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
 
     //種別を入室に
@@ -1277,7 +1293,8 @@ void PhotonLib::sendJoinPermissionData(bool request)
                     join.joinPermission = true; //入室を許可
 
                     //空きを探してプレイヤーIDを決定する
-                    bool usedPlayerID[4] = { false };
+                    bool usedPlayerID[4] = { false,false,false,false };
+
                     for (auto& s : saveInputPhoton)
                     {
                         usedPlayerID[s.playerId] = true;

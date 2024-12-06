@@ -220,6 +220,8 @@ private:
         NextInput nextInput;
     };
     std::vector<SaveInput> saveInputPhoton;
+    //’Ç‰Á—\–ñ
+    int addPhotonID[4] = { -1,-1,-1,-1 };
 
     //ƒƒr[‚Å–¼‘O‚ÆID‚ğ•R‚Ã‚¯‚·‚é
     std::string savePlayerName[4];
