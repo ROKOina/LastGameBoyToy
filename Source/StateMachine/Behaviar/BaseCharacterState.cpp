@@ -97,7 +97,7 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown())
+    if (GamePad::BTN_A & owner->GetButtonDown() && moveCom.lock()->OnGround())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
@@ -148,7 +148,7 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown())
+    if (GamePad::BTN_A & owner->GetButtonDown() && moveCom.lock()->OnGround())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
@@ -165,10 +165,11 @@ void BaseCharacter_MoveState::Exit()
 
 void BaseCharacter_JumpState::Enter()
 {
-    if (!moveCom.lock()->OnGround())return;
-
     //ジャンプ
     JumpInput(owner->GetGameObject(), 1.5f);
+
+    //初期設定
+    moveCom.lock()->SetAirForce(0.0f);
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
