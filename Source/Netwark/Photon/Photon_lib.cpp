@@ -966,7 +966,7 @@ void PhotonLib::GameRecv(NetData recvData)
     //プレイヤー追加
     if (!net1)
     {
-        AddPlayer(recvData.photonId, recvData.playerId);
+        //AddPlayer(recvData.photonId, recvData.playerId);
 
         //netプレイヤー
         net1 = GameObjectManager::Instance().Create();
@@ -1114,7 +1114,10 @@ void PhotonLib::JoinRecv(NetData recvData)
 
 void PhotonLib::LobbyRecv(NetData recvData)
 {
-    //マスタークライアント以外
+    //キャラ追加
+    AddPlayer(recvData.photonId, recvData.playerId);
+
+    //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
     {
         //チームを保存
@@ -1235,8 +1238,21 @@ void PhotonLib::sendJoinPermissionData(bool request)
     }
     else    //ホストの処理
     {
+        //重複を防ぐ
+        std::vector<int> joinList;
         for (auto& j : joinManager) //申請リストから審議
         {
+            //重複を防ぐ
+            bool breakFlg = false;
+            for (auto& jIn : joinList)
+            {
+                if (j.jData.photonId == jIn)
+                    breakFlg = true;
+            }
+            if (breakFlg)break;
+            joinList.emplace_back(j.jData.photonId);
+
+            //データ送信
             auto& join = netD.joinData.emplace_back();
             join.photonId = j.jData.photonId;
             join.playerId = j.jData.playerId;
@@ -1296,8 +1312,12 @@ void PhotonLib::sendLobbyData(void)
     ExitGames::Common::Hashtable event;
     std::vector<NetData> n;
     NetData& netD = n.emplace_back(NetData());
+    //ID
     int myPhotonID = GetMyPhotonID();
     netD.photonId = myPhotonID;
+    //ID
+    int myPlayerID = GetMyPlayerID();
+    netD.playerId = myPlayerID;
     netD.isMasterClient = GetIsMasterPlayer();
     ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
 
