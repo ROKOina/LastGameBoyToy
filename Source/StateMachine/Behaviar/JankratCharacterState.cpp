@@ -4,6 +4,7 @@
 #include "Component\System\HitProcessCom.h"
 #include "Component\Bullet\BulletCom.h"
 #include "Component\SkillObj\JankratMineCom.h"
+#include "Component\Bullet\JankratBulletCom.h"
 
 JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -26,7 +27,9 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
 {
     if (charaCom.lock()->GetHaveBullet())
     {
-        RigidBodyCom* rigid = charaCom.lock()->GetHaveBullet()->GetComponent<RigidBodyCom>().get();
+        GameObj bullet = charaCom.lock()->GetHaveBullet();
+        RigidBodyCom* rigid = bullet->GetComponent<RigidBodyCom>().get();
+        JankratBulletCom* jankratBullet = bullet->GetComponent<JankratBulletCom>().get();
 
         //弾がセットされていたら発射
         rigid->SetMass(mass);           //質量
@@ -34,10 +37,12 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true); //速くても貫通しないような計算にするフラグ
         charaCom.lock()->ReleaseHaveBullet();
 
+        jankratBullet->SetLifeTime(bulletLifeTimer);//弾の寿命
+        jankratBullet->SetAddGravity(addGravity);
 
         //TODO 発射地点を銃の位置に変更
         DirectX::XMFLOAT3 vec = owner->GetFpsCameraDir();
-        rigid->AddForce(Mathf::Normalize({vec.x, vec.y + vecY, vec. z}) * force);
+        rigid->AddForce(Mathf::Normalize({ vec.x, vec.y + fireVecY, vec.z }) * force);
     }
 
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
@@ -48,12 +53,13 @@ void JankratCharacter_MainAtkState::ImGui()
     ImGui::DragFloat("Mass", &mass);
     ImGui::DragFloat("Restitution", &restitution);
     ImGui::DragFloat("Force", &force);
-    ImGui::DragFloat("VecY", &vecY);
+    ImGui::DragFloat("BulletLifeTimer", &bulletLifeTimer);
+    ImGui::DragFloat("AddGravity", &addGravity);
+    ImGui::DragFloat("VecY", &fireVecY);
 }
 
 void JankratCharacter_MainSkillState::Enter()
 {
-    
 }
 
 void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)

@@ -769,10 +769,7 @@ void Sprite::OnGUI()
             PathRelativePathToA(relativeTextureFile, dirname, FILE_ATTRIBUTE_DIRECTORY, textureFile, FILE_ATTRIBUTE_ARCHIVE);
 
             // 読み込み
-            spc.filename = relativeTextureFile;
-            LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
-            spc.texSize.x = texture2ddesc_.Width;
-            spc.texSize.y = texture2ddesc_.Height;
+            LoadTexture(relativeTextureFile);
             spc.scale = { 1.0f,1.0f };
             spc.pivot = { texture2ddesc_.Width / 2.0f,texture2ddesc_.Height / 2.0f };
         }
@@ -904,6 +901,15 @@ void Sprite::OnGUI()
     }
 
     ImGui::DragFloat2("numUV", &numUVScroll.x, 0.01f);
+}
+
+void Sprite::LoadTexture(std::string filenaem)
+{
+    spc.filename = filenaem;
+    shaderResourceView_ = nullptr;
+    LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
+    spc.texSize.x = texture2ddesc_.Width;
+    spc.texSize.y = texture2ddesc_.Height;
 }
 
 //シリアライズ

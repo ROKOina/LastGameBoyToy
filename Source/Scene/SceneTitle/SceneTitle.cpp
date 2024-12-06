@@ -28,6 +28,7 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include "Component\Audio\AudioCom.h"
+#include "Scene\SceneTraining\SceneTraining.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -131,15 +132,6 @@ void SceneTitle::Initialize()
             next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
         }
 
-        //‚Î‚Â
-        {
-            {
-                auto& next = obj->AddChildObject();
-                next->SetName("Batu1");
-                next->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/batu1.ui", Sprite::SpriteShader::DEFALT, false);
-            }
-        }
-
         //ƒZƒŒƒNƒg–_
         {
             auto& next = obj->AddChildObject();
@@ -238,7 +230,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
     std::vector<SceneName> names;
     names.emplace_back("PVE", new ScenePVE, 560);
     names.emplace_back("PVP", new ScenePVP, 750);
-    //names.emplace_back("Training", new ScenePVE, 940);
+    names.emplace_back("Training", new SceneTraining, 940);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
     auto& selectB = canvas->GetChildFind("selectBow");
@@ -259,8 +251,6 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
-
-                canvas->GetChildFind("Batu1")->SetEnabled(false);
 
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {

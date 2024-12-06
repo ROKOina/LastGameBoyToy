@@ -51,6 +51,9 @@ void FarahCom::Update(float elapsedTime)
     {
         boostflag = true;
     }
+
+    //ult更新
+    UltUpdate(elapsedTime);
 }
 
 //gui
@@ -63,6 +66,9 @@ void FarahCom::OnGUI()
 //右クリック単発押し処理
 void FarahCom::SubAttackDown()
 {
+    //初期化
+    GetGameObject()->GetComponent<MovementCom>()->SetAirForce(12.620f);
+
     //ステート変更
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
 
@@ -128,6 +134,7 @@ void FarahCom::MainAttackDown()
 //ULT
 void FarahCom::UltSkill()
 {
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 
 static float AH = 0;
@@ -171,4 +178,25 @@ void FarahCom::FPSArmAnimation()
     if (v < 0)v = 0;
 
     arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed = 1 + v * 0.1f;
+}
+
+//ウルト更新
+void FarahCom::UltUpdate(float elapsedTime)
+{
+    //ult使用中
+    if (UseUlt())
+    {
+        ulttimer += elapsedTime;
+
+        const auto& move = GetGameObject()->GetComponent<MovementCom>();
+
+        //時間でult解除ステータスを元に戻す
+        if (ulttimer > 15.0f)
+        {
+            dashgaugemin = 4.0f;
+            move->SetMoveAcceleration(3.0f);
+            FinishUlt();
+            ulttimer = 0.0f;
+        }
+    }
 }

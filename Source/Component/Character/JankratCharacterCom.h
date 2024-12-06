@@ -21,7 +21,6 @@ public:
 
     void ResetShootTimer() { shootTimer = 0; }
 
-
 private:
     //Á‹‚³‚ê‚Ä‚¢‚é’e‚â’n—‹‚ğè•ú‚·
     void EraseHaveObjects();
@@ -35,7 +34,7 @@ public:
     void AddHaveMine(GameObj obj) { haveMine.emplace_back(obj); }
     void ReleaseHaveMine(GameObj obj) { haveMine.erase(std::remove(haveMine.begin(), haveMine.end(), obj), haveMine.end()); }
     void AllReleaseHaveMine()
-    { 
+    {
         for (auto& mine : haveMine)
         {
             mine.reset();

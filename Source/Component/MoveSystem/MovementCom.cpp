@@ -1,6 +1,6 @@
 #include "MovementCom.h"
 #include <imgui.h>
-#include "Math/Mathf.h"
+
 #include "Component/System/TransformCom.h"
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
@@ -45,6 +45,7 @@ void MovementCom::OnGUI()
     ImGui::DragFloat((char*)u8"d—Í‰e‹¿“x", &gravityeffect, 0.01f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"—Ž‰ºƒXƒs[ƒh", &fallspeed, 0.1f, -100.0f, 0.0f);
     ImGui::DragFloat((char*)u8"–€ŽC", &friction_, 0.01f, 0.0f, 40.0f);
+    ImGui::DragFloat((char*)u8"‹ó‹C’ïR", &airForce, 0.01f, 0.0f, 40.0f);
     ImGui::DragFloat((char*)u8"Å‘å‘¬“x", &moveMaxSpeed_, 0.1f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"‰Á‘¬“x", &moveAcceleration_, 0.01f, 0.0f, 10.0f);
     ImGui::DragFloat((char*)u8"ã¸‘¬“x", &risespeed, 0.01f, 0.0f, 30.0f);
@@ -90,8 +91,11 @@ void MovementCom::HorizonUpdate(float elapsedTime)
     HorizonVelocity = DirectX::XMLoadFloat3(&horizonVelocity);
     horiLengthSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(HorizonVelocity));
 
-    // –€ŽC—Í
-    float friction = friction_ * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed());
+    // –€ŽC—Íor‹ó‹C’ïR
+    float friction;
+    onGround_
+        ? friction = friction_ * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed())
+        : friction = airForce * (elapsedTime * Graphics::Instance().GetWorldSpeed() * GetGameObject()->GetObjSpeed());
 
     // –€ŽC—Í“K—p
     if (horiLengthSq > 0.0f)
