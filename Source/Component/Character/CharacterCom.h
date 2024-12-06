@@ -200,7 +200,7 @@ public:
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
 
     //ネット関連変数ゲッター
-    NetCharaData GetNetCharaData() { return netCharaData; }
+    NetCharaData& GetNetCharaData() { return netCharaData; }
 
 private:
     //入力ステート更新
