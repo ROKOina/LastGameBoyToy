@@ -26,5 +26,8 @@ public:
 
     //アイテムを拾った時の処理
     void OnItemPickup();
+
+    //アイテムの動き
+    void TransformItem(float elapsedTime);
   
 };

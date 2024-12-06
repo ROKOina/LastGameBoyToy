@@ -236,24 +236,22 @@ void TrainingSystem::TrainingSystemStart()
         auto& scarecrow1 = GameObjectManager::Instance().Create();
         scarecrow1->SetName("ULTSKILLMAXITEM");
         std::shared_ptr<RendererCom> r = scarecrow1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Enemy/Enemy.mdl");
+        r->LoadModel("Data/Model/Item/item.mdl");
         r->SetOutlineColor({ 1,0,0 });
         r->SetOutlineIntensity(10.0f);
-        scarecrow1->transform_->SetWorldPosition({ 0.0f,0.0f,-2.0f });
-        scarecrow1->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
-        scarecrow1->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+        scarecrow1->transform_->SetWorldPosition({ 0.0f,1.0f,-2.0f });
+        scarecrow1->transform_->SetEulerRotation({ 0.0f,0.0f,30.0f });
+        scarecrow1->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+        scarecrow1->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/UltSkillMaxItem.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = scarecrow1->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         collider->SetJudgeTag(COLLIDER_TAG::Player);
         collider->SetEnabled(true);
         collider->SetRadius(1.0f);
-        scarecrow1->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/noobenemy.nodecollsion");
+
+        scarecrow1->AddComponent<NodeCollsionCom>(nullptr);
         scarecrow1->AddComponent<AnimationCom>();
-        scarecrow1->AddComponent<MovementCom>();
         scarecrow1->AddComponent<UltSkillMaxItem>();
-
-
-
         scarecrow1->AddComponent<AudioCom>();
 
     }
@@ -329,24 +327,22 @@ void TrainingSystem::SpawnItem()
         auto& scarecrow1 = GameObjectManager::Instance().Create();
         scarecrow1->SetName("ULTSKILLMAXITEM");
         std::shared_ptr<RendererCom> r = scarecrow1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Enemy/Enemy.mdl");
+        r->LoadModel("Data/Model/Item/item.mdl");
         r->SetOutlineColor({ 1,0,0 });
         r->SetOutlineIntensity(10.0f);
-        scarecrow1->transform_->SetWorldPosition({ 0.0f,0.0f,-2.0f });
-        scarecrow1->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
-        scarecrow1->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+        scarecrow1->transform_->SetWorldPosition({ 0.0f,1.0f,-2.0f });
+        scarecrow1->transform_->SetEulerRotation({ 0.0f,0.0f,30.0f });
+        scarecrow1->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+        
         std::shared_ptr<SphereColliderCom> collider = scarecrow1->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         collider->SetJudgeTag(COLLIDER_TAG::Player);
         collider->SetEnabled(true);
         collider->SetRadius(1.0f);
-        scarecrow1->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/noobenemy.nodecollsion");
+
+        scarecrow1->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/UltSkillMaxItem.nodecollsion");
         scarecrow1->AddComponent<AnimationCom>();
-        scarecrow1->AddComponent<MovementCom>();
         scarecrow1->AddComponent<UltSkillMaxItem>();
-
-
-
         scarecrow1->AddComponent<AudioCom>();
 
     }
