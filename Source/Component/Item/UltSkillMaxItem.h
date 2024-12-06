@@ -29,5 +29,7 @@ public:
 
     //ƒAƒCƒeƒ€‚Ì“®‚«
     void TransformItem(float elapsedTime);
+
+    float timer = 0.0f;
   
 };

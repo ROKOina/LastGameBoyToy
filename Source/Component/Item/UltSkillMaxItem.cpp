@@ -44,12 +44,12 @@ void UltSkillMaxItem::OnItemPickup()
 //ƒAƒCƒeƒ€‚Ì“®‚«
 void UltSkillMaxItem::TransformItem(float elapsedTime)
 {
-   
+    timer += elapsedTime;
     DirectX::XMFLOAT3 Pos = GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->GetWorldPosition();
     DirectX::XMFLOAT3 Eule = GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->GetEulerRotation();
 
-    Pos.y = 1.0f +0.5f*std::sin(elapsedTime);
-    Eule.y += 3*elapsedTime;
+    Pos.y = 2.0f +0.2f*std::sin(timer);
+    Eule.y += 5*elapsedTime;
 
     GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->SetEulerRotation(Eule);
     GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->SetWorldPosition(Pos);
