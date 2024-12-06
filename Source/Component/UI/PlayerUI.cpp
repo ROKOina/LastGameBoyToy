@@ -579,7 +579,8 @@ void PlayerUIManager::UIUpdate(float elapsedTime)
 void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill,int count)
 {
 
-   std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/";
+   std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/Skill/";
+   std::string iconName = "Data/Texture/KeyBoard/";
    CharacterCom::SkillCoolID skillNum;
    //ˆÊ’u‚ð‚¸‚ç‚·’è”
    const float offset  = 120.0f;
@@ -590,10 +591,12 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill,int count)
        break;
    case E:
        name += "skill_E.png";
+       iconName += "keyboard_e_outline.png";
        skillNum = CharacterCom::SkillCoolID::E;
        break;
    case LEFT_CLICK:
        name += "skill_Q.png";
+       iconName += "mouse_right_outline.png";
        skillNum = CharacterCom::SkillCoolID::LeftClick;
        break;
    default:
@@ -648,6 +651,15 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill,int count)
        skillIcon->GetComponent<UiSystem>()->LoadTexture(name);
        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
 
+   }
+
+   //KeyBoardIcon
+   {
+       std::shared_ptr<GameObject> skillIcon = skillFrame->AddChildObject();
+       skillIcon->SetName("KeyIcon");
+       auto& a = skillIcon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/KeyIcon.ui", Sprite::SpriteShader::DEFALT, false);
+       skillIcon->GetComponent<UiSystem>()->LoadTexture(iconName);
+       a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
    }
 }
 
