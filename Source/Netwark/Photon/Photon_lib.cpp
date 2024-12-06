@@ -949,6 +949,9 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 
 void PhotonLib::GameRecv(NetData recvData)
 {
+    //ゲーム開始フラグ
+    isGamePlay = true;
+
     //マスタークライアント以外はチームを保存
     if (recvData.isMasterClient)
     {
@@ -1135,9 +1138,6 @@ void PhotonLib::LobbyRecv(NetData recvData)
 //送信
 void PhotonLib::sendGameData(void)
 {
-    //ゲーム開始フラグ
-    isGamePlay = true;
-
     ExitGames::Common::Hashtable event;
 
     auto& obj = GameObjectManager::Instance().Find("player");
