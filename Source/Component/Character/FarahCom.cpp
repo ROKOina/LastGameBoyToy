@@ -66,6 +66,9 @@ void FarahCom::OnGUI()
 //右クリック単発押し処理
 void FarahCom::SubAttackDown()
 {
+    //初期化
+    GetGameObject()->GetComponent<MovementCom>()->SetAirForce(0.0f);
+
     //ステート変更
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
 
