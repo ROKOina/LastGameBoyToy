@@ -165,6 +165,8 @@ void BaseCharacter_MoveState::Exit()
 
 void BaseCharacter_JumpState::Enter()
 {
+    if (!moveCom.lock()->OnGround())return;
+
     //ƒWƒƒƒ“ƒv
     JumpInput(owner->GetGameObject(), 1.5f);
 
