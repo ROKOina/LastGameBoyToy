@@ -32,6 +32,10 @@
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 
+
+#include "Component/Renderer/InstanceRendererCom.h"
+
+
 void SceneNakanisi::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -70,6 +74,24 @@ void SceneNakanisi::Initialize()
         eventCamera->AddComponent<EventCameraCom>();
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
+
+    //// Instancingサンプル
+    //{
+    //    // 生成器
+    //    auto& spawnerObj = GameObjectManager::Instance().Create();
+    //    spawnerObj->SetName("spawner");
+    //    spawnerObj->transform_->SetWorldPosition({ 0.00f, 0.0f, 0.000f });
+    //    spawnerObj->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    //    std::shared_ptr<InstanceRenderer> ir = spawnerObj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 1, BLENDSTATE::ALPHA);
+    //    ir->LoadModel("Data/Model/MatuokaStage/Reactor.mdl");
+
+    //    // 大量生産
+    //    for (int i = 0; i < 6; ++i) {
+    //        auto& obj = ir->CreateInstance((i % 2 == 0));
+    //        obj->SetName("instanceOBJ");
+    //        obj->transform_->SetWorldPosition({ 8.0f * (i % 10) - 5, 1.1f, 0.4f * (i / 10) - 5 });
+    //    }
+    //}
 
     //ステージ
     {

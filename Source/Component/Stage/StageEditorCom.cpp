@@ -26,6 +26,7 @@
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\FrustumCom.h"
 #include "Component\Stage\GateGimmickCom.h"
+#include "Component\Renderer\InstanceRendererCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
