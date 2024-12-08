@@ -27,8 +27,6 @@ public:
 
     //UŒ‚ƒEƒ‹ƒgæ“¾
     void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }
-private:
-    void FPSArmAnimation();
 
 private:
     //”­ËŠÔŠu

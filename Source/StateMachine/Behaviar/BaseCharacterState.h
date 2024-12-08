@@ -112,8 +112,8 @@ public:
     BaseCharacter_DeathState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
     void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    void Exit() override;
+    void Execute(const float& elapsedTime) override {};
+    void Exit() override {};
     virtual const char* GetName() const override { return "Death"; }
 
 private:
@@ -128,7 +128,7 @@ class BaseCharacter_HitscanState : public BaseCharacter_BaseState
 public:
     BaseCharacter_HitscanState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
-    void Enter() override;
+    void Enter() override {};
     void Execute(const float& elapsedTime) override;
     void Exit() override;
     void ImGui() override;
@@ -147,7 +147,7 @@ class BaseCharacter_CapsuleState : public BaseCharacter_BaseState
 public:
     BaseCharacter_CapsuleState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
-    void Enter() override;
+    void Enter() override {};
     void Execute(const float& elapsedTime) override;
     void Exit() override;
     void ImGui() override;
@@ -164,7 +164,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit() override;
+    void Exit() override {};
     void ImGui() override;
     virtual const char* GetName() const override { return "StanBall"; }
 
@@ -180,7 +180,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit() override;
+    void Exit() override {};
     void ImGui() override;
     virtual const char* GetName() const override { return "KnockbackBall"; }
 
@@ -197,7 +197,7 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
-    void ImGui() override;
+    void ImGui() override {};
     virtual const char* GetName() const override { return "Ult_Attack"; }
 
 private:
@@ -209,6 +209,6 @@ class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
 public:
     BaseCharacter_NoneAttack(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
-    void Enter() override;
+    void Enter() override {};
     virtual const char* GetName() const override { return "NoneAttack"; }
 };

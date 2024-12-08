@@ -137,49 +137,6 @@ void FarahCom::UltSkill()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 
-static float AH = 0;
-//fps用の腕アニメーション
-void FarahCom::FPSArmAnimation()
-{
-    if (std::string(GetGameObject()->GetName()) != "player")return;
-    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-
-    //待機
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
-
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot"))
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
-    }
-
-    //移動
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
-        {
-            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
-            {
-                if (armAnim->IsEventCalling("attackEnd"))
-                    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-            }
-            else
-                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-        }
-    }
-
-    //アニメーションスピード変更
-    float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
-    float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
-
-    float v = max - fmax;
-    AH = max;
-    if (v < 0)v = 0;
-
-    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed = 1 + v * 0.1f;
-}
-
 //ウルト更新
 void FarahCom::UltUpdate(float elapsedTime)
 {

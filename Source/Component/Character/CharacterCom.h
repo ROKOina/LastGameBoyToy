@@ -201,6 +201,12 @@ public:
     float* GetSkillCoolTimerPointer(SkillCoolID id) { return &skillCools[id].timer; }
     void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
+
+protected:
+
+    //FPS視点の腕アニメーション制御
+    void FPSArmAnimation();
+
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);
@@ -312,5 +318,4 @@ private:
     float lerpSpeed = 4.0f;
 
     bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
-
 };

@@ -184,47 +184,4 @@ void InazawaCharacterCom::UltSkill()
     GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
     //ステートを初期化
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
-
-}
-
-//終わってます。何故ステートマシンか何かを作らなかったの？(不思議でしかたない)by上野
-void InazawaCharacterCom::FPSArmAnimation()
-{
-    if (std::string(GetGameObject()->GetName()) != "player")return;
-    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-
-    //待機
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
-
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot"))
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
-    }
-
-    //移動
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
-        {
-            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
-            {
-                if (armAnim->IsEventCalling("attackEnd"))
-                    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-            }
-            else
-                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-        }
-    }
-
-    //アニメーションスピード変更
-    float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
-    float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
-
-    float v = max - fmax;
-    if (v < 0)v = 0;
-
-    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
-        = 1 + v * 0.1f;
 }

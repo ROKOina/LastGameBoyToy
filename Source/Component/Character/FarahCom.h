@@ -33,9 +33,6 @@ public:
     //ULT
     void UltSkill()override;
 
-    //fps用の腕アニメーション
-    void FPSArmAnimation();
-
 public:
 
     //ウルト更新
