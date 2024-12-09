@@ -202,6 +202,16 @@ public:
     void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
 
+    //時間リセット
+    void ResetShootTimer() { shootTimer = 0; }
+
+    //時間取得
+    // shootTimerのゲッター
+    float GetShootTimer() const { return shootTimer; }
+
+    // shootTimeのゲッター
+    float GetShootTime() const { return shootTime; }
+
 protected:
 
     //FPS視点の腕アニメーション制御
@@ -254,12 +264,6 @@ protected:
         float time = 0;
         float timer = 100;
     };
-    //SkillCoolTime Qcool;
-    //SkillCoolTime Ecool;
-    //SkillCoolTime Rcool;
-    //SkillCoolTime LScool;
-    //SkillCoolTime Spacecool;
-    //SkillCoolTime LeftClickcool;
     SkillCoolTime skillCools[SkillCoolID::MAX];
 
     CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
@@ -271,6 +275,7 @@ protected:
 
     bool boostflag = false;
     float dashGauge = 10;
+    bool attackInputSave = false;   //先行入力
 
 private:
 
@@ -306,6 +311,10 @@ private:
     bool prevIsMaxUlt = false;
     float ultGauge = 0;
     float ultGaugeMax = 100;
+
+    //先行入力関係
+    float shootTimer = 0.0f;
+    float shootTime = 0.6f;
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;

@@ -33,10 +33,31 @@ public:
     //ULT
     void UltSkill()override;
 
-public:
+private:
 
     //ウルト更新
     void UltUpdate(float elapsedTime);
+
+    //銃の打つ間隔とマゼルフラッシュ
+    void ShotSecond();
+
+    //ウルトクールダウン
+    void HandleCooldown(float elapsedTime);
+
+    //ブーストフラグ
+    void HandleBoostFlag();
+
+    //ジャンプ処理
+    void ApplyJumpForce();
+
+    //クールダウンセット
+    void SetCooldown(float time);
+
+    //ダッシュ時間
+    void AddDashGauge(float amount);
+
+    //ウルトリセット
+    void ResetUlt();
 
 public:
 
@@ -45,6 +66,6 @@ public:
 
 private:
     float cooldownTimer = 0.0f;  // クールタイムの残り時間（秒）
+    float ulttimer = 0.0f;       //　ウルト時間
     float dashgaugemin = 4.0f;
-    float ulttimer = 0.0f;
 };

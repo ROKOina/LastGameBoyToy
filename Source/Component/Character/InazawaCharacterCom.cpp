@@ -38,23 +38,6 @@ void InazawaCharacterCom::Update(float elapsedTime)
 
     FPSArmAnimation();
 
-    shootTimer += elapsedTime;
-    //攻撃先行入力
-    if (attackInputSave)
-    {
-        if (shootTimer >= shootTime)
-        {
-            //スキル発動中はリターン
-            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
-            {
-                attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
-            }
-            attackInputSave = false;
-        }
-        if (CharacterInput::MainAttackButton & GetButtonUp())
-            attackInputSave = false;
-    }
-
     //ウルトエフェクト
     if (attackUltRayObj.lock())
     {
@@ -95,9 +78,6 @@ void InazawaCharacterCom::Update(float elapsedTime)
 void InazawaCharacterCom::OnGUI()
 {
     CharacterCom::OnGUI();
-    ImGui::DragFloat("shootTime", &shootTime);
-    ImGui::DragFloat("shootTimer", &shootTimer);
-
     ImGui::DragInt("attackUltCountMax", &attackUltCountMax);
     ImGui::DragInt("attackUltCounter", &attackUltCounter);
 }
@@ -106,15 +86,6 @@ void InazawaCharacterCom::MainAttackDown()
 {
     //スキル発動中はリターン
     if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::SUB_SKILL)return;
-
-    ////発砲アニメーションの場合はリターン
-    //auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    //auto& armAnim = arm->GetComponent<AnimationCom>();
-    //if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
-    //{
-    //    attackInputSave = true; //先行入力保存
-    //    return;
-    //}
 
     //ウルト発動中
     if (UseUlt())
@@ -130,12 +101,6 @@ void InazawaCharacterCom::MainAttackDown()
             FinishUlt();
         }
 
-        return;
-    }
-
-    if (shootTimer < shootTime)
-    {
-        attackInputSave = true; //先行入力保存
         return;
     }
 

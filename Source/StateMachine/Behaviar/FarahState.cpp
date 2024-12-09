@@ -35,6 +35,9 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         //攻撃処理
         BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f);
 
+        //射撃間隔タイマー起動
+        charaCom.lock()->ResetShootTimer();
+
         //ステート変更
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }

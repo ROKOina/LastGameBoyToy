@@ -102,6 +102,23 @@ void CharacterCom::Update(float elapsedTime)
     //ダメージビネット発動
     Vinetto(elapsedTime);
 
+    //攻撃先行入力
+    shootTimer += elapsedTime;
+    if (attackInputSave)
+    {
+        if (shootTimer >= shootTime)
+        {
+            //スキル発動中はリターン
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
+            {
+                attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+            }
+            attackInputSave = false;
+        }
+        if (CharacterInput::MainAttackButton & GetButtonUp())
+            attackInputSave = false;
+    }
+
     //地面について要れば元に戻す
     if (GetGameObject()->GetComponent<MovementCom>()->OnGround())
     {
@@ -178,6 +195,8 @@ void CharacterCom::OnGUI()
 
     if (ImGui::TreeNode("SkillCool"))
     {
+        ImGui::DragFloat("shootTime", &shootTime);
+        ImGui::DragFloat("shootTimer", &shootTimer);
         ImGui::DragFloat("QTime", &skillCools[SkillCoolID::Q].time);
         ImGui::DragFloat("QTimer", &skillCools[SkillCoolID::Q].timer);
         ImGui::Separator();
@@ -277,6 +296,12 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
+        if (shootTimer < shootTime)
+        {
+            attackInputSave = true; //先行入力保存
+            return;
+        }
+
         MainAttackDown();
     }
     else if (CharacterInput::MainAttackButton & GetButton()
@@ -289,6 +314,12 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
+        if (shootTimer < shootTime)
+        {
+            attackInputSave = true; //先行入力保存
+            return;
+        }
+
         MainAttackDown();
     }
     else if (CharacterInput::MainAttackButton & GetButton())

@@ -399,6 +399,12 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
+
+            //マゼルフラッシュ
+            std::shared_ptr<GameObject>particleobj = armChild->AddChildObject();
+            particleobj->SetName("muzzleflash");
+            std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
+            cpuparticle->SetActive(false);
         }
     }
 }
@@ -474,6 +480,12 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
+
+            //マゼルフラッシュ
+            std::shared_ptr<GameObject>particleobj = armChild->AddChildObject();
+            particleobj->SetName("muzzleflash");
+            std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
+            cpuparticle->SetActive(false);
         }
     }
 }

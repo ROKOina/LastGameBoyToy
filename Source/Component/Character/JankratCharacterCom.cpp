@@ -3,6 +3,7 @@
 #include "StateMachine\Behaviar\JankratCharacterState.h"
 #include "Component\SkillObj\JankratMineCom.h"
 #include "Component\Collsion\ColliderCom.h"
+#include "Component\Particle\CPUParticle.h"
 
 void JankratCharacterCom::Start()
 {
@@ -27,6 +28,9 @@ void JankratCharacterCom::Start()
 
 void JankratCharacterCom::Update(float elapsedTime)
 {
+    //銃の打つ間隔とマゼルフラッシュ
+    ShotSecond();
+
     //更新
     CharacterCom::Update(elapsedTime);
 
@@ -39,14 +43,26 @@ void JankratCharacterCom::Update(float elapsedTime)
 
 void JankratCharacterCom::MainAttackDown()
 {
+    //スキル発動中はリターン
+    if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::SUB_SKILL)return;
+
     //弾撃つ
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+    attackInputSave = false;
 }
 
-void JankratCharacterCom::MainSkill()
+//ESKILL
+void JankratCharacterCom::SubSkill()
 {
-    //地雷設置
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
+    if (!UseUlt())
+    {
+        //地雷設置
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
+    }
+    else
+    {
+        ResetSkillCoolTimer(SkillCoolID::E);
+    }
 }
 
 void JankratCharacterCom::SubAttackDown()
@@ -68,5 +84,22 @@ void JankratCharacterCom::EraseHaveObjects()
     for (auto& mine : eraseObjs)
     {
         ReleaseHaveMine(mine);
+    }
+}
+
+//銃の打つ間隔とマゼルフラッシュ
+void JankratCharacterCom::ShotSecond()
+{
+    const auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    const auto& particle = arm->GetChildFind("muzzleflash");
+    DirectX::XMFLOAT3 pos = {};
+    if (arm->GetComponent<AnimationCom>()->IsEventCallingNodePos("MUZZLEFLASH", "gun2", pos))
+    {
+        particle->transform_->SetWorldPosition(pos);
+        particle->GetComponent<CPUParticle>()->SetActive(true);
+    }
+    else
+    {
+        particle->GetComponent<CPUParticle>()->SetActive(false);
     }
 }

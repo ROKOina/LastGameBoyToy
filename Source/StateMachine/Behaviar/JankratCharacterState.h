@@ -33,6 +33,17 @@ public:
     virtual const char* GetName() const override { return "MainAttack"; }
 
 private:
+
+    // 腕アニメーション処理
+    void HandleArmAnimation() const;
+
+    // 弾丸を発射する処理
+    void FireBullet(const GameObj& bullet);
+
+    // 銃の先端位置を取得
+    bool GetGunTipPosition(DirectX::XMFLOAT3& outGunPos) const;
+
+private:
     float mass = 1.0f;
     float restitution = 0.0f;
     float force = 50.0f;
