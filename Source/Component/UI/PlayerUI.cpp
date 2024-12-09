@@ -34,7 +34,6 @@ void UI_Skill::Update(float elapsedTime)
     this->UiSystem::Update(elapsedTime);
 }
 
-
 UI_BoosGauge::UI_BoosGauge(int num)
 {
     player = GameObjectManager::Instance().Find("player");
@@ -473,6 +472,7 @@ UI_Ult_Count::UI_Ult_Count(int num)
     this->num = num;
 }
 
+
 void UI_Ult_Count::Start()
 {
     //親子付け
@@ -519,10 +519,14 @@ void UI_Ult_Count::UpdateCore(float elapsedTime)
 }
 
 
+
+
+
+
 void PlayerUIManager::Register()
 {  
     
-////共通のUI///
+////共通のUI////
     //キャンバス
     auto& canvas = GameObjectManager::Instance().Create();
     canvas->SetName("Canvas");
@@ -542,9 +546,9 @@ void PlayerUIManager::Register()
     //ULT
     CreateUltUI();
     //Hp
-    createHpUI();
+    CreateHpUI();
     //Boost
-    createBoostUI();
+    CreateBoostUI();
 ////////////////////////////////
 
 //キャラ固有のUI
@@ -709,7 +713,7 @@ void PlayerUIManager::CreateUltUI()
     }
 }
 
-void PlayerUIManager::createHpUI()
+void PlayerUIManager::CreateHpUI()
 {
     //ロードするテクスチャを設定(アイコンができてから)
     std::string name = "Data/Texture/PlayerUI/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + "/CharaIcon.png";
@@ -733,7 +737,7 @@ void PlayerUIManager::createHpUI()
     }
 }
 
-void PlayerUIManager::createBoostUI()
+void PlayerUIManager::CreateBoostUI()
 {
     int boostCount = player.lock()->GetComponent<CharacterCom>()->GetDahsGaugeMax()/5;
     //Boost
@@ -751,3 +755,4 @@ void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
     player = obj;
     bookingRegister = true;
 }
+
