@@ -224,7 +224,7 @@ private:
     int addSavePhotonID[4] = { -1,-1,-1,-1 };   //要素がプレイヤーID、値がフォトンIDになる
 
     //ロビーで名前とIDを紐づけする
-    std::string savePlayerName[4];
+    std::string savePlayerName[4];  //ゲーム中に参加処理をするため
 
     //タイマースタート時間
     int startTime = 0;

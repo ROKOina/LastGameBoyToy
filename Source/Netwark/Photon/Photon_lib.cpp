@@ -133,13 +133,25 @@ void PhotonLib::update(float elapsedTime)
                 break;
             }
 
+            static bool firstStartGame = false; //始めてゲーム開始に入った時
             if (isGamePlay) //ゲーム中か
             {
+                //ゲーム開始時に入る
+                if (!firstStartGame)
+                {
+                    //名前を保存
+                    for (auto& s : saveInputPhoton)
+                    {
+                        savePlayerName[s.playerId] = s.name;
+                    }
+                }
+                firstStartGame = true;
                 //ゲーム中情報送信
                 sendGameData();
             }
             else
             {
+                firstStartGame = false;
                 //ロビー中情報送信
                 sendLobbyData();
             }
@@ -207,6 +219,23 @@ void PhotonLib::ImGui()
 
     ImGui::Begin("PhotonNet", nullptr, ImGuiWindowFlags_None);
 
+    if (ImGui::Button("AAdd"))
+    {
+        auto& gameobjM = GameObjectManager::Instance();
+        std::weak_ptr<GameObject> p2 = gameobjM.Find("player");
+        gameobjM.RemoveNowTime(p2);
+
+        //プレイヤー
+        {
+            std::shared_ptr<GameObject> p = gameobjM.CreateNowTime();
+            p->SetName("player");
+            p->transform_->SetWorldPosition({ 0,0,0 });
+            RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, p);
+            gameobjM.CreateNowTimeSaveComponent(p);
+        }
+        int a = 0;
+    }
+
     //ネットネーム表示
     char name[256];
     ::strncpy_s(name, sizeof(name), netName.c_str(), sizeof(name));
@@ -240,6 +269,10 @@ void PhotonLib::ImGui()
     }
     else
     {
+        //ゲーム開始表示のみ
+        bool g = isGamePlay;
+        ImGui::Checkbox("PlayGameLookOnly", &g);
+
         //チーム表示
         if (ImGui::TreeNode("team"))
         {
@@ -252,6 +285,10 @@ void PhotonLib::ImGui()
             ImGui::TreePop();
         }
     }
+
+    //saveI保存プレイヤー数表示
+    int saveINum = saveInputPhoton.size();
+    ImGui::DragInt("saveINum", &saveINum);
 
     //状態表示
     std::string nowState = stateStr[GetPhotonState()];
@@ -987,6 +1024,7 @@ void PhotonLib::GameRecv(NetData recvData)
     }
 
     int myPlayerID = GetMyPlayerID();
+    auto& obj = GameObjectManager::Instance().Find("player");
     //ダメージ情報
     for (int id = 0; id < recvData.gameData.damageData.size(); ++id)
     {
@@ -994,7 +1032,6 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.damageData[id] > 0)
         {
-            auto& obj = GameObjectManager::Instance().Find("player");
             obj->GetComponent<CharaStatusCom>()->AddDamagePoint(-recvData.gameData.damageData[id]);
             break;
         }
@@ -1006,7 +1043,6 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.healData[id] > 0)
         {
-            auto& obj = GameObjectManager::Instance().Find("player");
             obj->GetComponent<CharaStatusCom>()->AddHealPoint(recvData.gameData.healData[id]);
             break;
         }
@@ -1018,7 +1054,6 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.stanData[id] >= 0.1f)
         {
-            auto& obj = GameObjectManager::Instance().Find("player");
             obj->GetComponent<CharacterCom>()->SetStanSeconds(recvData.gameData.stanData[id]);
             break;
         }
@@ -1030,7 +1065,6 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (Mathf::Length(recvData.gameData.knockbackData[id]) >= 0.1f)
         {
-            auto& obj = GameObjectManager::Instance().Find("player");
             obj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(recvData.gameData.knockbackData[id]);
             break;
         }
@@ -1042,7 +1076,6 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (Mathf::Length(recvData.gameData.movePosData[id]) >= 0.1f)
         {
-            auto& obj = GameObjectManager::Instance().Find("player");
             obj->transform_->SetWorldPosition(recvData.gameData.movePosData[id]);
             break;
         }
@@ -1081,7 +1114,7 @@ void PhotonLib::JoinRecv(NetData recvData)
     }
     else    //ホスト以外
     {
-        //入室許可を見てリストに追加
+        //入室許可を見て参加する
         for (auto& j : recvData.joinData)
         {
             //自分だけの処理
@@ -1150,10 +1183,6 @@ void PhotonLib::LobbyRecv(NetData recvData)
     {
         chatList.emplace_back(recvData.lobbyData.chat);
     }
-
-    //名前を保存
-    savePlayerName[recvData.playerId] = recvData.name;
-
 }
 
 //送信

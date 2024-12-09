@@ -119,7 +119,17 @@ void GameObject::OnGUI()
 //親子
 std::shared_ptr<GameObject> GameObject::AddChildObject()
 {
-    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    std::shared_ptr<GameObject> obj = nullptr;
+    auto& GM = GameObjectManager::Instance();
+    //即作成オブジェクトの子供の場合
+    if (GM.isCreatNowTimeObj)
+    {
+        obj = GM.CreateNowTime();
+        GM.creatNowTimeGameChildObject_.emplace_back(obj);
+    }
+    else
+        obj = GM.Create();
+
     //親登録
     obj->parentObject_ = shared_from_this();
     //子供追加
@@ -170,10 +180,76 @@ std::shared_ptr<GameObject> GameObjectManager::Create()
     return obj;
 }
 
+// 即作成（危険出来れば使わない方がいいかも）
+std::shared_ptr<GameObject> GameObjectManager::CreateNowTime()
+{
+    isCreatNowTimeObj = true;
+    std::shared_ptr<GameObject> obj = std::make_shared<GameObject>();
+    obj->AddComponent<TransformCom>();
+    {
+        static int id = 0;
+        char name[256];
+        ::sprintf_s(name, sizeof(name), "Actor%d", id++);
+        obj->SetName(name);
+    }
+
+    return obj;
+}
+void GameObjectManager::CreateNowTimeSaveComponent(std::shared_ptr<GameObject> obj)
+{
+    isCreatNowTimeObj = false;
+
+    //保存コンポーネントを追加
+    StartUpSaveComponent(obj);
+
+    //ここで親子処理
+
+    for (auto& childNowTime : creatNowTimeGameChildObject_)
+    {
+        StartUpSaveComponent(childNowTime);
+    }
+    creatNowTimeGameChildObject_.clear();
+
+    // 描画オブジェクトのソート
+    SortRenderObject();
+    SortInstanceRenderObject();
+}
+
 // 削除
 void GameObjectManager::Remove(std::shared_ptr<GameObject> obj)
 {
     removeGameObject_.insert(obj);
+}
+
+//即削除（危険出来れば使わない方がいいかも）
+void GameObjectManager::RemoveNowTime(std::weak_ptr<GameObject> obj)
+{
+    //オブジェクトを削除
+    {
+        std::weak_ptr<GameObject> parentObj;       
+
+        if (obj.lock()->GetParent())
+            parentObj = obj.lock()->GetParent();
+
+        obj.lock()->OnDestroy();
+        EraseObject(startGameObject_, obj.lock());
+        EraseObject(updateGameObject_, obj.lock());
+
+        std::set<std::shared_ptr<GameObject>>::iterator itSelection = selectionGameObject_.find(obj.lock());
+        if (itSelection != selectionGameObject_.end())
+        {
+            selectionGameObject_.erase(itSelection);
+        }
+
+        //child解放
+        if (!parentObj.expired()) {
+            parentObj.lock()->EraseExpiredChild();
+        }
+    }
+
+    //保存コンポーネント解放
+    EraseComponet();
+
 }
 
 // 全削除
@@ -477,100 +553,107 @@ void GameObjectManager::StartUpObjects()
     if (startGameObject_.empty())return;
 
     for (std::shared_ptr<GameObject>& obj : startGameObject_)
-    {
-        if (!obj)continue;
-
-        //ポストエフェクトがあれば入る
-        std::shared_ptr<PostEffect>posteffectcomp = obj->GetComponent<PostEffect>();
-        if (posteffectcomp)
-        {
-            posteffectobject.emplace_back(posteffectcomp);
-        }
-
-        //レンダラーコンポーネントがあればレンダーオブジェに入れる
-        std::shared_ptr<RendererCom> rendererComponent = obj->GetComponent<RendererCom>();
-        if (rendererComponent)
-        {
-            //モデルをスレッド読み込み
-            rendererComponent->JoinThred();
-            rendererComponent->GetModel()->GetResource()->JoinTexTH();
-
-            renderSortObject_.emplace_back(rendererComponent);
-        }
-
-        //CPUパーティクルオブジェクトがあれば入れる
-        std::shared_ptr<CPUParticle> cpuparticlecomp = obj->GetComponent<CPUParticle>();
-        if (cpuparticlecomp)
-        {
-            cpuparticleobject.emplace_back(cpuparticlecomp);
-        }
-
-        //GPUパーティクルオブジェクトがあれば入る
-        std::shared_ptr<GPUParticle>gpuparticlecomp = obj->GetComponent<GPUParticle>();
-        if (gpuparticlecomp)
-        {
-            gpuparticleobject.emplace_back(gpuparticlecomp);
-        }
-
-        //スプライトオブジェクトがあれば入る
-        std::shared_ptr<Sprite>spritecomp = obj->GetComponent<Sprite>();
-        if (spritecomp)
-        {
-            spriteobject.emplace_back(spritecomp);
-        }
-
-        //インスタンスオブジェクトがあれば入る
-        std::shared_ptr<InstanceRenderer>instancecomp = obj->GetComponent<InstanceRenderer>();
-        if (instancecomp)
-        {
-            instanceobject.emplace_back(instancecomp);
-        }
-
-        //デカールオブジェクトがあれば入る
-        std::shared_ptr<Decal>decalcomp = obj->GetComponent<Decal>();
-        if (decalcomp)
-        {
-            decalobject.emplace_back(decalcomp);
-        }
-
-        //トレイルオブジェクトがあれば入る
-        std::shared_ptr<Trail>trailcomp = obj->GetComponent<Trail>();
-        if (trailcomp)
-        {
-            trailobject.emplace_back(trailcomp);
-        }
-
-        obj->Start();
-        updateGameObject_.emplace_back(obj);
-
-        //当たり判定コンポーネント追加
-        std::shared_ptr<Collider> colliderComponent = obj->GetComponent<Collider>();
-        if (colliderComponent)
-        {
-            colliderObject_.emplace_back(colliderComponent);
-        }
-
-        //押し出し判定コンポーネント追加
-        std::shared_ptr<PushBackCom> pushBackComponent = obj->GetComponent<PushBackCom>();
-        if (pushBackComponent)
-        {
-            pushBackObject_.emplace_back(pushBackComponent);
-        }
-
-        //物理初期設定
-        std::shared_ptr<RigidBodyCom> rigidBodyComponent = obj->GetComponent<RigidBodyCom>();
-        if (rigidBodyComponent)
-        {
-            rigidBodyComponent->SetUp();
-        }
-
-        obj->UpdateTransform();
+    {    
+        //保存コンポーネントを追加
+        StartUpSaveComponent(obj);
     }
     startGameObject_.clear();
 
     // 描画オブジェクトのソート
     SortRenderObject();
     SortInstanceRenderObject();
+}
+
+//保存コンポーネントを追加
+void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
+{
+    if (!obj)return;
+
+    //ポストエフェクトがあれば入る
+    std::shared_ptr<PostEffect>posteffectcomp = obj->GetComponent<PostEffect>();
+    if (posteffectcomp)
+    {
+        posteffectobject.emplace_back(posteffectcomp);
+    }
+
+    //レンダラーコンポーネントがあればレンダーオブジェに入れる
+    std::shared_ptr<RendererCom> rendererComponent = obj->GetComponent<RendererCom>();
+    if (rendererComponent)
+    {
+        //モデルをスレッド読み込み
+        rendererComponent->JoinThred();
+        rendererComponent->GetModel()->GetResource()->JoinTexTH();
+
+        renderSortObject_.emplace_back(rendererComponent);
+    }
+
+    //CPUパーティクルオブジェクトがあれば入れる
+    std::shared_ptr<CPUParticle> cpuparticlecomp = obj->GetComponent<CPUParticle>();
+    if (cpuparticlecomp)
+    {
+        cpuparticleobject.emplace_back(cpuparticlecomp);
+    }
+
+    //GPUパーティクルオブジェクトがあれば入る
+    std::shared_ptr<GPUParticle>gpuparticlecomp = obj->GetComponent<GPUParticle>();
+    if (gpuparticlecomp)
+    {
+        gpuparticleobject.emplace_back(gpuparticlecomp);
+    }
+
+    //スプライトオブジェクトがあれば入る
+    std::shared_ptr<Sprite>spritecomp = obj->GetComponent<Sprite>();
+    if (spritecomp)
+    {
+        spriteobject.emplace_back(spritecomp);
+    }
+
+    //インスタンスオブジェクトがあれば入る
+    std::shared_ptr<InstanceRenderer>instancecomp = obj->GetComponent<InstanceRenderer>();
+    if (instancecomp)
+    {
+        instanceobject.emplace_back(instancecomp);
+    }
+
+    //デカールオブジェクトがあれば入る
+    std::shared_ptr<Decal>decalcomp = obj->GetComponent<Decal>();
+    if (decalcomp)
+    {
+        decalobject.emplace_back(decalcomp);
+    }
+
+    //トレイルオブジェクトがあれば入る
+    std::shared_ptr<Trail>trailcomp = obj->GetComponent<Trail>();
+    if (trailcomp)
+    {
+        trailobject.emplace_back(trailcomp);
+    }
+
+    obj->Start();
+    updateGameObject_.emplace_back(obj);
+
+    //当たり判定コンポーネント追加
+    std::shared_ptr<Collider> colliderComponent = obj->GetComponent<Collider>();
+    if (colliderComponent)
+    {
+        colliderObject_.emplace_back(colliderComponent);
+    }
+
+    //押し出し判定コンポーネント追加
+    std::shared_ptr<PushBackCom> pushBackComponent = obj->GetComponent<PushBackCom>();
+    if (pushBackComponent)
+    {
+        pushBackObject_.emplace_back(pushBackComponent);
+    }
+
+    //物理初期設定
+    std::shared_ptr<RigidBodyCom> rigidBodyComponent = obj->GetComponent<RigidBodyCom>();
+    if (rigidBodyComponent)
+    {
+        rigidBodyComponent->SetUp();
+    }
+
+    obj->UpdateTransform();
 }
 
 void GameObjectManager::CollideGameObjects()
@@ -647,108 +730,8 @@ void GameObjectManager::RemoveGameObjects()
         }
     }
 
-    //各オブジェクト解放(削除)
-      //collider解放
-    for (int col = 0; col < colliderObject_.size(); ++col)
-    {
-        if (colliderObject_[col].expired())
-        {
-            colliderObject_.erase(colliderObject_.begin() + col);
-            --col;
-        }
-    }
-    //pushback解放
-    for (int pb = 0; pb < pushBackObject_.size(); ++pb)
-    {
-        if (pushBackObject_[pb].expired())
-        {
-            pushBackObject_.erase(pushBackObject_.begin() + pb);
-            --pb;
-        }
-    }
-    //renderObject解放
-    for (int ren = 0; ren < renderSortObject_.size(); ++ren)
-    {
-        if (renderSortObject_[ren].expired())
-        {
-            renderSortObject_.erase(renderSortObject_.begin() + ren);
-            --ren;
-        }
-    }
-
-    //posteffect解放
-    for (int pos = 0; pos < posteffectobject.size(); ++pos)
-    {
-        if (posteffectobject[pos].expired())
-        {
-            posteffectobject.erase(posteffectobject.begin() + pos);
-            --pos;
-        }
-    }
-
-    //cpuparticleObject解放
-    for (int per = 0; per < cpuparticleobject.size(); ++per)
-    {
-        if (cpuparticleobject[per].expired())
-        {
-            cpuparticleobject.erase(cpuparticleobject.begin() + per);
-            --per;
-        }
-    }
-
-    //gpuparticleobject解放
-    for (int per = 0; per < gpuparticleobject.size(); ++per)
-    {
-        if (gpuparticleobject[per].expired())
-        {
-            gpuparticleobject.erase(gpuparticleobject.begin() + per);
-            --per;
-        }
-    }
-
-    //spriteobject解放
-    for (int spr = 0; spr < spriteobject.size(); ++spr)
-    {
-        if (spriteobject[spr].expired())
-        {
-            spriteobject.erase(spriteobject.begin() + spr);
-            --spr;
-        }
-    }
-
-    //インスタンス解放
-    for (int ins = 0; ins < instanceobject.size(); ++ins)
-    {
-        if (instanceobject[ins].expired())
-        {
-            instanceobject.erase(instanceobject.begin() + ins);
-            --ins;
-        }
-    }
-
-    //デカール解放
-    for (int d = 0; d < decalobject.size(); ++d)
-    {
-        if (decalobject[d].expired())
-        {
-            decalobject.erase(decalobject.begin() + d);
-            --d;
-        }
-    }
-
-    //トレイル解放
-    for (int t = 0; t < trailobject.size(); ++t)
-    {
-        if (trailobject[t].expired())
-        {
-            trailobject.erase(trailobject.begin() + t);
-            --t;
-        }
-    }
-
-    //ソート
-    SortRenderObject();
-    SortInstanceRenderObject();
+    //保存コンポーネント解放
+    EraseComponet();
 }
 
 // リスター描画
@@ -1118,6 +1101,112 @@ void GameObjectManager::EraseObject(std::vector<std::shared_ptr<GameObject>>& ob
         removeObj->AudioRelease();
         objs.erase(it);
     }
+}
+
+void GameObjectManager::EraseComponet()
+{
+    //各オブジェクト解放(削除)
+  //collider解放
+    for (int col = 0; col < colliderObject_.size(); ++col)
+    {
+        if (colliderObject_[col].expired())
+        {
+            colliderObject_.erase(colliderObject_.begin() + col);
+            --col;
+        }
+    }
+    //pushback解放
+    for (int pb = 0; pb < pushBackObject_.size(); ++pb)
+    {
+        if (pushBackObject_[pb].expired())
+        {
+            pushBackObject_.erase(pushBackObject_.begin() + pb);
+            --pb;
+        }
+    }
+    //renderObject解放
+    for (int ren = 0; ren < renderSortObject_.size(); ++ren)
+    {
+        if (renderSortObject_[ren].expired())
+        {
+            renderSortObject_.erase(renderSortObject_.begin() + ren);
+            --ren;
+        }
+    }
+
+    //posteffect解放
+    for (int pos = 0; pos < posteffectobject.size(); ++pos)
+    {
+        if (posteffectobject[pos].expired())
+        {
+            posteffectobject.erase(posteffectobject.begin() + pos);
+            --pos;
+        }
+    }
+
+    //cpuparticleObject解放
+    for (int per = 0; per < cpuparticleobject.size(); ++per)
+    {
+        if (cpuparticleobject[per].expired())
+        {
+            cpuparticleobject.erase(cpuparticleobject.begin() + per);
+            --per;
+        }
+    }
+
+    //gpuparticleobject解放
+    for (int per = 0; per < gpuparticleobject.size(); ++per)
+    {
+        if (gpuparticleobject[per].expired())
+        {
+            gpuparticleobject.erase(gpuparticleobject.begin() + per);
+            --per;
+        }
+    }
+
+    //spriteobject解放
+    for (int spr = 0; spr < spriteobject.size(); ++spr)
+    {
+        if (spriteobject[spr].expired())
+        {
+            spriteobject.erase(spriteobject.begin() + spr);
+            --spr;
+        }
+    }
+
+    //インスタンス解放
+    for (int ins = 0; ins < instanceobject.size(); ++ins)
+    {
+        if (instanceobject[ins].expired())
+        {
+            instanceobject.erase(instanceobject.begin() + ins);
+            --ins;
+        }
+    }
+
+    //デカール解放
+    for (int d = 0; d < decalobject.size(); ++d)
+    {
+        if (decalobject[d].expired())
+        {
+            decalobject.erase(decalobject.begin() + d);
+            --d;
+        }
+    }
+
+    //トレイル解放
+    for (int t = 0; t < trailobject.size(); ++t)
+    {
+        if (trailobject[t].expired())
+        {
+            trailobject.erase(trailobject.begin() + t);
+            --t;
+        }
+    }
+
+    //ソート
+    SortRenderObject();
+    SortInstanceRenderObject();
 }
 
 #pragma endregion endGameObjectManager
