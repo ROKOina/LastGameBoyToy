@@ -3,6 +3,7 @@
 #include "Component\Renderer\RendererCom.h"
 #include "Math\Mathf.h"
 #include "SystemStruct\TimeManager.h"
+#include "StateMachine\Behaviar\FarahState.h"
 
 //初期化
 void FarahCom::Start()
@@ -17,6 +18,9 @@ void FarahCom::Start()
 
     //ステート登録(攻撃関係)
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<Farah_MainAttackState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<Farah_ESkillState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::ULT, std::make_shared<Farah_UltState>(this));
 
     //初期ステート
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
@@ -30,91 +34,107 @@ void FarahCom::Update(float elapsedTime)
 
     //fps用の腕アニメーション
     FPSArmAnimation();
+
+    // クールタイム更新
+    if (cooldownTimer > 0.0f)
+    {
+        cooldownTimer = (std::max)(0.0f, cooldownTimer - elapsedTime);
+    }
+
+    //ブースト制御
+    const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
+    if (moveCom->OnGround())
+    {
+        boostflag = false;
+    }
+    else
+    {
+        boostflag = true;
+    }
+
+    //ult更新
+    UltUpdate(elapsedTime);
 }
 
 //gui
 void FarahCom::OnGUI()
 {
+    ImGui::DragFloat("cooldownTimer", &cooldownTimer);
     CharacterCom::OnGUI();
 }
 
 //右クリック単発押し処理
 void FarahCom::SubAttackDown()
 {
-    // ステート変更
+    //初期化
+    GetGameObject()->GetComponent<MovementCom>()->SetAirForce(12.620f);
+
+    //ステート変更
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
 
-    // 移動コンポーネント取得
     const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
 
-    // 現在の時間を取得
-    float currentTime = TimeManager::Instance().GetElapsedTime();
+    //初期化
+    moveCom->SetVelocity({ moveCom->GetVelocity().x,0.0f,moveCom->GetVelocity().z });
 
-    // 水平方向のダッシュ力と上昇力に対する減衰設定
-    static constexpr float DASH_POWER_BASE = 75.0f;    // 初期ダッシュ力
-    static constexpr float DASH_DURATION = 5.0f;      // ダッシュ力が持続する時間
-    static constexpr float LIFT_FORCE_BASE = 3.5f;    // 初期上昇力
-    static constexpr float LIFT_DURATION = 1.0f;      // 上昇力が持続する時間
-    static constexpr float GRAVITY = 9.8f;            // 重力加速度
-
-    // 時間経過に応じたダッシュ力の減衰計算
-    float dashPower = DASH_POWER_BASE * (1.0f - (currentTime / DASH_DURATION));
-    dashPower = (std::max)(dashPower, 0.0f); // 力が負にならないよう制限
-
-    // 前方向ベクトル（入力方向またはワールド前方向）
-    DirectX::XMVECTOR frontVec = IsPushLeftStick()
-        ? DirectX::XMLoadFloat3(&SceneManager::Instance().InputVec(GetGameObject()))
-        : DirectX::XMLoadFloat3(&GetGameObject()->transform_->GetWorldFront());
-    frontVec = DirectX::XMVector3Normalize(frontVec); // 正規化
-
-    // 減衰後のダッシュ力を計算
-    DirectX::XMVECTOR dashForce = DirectX::XMVectorScale(frontVec, dashPower);
-    DirectX::XMFLOAT3 dashForceFloat3;
-    DirectX::XMStoreFloat3(&dashForceFloat3, dashForce);
-
-    // 時間経過に応じた上昇力の減衰計算
-    float verticalForce = LIFT_FORCE_BASE - (GRAVITY * currentTime);
-    verticalForce = (std::max)(verticalForce, 0.0f); // 力が負にならないよう制限
-
-    // 最終的な力を計算
-    DirectX::XMFLOAT3 liftForce = {
-        0.0f, // X方向は無し
-        verticalForce, // 上昇力
-        0.0f  // Z方向は無し
+    //一瞬の飛び
+    DirectX::XMFLOAT3 power = {
+        0.0f,
+        Mathf::Lerp(0.0f,13.0f,0.8f),
+        0.0f
     };
 
     // 力を移動コンポーネントに加える
-    moveCom->AddForce(liftForce); // 上昇力
-    moveCom->AddNonMaxSpeedForce({ dashForceFloat3.x, 0.0f, dashForceFloat3.z }); // 水平移動
+    moveCom->AddForce(power);
+
+    // クールタイム設定（0.5秒）
+    cooldownTimer = 0.5f;
+
+    //ダッシュゲージ増加
+    dashGauge += 5.0f;
 }
 
 //スペーススキル長押し
 void FarahCom::SpaceSkillPushing(float elapsedTime)
 {
-    //上昇
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::JUMPLOOP)
+    // クールタイム中は処理を無効化
+    if (cooldownTimer > 0.0f)
     {
-        GetGameObject()->GetComponent<MovementCom>()->Rising(elapsedTime);
+        return; // クールダウン中なので何もしない
+    }
+
+    //上昇
+    if (dashGauge > 0.01f)
+    {
+        if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::JUMPLOOP)
+        {
+            //ゲージ減らす
+            dashGauge -= dashgaugemin * elapsedTime;
+            GetGameObject()->GetComponent<MovementCom>()->Rising(elapsedTime);
+        }
     }
 }
 
 //Eスキル
 void FarahCom::SubSkill()
 {
-    //ステート変更
-    moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::JUMP);
+    if (!UseUlt())
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
+    else
+        ResetSkillCoolTimer(SkillCoolID::E);
+}
 
-    const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
+//メインの攻撃
+void FarahCom::MainAttackDown()
+{
+    //弾丸発射
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+}
 
-    //一瞬の飛び
-    DirectX::XMFLOAT3 power = {
-        0.0f,
-        Mathf::Lerp(0.0f,10.0f,0.8f),
-        0.0f
-    };
-
-    // 力を移動コンポーネントに加える
-    moveCom->AddForce(power);
+//ULT
+void FarahCom::UltSkill()
+{
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 
 static float AH = 0;
@@ -158,4 +178,25 @@ void FarahCom::FPSArmAnimation()
     if (v < 0)v = 0;
 
     arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed = 1 + v * 0.1f;
+}
+
+//ウルト更新
+void FarahCom::UltUpdate(float elapsedTime)
+{
+    //ult使用中
+    if (UseUlt())
+    {
+        ulttimer += elapsedTime;
+
+        const auto& move = GetGameObject()->GetComponent<MovementCom>();
+
+        //時間でult解除ステータスを元に戻す
+        if (ulttimer > 15.0f)
+        {
+            dashgaugemin = 4.0f;
+            move->SetMoveAcceleration(3.0f);
+            FinishUlt();
+            ulttimer = 0.0f;
+        }
+    }
 }

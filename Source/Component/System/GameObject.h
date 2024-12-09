@@ -58,6 +58,7 @@ public:
         std::shared_ptr<T> component = std::make_shared<T>(args...);
         component->SetGameObject(shared_from_this());
 
+ 
         //transform‚Ìê‡‚Í•ÛŽ‚·‚é
         if (std::strcmp(component->GetName(), "Transform") == 0)
             transform_ = std::dynamic_pointer_cast<TransformCom>(component);

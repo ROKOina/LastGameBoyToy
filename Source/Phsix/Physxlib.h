@@ -32,6 +32,46 @@ public:
     //更新処理
     void Update(float elapsedTime);
 
+
+public:
+    //コリジョンレイヤー
+    enum class CollisionLayer
+    {
+        Stage = (1 << 0),
+        Battle = (1 << 1),
+        Public = (1 << 2),
+    };
+
+    enum class ShapeType
+    {
+        Triangle,
+        Convex,
+        Box,
+        Sphere,
+        Cupsule,
+        Sylnder,
+        Complex,
+        None
+    };
+
+    //物理オブジェクト生成時に使用する構造体
+    struct RigidData
+    {
+        DirectX::XMFLOAT3 pos = {};
+        DirectX::XMFLOAT4 rotate = {};
+        DirectX::XMFLOAT3 scale = {};
+
+        bool isStatic = true;
+        ShapeType type = ShapeType::None;
+        std::shared_ptr<ModelResource> model = nullptr;
+        CollisionLayer layer = CollisionLayer::Public;
+
+        float mass = 0.5f;
+        float friction = 0.5f;
+        float restitution = 0.5f;
+        bool useGravity = true;
+    };
+
     bool SphereCast_PhysX(
         const DirectX::XMFLOAT3& pos, 
         const DirectX::XMFLOAT3& dir, 
@@ -44,30 +84,33 @@ public:
         const float maxDistance,
         PxRaycastBuffer& hitBuffer);
 
+    //レイヤーあるバージョン
+    bool RayCast_PhysX(
+        const DirectX::XMFLOAT3& origin,
+        const  DirectX::XMFLOAT3& unitDir,
+        const float maxDistance,
+        PxRaycastBuffer& hitBuffer, PhysXLib::CollisionLayer layer);
+
+
     //オブジェクトの塊を分解してColliderを作る（スタティック専用・主にステージで使う）
-    void GenerateManyCollider(ModelResource* model, float worldScale);
-    void GenerateManyCollider_Convex(ModelResource* model, float worldScale);
+    void GenerateComplexCollider(ModelResource* model, std::string filepath, std::string key, float worldScale, CollisionLayer layer);
 
+    //当たり判定作成
+    physx::PxRigidActor* GenerateCollider(RigidData& data);
+    
+    //判定の形状生成
+    physx::PxShape* MakeShape(RigidData& data);
+    physx::PxShape* Make_TriangleShape(RigidData& data);
+    physx::PxShape* Make_ConvexShape(RigidData& data);
+    physx::PxShape* Make_SphereShape(RigidData& data);
+    physx::PxShape* Make_BoxShape(RigidData& data);
 
-    //Modelの形の当たり判定作成
-    physx::PxRigidActor* GenerateMeshCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale);
-    physx::PxRigidActor* GenerateConvexCollider(bool isStatic, ModelResource* model, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& rotate, const DirectX::XMFLOAT3& scale, float worldScale);
-    //矩形、球、カプセルの当たり判定作成
-    physx::PxRigidActor* GenerateCollider(bool isStatic, NodeCollsionCom::CollsionType type, DirectX::XMFLOAT3 pos, DirectX::XMFLOAT3 scale);
-
-    //MeshDescを保存しているmap取得
-    std::map<std::string, physx::PxTriangleMeshDesc>& GetMeshStlege() { return meshStlege; }
-    //作成されたMeshDesc取得
-    physx::PxTriangleMeshDesc& GetStlegeInMeshDesc(std::string filename) { return meshStlege[filename]; }
     //Scene取得
     PxScene* GetScene() { return gScene; }
     //Physcs取得
     PxPhysics* GetPhysics() { return gPhysics; }
 
 private:
-    //meshColliderの保存場所
-    std::map<std::string, physx::PxTriangleMeshDesc> meshStlege;
-
     PxDefaultAllocator gAllocator;
     PxDefaultErrorCallback gErrorCallback;
 

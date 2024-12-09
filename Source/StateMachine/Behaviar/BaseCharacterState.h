@@ -10,18 +10,12 @@ static void MoveInputVec(std::shared_ptr<GameObject> obj, float speed = 100)
 {
     auto& moveCom = obj->GetComponent<MovementCom>();
 
-    //GamePad gamePad = Input::Instance().GetGamePad();
-
     //“ü—Í’lŽæ“¾
-    //obj->GetComponent<CharacterCom>()->GetLeftStick()
     DirectX::XMFLOAT3 moveVec = SceneManager::Instance().InputVec(obj);
 
     //•à‚­
     DirectX::XMFLOAT3 v = moveVec * speed;
     moveCom->AddForce(v);
-
-    //ù‰ñˆ—
-    //obj->transform_->Turn(moveVec, 0.1f);
 }
 
 //ƒWƒƒƒ“ƒv
@@ -51,8 +45,6 @@ protected:
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
     float HoveringTimer = 0.0f;
-
-private:
 
     DirectX::XMFLOAT3 moveVec = {};
     float HoveringTime = 0.05f;

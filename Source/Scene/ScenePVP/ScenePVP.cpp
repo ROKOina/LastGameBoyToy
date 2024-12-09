@@ -32,6 +32,10 @@
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 
+
+#include "Component/Renderer/InstanceRendererCom.h"
+
+
 void ScenePVP::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -71,6 +75,25 @@ void ScenePVP::Initialize()
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
+    //// Instancingサンプル
+    //{
+    //    // 生成器
+    //    auto& spawnerObj = GameObjectManager::Instance().Create();
+    //    spawnerObj->SetName("spawner");
+    //    spawnerObj->transform_->SetWorldPosition({ 0.00f, 0.0f, 0.000f });
+    //    spawnerObj->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    //    std::shared_ptr<InstanceRenderer> ir = spawnerObj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 1, BLENDSTATE::ALPHA);
+    //    ir->LoadModel("Data/Model/MatuokaStage/Reactor.mdl");
+
+    //    // 大量生産
+    //    for (int i = 0; i < 6; ++i) {
+    //        auto& obj = ir->CreateInstance((i % 2 == 0));
+    //        obj->SetName("instanceOBJ");
+    //        obj->transform_->SetWorldPosition({ 8.0f * (i % 10) - 5, 1.1f, 0.4f * (i / 10) - 5 });
+    //    }
+    //}
+
+
     //ステージ
     {
         auto& stageObj = GameObjectManager::Instance().Create();
@@ -85,6 +108,8 @@ void ScenePVP::Initialize()
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //判定生成
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/","StageJson/ColliderStage.mdl", "__", 0.005f);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
@@ -98,10 +123,6 @@ void ScenePVP::Initialize()
             gate->SetUpPos({ pos.x, 1.85f, pos.z });
             gate->SetMoveSpeed(0.1f);
         }
-
-        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, RigidBodyCom::RigidType::Complex).get();
-        rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
-        rigid->SetNormalizeScale(1);
     }
 
     //プレイヤー
@@ -109,7 +130,7 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::FARAH, obj);
     }
 
     //snowparticle
@@ -119,8 +140,8 @@ void ScenePVP::Initialize()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
-    ////UIゲームオブジェクト生成
-    //CreateUiObject();
+    //UIゲームオブジェクト生成
+   // CreateUiObject();
 
 #pragma endregion
 
@@ -149,6 +170,9 @@ void ScenePVP::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
+    //Ui更新
+    PlayerUIManager::Instance().UIUpdate(elapsedTime);
+
     //ゲームオブジェクトの行列更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
@@ -175,6 +199,7 @@ void ScenePVP::Render(float elapsedTime)
     //オブジェクト生成関数
 #ifdef _DEBUG
     NewObject();
+    RegisterChara::Instance().ImGui();
 #endif
 
     //オブジェクト描画
@@ -255,8 +280,8 @@ void ScenePVP::CreateUiObject()
             std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
             std::shared_ptr<GameObject> ultCore = canvas->AddChildObject();
             ultCore->SetName("ultCore");
-            int value = GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
-            ultCore->AddComponent<UI_Ult_Count>(value);
+            //int value = GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
+            //ultCore->AddComponent<UI_Ult_Count>(value);
         }
 
         ////////////<SKill_E>/////////////////////////////

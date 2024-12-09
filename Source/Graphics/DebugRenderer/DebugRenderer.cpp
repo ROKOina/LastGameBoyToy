@@ -180,26 +180,6 @@ void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position1, const Direc
     cylinders_.emplace_back(cylinder);
 }
 
-void DebugRenderer::DrawRigidMesh(std::string filename, const physx::PxRigidActor* actor)
-{
-    using namespace physx;
-
-    //メッシュデスクを取得
-    physx::PxTriangleMeshDesc& meshDesc = PhysXLib::Instance().GetStlegeInMeshDesc(filename);
-    //トランスフォーム
-    physx::PxTransform transform = actor->getGlobalPose();
-
-    const PxVec3* originalData = static_cast<const PxVec3*>(meshDesc.points.data);
-
-    Mesh mesh;
-    mesh.position += transform.p;
-
-    mesh.rotation.x = transform.q.x;
-    mesh.rotation.y = transform.q.y;
-    mesh.rotation.z = transform.q.z;
-    mesh.rotation.w = transform.q.w;
-}
-
 // 球メッシュ作成
 void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks)
 {

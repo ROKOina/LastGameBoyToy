@@ -403,7 +403,7 @@ void PhotonLib::LobbyImGui()
         }
         //ネットネーム表示
         ::strncpy_s(name, sizeof(name), netName.c_str(), sizeof(name));
-        if(ImGui::InputText("netName", name, sizeof(name)))
+        if (ImGui::InputText("netName", name, sizeof(name)))
         {
             netName = name;
         }
@@ -426,7 +426,6 @@ void PhotonLib::LobbyImGui()
             std::string selectRoom = WStringToString(rooms[i]->getName().cstr());
             if (ImGui::TreeNodeEx(&rooms[i], nodeFlags, selectRoom.c_str()))
             {
-
                 // クリックすると選択
                 if (ImGui::IsItemClicked())
                 {
@@ -903,7 +902,6 @@ void PhotonLib::onAvailableRegions(const ExitGames::Common::JVector<ExitGames::C
 #pragma endregion
 
 ///////////////↓↓↓↓↓           ↓よく使う関数↓           ↓↓↓↓↓///////////////
-
 
 //入室時
 void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player)

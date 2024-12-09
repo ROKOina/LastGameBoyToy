@@ -56,7 +56,6 @@ static bool operator!= (USE_SKILL L, USE_SKILL R)
     return false;
 }
 
-
 class CharacterCom : public Component
 {
 public:
@@ -90,13 +89,6 @@ public:
         ULT,
         NONE,
         MAX,
-    };
-
-    //状態異常の種類
-    enum class AbnormalCondition
-    {
-        STAN,
-        MAX
     };
 
 public:
@@ -191,7 +183,7 @@ public:
     //スキルクールダウン系
     enum SkillCoolID
     {
-        Q, E, R, LeftShift, Space, LeftClick,MAX
+        Q, E, R, LeftShift, Space, LeftClick, MAX
     };
     void SetSkillCoolTime(SkillCoolID id, float time) { skillCools[id].time = time; }
     float GetSkillCoolTime(SkillCoolID id) { return skillCools[id].time; }
@@ -250,6 +242,11 @@ protected:
     //使用スキル
     USE_SKILL myUseSkill = USE_SKILL::NONE;
 
+protected:
+
+    bool boostflag = false;
+    float dashGauge = 10;
+
 private:
 
     // キャラクターの操作入力情報
@@ -261,10 +258,8 @@ private:
 
     //ダッシュ関係
     bool dashFlag = false;
-
-    float dashGauge = 10;
-    float dashGaugeMax = 10;
     float dashGaugeMinus = 1;   //一秒間減る数
+    float dashGaugeMax = 10;
     float dashGaugePlus = 2;
 
     float dashSpeed = 58;
@@ -286,8 +281,6 @@ private:
     bool prevIsMaxUlt = false;
     float ultGauge = 0;
     float ultGaugeMax = 100;
-
-    AbnormalCondition abnormalcondition;
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;

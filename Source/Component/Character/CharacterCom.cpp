@@ -79,11 +79,14 @@ void CharacterCom::Update(float elapsedTime)
             }
 
             //ゲージ増やす
-            //dashGauge += dashGaugePlus * elapsedTime;
-            //if (dashGauge > dashGaugeMax)
-            //{
-            //    dashGauge = dashGaugeMax;
-            //}
+            if (!boostflag)
+            {
+                dashGauge += dashGaugePlus * elapsedTime;
+            }
+            if (dashGauge > dashGaugeMax)
+            {
+                dashGauge = dashGaugeMax;
+            }
         }
     }
     else
@@ -97,11 +100,18 @@ void CharacterCom::Update(float elapsedTime)
 
     //ダメージビネット発動
     Vinetto(elapsedTime);
+
+    //地面について要れば元に戻す
+    if (GetGameObject()->GetComponent<MovementCom>()->OnGround())
+    {
+        GetGameObject()->GetComponent<MovementCom>()->SetAirForce(12.620f);
+    }
 }
 
 void CharacterCom::OnGUI()
 {
     ImGui::Checkbox("isHitAttack", &isHitAttack);
+    ImGui::Checkbox("boostflag", &boostflag);
     ImGui::DragFloat("jump", &jumpPower, 0.1f);
 
     if (ImGui::TreeNode("ult"))
@@ -167,7 +177,6 @@ void CharacterCom::OnGUI()
 
     if (ImGui::TreeNode("SkillCool"))
     {
-
         ImGui::DragFloat("QTime", &skillCools[SkillCoolID::Q].time);
         ImGui::DragFloat("QTimer", &skillCools[SkillCoolID::Q].timer);
         ImGui::Separator();
@@ -223,7 +232,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
 #ifdef _DEBUG
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()
-        && GamePad::BTN_A & GetButton())
+        && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
         MainAttackDown();
     }
@@ -297,7 +306,6 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             isUseUlt = true;
             isMaxUlt = false;
             ultGauge = 0;
-
         }
     }
 }
@@ -395,7 +403,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
             dashGauge -= 5; //最初は一気に減らす
 
             //音
-            GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
+            //GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
         }
         else
         {

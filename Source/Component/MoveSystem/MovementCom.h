@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component/System/Component.h"
+#include "Math/Mathf.h"
 
 #define GRAVITY_NORMAL 0.98
 
@@ -26,6 +27,9 @@ public:
 
     //velocity
     void AddForce(const DirectX::XMFLOAT3& force);
+
+    //y軸だけvelocity
+    void AddForceY(const float& forceY);
 
     //ランダム方向に飛ばす
     void ApplyRandomForce(float forcestrength, float yforce);
@@ -63,6 +67,7 @@ public:
     void ZeroNonMaxSpeedVelocity() { nonMaxSpeedVelocity_ = { 0,0,0 }; }
     const DirectX::XMFLOAT3& GetNonMaxSpeedVelocity()const { return nonMaxSpeedVelocity_; }
     void SetNonMaxSpeedVelocity(DirectX::XMFLOAT3 velo) { nonMaxSpeedVelocity_ = velo; }
+    void AddNonMaxSpeedVelocity(DirectX::XMFLOAT3 velo) { nonMaxSpeedVelocity_ += velo; }
 
     //重力
     const float& GetGravity()const { return gravity_; }
@@ -83,9 +88,18 @@ public:
     // 着地した瞬間のフラグを取得
     bool JustLanded() const { return justLanded_; }
 
+    //壁の判定系
+    bool GetOnWall() { return onWall_; }
+    bool GetWasOnWall() { return wasOnWall_; }
+    bool GetJustHitWall() { return justHitWall_; }
+    void SetUseWallSride(bool flag) { useWallSride_ = flag; }
+
     //摩擦
     const float& GetFriction()const { return friction_; }
-    void SetFriction(float friction) { friction_ = friction; }
+    void SetFriction(float friction) { friction_ = friction; airForce = friction; }
+
+    const float& GetAirForce()const { return airForce; }
+    void SetAirForce(float force) { airForce = force; }
 
     //最大速度
     const float& GetFisrtMoveMaxSpeed()const { return firstMoveMaxSpeed; }  //初期最大速度（基準）
@@ -102,6 +116,10 @@ public:
     const bool& GetIsRaycast()const { return isRaycast; }
     void SetIsRaycast(float isRaycast) { this->isRaycast = isRaycast; }
 
+    //レイキャストに使用するオフセット
+    void SetStepOffset(float num) { stepOffset = num; }
+    void SetAdvanceOffset(float num) { advanceOffset = num; }
+
 #pragma endregion
 
 private:
@@ -113,11 +131,17 @@ private:
     bool onGround_ = false;                    //地面についているか
     bool wasOnGround_ = false;                 // 前フレームの着地状態
     bool justLanded_ = false;                  // 今フレームで着地した瞬間かどうか
+    bool onWall_ = false;                      //壁についてるか
+    bool wasOnWall_ = false;                    //前フレームの壁つき状態
+    bool justHitWall_ = false;                  //今フレームで壁に当たったかどうか
+    bool useWallSride_ = true;                 //壁擦り使用フラグ
     float friction_ = 12.620f;                 //摩擦
+    float airForce = 12.620f;                  //空気抵抗
     float moveMaxSpeed_ = 9.5f;                //最大速度
     float firstMoveMaxSpeed = 8.0f;            //初期最大速度
     float moveAcceleration_ = 3.0f;            //加速度
-    inline static float stepOffset = 0.5f;     //レイキャスト用のオフセット
+    float stepOffset = 0.5f;                   //レイキャスト用(下向き)のオフセット
+    float advanceOffset = 1.0f;                //レイキャスト用(横向き)のオフセット
     bool isRaycast = true;                     //レイキャストをするか（true：使用する）
     float risespeed = 1.5f;                    //上昇速度
     float maxrisespeed = 8.0f;                 //最大上昇速度

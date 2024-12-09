@@ -53,6 +53,7 @@ public:
     std::vector<Node>& GetNodes() { return nodes; }
     const ModelResource* GetResource() const { return resource.get(); }
     ModelResource* GetResource() { return resource.get(); }
+    std::shared_ptr<ModelResource> GetResource_shared() { return resource; }
 
 #ifdef _DEBUG
 

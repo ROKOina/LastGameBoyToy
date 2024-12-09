@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CharacterCom.h"
+#include <algorithm>
 
 class FarahCom : public CharacterCom
 {
@@ -26,8 +27,27 @@ public:
     //Eスキル
     void SubSkill() override;
 
-private:
+    //メインの攻撃
+    void MainAttackDown() override;
+
+    //ULT
+    void UltSkill()override;
 
     //fps用の腕アニメーション
     void FPSArmAnimation();
+
+public:
+
+    //ウルト更新
+    void UltUpdate(float elapsedTime);
+
+public:
+
+    //ゲージ減る速度セット
+    void SetDashuGaugeMins(const float& dashgaugemin_) { dashgaugemin = dashgaugemin_; }
+
+private:
+    float cooldownTimer = 0.0f;  // クールタイムの残り時間（秒）
+    float dashgaugemin = 4.0f;
+    float ulttimer = 0.0f;
 };

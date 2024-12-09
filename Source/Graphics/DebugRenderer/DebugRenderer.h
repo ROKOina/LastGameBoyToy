@@ -28,9 +28,6 @@ public:
     // ‰~’Œ•`‰æ
     void DrawCylinder(const DirectX::XMFLOAT3& position1, const DirectX::XMFLOAT3& position2, float radius, float height, const DirectX::XMFLOAT4& color);
 
-    //Rigidbody‚ÌƒƒbƒVƒ…•`‰æ
-    void DrawRigidMesh(std::string filename, const physx::PxRigidActor* actor);
-
 private:
     // ‹…ƒƒbƒVƒ…ì¬
     void CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks);
