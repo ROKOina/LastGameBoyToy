@@ -57,7 +57,7 @@ private:
     physx::PxTransform rigidTransform = {};
 
     PhysXLib::CollisionLayer layer = PhysXLib::CollisionLayer::Public;
-    float rigidScale = 0.005f;//物理世界の大きさを調整するよう（生成時にしか使用しない
+    float rigidScale = 1.0f;//物理世界の大きさを調整するよう（生成時にしか使用しない
 
     physx::PxRigidBodyFlag::Enum rigidBodyFlag = physx::PxRigidBodyFlag::eENABLE_CCD;
 

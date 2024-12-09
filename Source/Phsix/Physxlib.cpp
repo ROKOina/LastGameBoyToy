@@ -109,7 +109,7 @@ bool PhysXLib::RayCast_PhysX(const DirectX::XMFLOAT3& origin, const DirectX::XMF
     return gScene->raycast(start, dir, maxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
 }
 
-void PhysXLib::GenerateComplexCollider(ModelResource* model, float worldScale, CollisionLayer layer)
+void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepath, std::string key, float worldScale, CollisionLayer layer)
 {
     //判定の形
     int convexIndex = INT_MAX;
@@ -139,12 +139,12 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, float worldScale, C
             #pragma region モデルリソース取得
 
             // 区切り文字 "(" の位置を検索
-            size_t delimiterPos = node.name.find("__");
+            size_t delimiterPos = node.name.find(key);
 
             // 区切り文字が見つかった場合、その位置までの部分文字列を取得
             std::string name = (delimiterPos != std::string::npos) ? node.name.substr(0, delimiterPos) : node.name;
             name += static_cast<std::string>(".mdl");
-            std::string path = static_cast<std::string>("Data/Model/MatuokaStage/") + name;
+            std::string path = filepath + name;
 
             ID3D11Device* device = Graphics::Instance().GetDevice();
             std::shared_ptr<ModelResource> m = std::make_shared<ModelResource>();

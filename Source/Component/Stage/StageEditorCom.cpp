@@ -26,6 +26,7 @@
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\FrustumCom.h"
 #include "Component\Stage\GateGimmickCom.h"
+#include "Component\Renderer\InstanceRendererCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -249,10 +250,13 @@ GameObj StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 posit
 }
 
 //ステージの物理判定生成
-void StageEditorCom::PlaceStageRigidCollider(std::string file, float scale)
+void StageEditorCom::PlaceStageRigidCollider(std::string filePath, std::string dataName, std::string key, float scale)
 {
+    std::string path = filePath + dataName;
+
     PhysXLib::Instance().GenerateComplexCollider(
-        ResourceManager::Instance().GetModelResource(file.c_str()).get(),
+        ResourceManager::Instance().GetModelResource(path.c_str()).get(),
+        filePath, key,
         scale, PhysXLib::CollisionLayer::Stage);
 }
 

@@ -101,4 +101,36 @@ public:
     void TutorialSystemUpdate(float elapsedTime);
     void TutorialSystemStart();
     void TutorialSystemClear();
+
+public:
+    //チュートリアルのID
+    enum TutorialID
+    { MOVE, GUN, SKILL, ULT, END };
+public:
+    //チュートリアル管理システム
+    void TutorialManagerSystem(float elapsedTime);
+
+    //チュートリアルを進める
+    void NextTutorial(TutorialID id);
+public:
+    //動きのチュートリアル管理
+    void MoveTutorialManager(float elapsedTime);
+
+    //銃のチュートリアル管理
+    void GunTutorialManager(float elapsedTime);
+
+    //スキルのチュートリアル管理
+    void SkillTutorialManager(float elapsedTime);
+
+    //ウルトのチュートリアル管理
+    void UltTutorialManager(float elapsedTime);
+private:
+
+    int tutorialID = 0;
+    
+                                           
+    bool moveInspectionFlag = false;         //動きのチュートリアル検査
+    bool gunInspectionFlag = false;          //銃のチュートリアル検査
+    bool skillInspectionFlag = false;        //スキルのチュートリアル検査
+    bool ultInspectionFlag = false;          //ウルトのチュートリアル検査
 };

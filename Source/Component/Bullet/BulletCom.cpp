@@ -12,6 +12,7 @@
 #include "Component\Particle\CPUParticle.h"
 #include <Component\MoveSystem\MovementCom.h>
 #include "Component\Renderer\TrailCom.h"
+#include "Component\Renderer\InstanceRendererCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\SkillObj\JankratMineCom.h"
 #include "KnockBackCom.h"
@@ -292,9 +293,6 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
 
-    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
-    trail->SetTransform(viewObj->transform_->GetWorldTransform());
-
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     float ya;
     if (cameraObj)
@@ -336,10 +334,10 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     moveCom->SetIsRaycast(false);
 
     //パーティクル
-    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Eskill.gpuparticle", 300);
     bulletgpuparticle->Play();
     std::shared_ptr<GameObject>bullettrajectory = viewObj->AddChildObject();
-    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
+    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Eskill_trail.gpuparticle", 400);
     bullettrajectoryparticle->Play();
 
     //判定部分
@@ -373,7 +371,8 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     bulletCom->SetDamageValue(power);
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
-    k->SetKnockBackForce({ 13,5,13 });
+    k->SetKnockBackForce({ 18,5,18 });
+    k->useTestCoad = true;
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
@@ -390,9 +389,6 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     //見た目部分
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
-
-    std::shared_ptr<Trail>trail = viewObj->AddComponent<Trail>("Data/SerializeData/TrailData/trajectory.trail");
-    trail->SetTransform(viewObj->transform_->GetWorldTransform());
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     float ya;
@@ -435,11 +431,10 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     moveCom->SetIsRaycast(false);
 
     //パーティクル
-    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_normalattack.gpuparticle", 200);
     bulletgpuparticle->Play();
-    std::shared_ptr<GameObject>bullettrajectory = viewObj->AddChildObject();
-    std::shared_ptr<GPUParticle>bullettrajectoryparticle = bullettrajectory->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/trajectory.gpuparticle", 200);
-    bullettrajectoryparticle->Play();
+    std::shared_ptr<CPUParticle>bullettrajectoryparticle = viewObj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/farah_normalattack.cpuparticle", 200);
+    bullettrajectoryparticle->SetActive(true);
 
     //判定部分
     GameObj colObj = GameObjectManager::Instance().Create();
@@ -487,14 +482,22 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 
     //物理
     RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
+    rigid->SetRigidScale(100);
+
+    //レンダー
     RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
     r->LoadModel("Data/Model/Jankrat/mine.mdl");
+
+    //InstanceRenderer* instanceRender = bullet->AddComponent<InstanceRenderer>();
 
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
-    coll->SetRadius(1.0f);
+    if (std::strcmp(parent->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.5f);
 
     //弾
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
@@ -538,13 +541,38 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    coll->SetJudgeTag(COLLIDER_TAG::Enemy);
-    coll->SetRadius(1.0f);
+    if (std::strcmp(parent->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.5f);
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(damage);
+
+    //吹き飛ばし用子供オブジェクト
+    GameObj kcockBack = bullet->AddChildObject();
+
+    //コライダー
+    std::shared_ptr<SphereColliderCom> childColl = kcockBack->AddComponent<SphereColliderCom>();
+    childColl->SetMyTag(COLLIDER_TAG::Impact);
+    if (std::strcmp(parent->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    childColl->SetRadius(2.5f);
+
+    float knockBackForce = 5.0f;
+    KnockBackCom* childKcockBack = kcockBack->AddComponent<KnockBackCom>().get();
+    childKcockBack->SetKnockBackForce({ 18,7,18 });
+    childKcockBack->useTestCoad = true;
+
+    ////判定用
+    //std::shared_ptr<HitProcessCom> childHit = kcockBack->AddComponent<HitProcessCom>(parent);
+    //childHit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
+    //childHit->SetValue3(fpsDir * knockBackForce);
 
     return bullet;
 }

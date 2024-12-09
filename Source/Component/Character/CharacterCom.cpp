@@ -100,6 +100,12 @@ void CharacterCom::Update(float elapsedTime)
 
     //ダメージビネット発動
     Vinetto(elapsedTime);
+
+    //地面について要れば元に戻す
+    if (GetGameObject()->GetComponent<MovementCom>()->OnGround())
+    {
+        GetGameObject()->GetComponent<MovementCom>()->SetAirForce(12.620f);
+    }
 }
 
 void CharacterCom::OnGUI()

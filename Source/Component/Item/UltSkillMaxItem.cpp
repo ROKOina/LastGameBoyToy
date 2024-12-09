@@ -2,6 +2,7 @@
 #include "Component/Collsion/ColliderCom.h"
 #include "Component/Character/CharacterCom.h"
 #include "Scene/SceneTraining/TrainingManager.h"
+#include "Component/System/TransformCom.h"
 void UltSkillMaxItem::Start()
 {
 
@@ -10,6 +11,8 @@ void UltSkillMaxItem::Start()
 void UltSkillMaxItem::Update(float elapsedTime)
 {
     OnItemPickup();
+
+    TransformItem(elapsedTime);
 }
 
 void UltSkillMaxItem::OnGUI()
@@ -36,6 +39,18 @@ void UltSkillMaxItem::OnItemPickup()
             }
         }
     }
-  
-    
+}
+
+//ƒAƒCƒeƒ€‚Ì“®‚«
+void UltSkillMaxItem::TransformItem(float elapsedTime)
+{
+    timer += elapsedTime;
+    DirectX::XMFLOAT3 Pos = GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->GetWorldPosition();
+    DirectX::XMFLOAT3 Eule = GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->GetEulerRotation();
+
+    Pos.y = 2.0f +0.2f*std::sin(timer);
+    Eule.y += 5*elapsedTime;
+
+    GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->SetEulerRotation(Eule);
+    GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->SetWorldPosition(Pos);
 }

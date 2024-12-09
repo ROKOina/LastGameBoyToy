@@ -47,9 +47,7 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
         PlayerUIManager::Instance().BookingRegistrationUI(obj);
-        
     }
-
 }
 
 //imgui
@@ -448,7 +446,6 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
-    
     //自分かネットのプレイヤーで
     if (std::strcmp(obj->GetName(), "player") == 0)
     {

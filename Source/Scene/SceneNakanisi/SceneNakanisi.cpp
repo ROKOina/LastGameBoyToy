@@ -32,6 +32,10 @@
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 
+
+#include "Component/Renderer/InstanceRendererCom.h"
+
+
 void SceneNakanisi::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -71,24 +75,41 @@ void SceneNakanisi::Initialize()
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
+    //// Instancingサンプル
+    //{
+    //    // 生成器
+    //    auto& spawnerObj = GameObjectManager::Instance().Create();
+    //    spawnerObj->SetName("spawner");
+    //    spawnerObj->transform_->SetWorldPosition({ 0.00f, 0.0f, 0.000f });
+    //    spawnerObj->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    //    std::shared_ptr<InstanceRenderer> ir = spawnerObj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 1, BLENDSTATE::ALPHA);
+    //    ir->LoadModel("Data/Model/MatuokaStage/Reactor.mdl");
+
+    //    // 大量生産
+    //    for (int i = 0; i < 6; ++i) {
+    //        auto& obj = ir->CreateInstance((i % 2 == 0));
+    //        obj->SetName("instanceOBJ");
+    //        obj->transform_->SetWorldPosition({ 8.0f * (i % 10) - 5, 1.1f, 0.4f * (i / 10) - 5 });
+    //    }
+    //}
+
     //ステージ
     {
         auto& stageObj = GameObjectManager::Instance().Create();
         stageObj->SetName("stage");
-        stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
-        stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+        stageObj->transform_->SetWorldPosition({ 0.00f, 0.00f, 0.000f });
+        stageObj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
-        r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
-        r->SetOutlineIntensity(5.5f);
-        stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-
+        r->LoadModel("Data/Model/AbeStage/TestStage.mdl");
+        //r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
+        //r->SetOutlineIntensity(5.5f);
+        
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl", 0.005f);
+        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/","testStage.mdl", "__", 0.05);
         //Jsonからオブジェクト配置
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
+        //stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
         StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
         for (auto& obj : placeObj.objList)
@@ -115,30 +136,6 @@ void SceneNakanisi::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("snowparticle");
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
-    }
-
-    //サンドバック
-    {
-        auto& boss = GameObjectManager::Instance().Create();
-        boss->SetName("SundBug");
-        std::shared_ptr<RendererCom> r = boss->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
-        r->SetOutlineColor({ 1,0,0 });
-        r->SetOutlineIntensity(10.0f);
-        boss->transform_->SetWorldPosition({ 0.0f,0.0f,0.0f });
-        boss->transform_->SetScale({ 0.23f, 0.23f, 0.23f });
-        boss->AddComponent<MovementCom>();
-        boss->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
-        std::shared_ptr<SphereColliderCom> collider = boss->AddComponent<SphereColliderCom>();
-        collider->SetMyTag(COLLIDER_TAG::Enemy);
-        boss->AddComponent<AnimationCom>();
-        std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
-        pushBack->SetRadius(1.5f);
-        pushBack->SetWeight(600.0f);
-        auto& charaStatusCom = boss->AddComponent<CharaStatusCom>();
-        charaStatusCom->SetInvincibleTime(0.1f);
-        charaStatusCom->SetHitPoint(2000);
-        charaStatusCom->SetMaxHitPoint(2000);
     }
 
     //UIゲームオブジェクト生成

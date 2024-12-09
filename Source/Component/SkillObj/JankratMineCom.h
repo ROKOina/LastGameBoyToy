@@ -48,6 +48,7 @@ private:
 
     bool isPlant = false;    //設置フラグ
     bool explosionFlag = false; //爆発中フラグ
+    bool explosionBegin = false; //起爆フラグ
 
     int damageValue = 10;
 };

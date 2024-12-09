@@ -2,6 +2,7 @@
 #include "StateMachine\Behaviar\BaseCharacterState.h"
 #include "StateMachine\Behaviar\JankratCharacterState.h"
 #include "Component\SkillObj\JankratMineCom.h"
+#include "Component\Collsion\ColliderCom.h"
 
 void JankratCharacterCom::Start()
 {

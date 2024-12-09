@@ -33,7 +33,7 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
 
         //攻撃処理
-        BulletCreate::FarahDamageFire(owner->GetGameObject(), 65.0f);
+        BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f);
 
         //ステート変更
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
@@ -44,9 +44,8 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
 #pragma region ult攻撃
 void Farah_UltState::Enter()
 {
-}
-void Farah_UltState::Execute(const float& elapsedTime)
-{
+    moveCom.lock()->SetMoveAcceleration(5.0f);
+    charaCom.lock()->SetDashuGaugeMins(2.0f);
 }
 #pragma endregion
 

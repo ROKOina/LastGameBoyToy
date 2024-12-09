@@ -68,13 +68,10 @@ void SceneTraining::Initialize()
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
        
-        
-        stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
-
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl", 0.005f);
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/","StageJson/ColliderStage.mdl", "__", 0.005f);
     }
 
     //プレイヤー
