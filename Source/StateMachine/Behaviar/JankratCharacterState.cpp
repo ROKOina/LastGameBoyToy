@@ -23,15 +23,13 @@ void JankratCharacter_MainAtkState::Enter()
     {
         return;
     }
-    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBulletFire(owner->GetGameObject(), pos, charaCom.lock()->GetNetCharaData().GetCharaID()));
-}
 
     // 銃の先端位置を取得
     DirectX::XMFLOAT3 gunPos;
     if (GetGunTipPosition(gunPos))
     {
         // 弾丸を作成しセット
-        const auto& bullet = BulletCreate::JankratBulletFire(owner->GetGameObject(), gunPos, charaComponent->GetCharaID());
+        const auto& bullet = BulletCreate::JankratBulletFire(owner->GetGameObject(), gunPos, charaCom.lock()->GetNetCharaData().GetCharaID());
         charaComponent->SetHaveBullet(bullet);
     }
 }
@@ -168,7 +166,7 @@ void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
                 gunNode->worldTransform._43
             };
 
-            charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, 100.0f, 20, owner->GetCharaID()));
+            charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, 100.0f, 20, charaCom.lock()->GetNetCharaData().GetCharaID()));
             ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
         }
     }
