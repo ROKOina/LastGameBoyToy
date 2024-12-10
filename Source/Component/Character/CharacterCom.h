@@ -121,6 +121,8 @@ public:
     //R
     virtual void UltSkill() {};
 
+    virtual void Reload() {};
+
     //LeftShift (ŒÅ’èƒ_ƒbƒVƒ…)
     void DashFewSub(float elapsedTime);
 
