@@ -81,7 +81,7 @@ private:
     {
         DirectX::XMFLOAT4 particlecolor = { 1,1,1,1 };
         DirectX::XMFLOAT3 intensity = { 1,1,1 };
-        float dummy = {};
+        float dissolveThreshold = 0.0f;
     };
     std::unique_ptr<ConstantBuffer<CPUParticleConstant>>m_cc;
 
@@ -151,4 +151,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D11InputLayout>  m_inputlayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_vertexbuffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_shaderresourceview;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_dissolveshaderresourceview;
 };

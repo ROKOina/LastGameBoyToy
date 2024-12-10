@@ -31,5 +31,5 @@ cbuffer CPUParticleConstants : register(b5)
 {
     float4 cpuparticlecolor;
     float3 cpuparticleluminance;
-    float cpuparticledummy;
+    float dissolveThreshold;
 }

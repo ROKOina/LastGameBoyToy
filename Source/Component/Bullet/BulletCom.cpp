@@ -505,9 +505,17 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(1);
 
-    //パーティクル付属
-    std::shared_ptr<GPUParticle>particle = bullet->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/jankurat_mainattack.gpuparticle", 300);
-    particle->Play();
+    //爆発エフェクト付属
+    std::shared_ptr<GameObject> bomber = bullet->AddChildObject();
+    bomber->SetName("bomber");
+    std::shared_ptr<CPUParticle>b = bomber->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratbomber.cpuparticle", 200);
+    b->SetActive(true);
+
+    //爆発破壊エフェクト
+    std::shared_ptr<GameObject> explosion = bomber->AddChildObject();
+    explosion->SetName("explosion");
+    std::shared_ptr<CPUParticle>ex = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratexplosion.cpuparticle", 200);
+    ex->SetActive(false);
 
     //RigidBodyのAddForceが生成時に使えないのでここで返す
     return bullet;
@@ -556,6 +564,7 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
 
     //吹き飛ばし用子供オブジェクト
     GameObj kcockBack = bullet->AddChildObject();
+    kcockBack->SetName("knockback");
 
     //コライダー
     std::shared_ptr<SphereColliderCom> childColl = kcockBack->AddComponent<SphereColliderCom>();
@@ -566,15 +575,15 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
         coll->SetJudgeTag(COLLIDER_TAG::Player);
     childColl->SetRadius(2.5f);
 
-    float knockBackForce = 5.0f;
     KnockBackCom* childKcockBack = kcockBack->AddComponent<KnockBackCom>().get();
     childKcockBack->SetKnockBackForce({ 18,7,18 });
     childKcockBack->useTestCoad = true;
 
-    ////判定用
-    //std::shared_ptr<HitProcessCom> childHit = kcockBack->AddComponent<HitProcessCom>(parent);
-    //childHit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
-    //childHit->SetValue3(fpsDir * knockBackForce);
+    //爆発破壊エフェクト
+    std::shared_ptr<GameObject> explosion = bullet->AddChildObject();
+    explosion->SetName("explosion");
+    std::shared_ptr<CPUParticle>ex = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratexplosion.cpuparticle", 200);
+    ex->SetActive(false);
 
     return bullet;
 }
