@@ -4,6 +4,12 @@
 #include "Component\SkillObj\JankratMineCom.h"
 #include "Component\Collsion\ColliderCom.h"
 
+JankratCharacterCom::~JankratCharacterCom()
+{
+    ReleaseHaveBullet();
+    AllReleaseHaveMine();
+}
+
 void JankratCharacterCom::Start()
 {
     //ステート登録
