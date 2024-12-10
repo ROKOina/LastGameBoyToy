@@ -132,8 +132,8 @@ private:
     bool wasOnGround_ = false;                 // 前フレームの着地状態
     bool justLanded_ = false;                  // 今フレームで着地した瞬間かどうか
     bool onWall_ = false;                      //壁についてるか
-    bool wasOnWall_ = false;                    //前フレームの壁つき状態
-    bool justHitWall_ = false;                  //今フレームで壁に当たったかどうか
+    bool wasOnWall_ = false;                   //前フレームの壁つき状態
+    bool justHitWall_ = false;                 //今フレームで壁に当たったかどうか
     bool useWallSride_ = true;                 //壁擦り使用フラグ
     float friction_ = 12.620f;                 //摩擦
     float airForce = 12.620f;                  //空気抵抗

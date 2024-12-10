@@ -196,6 +196,22 @@ public:
     //ネット関連変数ゲッター
     NetCharaData& GetNetCharaData() { return netCharaData; }
 
+
+    //時間リセット
+    void ResetShootTimer() { shootTimer = 0; }
+
+    //時間取得
+    // shootTimerのゲッター
+    float GetShootTimer() const { return shootTimer; }
+
+    // shootTimeのゲッター
+    float GetShootTime() const { return shootTime; }
+
+protected:
+
+    //FPS視点の腕アニメーション制御
+    void FPSArmAnimation();
+
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);
@@ -248,6 +264,7 @@ protected:
 
     bool boostflag = false;
     float dashGauge = 10;
+    bool attackInputSave = false;   //先行入力
 
 private:
 
@@ -283,6 +300,10 @@ private:
     bool prevIsMaxUlt = false;
     float ultGauge = 0;
     float ultGaugeMax = 100;
+
+    //先行入力関係
+    float shootTimer = 0.0f;
+    float shootTime = 0.6f;
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;
