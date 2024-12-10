@@ -127,7 +127,15 @@ void SceneNakanisi::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        obj->transform_->SetWorldPosition({ 0,0,0 });
+
+        //配置したステージオブジェクトの中からスポーン位置を取得
+        StageEditorCom* edit = GameObjectManager::Instance().Find("stage")->GetComponent<StageEditorCom>().get();
+        StageEditorCom::PlaceObject spawnObj = edit->GetPlaceObject("Spawn");
+
+        // イテレータを使って指定の位置まで進む
+        auto it = spawnObj.objList.begin();
+        std::advance(it, 0);
+        obj->transform_->SetWorldPosition(it->get()->transform_->GetWorldPosition());
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj);
     }
 
