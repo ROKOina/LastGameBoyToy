@@ -405,6 +405,7 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     moveCom->SetGravity(0.0f);
     moveCom->SetFriction(0.0f);
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+    moveCom->SetIsRaycast(false);
 
     //銃口から発射する
     if (cameraObj)
@@ -428,8 +429,6 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
         }
     }
 
-    moveCom->SetIsRaycast(false);
-
     //パーティクル
     const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_normalattack.gpuparticle", 200);
     bulletgpuparticle->Play();
@@ -448,9 +447,8 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     moveCom = colObj->AddComponent<MovementCom>();
     moveCom->SetGravity(0.0f);
     moveCom->SetFriction(0.0f);
-
+    moveCom->SetIsRaycast(true);
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
-    moveCom->SetIsRaycast(false);
 
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
@@ -459,6 +457,10 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
     coll->SetRadius(0.6f);
+
+    //爆発パーティクル生成
+    std::shared_ptr<GPUParticle>bomberparticle = colObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_bomber_normal.gpuparticle", 200);
+    bomberparticle->SetLoop(false);
 
     //弾
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();

@@ -5,6 +5,7 @@
 #include "SystemStruct\TimeManager.h"
 #include "StateMachine\Behaviar\FarahState.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Particle\GPUParticle.h"
 
 // 定数
 constexpr float JUMP_FORCE = 12.62f;
@@ -44,6 +45,7 @@ void FarahCom::Update(float elapsedTime)
     ShotSecond();
     CharacterCom::Update(elapsedTime);
     FPSArmAnimation();
+    GroundBomber();
 }
 
 // GUI
@@ -163,6 +165,18 @@ void FarahCom::ResetUlt()
     GetGameObject()->GetComponent<MovementCom>()->SetMoveAcceleration(3.0f);
     FinishUlt();
     ulttimer = 0.0f;
+}
+
+//地面に付けば爆発する処理
+void FarahCom::GroundBomber()
+{
+    if (const auto& damageball = GameObjectManager::Instance().Find("damageball"))
+    {
+        if (damageball->GetComponent<MovementCom>()->OnGround())
+        {
+            damageball->GetComponent<GPUParticle>()->SetLoop(true);
+        }
+    }
 }
 
 // クールダウンの管理

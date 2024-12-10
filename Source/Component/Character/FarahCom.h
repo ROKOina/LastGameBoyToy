@@ -59,6 +59,9 @@ private:
     //ウルトリセット
     void ResetUlt();
 
+    //地面に付けば爆発する処理
+    void GroundBomber();
+
 public:
 
     //ゲージ減る速度セット
