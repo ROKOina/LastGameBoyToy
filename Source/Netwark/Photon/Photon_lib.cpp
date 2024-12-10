@@ -14,6 +14,7 @@
 #include "Component/Collsion/ColliderCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
+#include "Component\Stage\StageEditorCom.h"
 
 #include "StaticSendDataManager.h"
 
@@ -907,6 +908,18 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 
                 RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(ne[0].charaID), net1);
                 net1->GetComponent<CharacterCom>()->SetNetID(playerNr);
+                
+                //スポーン位置の初期設定
+                //TODO ロビーやゲームスタート時の処理が固まってきたら消す
+                       
+                //配置したステージオブジェクトの中からスポーン位置を取得
+                StageEditorCom* edit = GameObjectManager::Instance().Find("stage")->GetComponent<StageEditorCom>().get();
+                StageEditorCom::PlaceObject spawnObj = edit->GetPlaceObject("Spawn");
+
+                // イテレータを使って指定の位置まで進む
+                auto it = spawnObj.objList.begin();
+                std::advance(it, playerNr);
+                net1->transform_->SetWorldPosition(it->get()->transform_->GetWorldPosition());
             }
 
             //ダメージ情報

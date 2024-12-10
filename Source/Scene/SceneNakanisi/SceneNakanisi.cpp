@@ -109,18 +109,18 @@ void SceneNakanisi::Initialize()
         //判定生成
         stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/","testStage.mdl", "__", 0.05);
         //Jsonからオブジェクト配置
-        //stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
-        //配置したステージオブジェクトの中からGateを取得
-        StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
-        for (auto& obj : placeObj.objList)
-        {
-            DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage_Spawn.json");
+        ////配置したステージオブジェクトの中からGateを取得
+        //StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
+        //for (auto& obj : placeObj.objList)
+        //{
+        //    DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
 
-            GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
-            gate->SetDownPos(pos);
-            gate->SetUpPos({ pos.x, 1.85f, pos.z });
-            gate->SetMoveSpeed(0.1f);
-        }
+        //    GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
+        //    gate->SetDownPos(pos);
+        //    gate->SetUpPos({ pos.x, 1.85f, pos.z });
+        //    gate->SetMoveSpeed(0.1f);
+        //}
     }
 
     //プレイヤー

@@ -488,8 +488,6 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
     RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
     r->LoadModel("Data/Model/Jankrat/mine.mdl");
 
-    //InstanceRenderer* instanceRender = bullet->AddComponent<InstanceRenderer>();
-
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
@@ -501,11 +499,6 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 
     //弾
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
-
-    //判定用
-    std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
-    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    hit->SetValue(1);
 
     //RigidBodyのAddForceが生成時に使えないのでここで返す
     return bullet;
