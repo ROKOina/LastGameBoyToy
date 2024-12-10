@@ -167,13 +167,13 @@ void SceneGame::Initialize()
     std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
     obj->SetName("Audio Test SE");
     std::shared_ptr<AudioSource> audio = obj->AddComponent<AudioSource>();
-    audio->SetAudio(static_cast<int>(AUDIOID::SE));
+    audio->SetAudioResourceId(static_cast<int>(AUDIOID::SE));
     audio->SetAudioName("Test");
 
     audio->SetListener(playerObj->transform_->GetWorldPosition(), playerObj->transform_->GetWorldFront(), playerObj->transform_->GetWorldUp());
     audio->SetEmitter(bossObj->transform_->GetWorldPosition(), bossObj->transform_->GetWorldFront(), bossObj->transform_->GetWorldFront());
 
-    audio->EmitterPlay(true, 10.0f);
+    audio->Play3D(true, 10.0f);
     //audio->Play(true);
 #pragma endregion
 

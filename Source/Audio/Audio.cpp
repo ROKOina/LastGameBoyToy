@@ -26,7 +26,7 @@ Audio::Audio()
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 	// X3DAudio‰Šú‰»
-	DWORD speakerChannelMask = 0;
+	DWORD speakerChannelMask;
 	hr = masteringVoice_->GetChannelMask(&speakerChannelMask);
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
