@@ -73,10 +73,10 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-    c->SetCharaID(int(CHARA_LIST::INAZAWA));
+    c->GetNetCharaData().SetCharaID(int(CHARA_LIST::INAZAWA));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 5.0f);
-    c->SetUseSkill(USE_SKILL::E | USE_SKILL::LEFT_CLICK);
+    c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
@@ -233,7 +233,7 @@ void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject>& obj)
     obj->AddComponent<CharaStatusCom>();
     obj->AddComponent<MovementCom>();
     std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
-    c->SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
+    c->GetNetCharaData().SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
 
     //煙のエフェクト
     {
@@ -339,10 +339,10 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
     std::shared_ptr<FarahCom> c = obj->AddComponent<FarahCom>();
-    c->SetCharaID(int(CHARA_LIST::FARAH));
+    c->GetNetCharaData().SetCharaID(int(CHARA_LIST::FARAH));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
-    c->SetUseSkill(USE_SKILL::E | USE_SKILL::LEFT_CLICK);
+    c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
@@ -420,7 +420,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
-    charaCom->SetCharaID(int(CHARA_LIST::JANKRAT));
+    charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
 
     //HPの初期設定
     status->SetMaxHitPoint(200);

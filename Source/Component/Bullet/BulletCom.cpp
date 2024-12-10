@@ -223,8 +223,8 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     coll->SetRadius(0.6f);
 
     //’e
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
-    std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
+    int netPlayerID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netPlayerID);
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(-damageValue);
     bulletCom->SetViewBullet(viewObj);
@@ -271,8 +271,8 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
         coll->SetJudgeTag(COLLIDER_TAG::Player);
 
     //’e
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
-    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
+    int netPlayerID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
     bulletCom->SetAliveTime(2.0f);
     bulletCom->SetDamageValue(0);
 
@@ -365,7 +365,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     coll->SetRadius(0.6f);
 
     //’e
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(power);
@@ -461,7 +461,7 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     coll->SetRadius(0.6f);
 
     //’e
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(-damageValue);

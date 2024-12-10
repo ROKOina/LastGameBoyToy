@@ -23,6 +23,8 @@ void JankratCharacter_MainAtkState::Enter()
     {
         return;
     }
+    charaCom.lock()->SetHaveBullet(BulletCreate::JankratBulletFire(owner->GetGameObject(), pos, charaCom.lock()->GetNetCharaData().GetCharaID()));
+}
 
     // e‚Ìæ’[ˆÊ’u‚ğæ“¾
     DirectX::XMFLOAT3 gunPos;

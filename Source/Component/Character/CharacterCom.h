@@ -6,6 +6,7 @@
 #include "Input\Input.h"
 #include "Component\Animation\AimIKCom.h"
 #include "Component\MoveSystem\MovementCom.h"
+#include "Prop/NetCharaData.h"
 #include <array>
 
 //プレイヤー用キー入力補助クラス
@@ -32,7 +33,7 @@ enum USE_SKILL : uint64_t
 
     Q = 1 << 1,
     E = 1 << 2,
-    LEFT_CLICK = 1 << 3,
+    RIGHT_CLICK = 1 << 3,
 };
 static USE_SKILL operator| (USE_SKILL L, USE_SKILL R)
 {
@@ -135,15 +136,6 @@ public:
 
     void SetStanSeconds(float sec) { stanTimer = sec; }
 
-    //ネット側で決める
-    void SetNetID(int id) { netID = id; }
-    int GetNetID() { return netID; }
-    //ネット側で決める
-    void SetTeamID(int id) { teamID = id; }
-    int GetTeamID() { return teamID; }
-    void AddGiveDamage(int index, float damage) { giveDamage[index] += damage; }
-    std::array<float, 6> GetGiveDamage() { return giveDamage; }
-
     // 操作入力情報
     void SetUserInput(const GamePadButton& button) { userInput = button; }
     void SetUserInputDown(const GamePadButton& button) { userInputDown = button; }
@@ -168,8 +160,6 @@ public:
     DirectX::XMFLOAT3 GetFpsCameraDir() { return fpsCameraDir; }
     void  SetFpsCameraDir(const DirectX::XMFLOAT3 dir) { fpsCameraDir = dir; }
 
-    int GetCharaID() { return charaID; }
-    void  SetCharaID(const int id) { charaID = id; }
 
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
@@ -183,7 +173,6 @@ public:
     bool* GetIsHitAttack() { return &isHitAttack; }
     void SetIsHitAttack(bool flg) { isHitAttack = flg; }
 
-    void SetULTID(CHARACTER_ULT ult) { ultID = ult; }
     bool UseUlt() { return isUseUlt; }
     void FinishUlt() { isUseUlt = false; }
 
@@ -201,6 +190,10 @@ public:
     float* GetSkillCoolTimerPointer(SkillCoolID id) { return &skillCools[id].timer; }
     void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
+
+    //ネット関連変数ゲッター
+    NetCharaData& GetNetCharaData() { return netCharaData; }
+
 
     //時間リセット
     void ResetShootTimer() { shootTimer = 0; }
@@ -246,17 +239,13 @@ private:
 protected:
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>   moveStateMachine;
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
-    GameObject* cameraObj = nullptr;
+    GameObject* cameraObj = nullptr;    //自分のキャラの場合だけ入る
 
     bool useMoveFlag = true;//falseにするとmoveStateを使わない
     float jumpPower = 3.0f;
 
     bool isStan = false;
     float stanTimer = 0;
-
-    int teamID = 0;   //自分のチーム
-    int netID = 0;//どのクライアントがこのキャラを担当するか
-    std::array<float, 6> giveDamage = { 0,0,0,0,0,0 };//敵に与えたダメージ量や味方に与えた回復
 
     //スキルクールダウン
     struct SkillCoolTime
@@ -265,8 +254,6 @@ protected:
         float timer = 100;
     };
     SkillCoolTime skillCools[SkillCoolID::MAX];
-
-    CHARACTER_ULT ultID = CHARACTER_ULT::ATTACK;  //ウルトの種類　0:attack 1:heal 2:power
 
     //使用スキル
     USE_SKILL myUseSkill = USE_SKILL::NONE;
@@ -319,12 +306,12 @@ private:
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;
 
-    int charaID;    //キャラクター識別用
-
     //野村追加
     float stickAngle = 0.0f;
     float nowAngle = 0.0f;
     float lerpSpeed = 4.0f;
 
     bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
+
+    NetCharaData netCharaData;  //ネット関連
 };

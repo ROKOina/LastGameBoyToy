@@ -18,14 +18,16 @@ void HitProcessCom::Update(float elapsedTime)
     //ヒットを送信
     std::shared_ptr<Collider> col = GetGameObject()->GetComponent<Collider>();
     if (!col)return;
-     std::shared_ptr<CharacterCom> parentChara = myObj.lock()->GetComponent<CharacterCom>();
-    if (!parentChara)return;
+    if (!myObj.lock())return;
+    std::shared_ptr<CharacterCom> chara = myObj.lock()->GetComponent<CharacterCom>();
+    if (!chara)return;
 
     for (auto& hit : col->OnHitGameObject())
     {
-        float ultGauge = *parentChara->GetUltGauge();
+        //ウルトゲージ溜める
+        float ultGauge = *chara->GetUltGauge();
         ultGauge += 5;
-        parentChara->SetUltGauge(ultGauge);
+        chara->SetUltGauge(ultGauge);
 
         auto& stats = hit.gameObject.lock()->GetComponent<CharaStatusCom>();
         if (!stats)continue;
@@ -39,7 +41,7 @@ void HitProcessCom::Update(float elapsedTime)
 
             //無敵時間の間はヒットを与えない
             if (!stats->IsInvincible())
-                parentChara->SetIsHitAttack(true);
+                chara->SetIsHitAttack(true);
 
             //ダメージを与える
             stats->AddDamagePoint(-value);
@@ -47,10 +49,10 @@ void HitProcessCom::Update(float elapsedTime)
             continue;
         }
 
-        parentChara->SetIsHitAttack(true);
+        chara->SetIsHitAttack(true);
 
         //ヒット処理
-        HitProcess(parentChara->GetNetID(), hitChara->GetNetID());
+        HitProcess(chara->GetNetCharaData().GetNetPlayerID(), hitChara->GetNetCharaData().GetNetPlayerID());
 
         hitIntervalTimer = 0;
 

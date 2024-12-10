@@ -212,10 +212,10 @@ public:
     void CreateUltUI();
 
     //HPUI
-    void createHpUI();
+    void CreateHpUI();
 
     //ブーストUI
-    void createBoostUI();
+    void CreateBoostUI();
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
   
