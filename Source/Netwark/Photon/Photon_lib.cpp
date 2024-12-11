@@ -69,7 +69,7 @@ void PhotonLib::update(float elapsedTime)
 
         //é©ï™ÇÃì¸óÕï€ë∂
         GamePad& gamePad = Input::Instance().GetGamePad();
-
+        
         SaveBuffer save;
         save.frame = GetServerTime();
         save.input = gamePad.GetButton();
@@ -967,6 +967,9 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 break;
             }
 
+            connectNow = connectBegin;
+            connectBegin = false;
+
             //ÉfÅ[É^éÌï Ç≈ï™äÚ
             switch (ne[0].dataKind)
             {
@@ -984,8 +987,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                     LobbyRecv(ne[0]);
                 break;
             }
-
-
         }
         break;
     default:
@@ -1145,6 +1146,7 @@ void PhotonLib::JoinRecv(NetData recvData)
                     if (s.photonId == GetMyPhotonID())
                     {
                         s.playerId = j.playerId;
+                        connectBegin = true;
                         break;
                     }
                 }
