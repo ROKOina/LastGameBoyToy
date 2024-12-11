@@ -116,7 +116,10 @@ void JankratCharacterCom::EraseHaveObjects()
 //e‚Ì‘Å‚ÂŠÔŠu‚Æƒ}ƒ[ƒ‹ƒtƒ‰ƒbƒVƒ…
 void JankratCharacterCom::ShotSecond()
 {
-    const auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& camera = GetGameObject()->GetChildFind("cameraPostPlayer");
+    if (!camera)return;
+
+    const auto& arm = camera->GetChildFind("armChild");
     const auto& particle = arm->GetChildFind("muzzleflash");
     DirectX::XMFLOAT3 pos = {};
     if (arm->GetComponent<AnimationCom>()->IsEventCallingNodePos("MUZZLEFLASH", "gun2", pos))

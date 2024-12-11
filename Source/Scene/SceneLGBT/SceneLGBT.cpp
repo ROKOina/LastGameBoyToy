@@ -6,6 +6,7 @@
 #include "SceneLGBT.h"
 #include "Component\Light\LightCom.h"
 #include "Scene\SceneTitle\SceneTitle.h"
+#include "Component/Character/RegisterChara.h"
 #include <Component\Camera\FreeCameraCom.h>
 
 //初期化
@@ -27,6 +28,15 @@ void SceneLGBT::Initialize()
         auto& obj = GameObjectManager::Instance().Create();
         obj->SetName("LGBT");
         obj->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/lgbt.ui", Sprite::SpriteShader::DISSOLVE, false);
+    }
+
+    //キャラのシリアル情報登録
+    for (int i = 0; i< int(RegisterChara::CHARA_LIST::MAX); ++i)
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName(std::string("p" + std::to_string(i)).c_str());
+        obj->transform_->SetWorldPosition({ 100,0,0 });
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(i), obj);
     }
 
     //コンスタントバッファの初期化

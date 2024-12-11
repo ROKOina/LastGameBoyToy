@@ -124,7 +124,10 @@ void FarahCom::UltUpdate(float elapsedTime)
 // 銃の発射間隔とマズルフラッシュ
 void FarahCom::ShotSecond()
 {
-    const auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& camera = GetGameObject()->GetChildFind("cameraPostPlayer");
+    if (!camera)return;
+
+    const auto& arm = camera->GetChildFind("armChild");
     const auto& particle = arm->GetChildFind("muzzleflash");
     DirectX::XMFLOAT3 pos;
 

@@ -161,8 +161,8 @@ void SceneNakanisi::Finalize()
     photonNet->close();
 }
 
-#include "Netwark\Photon\Photon_lib.h"
-extern PhotonLib* photonLib;
+//#include "Netwark\Photon\Photon_lib.h"
+//extern PhotonLib* photonLib;
 
 void SceneNakanisi::Update(float elapsedTime)
 {
