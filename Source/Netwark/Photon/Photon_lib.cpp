@@ -14,6 +14,7 @@
 #include "Component/Collsion/ColliderCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
+#include "Component\Stage\StageEditorCom.h"
 
 #include "StaticSendDataManager.h"
 

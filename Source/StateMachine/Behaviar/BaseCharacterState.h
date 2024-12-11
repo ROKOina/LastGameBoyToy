@@ -119,6 +119,18 @@ public:
 private:
 };
 
+class BaseCharacter_ReloadState : public BaseCharacter_BaseState
+{
+public:
+    BaseCharacter_ReloadState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    virtual const char* GetName() const override { return "Reload"; }
+
+};
+
 class BaseCharacter_HitscanState : public BaseCharacter_BaseState
 {
     //　※　ヒットスキャンOBJを起動するだけのステート　※

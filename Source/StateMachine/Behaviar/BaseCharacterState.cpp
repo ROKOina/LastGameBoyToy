@@ -462,3 +462,26 @@ void Ult_Attack_State::Exit()
     obj.reset();
 }
 #pragma endregion
+
+void BaseCharacter_ReloadState::Enter()
+{
+    //アニメーション(腕だけのアニメーション)
+    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_reload"), false);
+}
+
+void BaseCharacter_ReloadState::Execute(const float& elapsedTime)
+{
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+
+    //アニメーションが終われば
+    if (!armAnim->IsPlayAnimation())
+    {
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+        charaCom.lock()->SetMaxBullet();
+    }
+}
+

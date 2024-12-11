@@ -4,6 +4,8 @@
 class JankratCharacterCom : public CharacterCom
 {
 public:
+    ~JankratCharacterCom() override;
+
     // 名前取得
     const char* GetName() const override { return "JankratCharacter"; }
 
@@ -49,4 +51,7 @@ private:
 
     GameObj haveBullet; //射撃待機中の弾丸
     std::vector<GameObj> haveMine; //使用中の地雷
+
+    int maxBulletNum = 8;
+    int maxMineNum = 2;
 };

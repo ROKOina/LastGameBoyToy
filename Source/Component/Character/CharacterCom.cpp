@@ -100,7 +100,7 @@ void CharacterCom::Update(float elapsedTime)
     CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
-    Vinetto(elapsedTime);
+    if(GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
 
     //攻撃先行入力
     shootTimer += elapsedTime;
@@ -111,7 +111,8 @@ void CharacterCom::Update(float elapsedTime)
             //スキル発動中はリターン
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
             {
-                attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+                //弾切れならリロード
+                currentBulletNum > 0 ? MainAttackDown() : Reload();
             }
             attackInputSave = false;
         }
@@ -249,7 +250,8 @@ void CharacterCom::FPSArmAnimation()
     {
         if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
 
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot"))
+        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot")
+        &&  armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
             armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
     }
 
@@ -258,7 +260,8 @@ void CharacterCom::FPSArmAnimation()
     {
         if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
         {
-            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
+            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot")
+            &&  armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
             {
                 if (armAnim->IsEventCalling("attackEnd"))
                     armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
@@ -302,7 +305,15 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             return;
         }
 
-        MainAttackDown();
+        //弾切れなら自動的にリロード
+        if (currentBulletNum > 0)
+        {
+            MainAttackDown();
+        }
+        else
+        {
+            Reload();
+        }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
         && GamePad::BTN_A & GetButton())
@@ -320,7 +331,9 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             return;
         }
 
-        MainAttackDown();
+        //弾切れなら自動的にリロード
+        currentBulletNum > 0 ?
+            MainAttackDown() : Reload();
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
@@ -345,13 +358,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         //MainAttack();
     }
 
-    if (CharacterInput::MainSkillButton_Q & GetButtonDown()
+    if (CharacterInput::MainSkillButton_E & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::Q))
     {
         skillCools[SkillCoolID::Q].timer = 0;
         MainSkill();
     }
-    if (CharacterInput::SubSkillButton_E & GetButtonDown()
+    if (CharacterInput::SubSkillButton_C & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::E))
     {
         skillCools[SkillCoolID::E].timer = 0;
@@ -370,7 +383,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 
     //野村追加 Rキー
-    if (CharacterInput::UltimetButton_R & GetButtonDown()
+    if (CharacterInput::UltimetButton & GetButtonDown()
         /*&& Rcool.timer >= Rcool.time*/)
     {
         //ウルト発動フラグON
@@ -381,6 +394,12 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             isMaxUlt = false;
             ultGauge = 0;
         }
+    }
+
+    //リロード
+    if (CharacterInput::Reload & GetButtonDown())
+    {
+        Reload();
     }
 }
 

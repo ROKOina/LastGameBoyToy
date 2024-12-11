@@ -91,6 +91,8 @@ void ScenePVE::Initialize()
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //判定生成
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/","StageJson/ColliderStage.mdl", "__", 0.005f);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
@@ -104,10 +106,6 @@ void ScenePVE::Initialize()
             gate->SetUpPos({ pos.x, 1.85f, pos.z });
             gate->SetMoveSpeed(0.1f);
         }
-
-        RigidBodyCom* rigid = stageObj->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Complex).get();
-        rigid->SetUseResourcePath("Data/Model/MatuokaStage/StageJson/ColliderStage.mdl");
-        rigid->SetRigidScale(1);
     }
 
     //プレイヤー
