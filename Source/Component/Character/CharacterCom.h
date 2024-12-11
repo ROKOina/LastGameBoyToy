@@ -124,7 +124,7 @@ public:
     //R
     virtual void UltSkill() {};
 
-    //リロード（弾減らす処理は各自のキャラでする
+    //リロード（弾減らす処理は各自のキャラでする@
     virtual void Reload() {};
 
     //LeftShift (固定ダッシュ)
@@ -166,7 +166,6 @@ public:
     DirectX::XMFLOAT3 GetFpsCameraDir() { return fpsCameraDir; }
     void  SetFpsCameraDir(const DirectX::XMFLOAT3 dir) { fpsCameraDir = dir; }
 
-
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
     float GetUltGaugeMax() { return ultGaugeMax; }
@@ -199,7 +198,6 @@ public:
 
     //ネット関連変数ゲッター
     NetCharaData& GetNetCharaData() { return netCharaData; }
-
 
     //時間リセット
     void ResetShootTimer() { shootTimer = 0; }

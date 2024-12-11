@@ -100,7 +100,7 @@ void CharacterCom::Update(float elapsedTime)
     CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
-    if(GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
+    if (GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
 
     //攻撃先行入力
     shootTimer += elapsedTime;
@@ -251,7 +251,7 @@ void CharacterCom::FPSArmAnimation()
         if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
 
         if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot")
-        &&  armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
+            && armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
             armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
     }
 
@@ -261,7 +261,7 @@ void CharacterCom::FPSArmAnimation()
         if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
         {
             if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot")
-            &&  armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
+                || armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
             {
                 if (armAnim->IsEventCalling("attackEnd"))
                     armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
