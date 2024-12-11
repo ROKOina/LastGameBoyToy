@@ -111,7 +111,8 @@ void CharacterCom::Update(float elapsedTime)
             //スキル発動中はリターン
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
             {
-                attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+                //弾切れならリロード
+                currentBulletNum > 0 ? MainAttackDown() : Reload();
             }
             attackInputSave = false;
         }
@@ -305,8 +306,14 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //弾切れなら自動的にリロード
-        currentBulletNum > 0 ?
-            MainAttackDown() : Reload();
+        if (currentBulletNum > 0)
+        {
+            MainAttackDown();
+        }
+        else
+        {
+            Reload();
+        }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
         && GamePad::BTN_A & GetButton())

@@ -37,7 +37,9 @@ void JankratBulletCom::Update(float elapsedTime)
         lifeTimer = lifeTime;
         explosionFlag = true;
 
-        //TODO ここで爆発のエフェクト再生
+        // ここで爆発のエフェクト再生
+        GetGameObject()->GetChildFind("bomber")->GetChildFind("explosion")->GetComponent<CPUParticle>()->SetActive(true);
+
     }
 
     //消去
