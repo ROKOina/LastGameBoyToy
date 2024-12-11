@@ -4,6 +4,8 @@
 class JankratCharacterCom : public CharacterCom
 {
 public:
+    ~JankratCharacterCom() override;
+
     // –¼‘OŽæ“¾
     const char* GetName() const override { return "JankratCharacter"; }
 

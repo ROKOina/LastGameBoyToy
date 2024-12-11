@@ -468,7 +468,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
         fpscamera->ActiveCameraChange();
 
         //ƒJƒƒ‰ˆÊ’u
-        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
+        cameraPost->transform_->SetLocalPosition({ 0, 12.086f, 3.3050f });
         playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //˜r

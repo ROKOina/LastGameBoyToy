@@ -100,7 +100,7 @@ void CharacterCom::Update(float elapsedTime)
     CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
-    Vinetto(elapsedTime);
+    if(GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
 
     //攻撃先行入力
     shootTimer += elapsedTime;

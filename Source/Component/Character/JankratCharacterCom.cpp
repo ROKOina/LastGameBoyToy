@@ -5,6 +5,12 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Particle\CPUParticle.h"
 
+JankratCharacterCom::~JankratCharacterCom()
+{
+    ReleaseHaveBullet();
+    AllReleaseHaveMine();
+}
+
 void JankratCharacterCom::Start()
 {
     //ステート登録
