@@ -162,12 +162,6 @@ void BaseCharacter_JumpState::Enter()
 
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
-
-    //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
@@ -190,12 +184,12 @@ void BaseCharacter_JumpLoop::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), false);
 
-    //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    if (!armAnim->IsPlayAnimation())
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
+    ////アニメーション(腕だけのアニメーション)
+    //if (std::string(owner->GetGameObject()->GetName()) != "player")return;
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //if (!armAnim->IsPlayAnimation())
+    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
 }
 void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 {
@@ -218,10 +212,10 @@ void BaseCharacter_Landing::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_end"), false, false, 1.0f);
 
     //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
+    //if (std::string(owner->GetGameObject()->GetName()) != "player")return;
+    //auto& arm = GameObjectManager::Instance().Find("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
+    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
 }
 void BaseCharacter_Landing::Execute(const float& elapsedTime)
 {
@@ -478,13 +472,13 @@ void BaseCharacter_ReloadState::Execute(const float& elapsedTime)
 {
     AnimationCom* anima = nullptr;
     bool reloadEnd = false;
-
+    
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
         //アニメーションが終われば終了フラグを立てる
         auto& arm = GameObjectManager::Instance().Find("armChild");
         anima = arm->GetComponent<AnimationCom>().get();
-        reloadEnd = anima->IsPlayAnimation();
+        reloadEnd = !anima->IsPlayAnimation();
     }
     else
     {
@@ -501,3 +495,34 @@ void BaseCharacter_ReloadState::Execute(const float& elapsedTime)
     }
 }
 
+void BaseCharacter_NoneAttack::Execute(const float& elapsedTime)
+{
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& stateMachine = owner->GetMoveStateMachine();
+        auto& arm = GameObjectManager::Instance().Find("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+
+        //アニメーション(腕だけのアニメーション)
+        if (stateMachine.GetCurrentState() != stateMachine.GetOldState())
+        {
+            switch (stateMachine.GetCurrentState())
+            {
+            case CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP:
+                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
+                break;
+
+            case CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP:
+                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
+                break;
+
+            case CharacterCom::CHARACTER_MOVE_ACTIONS::LANDING:
+                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+}

@@ -112,7 +112,13 @@ void CharacterCom::Update(float elapsedTime)
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
             {
                 //弾切れならリロード
-                currentBulletNum > 0 ? MainAttackDown() : Reload();
+                if (currentBulletNum > 0) {
+                    MainAttackDown();
+                }
+                else {
+                    if(attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD) 
+                    Reload();
+                }
             }
             attackInputSave = false;
         }
@@ -312,7 +318,10 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
         else
         {
-            Reload();
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+            {
+                Reload();
+            }
         }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
@@ -397,7 +406,8 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 
     //リロード
-    if (CharacterInput::Reload & GetButtonDown())
+    if (CharacterInput::Reload & GetButtonDown()
+    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
     {
         Reload();
     }
