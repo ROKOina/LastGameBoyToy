@@ -40,6 +40,7 @@ public:
     int GetDamageValue() { return damageValue; }
 
     void SetViewBullet(std::shared_ptr<GameObject> obj) { viewBullet = obj; }
+    std::weak_ptr<GameObject> GetViewBullet() { return viewBullet; }
 
 private:
 
@@ -68,7 +69,8 @@ public:
     static void KnockbackFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
 
     //ファラ通常弾
-    static void FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = 10);
+    static GameObj FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = 10);
+    static GameObj FarahKnockBack(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
 
     //ジャンクラの弾
     static GameObj JankratBulletFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);

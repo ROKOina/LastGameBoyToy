@@ -27,7 +27,7 @@ class Trail;
 class GameObject : public std::enable_shared_from_this<GameObject>
 {
 public:
-    GameObject() {  }
+    GameObject() {}
     virtual ~GameObject() {};
 
     // ŠJnˆ—
@@ -58,7 +58,6 @@ public:
         std::shared_ptr<T> component = std::make_shared<T>(args...);
         component->SetGameObject(shared_from_this());
 
- 
         //transform‚Ìê‡‚Í•Û‚·‚é
         if (std::strcmp(component->GetName(), "Transform") == 0)
             transform_ = std::dynamic_pointer_cast<TransformCom>(component);
@@ -136,7 +135,7 @@ class GameObjectManager
 {
     friend class GameObject;
 private:
-    GameObjectManager() { }
+    GameObjectManager() {}
     ~GameObjectManager() {}
 
 public:

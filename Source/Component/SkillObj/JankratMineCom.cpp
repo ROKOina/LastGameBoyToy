@@ -1,6 +1,7 @@
 #include "JankratMineCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Collsion\ColliderCom.h"
+#include "Component\Particle\CPUParticle.h"
 
 void JankratMineCom::Update(float elapsedTime)
 {
@@ -34,7 +35,8 @@ void JankratMineCom::Update(float elapsedTime)
         SphereColliderCom* childCollder = GetGameObject()->GetChildren()[0].lock()->GetComponent<SphereColliderCom>().get();
         childCollder->SetMyTag(COLLIDER_TAG::NONE_COL);
 
-        //TODO ここで爆発エフェクト再生
+        // ここで爆発のエフェクト再生
+        GetGameObject()->GetChildFind("explosion")->GetComponent<CPUParticle>()->SetActive(true);
 
         //爆発から一定時間で消去
         if (lifeTimer >= lifeTime)

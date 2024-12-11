@@ -79,7 +79,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player.mdl");
-    r->SetDissolveThreshold(1.0f);
+    r->SetDissolveThreshold(0.0f);
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
@@ -345,19 +345,12 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player.mdl");
-    r->SetDissolveThreshold(1.0f);
+    r->SetDissolveThreshold(0.0f);
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
-
-    //生成コンポーネント
-    {
-        std::shared_ptr<GameObject>spawn = obj->AddChildObject();
-        spawn->SetName("ultspawn");
-        spawn->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/farahult.spawn");
-    }
 
     //HPの初期設定
     status->SetMaxHitPoint(200);
@@ -423,6 +416,12 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
+
+            //マゼルフラッシュ
+            std::shared_ptr<GameObject>particleobj = armChild->AddChildObject();
+            particleobj->SetName("muzzleflash");
+            std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
+            cpuparticle->SetActive(false);
         }
     }
 }
@@ -432,13 +431,15 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player.mdl");
-    r->SetDissolveThreshold(1.0f);
+    r->SetDissolveThreshold(0.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
+    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
+    charaCom->SetUseSkill(USE_SKILL::E);
 
     //HPの初期設定
     status->SetMaxHitPoint(200);
@@ -462,6 +463,19 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
+    //押し出し処理
+    auto& pushBack = obj->AddComponent<PushBackCom>();
+    pushBack->SetRadius(0.5f);
+    pushBack->SetWeight(1);
+
+    //煙のエフェクト
+    {
+        std::shared_ptr<GameObject> smoke = obj->AddChildObject();
+        smoke->SetName("smokeeffect");
+        std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
+        smokeeffct->SetActive(false);
+    }
+
     //自分かネットのプレイヤーで
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -472,7 +486,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
         fpscamera->ActiveCameraChange();
 
         //カメラ位置
-        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
+        cameraPost->transform_->SetLocalPosition({ 0, 12.086f, 3.3050f });
         obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //腕
@@ -484,6 +498,12 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
+
+            //マゼルフラッシュ
+            std::shared_ptr<GameObject>particleobj = armChild->AddChildObject();
+            particleobj->SetName("muzzleflash");
+            std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
+            cpuparticle->SetActive(false);
         }
     }
 }

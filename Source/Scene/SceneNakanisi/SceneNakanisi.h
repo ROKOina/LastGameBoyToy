@@ -26,9 +26,6 @@ public:
     //名前取得
     std::string GetName() const override { return "SceneNakanisi"; };
 
-    //UIのゲームオブジェクト生成
-    void CreateUiObject();
-
 private:
 
     //オブジェクト生成関数

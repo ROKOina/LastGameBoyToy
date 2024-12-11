@@ -137,9 +137,9 @@ float4 BRDF(float4 albedo, float metallic, float perceptualRoughness, float3 nor
 float3 SHEvalLinearL0L1(float4 normal)
 {
     float3 x;
-    float4 unity_SHAr = 0.2f;
-    float4 unity_SHAg = 0.2f;
-    float4 unity_SHAb = 0.2f;
+    float4 unity_SHAr = 1.0f;
+    float4 unity_SHAg = 1.0f;
+    float4 unity_SHAb = 1.0f;
 
     // Linear (L1) + constant (L0) polynomial terms
     x.r = dot(unity_SHAr, normal);
@@ -152,10 +152,10 @@ float3 SHEvalLinearL0L1(float4 normal)
 float3 SHEvalLinearL2(float4 normal)
 {
     float3 x1, x2;
-    float4 unity_SHBr = 0.2f;
-    float4 unity_SHBg = 0.2f;
-    float4 unity_SHBb = 0.2f;
-    float4 unity_SHC = 0.2f;
+    float4 unity_SHBr = 1.0f;
+    float4 unity_SHBg = 1.0f;
+    float4 unity_SHBb = 1.0f;
+    float4 unity_SHC = 1.0f;
 
     // 4 of the quadratic (L2) polynomials
     float4 vB = normal.xyzz * normal.yzzx;
