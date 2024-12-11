@@ -19,20 +19,33 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
 // 銃の先端位置を取得
 bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos) const
 {
-    const auto& cameraObj = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
-    const auto& arm = cameraObj->GetChildFind("armChild");
-    if (!arm) return false;
-
-    const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-    const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
-    if (!gunNode) return false;
-
-    outGunPos =
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
-        gunNode->worldTransform._41,
-        gunNode->worldTransform._42,
-        gunNode->worldTransform._43
-    };
+        const auto& cameraObj = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
+        const auto& arm = cameraObj->GetChildFind("armChild");
+        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+        const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
+        if (!gunNode) return false;
+
+        outGunPos =
+        {
+            gunNode->worldTransform._41,
+            gunNode->worldTransform._42,
+            gunNode->worldTransform._43
+        };
+    }
+    else
+    {
+        RendererCom* render = owner->GetGameObject()->GetComponent<RendererCom>().get();
+        const auto& gunNode = render->GetModel()->FindNode("gun2");
+
+        outGunPos =
+        {
+            gunNode->worldTransform._41,
+            gunNode->worldTransform._42,
+            gunNode->worldTransform._43
+        };
+    }
 
     return true;
 }
@@ -46,6 +59,12 @@ void JankratCharacter_BaseState::HandleArmAnimation() const
         const auto& armAnim = arm->GetComponent<AnimationCom>();
         armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
         armAnim->SetAnimationSeconds(0.3f);
+    }
+    else
+    {
+        const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetAnimationSeconds(0.3f);
     }
 }
 

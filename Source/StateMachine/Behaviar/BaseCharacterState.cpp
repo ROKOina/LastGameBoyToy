@@ -466,19 +466,35 @@ void Ult_Attack_State::Exit()
 void BaseCharacter_ReloadState::Enter()
 {
     //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_reload"), false);
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = GameObjectManager::Instance().Find("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_reload"), false);
+    }
 }
 
 void BaseCharacter_ReloadState::Execute(const float& elapsedTime)
 {
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
+    AnimationCom* anima = nullptr;
+    bool reloadEnd = false;
 
-    //アニメーションが終われば
-    if (!armAnim->IsPlayAnimation())
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        //アニメーションが終われば終了フラグを立てる
+        auto& arm = GameObjectManager::Instance().Find("armChild");
+        anima = arm->GetComponent<AnimationCom>().get();
+        reloadEnd = anima->IsPlayAnimation();
+    }
+    else
+    {
+        //リロードアニメーションと同じ時間たてば終了フラグを立てる
+        reloadTimer += elapsedTime;
+        reloadEnd = (reloadTimer >= reloadTime);
+    }
+
+    //終了処理
+    if(reloadEnd)
     {
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
         charaCom.lock()->SetMaxBullet();

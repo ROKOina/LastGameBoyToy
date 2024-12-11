@@ -161,8 +161,8 @@ void SceneNakanisi::Finalize()
     photonNet->close();
 }
 
-//#include "Netwark\Photon\Photon_lib.h"
-//extern PhotonLib* photonLib;
+#include "Netwark\Photon\Photon_lib.h"
+extern PhotonLib* photonLib;
 
 void SceneNakanisi::Update(float elapsedTime)
 {
@@ -171,20 +171,20 @@ void SceneNakanisi::Update(float elapsedTime)
     //ネット更新
     photonNet->run(elapsedTime);
 
-    ////ホストに繋がった瞬間に位置を変える
-    //if (photonLib->GetConnectNow())
-    //{
-    //    //配置したステージオブジェクトの中からスポーン位置を取得
-    //    StageEditorCom* edit = GameObjectManager::Instance().Find("stage")->GetComponent<StageEditorCom>().get();
-    //    StageEditorCom::PlaceObject spawnObj = edit->GetPlaceObject("Spawn");
+    //ホストに繋がった瞬間に位置を変える
+    if (photonLib->GetConnectNow())
+    {
+        //配置したステージオブジェクトの中からスポーン位置を取得
+        StageEditorCom* edit = GameObjectManager::Instance().Find("stage")->GetComponent<StageEditorCom>().get();
+        StageEditorCom::PlaceObject spawnObj = edit->GetPlaceObject("Spawn");
 
-    //    GameObj player = GameObjectManager::Instance().Find("player");
+        GameObj player = GameObjectManager::Instance().Find("player");
 
-    //    auto it = spawnObj.objList.begin();
-    //    std::advance(it, player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
+        auto it = spawnObj.objList.begin();
+        std::advance(it, player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
 
-    //    player->transform_->SetWorldPosition(it->get()->transform_->GetWorldPosition());
-    //}
+        player->transform_->SetWorldPosition(it->get()->transform_->GetWorldPosition());
+    }
 
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
