@@ -249,7 +249,8 @@ void CharacterCom::FPSArmAnimation()
     {
         if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
 
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot"))
+        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot")
+        &&  armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
             armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
     }
 
@@ -258,7 +259,8 @@ void CharacterCom::FPSArmAnimation()
     {
         if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
         {
-            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
+            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot")
+            &&  armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
             {
                 if (armAnim->IsEventCalling("attackEnd"))
                     armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
@@ -302,7 +304,9 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             return;
         }
 
-        MainAttackDown();
+        //弾切れなら自動的にリロード
+        currentBulletNum > 0 ?
+            MainAttackDown() : Reload();
     }
     else if (CharacterInput::MainAttackButton & GetButton()
         && GamePad::BTN_A & GetButton())
@@ -320,7 +324,9 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             return;
         }
 
-        MainAttackDown();
+        //弾切れなら自動的にリロード
+        currentBulletNum > 0 ?
+            MainAttackDown() : Reload();
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
@@ -381,6 +387,12 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             isMaxUlt = false;
             ultGauge = 0;
         }
+    }
+
+    //リロード
+    if (CharacterInput::Reload & GetButtonDown())
+    {
+        Reload();
     }
 }
 

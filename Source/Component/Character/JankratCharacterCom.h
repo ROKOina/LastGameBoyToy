@@ -16,6 +16,8 @@ public:
     void SubAttackDown() override;
     void SubSkill() override;
 
+    void Reload() override;
+
     void UltSkill() override {};
 
 private:
@@ -46,4 +48,7 @@ private:
 
     GameObj haveBullet; //射撃待機中の弾丸
     std::vector<GameObj> haveMine; //使用中の地雷
+
+    int maxBulletNum = 8;
+    int maxMineNum = 2;
 };

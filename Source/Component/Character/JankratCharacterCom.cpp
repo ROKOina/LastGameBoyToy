@@ -18,6 +18,7 @@ void JankratCharacterCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<JankratCharacter_MainAtkState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL, std::make_shared<JankratCharacter_MainSkillState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK, std::make_shared<JankratCharacter_SubAttackState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::RELOAD, std::make_shared<BaseCharacter_ReloadState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
 
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
@@ -62,6 +63,14 @@ void JankratCharacterCom::SubSkill()
     else
     {
         ResetSkillCoolTimer(SkillCoolID::E);
+    }
+}
+
+void JankratCharacterCom::Reload()
+{
+    if (currentBulletNum < maxBulletNum)
+    {
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
     }
 }
 

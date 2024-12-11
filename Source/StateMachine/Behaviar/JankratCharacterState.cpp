@@ -48,6 +48,7 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
     {
         FireBullet(bullet);
         charaComponent->ReleaseHaveBullet();
+        charaCom.lock()->AddCurrentBulletNum(-1);
 
         //‰Šú‰»
         charaComponent->ResetShootTimer();
