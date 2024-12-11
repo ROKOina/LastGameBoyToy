@@ -76,3 +76,15 @@ public:
     void ImGui() override {};
     virtual const char* GetName() const override { return "SubSkill"; }
 };
+
+class JankratCharacter_UltState : public JankratCharacter_BaseState
+{
+public:
+    JankratCharacter_UltState(CharacterCom* owner) : JankratCharacter_BaseState(owner) {};
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override;
+    void ImGui() override;
+    virtual const char* GetName() const override { return "ult"; }
+};

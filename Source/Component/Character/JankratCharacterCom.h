@@ -11,12 +11,15 @@ public:
 
     void Update(float elapsedTime) override;
 
+    //’ÊíUŒ‚
     void MainAttackDown() override;
 
+    //Eskill
     void SubAttackDown() override;
     void SubSkill() override;
 
-    void UltSkill() override {};
+    //ult
+    void UltSkill() override;
 
 private:
     //Á‹‚³‚ê‚Ä‚¢‚é’e‚â’n—‹‚ğè•ú‚·

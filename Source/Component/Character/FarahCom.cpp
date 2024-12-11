@@ -6,6 +6,8 @@
 #include "StateMachine\Behaviar\FarahState.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Particle\GPUParticle.h"
+#include "Component\Bullet\BulletCom.h"
+#include "Component\Collsion\ColliderCom.h"
 
 // 定数
 constexpr float JUMP_FORCE = 12.62f;
@@ -45,7 +47,7 @@ void FarahCom::Update(float elapsedTime)
     ShotSecond();
     CharacterCom::Update(elapsedTime);
     FPSArmAnimation();
-    GroundBomber();
+    GroundBomber(elapsedTime);
 }
 
 // GUI
@@ -167,18 +169,6 @@ void FarahCom::ResetUlt()
     ulttimer = 0.0f;
 }
 
-//地面に付けば爆発する処理
-void FarahCom::GroundBomber()
-{
-    if (const auto& damageball = GameObjectManager::Instance().Find("damageball"))
-    {
-        if (damageball->GetComponent<MovementCom>()->OnGround())
-        {
-            damageball->GetComponent<GPUParticle>()->SetLoop(true);
-        }
-    }
-}
-
 // クールダウンの管理
 void FarahCom::HandleCooldown(float elapsedTime)
 {
@@ -193,4 +183,82 @@ void FarahCom::HandleBoostFlag()
 {
     const auto& moveCom = GetGameObject()->GetComponent<MovementCom>();
     boostflag = !moveCom->OnGround();
+}
+
+// 地面で爆発処理
+void FarahCom::GroundBomber(float elapsedTime)
+{
+    for (auto& bullet : bullets)
+    {
+        if (!bullet.obj) continue;
+
+        // 地面に接触
+        auto& obj = bullet.obj;
+        if (obj->GetComponent<MovementCom>()->OnGround() || obj->GetComponent<MovementCom>()->GetOnWall())
+        {
+            bullet.bomberflag = true;
+            obj->GetComponent<MovementCom>()->SetIsRaycast(false);
+            obj->GetComponent<MovementCom>()->ZeroVelocity();
+            obj->GetComponent<MovementCom>()->ZeroNonMaxSpeedVelocity();
+            obj->GetComponent<SphereColliderCom>()->SetRadius(2.1f);
+        }
+
+        // 爆発フラグ処理
+        if (bullet.bomberflag)
+        {
+            bullet.bombertimer += elapsedTime;
+
+            // 一度だけ Play を実行する
+            if (!bullet.played)  // played フラグで制御
+            {
+                obj->GetComponent<GPUParticle>()->SetEnabled(true);
+                obj->GetComponent<GPUParticle>()->Play();
+                bullet.played = true; // フラグを設定
+            }
+
+            //回転させる
+            bullet.rotation += elapsedTime * 900;
+            obj->GetComponent<GPUParticle>()->GetGameObject()->transform_->SetEulerRotation({ 0.0f,0.0f,bullet.rotation });
+        }
+
+        // 爆発後に削除
+        if (bullet.bombertimer >= 0.1f)
+        {
+            auto& viewBullet = obj->GetComponent<BulletCom>()->GetViewBullet().lock();
+            if (viewBullet)
+            {
+                GameObjectManager::Instance().Remove(viewBullet);
+            }
+
+            if (bullet.bombertimer > 0.5f)
+            {
+                GameObjectManager::Instance().Remove(obj);
+                RemoveBullet(obj);
+            }
+        }
+    }
+}
+
+// 弾丸削除
+void FarahCom::RemoveBullet(const std::shared_ptr<GameObject>& obj)
+{
+    bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
+        [&obj](const FarahBullet& bullet) {
+            return bullet.obj == obj;
+        }),
+        bullets.end());
+}
+
+// 全弾削除
+void FarahCom::ClearAllBullets()
+{
+    bullets.clear();
+}
+
+// 弾丸生成
+void FarahCom::AddBullet(const std::shared_ptr<GameObject>& obj)
+{
+    FarahBullet bullet;
+    bullet.obj = obj;
+    bullets.push_back(bullet);
 }

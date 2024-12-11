@@ -180,6 +180,24 @@ void JankratCharacter_SubAttackState::Execute(const float& elapsedTime)
         mine->GetComponent<JankratMineCom>()->Fire();
     }
 
-    //TODO アニメーション終わってから遷移
+    //TODOアニメーション終わってから遷移
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
+
+#pragma region ウルト
+void JankratCharacter_UltState::Enter()
+{
+}
+void JankratCharacter_UltState::Execute(const float& elapsedTime)
+{
+    if (!charaCom.lock()->UseUlt()) return;
+}
+void JankratCharacter_UltState::Exit()
+{
+    charaCom.lock()->FinishUlt();
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+void JankratCharacter_UltState::ImGui()
+{
+}
+#pragma endregion

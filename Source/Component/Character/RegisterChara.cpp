@@ -421,6 +421,8 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
+    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
+    charaCom->SetUseSkill(USE_SKILL::E);
 
     //HP‚Ì‰ŠúÝ’è
     status->SetMaxHitPoint(200);
