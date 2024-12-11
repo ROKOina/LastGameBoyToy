@@ -351,13 +351,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         //MainAttack();
     }
 
-    if (CharacterInput::MainSkillButton_Q & GetButtonDown()
+    if (CharacterInput::MainSkillButton_E & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::Q))
     {
         skillCools[SkillCoolID::Q].timer = 0;
         MainSkill();
     }
-    if (CharacterInput::SubSkillButton_E & GetButtonDown()
+    if (CharacterInput::SubSkillButton_C & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::E))
     {
         skillCools[SkillCoolID::E].timer = 0;
@@ -376,7 +376,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 
     //野村追加 Rキー
-    if (CharacterInput::UltimetButton_R & GetButtonDown()
+    if (CharacterInput::UltimetButton & GetButtonDown()
         /*&& Rcool.timer >= Rcool.time*/)
     {
         //ウルト発動フラグON

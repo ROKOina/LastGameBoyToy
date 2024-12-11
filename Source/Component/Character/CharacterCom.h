@@ -15,9 +15,9 @@ class CharacterInput
 public:
     static constexpr GamePadButton JumpButton_SPACE = GamePad::BTN_A;
     static constexpr GamePadButton LeftShiftButton = GamePad::BTN_LEFT_SHOULDER;
-    static constexpr GamePadButton MainSkillButton_Q = GamePad::BTN_X;
-    static constexpr GamePadButton SubSkillButton_E = GamePad::BTN_RIGHT_SHOULDER;
-    static constexpr GamePadButton UltimetButton_R = GamePad::BTN_B;
+    static constexpr GamePadButton MainSkillButton_E = GamePad::BTN_X;
+    static constexpr GamePadButton SubSkillButton_C = GamePad::BTN_RIGHT_SHOULDER;
+    static constexpr GamePadButton UltimetButton = GamePad::BTN_B;
     static constexpr GamePadButton MainAttackButton = GamePad::BTN_RIGHT_TRIGGER;   //マウス左
     static constexpr GamePadButton SubAttackButton = GamePad::BTN_LEFT_TRIGGER;     //マウス右
     static constexpr GamePadButton Reload = GamePad::BTN_Y;
