@@ -429,7 +429,9 @@ void CharacterCom::Vinetto(float elapsedTime)
     float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // Å‘åHP
     float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // Œ»ÝHP
 
-    if (const auto posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>())
+    auto& postEff = GameObjectManager::Instance().Find("posteffect");
+    if (!postEff)return;
+    if (const auto posteffect = postEff->GetComponent<PostEffect>())
     {
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::VignetteIntensity };
 

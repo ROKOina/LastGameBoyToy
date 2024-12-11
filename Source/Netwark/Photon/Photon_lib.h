@@ -55,7 +55,6 @@ private:
     std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
     {
         "INAZAWA",
-        "HAVE_ALL_ATTACK",
         "FARAH",
         "JANKRAT",
     };
@@ -75,6 +74,17 @@ public:
 
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
+
+    //ゲームスタートしたか
+    bool GetIsGamePlay() { return isGamePlay; }
+
+    //キャラセレクト中か
+    bool GetIsCharaSelect() { return isCharaSelect; }
+
+
+
+    //入室許可
+    bool IsJoinPermission() { return joinPermission; }
 
     int GetServerTime();
     int GetServerTimeOffset();
@@ -229,6 +239,9 @@ private:
 
     //タイマースタート時間
     int startTime = 0;
+
+    //キャラ選択画面か
+    bool isCharaSelect = false;
 
     //ゲーム中か
     bool isGamePlay = false;

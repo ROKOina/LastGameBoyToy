@@ -1,6 +1,7 @@
 #pragma once
 
 class UIListener;
+class PhotonLib;
 
 class BasicsApplication
 {
@@ -12,5 +13,7 @@ public:
     void close();
 
     void ImGui();
+
+    PhotonLib* GetPhotonLib();
 private:
 };
