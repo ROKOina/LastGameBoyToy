@@ -99,7 +99,7 @@ void CharacterCom::Update(float elapsedTime)
     CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
-    Vinetto(elapsedTime);
+    if(GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
 
     //地面について要れば元に戻す
     if (GetGameObject()->GetComponent<MovementCom>()->OnGround())

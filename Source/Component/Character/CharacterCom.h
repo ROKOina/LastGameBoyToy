@@ -115,6 +115,8 @@ public:
 
     //Q
     virtual void MainSkill() {};
+    virtual void MainSkillDown() {};
+
     //E
     virtual void SubSkill() {};
     //R
