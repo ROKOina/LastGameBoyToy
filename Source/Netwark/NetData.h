@@ -43,42 +43,27 @@ static std::stringstream& operator>>(std::stringstream& in, DirectX::XMFLOAT2& h
 
 //array
 //float
-static std::stringstream& operator>>(std::stringstream& in, std::array<float, 6>& h)
+static std::stringstream& operator>>(std::stringstream& in, std::array<float, 4>& h)
 {
-    in >> float(h[0]) >> float(h[1]) >> float(h[2]) >> float(h[3]) >> float(h[4]) >> float(h[5]);
+    in >> float(h[0]) >> float(h[1]) >> float(h[2]) >> float(h[3]);
     return in;
 }
-static std::stringstream& operator<<(std::stringstream& out, const std::array<float, 6>& h)
+static std::stringstream& operator<<(std::stringstream& out, const std::array<float, 4>& h)
 {
-    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
+    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3];
     return out;
 }
 //int
-static std::stringstream& operator>>(std::stringstream& in, std::array<int, 6>& h)
+static std::stringstream& operator>>(std::stringstream& in, std::array<int, 4>& h)
 {
-    in >> int(h[0]) >> int(h[1]) >> int(h[2]) >> int(h[3]) >> int(h[4]) >> int(h[5]);
+    in >> int(h[0]) >> int(h[1]) >> int(h[2]) >> int(h[3]);
     return in;
 }
-static std::stringstream& operator<<(std::stringstream& out, const std::array<int, 6>& h)
+static std::stringstream& operator<<(std::stringstream& out, const std::array<int, 4>& h)
 {
-    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3] << " " << h[4] << " " << h[5];
+    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3];
     return out;
 }
-
-////フレームと入力
-//struct InputFrame
-//{
-//    int progressFrame;  //経過フレーム
-//    unsigned int input; //入力
-//};
-
-//struct InputData
-//{
-//    std::vector<unsigned int> input;
-//    std::vector<unsigned int> inputDown;
-//    std::vector<unsigned int> inputUp;
-//};
-//
 
 struct SaveBuffer
 {
@@ -127,85 +112,156 @@ static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& v
     }
 }
 //Vector3
-static void Vector3Out(std::stringstream& out, std::array<DirectX::XMFLOAT3, 6>& vec)
+static void Vector3Out(std::stringstream& out, std::array<DirectX::XMFLOAT3, 4>& vec)
 {
     out << vec[0] << " ";
     out << vec[1] << " ";
     out << vec[2] << " ";
     out << vec[3] << " ";
-    out << vec[4] << " ";
-    out << vec[5] << " ";
 }
-static void Vector3In(std::stringstream& in, std::array<DirectX::XMFLOAT3, 6>& vec)
+static void Vector3In(std::stringstream& in, std::array<DirectX::XMFLOAT3, 4>& vec)
 {
     in >> vec[0];
     in >> vec[1];
     in >> vec[2];
     in >> vec[3];
-    in >> vec[4];
-    in >> vec[5];
 }
+
 
 struct NetData
 {
+    //データ種別
+    enum DATA_KIND {
+        GAME,
+        JOIN,
+        LOBBY,
+    };
+    int dataKind;
     bool isMasterClient;
-    int id;
+    int photonId;   //ネット識別(入ってきた順番)
+    int playerId;   //プレイヤー識別(ホストが0~3を振り分け)
     char name[50];
-    int startTime;
 
-    std::vector<SaveBuffer> saveInputBuf;
+    //ゲーム中
+    struct GameData //0
+    {
+        int startTime;
 
-    std::array<int, 6> damageData;//キャラに与えたダメージ
-    std::array<int, 6> healData;//キャラに与えたヒール
-    std::array<float, 6> stanData;//キャラに与えたスタン
-    std::array<DirectX::XMFLOAT3, 6> knockbackData = {};//ノックバックを与える
-    std::array<DirectX::XMFLOAT3, 6> movePosData = {};//移動位置を与える
-    std::array<int, 6> teamID;//チームのID
-    int charaID;    //キャラのID
+        std::vector<SaveBuffer> saveInputBuf;
 
-    //int pSize;
-    //std::vector<int> p;
+        //要素番号をplayerIdと合わせる
+        std::array<int, 4> damageData;//キャラに与えたダメージ
+        std::array<int, 4> healData;//キャラに与えたヒール
+        std::array<float, 4> stanData;//キャラに与えたスタン
+        std::array<DirectX::XMFLOAT3, 4> knockbackData = {};//ノックバックを与える
+        std::array<DirectX::XMFLOAT3, 4> movePosData = {};//移動位置を与える
+        //std::array<int, 4> teamID;//チームのID
+        int charaID;    //キャラのID
+    }gameData;
+
+    //入室許可
+    int joinNum;    //下のJoinDataをどれだけおくるか
+    struct JoinData //1
+    {
+        //入室申請
+        bool joinRequest;
+
+        //入室許可(ホストのみ)
+        bool joinPermission;
+        int photonId;
+        int playerId;
+    };
+    std::vector<JoinData> joinData;
+
+    //ロビー中
+    struct LobbyData    //2
+    {
+        std::array<int, 4> teamID;//チームのID
+        char chat[500];
+    }lobbyData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
+    out << h.dataKind << " ";
     out << h.isMasterClient << " ";
-    out << h.id << " ";
+    out << h.photonId << " ";   
+    out << h.playerId << " ";      
     out << h.name << " ";
-    out << h.startTime << " ";
-    out << h.damageData << " ";
-    out << h.healData << " ";
-    out << h.stanData << " ";
 
-    Vector3Out(out, h.knockbackData);
+    if (h.dataKind == NetData::DATA_KIND::GAME)
+    {
+        out << h.gameData.startTime << " ";
+        out << h.gameData.damageData << " ";
+        out << h.gameData.healData << " ";
+        out << h.gameData.stanData << " ";
 
-    Vector3Out(out, h.movePosData);
+        Vector3Out(out, h.gameData.knockbackData);
 
-    out << h.teamID << " ";
-    out << h.charaID << " ";
-    VectorSaveBufferOut(out, h.saveInputBuf);
+        Vector3Out(out, h.gameData.movePosData);
 
-    //for (auto& i : h.p)
-    //{
-    //}
+        out << h.gameData.charaID << " ";
+        VectorSaveBufferOut(out, h.gameData.saveInputBuf);
+    }
+
+    out << (int)h.joinData.size() << " ";
+    if (h.dataKind == NetData::DATA_KIND::JOIN)
+    {
+        for (auto& j : h.joinData) {
+            out << j.joinRequest << " ";
+            out << j.joinPermission << " ";
+            out << j.photonId << " ";
+            out << j.playerId << " ";
+        }
+    }
+
+    if (h.dataKind == NetData::DATA_KIND::LOBBY)
+    {
+        out << h.lobbyData.chat << " ";
+        out << h.lobbyData.teamID << " ";
+    }
+
     return out;
 }
 static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 {
+    in >> h.dataKind;
     in >> h.isMasterClient;
-    in >> h.id;
+    in >> h.photonId;
+    in >> h.playerId;
     in >> h.name;
-    in >> h.startTime;
-    in >> h.damageData;
-    in >> h.healData;
-    in >> h.stanData;
 
-    Vector3In(in, h.knockbackData);
+    if (h.dataKind == NetData::DATA_KIND::GAME)
+    {
+        in >> h.gameData.startTime;
+        in >> h.gameData.damageData;
+        in >> h.gameData.healData;
+        in >> h.gameData.stanData;
 
-    Vector3In(in, h.movePosData);
+        Vector3In(in, h.gameData.knockbackData);
 
-    in >> h.teamID;
-    in >> h.charaID;
-    VectorSaveBufferIn(in, h.saveInputBuf);
+        Vector3In(in, h.gameData.movePosData);
+
+        in >> h.gameData.charaID;
+        VectorSaveBufferIn(in, h.gameData.saveInputBuf);
+    }
+
+    in >> h.joinNum;
+    if (h.dataKind == NetData::DATA_KIND::JOIN)
+    {
+        for (int j = 0; j < h.joinNum; ++j) {
+            auto& join = h.joinData.emplace_back();
+            in >> join.joinRequest;
+            in >> join.joinPermission;
+            in >> join.photonId;
+            in >> join.playerId;
+        }
+    }
+
+    if (h.dataKind == NetData::DATA_KIND::LOBBY)
+    {
+        in >> h.lobbyData.chat;
+        in >> h.lobbyData.teamID;
+    }
 
     return in;
 }

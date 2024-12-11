@@ -44,10 +44,11 @@ public:
     ExitGames::Common::JString getStateString(void);
 
     void LobbyImGui();
+    void ChatImGui();
 
 private:
-    //入室許可
-    bool joinPermission = false;
+    //接続開始フラグ
+    bool connectFlg = false;
     //部屋名
     std::string roomName;
     //charaID
@@ -69,7 +70,9 @@ public:
     //他の入室者との差を保存
     void DelayUpdate();
 
-    int GetPlayerNum();
+    int GetMyPhotonID();
+    int GetMyPlayerID();
+
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
 
@@ -79,9 +82,6 @@ public:
     //レイテンシ
     int GetRoundTripTime();
     int GetRoundTripTimeVariance();
-
-    //他の入室者との最新フレーム差
-    std::vector<int> GetTrips();
 
     int GetRoomPlayersNum();
     std::string GetRoomName();
@@ -125,7 +125,17 @@ public:
     PhotonState::States GetPhotonState() { return mState; }
 
 private:
-    void sendData(void);
+    //プレイヤー追加
+    void AddPlayer(int photonID, int playerID);
+
+    //ゲームデータ送信
+    void sendGameData(void);
+
+    //入室許可送信(申請の場合はtrue)
+    void sendJoinPermissionData(bool request);
+
+    //入室許可送信(申請の場合はtrue)
+    void sendLobbyData(void);
 
     // events, triggered by certain operations of all players in the same room
     //入室時に入る
@@ -133,6 +143,9 @@ private:
     virtual void leaveRoomEventAction(int playerNr, bool isInactive);
     //データ受信
     virtual void customEventAction(int playerNr, nByte eventCode, const ExitGames::Common::Object& eventContent);
+    void GameRecv(NetData recvData);    //ゲーム中受信
+    void JoinRecv(NetData recvData);    //入室受信
+    void LobbyRecv(NetData recvData);    //ロビー受信
 
     // receive and print out debug out here
     virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);
@@ -156,7 +169,6 @@ private:
     //地域を決める
     virtual void onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegions*/, const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegionServers*/);
 
-    int startTime = 0;
 
     PhotonState::States mState;
 
@@ -178,11 +190,12 @@ private:
         }
 
         std::string name = {};
-        int id;
+        int photonId;
+        int playerId;
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
-        //自分のIDから見たディレイ
-        int myDelay = 50;
+        ////自分のIDから見たディレイ
+        //int myDelay = 50;
 
         int teamID = 0;
 
@@ -207,8 +220,35 @@ private:
         };
         NextInput nextInput;
     };
+    std::vector<SaveInput> saveInputPhoton;
+    //追加予約
+    int addSavePhotonID[4] = { -1,-1,-1,-1 };   //要素がプレイヤーID、値がフォトンIDになる
 
+    //ロビーで名前とIDを紐づけする
+    std::string savePlayerName[4];  //ゲーム中に参加処理をするため
+
+    //タイマースタート時間
+    int startTime = 0;
+
+    //ゲーム中か
+    bool isGamePlay = false;
+
+    //入室申請リスト(ホストのみ使用)
+    struct JoinManager
+    {
+        NetData::JoinData jData;
+        std::string joinName;
+    };
+    std::vector<JoinManager> joinManager;
+    bool joinPermission = false;    //入室許可
+
+    //遅延フレーム
+    int delayFrame = 0;
+    //プレイヤーの名前
     std::string netName = {};
 
-    std::vector<SaveInput> saveInputPhoton;
+    //仮機能
+    bool isSendChat = false;    //チャット送信フラグ
+    std::string chat;   //チャット
+    std::vector<std::string> chatList;
 };

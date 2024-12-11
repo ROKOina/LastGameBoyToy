@@ -11,6 +11,7 @@
 #include "Scene/SceneTitle/SceneTitle.h"
 #include "Component\Audio\AudioCom.h"
 
+//基底君
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
@@ -72,23 +73,11 @@ void BaseCharacter_BaseState::Hovering(float elapsedTime)
 }
 
 #pragma region Idle
-
 void BaseCharacter_IdleState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
-
-    ////FPS用
-    //auto& camera = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
-    //if (camera)
-    //{
-    //    auto& arm = camera->GetChildFind("armChild");
-    //    auto& armAnim = arm->GetComponent<AnimationCom>();
-
-    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
-    //}
 }
-
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 {
     //移動
@@ -102,11 +91,9 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 }
-
 #pragma endregion
 
 #pragma region Move
-
 void BaseCharacter_MoveState::Enter()
 {
     //歩きアニメーション再生開始
@@ -130,11 +117,12 @@ void BaseCharacter_MoveState::Enter()
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
-    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Single_Shot"), false, 0.3f);
-    //GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
 
-    /*animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true);*/
+    //上半身アニメーション再生
+    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.25f);
+
+    //足元の煙エフェクト再生
+    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
 }
 
 void BaseCharacter_MoveState::Execute(const float& elapsedTime)
@@ -156,7 +144,8 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
 
 void BaseCharacter_MoveState::Exit()
 {
-    //GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    //足元の煙エフェクト停止
+    GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
 }
 
 #pragma endregion
@@ -174,11 +163,11 @@ void BaseCharacter_JumpState::Enter()
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
 
-    //アニメーション
-    // 例外処理必要
-    //auto& arm = GameObjectManager::Instance().Find("armChild");
-    //auto& armAnim = arm->GetComponent<AnimationCom>();
-    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
+    //アニメーション(腕だけのアニメーション)
+    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
@@ -201,12 +190,12 @@ void BaseCharacter_JumpLoop::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), false);
 
-    //アニメーション
-    // 例外処理必要
-    //auto& arm = GameObjectManager::Instance().Find("armChild");
-    //auto& armAnim = arm->GetComponent<AnimationCom>();
-    //if (!armAnim->IsPlayAnimation())
-    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
+    //アニメーション(腕だけのアニメーション)
+    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    if (!armAnim->IsPlayAnimation())
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
 }
 void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 {
@@ -228,11 +217,11 @@ void BaseCharacter_Landing::Enter()
 {
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_end"), false, false, 1.0f);
 
-    //アニメーション
-    // 例外処理必要
-    //auto& arm = GameObjectManager::Instance().Find("armChild");
-    //auto& armAnim = arm->GetComponent<AnimationCom>();
-    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
+    //アニメーション(腕だけのアニメーション)
+    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
+    auto& arm = GameObjectManager::Instance().Find("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
 }
 void BaseCharacter_Landing::Execute(const float& elapsedTime)
 {
@@ -267,7 +256,6 @@ void BaseCharacter_Landing::Exit()
 #pragma endregion
 
 #pragma region Death
-
 void BaseCharacter_DeathState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
@@ -285,23 +273,9 @@ void BaseCharacter_DeathState::Enter()
     //遷移
     SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 3);
 }
-
-void BaseCharacter_DeathState::Execute(const float& elapsedTime)
-{
-}
-
-void BaseCharacter_DeathState::Exit()
-{
-}
-
 #pragma endregion
 
 #pragma region Hitscan
-
-void BaseCharacter_HitscanState::Enter()
-{
-}
-
 void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
 {
     auto& ray = owner->GetGameObject()->GetChildFind("rayObj");
@@ -318,8 +292,8 @@ void BaseCharacter_HitscanState::Execute(const float& elapsedTime)
 
             //自分か判断する
             DirectX::XMFLOAT3 front;
-            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-            if (playerNetID == charaCom.lock()->GetNetID())
+            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+            if (playerNetID == charaCom.lock()->GetNetCharaData().GetNetPlayerID())
                 front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
             else
                 front = charaCom.lock()->GetFpsCameraDir();
@@ -353,11 +327,6 @@ void BaseCharacter_HitscanState::ImGui()
 #pragma endregion
 
 #pragma region Capsule
-
-void BaseCharacter_CapsuleState::Enter()
-{
-}
-
 void BaseCharacter_CapsuleState::Execute(const float& elapsedTime)
 {
     auto& capsule = owner->GetGameObject()->GetChildFind("capsuleObj");
@@ -371,8 +340,8 @@ void BaseCharacter_CapsuleState::Execute(const float& elapsedTime)
 
             //自分か判断する
             DirectX::XMFLOAT3 front;
-            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetID();
-            if (playerNetID == charaCom.lock()->GetNetID())
+            int playerNetID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+            if (playerNetID == charaCom.lock()->GetNetCharaData().GetNetPlayerID())
                 front = GameObjectManager::Instance().Find("cameraPostPlayer")->transform_->GetWorldFront();
             else
                 front = charaCom.lock()->GetFpsCameraDir();
@@ -389,7 +358,6 @@ void BaseCharacter_CapsuleState::Execute(const float& elapsedTime)
     if (!(CharacterInput::SubAttackButton & owner->GetButton()))
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
-
 void BaseCharacter_CapsuleState::Exit()
 {
     //無効に
@@ -401,65 +369,45 @@ void BaseCharacter_CapsuleState::Exit()
             capsuleCol->SetEnabled(false);
     }
 }
-
 void BaseCharacter_CapsuleState::ImGui()
 {
     ImGui::DragFloat("capsuleLength", &capsuleLength);
 }
-
 #pragma endregion
 
 #pragma region StanBall
-
 void BaseCharacter_StanBallState::Enter()
 {
     BulletCreate::DamageFire(owner->GetGameObject(), speed, power);
-    //BulletCreate::StanFire(owner->GetGameObject(), speed, power);
 }
-
 void BaseCharacter_StanBallState::Execute(const float& elapsedTime)
 {
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
-
-void BaseCharacter_StanBallState::Exit()
-{
-}
-
 void BaseCharacter_StanBallState::ImGui()
 {
     ImGui::DragFloat("speed", &speed);
     ImGui::DragFloat("power", &power);
 }
-
 #pragma endregion
 
 #pragma region KnockbackBall
-
 void BaseCharacter_KnockbackBallState::Enter()
 {
     BulletCreate::KnockbackFire(owner->GetGameObject(), speed, power);
 }
-
 void BaseCharacter_KnockbackBallState::Execute(const float& elapsedTime)
 {
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
-
-void BaseCharacter_KnockbackBallState::Exit()
-{
-}
-
 void BaseCharacter_KnockbackBallState::ImGui()
 {
     ImGui::DragFloat("speed", &speed);
     ImGui::DragFloat("power", &power);
 }
-
 #pragma endregion
 
 #pragma region ULT_ATTACK
-
 void Ult_Attack_State::Enter()
 {
     obj = owner->GetGameObject()->GetChildFind("UltAttackChild");
@@ -500,14 +448,12 @@ void Ult_Attack_State::Enter()
     ray->SetEnd(end);
     ray->SetEnabled(true);
 }
-
 void Ult_Attack_State::Execute(const float& elapsedTime)
 {
     if (!obj)return;
 
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
-
 void Ult_Attack_State::Exit()
 {
     auto& ray = obj->GetComponent<RayColliderCom>();
@@ -515,16 +461,4 @@ void Ult_Attack_State::Exit()
 
     obj.reset();
 }
-
-void Ult_Attack_State::ImGui()
-{
-}
-
 #pragma endregion
-
-void BaseCharacter_NoneAttack::Enter()
-{
-    ////歩きアニメーション再生開始
-    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Idle"), true, 0.1f);
-}

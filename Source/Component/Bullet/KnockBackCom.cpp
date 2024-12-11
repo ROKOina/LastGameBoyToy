@@ -21,6 +21,8 @@ void KnockBackCom::Update(float elapsedTime)
             DirectX::XMFLOAT3 forceY = { 0,knockbackforce.y,0 };
             DirectX::XMFLOAT3 force = (Mathf::Normalize(enemy - pos) * forceXZ);
 
+            //※※※   ムーブメント例外処理しましょう     ※※※
+            //ゲットは一回で良いかと思う
             obj.gameObject.lock()->GetComponent<MovementCom>()->AddNonMaxSpeedVelocity(force);
             obj.gameObject.lock()->GetComponent<MovementCom>()->AddForce(forceY);
             obj.gameObject.lock()->GetComponent<MovementCom>()->SetOnGround(false);

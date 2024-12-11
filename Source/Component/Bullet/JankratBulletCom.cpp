@@ -1,6 +1,7 @@
 #include "JankratBulletCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Component\Particle\CPUParticle.h"
 #include "Component\Character\CharaStatusCom.h"
 
 void JankratBulletCom::Update(float elapsedTime)
@@ -18,7 +19,8 @@ void JankratBulletCom::Update(float elapsedTime)
         RigidBodyCom* rigid = GetGameObject()->GetComponent<RigidBodyCom>().get();
         rigid->SetRigidFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
 
-        //TODO ここで爆発のエフェクト再生
+        // ここで爆発のエフェクト再生
+        GetGameObject()->GetChildFind("bomber")->GetChildFind("explosion")->GetComponent<CPUParticle>()->SetActive(true);
 
         explosionFlag = true;
     }

@@ -12,6 +12,7 @@
 #include "Component\Audio\AudioCom.h"
 #include "Component\Sprite\Sprite.h"
 #include "Component\Renderer\RendererCom.h"
+#include <Component\Animation\AnimationCom.h>
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -101,6 +102,23 @@ void CharacterCom::Update(float elapsedTime)
     //ダメージビネット発動
     if(GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
 
+    //攻撃先行入力
+    shootTimer += elapsedTime;
+    if (attackInputSave)
+    {
+        if (shootTimer >= shootTime)
+        {
+            //スキル発動中はリターン
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
+            {
+                attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
+            }
+            attackInputSave = false;
+        }
+        if (CharacterInput::MainAttackButton & GetButtonUp())
+            attackInputSave = false;
+    }
+
     //地面について要れば元に戻す
     if (GetGameObject()->GetComponent<MovementCom>()->OnGround())
     {
@@ -170,13 +188,15 @@ void CharacterCom::OnGUI()
         ImGui::InputInt("userInputUp", &i);
 
         ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
-        ImGui::InputInt("netID", &netID);
+        ImGui::InputInt("netID", &netCharaData.netPlayerID);
 
         ImGui::TreePop();
     }
 
     if (ImGui::TreeNode("SkillCool"))
     {
+        ImGui::DragFloat("shootTime", &shootTime);
+        ImGui::DragFloat("shootTimer", &shootTimer);
         ImGui::DragFloat("QTime", &skillCools[SkillCoolID::Q].time);
         ImGui::DragFloat("QTimer", &skillCools[SkillCoolID::Q].timer);
         ImGui::Separator();
@@ -217,6 +237,48 @@ void CharacterCom::DashFewSub(float elapsedTime)
     }
 }
 
+//FPS視点の腕アニメーション制御
+void CharacterCom::FPSArmAnimation()
+{
+    if (std::string(GetGameObject()->GetName()) != "player")return;
+    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+
+    //待機
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
+    {
+        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
+
+        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot"))
+            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
+    }
+
+    //移動
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
+    {
+        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
+        {
+            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot"))
+            {
+                if (armAnim->IsEventCalling("attackEnd"))
+                    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
+            }
+            else
+                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
+        }
+    }
+
+    //アニメーションスピード変更
+    float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
+    float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
+
+    float v = max - fmax;
+    if (v < 0)v = 0;
+
+    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
+        = 1 + v * 0.1f;
+}
+
 void CharacterCom::InputStateUpdate(float elapsedTime)
 {
     //ステート処理
@@ -234,6 +296,12 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
+        if (shootTimer < shootTime)
+        {
+            attackInputSave = true; //先行入力保存
+            return;
+        }
+
         MainAttackDown();
     }
     else if (CharacterInput::MainAttackButton & GetButton()
@@ -246,6 +314,12 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
+        if (shootTimer < shootTime)
+        {
+            attackInputSave = true; //先行入力保存
+            return;
+        }
+
         MainAttackDown();
     }
     else if (CharacterInput::MainAttackButton & GetButton())

@@ -27,7 +27,7 @@ class Trail;
 class GameObject : public std::enable_shared_from_this<GameObject>
 {
 public:
-    GameObject() {  }
+    GameObject() {}
     virtual ~GameObject() {};
 
     // 開始処理
@@ -58,7 +58,6 @@ public:
         std::shared_ptr<T> component = std::make_shared<T>(args...);
         component->SetGameObject(shared_from_this());
 
- 
         //transformの場合は保持する
         if (std::strcmp(component->GetName(), "Transform") == 0)
             transform_ = std::dynamic_pointer_cast<TransformCom>(component);
@@ -134,8 +133,9 @@ using GameObj = std::shared_ptr<GameObject>;
 // ゲームオブジェクトマネージャー
 class GameObjectManager
 {
+    friend class GameObject;
 private:
-    GameObjectManager() { }
+    GameObjectManager() {}
     ~GameObjectManager() {}
 
 public:
@@ -148,9 +148,14 @@ public:
 
     // 作成
     std::shared_ptr<GameObject> Create();
+    // 即作成（危険出来れば使わない方がいいかも）
+    std::shared_ptr<GameObject> CreateNowTime();    //オブジェクトを返すだけ　※これを使ったら下の関数呼ぶまで別のオブジェクトを作らないで下さい（これで返したオブジェクトの子供は下の関数呼ぶ前に登録しておく）
+    void CreateNowTimeSaveComponent(std::shared_ptr<GameObject> obj);   //オブジェクトにコンポーネント入れたら呼ぶ
 
     // 削除
     void Remove(std::shared_ptr<GameObject> obj);
+    //即削除（危険出来れば使わない方がいいかも）
+    void RemoveNowTime(std::weak_ptr<GameObject> obj);
     // 全削除
     void AllRemove();
 
@@ -176,6 +181,8 @@ public:
     void RemoveGameObjects();
 private:
     void StartUpObjects();
+    //保存コンポーネントを追加
+    void StartUpSaveComponent(std::shared_ptr<GameObject> obj);
 
     void CollideGameObjects();  //当たり
     void PushBackGameObjects(); //押し出し
@@ -217,11 +224,18 @@ private:
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
 
+    //保存コンポーネントnull解放
+    void EraseComponet();
+
 private:
     std::vector<std::shared_ptr<GameObject>>		startGameObject_;
     std::vector<std::shared_ptr<GameObject>>		updateGameObject_;
     std::set<std::shared_ptr<GameObject>>		selectionGameObject_;
     std::set<std::shared_ptr<GameObject>>		removeGameObject_;
+
+    //即OBJ作成用
+    std::vector<std::shared_ptr<GameObject>>		creatNowTimeGameChildObject_;   ////即OBJ作成が起動した後の子オブジェクトはここに追加される
+    bool isCreatNowTimeObj = false; //即OBJ作成が起動したらtrueになる（子を処理するため）
 
     //imguiguizmo
     ImGuizmo::OPERATION m_guizmoOperation = ImGuizmo::TRANSLATE;

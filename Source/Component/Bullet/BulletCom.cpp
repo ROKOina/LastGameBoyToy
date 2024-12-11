@@ -223,8 +223,8 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     coll->SetRadius(0.6f);
 
     //弾
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
-    std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
+    int netPlayerID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netPlayerID);
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(-damageValue);
     bulletCom->SetViewBullet(viewObj);
@@ -271,8 +271,8 @@ void BulletCreate::StanFire(std::shared_ptr<GameObject> objPoint, float bulletSp
         coll->SetJudgeTag(COLLIDER_TAG::Player);
 
     //弾
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
-    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netID);
+    int netPlayerID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
     bulletCom->SetAliveTime(2.0f);
     bulletCom->SetDamageValue(0);
 
@@ -365,7 +365,7 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     coll->SetRadius(0.6f);
 
     //弾
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(power);
@@ -461,7 +461,7 @@ void BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float b
     coll->SetRadius(0.6f);
 
     //弾
-    int netID = objPoint->GetComponent<CharacterCom>()->GetNetID();
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(-damageValue);
@@ -477,7 +477,7 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 {
     GameObj bullet = GameObjectManager::Instance().Create();
     bullet->SetName("damageball");
-    bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
+    bullet->transform_->SetScale({ 0.004f,0.004f,0.004f });
     bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
 
     //物理
@@ -495,10 +495,27 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
-    coll->SetRadius(0.5f);
+    coll->SetRadius(0.3f);
 
     //弾
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(1);
+
+    //爆発エフェクト付属
+    std::shared_ptr<GameObject> bomber = bullet->AddChildObject();
+    bomber->SetName("bomber");
+    std::shared_ptr<CPUParticle>b = bomber->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratbomber.cpuparticle", 200);
+    b->SetActive(true);
+
+    //爆発破壊エフェクト
+    std::shared_ptr<GameObject> explosion = bomber->AddChildObject();
+    explosion->SetName("explosion");
+    std::shared_ptr<CPUParticle>ex = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratexplosion.cpuparticle", 200);
+    ex->SetActive(false);
 
     //RigidBodyのAddForceが生成時に使えないのでここで返す
     return bullet;
@@ -547,6 +564,7 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
 
     //吹き飛ばし用子供オブジェクト
     GameObj kcockBack = bullet->AddChildObject();
+    kcockBack->SetName("knockback");
 
     //コライダー
     std::shared_ptr<SphereColliderCom> childColl = kcockBack->AddComponent<SphereColliderCom>();
@@ -557,15 +575,15 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
         coll->SetJudgeTag(COLLIDER_TAG::Player);
     childColl->SetRadius(2.5f);
 
-    float knockBackForce = 5.0f;
     KnockBackCom* childKcockBack = kcockBack->AddComponent<KnockBackCom>().get();
     childKcockBack->SetKnockBackForce({ 18,7,18 });
     childKcockBack->useTestCoad = true;
 
-    ////判定用
-    //std::shared_ptr<HitProcessCom> childHit = kcockBack->AddComponent<HitProcessCom>(parent);
-    //childHit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
-    //childHit->SetValue3(fpsDir * knockBackForce);
+    //爆発破壊エフェクト
+    std::shared_ptr<GameObject> explosion = bullet->AddChildObject();
+    explosion->SetName("explosion");
+    std::shared_ptr<CPUParticle>ex = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratexplosion.cpuparticle", 200);
+    ex->SetActive(false);
 
     return bullet;
 }
