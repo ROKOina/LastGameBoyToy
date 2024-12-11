@@ -6,6 +6,7 @@
 #include "Component\SkillObj\JankratMineCom.h"
 #include "Component\Bullet\JankratBulletCom.h"
 
+//基底クラス君
 JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
@@ -15,50 +16,8 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
     animationCom = GetComp(AnimationCom);
 }
 
-void JankratCharacter_MainAtkState::Enter()
-{
-    const auto& charaComponent = charaCom.lock();
-
-    if (!charaComponent)
-    {
-        return;
-    }
-
-    // 銃の先端位置を取得
-    DirectX::XMFLOAT3 gunPos;
-    if (GetGunTipPosition(gunPos))
-    {
-        // 弾丸を作成しセット
-        const auto& bullet = BulletCreate::JankratBulletFire(owner->GetGameObject(), gunPos, charaCom.lock()->GetNetCharaData().GetCharaID());
-        charaComponent->SetHaveBullet(bullet);
-    }
-}
-
-void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
-{
-    const auto& charaComponent = charaCom.lock();
-    if (!charaComponent)
-    {
-        return;
-    }
-
-    HandleArmAnimation();
-
-    if (const auto& bullet = charaComponent->GetHaveBullet())
-    {
-        FireBullet(bullet);
-        charaComponent->ReleaseHaveBullet();
-
-        //初期化
-        charaComponent->ResetShootTimer();
-
-        // 状態遷移
-        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-    }
-}
-
 // 銃の先端位置を取得
-bool JankratCharacter_MainAtkState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos) const
+bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos) const
 {
     const auto& cameraObj = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
     const auto& arm = cameraObj->GetChildFind("armChild");
@@ -79,7 +38,7 @@ bool JankratCharacter_MainAtkState::GetGunTipPosition(DirectX::XMFLOAT3& outGunP
 }
 
 // 腕アニメーション処理
-void JankratCharacter_MainAtkState::HandleArmAnimation() const
+void JankratCharacter_BaseState::HandleArmAnimation() const
 {
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
@@ -91,7 +50,7 @@ void JankratCharacter_MainAtkState::HandleArmAnimation() const
 }
 
 // 弾丸を発射する処理
-void JankratCharacter_MainAtkState::FireBullet(const GameObj& bullet)
+void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
 {
     const auto& rigid = bullet->GetComponent<RigidBodyCom>().get();
     const auto& jankratBullet = bullet->GetComponent<JankratBulletCom>().get();
@@ -123,6 +82,48 @@ void JankratCharacter_MainAtkState::FireBullet(const GameObj& bullet)
     }
 }
 
+#pragma region 通常弾
+void JankratCharacter_MainAtkState::Enter()
+{
+    const auto& charaComponent = charaCom.lock();
+
+    if (!charaComponent)
+    {
+        return;
+    }
+
+    // 銃の先端位置を取得
+    DirectX::XMFLOAT3 gunPos;
+    if (GetGunTipPosition(gunPos))
+    {
+        // 弾丸を作成しセット
+        const auto& bullet = BulletCreate::JankratBulletFire(owner->GetGameObject(), gunPos, charaCom.lock()->GetNetCharaData().GetCharaID());
+        charaComponent->SetHaveBullet(bullet);
+    }
+}
+void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
+{
+    const auto& charaComponent = charaCom.lock();
+    if (!charaComponent)
+    {
+        return;
+    }
+
+    //腕アニメーション再生
+    HandleArmAnimation();
+
+    if (const auto& bullet = charaComponent->GetHaveBullet())
+    {
+        FireBullet(bullet);
+        charaComponent->ReleaseHaveBullet();
+
+        //初期化
+        charaComponent->ResetShootTimer();
+
+        // 状態遷移
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
+}
 void JankratCharacter_MainAtkState::ImGui()
 {
     ImGui::DragFloat("Mass", &mass);
@@ -132,46 +133,26 @@ void JankratCharacter_MainAtkState::ImGui()
     ImGui::DragFloat("AddGravity", &addGravity);
     ImGui::DragFloat("VecY", &fireVecY);
 }
+#pragma endregion
 
-void JankratCharacter_MainSkillState::Enter()
-{
-}
-
+#pragma region 地雷設置
 void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
 {
     //腕アニメーションをする
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
-    }
+    HandleArmAnimation();
 
     //銃の位置から発射
-    auto& cameraObj = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
-    auto& arm = cameraObj->GetChildFind("armChild");
-    if (arm)
+    DirectX::XMFLOAT3 gunPos = {};
+    if (GetGunTipPosition(gunPos))
     {
-        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-        const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
-
-        if (gunNode)
-        {
-            // 銃先端ボーンのワールド位置を取得
-            DirectX::XMFLOAT3 gunPos =
-            {
-                gunNode->worldTransform._41,
-                gunNode->worldTransform._42,
-                gunNode->worldTransform._43
-            };
-
-            charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, 100.0f, 20, charaCom.lock()->GetNetCharaData().GetCharaID()));
-            ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-        }
+        // 弾丸を作成しセット
+        charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, 100.0f, 20, charaCom.lock()->GetNetCharaData().GetCharaID()));
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }
+#pragma endregion
 
+#pragma region 地雷起爆
 void JankratCharacter_SubAttackState::Execute(const float& elapsedTime)
 {
     for (auto& mine : charaCom.lock()->GetHaveMine())
@@ -183,21 +164,63 @@ void JankratCharacter_SubAttackState::Execute(const float& elapsedTime)
     //TODOアニメーション終わってから遷移
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
+#pragma endregion
 
 #pragma region ウルト
 void JankratCharacter_UltState::Enter()
 {
+    const auto& charaComponent = charaCom.lock();
+
+    if (!charaComponent)
+    {
+        return;
+    }
+
+    // 銃の先端位置を取得
+    DirectX::XMFLOAT3 gunPos;
+    if (GetGunTipPosition(gunPos))
+    {
+        // 弾丸を作成しセット
+        const auto& bullet = BulletCreate::JankratBulletFire(owner->GetGameObject(), gunPos, charaCom.lock()->GetNetCharaData().GetCharaID());
+        charaComponent->SetHaveBullet(bullet);
+    }
 }
 void JankratCharacter_UltState::Execute(const float& elapsedTime)
 {
     if (!charaCom.lock()->UseUlt()) return;
+
+    const auto& charaComponent = charaCom.lock();
+    if (!charaComponent)
+    {
+        return;
+    }
+
+    //腕アニメーション再生
+    HandleArmAnimation();
+
+    if (const auto& bullet = charaComponent->GetHaveBullet())
+    {
+        FireBullet(bullet);
+        charaComponent->ReleaseHaveBullet();
+
+        //初期化
+        charaComponent->ResetShootTimer();
+
+        // 状態遷移
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
 }
 void JankratCharacter_UltState::Exit()
 {
     charaCom.lock()->FinishUlt();
-    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
 void JankratCharacter_UltState::ImGui()
 {
+    ImGui::DragFloat("Mass", &mass);
+    ImGui::DragFloat("Restitution", &restitution);
+    ImGui::DragFloat("Force", &force);
+    ImGui::DragFloat("BulletLifeTimer", &bulletLifeTimer);
+    ImGui::DragFloat("AddGravity", &addGravity);
+    ImGui::DragFloat("VecY", &fireVecY);
 }
 #pragma endregion
