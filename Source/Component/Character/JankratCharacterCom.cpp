@@ -42,9 +42,6 @@ void JankratCharacterCom::Update(float elapsedTime)
     //更新
     CharacterCom::Update(elapsedTime);
 
-    //fps用の腕アニメーション
-    FPSArmAnimation();
-
     //後処理
     EraseHaveObjects();
 }

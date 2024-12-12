@@ -46,7 +46,6 @@ void FarahCom::Update(float elapsedTime)
     UltUpdate(elapsedTime);
     ShotSecond();
     CharacterCom::Update(elapsedTime);
-    FPSArmAnimation();
     GroundBomber(elapsedTime);
 }
 
