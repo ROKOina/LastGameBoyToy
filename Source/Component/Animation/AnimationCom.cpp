@@ -591,6 +591,12 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                             AnimationCalculation::Instance().ComputeAnimation(key0, key1, rate, *lowerNodes[lowerNodeIndex]);
                         }
                     }
+
+                    //AimIKの更新
+                    if (GetGameObject()->GetComponent<AimIKCom>())
+                    {
+                        GetGameObject()->GetComponent<AimIKCom>()->AimIK();
+                    }
                 }
                 else if (lowerBlendType == 1)
                 {
@@ -612,6 +618,12 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         {
                             AnimationCalculation::Instance().ComputeAnimation(key0, key1, lowerRate, *lowerNodes[lowerNodeIndex]);
                         }
+                    }
+
+                    //AimIKの更新
+                    if (GetGameObject()->GetComponent<AimIKCom>())
+                    {
+                        GetGameObject()->GetComponent<AimIKCom>()->AimIK();
                     }
                 }
                 //歩きモーション用
@@ -927,9 +939,9 @@ void AnimationCom::SeparateNode()
     Model* model = GetGameObject()->GetComponent<RendererCom>()->GetModel();
     for (auto& node : model->GetNodes())
     {
-        if (std::string(node.name).find("hip1") != std::string::npos)
+        if (std::string(node.name).find("root") != std::string::npos)
         {
-            lowerNodes.emplace_back(&node);
+            upperNodes.emplace_back(&node);
             continue;
         }
 

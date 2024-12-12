@@ -30,8 +30,8 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     case RegisterChara::CHARA_LIST::INAZAWA:
         InazawaChara(obj);
         break;
-    //case RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK:
-    //    HaveAllAttackChara(obj);
+        //case RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK:
+        //    HaveAllAttackChara(obj);
         break;
     case RegisterChara::CHARA_LIST::FARAH:
         FarahCharacter(obj);
@@ -434,6 +434,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(0.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
