@@ -33,7 +33,7 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
 
         //攻撃処理
-        BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f);
+        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
 
         //射撃間隔タイマー起動
         charaCom.lock()->ResetShootTimer();
@@ -48,7 +48,7 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
 void Farah_UltState::Enter()
 {
     moveCom.lock()->SetMoveAcceleration(5.0f);
-    charaCom.lock()->SetDashuGaugeMins(2.0f);
+    charaCom.lock()->SetDashGaugeMins(2.0f);
 }
 #pragma endregion
 
@@ -68,7 +68,7 @@ void Farah_ESkillState::Execute(const float& elapsedTime)
     }
 
     //攻撃処理
-    BulletCreate::KnockbackFire(owner->GetGameObject(), 30.0f, 2);
+    charaCom.lock()->AddBullet(BulletCreate::FarahKnockBack(owner->GetGameObject(), 30.0f, 2.0f));
 
     //ステート変更
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);

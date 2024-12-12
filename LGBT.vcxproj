@@ -178,6 +178,7 @@
     <ClInclude Include="Source\Component\Enemy\BossCom.h" />
     <ClInclude Include="Source\Component\Enemy\NoobEnemyCom.h" />
     <ClInclude Include="Source\Component\Enemy\ScarecrowCom.h" />
+    <ClInclude Include="Source\Component\GameSystem\RespawnCom.h" />
     <ClInclude Include="Source\Component\Item\UltSkillMaxItem.h" />
     <ClInclude Include="Source\Component\Light\LightCom.h" />
     <ClInclude Include="Source\Component\MoveSystem\EasingMoveCom.h" />
@@ -330,6 +331,7 @@
     <ClCompile Include="Source\Component\Enemy\BossCom.cpp" />
     <ClCompile Include="Source\Component\Enemy\NoobEnemyCom.cpp" />
     <ClCompile Include="Source\Component\Enemy\ScarecrowCom.cpp" />
+    <ClCompile Include="Source\Component\GameSystem\RespawnCom.cpp" />
     <ClCompile Include="Source\Component\Item\UltSkillMaxItem.cpp" />
     <ClCompile Include="Source\Component\Light\LightCom.cpp" />
     <ClCompile Include="Source\Component\MoveSystem\EasingMoveCom.cpp" />

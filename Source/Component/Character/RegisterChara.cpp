@@ -30,8 +30,8 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     case RegisterChara::CHARA_LIST::INAZAWA:
         InazawaChara(obj);
         break;
-    case RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK:
-        HaveAllAttackChara(obj);
+    //case RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK:
+    //    HaveAllAttackChara(obj);
         break;
     case RegisterChara::CHARA_LIST::FARAH:
         FarahCharacter(obj);
@@ -48,6 +48,24 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     {
         PlayerUIManager::Instance().BookingRegistrationUI(obj);
     }
+}
+
+void RegisterChara::ChangeChara(std::string objName, CHARA_LIST list)
+{
+    auto& gameobjM = GameObjectManager::Instance();
+    std::weak_ptr<GameObject> p2 = gameobjM.Find(objName.c_str());
+    if (!p2.lock())return;
+    if (int(list) >= int(CHARA_LIST::MAX))return;
+
+    //削除
+    gameobjM.RemoveNowTime(p2);
+
+    //追加(変更)
+    std::shared_ptr<GameObject> p = gameobjM.Create();
+    p->SetName(objName.c_str());
+    p->transform_->SetWorldPosition({ 0,0,0 });
+    RegisterChara::Instance().SetCharaComponet(list, p);
+    //gameobjM.CreateNowTimeSaveComponent(p);
 }
 
 //imgui
@@ -221,105 +239,105 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     }
 }
 
-//全てを兼ね備えたやばいやつ
-void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject>& obj)
-{
-    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/pico/pico.mdl");
-    obj->AddComponent<AimIKCom>("Spine", nullptr);
-    obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/Model/pico/pico.nodecollsion");
-    obj->AddComponent<CharaStatusCom>();
-    obj->AddComponent<MovementCom>();
-    std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
-    c->GetNetCharaData().SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
-
-    //煙のエフェクト
-    {
-        std::shared_ptr<GameObject> smoke = obj->AddChildObject();
-        smoke->SetName("smokeeffect");
-        std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
-        smokeeffct->SetActive(false);
-    }
-
-    //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
-    //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
-    //box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    //if (std::strcmp(obj->GetName(), "player") == 0)
-    //    box->SetMyTag(COLLIDER_TAG::Player);
-    //else
-    //    box->SetMyTag(COLLIDER_TAG::Enemy);
-
-    std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
-
-    if (std::strcmp(obj->GetName(), "player") == 0)
-    {
-        ca->SetMyTag(COLLIDER_TAG::Player);
-        ca->SetJudgeTag(COLLIDER_TAG::Enemy);
-    }
-    else
-    {
-        ca->SetMyTag(COLLIDER_TAG::Enemy);
-        ca->SetJudgeTag(COLLIDER_TAG::Player);
-    }
-
-    //std::shared_ptr<SphereColliderCom> sphere= obj->AddComponent<SphereColliderCom>();
-    //sphere->SetRadius(2);
-    //sphere->SetMyTag(COLLIDER_TAG::Player);
-    //sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
-
-    //攻撃レイキャスト
-    {
-        std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
-        rayChild->SetName("rayObj");
-
-        rayChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-
-        std::shared_ptr<RayColliderCom> rayCol = rayChild->AddComponent<RayColliderCom>();
-        if (std::strcmp(obj->GetName(), "player") == 0)
-        {
-            rayCol->SetMyTag(COLLIDER_TAG::Player);
-            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
-        }
-        else
-        {
-            rayCol->SetMyTag(COLLIDER_TAG::Enemy);
-            rayCol->SetJudgeTag(COLLIDER_TAG::Player);
-        }
-        rayCol->SetEnabled(false);
-
-        //ダメージ処理用
-        std::shared_ptr<HitProcessCom> hitDamage = rayChild->AddComponent<HitProcessCom>(obj);
-        hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    }
-
-    //回復カプセル
-    {
-        std::shared_ptr<GameObject> cupsuleChild = obj->AddChildObject();
-        cupsuleChild->SetName("capsuleObj");
-
-        cupsuleChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-
-        std::shared_ptr<CapsuleColliderCom> capsuleCol = cupsuleChild->AddComponent<CapsuleColliderCom>();
-        if (std::strcmp(obj->GetName(), "player") == 0)
-        {
-            capsuleCol->SetMyTag(COLLIDER_TAG::Player);
-            capsuleCol->SetJudgeTag(COLLIDER_TAG::Enemy);
-        }
-        else
-        {
-            capsuleCol->SetMyTag(COLLIDER_TAG::Enemy);
-            capsuleCol->SetJudgeTag(COLLIDER_TAG::Player);
-        }
-        capsuleCol->SetEnabled(false);
-
-        //ヒール処理用
-        std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>(obj);
-        hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
-        hitHeal->SetValue(2);
-    }
-}
+////全てを兼ね備えたやばいやつ
+//void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject>& obj)
+//{
+//    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
+//    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+//    r->LoadModel("Data/Model/pico/pico.mdl");
+//    obj->AddComponent<AimIKCom>("Spine", nullptr);
+//    obj->AddComponent<AnimationCom>();
+//    obj->AddComponent<NodeCollsionCom>("Data/Model/pico/pico.nodecollsion");
+//    obj->AddComponent<CharaStatusCom>();
+//    obj->AddComponent<MovementCom>();
+//    std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
+//    c->GetNetCharaData().SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
+//
+//    //煙のエフェクト
+//    {
+//        std::shared_ptr<GameObject> smoke = obj->AddChildObject();
+//        smoke->SetName("smokeeffect");
+//        std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
+//        smokeeffct->SetActive(false);
+//    }
+//
+//    //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
+//    //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
+//    //box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
+//    //if (std::strcmp(obj->GetName(), "player") == 0)
+//    //    box->SetMyTag(COLLIDER_TAG::Player);
+//    //else
+//    //    box->SetMyTag(COLLIDER_TAG::Enemy);
+//
+//    std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
+//
+//    if (std::strcmp(obj->GetName(), "player") == 0)
+//    {
+//        ca->SetMyTag(COLLIDER_TAG::Player);
+//        ca->SetJudgeTag(COLLIDER_TAG::Enemy);
+//    }
+//    else
+//    {
+//        ca->SetMyTag(COLLIDER_TAG::Enemy);
+//        ca->SetJudgeTag(COLLIDER_TAG::Player);
+//    }
+//
+//    //std::shared_ptr<SphereColliderCom> sphere= obj->AddComponent<SphereColliderCom>();
+//    //sphere->SetRadius(2);
+//    //sphere->SetMyTag(COLLIDER_TAG::Player);
+//    //sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
+//
+//    //攻撃レイキャスト
+//    {
+//        std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
+//        rayChild->SetName("rayObj");
+//
+//        rayChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+//
+//        std::shared_ptr<RayColliderCom> rayCol = rayChild->AddComponent<RayColliderCom>();
+//        if (std::strcmp(obj->GetName(), "player") == 0)
+//        {
+//            rayCol->SetMyTag(COLLIDER_TAG::Player);
+//            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
+//        }
+//        else
+//        {
+//            rayCol->SetMyTag(COLLIDER_TAG::Enemy);
+//            rayCol->SetJudgeTag(COLLIDER_TAG::Player);
+//        }
+//        rayCol->SetEnabled(false);
+//
+//        //ダメージ処理用
+//        std::shared_ptr<HitProcessCom> hitDamage = rayChild->AddComponent<HitProcessCom>(obj);
+//        hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+//    }
+//
+//    //回復カプセル
+//    {
+//        std::shared_ptr<GameObject> cupsuleChild = obj->AddChildObject();
+//        cupsuleChild->SetName("capsuleObj");
+//
+//        cupsuleChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
+//
+//        std::shared_ptr<CapsuleColliderCom> capsuleCol = cupsuleChild->AddComponent<CapsuleColliderCom>();
+//        if (std::strcmp(obj->GetName(), "player") == 0)
+//        {
+//            capsuleCol->SetMyTag(COLLIDER_TAG::Player);
+//            capsuleCol->SetJudgeTag(COLLIDER_TAG::Enemy);
+//        }
+//        else
+//        {
+//            capsuleCol->SetMyTag(COLLIDER_TAG::Enemy);
+//            capsuleCol->SetJudgeTag(COLLIDER_TAG::Player);
+//        }
+//        capsuleCol->SetEnabled(false);
+//
+//        //ヒール処理用
+//        std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>(obj);
+//        hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
+//        hitHeal->SetValue(2);
+//    }
+//}
 
 //ファラ
 void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
@@ -380,15 +398,14 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
-        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
-        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+        std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
         cameraPost->SetName("cameraPostPlayer");
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
         fpscamera->ActiveCameraChange();
 
         //カメラ位置
         cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
-        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+        obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //腕
         {
@@ -421,6 +438,8 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
+    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
+    charaCom->SetUseSkill(USE_SKILL::E);
 
     //HPの初期設定
     status->SetMaxHitPoint(200);
@@ -461,15 +480,14 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
         //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
-        std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
-        std::shared_ptr<GameObject> cameraPost = playerObj->AddChildObject();
+        std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
         cameraPost->SetName("cameraPostPlayer");
         std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
         fpscamera->ActiveCameraChange();
 
         //カメラ位置
-        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
-        playerObj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+        cameraPost->transform_->SetLocalPosition({ 0, 12.086f, 3.3050f });
+        obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //腕
         {

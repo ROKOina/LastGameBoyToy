@@ -203,8 +203,7 @@ void GameObjectManager::CreateNowTimeSaveComponent(std::shared_ptr<GameObject> o
     //保存コンポーネントを追加
     StartUpSaveComponent(obj);
 
-    //ここで親子処理
-
+    //ここで子の処理
     for (auto& childNowTime : creatNowTimeGameChildObject_)
     {
         StartUpSaveComponent(childNowTime);
@@ -227,7 +226,7 @@ void GameObjectManager::RemoveNowTime(std::weak_ptr<GameObject> obj)
 {
     //オブジェクトを削除
     {
-        std::weak_ptr<GameObject> parentObj;       
+        std::weak_ptr<GameObject> parentObj;
 
         if (obj.lock()->GetParent())
             parentObj = obj.lock()->GetParent();

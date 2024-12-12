@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 class GameObject;
 class RegisterChara
@@ -19,7 +20,7 @@ public:
     enum class CHARA_LIST
     {
         INAZAWA,
-        HAVE_ALL_ATTACK,
+        //HAVE_ALL_ATTACK,
         FARAH,
         JANKRAT,
         MAX,
@@ -27,6 +28,9 @@ public:
 
     //キャラに必要なコンポーネントを追加する
     void SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj);
+
+    //キャラ変更
+    void ChangeChara(std::string objName, CHARA_LIST list); //名前は今のオブジェクトの名前
 
     //imgui
     void ImGui();
