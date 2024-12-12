@@ -10,6 +10,7 @@
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene/SceneTitle/SceneTitle.h"
 #include "Component\Audio\AudioCom.h"
+#include "Component\GameSystem\RespawnCom.h"
 
 //基底君
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
@@ -284,6 +285,9 @@ void BaseCharacter_DeathState::Enter()
     //イベントカメラ
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
     EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
+
+    RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
+    respawn->SetIsRespawn(true);
 }
 #pragma endregion
 

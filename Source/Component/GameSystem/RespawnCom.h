@@ -29,6 +29,9 @@ public:
     GameMode GetGameMode() { return gameMode; }
     void SetGameMode(GameMode mode) { gameMode = mode; }
 
+    bool GetIsRespawn() { return isRespawn; }
+    void SetIsRespawn(bool flag) { isRespawn = flag; }
+
 private:
     GameMode gameMode = GameMode::PVE;
 
