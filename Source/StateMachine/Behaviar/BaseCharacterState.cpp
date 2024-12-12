@@ -75,8 +75,26 @@ void BaseCharacter_BaseState::Hovering(float elapsedTime)
 #pragma region Idle
 void BaseCharacter_IdleState::Enter()
 {
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    int animaIndex = animationCom.lock()->FindAnimation("Idle");
+
+    AnimationCom::PlayLowBodyAnimParam param =
+    {
+        param.lowerAnimaOneId = animaIndex,
+        param.lowerAnimeTwoId = animaIndex,
+        param.lowerAnimeThreeId = animaIndex,
+        param.lowerAnimeFourId = animaIndex,
+        param.lowerAnimeFiveId = animaIndex,
+        param.lowerAnimaSixId = animaIndex,
+        param.lowerAnimaSevenId = animaIndex,
+        param.lowerAnimaEightId = animaIndex,
+        param.loop = true,
+        param.rootFlag = false,
+        param.blendType = 0,
+        param.animeChangeRate = 0.2f,
+        param.animeBlendRate = 0.0f
+    };
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
 }
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 {

@@ -546,6 +546,7 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
         //現在の時間がどのキーフレームの間にいるか判定する
         const ModelResource::Keyframe& keyframe0 = Keyframes.at(keyIndex);
         const ModelResource::Keyframe& keyframe1 = Keyframes.at(keyIndex + 1);
+
         const ModelResource::Keyframe& walkFront = Keyframes.at(keyIndex + 1);
         const ModelResource::Keyframe& walkBack = TwoKeyframes.at(keyIndex + 1);
         const ModelResource::Keyframe& walkRight = ThreeKeyframes.at(keyIndex + 1);
