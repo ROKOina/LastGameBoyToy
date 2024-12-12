@@ -58,6 +58,8 @@ void JankratCharacter_BaseState::HandleArmAnimation() const
         const auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
         const auto& armAnim = arm->GetComponent<AnimationCom>();
         armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
         armAnim->SetAnimationSeconds(0.3f);
     }
     else
@@ -111,6 +113,9 @@ void JankratCharacter_MainAtkState::Enter()
         return;
     }
 
+    //腕アニメーション再生
+    HandleArmAnimation();
+
     // 銃の先端位置を取得
     DirectX::XMFLOAT3 gunPos;
     if (GetGunTipPosition(gunPos))
@@ -127,9 +132,6 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
     {
         return;
     }
-
-    //腕アニメーション再生
-    HandleArmAnimation();
 
     if (const auto& bullet = charaComponent->GetHaveBullet())
     {
