@@ -142,6 +142,8 @@ void SceneTraining::Render(float elapsedTime)
 
     photonNet->ImGui();
 
+    TrainingManager::Instance().OnGUI();
+
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }

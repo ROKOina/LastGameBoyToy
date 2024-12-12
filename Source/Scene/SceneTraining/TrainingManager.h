@@ -21,9 +21,10 @@ public:
     void TrainingManagerUpdate(float elapsedTime);
     void TrainingManagerStart();
     void TrainingManagerClear();
+    void OnGUI();
 
 public:
-    void SetTutorialFlag(bool flag) { tutorialFlag = flag; }
+    void ChangeTutorialFlag();
 private:
 
     //最初はトレーニングモード
@@ -53,6 +54,9 @@ public:
 
     void SetItemFlag(bool flag) { itemFlag = flag; }
 
+    //トレーニングモードのオブジェクトを非表示
+    void TrainingObjUnhide();
+
 private:
     //射撃の開始処理と終了処理
     void ShootingStartEndSystem();
@@ -60,13 +64,16 @@ private:
     //射撃のロジック？
     void ShootingSystem(float elapsdTime);
 
-    //射撃時の案山子スポーン
+    //射撃時の案山子スポーン 
     void ShootingSpawnCrow();
 
+    //アイテムのスポーン
     void SpawnItem();
 
+    //アイテムスポーンシステム
     void SpawnItemSystem(float elapsdTime);
 
+    
 private:
     int     shootingScore = 0;                     //射撃のスコア
     int     scarecrowMaxTotal = 30;                //射撃時の最大案山子スポーン数
@@ -124,13 +131,43 @@ public:
 
     //ウルトのチュートリアル管理
     void UltTutorialManager(float elapsedTime);
+
+    void OnGui();
 private:
 
     int tutorialID = 0;
     
-                                           
+    int  moveSubTitleIndex = 0;
+    int  gunSubTitleIndex = 0;
+    int  skillSubTitleIndex = 0;
+    int  ultSubTitleIndex = 0;
+
     bool moveInspectionFlag = false;         //動きのチュートリアル検査
     bool gunInspectionFlag = false;          //銃のチュートリアル検査
     bool skillInspectionFlag = false;        //スキルのチュートリアル検査
     bool ultInspectionFlag = false;          //ウルトのチュートリアル検査
+
+    bool moveAFlag = false;
+    bool moveDFlag = false;
+    bool moveWFlag = false;
+    bool moveSFlag = false;
+    bool moveJumpFlag = false;
+
+
+    DirectX::XMFLOAT2 InputVec = { 0,0 };
+
+    struct SubTitle
+    {
+        int  UIID = 0;              //UIの出し方が分からないから一旦これで代用
+
+        float subtitleTimer = 0.0f;
+        float subtitleTime = 1.0f;
+        float subtitleAlpha = 1.0f;
+    };
+
+    SubTitle moveSubTitle[11];
+    SubTitle gunSubTitle[3];
+    SubTitle skillSubTitle[3];
+    SubTitle ultSubTitle[5];
+
 };
