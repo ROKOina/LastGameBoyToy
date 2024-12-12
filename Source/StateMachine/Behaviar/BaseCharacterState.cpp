@@ -286,8 +286,11 @@ void BaseCharacter_DeathState::Enter()
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
     EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
 
-    RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
-    respawn->SetIsRespawn(true);
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
+        respawn->SetIsRespawn(true);
+    }
 }
 #pragma endregion
 

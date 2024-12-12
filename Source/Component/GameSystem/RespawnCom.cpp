@@ -4,6 +4,7 @@
 #include "Component\MoveSystem\MovementCom.h"
 #include "Scene\SceneTitle\SceneTitle.h"
 #include "Component\Camera\EventCameraManager.h"
+#include "Component\Character\CharaStatusCom.h"
 
 void RespawnCom::Update(float elapsedTime)
 {
@@ -36,14 +37,22 @@ void RespawnCom::Update(float elapsedTime)
                 int spawnIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
 
+                //プレイヤーリスポーン処理
+
+                //位置
                 if (spawnIndex < 0) { spawnIndex = 0; }
                 player->transform_->SetWorldPosition(respawnPoses[spawnIndex]);
 
+                //パラメータ回復
+                CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+                status->ReSpawn(status->GetMaxHitpoint());
+
+                //ステートを通常に戻す
                 auto& moveStateMachine = charaCom->GetMoveStateMachine();
                 auto& attackStateMachine = charaCom->GetAttackStateMachine();
                 moveStateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);                
                 attackStateMachine.ChangeState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-                
+
                 //最初にイベントカメラへ変更
                 GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
 
