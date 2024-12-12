@@ -9,46 +9,86 @@
 #include <codecvt>
 #include<windows.h>
 
-//変換関数
-// UTF-8 -> wchar_t* への変換
-std::wstring UTF8ToWChar(const std::string& input) {
-	if (input.empty()) {
-		return L"";
+// UTF-16 (std::wstring) → UTF-8 (std::string) 変換
+std::string WStringToUTF8(const std::wstring& wstr) {
+	std::string result;
+	result.reserve(wstr.size() * 4); // UTF-8では1文字が最大4バイトになる
+	for (wchar_t wc : wstr) {
+		if (wc <= 0x7F) {
+			result.push_back(static_cast<char>(wc)); // ASCII
+		}
+		else if (wc <= 0x7FF) {
+			result.push_back(static_cast<char>(0xC0 | ((wc >> 6) & 0x1F)));
+			result.push_back(static_cast<char>(0x80 | (wc & 0x3F)));
+		}
+		else if (wc <= 0xFFFF) {
+			result.push_back(static_cast<char>(0xE0 | ((wc >> 12) & 0x0F)));
+			result.push_back(static_cast<char>(0x80 | ((wc >> 6) & 0x3F)));
+			result.push_back(static_cast<char>(0x80 | (wc & 0x3F)));
+		}
+		else {
+			result.push_back(static_cast<char>(0xF0 | ((wc >> 18) & 0x07)));
+			result.push_back(static_cast<char>(0x80 | ((wc >> 12) & 0x3F)));
+			result.push_back(static_cast<char>(0x80 | ((wc >> 6) & 0x3F)));
+			result.push_back(static_cast<char>(0x80 | (wc & 0x3F)));
+		}
 	}
-
-	// 必要なバッファサイズを計算
-	int bufferSize = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, nullptr, 0);
-	if (bufferSize <= 0) {
-		return L""; // エラー処理
-	}
-
-	std::wstring result(bufferSize, L'\0');
-	MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, &result[0], bufferSize);
-
-	// 終端文字を考慮してサイズを調整
-	result.resize(bufferSize - 1);
 	return result;
 }
 
-// wchar_t* -> UTF-8 への変換
-std::string WCharToUTF8(const std::wstring& input) {
-	if (input.empty()) {
-		return "";
+// UTF-8 (std::string) → UTF-16 (std::wstring) 変換
+std::wstring UTF8ToWString(const std::string& str) {
+	std::wstring result;
+	size_t i = 0;
+	while (i < str.size()) {
+		unsigned char c = str[i];
+		if (c <= 0x7F) {
+			result.push_back(c);
+			++i;
+		}
+		else if ((c & 0xE0) == 0xC0) {
+			wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+			result.push_back(wc);
+			i += 2;
+		}
+		else if ((c & 0xF0) == 0xE0) {
+			wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+			result.push_back(wc);
+			i += 3;
+		}
+		else if ((c & 0xF8) == 0xF0) {
+			wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+			result.push_back(wc);
+			i += 4;
+		}
+		else {
+			// 不正なUTF-8データを無視する
+			++i;
+		}
 	}
-
-	// 必要なバッファサイズを計算
-	int bufferSize = WideCharToMultiByte(CP_UTF8, 0, input.c_str(), -1, nullptr, 0, nullptr, nullptr);
-	if (bufferSize <= 0) {
-		return ""; // エラー処理
-	}
-
-	std::string result(bufferSize, '\0');
-	WideCharToMultiByte(CP_UTF8, 0, input.c_str(), -1, &result[0], bufferSize, nullptr, nullptr);
-
-	// 終端文字を考慮してサイズを調整
-	result.resize(bufferSize - 1);
 	return result;
 }
+
+// ImGuiでstd::wstringを扱う関数
+bool InputTextWString(const char* label, std::wstring& wstr, size_t max_length = 256) {
+	// wstringをUTF-8に変換
+	std::string utf8 = WStringToUTF8(wstr);
+
+	// バッファを準備
+	std::vector<char> buffer(max_length + 1); // NULL終端の分を考慮
+	strncpy_s(buffer.data(), buffer.size(), utf8.c_str(), max_length);
+
+	// ImGuiのInputTextで編集
+	bool edited = ImGui::InputText(label, buffer.data(), buffer.size());
+
+	if (edited) {
+		// 編集後の文字列をUTF-8からwstringに変換
+		wstr = UTF8ToWString(std::string(buffer.data()));
+	}
+
+	return edited;
+}
+
 
 Font::Font( const char* filename, int maxSpriteCount)
 {
@@ -112,14 +152,13 @@ Font::Font( const char* filename, int maxSpriteCount)
 				p[1] = i + 1;
 				p[2] = i + 2;
 				p[3] = i + 2;
-				p[4] = i + 1;
-				p[5] = i + 3;
+				p[4] = i + 3;
+				p[5] = i + 1;
 				p += 6;
 			}
 		}
 
 		bufferDesc.ByteWidth = static_cast<UINT>(sizeof(UINT) * maxSpriteCount * 6);
-		//bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bufferDesc.CPUAccessFlags = 0;
@@ -316,7 +355,7 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 	dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
 	dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
 
-
+	stri = L"いとうさいこう";
 	// 頂点編集開始
 	D3D11_MAPPED_SUBRESOURCE mapped_subresource;
 	dc->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_subresource);
@@ -327,6 +366,7 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 	subsets.clear();
 
 	size_t length = str.size();
+	//size_t length = ::wcslen(stri);
 
 	float start_x = position.x;
 	float start_y = position.y;
@@ -457,6 +497,7 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		Subset& next = subsets.at(i);
 		prev.indexCount = next.startIndex - prev.startIndex;
 	}
+	if (subsets.size() <= 0)return;
 	Subset& last = subsets.back();
 	last.indexCount = currentIndexCount - last.startIndex;
 
@@ -471,7 +512,7 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 	UINT offset = 0;
 	dc->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	dc->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 ;
 
 	// 描画
@@ -486,31 +527,14 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 
 void Font::OnGUI()
 {
-	char name[256];
-    ::strncpy_s(name, sizeof(name),str.c_str(), sizeof(name));
-    if (ImGui::InputText((char*)"string", name, sizeof(name), ImGuiInputTextFlags_EnterReturnsTrue))
-    {
-       str = name;
-    }
-		ImGui::DragFloat2("Position", &originalPos.x);
-		ImGui::DragFloat("Scale", &scale);
-	
+	if (InputTextWString("String Input", str)) {
+		// ユーザーがEnterを押したとき、文字列が更新される
+		ImGui::Text("Updated: %ls", str.c_str());
+	}
+
+	static ImVec2 originalPos = { 100.0f, 200.0f };
+	static float scale = 1.0f;
+
+	ImGui::DragFloat2("Position", &originalPos.x);
+	ImGui::DragFloat("Scale", &scale);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

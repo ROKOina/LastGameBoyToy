@@ -150,7 +150,7 @@ void ScenePVP::Initialize()
        std::shared_ptr<Font> font =  obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
        font->position = { 0,0 };
        font->originalPos = { 0,0 };
-       font->str = "ab";
+       font->str = L"ab";
        font->scale = 1.0f;
     }
 

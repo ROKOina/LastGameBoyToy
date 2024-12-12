@@ -108,5 +108,6 @@ public:
 	DirectX::XMFLOAT2				position = { 0,0 };
 	 DirectX::XMFLOAT2			    originalPos = {0,0};
 	float							scale = 0;
-   std::string			            str;
+    std::wstring			            str;
+	wchar_t*						stri = nullptr;
 };
