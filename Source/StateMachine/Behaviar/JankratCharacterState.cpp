@@ -111,6 +111,9 @@ void JankratCharacter_MainAtkState::Enter()
         return;
     }
 
+    //腕アニメーション再生
+    HandleArmAnimation();
+
     // 銃の先端位置を取得
     DirectX::XMFLOAT3 gunPos;
     if (GetGunTipPosition(gunPos))
@@ -127,9 +130,6 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
     {
         return;
     }
-
-    //腕アニメーション再生
-    HandleArmAnimation();
 
     if (const auto& bullet = charaComponent->GetHaveBullet())
     {

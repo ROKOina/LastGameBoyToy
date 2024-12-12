@@ -224,8 +224,11 @@ class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
 public:
     BaseCharacter_NoneAttack(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
-    void Enter() override {};
+    void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override {};
     virtual const char* GetName() const override { return "NoneAttack"; }
+
+private:
+    void PlayStateAnimation(CharacterCom::CHARACTER_MOVE_ACTIONS state);
 };
