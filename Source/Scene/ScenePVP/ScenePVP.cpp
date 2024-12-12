@@ -255,6 +255,9 @@ void ScenePVP::Update(float elapsedTime)
     //{
     //    InitializeLobby();
     //}
+
+    // キャラピック更新処理
+    charaPicks->CharaPicksUpdate(elapsedTime);
 }
 
 void ScenePVP::Render(float elapsedTime)
