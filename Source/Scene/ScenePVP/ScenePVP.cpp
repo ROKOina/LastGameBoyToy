@@ -31,6 +31,7 @@
 #include "Component\Sprite\Sprite.h"
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
+#include "Component\UI\Font.h"
 
 
 #include "Component/Renderer/InstanceRendererCom.h"
@@ -142,6 +143,18 @@ void ScenePVP::Initialize()
 
     //UIゲームオブジェクト生成
    // CreateUiObject();
+      //snowparticle
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testFont");
+       std::shared_ptr<Font> font =  obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+       font->position = { 0,0 };
+       font->originalPos = { 0,0 };
+       font->str = "ab";
+       font->scale = 1.0f;
+    }
+
+
 
 #pragma endregion
 
@@ -171,7 +184,9 @@ void ScenePVP::Update(float elapsedTime)
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
     //Ui更新
-    PlayerUIManager::Instance().UIUpdate(elapsedTime);
+    PlayerUIManager::Instance().
+           
+     UIUpdate(elapsedTime);
 
     //ゲームオブジェクトの行列更新
     GameObjectManager::Instance().UpdateTransform();
