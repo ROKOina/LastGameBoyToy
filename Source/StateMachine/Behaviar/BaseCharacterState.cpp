@@ -189,8 +189,8 @@ void BaseCharacter_JumpState::Enter()
     //ƒWƒƒƒ“ƒv
     JumpInput(owner->GetGameObject(), 1.5f);
 
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animationCom.lock()->FindAnimation("Jump_begin"), false));
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
