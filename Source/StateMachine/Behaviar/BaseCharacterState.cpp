@@ -543,6 +543,7 @@ void BaseCharacter_NoneAttack::Enter()
     else
     {
         auto& stateMachine = owner->GetMoveStateMachine();
+        if (owner->GetGameObject()->GetComponent<AnimationCom>()->IsPlayAnimation()) return;
 
         //それぞれのステートによるアニメーション(腕だけのアニメーション)
         PlayStateAnimation(false, stateMachine.GetCurrentState());
@@ -558,7 +559,6 @@ void BaseCharacter_NoneAttack::Execute(const float& elapsedTime)
     {
         PlayStateAnimation(std::string(owner->GetGameObject()->GetName()) == "player", stateMachine.GetCurrentState());
     }
-
 }
 
 void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::CHARACTER_MOVE_ACTIONS state)
