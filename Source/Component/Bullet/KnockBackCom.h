@@ -26,8 +26,6 @@ public:
     void SetKnockBackForce(DirectX::XMFLOAT3 knockbackforce_) { knockbackforce = knockbackforce_; }
     void SetParent(GameObj obj) { parent = obj; }
 
-    bool useTestCoad = false;
-
 private:
     GameObj parent;//’e‚ğ”­Ë‚µ‚½ƒvƒŒƒCƒ„[
     DirectX::XMFLOAT3 knockbackforce = {};

@@ -59,8 +59,8 @@ private:
     //ギミックミサイル生成関数
     void CreateGimmickMissile(const std::shared_ptr<GameObject>& obj);
 
-    //ファラのウルト
-    void CreateFarahUlt(const std::shared_ptr<GameObject>& obj);
+    //ジャンクラウルト生成関数
+    void CreateJyankratUlt(const std::shared_ptr<GameObject>& obj);
 
     //当たり判定
     void HitObject();
@@ -88,7 +88,7 @@ public:
         EXPLOSION,
         BEEM,
         GIMMICKMISSILE,
-        FARAHULT,
+        JANKRATULT,
         MAX
     };
     ObjectType objtype = ObjectType::ENEMY;
@@ -118,6 +118,9 @@ private:
     bool spwntrigger = false;
     bool spawnflag = false;
     std::string filepath = {};
+
+    //削除時間
+    float deletetime = 0.0f;
 
     // 複製されたオブジェクトを管理するリスト
     std::vector<std::weak_ptr<GameObject>> spawnedObjects;

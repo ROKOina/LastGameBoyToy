@@ -192,6 +192,7 @@
     <ClInclude Include="Source\Component\Renderer\RendererCom.h" />
     <ClInclude Include="Source\Component\Renderer\TrailCom.h" />
     <ClInclude Include="Source\Component\SkillObj\JankratMineCom.h" />
+    <ClInclude Include="Source\Component\SkillObj\JankratUltCom.h" />
     <ClInclude Include="Source\Component\Sprite\Sprite.h" />
     <ClInclude Include="Source\Component\Stage\GateGimmickCom.h" />
     <ClInclude Include="Source\Component\Stage\StageEditorCom.h" />
@@ -343,6 +344,7 @@
     <ClCompile Include="Source\Component\Renderer\RendererCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\TrailCom.cpp" />
     <ClCompile Include="Source\Component\SkillObj\JankratMineCom.cpp" />
+    <ClCompile Include="Source\Component\SkillObj\JankratUltCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Component\Stage\GateGimmickCom.cpp" />
     <ClCompile Include="Source\Component\Stage\StageEditorCom.cpp" />

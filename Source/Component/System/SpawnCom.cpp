@@ -24,6 +24,7 @@
 #include "Component\Audio\AudioCom.h"
 #include "Component\Character\CharacterCom.h"
 #include "SystemStruct\TimeManager.h"
+#include "Component\SkillObj\JankratUltCom.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -222,8 +223,8 @@ void SpawnCom::SpawnGameObject(float elapsedTime)
     case ObjectType::GIMMICKMISSILE:
         CreateGimmickMissile(obj);
         break;
-    case ObjectType::FARAHULT:
-        CreateFarahUlt(obj);
+    case ObjectType::JANKRATULT:
+        CreateJyankratUlt(obj);
         break;
     default:
         break;
@@ -377,6 +378,9 @@ void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
     collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.7f);
 
+    //削除時間設定
+    deletetime = 1.5f;
+
     //爆発物
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
     explosion->SetName("explosion");
@@ -388,18 +392,36 @@ void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
     cpuchilld->SetActive(false);
 }
 
-//ファラのウルト
-void SpawnCom::CreateFarahUlt(const std::shared_ptr<GameObject>& obj)
+//ジャンクラウルト生成関数
+void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
 {
-    obj->SetName("farahult");
-    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/playerbullet.gpuparticle", 100);
-    obj->AddComponent<EasingMoveCom>(nullptr);
-    std::shared_ptr<MovementCom>m = obj->AddComponent<MovementCom>();
-    DirectX::XMFLOAT3 cameradirection = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetFpsCameraDir();
-    m->SetGravity(0.0f);
-    m->SetFriction(0.0f);
-    m->SetIsRaycast(false);
-    m->AddNonMaxSpeedForce(cameradirection * 20.0f);
+    obj->SetName("jankratfireball");
+    obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankratult_fireball.cpuparticle", 400);
+    std::shared_ptr<MovementCom>move = obj->AddComponent<MovementCom>();
+    move->ApplyRandomForce(15.0f, 19.0f);
+    move->SetFallSpeed(-45.0f);
+    move->SetFriction(2.0f);
+    move->SetMoveAcceleration(30.0f);
+    move->SetMoveMaxSpeed(15.0f);
+
+    //ジャンクラのウルト制御
+    obj->AddComponent<JankratUltCom>();
+
+    //コリジョン判定
+    const auto& collider = obj->AddComponent<SphereColliderCom>();
+    collider->SetEnabled(true);
+    collider->SetMyTag(COLLIDER_TAG::Bullet);
+    if (std::strcmp(GameObjectManager::Instance().Find("player")->GetName(), "player") == 0)
+        collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        collider->SetJudgeTag(COLLIDER_TAG::Player);
+    collider->SetRadius(0.7f);
+
+    //爆発物
+    std::shared_ptr<GameObject>explosion = obj->AddChildObject();
+    explosion->SetName("explosion");
+    std::shared_ptr<CPUParticle>cpuparticle = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankratult_fire.cpuparticle", 400);
+    cpuparticle->SetActive(false);
 }
 
 //当たり判定
@@ -465,9 +487,17 @@ void SpawnCom::OnGroundDelete(float elapsedTime)
                         //着地した瞬間の処理
                         if (move->JustLanded())
                         {
+                            move->SetIsRaycast(false);
+                            move->ZeroNonMaxSpeedVelocity();
+                            move->ZeroVelocity();
+                            move->SetGravity(0.0f);
+
+                            //ここでパーティクルを発動
                             obj->GetComponent<CPUParticle>()->SetActive(false);
                             const auto& explosion = obj->GetChildFind("explosion");
                             explosion->GetComponent<CPUParticle>()->SetActive(true);
+
+                            //子どもがいれば処理を通す
                             explosion->GetChildFind("explosionchildren")->GetComponent<CPUParticle>()->SetActive(true);
                         }
                     }
@@ -490,7 +520,7 @@ void SpawnCom::OnGroundDelete(float elapsedTime)
                 it->second += elapsedTime; // フレーム間の経過時間を加算
 
                 // 経過時間が削除遅延を超えたら削除
-                if (it->second >= 1.5f)
+                if (it->second >= deletetime)
                 {
                     GameObjectManager::Instance().Remove(obj); // ゲームオブジェクトを削除
                     it = deleteQueue.erase(it); // キューからも削除

@@ -312,7 +312,10 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
         else
         {
-            Reload();
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+            {
+                Reload();
+            }
         }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
