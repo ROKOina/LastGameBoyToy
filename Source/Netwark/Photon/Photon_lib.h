@@ -69,6 +69,9 @@ public:
     //他の入室者との差を保存
     void DelayUpdate();
 
+    //キル数取得
+    int GetKillCount(int team);
+
     int GetMyPhotonID();
     int GetMyPlayerID();
 
@@ -81,10 +84,14 @@ public:
     //キャラセレクト中か
     bool GetIsCharaSelect() { return isCharaSelect; }
 
-
+    //ゲームモード登録
+    int GetGameMode() { return gameMode; }
 
     //入室許可
     bool IsJoinPermission() { return joinPermission; }
+
+    //今の試合時間
+    float GetNowTime();
 
     int GetServerTime();
     int GetServerTimeOffset();
@@ -147,6 +154,10 @@ private:
     //入室許可送信(申請の場合はtrue)
     void sendLobbyData(void);
 
+    //ゲームモード情報送信
+    void sendGameModeData(void);
+    void sendDeathMatchData(void);
+
     // events, triggered by certain operations of all players in the same room
     //入室時に入る
     virtual void joinRoomEventAction(int playerNr, const ExitGames::Common::JVector<int>& playernrs, const ExitGames::LoadBalancing::Player& player);
@@ -156,6 +167,7 @@ private:
     void GameRecv(NetData recvData);    //ゲーム中受信
     void JoinRecv(NetData recvData);    //入室受信
     void LobbyRecv(NetData recvData);    //ロビー受信
+    void DeathMatchRecv(NetData recvData);    //デスマッチ受信
 
     // receive and print out debug out here
     virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);
@@ -212,6 +224,9 @@ private:
         //情報が更新されたか
         bool isInputUpdate = false;
 
+        //キル数
+        int killCount = 0;
+
         //次の入力情報を格納
         struct NextInput
         {
@@ -259,6 +274,9 @@ private:
     int delayFrame = 0;
     //プレイヤーの名前
     std::string netName = {};
+
+    //ゲームモード
+    int gameMode = -1;
 
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ

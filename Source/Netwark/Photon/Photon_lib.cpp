@@ -16,6 +16,8 @@
 #include "Component\Character\InazawaCharacterCom.h"
 #include "Component\Stage\StageEditorCom.h"
 
+#include "PVPGameSystem/PVPGameSystem.h"
+
 #include "StaticSendDataManager.h"
 
 #include "imgui.h"
@@ -148,10 +150,15 @@ void PhotonLib::update(float elapsedTime)
                     {
                         savePlayerName[s.playerId] = s.name;
                     }
+                    //スタート時間保存
+                    startTime = GetServerTime();
                 }
                 firstStartGame = true;
                 //ゲーム中情報送信
                 sendGameData();
+
+                //ゲームモード情報
+                sendGameModeData();
             }
             else
             {
@@ -268,12 +275,61 @@ void PhotonLib::ImGui()
     int myPhotonID = GetMyPhotonID();
     ImGui::InputInt("photonID", &myPhotonID);
 
+    //gamemode
+    std::string mode[int(4)] =
+    {
+        "NONE",
+        "Deathmatch",
+        "Crown",
+        "Button",
+    };
+    int modeI = 0;
+    for (auto& name : mode)
+    {
+        ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
+
+        if (gameMode == modeI)
+        {
+            nodeFlags |= ImGuiTreeNodeFlags_Selected;
+        }
+
+        if (ImGui::TreeNodeEx(&name, nodeFlags, name.c_str()))
+        {
+            if (ImGui::IsItemClicked())
+            {
+                gameMode = modeI;
+            }
+
+            ++modeI;
+
+            ImGui::TreePop();
+        }
+    }
+
+    //切る数
+    if (ImGui::TreeNode("killcount"))
+    {
+        int cc = 0;
+        for (auto& s : saveInputPhoton)
+        {
+            ImGui::InputInt(std::string("killcount" + std::to_string(cc)).c_str(), &s.killCount);
+            cc++;
+        }
+        ImGui::TreePop();
+    }
+    
+
     //マスタークライアントか
     bool isMaster = GetIsMasterPlayer();
     ImGui::Checkbox("master", &isMaster);
 
     if (isMaster)
     {
+        //キャラセレクト
+        bool isC = isCharaSelect;
+        ImGui::Checkbox("isCharaSelect", &isC);
+        if (isC)isCharaSelect = isC;
+
         //ゲーム開始
         bool g = isGamePlay;
         ImGui::Checkbox("PlayGame", &g);
@@ -650,6 +706,17 @@ void PhotonLib::DelayUpdate()
 
 #pragma region ゲッターセッター
 
+int PhotonLib::GetKillCount(int team)
+{
+    int count = 0;
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.teamID == team)
+            count += s.killCount;
+    }
+    return count;
+}
+
 int PhotonLib::GetMyPhotonID()
 {
     int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
@@ -672,6 +739,11 @@ bool PhotonLib::GetIsMasterPlayer()
     bool isMaster = mLoadBalancingClient.getLocalPlayer().getIsMasterClient();
 
     return isMaster;
+}
+
+float PhotonLib::GetNowTime()
+{
+    return (GetServerTime() - startTime) / 1000.0f;
 }
 
 int PhotonLib::GetServerTime()
@@ -962,6 +1034,12 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 break;
             }
 
+            //ゲームモード保存
+            if (!GetIsMasterPlayer())
+            {
+                gameMode = ne[0].gameMode;
+            }
+
             //データ種別で分岐
             switch (ne[0].dataKind)
             {
@@ -977,6 +1055,10 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             case NetData::DATA_KIND::LOBBY:
                 if (joinPermission || GetIsMasterPlayer())
                     LobbyRecv(ne[0]);
+                break;
+            case NetData::DATA_KIND::DEATHMATCH:
+                if (isGamePlay)
+                    DeathMatchRecv(ne[0]);
                 break;
             }
 
@@ -1017,8 +1099,13 @@ void PhotonLib::GameRecv(NetData recvData)
         net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
     }
 
+    //hp
+    net1->GetComponent<CharaStatusCom>()->SetHitPoint(recvData.gameData.hp);
+
     int myPlayerID = GetMyPlayerID();
     auto& myPlayer = GameObjectManager::Instance().Find("player");
+    if (!myPlayer)return;
+
     //ダメージ情報
     for (int id = 0; id < recvData.gameData.damageData.size(); ++id)
     {
@@ -1075,10 +1162,11 @@ void PhotonLib::GameRecv(NetData recvData)
         }
     }
 
-    //入力を保存
+    //保存情報
     for (auto& s : saveInputPhoton)
     {
         if (s.photonId != recvData.photonId)continue;
+        //入力
         for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
         {
             SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
@@ -1179,12 +1267,25 @@ void PhotonLib::LobbyRecv(NetData recvData)
     }
 }
 
+void PhotonLib::DeathMatchRecv(NetData recvData)
+{
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.playerId == recvData.playerId)
+        {
+            s.killCount = recvData.deathMatchData.killCount;
+            break;
+        }
+    }
+}
+
 //送信
 void PhotonLib::sendGameData(void)
 {
     ExitGames::Common::Hashtable event;
 
     auto& myPlayer = GameObjectManager::Instance().Find("player");
+    if (!myPlayer)return;
 
     std::vector<NetData> n;
     NetData& netD = n.emplace_back(NetData());
@@ -1206,6 +1307,11 @@ void PhotonLib::sendGameData(void)
     //名前
     ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
 
+    //gamemode
+    netD.gameMode = gameMode;
+
+    //HP
+    netD.gameData.hp = int(*myPlayer->GetComponent<CharaStatusCom>()->GetHitPoint());
 
     //ダメージ情報送信
     auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
@@ -1363,6 +1469,9 @@ void PhotonLib::sendLobbyData(void)
     netD.isMasterClient = GetIsMasterPlayer();
     ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
 
+    //gamemode
+    netD.gameMode = gameMode;
+
     //種別をロビーに
     netD.dataKind = NetData::DATA_KIND::LOBBY;
 
@@ -1382,6 +1491,59 @@ void PhotonLib::sendLobbyData(void)
         ::strncpy_s(netD.lobbyData.chat, sizeof(netD.lobbyData.chat), chat.c_str(), sizeof(netD.lobbyData.chat));
         isSendChat = false;
         chat.clear();
+    }
+
+    std::stringstream s = NetDataSendCast(n);
+    auto ne = NetDataRecvCast(s.str());
+    event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
+    int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
+    //自分以外全員に送信
+    mLoadBalancingClient.opRaiseEvent(true, event, 0);
+    //特定のナンバーに送信
+    //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+}
+
+void PhotonLib::sendGameModeData(void)
+{
+    switch (gameMode)
+    {
+        case int(PVPGameSystem::GAME_MODE::Deathmatch) :
+            sendDeathMatchData();
+            break;
+            case int(PVPGameSystem::GAME_MODE::Crown) :
+                break;
+                case int(PVPGameSystem::GAME_MODE::Button) :
+                    break;
+    }
+}
+
+void PhotonLib::sendDeathMatchData(void)
+{
+    ExitGames::Common::Hashtable event;
+    std::vector<NetData> n;
+    NetData& netD = n.emplace_back(NetData());
+    //ID
+    int myPhotonID = GetMyPhotonID();
+    netD.photonId = myPhotonID;
+    //ID
+    int myPlayerID = GetMyPlayerID();
+    netD.playerId = myPlayerID;
+    netD.isMasterClient = GetIsMasterPlayer();
+    ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
+
+    //gamemode
+    netD.gameMode = gameMode;
+
+    //種別をロビーに
+    netD.dataKind = NetData::DATA_KIND::DEATHMATCH;
+
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.playerId == myPlayerID)
+        {
+            netD.deathMatchData.killCount = s.killCount;
+            break;
+        }
     }
 
     std::stringstream s = NetDataSendCast(n);

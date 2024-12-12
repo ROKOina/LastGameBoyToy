@@ -35,6 +35,7 @@
 #include "Component/Renderer/InstanceRendererCom.h"
 
 #include "Netwark/Photon/Photon_lib.h"
+#include "../SceneTitle/SceneTitle.h"
 
 
 void ScenePVP::Initialize()
@@ -56,8 +57,8 @@ void ScenePVP::Initialize()
     }
 
     //ロビー選択から始まる
-    InitializePVP();
-    //InitializeLobbySelect();
+    //InitializePVP();
+    InitializeLobbySelect();
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -65,6 +66,9 @@ void ScenePVP::Initialize()
     //ネット大事
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
+
+    //ゲームシステム
+    pvpGameSystem = std::make_unique<PVPGameSystem>();
 }
 
 void ScenePVP::InitializeLobbySelect()
@@ -205,46 +209,68 @@ void ScenePVP::Update(float elapsedTime)
     //Ui更新
     PlayerUIManager::Instance().UIUpdate(elapsedTime);
 
-    ////画面切り替え処理
-    //auto net = photonNet->GetPhotonLib();
-    //bool lobbyOneFlg = false;   //一回だけ初期化するように(ロビーに)
-    //if (!isLobby) //一回だけ入る
-    //{
-    //    if (net->IsJoinPermission() || net->GetIsMasterPlayer())    //ネットに繋がった時ロビーに入る
-    //    {
-    //        lobbyOneFlg = true;
-    //        isLobby = true;
-    //        TransitionRemove(tempRemoveObj);
-    //    }
-    //}
-    //bool lobbyOneFlg = false;   //一回だけ初期化するように(キャラセレクトに)
-    //if (!isCharaSelect) //一回だけ入る
-    //{
-    //    if (net->GetIsGamePlay())    //ゲーム開始
-    //    {
-    //        lobbyOneFlg = true;
-    //        isLobby = true;
-    //        TransitionRemove(tempRemoveObj);
-    //    }
-    //}
-    //if (!isCharaSelect) //一回だけ入る
-    //{
-    //    if (net->GetIsGamePlay())    //ゲーム開始
-    //    {
-    //        lobbyOneFlg = true;
-    //        isLobby = true;
-    //        TransitionRemove(tempRemoveObj);
-    //    }
-    //}
+    //ゲームシステム更新
+    GameSystemUpdate(elapsedTime);
+    pvpGameSystem->update(elapsedTime);
+
+    //終わり
+    if (pvpGameSystem->IsGameEnd())
+    {
+        SceneManager::Instance().ChangeScene(new SceneTitle);
+    }
+
+    //画面切り替え処理
+    auto net = photonNet->GetPhotonLib();
+    bool lobbyOneFlg = false;   //一回だけ初期化するように(ロビーに)
+    if (!isLobby) //一回だけ入る
+    {
+        if (net->IsJoinPermission() || net->GetIsMasterPlayer())    //ネットに繋がった時ロビーに入る
+        {
+            lobbyOneFlg = true;
+            isLobby = true;
+            TransitionRemove(tempRemoveObj);
+        }
+    }
+    bool lobbySelectOneFlg = false;   //一回だけ初期化するように(キャラセレクトに)
+    if (!isCharaSelect) //一回だけ入る
+    {
+        if (net->GetIsCharaSelect())    //キャラセレクト
+        {
+            lobbySelectOneFlg = true;
+            isCharaSelect = true;
+            TransitionRemove(tempRemoveObj);
+        }
+    }
+    bool GameOneFlg = false;   //一回だけ初期化するように(ゲーム開始に)
+    if (!isGame) //一回だけ入る
+    {
+        if (net->GetIsGamePlay())    //ゲーム開始
+        {
+            GameOneFlg = true;
+            isGame = true;
+            TransitionRemove(tempRemoveObj);
+
+            //ゲームモード設定
+            pvpGameSystem->SetGameMode(PVPGameSystem::GAME_MODE(net->GetGameMode()));
+        }
+    }
 
     //ゲームオブジェクトの行列更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
-    //if (lobbyOneFlg)    //一回だけ入る
-    //{
-    //    InitializeLobby();
-    //}
+    if (lobbyOneFlg)    //一回だけ入る
+    {
+        InitializeLobby();
+    }
+    if (lobbySelectOneFlg)    //一回だけ入る
+    {
+        InitializeCharaSelect();
+    }
+    if (GameOneFlg)    //一回だけ入る
+    {
+        InitializePVP();
+    }
 }
 
 void ScenePVP::Render(float elapsedTime)
@@ -524,3 +550,28 @@ void ScenePVP::NewObject()
 
     ImGui::End();
 }
+
+void ScenePVP::GameSystemUpdate(float elapsedTime)
+{
+    auto net = photonNet->GetPhotonLib();
+    //各ゲームモード必要情報更新
+    switch (pvpGameSystem->GetGameMode())
+    {
+    case PVPGameSystem::GAME_MODE::Deathmatch:
+    {
+        auto& DM = pvpGameSystem->GetDeathMatchData();
+        DM.teamData[PVPGameSystem::TEAM_KIND::RED_GROUP].killCount = net->GetKillCount(PVPGameSystem::TEAM_KIND::RED_GROUP);
+        DM.teamData[PVPGameSystem::TEAM_KIND::BLUE_GROUP].killCount = net->GetKillCount(PVPGameSystem::TEAM_KIND::BLUE_GROUP);
+        DM.nowTime = net->GetNowTime();
+    }
+        break;
+    case PVPGameSystem::GAME_MODE::Crown:
+
+        break;
+    case PVPGameSystem::GAME_MODE::Button:
+
+        break;
+    }
+}
+    
+    

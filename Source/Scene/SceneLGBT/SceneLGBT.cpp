@@ -7,7 +7,10 @@
 #include "Component\Light\LightCom.h"
 #include "Scene\SceneTitle\SceneTitle.h"
 #include "Component/Character/RegisterChara.h"
+#include "Component/Renderer/RendererCom.h"
 #include <Component\Camera\FreeCameraCom.h>
+
+#include <Component\Stage\StageEditorCom.h>
 
 //初期化
 void SceneLGBT::Initialize()
@@ -18,8 +21,9 @@ void SceneLGBT::Initialize()
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
-        freeCamera->AddComponent<FreeCameraCom>();
-        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        auto& c = freeCamera->AddComponent<FreeCameraCom>();
+        c->SetFocusPos({ 1000,1000,1000 });
+        freeCamera->transform_->SetWorldPosition({ 100, 500, -10 });
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 
@@ -37,6 +41,31 @@ void SceneLGBT::Initialize()
         obj->SetName(std::string("p" + std::to_string(i)).c_str());
         obj->transform_->SetWorldPosition({ 100,0,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(i), obj);
+        {
+            std::shared_ptr<GameObject> arm = GameObjectManager::Instance().Create();
+            arm->SetName("armChild");
+            arm->transform_->SetScale({ 0.5f,0.5f,0.5f });
+            std::shared_ptr<RendererCom> r = arm->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+
+        }
+    }
+
+    //ステージのシリアル情報登録
+    {
+        auto& stageObj = GameObjectManager::Instance().Create();
+        stageObj->SetName("stage");
+        stageObj->transform_->SetWorldPosition({ 0, 0, -1000 });
+        stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        //ステージ
+        StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //判定生成
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/", "StageJson/ColliderStage.mdl", "__", 0.005f);
+        //Jsonからオブジェクト配置
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
+
     }
 
     //コンスタントバッファの初期化
