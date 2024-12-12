@@ -990,13 +990,13 @@ void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVect
     mpOutputListener->writeString(L"");
     mpOutputListener->writeString(ExitGames::Common::JString(L"player ") + playerNr + L" " + player.getName() + L" has joined the game");
 
-    //自分の枠を確保
-    int myPhotonID = GetMyPhotonID();
-    if (playerNr == myPhotonID)
-    {
-        //追加
-        AddPlayer(myPhotonID, -1);
-    }
+    ////自分の枠を確保
+    //int myPhotonID = GetMyPhotonID();
+    //if (playerNr == myPhotonID)
+    //{
+    //    //追加
+    //    AddPlayer(myPhotonID, -1);
+    //}
 }
 //退出時
 void PhotonLib::leaveRoomEventAction(int playerNr, bool isInactive)
@@ -1265,14 +1265,15 @@ void PhotonLib::JoinRecv(NetData recvData)
 
                 //入室処理
                 joinPermission = true;  //入室
-                for (auto& s : saveInputPhoton) //自分のプレイヤーID決定
-                {
-                    if (s.photonId == GetMyPhotonID())
-                    {
-                        s.playerId = j.playerId;
-                        break;
-                    }
-                }
+                //for (auto& s : saveInputPhoton) //自分のプレイヤーID決定
+                //{
+                //    if (s.photonId == GetMyPhotonID())
+                //    {
+                        //s.playerId = j.playerId;
+                addSavePhotonID[j.playerId] = GetMyPhotonID();
+                //        break;
+                //    }
+                //}
 
             }
         }
@@ -1612,17 +1613,17 @@ void PhotonLib::AddPlayer(int photonID, int playerID)
     //saveInputJoin.photonId = photonID;
 
     //プレイヤーID決定
-    int pID = 0;
-    if (GetIsMasterPlayer() && photonID == GetMyPhotonID())
-    {
-        saveInputPhoton[0].playerId = 0;
-        pID = 0;
-    }
-    else
-    {
+    //int pID = 0;
+    //if (GetIsMasterPlayer() && photonID == GetMyPhotonID())
+    //{
+    //    saveInputPhoton[0].playerId = 0;
+    //    pID = 0;
+    //}
+    //else
+    //{
         saveInputPhoton[playerID].playerId = playerID;
-        pID = playerID;
-    }
+    //    pID = playerID;
+    //}
     ////プレイヤーID決定
     //if (GetIsMasterPlayer() && photonID == GetMyPhotonID())
     //    saveInputJoin.playerId = 0;
@@ -1630,14 +1631,14 @@ void PhotonLib::AddPlayer(int photonID, int playerID)
     //    saveInputJoin.playerId = playerID;
 
     //少し古いフレームを保存
-    saveInputPhoton[pID].nextInput.oldFrame = GetServerTime() - 100;
+    saveInputPhoton[playerID].nextInput.oldFrame = GetServerTime() - 100;
     //saveInputJoin.nextInput.oldFrame = GetServerTime() - 100;
 
     //今のフレームを入れる
     SaveBuffer saveBuf;
     saveBuf.frame = GetServerTime();
-    saveInputPhoton[pID].inputBuf->Enqueue(saveBuf);
+    saveInputPhoton[playerID].inputBuf->Enqueue(saveBuf);
 
-    saveInputPhoton[pID].useFlg = true;
-    saveInputPhoton[pID].photonId = photonID;
+    saveInputPhoton[playerID].useFlg = true;
+    saveInputPhoton[playerID].photonId = photonID;
 }
