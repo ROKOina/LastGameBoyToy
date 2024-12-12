@@ -13,6 +13,7 @@
 #include "Component\Sprite\Sprite.h"
 #include "Component\Renderer\RendererCom.h"
 #include <Component\Animation\AnimationCom.h>
+#include "Component\Stage\StageEditorCom.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -112,7 +113,13 @@ void CharacterCom::Update(float elapsedTime)
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
             {
                 //弾切れならリロード
-                currentBulletNum > 0 ? MainAttackDown() : Reload();
+                if (currentBulletNum > 0) {
+                    MainAttackDown();
+                }
+                else {
+                    if(attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD) 
+                    Reload();
+                }
             }
             attackInputSave = false;
         }
@@ -241,45 +248,45 @@ void CharacterCom::DashFewSub(float elapsedTime)
 //FPS視点の腕アニメーション制御
 void CharacterCom::FPSArmAnimation()
 {
-    if (std::string(GetGameObject()->GetName()) != "player")return;
-    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
+    //if (std::string(GetGameObject()->GetName()) != "player")return;
+    //auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    //auto& armAnim = arm->GetComponent<AnimationCom>();
 
-    //待機
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
+    ////待機
+    //if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
+    //{
+    //    if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
 
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot")
-            && armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
-    }
+    //    if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot")
+    //        && armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
+    //        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
+    //}
 
-    //移動
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
-        {
-            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot")
-                || armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
-            {
-                if (armAnim->IsEventCalling("attackEnd"))
-                    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-            }
-            else
-                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-        }
-    }
+    ////移動
+    //if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
+    //{
+    //    if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
+    //    {
+    //        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot")
+    //            || armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
+    //        {
+    //            if (armAnim->IsEventCalling("attackEnd"))
+    //                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
+    //        }
+    //        else
+    //            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
+    //    }
+    //}
 
-    //アニメーションスピード変更
-    float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
-    float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
+    ////アニメーションスピード変更
+    //float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
+    //float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
 
-    float v = max - fmax;
-    if (v < 0)v = 0;
+    //float v = max - fmax;
+    //if (v < 0)v = 0;
 
-    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
-        = 1 + v * 0.1f;
+    //arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
+    //    = 1 + v * 0.1f;
 }
 
 void CharacterCom::InputStateUpdate(float elapsedTime)
@@ -400,7 +407,8 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 
     //リロード
-    if (CharacterInput::Reload & GetButtonDown())
+    if (CharacterInput::Reload & GetButtonDown()
+    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
     {
         Reload();
     }

@@ -49,6 +49,12 @@ public:
 private:
     //接続開始フラグ
     bool connectFlg = false;
+
+    //接続した瞬間
+    bool connectBegin = false;
+    //接続中
+    bool connectNow = false;
+
     //部屋名
     std::string roomName;
     //charaID
@@ -95,6 +101,9 @@ public:
 
     int GetRoomPlayersNum();
     std::string GetRoomName();
+
+    bool GetConnectBegin() { return connectBegin; }
+    bool GetConnectNow() { return connectNow; }
 
     int SendMs();
 

@@ -962,6 +962,9 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 break;
             }
 
+            connectNow = connectBegin;
+            connectBegin = false;
+
             //ÉfÅ[É^éÌï Ç≈ï™äÚ
             switch (ne[0].dataKind)
             {
@@ -979,8 +982,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                     LobbyRecv(ne[0]);
                 break;
             }
-
-
         }
         break;
     default:
@@ -1140,6 +1141,7 @@ void PhotonLib::JoinRecv(NetData recvData)
                     if (s.photonId == GetMyPhotonID())
                     {
                         s.playerId = j.playerId;
+                        connectBegin = true;
                         break;
                     }
                 }

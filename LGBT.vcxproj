@@ -203,6 +203,7 @@
     <ClInclude Include="Source\Component\System\RayCastManager.h" />
     <ClInclude Include="Source\Component\System\SpawnCom.h" />
     <ClInclude Include="Source\Component\System\TransformCom.h" />
+    <ClInclude Include="Source\Component\UI\Font.h" />
     <ClInclude Include="Source\Component\UI\PlayerUI.h" />
     <ClInclude Include="Source\Component\UI\UiFlag.h" />
     <ClInclude Include="Source\Component\UI\UiGauge.h" />
@@ -275,6 +276,7 @@
     <ClInclude Include="Source\SystemStruct\Logger.h" />
     <ClInclude Include="Source\SystemStruct\Misc.h" />
     <ClInclude Include="Source\SystemStruct\MySequence.h" />
+    <ClInclude Include="Source\SystemStruct\Targa.h" />
     <ClInclude Include="Source\SystemStruct\ThreadPool.h" />
     <ClInclude Include="Source\SystemStruct\TimeManager.h" />
   </ItemGroup>
@@ -354,6 +356,7 @@
     <ClCompile Include="Source\Component\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Component\System\SpawnCom.cpp" />
     <ClCompile Include="Source\Component\System\TransformCom.cpp" />
+    <ClCompile Include="Source\Component\UI\Font.cpp" />
     <ClCompile Include="Source\Component\UI\PlayerUI.cpp" />
     <ClCompile Include="Source\Component\UI\UiFlag.cpp" />
     <ClCompile Include="Source\Component\UI\UiGauge.cpp" />
@@ -418,6 +421,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="HLSL\2D\Font.hlsli" />
     <None Include="HLSL\2D\PostEffect\FilterFunctions.hlsli" />
     <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
@@ -443,6 +447,12 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\2D\Font_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\Font_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\CascadeShadow.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>

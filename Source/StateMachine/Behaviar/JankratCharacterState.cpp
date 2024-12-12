@@ -23,10 +23,21 @@ bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos)
     {
         const auto& cameraObj = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
         const auto& arm = cameraObj->GetChildFind("armChild");
-
         const auto& model = arm->GetComponent<RendererCom>()->GetModel();
         const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
         if (!gunNode) return false;
+
+        outGunPos =
+        {
+            gunNode->worldTransform._41,
+            gunNode->worldTransform._42,
+            gunNode->worldTransform._43
+        };
+    }
+    else
+    {
+        RendererCom* render = owner->GetGameObject()->GetComponent<RendererCom>().get();
+        const auto& gunNode = render->GetModel()->FindNode("gun2");
 
         outGunPos =
         {
@@ -47,7 +58,16 @@ void JankratCharacter_BaseState::HandleArmAnimation() const
         const auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
         const auto& armAnim = arm->GetComponent<AnimationCom>();
         armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetUpperCurrentAnimationSeconds(0.3f);
         armAnim->SetAnimationSeconds(0.3f);
+    }
+    else
+    {
+        const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetAnimationSeconds(0.3f);
     }
 }
 
@@ -95,6 +115,9 @@ void JankratCharacter_MainAtkState::Enter()
         return;
     }
 
+    //腕アニメーション再生
+    HandleArmAnimation();
+
     // 銃の先端位置を取得
     DirectX::XMFLOAT3 gunPos;
     if (GetGunTipPosition(gunPos))
@@ -111,9 +134,6 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
     {
         return;
     }
-
-    //腕アニメーション再生
-    HandleArmAnimation();
 
     if (const auto& bullet = charaComponent->GetHaveBullet())
     {

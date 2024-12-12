@@ -19,6 +19,7 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include  "Component\UI\Font.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -382,6 +383,9 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     // スプライト描画
     SpriteRender(view, projection);
 
+    //Font
+    FontRender(view,projection);
+
 #ifdef _DEBUG
     // デバッグ情報の描画
     if (graphics.IsDebugGUI())
@@ -606,6 +610,15 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
     {
         spriteobject.emplace_back(spritecomp);
     }
+
+
+    //スプライトオブジェクトがあれば入る
+    std::shared_ptr<Font>fontcomp = obj->GetComponent<Font>();
+    if (fontcomp)
+    {
+        fontobject.emplace_back(fontcomp);
+    }
+
 
     //インスタンスオブジェクトがあれば入る
     std::shared_ptr<InstanceRenderer>instancecomp = obj->GetComponent<InstanceRenderer>();
@@ -1082,6 +1095,20 @@ void GameObjectManager::SpriteRender(const DirectX::XMFLOAT4X4& view, const Dire
 
         if (IsParentEnable(sp.lock()->GetGameObject()))
             sp.lock()->Render(view, projection);
+    }
+}
+
+void GameObjectManager::FontRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    if (fontobject.size() <= 0)return;
+
+    for (std::weak_ptr<Font>& font : fontobject)
+    {
+        if (!font.lock()->GetGameObject()->GetEnabled())continue;
+        if (!font.lock()->GetEnabled())continue;
+
+        if (IsParentEnable(font.lock()->GetGameObject()))
+            font.lock()->Render(view, projection);
     }
 }
 

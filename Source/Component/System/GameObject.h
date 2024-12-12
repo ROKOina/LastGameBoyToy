@@ -22,6 +22,7 @@ class Sprite;
 class Decal;
 class PostEffect;
 class Trail;
+class Font;
 
 // ゲームオブジェクト
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -221,6 +222,9 @@ private:
     //スプライト描画
     void SpriteRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    //スプライト描画
+    void FontRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
 
@@ -228,10 +232,10 @@ private:
     void EraseComponet();
 
 private:
-    std::vector<std::shared_ptr<GameObject>>		startGameObject_;
-    std::vector<std::shared_ptr<GameObject>>		updateGameObject_;
-    std::set<std::shared_ptr<GameObject>>		selectionGameObject_;
-    std::set<std::shared_ptr<GameObject>>		removeGameObject_;
+    std::vector<std::shared_ptr<GameObject>>	   startGameObject_;
+    std::vector<std::shared_ptr<GameObject>>	   updateGameObject_;
+    std::set<std::shared_ptr<GameObject>>		   selectionGameObject_;
+    std::set<std::shared_ptr<GameObject>>		   removeGameObject_;
 
     //即OBJ作成用
     std::vector<std::shared_ptr<GameObject>>		creatNowTimeGameChildObject_;   ////即OBJ作成が起動した後の子オブジェクトはここに追加される
@@ -275,6 +279,9 @@ private:
 
     //スプライト描画
     std::vector<std::weak_ptr<Sprite>>spriteobject;
+
+    //Font描画
+    std::vector<std::weak_ptr<Font>>fontobject;
 
     bool					isHiddenLister_ = false;
     bool					isHiddenDetail_ = false;
