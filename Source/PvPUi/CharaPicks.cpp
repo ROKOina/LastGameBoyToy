@@ -1,5 +1,6 @@
 #include "CharaPicks.h"
 #include "Component\System\GameObject.h"
+#include "Component/System/TransformCom.h"
 #include "Component/Sprite/Sprite.h"
 
 // キャラピックUI生成
@@ -15,6 +16,7 @@ void CharaPicks::CreateCharaPicksUiObject()
         {
             auto& chara = charaPicksCanvas->AddChildObject();
             chara->SetName("INAZAWA");
+            //chara->AddComponent<Sprite>("Data/Texture/CharaPick/charaIcon0.png", Sprite::SpriteShader::DEFALT, false);
         }
         // FARAH
         {

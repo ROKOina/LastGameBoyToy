@@ -4,6 +4,9 @@
 #include "Netwark/Photon/BasicsApplication.h"
 #include "Component\System\GameObject.h"
 
+// 前方宣言
+class CharaPicks;
+
 //リザルトシーン
 class ScenePVP :public Scene
 {
@@ -45,6 +48,7 @@ private:
 
 private:
 
+    std::shared_ptr<CharaPicks>          charaPicks;
     std::unique_ptr<BasicsApplication> photonNet;
 
     bool isCharaSelect = false;
