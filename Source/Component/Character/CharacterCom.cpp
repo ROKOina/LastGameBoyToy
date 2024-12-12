@@ -13,6 +13,7 @@
 #include "Component\Sprite\Sprite.h"
 #include "Component\Renderer\RendererCom.h"
 #include <Component\Animation\AnimationCom.h>
+#include "Component\Stage\StageEditorCom.h"
 
 void CharacterCom::Update(float elapsedTime)
 {

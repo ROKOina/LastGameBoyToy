@@ -72,29 +72,39 @@ void BaseCharacter_BaseState::Hovering(float elapsedTime)
     }
 }
 
-#pragma region Idle
-void BaseCharacter_IdleState::Enter()
+auto MakeNormalLowerAnimeParam = [](int index, bool loop)
 {
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
-    int animaIndex = animationCom.lock()->FindAnimation("Idle");
-
+    //下半身アニメーション用構造体
     AnimationCom::PlayLowBodyAnimParam param =
     {
-        param.lowerAnimaOneId = animaIndex,
-        param.lowerAnimeTwoId = animaIndex,
-        param.lowerAnimeThreeId = animaIndex,
-        param.lowerAnimeFourId = animaIndex,
-        param.lowerAnimeFiveId = animaIndex,
-        param.lowerAnimaSixId = animaIndex,
-        param.lowerAnimaSevenId = animaIndex,
-        param.lowerAnimaEightId = animaIndex,
-        param.loop = true,
+        param.lowerAnimaOneId = index,
+        param.lowerAnimeTwoId = index,
+        param.lowerAnimeThreeId = index,
+        param.lowerAnimeFourId = index,
+        param.lowerAnimeFiveId = index,
+        param.lowerAnimaSixId = index,
+        param.lowerAnimaSevenId = index,
+        param.lowerAnimaEightId = index,
+        param.loop = loop,
         param.rootFlag = false,
         param.blendType = 0,
         param.animeChangeRate = 0.2f,
         param.animeBlendRate = 0.0f
     };
-    animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
+
+    return param;
+};
+
+
+#pragma region Idle
+void BaseCharacter_IdleState::Enter()
+{
+    //アニメーション検索
+    int animaIndex = animationCom.lock()->FindAnimation("Idle");
+
+    //下半身だけ再生
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animaIndex, true));
 }
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 {
@@ -137,7 +147,7 @@ void BaseCharacter_MoveState::Enter()
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
 
     //上半身アニメーション再生
-    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.25f);
+    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.25f);
 
     //足元の煙エフェクト再生
     GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
@@ -200,14 +210,12 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 #pragma region JumpLoop
 void BaseCharacter_JumpLoop::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), false);
+    //アニメーション検索
+    int animaIndex = animationCom.lock()->FindAnimation("Jump_middle");
 
-    ////アニメーション(腕だけのアニメーション)
-    //if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    //auto& arm = GameObjectManager::Instance().Find("armChild");
-    //auto& armAnim = arm->GetComponent<AnimationCom>();
-    //if (!armAnim->IsPlayAnimation())
-    //    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
+    //下半身だけ再生
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animaIndex,true));
 }
 void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 {
@@ -227,13 +235,8 @@ void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 #pragma region Landing
 void BaseCharacter_Landing::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_end"), false, false, 1.0f);
-
-    //アニメーション(腕だけのアニメーション)
-    //if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    //auto& arm = GameObjectManager::Instance().Find("armChild");
-    //auto& armAnim = arm->GetComponent<AnimationCom>();
-    //armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animationCom.lock()->FindAnimation("Jump_end"), false));
 }
 void BaseCharacter_Landing::Execute(const float& elapsedTime)
 {
@@ -281,9 +284,6 @@ void BaseCharacter_DeathState::Enter()
     //イベントカメラ
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
     EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
-
-    //遷移
-    SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 3);
 }
 #pragma endregion
 
@@ -484,6 +484,11 @@ void BaseCharacter_ReloadState::Enter()
         auto& armAnim = arm->GetComponent<AnimationCom>();
         armAnim->PlayAnimation(armAnim->FindAnimation("FPS_reload"), false);
     }
+    else
+    {
+        auto& animCom = owner->GetGameObject()->GetComponent<AnimationCom>();
+        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+    }
 }
 
 void BaseCharacter_ReloadState::Execute(const float& elapsedTime)
@@ -525,7 +530,7 @@ void BaseCharacter_NoneAttack::Enter()
         auto& stateMachine = owner->GetMoveStateMachine();
 
         //それぞれのステートによるアニメーション(腕だけのアニメーション)
-        PlayStateAnimation(stateMachine.GetCurrentState());
+        PlayStateAnimation(true, stateMachine.GetCurrentState());
     }
 }
 
@@ -538,13 +543,14 @@ void BaseCharacter_NoneAttack::Execute(const float& elapsedTime)
         //それぞれのステートによるアニメーション(腕だけのアニメーション)
         if (stateMachine.GetCurrentState() != stateMachine.GetOldState())
         {
-            PlayStateAnimation(stateMachine.GetCurrentState());
+            PlayStateAnimation(true,stateMachine.GetCurrentState());
         }
     }
 }
 
-void BaseCharacter_NoneAttack::PlayStateAnimation(CharacterCom::CHARACTER_MOVE_ACTIONS state)
+void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::CHARACTER_MOVE_ACTIONS state)
 {
+    auto& animCom = owner->GetGameObject()->GetComponent<AnimationCom>();
     auto& arm = GameObjectManager::Instance().Find("armChild");
     auto& armAnim = arm->GetComponent<AnimationCom>();
 
@@ -553,6 +559,7 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(CharacterCom::CHARACTER_MOVE_A
     switch (state)
     {
     case CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE:
+        
         armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
         break;
 

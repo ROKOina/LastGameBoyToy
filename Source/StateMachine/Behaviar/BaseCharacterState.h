@@ -230,5 +230,5 @@ public:
     virtual const char* GetName() const override { return "NoneAttack"; }
 
 private:
-    void PlayStateAnimation(CharacterCom::CHARACTER_MOVE_ACTIONS state);
+    void PlayStateAnimation(bool isPlayer, CharacterCom::CHARACTER_MOVE_ACTIONS state);
 };
