@@ -216,7 +216,7 @@ void ScenePVP::Update(float elapsedTime)
     //I‚í‚è
     if (pvpGameSystem->IsGameEnd())
     {
-        SceneManager::Instance().ChangeScene(new SceneTitle);
+        SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //‰æ–ÊØ‚è‘Ö‚¦ˆ—
