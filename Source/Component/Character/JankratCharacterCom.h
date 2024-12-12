@@ -4,6 +4,8 @@
 class JankratCharacterCom : public CharacterCom
 {
 public:
+    ~JankratCharacterCom() override;
+
     // 名前取得
     const char* GetName() const override { return "JankratCharacter"; }
 
@@ -11,19 +13,25 @@ public:
 
     void Update(float elapsedTime) override;
 
+    //通常攻撃
     void MainAttackDown() override;
-    void MainSkill() override;
 
+    //Eskill
     void SubAttackDown() override;
-    void SubSkill() override {};
+    void SubSkill() override;
 
-    void UltSkill() override {};
+    //ult
+    void UltSkill() override;
 
-    void ResetShootTimer() { shootTimer = 0; }
+    //リロード（弾減らす処理は各自のキャラでする
+    void Reload()override;
 
 private:
     //消去されている弾や地雷を手放す
     void EraseHaveObjects();
+
+    //銃の打つ間隔とマゼルフラッシュ
+    void ShotSecond();
 
 public:
     GameObj GetHaveBullet() { return haveBullet; }
@@ -43,9 +51,6 @@ public:
     }
 
 private:
-    //発射間隔
-    float shootTime = 0.6f;
-    float shootTimer = 0;
 
     GameObj haveBullet; //射撃待機中の弾丸
     std::vector<GameObj> haveMine; //使用中の地雷

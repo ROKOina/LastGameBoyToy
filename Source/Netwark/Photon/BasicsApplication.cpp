@@ -49,3 +49,9 @@ void BasicsApplication::ImGui()
 {
 	photonLib->ImGui();
 }
+
+PhotonLib* BasicsApplication::GetPhotonLib()
+{
+
+	return photonLib;
+}

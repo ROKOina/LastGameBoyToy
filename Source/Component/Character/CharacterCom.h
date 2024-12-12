@@ -15,11 +15,12 @@ class CharacterInput
 public:
     static constexpr GamePadButton JumpButton_SPACE = GamePad::BTN_A;
     static constexpr GamePadButton LeftShiftButton = GamePad::BTN_LEFT_SHOULDER;
-    static constexpr GamePadButton MainSkillButton_Q = GamePad::BTN_B;
-    static constexpr GamePadButton SubSkillButton_E = GamePad::BTN_X;
-    static constexpr GamePadButton UltimetButton_R = GamePad::BTN_Y;
+    static constexpr GamePadButton MainSkillButton_E = GamePad::BTN_X;
+    static constexpr GamePadButton SubSkillButton_C = GamePad::BTN_RIGHT_SHOULDER;
+    static constexpr GamePadButton UltimetButton = GamePad::BTN_B;
     static constexpr GamePadButton MainAttackButton = GamePad::BTN_RIGHT_TRIGGER;   //マウス左
     static constexpr GamePadButton SubAttackButton = GamePad::BTN_LEFT_TRIGGER;     //マウス右
+    static constexpr GamePadButton Reload = GamePad::BTN_Y;
 };
 
 #define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
@@ -116,10 +117,15 @@ public:
 
     //Q
     virtual void MainSkill() {};
+    virtual void MainSkillDown() {};
+
     //E
     virtual void SubSkill() {};
     //R
     virtual void UltSkill() {};
+
+    //リロード（弾減らす処理は各自のキャラでする@
+    virtual void Reload() {};
 
     //LeftShift (固定ダッシュ)
     void DashFewSub(float elapsedTime);
@@ -160,7 +166,6 @@ public:
     DirectX::XMFLOAT3 GetFpsCameraDir() { return fpsCameraDir; }
     void  SetFpsCameraDir(const DirectX::XMFLOAT3 dir) { fpsCameraDir = dir; }
 
-
     void SetUltGauge(float gauge) { ultGauge = gauge; }
     float* GetUltGauge() { return  &ultGauge; }
     float GetUltGaugeMax() { return ultGaugeMax; }
@@ -193,6 +198,37 @@ public:
 
     //ネット関連変数ゲッター
     NetCharaData& GetNetCharaData() { return netCharaData; }
+
+    //時間リセット
+    void ResetShootTimer() { shootTimer = 0; }
+
+    //時間取得
+    // shootTimerのゲッター
+    float GetShootTimer() const { return shootTimer; }
+
+    // shootTimeのゲッター
+    float GetShootTime() const { return shootTime; }
+
+    //残弾
+    int GetCurrentBulletNum() { return currentBulletNum; }
+    void SetCurrentBulletNum(int num) { currentBulletNum = num; }
+    void AddCurrentBulletNum(int num) { currentBulletNum += num; }
+
+    int GetMaxBulletNum() { return maxBulletNum; }
+    void SetMaxBulletNum(int num) { maxBulletNum = num; }
+    void SetMaxBullet() { currentBulletNum = maxBulletNum; }
+
+    int GetCurrentMainSkillNum() { return currentMainSkillNum; }
+    void SetCurrentMainSkillNum(int num) { currentMainSkillNum = num; }
+
+    int GetMaxMainSkillNum() { return maxMainSkillNum; }
+    void SetMaxMainSkillNum(int num) { maxMainSkillNum = num; }
+    void SetMaxMainSkill() { currentMainSkillNum = maxMainSkillNum; }
+
+protected:
+
+    //FPS視点の腕アニメーション制御
+    void FPSArmAnimation();
 
 private:
     //入力ステート更新
@@ -231,6 +267,12 @@ protected:
     bool isStan = false;
     float stanTimer = 0;
 
+    int currentBulletNum = 10;
+    int currentMainSkillNum = 2;
+
+    int maxBulletNum = 10;
+    int maxMainSkillNum = 2;
+
     //スキルクールダウン
     struct SkillCoolTime
     {
@@ -246,6 +288,7 @@ protected:
 
     bool boostflag = false;
     float dashGauge = 10;
+    bool attackInputSave = false;   //先行入力
 
 private:
 
@@ -281,6 +324,10 @@ private:
     bool prevIsMaxUlt = false;
     float ultGauge = 0;
     float ultGaugeMax = 100;
+
+    //先行入力関係
+    float shootTimer = 0.0f;
+    float shootTime = 0.6f;
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;

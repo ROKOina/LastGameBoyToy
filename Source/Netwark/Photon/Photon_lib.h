@@ -49,13 +49,18 @@ public:
 private:
     //接続開始フラグ
     bool connectFlg = false;
+
+    //接続した瞬間
+    bool connectBegin = false;
+    //接続中
+    bool connectNow = false;
+
     //部屋名
     std::string roomName;
     //charaID
     std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
     {
         "INAZAWA",
-        "HAVE_ALL_ATTACK",
         "FARAH",
         "JANKRAT",
     };
@@ -76,6 +81,17 @@ public:
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
 
+    //ゲームスタートしたか
+    bool GetIsGamePlay() { return isGamePlay; }
+
+    //キャラセレクト中か
+    bool GetIsCharaSelect() { return isCharaSelect; }
+
+
+
+    //入室許可
+    bool IsJoinPermission() { return joinPermission; }
+
     int GetServerTime();
     int GetServerTimeOffset();
 
@@ -85,6 +101,9 @@ public:
 
     int GetRoomPlayersNum();
     std::string GetRoomName();
+
+    bool GetConnectBegin() { return connectBegin; }
+    bool GetConnectNow() { return connectNow; }
 
     int SendMs();
 
@@ -229,6 +248,9 @@ private:
 
     //タイマースタート時間
     int startTime = 0;
+
+    //キャラ選択画面か
+    bool isCharaSelect = false;
 
     //ゲーム中か
     bool isGamePlay = false;

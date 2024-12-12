@@ -29,18 +29,17 @@
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component\Sprite\Sprite.h"
-#include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
+#include "Netwark/Photon/Photon_lib.h"
+
 
 void ScenePVP::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
-
-#pragma region ゲームオブジェクトの設定
 
     //ポストエフェクト
     {
@@ -55,6 +54,58 @@ void ScenePVP::Initialize()
         obj->SetName("directionallight");
         obj->AddComponent<Light>(nullptr);
     }
+
+    //ロビー選択から始まる
+    InitializePVP();
+    //InitializeLobbySelect();
+
+    //コンスタントバッファの初期化
+    ConstantBufferInitialize();
+
+    //ネット大事
+    StdIO_UIListener* l = new StdIO_UIListener();
+    photonNet = std::make_unique<BasicsApplication>(l);
+}
+
+void ScenePVP::InitializeLobbySelect()
+{
+    //kari
+    {
+        std::shared_ptr<GameObject> kariLOBBYSELECT = GameObjectManager::Instance().Create();
+        kariLOBBYSELECT->SetName("kariLOBBYSELECT");
+        kariLOBBYSELECT->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        //削除予定リストに追加
+        tempRemoveObj.emplace_back(kariLOBBYSELECT);
+    }
+}
+
+void ScenePVP::InitializeLobby()
+{    
+    //kari
+    {
+        std::shared_ptr<GameObject> kariLOBBY = GameObjectManager::Instance().Create();
+        kariLOBBY->SetName("kariLobby");
+        kariLOBBY->AddComponent<UiSystem>("Data/Texture/LobbyPVPUI/kariLOBBY.ui", Sprite::SpriteShader::DEFALT, false);
+        //削除予定リストに追加
+        tempRemoveObj.emplace_back(kariLOBBY);
+    }
+}
+
+void ScenePVP::InitializeCharaSelect()
+{
+    //kari
+    {
+        std::shared_ptr<GameObject> kariCHARASELECT = GameObjectManager::Instance().Create();
+        kariCHARASELECT->SetName("kariCHARASELECT");
+        kariCHARASELECT->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        //削除予定リストに追加
+        tempRemoveObj.emplace_back(kariCHARASELECT);
+    }
+}
+
+void ScenePVP::InitializePVP()
+{
+#pragma region ゲームオブジェクトの設定
 
 #ifdef _DEBUG
     //フリーカメラ
@@ -75,25 +126,6 @@ void ScenePVP::Initialize()
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
-    //// Instancingサンプル
-    //{
-    //    // 生成器
-    //    auto& spawnerObj = GameObjectManager::Instance().Create();
-    //    spawnerObj->SetName("spawner");
-    //    spawnerObj->transform_->SetWorldPosition({ 0.00f, 0.0f, 0.000f });
-    //    spawnerObj->transform_->SetScale({ 0.01f,0.01f,0.01f });
-    //    std::shared_ptr<InstanceRenderer> ir = spawnerObj->AddComponent<InstanceRenderer>(SHADER_ID_MODEL::DEFERRED, 1, BLENDSTATE::ALPHA);
-    //    ir->LoadModel("Data/Model/MatuokaStage/Reactor.mdl");
-
-    //    // 大量生産
-    //    for (int i = 0; i < 6; ++i) {
-    //        auto& obj = ir->CreateInstance((i % 2 == 0));
-    //        obj->SetName("instanceOBJ");
-    //        obj->transform_->SetWorldPosition({ 8.0f * (i % 10) - 5, 1.1f, 0.4f * (i / 10) - 5 });
-    //    }
-    //}
-
-
     //ステージ
     {
         auto& stageObj = GameObjectManager::Instance().Create();
@@ -109,7 +141,7 @@ void ScenePVP::Initialize()
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/","StageJson/ColliderStage.mdl", "__", 0.005f);
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/", "StageJson/ColliderStage.mdl", "__", 0.005f);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
         //配置したステージオブジェクトの中からGateを取得
@@ -141,18 +173,10 @@ void ScenePVP::Initialize()
     }
 
     //UIゲームオブジェクト生成
-   // CreateUiObject();
+    CreateUiObject();
 
 #pragma endregion
 
-#pragma region グラフィック系の設定
-
-    //コンスタントバッファの初期化
-    ConstantBufferInitialize();
-
-    //ネット大事
-    StdIO_UIListener* l = new StdIO_UIListener();
-    photonNet = std::make_unique<BasicsApplication>(l);
 }
 
 void ScenePVP::Finalize()
@@ -160,10 +184,18 @@ void ScenePVP::Finalize()
     photonNet->close();
 }
 
+void TransitionRemove(std::vector<std::weak_ptr<GameObject>>& removeObjs)
+{
+    for (auto& removeObj : removeObjs)
+    {
+        //保存オブジェクトすべて削除
+        GameObjectManager::Instance().Remove(removeObj.lock());
+    }
+    removeObjs.clear();
+}
+
 void ScenePVP::Update(float elapsedTime)
 {
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
     //ネット更新
     photonNet->run(elapsedTime);
 
@@ -173,9 +205,46 @@ void ScenePVP::Update(float elapsedTime)
     //Ui更新
     PlayerUIManager::Instance().UIUpdate(elapsedTime);
 
+    ////画面切り替え処理
+    //auto net = photonNet->GetPhotonLib();
+    //bool lobbyOneFlg = false;   //一回だけ初期化するように(ロビーに)
+    //if (!isLobby) //一回だけ入る
+    //{
+    //    if (net->IsJoinPermission() || net->GetIsMasterPlayer())    //ネットに繋がった時ロビーに入る
+    //    {
+    //        lobbyOneFlg = true;
+    //        isLobby = true;
+    //        TransitionRemove(tempRemoveObj);
+    //    }
+    //}
+    //bool lobbyOneFlg = false;   //一回だけ初期化するように(キャラセレクトに)
+    //if (!isCharaSelect) //一回だけ入る
+    //{
+    //    if (net->GetIsGamePlay())    //ゲーム開始
+    //    {
+    //        lobbyOneFlg = true;
+    //        isLobby = true;
+    //        TransitionRemove(tempRemoveObj);
+    //    }
+    //}
+    //if (!isCharaSelect) //一回だけ入る
+    //{
+    //    if (net->GetIsGamePlay())    //ゲーム開始
+    //    {
+    //        lobbyOneFlg = true;
+    //        isLobby = true;
+    //        TransitionRemove(tempRemoveObj);
+    //    }
+    //}
+
     //ゲームオブジェクトの行列更新
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
+    //if (lobbyOneFlg)    //一回だけ入る
+    //{
+    //    InitializeLobby();
+    //}
 }
 
 void ScenePVP::Render(float elapsedTime)

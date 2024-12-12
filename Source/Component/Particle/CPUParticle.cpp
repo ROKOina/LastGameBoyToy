@@ -72,8 +72,8 @@ namespace DirectX
 template<class Archive>
 void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
 {
-    archive
-    (
+    // 共通のフィールドを最初に処理
+    archive(
         CEREAL_NVP(m_verticalkoma),
         CEREAL_NVP(m_besidekoma),
         CEREAL_NVP(m_animationspeed),
@@ -104,23 +104,25 @@ void CPUParticle::SerializeCPUParticle::serialize(Archive& archive, int version)
         CEREAL_NVP(limitime),
         CEREAL_NVP(collsionradius)
     );
-    // バージョン1には存在しないフィールドにはデフォルト値を与える
-    if (version == 1)
+
+    // バージョンに応じて追加のフィールドを処理
+    switch (version)
     {
-        collider = false;
-        deleteflag = false;
-        m_direction = { 1.0f,1.0f,1.0f };
-        deletetime = 0.0f;
-    }
-    if (version >= 2)
-    {
-        archive
-        (
+    case 0:
+        // バージョン0では追加フィールドはなし
+        break;
+
+    case 1:
+        archive(
             CEREAL_NVP(collider),
             CEREAL_NVP(deleteflag),
             CEREAL_NVP(m_direction),
             CEREAL_NVP(deletetime)
         );
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -182,6 +184,9 @@ CPUParticle::CPUParticle(const char* filename, int num)
         D3D11_TEXTURE2D_DESC texture2d_desc{};
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_scp.m_filename.c_str(), m_shaderresourceview.GetAddressOf(), &texture2d_desc);
     }
+
+    D3D11_TEXTURE2D_DESC d_texture2d_desc{};
+    LoadTextureFromFile(Graphics::Instance().GetDevice(), "Data/Texture/Dissolve.png", m_dissolveshaderresourceview.GetAddressOf(), &d_texture2d_desc);
 }
 
 //デストラクタ
@@ -279,6 +284,7 @@ void CPUParticle::Render()
 
     //テクスチャの設定
     dc->PSSetShaderResources(0, 1, m_shaderresourceview.GetAddressOf());
+    dc->PSSetShaderResources(1, 1, m_dissolveshaderresourceview.GetAddressOf());
 
     //コンスタントバッファの更新
     m_cc->data.particlecolor = m_scp.m_particlecolor;
@@ -434,6 +440,9 @@ void CPUParticle::ParticleMove(float elapsedTime)
 
                 //回転ランダム
                 m_data[j].rz += Mathf::RandomRange(0.0f, m_scp.m_randomrotation);
+
+                // 色の変化
+                m_data[i].alpha = Mathf::Lerp(0.0f, 1.0f, 1.0f - lifelate);
             }
 
             //セットする
@@ -555,6 +564,7 @@ void CPUParticle::OnGUI()
     ImGui::Spacing();
     ImGui::ColorEdit4(J(u8"色"), &m_scp.m_particlecolor.x);
     ImGui::DragFloat3(J(u8"輝度"), &m_scp.m_intensity.x, 0.1f, 0.0f, 300.0f);
+    ImGui::DragFloat(J(u8"ディゾルブ"), &m_cc->data.dissolveThreshold, 0.1f, 0.0f, 1.0f);
     ImGui::DragFloat(J(u8"生存時間"), &m_scp.m_lifetime, 0.1f);
     ImGui::Checkbox(J(u8"制限時間を使う"), &m_scp.usetime);
     ImGui::DragFloat(J(u8"時間"), &timer, 0.1f);

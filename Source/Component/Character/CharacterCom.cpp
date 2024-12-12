@@ -12,6 +12,7 @@
 #include "Component\Audio\AudioCom.h"
 #include "Component\Sprite\Sprite.h"
 #include "Component\Renderer\RendererCom.h"
+#include <Component\Animation\AnimationCom.h>
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -99,7 +100,31 @@ void CharacterCom::Update(float elapsedTime)
     CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
-    Vinetto(elapsedTime);
+    if (GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
+
+    //攻撃先行入力
+    shootTimer += elapsedTime;
+    if (attackInputSave)
+    {
+        if (shootTimer >= shootTime)
+        {
+            //スキル発動中はリターン
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
+            {
+                //弾切れならリロード
+                if (currentBulletNum > 0) {
+                    MainAttackDown();
+                }
+                else {
+                    if(attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD) 
+                    Reload();
+                }
+            }
+            attackInputSave = false;
+        }
+        if (CharacterInput::MainAttackButton & GetButtonUp())
+            attackInputSave = false;
+    }
 
     //地面について要れば元に戻す
     if (GetGameObject()->GetComponent<MovementCom>()->OnGround())
@@ -177,6 +202,8 @@ void CharacterCom::OnGUI()
 
     if (ImGui::TreeNode("SkillCool"))
     {
+        ImGui::DragFloat("shootTime", &shootTime);
+        ImGui::DragFloat("shootTimer", &shootTimer);
         ImGui::DragFloat("QTime", &skillCools[SkillCoolID::Q].time);
         ImGui::DragFloat("QTimer", &skillCools[SkillCoolID::Q].timer);
         ImGui::Separator();
@@ -217,6 +244,50 @@ void CharacterCom::DashFewSub(float elapsedTime)
     }
 }
 
+//FPS視点の腕アニメーション制御
+void CharacterCom::FPSArmAnimation()
+{
+    if (std::string(GetGameObject()->GetName()) != "player")return;
+    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+    auto& armAnim = arm->GetComponent<AnimationCom>();
+
+    //待機
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
+    {
+        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
+
+        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot")
+            && armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
+            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
+    }
+
+    //移動
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
+    {
+        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
+        {
+            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot")
+                || armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
+            {
+                if (armAnim->IsEventCalling("attackEnd"))
+                    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
+            }
+            else
+                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
+        }
+    }
+
+    //アニメーションスピード変更
+    float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
+    float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
+
+    float v = max - fmax;
+    if (v < 0)v = 0;
+
+    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
+        = 1 + v * 0.1f;
+}
+
 void CharacterCom::InputStateUpdate(float elapsedTime)
 {
     //ステート処理
@@ -234,7 +305,24 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     if (CharacterInput::MainAttackButton & GetButtonDown()
         && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
-        MainAttackDown();
+        if (shootTimer < shootTime)
+        {
+            attackInputSave = true; //先行入力保存
+            return;
+        }
+
+        //弾切れなら自動的にリロード
+        if (currentBulletNum > 0)
+        {
+            MainAttackDown();
+        }
+        else
+        {
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+            {
+                Reload();
+            }
+        }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
         && GamePad::BTN_A & GetButton())
@@ -246,7 +334,15 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown())
     {
-        MainAttackDown();
+        if (shootTimer < shootTime)
+        {
+            attackInputSave = true; //先行入力保存
+            return;
+        }
+
+        //弾切れなら自動的にリロード
+        currentBulletNum > 0 ?
+            MainAttackDown() : Reload();
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
@@ -271,13 +367,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         //MainAttack();
     }
 
-    if (CharacterInput::MainSkillButton_Q & GetButtonDown()
+    if (CharacterInput::MainSkillButton_E & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::Q))
     {
         skillCools[SkillCoolID::Q].timer = 0;
         MainSkill();
     }
-    if (CharacterInput::SubSkillButton_E & GetButtonDown()
+    if (CharacterInput::SubSkillButton_C & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::E))
     {
         skillCools[SkillCoolID::E].timer = 0;
@@ -296,7 +392,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 
     //野村追加 Rキー
-    if (CharacterInput::UltimetButton_R & GetButtonDown()
+    if (CharacterInput::UltimetButton & GetButtonDown()
         /*&& Rcool.timer >= Rcool.time*/)
     {
         //ウルト発動フラグON
@@ -307,6 +403,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             isMaxUlt = false;
             ultGauge = 0;
         }
+    }
+
+    //リロード
+    if (CharacterInput::Reload & GetButtonDown()
+    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+    {
+        Reload();
     }
 }
 
@@ -429,7 +532,9 @@ void CharacterCom::Vinetto(float elapsedTime)
     float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
     float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
 
-    if (const auto posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>())
+    auto& postEff = GameObjectManager::Instance().Find("posteffect");
+    if (!postEff)return;
+    if (const auto posteffect = postEff->GetComponent<PostEffect>())
     {
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::VignetteIntensity };
 

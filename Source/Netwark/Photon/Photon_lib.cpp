@@ -14,6 +14,7 @@
 #include "Component/Collsion/ColliderCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
+#include "Component\Stage\StageEditorCom.h"
 
 #include "StaticSendDataManager.h"
 
@@ -61,48 +62,51 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 void PhotonLib::update(float elapsedTime)
 {
     auto& myPlayer = GameObjectManager::Instance().Find("player");
-    int myPhotonID = GetMyPhotonID();
-    for (auto& s : saveInputPhoton)
+    if (myPlayer)
     {
-        if (s.photonId != myPhotonID)continue;
-
-        //自分の入力保存
-        GamePad& gamePad = Input::Instance().GetGamePad();
-
-        SaveBuffer save;
-        save.frame = GetServerTime();
-        save.input = gamePad.GetButton();
-        save.inputDown = gamePad.GetButtonDown();
-        save.inputUp = gamePad.GetButtonUp();
-
-        //移動
-        save.leftStick = gamePad.GetAxisL();
-        save.pos = myPlayer->transform_->GetWorldPosition();
-        save.rotato = myPlayer->transform_->GetRotation();
-
-        //FPSカメラの向き保存
-        auto& fpsCamera = myPlayer->GetChildFind("cameraPostPlayer");
-        save.fpsDir = fpsCamera->transform_->GetWorldFront();
-
-        //速力
-        DirectX::XMFLOAT3 velo = myPlayer->GetComponent<MovementCom>()->GetVelocity();
-        save.velo = velo;
-
-        s.inputBuf->Enqueue(save);
-
-        //ちーむID保存
-        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetTeamID(s.teamID);
-
-        //名前登録
-        if (s.name.size() <= 0)
+        int myPhotonID = GetMyPhotonID();
+        for (auto& s : saveInputPhoton)
         {
-            s.name = netName;
-        }
+            if (s.photonId != myPhotonID)continue;
 
-        break;
+            //自分の入力保存
+            GamePad& gamePad = Input::Instance().GetGamePad();
+
+            SaveBuffer save;
+            save.frame = GetServerTime();
+            save.input = gamePad.GetButton();
+            save.inputDown = gamePad.GetButtonDown();
+            save.inputUp = gamePad.GetButtonUp();
+
+            //移動
+            save.leftStick = gamePad.GetAxisL();
+            save.pos = myPlayer->transform_->GetWorldPosition();
+            save.rotato = myPlayer->transform_->GetRotation();
+
+            //FPSカメラの向き保存
+            auto& fpsCamera = myPlayer->GetChildFind("cameraPostPlayer");
+            save.fpsDir = fpsCamera->transform_->GetWorldFront();
+
+            //速力
+            DirectX::XMFLOAT3 velo = myPlayer->GetComponent<MovementCom>()->GetVelocity();
+            save.velo = velo;
+
+            s.inputBuf->Enqueue(save);
+
+            //ちーむID保存
+            myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetTeamID(s.teamID);
+
+            //名前登録
+            if (s.name.size() <= 0)
+            {
+                s.name = netName;
+            }
+
+            break;
+        }
+        int myPlayerID = GetMyPlayerID();
+        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(myPlayerID);
     }
-    int myPlayerID = GetMyPlayerID();
-    myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(myPlayerID);
 
     switch (mState)
     {
@@ -219,21 +223,40 @@ void PhotonLib::ImGui()
 
     ImGui::Begin("PhotonNet", nullptr, ImGuiWindowFlags_None);
 
-    if (ImGui::Button("AAdd"))
     {
-        auto& gameobjM = GameObjectManager::Instance();
-        std::weak_ptr<GameObject> p2 = gameobjM.Find("player");
-        gameobjM.RemoveNowTime(p2);
-
-        //プレイヤー
+        //キャラ選択
+        if (ImGui::TreeNode("character"))
         {
-            std::shared_ptr<GameObject> p = gameobjM.CreateNowTime();
-            p->SetName("player");
-            p->transform_->SetWorldPosition({ 0,0,0 });
-            RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, p);
-            gameobjM.CreateNowTimeSaveComponent(p);
+            int charaIndex = 0;
+            for (auto& name : charaIDList)
+            {
+                ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
+
+                if (charaID == charaIndex)
+                {
+                    nodeFlags |= ImGuiTreeNodeFlags_Selected;
+                }
+
+                if (ImGui::TreeNodeEx(&name, nodeFlags, name.c_str()))
+                {
+                    if (ImGui::IsItemClicked())
+                    {
+                        charaID = charaIndex;
+
+                        //キャラ変更
+                        RegisterChara::Instance().ChangeChara("player",RegisterChara::CHARA_LIST(charaID));
+
+                        ImGui::TreePop();
+                        break;
+                    }
+
+                    ++charaIndex;
+
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
         }
-        int a = 0;
     }
 
     //ネットネーム表示
@@ -367,33 +390,6 @@ void PhotonLib::LobbyImGui()
 
         ImGui::Begin("PhotonNetLobby", nullptr, ImGuiWindowFlags_None);
 
-        //キャラ選択
-        if (ImGui::TreeNode("character"))
-        {
-            int charaIndex = 0;
-            for (auto& name : charaIDList)
-            {
-                ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_Leaf;
-
-                if (charaID == charaIndex)
-                {
-                    nodeFlags |= ImGuiTreeNodeFlags_Selected;
-                }
-
-                ImGui::TreeNodeEx(&name, nodeFlags, name.c_str());
-
-                if (ImGui::IsItemClicked())
-                {
-                    charaID = charaIndex;
-                }
-
-                ++charaIndex;
-
-                ImGui::TreePop();
-            }
-            ImGui::TreePop();
-        }
-
         //新しくルーム生成
         char name[256];
         ::strncpy_s(name, sizeof(name), roomName.c_str(), sizeof(name));
@@ -516,10 +512,10 @@ void PhotonLib::NetInputUpdate()
 
 void PhotonLib::MyCharaInput()
 {
-    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Find("player");
-    if (obj.use_count() == 0)return;
+    std::shared_ptr<GameObject> myPlayer = GameObjectManager::Instance().Find("player");
+    if (myPlayer.use_count() == 0)return;
 
-    std::shared_ptr<CharacterCom> chara = obj->GetComponent<CharacterCom>();
+    std::shared_ptr<CharacterCom> chara = myPlayer->GetComponent<CharacterCom>();
     if (chara.use_count() == 0) return;
 
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -533,7 +529,7 @@ void PhotonLib::MyCharaInput()
 
         chara->SetLeftStick(gamePad.GetAxisL());
         //カメラ情報
-        auto& fpsCamera = obj->GetChildFind("cameraPostPlayer");
+        auto& fpsCamera = myPlayer->GetChildFind("cameraPostPlayer");
         chara->SetFpsCameraDir(fpsCamera->transform_->GetWorldFront());
     }
     else
@@ -966,6 +962,9 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 break;
             }
 
+            connectNow = connectBegin;
+            connectBegin = false;
+
             //データ種別で分岐
             switch (ne[0].dataKind)
             {
@@ -983,8 +982,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                     LobbyRecv(ne[0]);
                 break;
             }
-
-
         }
         break;
     default:
@@ -1022,7 +1019,7 @@ void PhotonLib::GameRecv(NetData recvData)
     }
 
     int myPlayerID = GetMyPlayerID();
-    auto& obj = GameObjectManager::Instance().Find("player");
+    auto& myPlayer = GameObjectManager::Instance().Find("player");
     //ダメージ情報
     for (int id = 0; id < recvData.gameData.damageData.size(); ++id)
     {
@@ -1030,7 +1027,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.damageData[id] > 0)
         {
-            obj->GetComponent<CharaStatusCom>()->AddDamagePoint(-recvData.gameData.damageData[id]);
+            myPlayer->GetComponent<CharaStatusCom>()->AddDamagePoint(-recvData.gameData.damageData[id]);
             break;
         }
     }
@@ -1041,7 +1038,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.healData[id] > 0)
         {
-            obj->GetComponent<CharaStatusCom>()->AddHealPoint(recvData.gameData.healData[id]);
+            myPlayer->GetComponent<CharaStatusCom>()->AddHealPoint(recvData.gameData.healData[id]);
             break;
         }
     }
@@ -1052,7 +1049,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.stanData[id] >= 0.1f)
         {
-            obj->GetComponent<CharacterCom>()->SetStanSeconds(recvData.gameData.stanData[id]);
+            myPlayer->GetComponent<CharacterCom>()->SetStanSeconds(recvData.gameData.stanData[id]);
             break;
         }
     }
@@ -1063,7 +1060,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (Mathf::Length(recvData.gameData.knockbackData[id]) >= 0.1f)
         {
-            obj->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(recvData.gameData.knockbackData[id]);
+            myPlayer->GetComponent<MovementCom>()->SetNonMaxSpeedVelocity(recvData.gameData.knockbackData[id]);
             break;
         }
     }
@@ -1074,7 +1071,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (Mathf::Length(recvData.gameData.movePosData[id]) >= 0.1f)
         {
-            obj->transform_->SetWorldPosition(recvData.gameData.movePosData[id]);
+            myPlayer->transform_->SetWorldPosition(recvData.gameData.movePosData[id]);
             break;
         }
     }
@@ -1144,6 +1141,7 @@ void PhotonLib::JoinRecv(NetData recvData)
                     if (s.photonId == GetMyPhotonID())
                     {
                         s.playerId = j.playerId;
+                        connectBegin = true;
                         break;
                     }
                 }
@@ -1188,7 +1186,7 @@ void PhotonLib::sendGameData(void)
 {
     ExitGames::Common::Hashtable event;
 
-    auto& obj = GameObjectManager::Instance().Find("player");
+    auto& myPlayer = GameObjectManager::Instance().Find("player");
 
     std::vector<NetData> n;
     NetData& netD = n.emplace_back(NetData());
@@ -1232,7 +1230,7 @@ void PhotonLib::sendGameData(void)
     }
 
     //キャラIDを送る
-    netD.gameData.charaID = obj->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();
+    netD.gameData.charaID = myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();
 
     //自分の入力を送る
     for (auto& s : saveInputPhoton)
