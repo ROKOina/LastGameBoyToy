@@ -404,9 +404,6 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     move->SetMoveAcceleration(30.0f);
     move->SetMoveMaxSpeed(15.0f);
 
-    //ジャンクラのウルト制御
-    obj->AddComponent<JankratUltCom>();
-
     //コリジョン判定
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
@@ -416,6 +413,9 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     else
         collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.7f);
+
+    //ジャンクラのウルト制御
+    obj->AddComponent<JankratUltCom>();
 
     //爆発物
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();

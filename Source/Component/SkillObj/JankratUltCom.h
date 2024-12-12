@@ -30,4 +30,5 @@ private:
 private:
 
     float time = 0.0f;
+    bool plustime = false;
 };
