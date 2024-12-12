@@ -619,12 +619,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                             AnimationCalculation::Instance().ComputeAnimation(key0, key1, lowerRate, *lowerNodes[lowerNodeIndex]);
                         }
                     }
-
-                    //AimIKの更新
-                    if (GetGameObject()->GetComponent<AimIKCom>())
-                    {
-                        GetGameObject()->GetComponent<AimIKCom>()->AimIK();
-                    }
                 }
                 //歩きモーション用
                 else if (lowerBlendType == 2)
