@@ -93,6 +93,9 @@ public:
     //今の試合時間
     float GetNowTime();
 
+    //参加人数
+    float GetJoinNum();
+
     int GetServerTime();
     int GetServerTimeOffset();
 
@@ -210,7 +213,7 @@ private:
         {
             inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
         }
-
+        bool useFlg = false;    //使用されているか
         std::string name = {};
         int photonId;
         int playerId;
