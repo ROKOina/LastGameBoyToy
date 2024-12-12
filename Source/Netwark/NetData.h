@@ -158,7 +158,7 @@ struct NetData
         std::array<float, 4> stanData;//キャラに与えたスタン
         std::array<DirectX::XMFLOAT3, 4> knockbackData = {};//ノックバックを与える
         std::array<DirectX::XMFLOAT3, 4> movePosData = {};//移動位置を与える
-        //std::array<int, 4> teamID;//チームのID
+        std::array<int, 4> teamID;//チームのID
         int charaID;    //キャラのID
         int hp;
     }gameData;
@@ -212,6 +212,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 
         out << h.gameData.charaID << " ";
         out << h.gameData.hp << " ";
+        out << h.gameData.teamID << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
     }
 
@@ -261,6 +262,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 
         in >> h.gameData.charaID;
         in >> h.gameData.hp;
+        in >> h.gameData.teamID;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
     }
 

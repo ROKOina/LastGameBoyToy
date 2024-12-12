@@ -309,11 +309,9 @@ void PhotonLib::ImGui()
     //切る数
     if (ImGui::TreeNode("killcount"))
     {
-        int cc = 0;
         for (auto& s : saveInputPhoton)
         {
-            ImGui::InputInt(std::string("killcount" + std::to_string(cc)).c_str(), &s.killCount);
-            cc++;
+            ImGui::InputInt(std::string(s.name).c_str(), &s.killCount);
         }
         ImGui::TreePop();
     }
@@ -1072,6 +1070,24 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
 
 void PhotonLib::GameRecv(NetData recvData)
 {
+    //キャラ追加
+    bool add = true;
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.photonId == recvData.photonId)add = false;
+    }
+    //キャラ追加リストに追加
+    if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
+
+    //マスタークライアントからの受信の場合
+    if (recvData.isMasterClient)
+    {
+        //チームを保存
+        for (auto& s : saveInputPhoton)
+        {
+            s.teamID = recvData.gameData.teamID[s.playerId];
+        }
+    }
     //ゲーム開始フラグ
     isGamePlay = true;
 
