@@ -60,12 +60,13 @@ void JankratCharacter_BaseState::HandleArmAnimation() const
         armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
         const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
         anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetUpperCurrentAnimationSeconds(0.3f);
         armAnim->SetAnimationSeconds(0.3f);
     }
     else
     {
         const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
-        anim->PlayAnimation(anim->FindAnimation("shoot"), false);
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
         anim->SetAnimationSeconds(0.3f);
     }
 }

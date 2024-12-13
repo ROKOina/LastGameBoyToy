@@ -36,8 +36,6 @@ void InazawaCharacterCom::Update(float elapsedTime)
 {
     CharacterCom::Update(elapsedTime);
 
-    FPSArmAnimation();
-
     //ウルトエフェクト
     if (attackUltRayObj.lock())
     {

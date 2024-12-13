@@ -209,6 +209,10 @@ public:
     // shootTimeのゲッター
     float GetShootTime() const { return shootTime; }
 
+    void SetDashFlag(bool flag) { dashFlag = flag; }
+    bool GetDashFlag() { return dashFlag; }
+
+
     //残弾
     int GetCurrentBulletNum() { return currentBulletNum; }
     void SetCurrentBulletNum(int num) { currentBulletNum = num; }

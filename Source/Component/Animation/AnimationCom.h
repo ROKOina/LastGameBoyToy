@@ -94,6 +94,8 @@ public:
     // アニメーション時間
     float GetAnimationSeconds() const { return currentSeconds; }
     void SetAnimationSeconds(float seconds) { currentSeconds = seconds; }
+    float GetUpperCurrentAnimationSeconds() const { return upperCurrentAnimationSeconds; }
+    void SetUpperCurrentAnimationSeconds(float seconds) { upperCurrentAnimationSeconds = seconds; }
 
     // 現在のアニメーション番号取得
     int GetCurrentAnimationIndex()const { return currentAnimation; }

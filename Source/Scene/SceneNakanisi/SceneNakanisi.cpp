@@ -30,7 +30,7 @@
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component\Sprite\Sprite.h"
 #include "Component\System\GameObject.h"
-
+#include "Component\GameSystem\RespawnCom.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
@@ -100,8 +100,6 @@ void SceneNakanisi::Initialize()
         stageObj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/AbeStage/TestStage.mdl");
-        //r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
-        //r->SetOutlineIntensity(5.5f);
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
@@ -109,17 +107,18 @@ void SceneNakanisi::Initialize()
         stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "testStage.mdl", "__", 0.05);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage_Spawn.json");
-        ////配置したステージオブジェクトの中からGateを取得
-        //StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
-        //for (auto& obj : placeObj.objList)
-        //{
-        //    DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
 
-        //    GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
-        //    gate->SetDownPos(pos);
-        //    gate->SetUpPos({ pos.x, 1.85f, pos.z });
-        //    gate->SetMoveSpeed(0.1f);
-        //}
+        //リスポーン用
+        GameObj respawnObj = GameObjectManager::Instance().Create();
+        respawnObj->SetName("respawn");
+        RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
+        spawnCom->SetGameMode(RespawnCom::GameMode::DeathMatch);
+
+        StageEditorCom::PlaceObject spawnObj = stageEdit->GetPlaceObject("Spawn");
+        for (auto& obj : spawnObj.objList)
+        {
+            spawnCom->AddRespawnPoses(obj->transform_->GetWorldPosition());
+        }
     }
 
     //プレイヤー
@@ -127,13 +126,10 @@ void SceneNakanisi::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
 
-        //配置したステージオブジェクトの中からスポーン位置を取得
-        StageEditorCom* edit = GameObjectManager::Instance().Find("stage")->GetComponent<StageEditorCom>().get();
-        StageEditorCom::PlaceObject spawnObj = edit->GetPlaceObject("Spawn");
+        //スポーン位置を設定
+        RespawnCom* spawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
+        obj->transform_->SetWorldPosition(spawn->GetRespawnPoses()[0]);
 
-        auto it = spawnObj.objList.begin();
-        std::advance(it, 0);
-        obj->transform_->SetWorldPosition(it->get()->transform_->GetWorldPosition());
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj);
     }
 
@@ -175,15 +171,10 @@ void SceneNakanisi::Update(float elapsedTime)
     if (photonLib->GetConnectNow())
     {
         //配置したステージオブジェクトの中からスポーン位置を取得
-        StageEditorCom* edit = GameObjectManager::Instance().Find("stage")->GetComponent<StageEditorCom>().get();
-        StageEditorCom::PlaceObject spawnObj = edit->GetPlaceObject("Spawn");
+        RespawnCom* spawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
 
         GameObj player = GameObjectManager::Instance().Find("player");
-
-        auto it = spawnObj.objList.begin();
-        std::advance(it, player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
-
-        player->transform_->SetWorldPosition(it->get()->transform_->GetWorldPosition());
+        player->transform_->SetWorldPosition(spawn->GetRespawnPoses()[0]);
     }
 
     //イベントカメラ用
