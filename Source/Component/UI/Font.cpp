@@ -92,6 +92,8 @@ bool InputTextWString(const char* label, std::wstring& wstr, size_t max_length =
 
 Font::Font( const char* filename, int maxSpriteCount)
 {
+
+	//Fontの作り方はPVPシーンにイニシャライズに参考例置いときます
 	HRESULT hr = S_OK;
 
 	ID3D11Device* device = Graphics::Instance().GetDevice();
@@ -341,7 +343,7 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 	ID3D11Device* device = Graphics.GetDevice();
 	ID3D11DeviceContext* dc = Graphics.GetDeviceContext();
 
-	position = originalPos;
+	 currentPosition = position;
 
 	// スクリーンサイズ取得
 	D3D11_VIEWPORT viewport;
@@ -368,8 +370,8 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 	size_t length = str.size();
 	//size_t length = ::wcslen(stri);
 
-	float start_x = position.x;
-	float start_y = position.y;
+	float start_x = currentPosition.x;
+	float start_y = currentPosition.y;
 	float space = fontWidth;
 
 	for (size_t i = 0; i < length; ++i)
@@ -385,18 +387,18 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		}
 		else if (code == CharacterInfo::ReturnCode)
 		{
-			position.x = start_x;
-			position.y += fontHeight;
+			currentPosition.x = start_x;
+			currentPosition.y += fontHeight;
 			continue;
 		}
 		else if (code == CharacterInfo::TabCode)
 		{
-			position.x += space * 4;
+			currentPosition.x += space * 4;
 			continue;
 		}
 		else if (code == CharacterInfo::SpaceCode)
 		{
-			position.x += space;
+			currentPosition.x += space;
 			continue;
 		}
 
@@ -412,8 +414,8 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		// 文字情報を取得し、頂点データを編集
 		const CharacterInfo& info = characterInfos.at(code);
 
-		float positionX = position.x + info.xoffset * scale;// + 0.5f;
-		float positionY = position.y + info.yoffset * scale;// + 0.5f;
+		float positionX = currentPosition.x + info.xoffset * scale;// + 0.5f;
+		float positionY = currentPosition.y + info.yoffset * scale;// + 0.5f;
 		float width = info.width * scale;
 		float height = info.height * scale;
 
@@ -472,7 +474,7 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		}
 		currentVertex += 4;
 
-		position.x+= info.xadvance * scale;
+		currentPosition.x+= info.xadvance * scale;
 		
 		// テクスチャが切り替わる度に描画する情報を設定
 		if (currentPage != info.page)
@@ -532,9 +534,6 @@ void Font::OnGUI()
 		ImGui::Text("Updated: %ls", str.c_str());
 	}
 
-	static ImVec2 originalPos = { 100.0f, 200.0f };
-	static float scale = 1.0f;
-
-	ImGui::DragFloat2("Position", &originalPos.x);
+	ImGui::DragFloat2("Position", &position.x);
 	ImGui::DragFloat("Scale", &scale);
 }
