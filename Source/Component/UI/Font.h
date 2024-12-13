@@ -96,6 +96,7 @@ private:
 		UINT						startIndex;
 		UINT						indexCount;
 	};
+
 	std::vector<Subset>				subsets;
 	Vertex* currentVertex = nullptr;
 	UINT							currentIndexCount;
@@ -108,6 +109,7 @@ public:
 	DirectX::XMFLOAT2				currentPosition = { 0,0 };
 	DirectX::XMFLOAT2			    position = {0,0};		//é¿ç€Ç…ìÆÇ©Ç∑ÇÃÇÕÇ±Ç¡Çø	
 	float							scale = 0;
-    std::wstring			            str;
+	DirectX::XMFLOAT4				color = { 1,1,1,1 };
+    std::wstring			        str;
 	wchar_t*						stri = nullptr;
 };
