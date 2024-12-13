@@ -990,13 +990,14 @@ void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVect
     mpOutputListener->writeString(L"");
     mpOutputListener->writeString(ExitGames::Common::JString(L"player ") + playerNr + L" " + player.getName() + L" has joined the game");
 
-    ////自分の枠を確保
-    //int myPhotonID = GetMyPhotonID();
-    //if (playerNr == myPhotonID)
-    //{
-    //    //追加
-    //    AddPlayer(myPhotonID, -1);
-    //}
+    //自分の枠を確保
+    int myPhotonID = GetMyPhotonID();
+    if (playerNr == myPhotonID)
+    {
+        //追加
+        if (GetIsMasterPlayer())
+            AddPlayer(myPhotonID, 0);
+    }
 }
 //退出時
 void PhotonLib::leaveRoomEventAction(int playerNr, bool isInactive)
@@ -1297,10 +1298,8 @@ void PhotonLib::LobbyRecv(NetData recvData)
     if (recvData.isMasterClient)
     {
         //チームを保存
-        for (auto& s : saveInputPhoton)
-        {
-            s.teamID = recvData.lobbyData.teamID[s.playerId];
-        }
+        for (int pID = 0; pID < 4; ++pID)
+            saveInputPhoton[pID].teamID = recvData.lobbyData.teamID[pID];
     }
 
     //チャットに文字が入っているなら
