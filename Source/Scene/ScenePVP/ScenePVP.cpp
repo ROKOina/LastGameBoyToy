@@ -37,6 +37,7 @@
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
 
+
 void ScenePVP::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -72,13 +73,41 @@ void ScenePVP::Initialize()
 
 void ScenePVP::InitializeLobbySelect()
 {
-    //kari
+
+    //font
+    std::shared_ptr<GameObject> FParent = GameObjectManager::Instance().Create();
+    FParent->SetName("fontParent");
+    //削除予定リストに追加
+    tempRemoveObj.emplace_back(FParent);
+
+    std::shared_ptr<GameObject> lobbyNameGage = FParent->AddChildObject();
+    lobbyNameGage->SetName("lobbyNameGage");
+    lobbyNameGage->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyNameInput.ui", Sprite::SpriteShader::DEFALT, false);
+    //削除予定リストに追加
+    tempRemoveObj.emplace_back(lobbyNameGage);
+
+    for (auto& lf : lobbySelectFont)
     {
-        std::shared_ptr<GameObject> kariLOBBYSELECT = GameObjectManager::Instance().Create();
-        kariLOBBYSELECT->SetName("kariLOBBYSELECT");
-        kariLOBBYSELECT->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        if (lf.collision)
+        {
+            std::shared_ptr<GameObject> kariLOBBYSELECT = FParent->AddChildObject();
+            //std::shared_ptr<GameObject> kariLOBBYSELECT = GameObjectManager::Instance().Create();
+            kariLOBBYSELECT->SetName(("FontBack" + std::to_string(lf.id)).c_str());
+            kariLOBBYSELECT->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyStrBack.ui", Sprite::SpriteShader::DEFALT, true);
+            //削除予定リストに追加
+            tempRemoveObj.emplace_back(kariLOBBYSELECT);
+            strBack.emplace_back(kariLOBBYSELECT);  //背景管理用
+        }
+
+        std::shared_ptr<GameObject> obj = FParent->AddChildObject();
+        //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName(("lobbySelectFont" + std::to_string(lf.id)).c_str());
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = lf.pos;
+        font->str = lf.str;  //L付けてね
+        font->scale = lf.scale;
         //削除予定リストに追加
-        tempRemoveObj.emplace_back(kariLOBBYSELECT);
+        tempRemoveObj.emplace_back(obj);
     }
 }
 
@@ -92,6 +121,8 @@ void ScenePVP::InitializeLobby()
         //削除予定リストに追加
         tempRemoveObj.emplace_back(kariLOBBY);
     }
+
+
 }
 
 void ScenePVP::InitializeCharaSelect()
@@ -215,6 +246,9 @@ void ScenePVP::Update(float elapsedTime)
     //Ui更新
     PlayerUIManager::Instance().UIUpdate(elapsedTime);
 
+    //画面に応じた更新処理
+    TransitionUpdate(elapsedTime);
+
     //ゲームシステム更新
     GameSystemUpdate(elapsedTime);
     pvpGameSystem->update(elapsedTime);
@@ -237,6 +271,7 @@ void ScenePVP::Update(float elapsedTime)
             lobbyOneFlg = true;
             isLobby = true;
             TransitionRemove(tempRemoveObj);
+            lobbyState++;   //1
         }
     }
     bool lobbySelectOneFlg = false;   //一回だけ初期化するように(キャラセレクトに)
@@ -247,6 +282,7 @@ void ScenePVP::Update(float elapsedTime)
             lobbySelectOneFlg = true;
             isCharaSelect = true;
             TransitionRemove(tempRemoveObj);
+            lobbyState++;   //2
         }
     }
     bool GameOneFlg = false;   //一回だけ初期化するように(ゲーム開始に)
@@ -257,6 +293,7 @@ void ScenePVP::Update(float elapsedTime)
             GameOneFlg = true;
             isGame = true;
             TransitionRemove(tempRemoveObj);
+            lobbyState++;   //3
 
             //ゲームモード設定
             pvpGameSystem->SetGameMode(PVPGameSystem::GAME_MODE(net->GetGameMode()));
@@ -577,6 +614,234 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
         break;
     case PVPGameSystem::GAME_MODE::Button:
 
+        break;
+    }
+}
+
+void ScenePVP::TransitionUpdate(float elapsedTime)
+{
+    switch (lobbyState)
+    {
+    case 0: //ロビー選択
+    {
+        //font当たり背景セット
+        auto& fP = GameObjectManager::Instance().Find("fontParent");
+        for (auto& f : lobbySelectFont)
+        {
+            auto& back = fP->GetChildFind(("FontBack" + std::to_string(f.id)).c_str()); //背景オブジェクト
+            auto& fontObj = fP->GetChildFind(("lobbySelectFont" + std::to_string(f.id)).c_str());  //文字
+
+            //下で処理するためここではfalseに
+            if (f.id >= 20)
+            {
+                if (back)
+                    back->SetEnabled(false);
+                if (fontObj)
+                    fontObj->SetEnabled(false);
+                continue;
+            }
+
+            //ステートで有効判定
+            if (f.state != fontState)
+            {
+                if (back)
+                    back->SetEnabled(false);
+                if (fontObj)
+                    fontObj->SetEnabled(false);
+                continue;
+            }
+            if (back)
+                back->SetEnabled(true);
+            if (fontObj)
+                fontObj->SetEnabled(true);
+
+            //判定
+            if (f.collision)
+            {
+                auto& font = fontObj->GetComponent<Font>();
+                auto& ui = back->GetComponent<UiSystem>();
+
+                //各情報更新
+                back->transform_->SetWorldPosition({ font->position.x,font->position.y ,0 });
+                ui->spc.scale.x = 0.096f * font->str.length() * font->scale;
+                ui->spc.scale.y = 0.096f * font->scale;
+
+                //判定
+                if (ui->GetHitSprite())
+                {
+                    ui->spc.color.x = 1;
+
+                    GamePad& gamePad = Input::Instance().GetGamePad();
+                    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+                    {
+                        auto& lobbyStr = fP->GetChildFind(("lobbySelectFont" + std::to_string(2)).c_str());  //文字
+                        auto& lobbyF = lobbyStr->GetComponent<Font>();
+
+                        if (f.id == 4 || f.id == 11)    //戻る
+                            fontState = 0;
+                        else if (f.id == 0)     //新規
+                        {
+                            fontState = 1;
+                            lobbyF->str = L"";
+                        }
+                        else if (f.id == 10)    //参加
+                        {
+                            fontState = 2;
+                            joinRoomCount = -1;
+                            lobbyF->str = L"";
+                        }
+                        else if (f.id == 3) //ルーム作成
+                        {
+                            if (lobbyF->str.length() > 0)
+                            {
+                                auto net = photonNet->GetPhotonLib();
+                                net->SetRoomName(lobbyF->str);
+                                net->StartConnect();
+                            }
+
+                            break;
+                        }
+                        else if (f.id == 12)    //入室
+                        {
+                            if (lobbyF->str.length() > 0)
+                            {
+                                auto net = photonNet->GetPhotonLib();
+                                net->SetRoomName(lobbyF->str);
+                                net->StartConnect();
+                            }
+
+                            break;
+                        }
+                        //ヒット情報リセット
+                        for (auto& f : lobbySelectFont)
+                        {
+                            auto& back = fP->GetChildFind(("FontBack" + std::to_string(f.id)).c_str()); //背景オブジェクト
+                            if (!back)continue;
+                            auto& ui = back->GetComponent<UiSystem>();
+                            ui->SetHitSprite(false);
+                        }
+                    }
+                }
+                else
+                    ui->spc.color.x = 0;
+            }
+
+            //ロビー名入力
+            auto& gage = fP->GetChildFind("lobbyNameGage"); //背景オブジェクト
+            gage->SetEnabled(false);
+            if (fontState == 1)
+            {
+                gage->SetEnabled(true);
+
+                if (f.id == 2)  //入力用
+                {
+                    auto& font = fontObj->GetComponent<Font>();
+                    //一文字削除
+                    static bool BSflg = false;  //連続対処
+                    bool BSOneFlg = false;
+                    if (GetKeyState(8) & 0x8000)
+                    {
+                        BSOneFlg = true;
+                        if (!BSflg)
+                        {
+                            if (font->str.length() > 0)
+                                font->str.erase(font->str.end() - 1);
+                        }
+                    }
+                    BSflg = BSOneFlg;
+
+                    //文字入力
+                    static bool inputFlg[26];  //連続対処
+                    for (int i = 65; i < 91; ++i)
+                    {
+                        bool oneIn = false;
+                        if (GetKeyState(i) & 0x8000)
+                        {
+                            oneIn = true;
+                            if (!inputFlg[91 - i])
+                            {
+                                char a = char(i);
+                                font->str.push_back(static_cast<wchar_t>(a));
+                            }
+                        }
+                        inputFlg[91 - i] = oneIn;
+                    }
+                    //文字入力
+                    static bool numFlg[10];  //連続対処
+                    for (int i = 48; i < 58; ++i)
+                    {
+                        bool oneIn = false;
+                        if (GetKeyState(i) & 0x8000)
+                        {
+                            oneIn = true;
+                            if (!numFlg[58 - i])
+                            {
+                                char a = char(i);
+                                font->str.push_back(static_cast<wchar_t>(a));
+                            }
+                        }
+                        numFlg[58 - i] = oneIn;
+                    }
+                }
+            }
+        }
+        //部屋名
+        if (fontState == 2)
+        {
+            //部屋名を並べる
+            auto net = photonNet->GetPhotonLib();
+            int count = 20;
+            for (auto& room : net->GetRoomNames())
+            {
+                auto& back = fP->GetChildFind(("FontBack" + std::to_string(count)).c_str()); //背景オブジェクト
+                auto& fontObj = fP->GetChildFind(("lobbySelectFont" + std::to_string(count)).c_str());  //文字
+                if (back)
+                    back->SetEnabled(true);
+                if (fontObj)
+                    fontObj->SetEnabled(true);
+
+                auto& font = fontObj->GetComponent<Font>();
+                auto& ui = back->GetComponent<UiSystem>();
+
+                //情報更新
+                back->transform_->SetWorldPosition({ font->position.x,font->position.y ,0 });
+                //ui->spc.position.y = 218 + 500 * (count - 20);
+                font->position.y = 218 + 50 * (count - 20);
+                font->str = room;
+                //ui->spc.scale.x = 0.096f / 2 * font->str.length() * font->scale;
+
+                //判定
+                if (ui->GetHitSprite())
+                {
+                    GamePad& gamePad = Input::Instance().GetGamePad();
+                    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+                    {
+                        auto& lobbyStr = fP->GetChildFind(("lobbySelectFont" + std::to_string(2)).c_str());  //文字
+                        auto& lobbyF = lobbyStr->GetComponent<Font>();
+                        lobbyF->str = room;
+                        joinRoomCount = count;
+
+                        break;
+                    }
+                    ui->spc.color.x = 1;
+                }
+                else
+                    ui->spc.color.x = 0;
+
+                if (joinRoomCount == count)
+                    ui->spc.color.x = 1;
+
+                count++;
+            }
+        }
+
+    }
+    break;
+    case 1: //ロビー
+        break;
+    case 2: //キャラ選択
+        break;
+    case 3: //ゲーム中
         break;
     }
 }

@@ -82,6 +82,8 @@ public:
     int GetMyPhotonID();
     int GetMyPlayerID();
 
+    void SetRoomName(std::wstring wstr) { roomName = WStringToString(wstr); }
+
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
 
@@ -112,7 +114,11 @@ public:
 
     int GetRoomPlayersNum();
     std::string GetRoomName();
+    //全ての部屋名を取得
+    std::vector<std::wstring> GetRoomNames();
 
+    //接続開始
+    void StartConnect() { connectFlg = true; }
     bool GetConnectBegin() { return connectBegin; }
     bool GetConnectNow() { return connectNow; }
 

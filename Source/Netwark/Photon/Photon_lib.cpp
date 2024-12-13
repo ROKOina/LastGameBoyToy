@@ -794,6 +794,18 @@ std::string PhotonLib::GetRoomName()
     return WStringToString(mLoadBalancingClient.getCurrentlyJoinedRoom().getName().cstr());
 }
 
+std::vector<std::wstring> PhotonLib::GetRoomNames()
+{
+    std::vector<std::wstring> roomnames;
+    auto rooms = mLoadBalancingClient.getRoomList();
+    for (int i = 0; i < rooms.getSize(); ++i)
+    {
+        roomnames.emplace_back(rooms[i]->getName().cstr());
+    }
+
+    return roomnames;
+}
+
 int PhotonLib::SendMs()
 {
     return GetServerTime() - oldMs;

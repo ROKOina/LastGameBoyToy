@@ -126,6 +126,7 @@ public:
 
     //カーソルがスプライトに当たっているか
     bool GetHitSprite() { return hit; }
+    void SetHitSprite(bool h) { hit = h; }
     //カーソルがスプライトに当たった瞬間
     bool GetHitSpriteEnter() { return hitEnter; }
 
