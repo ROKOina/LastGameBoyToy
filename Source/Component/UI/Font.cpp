@@ -427,10 +427,10 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		currentVertex[0].position.z = 0.0f;
 		currentVertex[0].texcoord.x = info.left;
 		currentVertex[0].texcoord.y = info.top;
-		currentVertex[0].color.x = 1.0f;
-		currentVertex[0].color.y = 1.0f;
-		currentVertex[0].color.z = 1.0f;
-		currentVertex[0].color.w = 1.0f;
+		currentVertex[0].color.x = color.x;
+		currentVertex[0].color.y = color.y;
+		currentVertex[0].color.z = color.z;
+		currentVertex[0].color.w = color.w;
 		currentVertex[0].mask = mask[info.channel];
 
 		currentVertex[1].position.x = positionX + width;
@@ -438,10 +438,10 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		currentVertex[1].position.z = 0.0f;
 		currentVertex[1].texcoord.x = info.right;
 		currentVertex[1].texcoord.y = info.top;
-		currentVertex[1].color.x = 1.0f;
-		currentVertex[1].color.y = 1.0f;
-		currentVertex[1].color.z = 1.0f;
-		currentVertex[1].color.w = 1.0f;
+		currentVertex[1].color.x = color.x;
+		currentVertex[1].color.y = color.y;
+		currentVertex[1].color.z = color.z;
+		currentVertex[1].color.w = color.w;
 		currentVertex[1].mask = mask[info.channel];
 
 		currentVertex[2].position.x = positionX;
@@ -449,10 +449,10 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		currentVertex[2].position.z = 0.0f;
 		currentVertex[2].texcoord.x = info.left;
 		currentVertex[2].texcoord.y = info.bottom;
-		currentVertex[2].color.x = 1.0f;
-		currentVertex[2].color.y = 1.0f;
-		currentVertex[2].color.z = 1.0f;
-		currentVertex[2].color.w = 1.0f;
+		currentVertex[2].color.x = color.x;
+		currentVertex[2].color.y = color.y;
+		currentVertex[2].color.z = color.z;
+		currentVertex[2].color.w = color.w;
 		currentVertex[2].mask = mask[info.channel];
 
 		currentVertex[3].position.x = positionX + width;
@@ -460,10 +460,10 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
 		currentVertex[3].position.z = 0.0f;
 		currentVertex[3].texcoord.x = info.right;
 		currentVertex[3].texcoord.y = info.bottom;
-		currentVertex[3].color.x = 1.0f;
-		currentVertex[3].color.y = 1.0f;
-		currentVertex[3].color.z = 1.0f;
-		currentVertex[3].color.w = 1.0f;
+		currentVertex[3].color.x = color.x;
+		currentVertex[3].color.y = color.y;
+		currentVertex[3].color.z = color.z;
+		currentVertex[3].color.w = color.w;
 		currentVertex[3].mask = mask[info.channel];
 
 		// NDCç¿ïWïœä∑

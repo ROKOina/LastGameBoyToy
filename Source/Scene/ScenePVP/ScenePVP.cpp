@@ -184,6 +184,7 @@ void ScenePVP::InitializePVP()
         font->position = { 0,0 };
         font->str = L"ab";  //L•t‚¯‚Ä‚Ë
         font->scale = 1.0f;
+        font->color = { 0,1,0,0.5 };
     }
 
 #pragma endregion
