@@ -120,6 +120,10 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 }
+void BaseCharacter_IdleState::Exit()
+{
+
+}
 #pragma endregion
 
 #pragma region Move
@@ -146,9 +150,6 @@ void BaseCharacter_MoveState::Enter()
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
-
-    //上半身アニメーション再生
-    //animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.25f);
 
     //足元の煙エフェクト再生
     GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
@@ -543,7 +544,7 @@ void BaseCharacter_NoneAttack::Enter()
     else
     {
         auto& stateMachine = owner->GetMoveStateMachine();
-        if (owner->GetGameObject()->GetComponent<AnimationCom>()->IsPlayAnimation()) return;
+        if (owner->GetGameObject()->GetComponent<AnimationCom>()->IsPlayUpperAnimation()) return;
 
         //それぞれのステートによるアニメーション(腕だけのアニメーション)
         PlayStateAnimation(false, stateMachine.GetCurrentState());
