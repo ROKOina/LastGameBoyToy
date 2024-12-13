@@ -160,6 +160,8 @@ private:
     {
         int  UIID = 0;              //UI‚Ìo‚µ•û‚ª•ª‚©‚ç‚È‚¢‚©‚çˆê’U‚±‚ê‚Å‘ã—p
 
+        std::wstring str;
+
         float subtitleTimer = 0.0f;
         float subtitleTime = 1.0f;
         float subtitleAlpha = 1.0f;
@@ -170,4 +172,8 @@ private:
     SubTitle skillSubTitle[3];
     SubTitle ultSubTitle[5];
 
+    std::wstring movestr[12];
+    std::wstring gunstr[4];
+    std::wstring skillstr[4];
+    std::wstring ultstr[6];
 };

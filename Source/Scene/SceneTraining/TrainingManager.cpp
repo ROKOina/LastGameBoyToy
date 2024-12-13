@@ -31,7 +31,7 @@
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component/Item/UltSkillMaxItem.h"
-
+#include "Component\UI\Font.h"
 
 TrainingManager::TrainingManager()
 {
@@ -477,10 +477,65 @@ void TrainingSystem::TrainingObjUnhide()
 #pragma region チュートリアルモード
 void TutorialSystem::TutorialSystemStart()
 {
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testFont");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 0,0 };
+        font->str = L"ab";  //L付けてね
+        font->scale = 1.0f;
+    }
+
+#pragma region 移動セリフ
+
+    movestr[0] = L"ようこそ　チュートリアルへ";
+    movestr[1] = L"今から基本的な操作方法を教えるのだ";
+    movestr[2] = L"まずは、移動からなのだ";
+    movestr[3] = L"キーボードのADキーで左右移動なのだ";
+    movestr[4] = L"よくできたのだ";
+    movestr[5] = L"次は縦移動なのだ";
+    movestr[6] = L"キーボードのWSキーで縦移動なのだ";
+    movestr[7] = L"素晴らしいのだ";
+    movestr[8] = L"次はジャンプなのだ";
+    movestr[9] = L"キーボードのスペースキーでジャンプなのだ";
+    movestr[10] = L"天才なのだ";
+    movestr[11] = L"次は銃の説明なのだ";
+
+#pragma endregion
+#pragma region 銃セリフ
+
+    gunstr[0] = L"銃の基本説明を教えるのだ";
+    gunstr[1] = L"マウスの左クリックで、発射なのだ";
+    gunstr[2] = L"よくできたのだ";
+    gunstr[3] = L"次は説明なのだ";
+
+#pragma endregion
+#pragma region スキルセリフ
+
+    skillstr[0] = L"スキルの基本操作を教えるのだ";
+    skillstr[1] = L"キーボードのEキーで発動なのだ";
+    skillstr[2] = L"素晴らしいのだ";
+    skillstr[3] = L"ウルトの基本操作を教えるのだ";
+
+#pragma endregion
+#pragma region ウルトセリフ
+
+    ultstr[0] = L"ウルトの基本操作を教えるのだ";
+    ultstr[1] = L"キーボードのRキーで発動なのだ";
+    ultstr[2] = L"天才なのだ";
+    ultstr[3] = L"これでチュートリアルは終わりなのだ";
+    ultstr[4] = L"キャラクターによってスキルやウルトの内容が変わるから、よく説明を読んで欲しいのだ";
+    ultstr[5] = L"Les’t enjoyなのだ";
+
+#pragma endregion
+
+
     int indexM = 0;
     for (auto& sub : moveSubTitle)
     {
         sub.UIID = indexM;
+        sub.str = movestr[indexM];
         indexM++;
     }
 
@@ -488,6 +543,7 @@ void TutorialSystem::TutorialSystemStart()
     for (auto& sub : gunSubTitle)
     {
         sub.UIID = indexG;
+        sub.str = gunstr[indexG];
         indexG++;
     }
 
@@ -495,6 +551,7 @@ void TutorialSystem::TutorialSystemStart()
     for (auto& sub : skillSubTitle)
     {
         sub.UIID = indexS;
+        sub.str = skillstr[indexS];
         indexS++;
     }
 
@@ -502,6 +559,7 @@ void TutorialSystem::TutorialSystemStart()
     for (auto& sub : ultSubTitle)
     {
         sub.UIID = indexU;
+        sub.str = ultstr[indexU];
         indexU++;
     }
 
