@@ -41,6 +41,9 @@ private:
     //ヒットスキャンが当たった時の処理
     void HitObject();
 
+    //銃口にエフェクトを付ける
+    void SetMuzzleFlash();
+
 private:
 
     //ヒットスキャンのオブジェクト

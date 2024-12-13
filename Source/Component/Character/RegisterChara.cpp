@@ -516,4 +516,11 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
             cpuparticle->SetActive(false);
         }
     }
+
+    //’…‰Î
+    {
+        std::shared_ptr<GameObject> beem = obj->AddChildObject();
+        beem->SetName("beem_fire");
+        beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_mainattack_fire.gpuparticle", 300);
+    }
 }

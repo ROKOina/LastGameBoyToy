@@ -28,29 +28,8 @@ void Solder_MainAttackState::Enter()
     DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
     DirectX::XMFLOAT3 end = start + front * 100;
 
-    //銃の位置を取得
-    DirectX::XMFLOAT3 gunpos = {};
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        const auto& arm = camera->GetChildFind("armChild");
-        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-        const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
-
-        gunpos =
-        {
-            gunNode->worldTransform._41,
-            gunNode->worldTransform._42,
-            gunNode->worldTransform._43
-        };
-    }
-
-    ////パーティクル生成
-    //std::shared_ptr<GameObject> beem = GameObjectManager::Instance().Create();
-    //beem->transform_->SetWorldPosition(gunpos);
-    ////beem->transform_->SetRotation()
-    //beem->SetName("beem");
-    //std::shared_ptr<GPUParticle>beemeffect = beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_mainattack.gpuparticle", 300);
-    //beemeffect->Play();
+    //エフェクト再生
+    owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
 
     //レイキャスト有効化
     ray->SetStart(start);

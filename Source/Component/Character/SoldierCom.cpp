@@ -4,6 +4,7 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Particle\GPUParticle.h"
+#include "Component\Renderer\RendererCom.h"
 
 //初期化
 void SoldierCom::Start()
@@ -35,6 +36,9 @@ void SoldierCom::Update(float elapsedTime)
 
     //ヒットスキャンが当たった時の処理
     HitObject();
+
+    //銃口にエフェクトを付ける
+    SetMuzzleFlash();
 }
 
 // 右クリック単発押し処理
@@ -109,4 +113,39 @@ void SoldierCom::HitObject()
             }
         }
     }
+}
+
+//銃口にエフェクトを付ける
+void SoldierCom::SetMuzzleFlash()
+{
+    auto& muzzle_fire = GetGameObject()->GetChildFind("beem_fire");
+
+    DirectX::XMFLOAT3 gunpos = {};
+    if (std::string(GetGameObject()->GetName()) == "player")
+    {
+        const auto& cameraObj = GetGameObject()->GetChildFind("cameraPostPlayer");
+        const auto& arm = cameraObj->GetChildFind("armChild");
+        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+        const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
+
+        gunpos =
+        {
+            gunNode->worldTransform._41,
+            gunNode->worldTransform._42,
+            gunNode->worldTransform._43
+        };
+    }
+    else
+    {
+        RendererCom* render = GetGameObject()->GetComponent<RendererCom>().get();
+        const auto& gunNode = render->GetModel()->FindNode("gun2");
+
+        gunpos =
+        {
+            gunNode->worldTransform._41,
+            gunNode->worldTransform._42,
+            gunNode->worldTransform._43
+        };
+    }
+    muzzle_fire->transform_->SetWorldPosition(gunpos);
 }
