@@ -171,14 +171,14 @@ void ScenePVP::InitializePVP()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
+    //FontéQçló·
     //font
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("testFont");
         std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
         font->position = { 0,0 };
-        font->originalPos = { 0,0 };
-        font->str = L"ab";
+        font->str = L"ab";  //LïtÇØÇƒÇÀ
         font->scale = 1.0f;
     }
 
