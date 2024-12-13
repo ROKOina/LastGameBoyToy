@@ -657,6 +657,36 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 
 void TutorialSystem::SkillTutorialManager(float elapsedTime)
 {
+    //タイマー更新
+    skillSubTitle[skillSubTitleIndex].subtitleTimer += elapsedTime;
+
+
+    if (skillSubTitleIndex != 1)
+    {
+        if (skillSubTitle[skillSubTitleIndex].subtitleTimer > skillSubTitle[skillSubTitleIndex].subtitleTime)
+        {
+            if (skillSubTitleIndex == 3)
+            {
+                skillInspectionFlag = true;
+            }
+            else
+            {
+                skillSubTitleIndex += 1;
+            }
+        }
+    }
+    else if (skillSubTitleIndex == 1)
+    {
+        //攻撃終了処理＆攻撃処理
+        if (CharacterInput::MainSkillButton_E & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
+        {
+            skillSubTitleIndex += 1;
+        }
+    }
+
+
+
+
     if (skillInspectionFlag)
     {
         NextTutorial(TutorialID::ULT);
@@ -665,6 +695,34 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 
 void TutorialSystem::UltTutorialManager(float elapsedTime)
 {
+
+    //タイマー更新
+    ultSubTitle[ultSubTitleIndex].subtitleTimer += elapsedTime;
+
+
+    if (ultSubTitleIndex != 1)
+    {
+        if (ultSubTitle[ultSubTitleIndex].subtitleTimer > ultSubTitle[ultSubTitleIndex].subtitleTime)
+        {
+            if (ultSubTitleIndex == 3)
+            {
+                ultInspectionFlag = true;
+            }
+            else
+            {
+                ultSubTitleIndex += 1;
+            }
+        }
+    }
+    else if (ultSubTitleIndex == 1)
+    {
+        //攻撃終了処理＆攻撃処理
+        if (CharacterInput::UltimetButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
+        {
+            ultSubTitleIndex += 1;
+        }
+    }
+
     if (ultInspectionFlag)
     {
         NextTutorial(TutorialID::END);
@@ -676,6 +734,10 @@ void TutorialSystem::OnGui()
     if (ImGui::Begin("TutorialSystem", nullptr, ImGuiWindowFlags_None))
     {
         ImGui::DragInt("moveIndex", &moveSubTitleIndex);
+        ImGui::DragInt("gunIndex", &gunSubTitleIndex);
+        ImGui::DragInt("skillIndex", &skillSubTitleIndex);
+        ImGui::DragInt("ultIndex", &ultSubTitleIndex);
+
     }
     ImGui::End();
 }
