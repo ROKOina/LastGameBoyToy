@@ -101,7 +101,7 @@ void CharacterCom::Update(float elapsedTime)
     CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
-    if (std::string(GetGameObject()->GetName()) != "player")
+    if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
     {
         Vinetto(elapsedTime);
     }
@@ -449,7 +449,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
         //ゲージ減らす
         dashGauge -= dashGaugeMinus * elapsedTime;
 
-        if (std::string(GetGameObject()->GetName()) != "player")
+        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
         {
             std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::BlurStrength };
 
