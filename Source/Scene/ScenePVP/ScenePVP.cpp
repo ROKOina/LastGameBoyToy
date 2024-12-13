@@ -32,11 +32,9 @@
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Component\UI\Font.h"
 
-
 #include "Component/Renderer/InstanceRendererCom.h"
 
 #include "Netwark/Photon/Photon_lib.h"
-
 
 void ScenePVP::Initialize()
 {
@@ -81,7 +79,7 @@ void ScenePVP::InitializeLobbySelect()
 }
 
 void ScenePVP::InitializeLobby()
-{    
+{
     //kari
     {
         std::shared_ptr<GameObject> kariLOBBY = GameObjectManager::Instance().Create();
@@ -173,23 +171,18 @@ void ScenePVP::InitializePVP()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
-    //UIゲームオブジェクト生成
-   // CreateUiObject();
-      //snowparticle
+    //font
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("testFont");
-       std::shared_ptr<Font> font =  obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-       font->position = { 0,0 };
-       font->originalPos = { 0,0 };
-       font->str = L"ab";
-       font->scale = 1.0f;
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 0,0 };
+        font->originalPos = { 0,0 };
+        font->str = L"ab";
+        font->scale = 1.0f;
     }
 
-
-
 #pragma endregion
-
 }
 
 void ScenePVP::Finalize()
@@ -216,9 +209,7 @@ void ScenePVP::Update(float elapsedTime)
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
     //Ui更新
-    PlayerUIManager::Instance().
-           
-     UIUpdate(elapsedTime);
+    PlayerUIManager::Instance().UIUpdate(elapsedTime);
 
     ////画面切り替え処理
     //auto net = photonNet->GetPhotonLib();
@@ -283,7 +274,6 @@ void ScenePVP::Render(float elapsedTime)
     //オブジェクト生成関数
 #ifdef _DEBUG
     NewObject();
-    RegisterChara::Instance().ImGui();
 #endif
 
     //オブジェクト描画

@@ -32,6 +32,7 @@ void KnockBackCom::Update(float elapsedTime)
         const DirectX::XMFLOAT3 normalizedDir = (Mathf::Normalize(enemy - pos) * forceXZ);
 
         // MovementCom‚Ì‘€ì
+        movement->ZeroVelocity();
         movement->AddNonMaxSpeedVelocity(normalizedDir);
         movement->AddForce(forceY);
         movement->SetOnGround(false);

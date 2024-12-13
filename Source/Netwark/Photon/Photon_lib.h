@@ -63,6 +63,7 @@ private:
         "INAZAWA",
         "FARAH",
         "JANKRAT",
+        "SOLDIER",
     };
     int charaID = 0;
 
@@ -86,8 +87,6 @@ public:
 
     //キャラセレクト中か
     bool GetIsCharaSelect() { return isCharaSelect; }
-
-
 
     //入室許可
     bool IsJoinPermission() { return joinPermission; }
@@ -187,7 +186,6 @@ private:
     virtual void leaveLobbyReturn(void);
     //地域を決める
     virtual void onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegions*/, const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegionServers*/);
-
 
     PhotonState::States mState;
 

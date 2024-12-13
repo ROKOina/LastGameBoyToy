@@ -2,8 +2,10 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Particle\GPUParticle.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\System\SpawnCom.h"
+#include "Component\System\TransformCom.h"
 
 //更新処理
 void JankratBulletCom::Update(float elapsedTime)
@@ -94,6 +96,16 @@ void JankratBulletCom::ApplyDirectHitDamage()
         const auto& chara = obj.gameObject.lock()->GetComponent<CharaStatusCom>().get();
         if (chara)
         {
+            //ヒットエフェクト生成
+            std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
+            hiteffectobject->transform_->SetWorldPosition(GetGameObject()->transform_->GetWorldPosition());
+            hiteffectobject->SetName("HitEffect");
+            std::shared_ptr<GPUParticle>Chiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
+            Chiteffct->Play();
+            std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
+            Ghiteffct->SetActive(true);
+
+            //ダメージを与える
             chara->AddDamagePoint(-damageValue);
 
             //消す処理

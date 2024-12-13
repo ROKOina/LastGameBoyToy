@@ -14,7 +14,6 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
-#include "Component\Animation\FootIKcom.h"
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
 #include "Netwark/Photon/StdIO_UIListener.h"
@@ -33,7 +32,6 @@
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
 #include <Component/UI/PlayerUI.h>
-
 
 void SceneTraining::Initialize()
 {
@@ -67,11 +65,11 @@ void SceneTraining::Initialize()
         stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
-       
+
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/","StageJson/ColliderStage.mdl", "__", 0.005f);
+        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/", "StageJson/ColliderStage.mdl", "__", 0.005f);
     }
 
     //プレイヤー
@@ -80,10 +78,7 @@ void SceneTraining::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
-
     }
-
-
 
     //snowparticle
     {
@@ -91,7 +86,6 @@ void SceneTraining::Initialize()
         obj->SetName("snowparticle");
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
-
 
     //UIゲームオブジェクト生成
     CreateUiObject();
@@ -147,7 +141,6 @@ void SceneTraining::Render(float elapsedTime)
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }
-
 
 void SceneTraining::CreateUiObject()
 {

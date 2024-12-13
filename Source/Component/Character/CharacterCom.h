@@ -212,7 +212,6 @@ public:
     void SetDashFlag(bool flag) { dashFlag = flag; }
     bool GetDashFlag() { return dashFlag; }
 
-
     //残弾
     int GetCurrentBulletNum() { return currentBulletNum; }
     void SetCurrentBulletNum(int num) { currentBulletNum = num; }
@@ -221,18 +220,6 @@ public:
     int GetMaxBulletNum() { return maxBulletNum; }
     void SetMaxBulletNum(int num) { maxBulletNum = num; }
     void SetMaxBullet() { currentBulletNum = maxBulletNum; }
-
-    int GetCurrentMainSkillNum() { return currentMainSkillNum; }
-    void SetCurrentMainSkillNum(int num) { currentMainSkillNum = num; }
-
-    int GetMaxMainSkillNum() { return maxMainSkillNum; }
-    void SetMaxMainSkillNum(int num) { maxMainSkillNum = num; }
-    void SetMaxMainSkill() { currentMainSkillNum = maxMainSkillNum; }
-
-protected:
-
-    //FPS視点の腕アニメーション制御
-    void FPSArmAnimation();
 
 private:
     //入力ステート更新
@@ -255,7 +242,6 @@ private:
 
     //アニメーションに使用する角度の補完
     float InterpolateAngle(float currentAngle, float targetAngle, float deltaTime, float speed);
-    float Lerp(float start, float end, float t);
 
     //UltUpdate
     void UltUpdate(float elapsedTime);
@@ -271,11 +257,11 @@ protected:
     bool isStan = false;
     float stanTimer = 0;
 
+    //今の球数と
     int currentBulletNum = 10;
-    int currentMainSkillNum = 2;
 
+    //最大の球数
     int maxBulletNum = 10;
-    int maxMainSkillNum = 2;
 
     //スキルクールダウン
     struct SkillCoolTime

@@ -9,4 +9,3 @@ float4 main(VS_OUT pin) : SV_TARGET
     float alpha = color.x + color.y + color.z + color.w;
     return float4(pin.color.rgb, pin.color.a * alpha);
 }
-

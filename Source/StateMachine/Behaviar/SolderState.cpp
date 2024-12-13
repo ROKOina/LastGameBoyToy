@@ -1,21 +1,20 @@
-#include "FarahState.h"
-#include "Component\Bullet\BulletCom.h"
+#include "SolderState.h"
 
-//基底クラスです
-Farah_BaseState::Farah_BaseState(CharacterCom* owner) : State(owner)
+//基底クラス
+Solder_BaseState::Solder_BaseState(CharacterCom* owner) : State(owner)
 {
     //初期設定
-    charaCom = GetComp(FarahCom);
+    charaCom = GetComp(SoldierCom);
     moveCom = GetComp(MovementCom);
     transCom = GetComp(TransformCom);
     animationCom = GetComp(AnimationCom);
 }
 
 #pragma region メイン攻撃
-void Farah_MainAttackState::Enter()
+void Solder_MainAttackState::Enter()
 {
 }
-void Farah_MainAttackState::Execute(const float& elapsedTime)
+void Solder_MainAttackState::Execute(const float& elapsedTime)
 {
     //攻撃終了処理＆攻撃処理
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
@@ -29,14 +28,8 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
             armAnim->SetAnimationSeconds(0.3f);
         }
 
-        //上半身アニメーション?
-        owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-
         //弾減らさないとリロードしない
         charaCom.lock()->AddCurrentBulletNum(-1);
-
-        //攻撃処理
-        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
 
         //射撃間隔タイマー起動
         charaCom.lock()->ResetShootTimer();
@@ -45,21 +38,34 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }
+void Solder_MainAttackState::Exit()
+{
+}
+void Solder_MainAttackState::ImGui()
+{
+}
 #pragma endregion
 
 #pragma region ult攻撃
-void Farah_UltState::Enter()
+void Solder_UltState::Enter()
 {
-    moveCom.lock()->SetMoveAcceleration(5.0f);
-    charaCom.lock()->SetDashGaugeMins(2.0f);
+}
+void Solder_UltState::Execute(const float& elapsedTime)
+{
+}
+void Solder_UltState::Exit()
+{
+}
+void Solder_UltState::ImGui()
+{
 }
 #pragma endregion
 
 #pragma region Eskill
-void Farah_ESkillState::Enter()
+void Solder_ESkillState::Enter()
 {
 }
-void Farah_ESkillState::Execute(const float& elapsedTime)
+void Solder_ESkillState::Execute(const float& elapsedTime)
 {
     //攻撃終了処理＆攻撃処理
     if (std::string(owner->GetGameObject()->GetName()) == "player")
@@ -70,10 +76,13 @@ void Farah_ESkillState::Execute(const float& elapsedTime)
         armAnim->SetAnimationSeconds(0.3f);
     }
 
-    //攻撃処理
-    charaCom.lock()->AddBullet(BulletCreate::FarahKnockBack(owner->GetGameObject(), 30.0f, 2.0f));
-
     //ステート変更
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+}
+void Solder_ESkillState::Exit()
+{
+}
+void Solder_ESkillState::ImGui()
+{
 }
 #pragma endregion

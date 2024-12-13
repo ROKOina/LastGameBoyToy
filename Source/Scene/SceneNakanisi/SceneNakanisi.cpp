@@ -209,7 +209,6 @@ void SceneNakanisi::Render(float elapsedTime)
     //オブジェクト生成関数
 #ifdef _DEBUG
     NewObject();
-    RegisterChara::Instance().ImGui();
 #endif
 
     //オブジェクト描画
