@@ -30,13 +30,12 @@
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component\Sprite\Sprite.h"
 #include "Component/Collsion/NodeCollsionCom.h"
-
+#include "Component\UI\Font.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
-
 
 void ScenePVP::Initialize()
 {
@@ -84,7 +83,7 @@ void ScenePVP::InitializeLobbySelect()
 }
 
 void ScenePVP::InitializeLobby()
-{    
+{
     //kari
     {
         std::shared_ptr<GameObject> kariLOBBY = GameObjectManager::Instance().Create();
@@ -176,11 +175,18 @@ void ScenePVP::InitializePVP()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
-    //UIゲームオブジェクト生成
-    CreateUiObject();
+    //Font参考例
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testFont");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 0,0 };
+        font->str = L"ab";  //L付けてね
+        font->scale = 1.0f;
+    }
 
 #pragma endregion
-
 }
 
 void ScenePVP::Finalize()
@@ -296,7 +302,6 @@ void ScenePVP::Render(float elapsedTime)
     //オブジェクト生成関数
 #ifdef _DEBUG
     NewObject();
-    RegisterChara::Instance().ImGui();
 #endif
 
     //オブジェクト描画

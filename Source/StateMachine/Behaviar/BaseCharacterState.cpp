@@ -10,6 +10,7 @@
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene/SceneTitle/SceneTitle.h"
 #include "Component\Audio\AudioCom.h"
+#include "Component\GameSystem\RespawnCom.h"
 
 //基底君
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
@@ -72,11 +73,39 @@ void BaseCharacter_BaseState::Hovering(float elapsedTime)
     }
 }
 
+auto MakeNormalLowerAnimeParam = [](int index, bool loop)
+{
+    //下半身アニメーション用構造体
+    AnimationCom::PlayLowBodyAnimParam param =
+    {
+        param.lowerAnimaOneId = index,
+        param.lowerAnimeTwoId = index,
+        param.lowerAnimeThreeId = index,
+        param.lowerAnimeFourId = index,
+        param.lowerAnimeFiveId = index,
+        param.lowerAnimaSixId = index,
+        param.lowerAnimaSevenId = index,
+        param.lowerAnimaEightId = index,
+        param.loop = loop,
+        param.rootFlag = false,
+        param.blendType = 0,
+        param.animeChangeRate = 0.2f,
+        param.animeBlendRate = 0.0f
+    };
+
+    return param;
+};
+
+
 #pragma region Idle
 void BaseCharacter_IdleState::Enter()
 {
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Idle"), true);
+    //アニメーション検索
+    int animaIndex = animationCom.lock()->FindAnimation("Idle");
+
+    //下半身だけ再生
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animaIndex, true));
 }
 void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 {
@@ -90,6 +119,10 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
+}
+void BaseCharacter_IdleState::Exit()
+{
+
 }
 #pragma endregion
 
@@ -117,9 +150,6 @@ void BaseCharacter_MoveState::Enter()
     };
 
     animationCom.lock()->PlayLowerBodyOnlyAnimation(param);
-
-    //上半身アニメーション再生
-    animationCom.lock()->PlayUpperBodyOnlyAnimation(animationCom.lock()->FindAnimation("Walk_Forward"), true, 0.25f);
 
     //足元の煙エフェクト再生
     GameObjectManager::Instance().Find("smokeeffect")->GetComponent<CPUParticle>()->SetActive(true);
@@ -160,14 +190,8 @@ void BaseCharacter_JumpState::Enter()
     //ジャンプ
     JumpInput(owner->GetGameObject(), 1.5f);
 
-    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_begin"), false);
-
-    //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_begin"), false);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animationCom.lock()->FindAnimation("Jump_begin"), false));
 }
 
 void BaseCharacter_JumpState::Execute(const float& elapsedTime)
@@ -188,14 +212,12 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 #pragma region JumpLoop
 void BaseCharacter_JumpLoop::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_middle"), false);
+    //アニメーション検索
+    int animaIndex = animationCom.lock()->FindAnimation("Jump_middle");
 
-    //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    if (!armAnim->IsPlayAnimation())
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_middle"), true);
+    //下半身だけ再生
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animaIndex, true));
 }
 void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 {
@@ -215,13 +237,8 @@ void BaseCharacter_JumpLoop::Execute(const float& elapsedTime)
 #pragma region Landing
 void BaseCharacter_Landing::Enter()
 {
-    animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Jump_end"), false, false, 1.0f);
-
-    //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_Jump_end"), false);
+    animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    animationCom.lock()->PlayLowerBodyOnlyAnimation(MakeNormalLowerAnimeParam(animationCom.lock()->FindAnimation("Jump_end"), false));
 }
 void BaseCharacter_Landing::Execute(const float& elapsedTime)
 {
@@ -266,12 +283,16 @@ void BaseCharacter_DeathState::Enter()
     //FPS用オブジェクト隠す
     GameObjectManager::Instance().Find("armChild")->GetComponent<RendererCom>()->SetDissolveThreshold(1);
 
-    //イベントカメラ
-    GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
-    EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        //イベントカメラ
+        GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
 
-    //遷移
-    SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 3);
+
+        RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
+        respawn->SetIsRespawn(true);
+    }
 }
 #pragma endregion
 
@@ -466,22 +487,151 @@ void Ult_Attack_State::Exit()
 void BaseCharacter_ReloadState::Enter()
 {
     //アニメーション(腕だけのアニメーション)
-    if (std::string(owner->GetGameObject()->GetName()) != "player")return;
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_reload"), false);
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = GameObjectManager::Instance().Find("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_reload"), false);
+    }
+    else
+    {
+        auto& animCom = owner->GetGameObject()->GetComponent<AnimationCom>();
+        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+    }
 }
 
 void BaseCharacter_ReloadState::Execute(const float& elapsedTime)
 {
-    auto& arm = GameObjectManager::Instance().Find("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
+    AnimationCom* anima = nullptr;
+    bool reloadEnd = false;
 
-    //アニメーションが終われば
-    if (!armAnim->IsPlayAnimation())
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        //アニメーションが終われば終了フラグを立てる
+        auto& arm = GameObjectManager::Instance().Find("armChild");
+        anima = arm->GetComponent<AnimationCom>().get();
+        reloadEnd = !anima->IsPlayAnimation();
+    }
+    else
+    {
+        //リロードアニメーションと同じ時間たてば終了フラグを立てる
+        reloadTimer += elapsedTime;
+        reloadEnd = (reloadTimer >= reloadTime);
+    }
+
+    //終了処理
+    if (reloadEnd)
     {
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
         charaCom.lock()->SetMaxBullet();
     }
 }
 
+void BaseCharacter_NoneAttack::Enter()
+{
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = GameObjectManager::Instance().Find("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        if (!arm->GetComponent<RendererCom>()->GetModel()) return;
+        if (arm->GetComponent<AnimationCom>()->IsPlayAnimation()) return;
+
+        auto& stateMachine = owner->GetMoveStateMachine();
+
+        //それぞれのステートによるアニメーション(腕だけのアニメーション)
+        PlayStateAnimation(true, stateMachine.GetCurrentState());
+    }
+    else
+    {
+        auto& stateMachine = owner->GetMoveStateMachine();
+        if (owner->GetGameObject()->GetComponent<AnimationCom>()->IsPlayUpperAnimation()) return;
+
+        //それぞれのステートによるアニメーション(腕だけのアニメーション)
+        PlayStateAnimation(false, stateMachine.GetCurrentState());
+    }
+}
+
+void BaseCharacter_NoneAttack::Execute(const float& elapsedTime)
+{
+    auto& stateMachine = owner->GetMoveStateMachine();
+
+    //それぞれのステートによるアニメーション(腕だけのアニメーション)
+    if (stateMachine.GetCurrentState() != stateMachine.GetOldState())
+    {
+        PlayStateAnimation(std::string(owner->GetGameObject()->GetName()) == "player", stateMachine.GetCurrentState());
+    }
+}
+
+void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::CHARACTER_MOVE_ACTIONS state)
+{
+    AnimationCom* animCom = nullptr;
+    GameObj arm;
+    if (isPlayer)
+    {
+        arm = GameObjectManager::Instance().Find("armChild");
+        animCom = arm->GetComponent<AnimationCom>().get();
+    }
+    else
+    {
+        animCom = owner->GetGameObject()->GetComponent<AnimationCom>().get();
+    }
+    float animeSpeed = 0;
+
+    switch (state)
+    {
+    case CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE:
+
+        isPlayer ?
+            animCom->PlayAnimation(animCom->FindAnimation("FPS_idol"), true) :
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
+        break;
+
+    case CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE:
+
+        if (isPlayer)
+        {
+            animCom->PlayAnimation(animCom->FindAnimation("FPS_walk"), true);
+
+            //アニメーションスピード変更
+            animeSpeed = owner->GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed() - owner->GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
+            if (animeSpeed < 0)animeSpeed = 0;
+
+            arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animCom->FindAnimation("FPS_walk")].animationspeed
+                = 1 + animeSpeed * 0.1f;
+        }
+        else
+        {
+            if (owner->GetDashFlag())
+            {
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+            }
+            else
+            {
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Walk_Forward"), true);
+            }
+        }
+
+        break;
+
+    case CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP:
+        isPlayer ?
+            animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_begin"), false) :
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_begin"), false);
+        break;
+
+    case CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP:
+        isPlayer ?
+            animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_middle"), false) :
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_middle"), false);
+        break;
+
+    case CharacterCom::CHARACTER_MOVE_ACTIONS::LANDING:
+        isPlayer ?
+            animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_end"), false) :
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_end"), false);        break;
+        break;
+
+    default:
+        break;
+    }
+}

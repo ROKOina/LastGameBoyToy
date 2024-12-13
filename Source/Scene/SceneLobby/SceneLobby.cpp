@@ -12,7 +12,6 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
-#include "Component\Animation\FootIKcom.h"
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneLobby.h"
@@ -51,7 +50,6 @@ void SceneLobby::Initialize()
         std::shared_ptr<AnimationCom> a = obj->AddComponent<AnimationCom>();
         std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
         std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
-        std::shared_ptr<FootIKCom> f = obj->AddComponent<FootIKCom>();
     }
 
     //ステージ

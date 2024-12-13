@@ -10,7 +10,7 @@
 class JankratBulletCom : public Component
 {
 public:
-    JankratBulletCom(){};
+    JankratBulletCom() {};
     ~JankratBulletCom() override {};
 
     // 名前取得
@@ -25,12 +25,26 @@ public:
     // GUI描画
     void OnGUI() override {};
 
+    //ult更新
+    void UltUpdate(float elapsedTime);
+
     //セッター・ゲッター
     void SetLifeTime(float time) { lifeTime = time; };
     void SetAddGravity(float value) { addGravity = value; }
 
     void SetDamageValue(int value) { damageValue = value; }
     int GetDamageValue() { return damageValue; }
+
+    void SetExplosionTime(float explosionTime_) { explosionTime = explosionTime_; }
+    float GetExplosionTime() { return explosionTime; }
+
+private:
+
+    //爆発させる
+    void TriggerExplosion();
+
+    //直撃ダメージを与える
+    void ApplyDirectHitDamage();
 
 private:
     float lifeTimer = 0.0f;

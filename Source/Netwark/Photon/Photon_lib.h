@@ -49,6 +49,12 @@ public:
 private:
     //接続開始フラグ
     bool connectFlg = false;
+
+    //接続した瞬間
+    bool connectBegin = false;
+    //接続中
+    bool connectNow = false;
+
     //部屋名
     std::string roomName;
     //charaID
@@ -57,6 +63,7 @@ private:
         "INAZAWA",
         "FARAH",
         "JANKRAT",
+        "SOLDIER",
     };
     int charaID = 0;
 
@@ -105,6 +112,9 @@ public:
 
     int GetRoomPlayersNum();
     std::string GetRoomName();
+
+    bool GetConnectBegin() { return connectBegin; }
+    bool GetConnectNow() { return connectNow; }
 
     int SendMs();
 
@@ -193,7 +203,6 @@ private:
     virtual void leaveLobbyReturn(void);
     //地域を決める
     virtual void onAvailableRegions(const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegions*/, const ExitGames::Common::JVector<ExitGames::Common::JString>& /*availableRegionServers*/);
-
 
     PhotonState::States mState;
 

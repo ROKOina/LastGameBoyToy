@@ -16,6 +16,7 @@
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\SkillObj\JankratMineCom.h"
 #include "KnockBackCom.h"
+#include "Component\System\SpawnCom.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -346,7 +347,6 @@ void BulletCreate::KnockbackFire(std::shared_ptr<GameObject> objPoint, float bul
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
     k->SetKnockBackForce({ 18,5,18 });
-    k->useTestCoad = true;
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
@@ -544,7 +544,6 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
     k->SetKnockBackForce({ 18,5,18 });
-    k->useTestCoad = true;
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
@@ -562,7 +561,7 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 
     //物理
     RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
-    rigid->SetRigidScale(100);
+    rigid->SetRigidScale(70);
 
     //レンダー
     RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
@@ -657,7 +656,6 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
 
     KnockBackCom* childKcockBack = kcockBack->AddComponent<KnockBackCom>().get();
     childKcockBack->SetKnockBackForce({ 18,7,18 });
-    childKcockBack->useTestCoad = true;
 
     //爆発破壊エフェクト
     std::shared_ptr<GameObject> explosion = bullet->AddChildObject();
@@ -665,5 +663,51 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     std::shared_ptr<CPUParticle>ex = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratexplosion.cpuparticle", 200);
     ex->SetActive(false);
 
+    return bullet;
+}
+
+//ジャンクラウルト
+GameObj BulletCreate::JankratUlt(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int damagepower)
+{
+    GameObj bullet = GameObjectManager::Instance().Create();
+    bullet->SetName("ultbullet");
+    bullet->transform_->SetScale({ 0.004f,0.004f,0.004f });
+    bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
+
+    //物理
+    RigidBodyCom* rigid = bullet->AddComponent<RigidBodyCom>(false, PhysXLib::ShapeType::Sphere).get();
+    rigid->SetRigidScale(100);
+
+    //レンダー
+    RendererCom* r = bullet->AddComponent<RendererCom>((SHADER_ID_MODEL::DEFERRED), (BLENDSTATE::MULTIPLERENDERTARGETS)).get();
+    r->LoadModel("Data/Model/Jankrat/mine.mdl");
+
+    //コライダー
+    std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
+    coll->SetMyTag(COLLIDER_TAG::Bullet);
+    if (std::strcmp(parent->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.5f);
+
+    //spawncomponent付与
+    bullet->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/jankrat_ult.spawn");
+
+    //弾
+    std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(damagepower);
+
+    //爆発エフェクト付属
+    std::shared_ptr<GameObject> bomber = bullet->AddChildObject();
+    bomber->SetName("bomber");
+    std::shared_ptr<CPUParticle>b = bomber->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankuratbomber.cpuparticle", 200);
+    b->SetActive(true);
+
+    //RigidBodyのAddForceが生成時に使えないのでここで返す
     return bullet;
 }

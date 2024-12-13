@@ -57,6 +57,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
+    void Exit() override;
     virtual const char* GetName() const override { return "Idle"; }
 };
 
@@ -126,9 +127,12 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit() override {};
+    void Exit() override { reloadTimer = 0; };
     virtual const char* GetName() const override { return "Reload"; }
 
+private:
+    float reloadTimer = 0;
+    float reloadTime = 1.133f;//腕のリロードアニメーションと同じ長さ
 };
 
 class BaseCharacter_HitscanState : public BaseCharacter_BaseState
@@ -221,6 +225,11 @@ class BaseCharacter_NoneAttack : public BaseCharacter_BaseState
 public:
     BaseCharacter_NoneAttack(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
 
-    void Enter() override {};
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
     virtual const char* GetName() const override { return "NoneAttack"; }
+
+private:
+    void PlayStateAnimation(bool isPlayer, CharacterCom::CHARACTER_MOVE_ACTIONS state);
 };

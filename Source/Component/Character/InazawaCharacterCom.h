@@ -26,6 +26,9 @@ public:
     //攻撃ウルト取得
     void SetAttackUltRayObj(std::shared_ptr<GameObject> obj) { attackUltRayObj = obj; }
 
+    //リロード（弾減らす処理は各自のキャラでする
+    void Reload()override;
+
 private:
 
     //アタックULT

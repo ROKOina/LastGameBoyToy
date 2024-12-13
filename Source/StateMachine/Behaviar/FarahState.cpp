@@ -32,6 +32,9 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         //上半身アニメーション?
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
 
+        //弾減らさないとリロードしない
+        charaCom.lock()->AddCurrentBulletNum(-1);
+
         //攻撃処理
         charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
 

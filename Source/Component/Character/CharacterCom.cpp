@@ -13,6 +13,7 @@
 #include "Component\Sprite\Sprite.h"
 #include "Component\Renderer\RendererCom.h"
 #include <Component\Animation\AnimationCom.h>
+#include "Component\Stage\StageEditorCom.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -100,7 +101,10 @@ void CharacterCom::Update(float elapsedTime)
     CoolUpdate(elapsedTime);
 
     //ダメージビネット発動
-    if (GetGameObject()->GetName() == "player") Vinetto(elapsedTime);
+    if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+    {
+        Vinetto(elapsedTime);
+    }
 
     //攻撃先行入力
     shootTimer += elapsedTime;
@@ -112,7 +116,13 @@ void CharacterCom::Update(float elapsedTime)
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
             {
                 //弾切れならリロード
-                currentBulletNum > 0 ? MainAttackDown() : Reload();
+                if (currentBulletNum > 0) {
+                    MainAttackDown();
+                }
+                else {
+                    if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+                        Reload();
+                }
             }
             attackInputSave = false;
         }
@@ -238,50 +248,6 @@ void CharacterCom::DashFewSub(float elapsedTime)
     }
 }
 
-//FPS視点の腕アニメーション制御
-void CharacterCom::FPSArmAnimation()
-{
-    if (std::string(GetGameObject()->GetName()) != "player")return;
-    auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-
-    //待機
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::IDLE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_idol"))return;
-
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_shoot")
-            && armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_reload"))
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_idol"), true);
-    }
-
-    //移動
-    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::MOVE)
-    {
-        if (armAnim->GetCurrentAnimationIndex() != armAnim->FindAnimation("FPS_walk"))
-        {
-            if (armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_shoot")
-                || armAnim->GetCurrentAnimationIndex() == armAnim->FindAnimation("FPS_reload"))
-            {
-                if (armAnim->IsEventCalling("attackEnd"))
-                    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-            }
-            else
-                armAnim->PlayAnimation(armAnim->FindAnimation("FPS_walk"), true);
-        }
-    }
-
-    //アニメーションスピード変更
-    float fmax = GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
-    float max = GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed();
-
-    float v = max - fmax;
-    if (v < 0)v = 0;
-
-    arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[armAnim->FindAnimation("FPS_walk")].animationspeed
-        = 1 + v * 0.1f;
-}
-
 void CharacterCom::InputStateUpdate(float elapsedTime)
 {
     //ステート処理
@@ -312,7 +278,10 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
         else
         {
-            Reload();
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+            {
+                Reload();
+            }
         }
     }
     else if (CharacterInput::MainAttackButton & GetButton()
@@ -353,11 +322,6 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SubAttackPushing();
     }
 
-    if (CharacterInput::MainAttackButton & GetButtonDown())
-    {
-        //MainAttack();
-    }
-
     if (CharacterInput::MainSkillButton_E & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::Q))
     {
@@ -383,8 +347,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 
     //野村追加 Rキー
-    if (CharacterInput::UltimetButton & GetButtonDown()
-        /*&& Rcool.timer >= Rcool.time*/)
+    if (CharacterInput::UltimetButton & GetButtonDown())
     {
         //ウルト発動フラグON
         if (isMaxUlt)
@@ -397,7 +360,8 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 
     //リロード
-    if (CharacterInput::Reload & GetButtonDown())
+    if (CharacterInput::Reload & GetButtonDown()
+        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
     {
         Reload();
     }
@@ -485,29 +449,32 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
         //ゲージ減らす
         dashGauge -= dashGaugeMinus * elapsedTime;
 
-        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::BlurStrength };
-
-        //ダッシュ時一回だけ入る
-        const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
-        if (isNowPush)
+        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
         {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
-            dashFlag = true;
-            dashGauge -= 5; //最初は一気に減らす
+            std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::BlurStrength };
 
-            //音
-            //GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
-        }
-        else
-        {
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
-        }
+            //ダッシュ時一回だけ入る
+            const auto& posteffect = GameObjectManager::Instance().Find("posteffect");
+            if (isNowPush)
+            {
+                posteffect->GetComponent<PostEffect>()->SetParameter(0.4f, 50.0f, parameters);
+                dashFlag = true;
+                dashGauge -= 5; //最初は一気に減らす
 
-        //ゲージがなくなったらタイマーをセット
-        if (dashGauge <= 0)
-        {
-            skillCools[SkillCoolID::LeftShift].timer = 0;
-            posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
+                //音
+                //GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
+            }
+            else
+            {
+                posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
+            }
+
+            //ゲージがなくなったらタイマーをセット
+            if (dashGauge <= 0)
+            {
+                skillCools[SkillCoolID::LeftShift].timer = 0;
+                posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
+            }
         }
 
         return true;
@@ -532,10 +499,6 @@ void CharacterCom::Vinetto(float elapsedTime)
         if (previousHP - currentHP > 0)
         {
             posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
-
-            //イージングプレイ
-            if (GameObjectManager::Instance().Find("HpGauge"))
-                GameObjectManager::Instance().Find("HpGauge")->GetComponent<Sprite>()->EasingPlay();
 
             //音
             GetGameObject()->GetComponent<AudioCom>()->Play("P_DAMAGE", false, 10);
@@ -581,11 +544,6 @@ void CharacterCom::CoolUpdate(float elapsedTime)
     }
 }
 
-float CharacterCom::Lerp(float start, float end, float t)
-{
-    return start + t * (end - start);
-}
-
 void CharacterCom::UltUpdate(float elapsedTime)
 {
     //ゲージ更新
@@ -598,22 +556,6 @@ void CharacterCom::UltUpdate(float elapsedTime)
     else
     {
         isMaxUlt = false; // max未到達ならfalseに戻す
-    }
-
-    //例外処理
-    const auto& ultui = GameObjectManager::Instance().Find("UltFrame");
-    if (ultui != nullptr)
-    {
-        if (isMaxUlt && !prevIsMaxUlt)
-        {
-            GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->EasingPlay();
-        }
-
-        // isMaxUlt が false または変化がない場合は StopEasing を呼ぶ
-        if (!isMaxUlt)
-        {
-            GameObjectManager::Instance().Find("UltFrame")->GetComponent<Sprite>()->StopEasing();
-        }
     }
 
     // 状態を記録
@@ -634,7 +576,7 @@ float CharacterCom::InterpolateAngle(float currentAngle, float targetAngle, floa
     }
 
     // 少しずつ近づける（Lerp を用いる）
-    currentAngle = Lerp(currentAngle, currentAngle + diff, deltaTime * speed);
+    currentAngle = Mathf::Lerp(currentAngle, currentAngle + diff, deltaTime * speed);
 
     //ステックの角度制限
     if (currentAngle < 0.0f)

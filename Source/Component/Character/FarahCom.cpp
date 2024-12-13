@@ -32,10 +32,15 @@ void FarahCom::Start()
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK, std::make_shared<Farah_MainAttackState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL, std::make_shared<Farah_ESkillState>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::ULT, std::make_shared<Farah_UltState>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::RELOAD, std::make_shared<BaseCharacter_ReloadState>(this));
 
     // 初期ステート設定
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+
+    //弾数をセット
+    currentBulletNum = 5;
+    maxBulletNum = 5;
 }
 
 // 更新処理
@@ -46,7 +51,6 @@ void FarahCom::Update(float elapsedTime)
     UltUpdate(elapsedTime);
     ShotSecond();
     CharacterCom::Update(elapsedTime);
-    FPSArmAnimation();
     GroundBomber(elapsedTime);
 }
 
@@ -107,6 +111,15 @@ void FarahCom::MainAttackDown()
 void FarahCom::UltSkill()
 {
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
+}
+
+//リロード（弾減らす処理は各自のキャラでする
+void FarahCom::Reload()
+{
+    if (currentBulletNum < maxBulletNum)
+    {
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
+    }
 }
 
 // ウルト更新

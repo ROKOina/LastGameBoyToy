@@ -94,6 +94,10 @@ public:
 
     PlaceObject& GetPlaceObject(std::string name) { return placeObjcts[name]; }
 
+    //プレイヤーが死ぬ高さ
+    float GetPlayerDeathHeight() { return playerDeathHeight; }
+    void SetPlayerDeathHeight(float value) { playerDeathHeight = value; }
+
 private:
     bool onImGui = false;//カーソルがGui上にあるかどうか
     bool nowEdit = false;//編集中フラグ
@@ -102,4 +106,6 @@ private:
     char registerObjName[256] = {};
     std::string objType;
     std::list<GameObj> objList;
+
+    float playerDeathHeight = -50;
 };

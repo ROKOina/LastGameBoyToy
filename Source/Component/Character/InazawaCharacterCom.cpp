@@ -27,6 +27,7 @@ void InazawaCharacterCom::Start()
     //ウルト追加
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::ULT, std::make_shared<Ult_Attack_State>(this));
     attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::NONE, std::make_shared<BaseCharacter_NoneAttack>(this));
+    attackStateMachine.AddState(CHARACTER_ATTACK_ACTIONS::RELOAD, std::make_shared<BaseCharacter_ReloadState>(this));
 
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
@@ -35,8 +36,6 @@ void InazawaCharacterCom::Start()
 void InazawaCharacterCom::Update(float elapsedTime)
 {
     CharacterCom::Update(elapsedTime);
-
-    FPSArmAnimation();
 
     //ウルトエフェクト
     if (attackUltRayObj.lock())
@@ -149,4 +148,13 @@ void InazawaCharacterCom::UltSkill()
     GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
     //ステートを初期化
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+}
+
+//リロード（弾減らす処理は各自のキャラでする
+void InazawaCharacterCom::Reload()
+{
+    if (currentBulletNum < maxBulletNum)
+    {
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
+    }
 }

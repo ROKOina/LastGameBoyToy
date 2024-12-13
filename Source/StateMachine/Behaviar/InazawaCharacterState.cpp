@@ -74,6 +74,9 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
 
         owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
 
+        //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
+        charaCom.lock()->AddCurrentBulletNum(-1);
+
         //UŒ‚ˆ—
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower / maxAttackPower, maxDamage * attackPower);
 

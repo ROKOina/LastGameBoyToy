@@ -8,31 +8,35 @@
 //更新処理
 void KnockBackCom::Update(float elapsedTime)
 {
+    // Colliderコンポーネントの取得
     const auto& collider = GetGameObject()->GetComponent<Collider>();
+    if (!collider) return;
 
     for (auto& obj : collider->OnHitGameObject())
     {
-        DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
-        DirectX::XMFLOAT3 enemy = obj.gameObject.lock()->transform_->GetWorldPosition();
+        auto gameObject = obj.gameObject.lock();
+        if (!gameObject) continue;
 
-        if (useTestCoad)
-        {
-            DirectX::XMFLOAT3 forceXZ = { knockbackforce.x,0,knockbackforce.z };
-            DirectX::XMFLOAT3 forceY = { 0,knockbackforce.y,0 };
-            DirectX::XMFLOAT3 force = (Mathf::Normalize(enemy - pos) * forceXZ);
+        auto movement = gameObject->GetComponent<MovementCom>();
+        if (!movement) continue; // MovementComが無ければ処理をスキップ
 
-            //※※※   ムーブメント例外処理しましょう     ※※※
-            //ゲットは一回で良いかと思う
-            obj.gameObject.lock()->GetComponent<MovementCom>()->AddNonMaxSpeedVelocity(force);
-            obj.gameObject.lock()->GetComponent<MovementCom>()->AddForce(forceY);
-            obj.gameObject.lock()->GetComponent<MovementCom>()->SetOnGround(false);
-            obj.gameObject.lock()->GetComponent<MovementCom>()->SetAirForce(1.0f);
-        }
-        else
-        {
-            const auto& hitProcess = GetGameObject()->GetComponent<HitProcessCom>();
-            hitProcess->SetValue3(Mathf::Normalize(enemy - pos) * knockbackforce / elapsedTime);
-        }
+        // 自分と衝突対象の位置を取得
+        const DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
+        const DirectX::XMFLOAT3 enemy = gameObject->transform_->GetWorldPosition();
+
+        // ノックバック力の分離
+        const DirectX::XMFLOAT3 forceXZ = { knockbackforce.x, 0, knockbackforce.z };
+        const DirectX::XMFLOAT3 forceY = { 0, knockbackforce.y, 0 };
+
+        // XZ平面でのノックバック計算
+        const DirectX::XMFLOAT3 normalizedDir = (Mathf::Normalize(enemy - pos) * forceXZ);
+
+        // MovementComの操作
+        movement->ZeroVelocity();
+        movement->AddNonMaxSpeedVelocity(normalizedDir);
+        movement->AddForce(forceY);
+        movement->SetOnGround(false);
+        movement->SetAirForce(1.0f);
     }
 }
 

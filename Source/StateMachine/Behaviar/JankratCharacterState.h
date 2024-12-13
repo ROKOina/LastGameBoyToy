@@ -31,6 +31,7 @@ protected:
     float bulletLifeTimer = 3.0f;
     float addGravity = -0.8f;
     float fireVecY = 0.35f;
+    float explosiontime = 1.5f;
 
 protected:
     std::weak_ptr<JankratCharacterCom> charaCom;

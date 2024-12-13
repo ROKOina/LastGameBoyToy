@@ -79,6 +79,20 @@ void TrainingManager::TrainingManagerClear()
     TutorialSystem::Instance().TutorialSystemClear();
     TrainingSystem::Instance().TrainingSystemClear();
 }
+
+void TrainingManager::ChangeTutorialFlag()
+{
+    GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -0.115f,0.0f,3.489f });
+    GameObjectManager::Instance().Find("player")->transform_->SetEulerRotation({0.0f,180.119f,0.0f});
+    TrainingSystem::Instance().TrainingObjUnhide();
+    tutorialFlag = true;
+}
+
+void TrainingManager::OnGUI()
+{
+    TutorialSystem::Instance().OnGui();
+}
+
 #pragma endregion
 
 
@@ -354,9 +368,10 @@ void TrainingSystem::ShootingStartEndSystem()
     //開始処理
     if (GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->IsDeath()&&!shootingStartFlag)
     {
-        shootingStartFlag = true;
+       /* shootingStartFlag = true;
         GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
-        ShootingSpawnCrow();
+        ShootingSpawnCrow();*/
+        TrainingManager::Instance().ChangeTutorialFlag();
     }
 
     //終了処理
@@ -438,6 +453,21 @@ void TrainingSystem::SpawnItemSystem(float elapsdTime)
         }
     }
 }
+
+//トレーニングモードのアイテム非表示
+void TrainingSystem::TrainingObjUnhide()
+{
+    GameObjectManager::Instance().Find("scarecrow1")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow2")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow3")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow4")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
+
+    if (GameObjectManager::Instance().Find("ULTSKILLMAXITEM") != nullptr)
+    {
+        GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->SetEnabled(false);
+    }
+}
 #pragma endregion
 
 
@@ -447,7 +477,34 @@ void TrainingSystem::SpawnItemSystem(float elapsdTime)
 #pragma region チュートリアルモード
 void TutorialSystem::TutorialSystemStart()
 {
-    
+    int indexM = 0;
+    for (auto& sub : moveSubTitle)
+    {
+        sub.UIID = indexM;
+        indexM++;
+    }
+
+    int indexG = 0;
+    for (auto& sub : gunSubTitle)
+    {
+        sub.UIID = indexG;
+        indexG++;
+    }
+
+    int indexS = 0;
+    for (auto& sub : skillSubTitle)
+    {
+        sub.UIID = indexS;
+        indexS++;
+    }
+
+    int indexU = 0;
+    for (auto& sub : ultSubTitle)
+    {
+        sub.UIID = indexU;
+        indexU++;
+    }
+
    
 }
 
@@ -485,8 +542,76 @@ void TutorialSystem::NextTutorial(TutorialID id)
     tutorialID = id;
 }
 
+//移動のロジック
 void TutorialSystem::MoveTutorialManager(float elapsedTime)
 {
+    //タイマー更新
+    moveSubTitle[moveSubTitleIndex].subtitleTimer += elapsedTime;
+
+
+    InputVec = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetLeftStick();
+
+    if (moveSubTitleIndex != 3&&moveSubTitleIndex!=6&&moveSubTitleIndex!=9)
+    {
+        if (moveSubTitle[moveSubTitleIndex].subtitleTimer > moveSubTitle[moveSubTitleIndex].subtitleTime)
+        {
+            if (moveSubTitleIndex == 11)
+            {
+                moveInspectionFlag = true;
+            }
+            else
+            {
+                moveSubTitleIndex += 1;
+            }
+        }
+    }
+    //横移動
+    else if(moveSubTitleIndex==3)
+    {
+        if (InputVec.x == 1.0f)
+        {
+            moveDFlag = true;
+        }
+
+        if (InputVec.x == -1.0f)
+        {
+            moveAFlag = true;
+        }
+
+        if (moveAFlag && moveDFlag)
+        {
+            moveSubTitleIndex += 1;
+        }
+
+    }
+    //縦移動
+    else if (moveSubTitleIndex == 6)
+    {
+        if (InputVec.y == 1.0f)
+        {
+            moveWFlag = true;
+        }
+
+        if (InputVec.y == -1.0f)
+        {
+            moveSFlag = true;
+        }
+
+        if (moveWFlag && moveSFlag)
+        {
+            moveSubTitleIndex += 1;
+        }
+    }
+    //ジャンプ
+    else if (moveSubTitleIndex == 9)
+    {
+        if (CharacterInput::JumpButton_SPACE & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonDown())
+        {
+            moveSubTitleIndex += 1;
+        }
+    }
+
+
     if (moveInspectionFlag)
     {
         NextTutorial(TutorialID::GUN);
@@ -495,6 +620,35 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
 void TutorialSystem::GunTutorialManager(float elapsedTime)
 {
+    //タイマー更新
+    gunSubTitle[gunSubTitleIndex].subtitleTimer += elapsedTime;
+
+
+    if (gunSubTitleIndex != 1)
+    {
+        if (gunSubTitle[gunSubTitleIndex].subtitleTimer > gunSubTitle[gunSubTitleIndex].subtitleTime)
+        {
+            if (gunSubTitleIndex == 3)
+            {
+                gunInspectionFlag = true;
+            }
+            else
+            {
+                gunSubTitleIndex += 1;
+            }
+        }
+    }
+    else if (gunSubTitleIndex==1)
+    {
+        //攻撃終了処理＆攻撃処理
+        if (CharacterInput::MainAttackButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
+        {
+            gunSubTitleIndex += 1;
+        }
+    }
+
+
+
     if (gunInspectionFlag)
     {
         NextTutorial(TutorialID::SKILL);
@@ -503,6 +657,36 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 
 void TutorialSystem::SkillTutorialManager(float elapsedTime)
 {
+    //タイマー更新
+    skillSubTitle[skillSubTitleIndex].subtitleTimer += elapsedTime;
+
+
+    if (skillSubTitleIndex != 1)
+    {
+        if (skillSubTitle[skillSubTitleIndex].subtitleTimer > skillSubTitle[skillSubTitleIndex].subtitleTime)
+        {
+            if (skillSubTitleIndex == 3)
+            {
+                skillInspectionFlag = true;
+            }
+            else
+            {
+                skillSubTitleIndex += 1;
+            }
+        }
+    }
+    else if (skillSubTitleIndex == 1)
+    {
+        //攻撃終了処理＆攻撃処理
+        if (CharacterInput::MainSkillButton_E & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
+        {
+            skillSubTitleIndex += 1;
+        }
+    }
+
+
+
+
     if (skillInspectionFlag)
     {
         NextTutorial(TutorialID::ULT);
@@ -511,10 +695,51 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 
 void TutorialSystem::UltTutorialManager(float elapsedTime)
 {
+
+    //タイマー更新
+    ultSubTitle[ultSubTitleIndex].subtitleTimer += elapsedTime;
+
+
+    if (ultSubTitleIndex != 1)
+    {
+        if (ultSubTitle[ultSubTitleIndex].subtitleTimer > ultSubTitle[ultSubTitleIndex].subtitleTime)
+        {
+            if (ultSubTitleIndex == 3)
+            {
+                ultInspectionFlag = true;
+            }
+            else
+            {
+                ultSubTitleIndex += 1;
+            }
+        }
+    }
+    else if (ultSubTitleIndex == 1)
+    {
+        //攻撃終了処理＆攻撃処理
+        if (CharacterInput::UltimetButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
+        {
+            ultSubTitleIndex += 1;
+        }
+    }
+
     if (ultInspectionFlag)
     {
         NextTutorial(TutorialID::END);
     }
+}
+
+void TutorialSystem::OnGui()
+{
+    if (ImGui::Begin("TutorialSystem", nullptr, ImGuiWindowFlags_None))
+    {
+        ImGui::DragInt("moveIndex", &moveSubTitleIndex);
+        ImGui::DragInt("gunIndex", &gunSubTitleIndex);
+        ImGui::DragInt("skillIndex", &skillSubTitleIndex);
+        ImGui::DragInt("ultIndex", &ultSubTitleIndex);
+
+    }
+    ImGui::End();
 }
 
 #pragma endregion

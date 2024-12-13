@@ -1055,6 +1055,9 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 gameMode = ne[0].gameMode;
             }
 
+            connectNow = connectBegin;
+            connectBegin = false;
+
             //ÉfÅ[É^éÌï Ç≈ï™äÚ
             switch (ne[0].dataKind)
             {
@@ -1076,8 +1079,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                     DeathMatchRecv(ne[0]);
                 break;
             }
-
-
         }
         break;
     default:

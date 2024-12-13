@@ -69,7 +69,7 @@ public:
     //普通のアニメーション再生関数
     void PlayAnimation(int animeID, bool loop, bool rootFlag = false, float blendSeconds = 0.25f);
     //上半身だけアニメーション再生
-    void PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds);
+    void PlayUpperBodyOnlyAnimation(int upperAnimaId, bool loop, float blendSeconds = 0.25f);
     //下半身だけアニメーション再生 lowerAnimeTwoIdはブレンドアニメーションしないときは‐1を入れといて下さい blendType　 0=ノーマルアニメーション 1=ブレンドアニメーション 2=歩きブレンドアニメーション
     void PlayLowerBodyOnlyAnimation(PlayLowBodyAnimParam param);
     //再生中か
@@ -94,6 +94,8 @@ public:
     // アニメーション時間
     float GetAnimationSeconds() const { return currentSeconds; }
     void SetAnimationSeconds(float seconds) { currentSeconds = seconds; }
+    float GetUpperCurrentAnimationSeconds() const { return upperCurrentAnimationSeconds; }
+    void SetUpperCurrentAnimationSeconds(float seconds) { upperCurrentAnimationSeconds = seconds; }
 
     // 現在のアニメーション番号取得
     int GetCurrentAnimationIndex()const { return currentAnimation; }

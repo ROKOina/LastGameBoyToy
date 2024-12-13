@@ -12,7 +12,6 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
-#include "Component\Animation\FootIKcom.h"
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
 #include "SceneResult.h"

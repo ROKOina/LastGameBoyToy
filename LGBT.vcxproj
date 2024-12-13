@@ -148,13 +148,11 @@
     <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\Component\Animation\AimIKCom.h" />
     <ClInclude Include="Source\Component\Animation\AnimationCom.h" />
-    <ClInclude Include="Source\Component\Animation\FootIKcom.h" />
     <ClInclude Include="Source\Component\Audio\AudioCom.h" />
     <ClInclude Include="Source\Component\Bullet\BulletCom.h" />
     <ClInclude Include="Source\Component\Bullet\KnockBackCom.h" />
     <ClInclude Include="Source\Component\Bullet\JankratBulletCom.h" />
     <ClInclude Include="Source\Component\Bullet\MissileCom.h" />
-    <ClInclude Include="Source\Component\Bullet\ProjectileCom.h" />
     <ClInclude Include="Source\Component\Camera\CameraCom.h" />
     <ClInclude Include="Source\Component\Camera\EventCameraCom.h" />
     <ClInclude Include="Source\Component\Camera\EventCameraManager.h" />
@@ -170,6 +168,7 @@
     <ClInclude Include="Source\Component\Character\Prop\SetNodeWorldPosCom.h" />
     <ClInclude Include="Source\Component\Character\RegisterChara.h" />
     <ClInclude Include="Source\Component\Character\RemoveTimerCom.h" />
+    <ClInclude Include="Source\Component\Character\SoldierCom.h" />
     <ClInclude Include="Source\Component\Collsion\ColliderCom.h" />
     <ClInclude Include="Source\Component\Collsion\FrustumCom.h" />
     <ClInclude Include="Source\Component\Collsion\NodeCollsionCom.h" />
@@ -192,6 +191,7 @@
     <ClInclude Include="Source\Component\Renderer\RendererCom.h" />
     <ClInclude Include="Source\Component\Renderer\TrailCom.h" />
     <ClInclude Include="Source\Component\SkillObj\JankratMineCom.h" />
+    <ClInclude Include="Source\Component\SkillObj\JankratUltCom.h" />
     <ClInclude Include="Source\Component\Sprite\Sprite.h" />
     <ClInclude Include="Source\Component\Stage\GateGimmickCom.h" />
     <ClInclude Include="Source\Component\Stage\StageEditorCom.h" />
@@ -202,6 +202,7 @@
     <ClInclude Include="Source\Component\System\RayCastManager.h" />
     <ClInclude Include="Source\Component\System\SpawnCom.h" />
     <ClInclude Include="Source\Component\System\TransformCom.h" />
+    <ClInclude Include="Source\Component\UI\Font.h" />
     <ClInclude Include="Source\Component\UI\PlayerUI.h" />
     <ClInclude Include="Source\Component\UI\UiFlag.h" />
     <ClInclude Include="Source\Component\UI\UiGauge.h" />
@@ -265,6 +266,7 @@
     <ClInclude Include="Source\StateMachine\Behaviar\GateGimmickState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\InazawaCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\JankratCharacterState.h" />
+    <ClInclude Include="Source\StateMachine\Behaviar\SolderState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\StageGimmickState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\TrainingScarecrowState.h" />
     <ClInclude Include="Source\StateMachine\State.h" />
@@ -275,6 +277,7 @@
     <ClInclude Include="Source\SystemStruct\Logger.h" />
     <ClInclude Include="Source\SystemStruct\Misc.h" />
     <ClInclude Include="Source\SystemStruct\MySequence.h" />
+    <ClInclude Include="Source\SystemStruct\Targa.h" />
     <ClInclude Include="Source\SystemStruct\ThreadPool.h" />
     <ClInclude Include="Source\SystemStruct\TimeManager.h" />
   </ItemGroup>
@@ -302,13 +305,11 @@
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\Component\Animation\AimIKCom.cpp" />
     <ClCompile Include="Source\Component\Animation\AnimationCom.cpp" />
-    <ClCompile Include="Source\Component\Animation\FootIKCom.cpp" />
     <ClCompile Include="Source\Component\Audio\AudioCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\BulletCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\JankratBulletCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\KnockBackCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\MissileCom.cpp" />
-    <ClCompile Include="Source\Component\Bullet\ProjectileCom.cpp" />
     <ClCompile Include="Source\Component\Camera\CameraCom.cpp" />
     <ClCompile Include="Source\Component\Camera\EventCameraCom.cpp" />
     <ClCompile Include="Source\Component\Camera\EventCameraManager.cpp" />
@@ -322,6 +323,7 @@
     <ClCompile Include="Source\Component\Character\JankratCharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\Prop\SetNodeWorldPosCom.cpp" />
     <ClCompile Include="Source\Component\Character\RegisterChara.cpp" />
+    <ClCompile Include="Source\Component\Character\SoldierCom.cpp" />
     <ClCompile Include="Source\Component\Collsion\ColliderCom.cpp" />
     <ClCompile Include="Source\Component\Collsion\FrustumCom.cpp" />
     <ClCompile Include="Source\Component\Collsion\NodeCollsionCom.cpp" />
@@ -344,6 +346,7 @@
     <ClCompile Include="Source\Component\Renderer\RendererCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\TrailCom.cpp" />
     <ClCompile Include="Source\Component\SkillObj\JankratMineCom.cpp" />
+    <ClCompile Include="Source\Component\SkillObj\JankratUltCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\Component\Stage\GateGimmickCom.cpp" />
     <ClCompile Include="Source\Component\Stage\StageEditorCom.cpp" />
@@ -353,6 +356,7 @@
     <ClCompile Include="Source\Component\System\RayCastManager.cpp" />
     <ClCompile Include="Source\Component\System\SpawnCom.cpp" />
     <ClCompile Include="Source\Component\System\TransformCom.cpp" />
+    <ClCompile Include="Source\Component\UI\Font.cpp" />
     <ClCompile Include="Source\Component\UI\PlayerUI.cpp" />
     <ClCompile Include="Source\Component\UI\UiFlag.cpp" />
     <ClCompile Include="Source\Component\UI\UiGauge.cpp" />
@@ -408,6 +412,7 @@
     <ClCompile Include="Source\StateMachine\Behaviar\GateGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\InazawaCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\JankratCharacterState.cpp" />
+    <ClCompile Include="Source\StateMachine\Behaviar\SolderState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\StageGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\TrainingScarecrowState.cpp" />
     <ClCompile Include="Source\SystemStruct\Dialog.cpp" />
@@ -418,6 +423,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="HLSL\2D\Font.hlsli" />
     <None Include="HLSL\2D\PostEffect\FilterFunctions.hlsli" />
     <None Include="HLSL\2D\PostEffect\FullScreenQuad.hlsli" />
     <None Include="HLSL\2D\PostEffect\PostEffect.hlsli" />
@@ -443,6 +449,12 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\2D\Font_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\Font_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\CascadeShadow.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>

@@ -22,22 +22,23 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Character\Prop\SetNodeWorldPosCom.h>
 #include "Component\UI\PlayerUI.h"
+#include "Component\Character\SoldierCom.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
 {
     switch (list)
     {
-    case RegisterChara::CHARA_LIST::INAZAWA:
+    case CHARA_LIST::INAZAWA:
         InazawaChara(obj);
         break;
-    //case RegisterChara::CHARA_LIST::HAVE_ALL_ATTACK:
-    //    HaveAllAttackChara(obj);
-        break;
-    case RegisterChara::CHARA_LIST::FARAH:
+    case CHARA_LIST::FARAH:
         FarahCharacter(obj);
         break;
-    case RegisterChara::CHARA_LIST::JANKRAT:
+    case CHARA_LIST::JANKRAT:
         JankratChara(obj);
+        break;
+    case CHARA_LIST::SOLIDER:
+        SoldireChar(obj);
         break;
     default:
         break;
@@ -66,11 +67,6 @@ void RegisterChara::ChangeChara(std::string objName, CHARA_LIST list)
     p->transform_->SetWorldPosition({ 0,0,0 });
     RegisterChara::Instance().SetCharaComponet(list, p);
     //gameobjM.CreateNowTimeSaveComponent(p);
-}
-
-//imgui
-void RegisterChara::ImGui()
-{
 }
 
 //稲澤キャラ
@@ -434,6 +430,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(0.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
@@ -487,6 +484,93 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
 
         //カメラ位置
         cameraPost->transform_->SetLocalPosition({ 0, 12.086f, 3.3050f });
+        obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
+
+        //腕
+        {
+            std::shared_ptr<GameObject> armChild = cameraPost->AddChildObject();
+            armChild->SetName("armChild");
+            armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
+            armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            armChild->AddComponent<AnimationCom>();
+
+            //マゼルフラッシュ
+            std::shared_ptr<GameObject>particleobj = armChild->AddChildObject();
+            particleobj->SetName("muzzleflash");
+            std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
+            cpuparticle->SetActive(false);
+        }
+    }
+}
+
+//ソルジャー
+void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
+{
+    obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+    r->LoadModel("Data/Model/player_True/player.mdl");
+    r->SetDissolveThreshold(0.0f);
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
+    obj->AddComponent<AnimationCom>();
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
+    std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
+
+    //HPの初期設定
+    status->SetMaxHitPoint(200);
+    status->SetHitPoint(status->GetMaxHitpoint());
+    status->SetInvincibleTime(0.3f);
+    std::shared_ptr<SoldierCom> c = obj->AddComponent<SoldierCom>();
+    c->GetNetCharaData().SetCharaID(int(CHARA_LIST::SOLIDER));
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
+    c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
+
+    //ボックスコライダー
+    std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
+    box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
+    box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
+    if (std::strcmp(obj->GetName(), "player") == 0)
+        box->SetMyTag(COLLIDER_TAG::Player);
+    else
+        box->SetMyTag(COLLIDER_TAG::Enemy);
+
+    //押し出し処理
+    auto& pushBack = obj->AddComponent<PushBackCom>();
+    pushBack->SetRadius(0.5f);
+    pushBack->SetWeight(1);
+
+    //煙のエフェクト
+    {
+        std::shared_ptr<GameObject> smoke = obj->AddChildObject();
+        smoke->SetName("smokeeffect");
+        std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
+        smokeeffct->SetActive(false);
+    }
+
+    //SE
+    {
+        auto& au = obj->AddComponent<AudioCom>();
+        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
+        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
+        au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
+        au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
+        au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
+        au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
+    }
+
+    //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
+    if (std::strcmp(obj->GetName(), "player") == 0)
+    {
+        std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
+        cameraPost->SetName("cameraPostPlayer");
+        std::shared_ptr<FPSCameraCom>fpscamera = cameraPost->AddComponent<FPSCameraCom>();
+        fpscamera->ActiveCameraChange();
+
+        //カメラ位置
+        cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
         obj->GetComponent<CharacterCom>()->SetCameraObj(cameraPost.get());
 
         //腕
