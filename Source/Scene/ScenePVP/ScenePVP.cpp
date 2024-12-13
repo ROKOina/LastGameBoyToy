@@ -175,13 +175,12 @@ void ScenePVP::InitializePVP()
 
     //UIゲームオブジェクト生成
    // CreateUiObject();
-      //snowparticle
+      //Font参考例
     {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("testFont");
+       std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+       obj->SetName("testFont");
        std::shared_ptr<Font> font =  obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
        font->position = { 0,0 };
-       font->originalPos = { 0,0 };
        font->str = L"ab";
        font->scale = 1.0f;
     }
