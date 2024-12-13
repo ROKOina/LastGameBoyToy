@@ -32,4 +32,17 @@ public:
 
     // GUI
     void OnGUI() override;
+
+    //攻撃ウルト取得
+    void SetAttackRayObj(std::shared_ptr<GameObject> obj) { attackray = obj; }
+
+private:
+
+    //ヒットスキャンが当たった時の処理
+    void HitObject();
+
+private:
+
+    //ヒットスキャンのオブジェクト
+    std::weak_ptr<GameObject> attackray;
 };

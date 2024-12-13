@@ -1,6 +1,9 @@
 #include "SoldierCom.h"
 #include "StateMachine\Behaviar\BaseCharacterState.h"
 #include "StateMachine\Behaviar\SolderState.h"
+#include "Component\Collsion\ColliderCom.h"
+#include "Component\Particle\CPUParticle.h"
+#include "Component\Particle\GPUParticle.h"
 
 //初期化
 void SoldierCom::Start()
@@ -29,6 +32,9 @@ void SoldierCom::Start()
 void SoldierCom::Update(float elapsedTime)
 {
     CharacterCom::Update(elapsedTime);
+
+    //ヒットスキャンが当たった時の処理
+    HitObject();
 }
 
 // 右クリック単発押し処理
@@ -79,4 +85,28 @@ void SoldierCom::Reload()
 void SoldierCom::OnGUI()
 {
     CharacterCom::OnGUI();
+}
+
+//ヒットスキャンが当たった時の処理
+void SoldierCom::HitObject()
+{
+    //ヒットスキャンが当たれば
+    if (attackray.lock())
+    {
+        auto& rayCol = attackray.lock()->GetComponent<Collider>();
+        if (rayCol)
+        {
+            for (auto& obj : rayCol->OnHitGameObject())
+            {
+                //ヒットエフェクト生成
+                std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
+                hiteffectobject->transform_->SetWorldPosition(obj.hitPos);
+                hiteffectobject->SetName("HitEffect");
+                std::shared_ptr<GPUParticle>Chiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
+                Chiteffct->Play();
+                std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
+                Ghiteffct->SetActive(true);
+            }
+        }
+    }
 }

@@ -235,106 +235,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     }
 }
 
-////全てを兼ね備えたやばいやつ
-//void RegisterChara::HaveAllAttackChara(std::shared_ptr<GameObject>& obj)
-//{
-//    obj->transform_->SetScale({ 0.02f, 0.02f, 0.02f });
-//    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-//    r->LoadModel("Data/Model/pico/pico.mdl");
-//    obj->AddComponent<AimIKCom>("Spine", nullptr);
-//    obj->AddComponent<AnimationCom>();
-//    obj->AddComponent<NodeCollsionCom>("Data/Model/pico/pico.nodecollsion");
-//    obj->AddComponent<CharaStatusCom>();
-//    obj->AddComponent<MovementCom>();
-//    std::shared_ptr<HaveAllAttackCharaCom> c = obj->AddComponent<HaveAllAttackCharaCom>();
-//    c->GetNetCharaData().SetCharaID(int(CHARA_LIST::HAVE_ALL_ATTACK));
-//
-//    //煙のエフェクト
-//    {
-//        std::shared_ptr<GameObject> smoke = obj->AddChildObject();
-//        smoke->SetName("smokeeffect");
-//        std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
-//        smokeeffct->SetActive(false);
-//    }
-//
-//    //std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
-//    //box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
-//    //box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-//    //if (std::strcmp(obj->GetName(), "player") == 0)
-//    //    box->SetMyTag(COLLIDER_TAG::Player);
-//    //else
-//    //    box->SetMyTag(COLLIDER_TAG::Enemy);
-//
-//    std::shared_ptr<CapsuleColliderCom> ca = obj->AddComponent<CapsuleColliderCom>();
-//
-//    if (std::strcmp(obj->GetName(), "player") == 0)
-//    {
-//        ca->SetMyTag(COLLIDER_TAG::Player);
-//        ca->SetJudgeTag(COLLIDER_TAG::Enemy);
-//    }
-//    else
-//    {
-//        ca->SetMyTag(COLLIDER_TAG::Enemy);
-//        ca->SetJudgeTag(COLLIDER_TAG::Player);
-//    }
-//
-//    //std::shared_ptr<SphereColliderCom> sphere= obj->AddComponent<SphereColliderCom>();
-//    //sphere->SetRadius(2);
-//    //sphere->SetMyTag(COLLIDER_TAG::Player);
-//    //sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
-//
-//    //攻撃レイキャスト
-//    {
-//        std::shared_ptr<GameObject> rayChild = obj->AddChildObject();
-//        rayChild->SetName("rayObj");
-//
-//        rayChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-//
-//        std::shared_ptr<RayColliderCom> rayCol = rayChild->AddComponent<RayColliderCom>();
-//        if (std::strcmp(obj->GetName(), "player") == 0)
-//        {
-//            rayCol->SetMyTag(COLLIDER_TAG::Player);
-//            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
-//        }
-//        else
-//        {
-//            rayCol->SetMyTag(COLLIDER_TAG::Enemy);
-//            rayCol->SetJudgeTag(COLLIDER_TAG::Player);
-//        }
-//        rayCol->SetEnabled(false);
-//
-//        //ダメージ処理用
-//        std::shared_ptr<HitProcessCom> hitDamage = rayChild->AddComponent<HitProcessCom>(obj);
-//        hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-//    }
-//
-//    //回復カプセル
-//    {
-//        std::shared_ptr<GameObject> cupsuleChild = obj->AddChildObject();
-//        cupsuleChild->SetName("capsuleObj");
-//
-//        cupsuleChild->transform_->SetWorldPosition({ 0, 80.821f, 33.050f });
-//
-//        std::shared_ptr<CapsuleColliderCom> capsuleCol = cupsuleChild->AddComponent<CapsuleColliderCom>();
-//        if (std::strcmp(obj->GetName(), "player") == 0)
-//        {
-//            capsuleCol->SetMyTag(COLLIDER_TAG::Player);
-//            capsuleCol->SetJudgeTag(COLLIDER_TAG::Enemy);
-//        }
-//        else
-//        {
-//            capsuleCol->SetMyTag(COLLIDER_TAG::Enemy);
-//            capsuleCol->SetJudgeTag(COLLIDER_TAG::Player);
-//        }
-//        capsuleCol->SetEnabled(false);
-//
-//        //ヒール処理用
-//        std::shared_ptr<HitProcessCom> hitHeal = cupsuleChild->AddComponent<HitProcessCom>(obj);
-//        hitHeal->SetHitType(HitProcessCom::HIT_TYPE::HEAL);
-//        hitHeal->SetValue(2);
-//    }
-//}
-
 //ファラ
 void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
 {
@@ -548,6 +448,32 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
         smoke->SetName("smokeeffect");
         std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
         smokeeffct->SetActive(false);
+    }
+
+    //ヒットスキャン
+    {
+        std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
+        ultAttckChild->SetName("mainattack");
+
+        //位置をカメラと一緒にする
+        ultAttckChild->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });
+
+        //コライダーセット
+        std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
+        rayCol->SetEnabled(false);
+        rayCol->SetMyTag(COLLIDER_TAG::Bullet);
+        if (std::strcmp(obj->GetName(), "player") == 0)
+            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+        else
+            rayCol->SetJudgeTag(COLLIDER_TAG::Player);
+
+        //ダメージ処理用
+        std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
+        hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+        hitDamage->SetValue(10);
+
+        //キャラクターに登録
+        obj->GetComponent<SoldierCom>()->SetAttackRayObj(ultAttckChild);
     }
 
     //SE
