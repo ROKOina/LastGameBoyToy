@@ -77,18 +77,23 @@ private:
         bool collision;
         int state;  //切り替えよう
     };
+    //ロビー選択
     std::vector<LobbySelectFont> lobbySelectFont =
     {
-        LobbySelectFont(0,L"新規部屋作成",{303,164},1.5f,true,0),
+        LobbySelectFont(0,L"新規部屋作成",{303,320},1.5f,true,0),
         LobbySelectFont(1,L"ロビー名",{465,223},1,false,1),
         LobbySelectFont(2,L"",{784,223},1,false,1),   //ロビー名打ち込み用
         LobbySelectFont(3,L"作成",{1203,624},1.5f,true,1),
         LobbySelectFont(4,L"戻る",{100,700},1.5f,true,1),
 
+        LobbySelectFont(5,L"ロビー選択",{76,54},2,false,0),
+        LobbySelectFont(6,L"新規部屋作成",{76,54},2,false,1),
 
-        LobbySelectFont(10,L"部屋参加",{906,164},1.5f,true,0),
+        LobbySelectFont(10,L"部屋参加",{906,320},1.5f,true,0),
         LobbySelectFont(11,L"戻る",{100,700},1.5f,true,2),
         LobbySelectFont(12,L"入室",{1203,624},1.5f,true,2),
+
+        LobbySelectFont(13,L"部屋参加",{76,54},2,false,2),
 
         //ロビー名用
         LobbySelectFont(20,L"",{536,218},1.0f,true,2),
@@ -97,8 +102,24 @@ private:
         LobbySelectFont(23,L"",{536,218},1.0f,true,2),
         LobbySelectFont(24,L"",{536,218},1.0f,true,2),
     };
+    //ロビー
+    std::vector<LobbySelectFont> lobbyFont =
+    {
+        LobbySelectFont(0,L"ロビー",{76,54},2,false,0),
+        LobbySelectFont(1,L"参加者",{455,210},1,false,0),
+        LobbySelectFont(2,L"プレイ",{1303,747},2.5f,true,0),
+
+        LobbySelectFont(10,L"ゲームモード",{1260,52},1.5f,false,0),
+        LobbySelectFont(11,L"チームデスマッチ",{1435,201},1,true,0),
+        LobbySelectFont(12,L"王冠",{1435,281},1,true,0),
+
+        //ネット名用
+        LobbySelectFont(20,L"",{536,218},1.0f,true,2),
+        LobbySelectFont(21,L"",{536,218},1.0f,true,2),
+        LobbySelectFont(22,L"",{536,218},1.0f,true,2),
+        LobbySelectFont(23,L"",{536,218},1.0f,true,2),
+    };
+
     int fontState = 0;
     int joinRoomCount = -1; //部屋参加時登録用
-
-    std::vector<std::weak_ptr<GameObject>> strBack;
 };
