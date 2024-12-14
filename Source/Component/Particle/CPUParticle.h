@@ -74,7 +74,8 @@ private:
         float anime_timer;
         float type;
     };
-    ParticleData* m_data = {}; //パーティクルデータ
+    std::vector<std::unique_ptr<ParticleData>> m_data; //パーティクルデータ
+    //ParticleData* m_data = {}; //パーティクルデータ
 
     //定数バッファ
     struct CPUParticleConstant

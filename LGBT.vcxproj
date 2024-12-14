@@ -245,6 +245,7 @@
     <ClInclude Include="Source\Netwark\RingBuffer.h" />
     <ClInclude Include="Source\Netwark\Server.h" />
     <ClInclude Include="Source\Phsix\Physxlib.h" />
+    <ClInclude Include="Source\PVPGameSystem\PVPGameSystem.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Scene\SceneLGBT\SceneLGBT.h" />
     <ClInclude Include="Source\Scene\SceneLoading\SceneLoading.h" />
@@ -390,6 +391,7 @@
     <ClCompile Include="Source\Netwark\Photon\StaticSendDataManager.cpp" />
     <ClCompile Include="Source\Netwark\Photon\StdIO_UIListener.cpp" />
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
+    <ClCompile Include="Source\PVPGameSystem\PVPGameSystem.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneLGBT\SceneLGBT.cpp" />
     <ClCompile Include="Source\Scene\SceneLoading\SceneLoading.cpp" />
