@@ -2,6 +2,7 @@
 #include <Component\Collsion\ColliderCom.h>
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Particle\GPUParticle.h"
+#include "Component\Bullet\BulletCom.h"
 
 //基底クラス
 Solder_BaseState::Solder_BaseState(CharacterCom* owner) : State(owner)
@@ -115,5 +116,25 @@ void Solder_ESkillState::Exit()
 }
 void Solder_ESkillState::ImGui()
 {
+}
+#pragma endregion
+
+#pragma region 右クリックスキル
+void Solder_RightClickSkillState::Execute(const float& elapsedTime)
+{
+    //攻撃終了処理＆攻撃処理
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        armAnim->SetAnimationSeconds(0.3f);
+    }
+
+    //攻撃処理
+    BulletCreate::SoldierEskillBullet(owner->GetGameObject(), 30.0f, 2.0f);
+
+    //ステート変更
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
 #pragma endregion

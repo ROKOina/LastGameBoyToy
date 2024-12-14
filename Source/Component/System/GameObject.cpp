@@ -249,7 +249,6 @@ void GameObjectManager::RemoveNowTime(std::weak_ptr<GameObject> obj)
 
     //保存コンポーネント解放
     EraseComponet();
-
 }
 
 // 全削除
@@ -384,7 +383,7 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     SpriteRender(view, projection);
 
     //Font
-    FontRender(view,projection);
+    FontRender(view, projection);
 
 #ifdef _DEBUG
     // デバッグ情報の描画
@@ -556,7 +555,7 @@ void GameObjectManager::StartUpObjects()
     if (startGameObject_.empty())return;
 
     for (std::shared_ptr<GameObject>& obj : startGameObject_)
-    {    
+    {
         //保存コンポーネントを追加
         StartUpSaveComponent(obj);
     }
@@ -611,14 +610,12 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
         spriteobject.emplace_back(spritecomp);
     }
 
-
-    //スプライトオブジェクトがあれば入る
+    //フォントオブジェクトがあれば入る
     std::shared_ptr<Font>fontcomp = obj->GetComponent<Font>();
     if (fontcomp)
     {
         fontobject.emplace_back(fontcomp);
     }
-
 
     //インスタンスオブジェクトがあれば入る
     std::shared_ptr<InstanceRenderer>instancecomp = obj->GetComponent<InstanceRenderer>();
@@ -1197,6 +1194,16 @@ void GameObjectManager::EraseComponet()
         {
             spriteobject.erase(spriteobject.begin() + spr);
             --spr;
+        }
+    }
+
+    //fntobject解放
+    for (int fnt = 0; fnt < fontobject.size(); ++fnt)
+    {
+        if (fontobject[fnt].expired())
+        {
+            fontobject.erase(fontobject.begin() + fnt);
+            --fnt;
         }
     }
 

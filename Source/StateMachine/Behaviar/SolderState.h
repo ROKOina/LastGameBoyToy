@@ -48,6 +48,19 @@ public:
     virtual const char* GetName() const override { return "ESkill"; }
 };
 
+//右クリックスキル
+class Solder_RightClickSkillState : public Solder_BaseState
+{
+public:
+    Solder_RightClickSkillState(CharacterCom* owner) :Solder_BaseState(owner) {}
+
+    void Enter() override {};
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "RightClickSkill"; }
+};
+
 //ult攻撃
 class Solder_UltState : public Solder_BaseState
 {
