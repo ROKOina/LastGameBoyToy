@@ -135,6 +135,9 @@ struct NetData
         GAME,
         JOIN,
         LOBBY,
+
+        //ゲームモード
+        DEATHMATCH,
     };
     int dataKind;
     bool isMasterClient;
@@ -155,8 +158,9 @@ struct NetData
         std::array<float, 4> stanData;//キャラに与えたスタン
         std::array<DirectX::XMFLOAT3, 4> knockbackData = {};//ノックバックを与える
         std::array<DirectX::XMFLOAT3, 4> movePosData = {};//移動位置を与える
-        //std::array<int, 4> teamID;//チームのID
+        std::array<int, 4> teamID;//チームのID
         int charaID;    //キャラのID
+        int hp;
     }gameData;
 
     //入室許可
@@ -179,13 +183,20 @@ struct NetData
         std::array<int, 4> teamID;//チームのID
         char chat[500];
     }lobbyData;
+
+    int gameMode;   //ゲームモード(ホストが決定)
+    //デスマッチ
+    struct DeathMatchData   //3
+    {
+        int killCount;
+    }deathMatchData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
     out << h.dataKind << " ";
     out << h.isMasterClient << " ";
-    out << h.photonId << " ";   
-    out << h.playerId << " ";      
+    out << h.photonId << " ";
+    out << h.playerId << " ";
     out << h.name << " ";
 
     if (h.dataKind == NetData::DATA_KIND::GAME)
@@ -200,6 +211,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         Vector3Out(out, h.gameData.movePosData);
 
         out << h.gameData.charaID << " ";
+        out << h.gameData.hp << " ";
+        out << h.gameData.teamID << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
     }
 
@@ -218,6 +231,12 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     {
         out << h.lobbyData.chat << " ";
         out << h.lobbyData.teamID << " ";
+    }
+
+    out << h.gameMode << " ";
+    if (h.dataKind == NetData::DATA_KIND::DEATHMATCH)
+    {
+        out << h.deathMatchData.killCount << " ";
     }
 
     return out;
@@ -242,6 +261,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
         Vector3In(in, h.gameData.movePosData);
 
         in >> h.gameData.charaID;
+        in >> h.gameData.hp;
+        in >> h.gameData.teamID;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
     }
 
@@ -261,6 +282,12 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     {
         in >> h.lobbyData.chat;
         in >> h.lobbyData.teamID;
+    }
+
+    in >> h.gameMode;
+    if (h.dataKind == NetData::DATA_KIND::DEATHMATCH)
+    {
+        in >> h.deathMatchData.killCount;
     }
 
     return in;

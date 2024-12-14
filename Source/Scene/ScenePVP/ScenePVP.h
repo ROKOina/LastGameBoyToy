@@ -4,6 +4,8 @@
 #include "Netwark/Photon/BasicsApplication.h"
 #include "Component\System\GameObject.h"
 
+#include "PVPGameSystem/PVPGameSystem.h"
+
 //リザルトシーン
 class ScenePVP :public Scene
 {
@@ -43,15 +45,19 @@ private:
     //オブジェクト生成関数
     void NewObject();
 
+    //ゲームシステム更新
+    void GameSystemUpdate(float elapsedTime);
+
 private:
 
     std::unique_ptr<BasicsApplication> photonNet;
 
+    bool isGame = false;
     bool isCharaSelect = false;
     bool isLobby = false;
-    //bool is = false;
 
     std::vector<std::weak_ptr<GameObject>> tempRemoveObj;   //画面切り替え時に削除するオブジェクト
-};
 
-void TransitionRemove();
+    //ゲームシステム
+    std::unique_ptr<PVPGameSystem> pvpGameSystem;
+};

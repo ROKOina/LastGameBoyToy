@@ -153,14 +153,20 @@ CPUParticle::CPUParticle(const char* filename, int num)
     // ピクセルシェーダー
     CreatePsFromCso(graphics.GetDevice(), "Shader\\CPUParticlePS.cso", m_pixelshader.GetAddressOf());
 
-    m_data = new ParticleData[num];
-    ZeroMemory(m_data, sizeof(ParticleData) * num);
+    m_data.resize(num);
+    for (auto& mD : m_data)
+    {
+        mD = std::make_unique<ParticleData>();
+        mD->type = 1;
+    }
+    //m_data = new ParticleData[num];
+    //ZeroMemory(m_data, sizeof(ParticleData) * num);
 
     m_numparticle = num;
     m_v = new VERTEX[num];
     ZeroMemory(m_v, sizeof(VERTEX) * num);
 
-    for (int i = 0; i < m_numparticle; ++i) { m_data[i].type = 1; }
+    //for (int i = 0; i < m_numparticle; ++i) { m_data[i].type = 1; }
 
     //頂点バッファ作成
     D3D11_BUFFER_DESC desc;
@@ -192,7 +198,7 @@ CPUParticle::CPUParticle(const char* filename, int num)
 //デストラクタ
 CPUParticle::~CPUParticle()
 {
-    delete[] m_data;
+    //delete[] m_data;
     delete[] m_v;
 }
 
@@ -224,32 +230,32 @@ void CPUParticle::Update(float elapsedTime)
 
         for (int i = 0; i < m_numparticle; i++)
         {
-            if (m_data[i].type == -1) continue; // 非表示のパーティクルをスキップ
+            if (m_data[i]->type == -1) continue; // 非表示のパーティクルをスキップ
 
-            if (m_data[i].type < 0) continue;
+            if (m_data[i]->type < 0) continue;
 
             //寿命時間の割合を求める
-            float lifelate = 1 - (m_data[i].timer / m_scp.m_lifetime);
+            float lifelate = 1 - (m_data[i]->timer / m_scp.m_lifetime);
 
-            m_data[i].vx += m_data[i].ax * elapsedTime;
-            m_data[i].vy += m_data[i].ay * elapsedTime;
-            m_data[i].vz += m_data[i].az * elapsedTime;
+            m_data[i]->vx += m_data[i]->ax * elapsedTime;
+            m_data[i]->vy += m_data[i]->ay * elapsedTime;
+            m_data[i]->vz += m_data[i]->az * elapsedTime;
 
-            m_data[i].x += m_data[i].vx * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
-            m_data[i].y += m_data[i].vy * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
-            m_data[i].z += m_data[i].vz * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
+            m_data[i]->x += m_data[i]->vx * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
+            m_data[i]->y += m_data[i]->vy * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
+            m_data[i]->z += m_data[i]->vz * m_scp.m_string * Mathf::Lerp(m_scp.m_stringlate.x, m_scp.m_stringlate.y, lifelate) * elapsedTime;
 
-            m_data[i].timer -= elapsedTime;
-            m_data[i].alpha = sqrtf(m_data[i].timer);
+            m_data[i]->timer -= elapsedTime;
+            m_data[i]->alpha = sqrtf(m_data[i]->timer);
 
-            if (m_data[i].timer <= 0) m_data[i].type = -1;
+            if (m_data[i]->timer <= 0) m_data[i]->type = -1;
         }
 
         //アニメーション
         for (int i = 0; i < m_numparticle; i++)
         {
-            if (m_data[i].type < 0) continue;
-            m_data[i].type += elapsedTime * m_scp.m_animationspeed; // speedコマ/秒(ここは後々変数になるかも)
+            if (m_data[i]->type < 0) continue;
+            m_data[i]->type += elapsedTime * m_scp.m_animationspeed; // speedコマ/秒(ここは後々変数になるかも)
         }
 
         //パーティクルの動き
@@ -295,22 +301,22 @@ void CPUParticle::Render()
     int n = 0;
     for (int i = 0; i < m_numparticle; ++i)
     {
-        if (m_data[i].type < 0)continue;
+        if (m_data[i]->type < 0)continue;
 
-        m_v[n].Pos.x = m_data[i].x;
-        m_v[n].Pos.y = m_data[i].y;
-        m_v[n].Pos.z = m_data[i].z;
-        m_v[n].Rotate.x = m_data[i].rx;
-        m_v[n].Rotate.y = m_data[i].ry;
-        m_v[n].Rotate.z = m_data[i].rz;
-        m_v[n].Rotate.w = m_data[i].rw;
-        m_v[n].Tex.x = m_data[i].w;
-        m_v[n].Tex.y = m_data[i].h;
+        m_v[n].Pos.x = m_data[i]->x;
+        m_v[n].Pos.y = m_data[i]->y;
+        m_v[n].Pos.z = m_data[i]->z;
+        m_v[n].Rotate.x = m_data[i]->rx;
+        m_v[n].Rotate.y = m_data[i]->ry;
+        m_v[n].Rotate.z = m_data[i]->rz;
+        m_v[n].Rotate.w = m_data[i]->rw;
+        m_v[n].Tex.x = m_data[i]->w;
+        m_v[n].Tex.y = m_data[i]->h;
         m_v[n].Color.x = 1;
         m_v[n].Color.y = m_v[n].Color.z = 1.0f;
-        m_v[n].Color.w = m_data[i].alpha;
+        m_v[n].Color.w = m_data[i]->alpha;
         m_v[n].Param.x = 0;
-        m_v[n].Param.y = m_data[i].type;
+        m_v[n].Param.y = m_data[i]->type;
         m_v[n].Param.z = static_cast<float>(m_scp.m_besidekoma); //横コマ数
         m_v[n].Param.w = static_cast<float>(m_scp.m_verticalkoma); //縦コマ数
         ++n;
@@ -340,7 +346,7 @@ void CPUParticle::Render()
     {
         for (int i = 0; i < m_numparticle; ++i)
         {
-            if (m_data[i].type == -1) continue; // 非表示のパーティクルをスキップ
+            if (m_data[i]->type == -1) continue; // 非表示のパーティクルをスキップ
 
             Graphics::Instance().GetDebugRenderer()->DrawSphere(m_v[i].Pos, m_scp.collsionradius, { 1,0,0,1 });
         }
@@ -352,25 +358,25 @@ void CPUParticle::Set(int type, float time, DirectX::XMFLOAT3 p, DirectX::XMFLOA
 {
     for (int i = 0; i < m_numparticle; i++)
     {
-        if (m_data[i].type >= 0) continue;
-        m_data[i].type = static_cast<float>(type);
-        m_data[i].x = p.x;
-        m_data[i].y = p.y;
-        m_data[i].z = p.z;
-        m_data[i].rx = r.x;
-        m_data[i].ry = r.y;
-        m_data[i].rz = r.z;
-        m_data[i].rw = r.w;
-        m_data[i].vx = v.x;
-        m_data[i].vy = v.y;
-        m_data[i].vz = v.z;
-        m_data[i].ax = f.x;
-        m_data[i].ay = f.y;
-        m_data[i].az = f.z;
-        m_data[i].w = size.x;
-        m_data[i].h = size.y;
-        m_data[i].alpha = 1.0f;
-        m_data[i].timer = time;
+        if (m_data[i]->type >= 0) continue;
+        m_data[i]->type = static_cast<float>(type);
+        m_data[i]->x = p.x;
+        m_data[i]->y = p.y;
+        m_data[i]->z = p.z;
+        m_data[i]->rx = r.x;
+        m_data[i]->ry = r.y;
+        m_data[i]->rz = r.z;
+        m_data[i]->rw = r.w;
+        m_data[i]->vx = v.x;
+        m_data[i]->vy = v.y;
+        m_data[i]->vz = v.z;
+        m_data[i]->ax = f.x;
+        m_data[i]->ay = f.y;
+        m_data[i]->az = f.z;
+        m_data[i]->w = size.x;
+        m_data[i]->h = size.y;
+        m_data[i]->alpha = 1.0f;
+        m_data[i]->timer = time;
         break;
     }
 }
@@ -396,53 +402,53 @@ void CPUParticle::ParticleMove(float elapsedTime)
             for (int j = 0; j < m_numparticle; j++)
             {
                 //寿命時間の割合を求める
-                float lifelate = 1 - (m_data[j].timer / m_scp.m_lifetime);
+                float lifelate = 1 - (m_data[j]->timer / m_scp.m_lifetime);
 
                 //回転のやつ
-                DirectX::XMFLOAT3 vec = Mathf::Normalize(position - DirectX::XMFLOAT3(m_data[j].x, m_data[j].y, m_data[j].z));
+                DirectX::XMFLOAT3 vec = Mathf::Normalize(position - DirectX::XMFLOAT3(m_data[j]->x, m_data[j]->y, m_data[j]->z));
                 DirectX::XMFLOAT3 X = Mathf::Cross(vec, DirectX::XMFLOAT3(1, 0, 0));
                 DirectX::XMFLOAT3 Y = Mathf::Cross(vec, DirectX::XMFLOAT3(0, 1, 0));
                 DirectX::XMFLOAT3 Z = Mathf::Cross(vec, DirectX::XMFLOAT3(0, 0, 1));
                 DirectX::XMFLOAT3 orbVelo = { X * m_scp.m_orbitalvelocity.x + Y * m_scp.m_orbitalvelocity.y + Z * m_scp.m_orbitalvelocity.z };
                 DirectX::XMFLOAT3 radialvector = -vec * m_scp.m_scaleradius;
-                m_data[j].x += (m_scp.m_velocity.x + orbVelo.x + radialvector.x) * m_scp.m_scalar;
-                m_data[j].y += (m_scp.m_velocity.y + orbVelo.y + radialvector.y) * m_scp.m_scalar;
-                m_data[j].z += (m_scp.m_velocity.z + orbVelo.z + radialvector.z) * m_scp.m_scalar;
+                m_data[j]->x += (m_scp.m_velocity.x + orbVelo.x + radialvector.x) * m_scp.m_scalar;
+                m_data[j]->y += (m_scp.m_velocity.y + orbVelo.y + radialvector.y) * m_scp.m_scalar;
+                m_data[j]->z += (m_scp.m_velocity.z + orbVelo.z + radialvector.z) * m_scp.m_scalar;
 
                 //重力ランダム
-                m_data[j].vx += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.x);
-                m_data[j].vy += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.y);
-                m_data[j].vz += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.z);
+                m_data[j]->vx += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.x);
+                m_data[j]->vy += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.y);
+                m_data[j]->vz += Mathf::RandomRange(0.0f, m_scp.m_randomvelocity.z);
 
                 //ベクトルを適用
                 float length = sqrt(m_scp.m_direction.x * m_scp.m_direction.x + m_scp.m_direction.y * m_scp.m_direction.y + m_scp.m_direction.z * m_scp.m_direction.z);
                 m_scp.m_direction.x /= length;
                 m_scp.m_direction.y /= length;
                 m_scp.m_direction.z /= length;
-                m_data[j].vx += m_scp.m_direction.x * m_scp.m_speed;
-                m_data[j].vy += m_scp.m_direction.y * m_scp.m_speed;
-                m_data[j].vz += m_scp.m_direction.z * m_scp.m_speed;
+                m_data[j]->vx += m_scp.m_direction.x * m_scp.m_speed;
+                m_data[j]->vy += m_scp.m_direction.y * m_scp.m_speed;
+                m_data[j]->vz += m_scp.m_direction.z * m_scp.m_speed;
 
                 //浮力ランダム
-                m_data[j].ax += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.x);
-                m_data[j].ay += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.y);
-                m_data[j].az += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.z);
+                m_data[j]->ax += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.x);
+                m_data[j]->ay += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.y);
+                m_data[j]->az += Mathf::RandomRange(0.0f, m_scp.m_randombuoyancy.z);
 
                 //大きさをラープで制御
-                m_data[j].w = Mathf::Lerp(m_scp.m_latesize.x, m_scp.m_latesize.y, lifelate);
-                m_data[j].h = Mathf::Lerp(m_scp.m_latesize.x, m_scp.m_latesize.y, lifelate);
+                m_data[j]->w = Mathf::Lerp(m_scp.m_latesize.x, m_scp.m_latesize.y, lifelate);
+                m_data[j]->h = Mathf::Lerp(m_scp.m_latesize.x, m_scp.m_latesize.y, lifelate);
 
                 //スケールランダム
-                DirectX::XMFLOAT2 latescale = { m_data[j].w, m_data[j].h };
+                DirectX::XMFLOAT2 latescale = { m_data[j]->w, m_data[j]->h };
                 latescale += Mathf::RandomRange(0.0f, m_scp.m_scalerandom);
-                m_data[j].w = Mathf::Lerp(m_scp.m_scale.x, latescale.x, lifelate);
-                m_data[j].h = Mathf::Lerp(m_scp.m_scale.y, latescale.y, lifelate);
+                m_data[j]->w = Mathf::Lerp(m_scp.m_scale.x, latescale.x, lifelate);
+                m_data[j]->h = Mathf::Lerp(m_scp.m_scale.y, latescale.y, lifelate);
 
                 //回転ランダム
-                m_data[j].rz += Mathf::RandomRange(0.0f, m_scp.m_randomrotation);
+                m_data[j]->rz += Mathf::RandomRange(0.0f, m_scp.m_randomrotation);
 
                 // 色の変化
-                m_data[i].alpha = Mathf::Lerp(0.0f, 1.0f, 1.0f - lifelate);
+                m_data[i]->alpha = Mathf::Lerp(0.0f, 1.0f, 1.0f - lifelate);
             }
 
             //セットする
