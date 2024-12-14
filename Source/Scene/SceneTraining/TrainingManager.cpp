@@ -487,83 +487,120 @@ void TutorialSystem::TutorialSystemStart()
         font->scale = 1.0f;
     }
 
-#pragma region 移動セリフ
+#pragma region 移動
 
-    movestr[0] = L"ようこそ　チュートリアルへ";
-    movestr[1] = L"今から基本的な操作方法を教えるのだ";
-    movestr[2] = L"まずは、移動からなのだ";
-    movestr[3] = L"キーボードのADキーで左右移動なのだ";
-    movestr[4] = L"よくできたのだ";
-    movestr[5] = L"次は縦移動なのだ";
-    movestr[6] = L"キーボードのWSキーで縦移動なのだ";
-    movestr[7] = L"素晴らしいのだ";
-    movestr[8] = L"次はジャンプなのだ";
-    movestr[9] = L"キーボードのスペースキーでジャンプなのだ";
-    movestr[10] = L"天才なのだ";
-    movestr[11] = L"次は銃の説明なのだ";
+    moveSubTitle[0].str= L"ようこそ　チュートリアルへ";
+    moveSubTitle[0].pos = {650.0f,80.0f};
+    moveSubTitle[0].UIID = 0;
+
+    moveSubTitle[1].str = L"今から基本的な操作方法を教えるのだ";
+    moveSubTitle[1].pos = {553.0f,80.0f};
+    moveSubTitle[1].UIID = 1;
+
+    moveSubTitle[2].str = L"まずは、移動からなのだ";
+    moveSubTitle[2].pos = { 701.0f,80.0f };
+    moveSubTitle[2].UIID = 2;
+
+    moveSubTitle[3].str = L"キーボードのADキーで左右移動なのだ";
+    moveSubTitle[3].pos = { 539.0f,80.0f };
+    moveSubTitle[3].UIID = 3;
+
+    moveSubTitle[4].str = L"よくできたのだ";
+    moveSubTitle[4].pos = { 806.0f,80.0f };
+    moveSubTitle[4].UIID = 4;
+
+    moveSubTitle[5].str = L"次は縦移動なのだ";
+    moveSubTitle[5].pos = { 777.0f,80.0f };
+    moveSubTitle[5].UIID = 5;
+
+    moveSubTitle[6].str = L"キーボードのWSキーで縦移動なのだ";
+    moveSubTitle[6].pos = { 556.0f,80.0f };
+    moveSubTitle[6].UIID = 6;
+
+    moveSubTitle[7].str = L"素晴らしいのだ";
+    moveSubTitle[7].pos = { 809.0f,80.0f };
+    moveSubTitle[7].UIID = 7;
+
+    moveSubTitle[8].str = L"次はジャンプなのだ";
+    moveSubTitle[8].pos = { 740.0f,80.0f };
+    moveSubTitle[8].UIID = 8;
+
+    moveSubTitle[9].str = L"キーボードのスペースキーでジャンプなのだ";
+    moveSubTitle[9].pos = { 493.0f,80.0f };
+    moveSubTitle[9].UIID = 9;
+
+    moveSubTitle[10].str = L"天才なのだ";
+    moveSubTitle[10].pos = { 834.0f,80.0f };
+    moveSubTitle[10].UIID = 10;
+
+    moveSubTitle[11].str = L"次は銃の説明なのだ";
+    moveSubTitle[11].pos = { 715.0f,80.0f };
+    moveSubTitle[11].UIID = 11;
+
 
 #pragma endregion
 #pragma region 銃セリフ
 
-    gunstr[0] = L"銃の基本説明を教えるのだ";
-    gunstr[1] = L"マウスの左クリックで、発射なのだ";
-    gunstr[2] = L"よくできたのだ";
-    gunstr[3] = L"次は説明なのだ";
+    gunSubTitle[0].str = L"銃の基本説明を教えるのだ";
+    gunSubTitle[0].pos = {674.0f,80.0f};
+    gunSubTitle[0].UIID = 0;
+
+    gunSubTitle[1].str = L"マウスの左クリックで、発射なのだ";
+    gunSubTitle[1].pos = { 571.0f,80.0f };
+    gunSubTitle[1].UIID=1;
+
+    gunSubTitle[2].str = L"よくできたのだ";
+    gunSubTitle[2].pos = { 765.0f,80.0f };
+    gunSubTitle[2].UIID =2;
+
+    gunSubTitle[3].str = L"次はスキルの説明なのだ";
+    gunSubTitle[3].pos = { 693.0f,80.0f};
+    gunSubTitle[3].UIID=3;
 
 #pragma endregion
 #pragma region スキルセリフ
 
-    skillstr[0] = L"スキルの基本操作を教えるのだ";
-    skillstr[1] = L"キーボードのEキーで発動なのだ";
-    skillstr[2] = L"素晴らしいのだ";
-    skillstr[3] = L"ウルトの基本操作を教えるのだ";
+    skillSubTitle[0].str = L"スキルの基本操作を教えるのだ";
+    skillSubTitle[0].pos = { 624.0f,80.0f };
+    skillSubTitle[0].UIID = 0;
+
+    skillSubTitle[1].str = L"キーボードのEキーで発動なのだ";
+    skillSubTitle[1].pos = { 621.0f,80.0f };
+    skillSubTitle[1].UIID =1;
+
+    skillSubTitle[2].str = L"素晴らしいのだ";
+    skillSubTitle[2].pos = { 780.0f,80.0f };
+    skillSubTitle[2].UIID = 2;
+
+    skillSubTitle[3].str = L"次はウルトの説明なのだ";
+    skillSubTitle[3].pos = { 714.0f,80.0f };
+    skillSubTitle[3].UIID=3;
 
 #pragma endregion
 #pragma region ウルトセリフ
 
-    ultstr[0] = L"ウルトの基本操作を教えるのだ";
-    ultstr[1] = L"キーボードのRキーで発動なのだ";
-    ultstr[2] = L"天才なのだ";
-    ultstr[3] = L"これでチュートリアルは終わりなのだ";
-    ultstr[4] = L"キャラクターによってスキルやウルトの内容が変わるから、よく説明を読んで欲しいのだ";
-    ultstr[5] = L"Les’t enjoyなのだ";
+    ultSubTitle[0].str = L"ウルトの基本操作を教えるのだ";
+    ultSubTitle[0].pos = { 628.0f,80.0f};
+    ultSubTitle[0].UIID = 0;
+
+    ultSubTitle[1].str = L"キーボードのRキーで発動なのだ";
+    ultSubTitle[1].pos = { 628.0f,80.0f};
+    ultSubTitle[1].UIID = 1;
+
+    ultSubTitle[2].str = L"天才なのだ";
+    ultSubTitle[2].pos = { 827.0f,80.0f};
+    ultSubTitle[2].UIID = 2;
+
+    ultSubTitle[3].str = L"これでチュートリアルは終わりなのだ";
+    ultSubTitle[3].pos = { 543.0f,80.0f};
+    ultSubTitle[3].UIID = 3;
+
+    ultSubTitle[4].str = L"Les’t enjoyなのだ";
+    ultSubTitle[4].pos = { 742.0f,80.0f};
+    ultSubTitle[4].UIID=5;
 
 #pragma endregion
 
-
-    int indexM = 0;
-    for (auto& sub : moveSubTitle)
-    {
-        sub.UIID = indexM;
-        sub.str = movestr[indexM];
-        indexM++;
-    }
-
-    int indexG = 0;
-    for (auto& sub : gunSubTitle)
-    {
-        sub.UIID = indexG;
-        sub.str = gunstr[indexG];
-        indexG++;
-    }
-
-    int indexS = 0;
-    for (auto& sub : skillSubTitle)
-    {
-        sub.UIID = indexS;
-        sub.str = skillstr[indexS];
-        indexS++;
-    }
-
-    int indexU = 0;
-    for (auto& sub : ultSubTitle)
-    {
-        sub.UIID = indexU;
-        sub.str = ultstr[indexU];
-        indexU++;
-    }
-
-   
 }
 
 void TutorialSystem::TutorialSystemUpdate(float elapsedTime)
@@ -613,7 +650,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
     {
         if (moveSubTitle[moveSubTitleIndex].subtitleTimer > moveSubTitle[moveSubTitleIndex].subtitleTime)
         {
-            if (moveSubTitleIndex == 11)
+            if (moveSubTitleIndex == 12)
             {
                 moveInspectionFlag = true;
             }
@@ -674,6 +711,9 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
     {
         NextTutorial(TutorialID::GUN);
     }
+
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = moveSubTitle[moveSubTitleIndex].str;
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = moveSubTitle[moveSubTitleIndex].pos;
 }
 
 void TutorialSystem::GunTutorialManager(float elapsedTime)
@@ -686,7 +726,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
     {
         if (gunSubTitle[gunSubTitleIndex].subtitleTimer > gunSubTitle[gunSubTitleIndex].subtitleTime)
         {
-            if (gunSubTitleIndex == 3)
+            if (gunSubTitleIndex == 4)
             {
                 gunInspectionFlag = true;
             }
@@ -711,6 +751,10 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
     {
         NextTutorial(TutorialID::SKILL);
     }
+
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = gunSubTitle[gunSubTitleIndex].str;
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = gunSubTitle[gunSubTitleIndex].pos;
+
 }
 
 void TutorialSystem::SkillTutorialManager(float elapsedTime)
@@ -723,7 +767,7 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
     {
         if (skillSubTitle[skillSubTitleIndex].subtitleTimer > skillSubTitle[skillSubTitleIndex].subtitleTime)
         {
-            if (skillSubTitleIndex == 3)
+            if (skillSubTitleIndex == 4)
             {
                 skillInspectionFlag = true;
             }
@@ -749,6 +793,10 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
     {
         NextTutorial(TutorialID::ULT);
     }
+
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = skillSubTitle[skillSubTitleIndex].str;
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = skillSubTitle[skillSubTitleIndex].pos;
+
 }
 
 void TutorialSystem::UltTutorialManager(float elapsedTime)
@@ -762,7 +810,7 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
     {
         if (ultSubTitle[ultSubTitleIndex].subtitleTimer > ultSubTitle[ultSubTitleIndex].subtitleTime)
         {
-            if (ultSubTitleIndex == 3)
+            if (ultSubTitleIndex == 5)
             {
                 ultInspectionFlag = true;
             }
@@ -785,6 +833,11 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
     {
         NextTutorial(TutorialID::END);
     }
+
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = ultSubTitle[ultSubTitleIndex].str;
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = ultSubTitle[ultSubTitleIndex].pos;
+
+
 }
 
 void TutorialSystem::OnGui()
@@ -794,6 +847,7 @@ void TutorialSystem::OnGui()
         ImGui::DragInt("moveIndex", &moveSubTitleIndex);
         ImGui::DragInt("gunIndex", &gunSubTitleIndex);
         ImGui::DragInt("skillIndex", &skillSubTitleIndex);
+        ImGui::DragFloat2("float", &skillSubTitle[skillSubTitleIndex].pos.x, 0.1);
         ImGui::DragInt("ultIndex", &ultSubTitleIndex);
 
     }
