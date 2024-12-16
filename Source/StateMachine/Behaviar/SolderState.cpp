@@ -120,6 +120,11 @@ void Solder_ESkillState::ImGui()
 #pragma endregion
 
 #pragma region 右クリックスキル
+void Solder_RightClickSkillState::Enter()
+{
+    //エフェクト再生
+    owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
+}
 void Solder_RightClickSkillState::Execute(const float& elapsedTime)
 {
     //攻撃終了処理＆攻撃処理
@@ -132,7 +137,7 @@ void Solder_RightClickSkillState::Execute(const float& elapsedTime)
     }
 
     //攻撃処理
-    BulletCreate::SoldierEskillBullet(owner->GetGameObject(), 30.0f, 2.0f);
+    BulletCreate::SoldierEskillBullet(owner->GetGameObject(), 50.0f, 20.0f);
 
     //ステート変更
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);

@@ -723,6 +723,10 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     GameObj viewObj = GameObjectManager::Instance().Create();
     viewObj->SetName("damageballView");
 
+    //パーティクル
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_rightclickskill.gpuparticle", 300);
+    bulletgpuparticle->Play();
+
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
     float ya;
     if (cameraObj)
@@ -761,10 +765,6 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
             viewObj->transform_->SetWorldPosition(gunPos);
         }
     }
-
-    //パーティクル
-    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_normalattack.gpuparticle", 200);
-    bulletgpuparticle->Play();
 
     //判定部分
     GameObj colObj = GameObjectManager::Instance().Create();

@@ -54,7 +54,7 @@ class Solder_RightClickSkillState : public Solder_BaseState
 public:
     Solder_RightClickSkillState(CharacterCom* owner) :Solder_BaseState(owner) {}
 
-    void Enter() override {};
+    void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override {};
     void ImGui() override {};

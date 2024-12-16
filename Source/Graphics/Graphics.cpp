@@ -808,7 +808,8 @@ DirectX::XMFLOAT3 Graphics::WorldToScreenPos(DirectX::XMFLOAT3 worldPos, std::sh
 //サンプラーステートの設定
 void Graphics::SetSamplerState()
 {
-    ID3D11SamplerState* santolers[] = {
+    ID3D11SamplerState* santolers[] =
+    {
         samplerStates[SAMPLEMODE::WRAP_POINT].Get(),
         samplerStates[SAMPLEMODE::WRAP_LINEAR].Get(),
         samplerStates[SAMPLEMODE::WRAP_ANISOTROPIC].Get(),
@@ -826,4 +827,5 @@ void Graphics::SetSamplerState()
 
     //ピクセルシェーダのサンプラーステート設定
     immediateContext_->PSSetSamplers(0, SAMPLEMODE::MAX, santolers);
+    immediateContext_->CSSetSamplers(0, SAMPLEMODE::MAX, santolers);
 }

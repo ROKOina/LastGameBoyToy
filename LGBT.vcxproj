@@ -137,6 +137,7 @@
     <ClInclude Include="External\imgui\imconfig.h" />
     <ClInclude Include="External\imgui\imgui.h" />
     <ClInclude Include="External\imgui\ImGuiRender.h" />
+    <ClInclude Include="External\imgui\imgui_curve.hpp" />
     <ClInclude Include="External\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="External\imgui\imgui_impl_win32.h" />
     <ClInclude Include="External\imgui\imgui_internal.h" />
@@ -271,6 +272,7 @@
     <ClInclude Include="Source\StateMachine\Behaviar\TrainingScarecrowState.h" />
     <ClInclude Include="Source\StateMachine\State.h" />
     <ClInclude Include="Source\StateMachine\StateMachine.h" />
+    <ClInclude Include="Source\SystemStruct\Curve.h" />
     <ClInclude Include="Source\SystemStruct\Dialog.h" />
     <ClInclude Include="Source\SystemStruct\Framework.h" />
     <ClInclude Include="Source\SystemStruct\HighResolutionTimer.h" />
@@ -415,6 +417,7 @@
     <ClCompile Include="Source\StateMachine\Behaviar\SolderState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\StageGimmickState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\TrainingScarecrowState.cpp" />
+    <ClCompile Include="Source\SystemStruct\Curve.cpp" />
     <ClCompile Include="Source\SystemStruct\Dialog.cpp" />
     <ClCompile Include="Source\SystemStruct\Framework.cpp" />
     <ClCompile Include="Source\SystemStruct\Logger.cpp" />
