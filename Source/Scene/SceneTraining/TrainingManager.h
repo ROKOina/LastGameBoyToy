@@ -163,11 +163,18 @@ private:
         float subtitleTimer = 0.0f;
         float subtitleTime = 1.0f;
         float subtitleAlpha = 1.0f;
+
+        DirectX::XMFLOAT2 pos = { 0,0 };
+
+        std::wstring str;
     };
 
-    SubTitle moveSubTitle[11];
-    SubTitle gunSubTitle[3];
-    SubTitle skillSubTitle[3];
+    SubTitle moveSubTitle[12];
+    SubTitle gunSubTitle[4];
+    SubTitle skillSubTitle[4];
     SubTitle ultSubTitle[5];
 
+    
+
+    
 };
