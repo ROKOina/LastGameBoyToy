@@ -3,12 +3,12 @@
 #include "Scene/Scene.h"
 #include "Netwark/Photon/BasicsApplication.h"
 
-//リザルトシーン
-class SceneNakanisi :public Scene
+//上野シーン
+class SceneUeno :public Scene
 {
 public:
-    SceneNakanisi() {};
-    ~SceneNakanisi()override {};
+    SceneUeno() {};
+    ~SceneUeno()override {};
 
     // 初期化
     void Initialize()override;
@@ -23,7 +23,7 @@ public:
     void Render(float elapsedTime)override;
 
     //名前取得
-    std::string GetName() const override { return "SceneNakanisi"; };
+    std::string GetName() const override { return "SceneUeno"; };
 
 private:
 

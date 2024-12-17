@@ -260,6 +260,7 @@
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
     <ClInclude Include="Source\Scene\SceneTraining\TrainingManager.h" />
+    <ClInclude Include="Source\Scene\SceneUeno\SceneUeno.h" />
     <ClInclude Include="Source\Setting\Setting.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BaseCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
@@ -407,6 +408,7 @@
     <ClCompile Include="Source\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\SceneTraining.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\TrainingManager.cpp" />
+    <ClCompile Include="Source\Scene\SceneUeno\SceneUeno.cpp" />
     <ClCompile Include="Source\Setting\Setting.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BaseCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />

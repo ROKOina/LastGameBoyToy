@@ -251,7 +251,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
-           
+
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
                     audioObj->FeedStart("Title", 0.0f, elapsedTime);
