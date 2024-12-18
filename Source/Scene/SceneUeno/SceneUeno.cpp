@@ -47,8 +47,6 @@ void SceneUeno::Initialize()
         stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
-        r->SetOutlineColor({ 0.000f, 0.932f, 1.000f });
-        r->SetOutlineIntensity(5.5f);
         stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
 
         //ステージ
@@ -74,7 +72,6 @@ void SceneUeno::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
-        obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
     }
 
