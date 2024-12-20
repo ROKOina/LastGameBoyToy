@@ -151,6 +151,7 @@ void CharaPicks::CharaDetails()
         };
         };
 
+    // キャラ、ID設定
     std::vector<CharacterInfo> characters = {
         getCharacterInfo("INAZAWA", 0),
         getCharacterInfo("FARAH", 1),
@@ -161,6 +162,7 @@ void CharaPicks::CharaDetails()
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
             selected.name->SetEnabled(true);
+            // スキル表示はここのコメント解除してね！
             //selected.skill->SetEnabled(true);
             selectedCharacterId = selected.id;
 
