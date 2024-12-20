@@ -140,7 +140,7 @@ private:
     float moveMaxSpeed_ = 9.5f;                //最大速度
     float firstMoveMaxSpeed = 8.0f;            //初期最大速度
     float moveAcceleration_ = 3.0f;            //加速度
-    float stepOffset = 0.5f;                   //レイキャスト用(下向き)のオフセット
+    float stepOffset = 1.0f;                   //レイキャスト用(下向き)のオフセット
     float advanceOffset = 1.0f;                //レイキャスト用(横向き)のオフセット
     bool isRaycast = true;                     //レイキャストをするか（true：使用する）
     float risespeed = 1.5f;                    //上昇速度

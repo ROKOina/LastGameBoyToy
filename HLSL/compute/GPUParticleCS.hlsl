@@ -3,7 +3,23 @@
 #include "../Constants.hlsli"
 #include "../Rand.hlsli"
 
+// カーブ用テクスチャ
+Texture1D SSGCurveTex : register(t0); //スケール、スピード、重力
+Texture1D colorCurveTex : register(t1);
+
 RWStructuredBuffer<MainParticle> particlebuffer : register(u0);
+
+// カーブテクスチャのサンプル
+float GetCurveValue(Texture1D curveTex, float t)
+{
+    return curveTex.SampleLevel(sampler_states[POINT], t, 0).r;
+}
+
+// カーブテクスチャのサンプル
+float4 GetCurve4Value(Texture1D curveTex, float t)
+{
+    return curveTex.SampleLevel(sampler_states[POINT], t, 0);
+}
 
 //パーティクルの更新
 [numthreads(THREAD, 1, 1)]
@@ -24,7 +40,10 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         p.lifetime -= deltatime;
 
         //寿命時間から割合を計算
-        float lerprate = 1 - (p.lifetime / lifeTime);
+        float lerprate = saturate(1 - (p.lifetime / lifeTime));
+
+        // 各カーブをサンプリング
+        float4 SSG = (iscurve == 1) ? GetCurve4Value(SSGCurveTex, lerprate) : float4(1, 1, 1, 1);
 
         //パーティクル方向のノーマルベクトル
         float3 normVec = normalize(position - p.position);
@@ -49,7 +68,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float3 spiralVec = float3(
             sin(time * spiralSpeed + id),
             cos(time * spiralSpeed + id),
-            sin(time * spiralSpeed + id)
+            cos(time * spiralSpeed + id)
         ) * spiralstrong; // スパイラルの強さ
 
         //トータルの速力
@@ -57,13 +76,13 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 
         // 重力の適用
         p.velocity.xyz = 0;
-        p.velocity.y -= lerp(emitStartGravity, emitEndGravity, lerprate) ;
+        p.velocity.y -= lerp(emitStartGravity, emitEndGravity, lerprate) * SSG.b;
 
         // 浮力の適用
         p.velocity.y += buoyancy;
 
         //速力更新;
-        p.velocity += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate); // 速力の更新
+        p.velocity += totalVelocity * lerp(emitStartSpeed, emitEndSpeed, lerprate) * SSG.g; // 速力の更新
         p.position += p.velocity * deltatime; // 位置の更新
     }
 
@@ -72,7 +91,11 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
     if (p.age > lifeTime && isEmitFlg == 1)
     {
          //寿命時間から割合を計算
-        float lerprate = 1 - (p.lifetime / lifeTime);
+        float lerprate = saturate(1 - (p.lifetime / lifeTime));
+
+        // 各カーブをサンプリング
+        float4 SSG = (iscurve == 1) ? GetCurve4Value(SSGCurveTex, lerprate) : float4(1, 1, 1, 1);
+        float4 colorFactor = (iscurve == 1) ? GetCurve4Value(colorCurveTex, lerprate) : float4(1, 1, 1, 1);
 
         // ランダム生成
         const float noiseScale = 1.0;
@@ -85,14 +108,14 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float pp = lerp(0.0, 1.0, random(theta + id * time));
         float phi = asin((2.0f * pp) - 1.0f);
 
-        //位置,大きさ
+        //位置
         p.position = position.xyz;
 
         //大きさをラープで制御
-        p.scale = scale * lerp(emitStartSize, emitEndSize, lerprate) * random(f0);
+        p.scale = (scale * lerp(emitStartSize, emitEndSize, lerprate) * SSG.r) * random(f0);
 
         //色をラープで制御
-        p.color = baseColor * lerp(emitStartColor, emitEndColor, lerprate) * random(f2);
+        p.color = (baseColor * lerp(emitStartColor, emitEndColor, lerprate) * colorFactor) * random(f2);
 
         //半径のボリューム
         float tick = shape.z * 0.9f; //オフセット値　0.9f

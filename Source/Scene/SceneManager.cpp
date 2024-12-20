@@ -13,6 +13,7 @@
 #include "SceneTraining/SceneTraining.h"
 #include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\SceneNakanisi\SceneNakanisi.h"
+#include "SceneUeno\SceneUeno.h"
 
 #include "Setting/Setting.h"
 
@@ -134,6 +135,7 @@ void SceneManager::ImGui()
                 "SceneLobby",
                 "SceneResult",
                 "SceneNakanisi",
+                "SceneUeno",
             };
             int scene_id = 0;
             int last_index = sizeof(scene_names) / sizeof(const char*);
@@ -154,6 +156,7 @@ void SceneManager::ImGui()
                     new SceneLobby,
                     new SceneResult,
                     new SceneNakanisi,
+                    new SceneUeno,
                 };
                 ChangeScene((scenes[scene_id]));
                 for (int i = 0; i < _countof(scenes); i++)
@@ -172,15 +175,10 @@ DirectX::XMFLOAT3 SceneManager::InputVec(std::shared_ptr<GameObject> obj) const
     std::shared_ptr<GameObject> cameraObj = SceneManager::Instance().GetActiveCamera();
     CameraCom* cameraCom = cameraObj->GetComponent<CameraCom>().get();
 
-    //// 入力情報を取得
-    //GamePad& gamePad = Input::Instance().GetGamePad();
-
     //ステックのXY取得
     DirectX::XMFLOAT2 leftStick = obj->GetComponent<CharacterCom>()->GetLeftStick();
     float ax = leftStick.x;
     float ay = leftStick.y;
-    //float ax = gamePad.GetAxisLX();
-    //float ay = gamePad.GetAxisLY();
 
     // カメラ方向とスティックの入力値によって進行方向を計算する
     const DirectX::XMFLOAT3& rightVec = cameraCom->GetRight();

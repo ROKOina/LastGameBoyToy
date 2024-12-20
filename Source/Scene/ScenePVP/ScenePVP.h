@@ -5,6 +5,8 @@
 #include "Component\System\GameObject.h"
 
 #include "PVPGameSystem/PVPGameSystem.h"
+// 前方宣言
+class CharaPicks;
 
 //リザルトシーン
 class ScenePVP :public Scene
@@ -37,9 +39,6 @@ public:
     //名前取得
     std::string GetName() const override { return "ScenePVP"; };
 
-    //UIのゲームオブジェクト生成
-    void CreateUiObject();
-
 private:
 
     //オブジェクト生成関数
@@ -59,6 +58,7 @@ private:
     void LobbyBackSprUpdate(float elapsedTime);
 private:
 
+    std::shared_ptr<CharaPicks>          charaPicks;
     std::unique_ptr<BasicsApplication> photonNet;
 
     bool isGame = false;

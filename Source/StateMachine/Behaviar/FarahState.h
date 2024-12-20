@@ -26,7 +26,7 @@ class Farah_MainAttackState : public Farah_BaseState
 public:
     Farah_MainAttackState(CharacterCom* owner) :Farah_BaseState(owner) {}
 
-    void Enter() override;
+    void Enter() override {};
     void Execute(const float& elapsedTime) override;
     void Exit() override {};
     void ImGui() override {};
@@ -39,7 +39,7 @@ class Farah_ESkillState : public Farah_BaseState
 public:
     Farah_ESkillState(CharacterCom* owner) :Farah_BaseState(owner) {}
 
-    void Enter() override;
+    void Enter() override {};
     void Execute(const float& elapsedTime) override;
     void Exit() override {};
     void ImGui() override {};
