@@ -136,11 +136,10 @@ void CharaPicks::CharaPicksUpdate(float elapsedTime)
 // キャラ詳細
 void CharaPicks::CharaDetails()
 {
-    // アイコンが横並び
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    // アイコンに触れていたら表示
+    // アイコンを選択したら表示
     {
         auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
 
