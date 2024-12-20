@@ -37,6 +37,8 @@
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
 
+#include "PvPUi/CharaPicks.h"
+
 void ScenePVP::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -58,6 +60,8 @@ void ScenePVP::Initialize()
     //ロビー選択から始まる
     //InitializePVP();
     InitializeLobbySelect();
+
+    InitializeCharaSelect();
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -96,6 +100,12 @@ void ScenePVP::InitializeLobby()
 
 void ScenePVP::InitializeCharaSelect()
 {
+
+    charaPicks = std::make_shared<CharaPicks>();
+
+    // キャラピックUI生成
+    charaPicks->CreateCharaPicksUiObject();
+
     //kari
     {
         std::shared_ptr<GameObject> kariCHARASELECT = GameObjectManager::Instance().Create();
@@ -280,6 +290,9 @@ void ScenePVP::Update(float elapsedTime)
     {
         InitializePVP();
     }
+
+    // キャラピック更新処理
+    charaPicks->CharaPicksUpdate(elapsedTime);
 }
 
 void ScenePVP::Render(float elapsedTime)

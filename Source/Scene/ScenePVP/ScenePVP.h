@@ -5,6 +5,8 @@
 #include "Component\System\GameObject.h"
 
 #include "PVPGameSystem/PVPGameSystem.h"
+// 前方宣言
+class CharaPicks;
 
 //リザルトシーン
 class ScenePVP :public Scene
@@ -47,6 +49,7 @@ private:
 
 private:
 
+    std::shared_ptr<CharaPicks>          charaPicks;
     std::unique_ptr<BasicsApplication> photonNet;
 
     bool isGame = false;
