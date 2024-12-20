@@ -794,6 +794,8 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     bulletCom->SetAliveTime(5.0f);
     bulletCom->SetDamageValue(-damageValue);
     bulletCom->SetViewBullet(viewObj);
+    std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
+    k->SetKnockBackForce({ 10,3,10 });
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);

@@ -47,7 +47,6 @@ void SceneLGBT::Initialize()
             arm->transform_->SetScale({ 0.5f,0.5f,0.5f });
             std::shared_ptr<RendererCom> r = arm->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
-
         }
     }
 
@@ -65,7 +64,6 @@ void SceneLGBT::Initialize()
         stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/", "StageJson/ColliderStage.mdl", "__", 0.005f);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
-
     }
 
     //コンスタントバッファの初期化

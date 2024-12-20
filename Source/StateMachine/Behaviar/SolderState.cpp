@@ -99,17 +99,6 @@ void Solder_ESkillState::Enter()
 }
 void Solder_ESkillState::Execute(const float& elapsedTime)
 {
-    //攻撃終了処理＆攻撃処理
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
-    }
-
-    //ステート変更
-    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
 void Solder_ESkillState::Exit()
 {
