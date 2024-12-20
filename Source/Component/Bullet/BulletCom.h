@@ -79,4 +79,5 @@ public:
 
     //ソルジャースキル
     static void SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, int damageValue = 10);
+    static void SoldierStanBall(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int stanValue = 3);
 };

@@ -96,15 +96,25 @@ void Solder_UltState::ImGui()
 #pragma region Eskill
 void Solder_ESkillState::Enter()
 {
+    //エフェクト再生
+    owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
 }
 void Solder_ESkillState::Execute(const float& elapsedTime)
 {
-}
-void Solder_ESkillState::Exit()
-{
-}
-void Solder_ESkillState::ImGui()
-{
+    //攻撃終了処理＆攻撃処理
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        armAnim->SetAnimationSeconds(0.3f);
+    }
+
+    //攻撃処理(スタンボール)
+    BulletCreate::SoldierStanBall(owner->GetGameObject(), 50.0f, 10.0f, 2.0f);
+
+    //ステート変更
+    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
 #pragma endregion
 

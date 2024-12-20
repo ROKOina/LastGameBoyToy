@@ -802,3 +802,92 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(damageValue);
 }
+
+//ソルジャースタン
+void BulletCreate::SoldierStanBall(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power, int stanValue)
+{
+    //発射位置算出用変数定義
+    DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
+    auto& cameraObj = objPoint->GetChildFind("cameraPostPlayer");
+
+    //見た目部分
+    GameObj viewObj = GameObjectManager::Instance().Create();
+    viewObj->SetName("damageballView");
+
+    //パーティクル
+    const auto& bulletgpuparticle = viewObj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_stan.gpuparticle", 300);
+    bulletgpuparticle->Play();
+
+    DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
+    float ya;
+    if (cameraObj)
+        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
+    else
+        ya = 1.5f;
+
+    firePos.y += ya;
+    viewObj->transform_->SetWorldPosition(firePos);
+
+    //弾発射
+    std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
+    moveCom->SetGravity(0.0f);
+    moveCom->SetFriction(0.0f);
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+    moveCom->SetIsRaycast(false);
+
+    //銃口から発射する
+    if (cameraObj)
+    {
+        auto& arm = cameraObj->GetChildFind("armChild");
+        if (arm)
+        {
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& node = model->FindNode("gun2");
+
+            DirectX::XMFLOAT3 gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+            DirectX::XMFLOAT3 cameraPos = cameraObj->transform_->GetWorldPosition();
+
+            //カメラの子供にする
+            DirectX::XMFLOAT3 cameraFromGun = gunPos - cameraPos;
+            DirectX::XMFLOAT3 fpsPos = fpsDir * 60;
+
+            DirectX::XMFLOAT3 velo = fpsPos - cameraFromGun;
+            moveCom->SetNonMaxSpeedVelocity(Mathf::Normalize(velo) * bulletSpeed);
+            viewObj->transform_->SetWorldPosition(gunPos);
+        }
+    }
+
+    //判定部分
+    GameObj colObj = GameObjectManager::Instance().Create();
+    colObj->SetName("stanball");
+    colObj->transform_->SetWorldPosition(firePos);
+
+    ///////////////////////////////
+
+    //弾発射
+    moveCom = colObj->AddComponent<MovementCom>();
+    moveCom->SetGravity(0.0f);
+    moveCom->SetFriction(0.0f);
+    moveCom->SetIsRaycast(false);
+    moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+
+    std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
+    coll->SetMyTag(COLLIDER_TAG::Bullet);
+    if (std::strcmp(objPoint->GetName(), "player") == 0)
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    else
+        coll->SetJudgeTag(COLLIDER_TAG::Player);
+    coll->SetRadius(0.6f);
+
+    //弾
+    int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
+    bulletCom->SetAliveTime(5.0f);
+    bulletCom->SetDamageValue(-power);
+    bulletCom->SetViewBullet(viewObj);
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::STAN);
+    hit->SetValue(stanValue);
+}
