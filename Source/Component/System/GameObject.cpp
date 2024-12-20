@@ -457,8 +457,12 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
             // ImGui上にマウスカーソルがある場合は処理しない
             if (!io.WantCaptureMouse) return;
 
-            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
-            GameObjectManager::Instance().Find("freecamera")->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
+            auto& f = GameObjectManager::Instance().Find("freecamera");
+            if (f)
+            {
+                f->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
+                f->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
+            }
         }
     }
 

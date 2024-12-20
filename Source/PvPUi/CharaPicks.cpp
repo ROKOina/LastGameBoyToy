@@ -35,8 +35,6 @@ void CharaPicks::CreateCharaPicksUiObject()
                 skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill0.ui", Sprite::SpriteShader::DEFALT, false);
                 skill->SetEnabled(false);
             }
-
-
         }
         // FARAH
         {
@@ -49,7 +47,7 @@ void CharaPicks::CreateCharaPicksUiObject()
                 auto& name = chara->AddChildObject();
                 name->SetName("name");
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName1.ui", Sprite::SpriteShader::DEFALT, false);
-                name->GetComponent<Sprite>()->SetEnabled(false);
+                name->SetEnabled(false);
             }
 
 
@@ -58,7 +56,7 @@ void CharaPicks::CreateCharaPicksUiObject()
                 auto& skill = chara->AddChildObject();
                 skill->SetName("skill");
                 skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill1.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->GetComponent<Sprite>()->SetEnabled(false);
+                skill->SetEnabled(false);
             }
 
         }
@@ -73,7 +71,7 @@ void CharaPicks::CreateCharaPicksUiObject()
                 auto& name = chara->AddChildObject();
                 name->SetName("name");
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName2.ui", Sprite::SpriteShader::DEFALT, false);
-                name->GetComponent<Sprite>()->SetEnabled(false);
+                name->SetEnabled(false);
             }
 
             // スキル表記
@@ -81,7 +79,7 @@ void CharaPicks::CreateCharaPicksUiObject()
                 auto& skill = chara->AddChildObject();
                 skill->SetName("skill");
                 skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill2.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->GetComponent<Sprite>()->SetEnabled(false);
+                skill->SetEnabled(false);
             }
 
         }
@@ -96,7 +94,7 @@ void CharaPicks::CreateCharaPicksUiObject()
                 auto& name = chara->AddChildObject();
                 name->SetName("name");
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName3.ui", Sprite::SpriteShader::DEFALT, false);
-                name->GetComponent<Sprite>()->SetEnabled(false);
+                name->SetEnabled(false);
             }
 
             // スキル表記
@@ -104,7 +102,7 @@ void CharaPicks::CreateCharaPicksUiObject()
                 auto& skill = chara->AddChildObject();
                 skill->SetName("skill");
                 skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill3.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->GetComponent<Sprite>()->SetEnabled(false);
+                skill->SetEnabled(false);
             }
 
         }
@@ -114,6 +112,7 @@ void CharaPicks::CreateCharaPicksUiObject()
     {
         auto& decision = charaPicksCanvas->AddChildObject();
         decision->SetName("decision");
+        decision->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
     }
 
     // 時間制限
@@ -128,50 +127,81 @@ void CharaPicks::CharaPicksUpdate(float elapsedTime)
 {
     // 各キャラ詳細
     CharaDetails();
-    
+
     // 時間制限システム
     TimeLimitSystem(elapsedTime);
+
+    // 決定処理
+    DecisionButton();
 }
 
 // キャラ詳細
 void CharaPicks::CharaDetails()
 {
-    // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
+    // 決定していたら操作不可
+    if (decisionFlg) return;
+
     GamePad& gamePad = Input::Instance().GetGamePad();
+    auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
 
-    // アイコンを選択したら表示
-    {
-        auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
+    auto getCharacterInfo = [&](const std::string& charaName, int id) -> CharacterInfo {
+        auto& chara = canvas->GetChildFind(charaName.c_str());
+        return {
+            chara,
+            chara->GetComponent<Sprite>(),
+            chara->GetChildFind("name"),
+            chara->GetChildFind("skill"),
+            id
+        };
+        };
 
-        {
-            auto& chara = canvas->GetChildFind("INAZAWA");
-            auto& sprite = chara->GetComponent<Sprite>();
+    // キャラ、ID設定
+    std::vector<CharacterInfo> characters = {
+        getCharacterInfo("INAZAWA", 0),
+        getCharacterInfo("FARAH", 1),
+        getCharacterInfo("JANKRAT", 2),
+        getCharacterInfo("chara4", 3)
+    };
 
-            auto& name = chara->GetChildFind("name");
-            auto& skill = chara->GetChildFind("skill");
+    // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
+    auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
+            selected.name->SetEnabled(true);
+            // スキル表示はここのコメント解除してね！
+            //selected.skill->SetEnabled(true);
+            selectedCharacterId = selected.id;
 
-            // スプライト判定
-            if (sprite->GetHitSprite())
-            {
-                name->SetEnabled(true);
-                skill->SetEnabled(true);
-            }
-            else
-            {
-                name->SetEnabled(false);
-                skill->SetEnabled(false);
+            for (auto& other : others) {
+                if (&other != &selected) {
+                    other.name->SetEnabled(false);
+                    other.skill->SetEnabled(false);
+                }
             }
         }
-    }
+        };
 
-
-    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
-    {
-
+    for (size_t i = 0; i < characters.size(); ++i) {
+        std::vector<CharacterInfo> others = characters;
+        others.erase(others.begin() + i);
+        handleCharacterSelection(characters[i], others);
     }
 }
 
 // 決定処理
+void CharaPicks::DecisionButton()
+{
+    auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
+    auto& decisionButton = canvas->GetChildFind("decision");
+    auto& sprite = decisionButton->GetComponent<Sprite>();
+
+    // 決定ボタンが押され、かつキャラが選択されている場合のみ処理を実行
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
+    {
+        decisionFlg = true;
+        decisionButton->SetEnabled(false);
+    }
+}
 
 // 時間制限システム
 void CharaPicks::TimeLimitSystem(float elapsedTime)

@@ -527,6 +527,7 @@ void PlayerUIManager::Register()
     use_skill[0] = USE_SKILL::E;
     use_skill[1] = USE_SKILL::RIGHT_CLICK;
     int count = 0;
+    if (player.expired())return;
     for (int i = 0; i < sizeof(use_skill) / sizeof(USE_SKILL); i++) {
         if (player.lock()->GetComponent<CharacterCom>()->GetUseSkill() == use_skill[i]) {
             CreateSkillUI(use_skill[i], count);
