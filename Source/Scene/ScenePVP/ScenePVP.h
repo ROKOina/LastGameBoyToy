@@ -51,6 +51,12 @@ private:
     //画面に応じた更新処理
     void TransitionUpdate(float elapsedTime);
 
+    //ロビー選択時
+    void LobbySelectFontUpdate(float elapsedTime);  //fontUpdate
+    //ロビー時
+    void LobbyFontUpdate(float elapsedTime);    //fontUpdate
+    //背景Uodate
+    void LobbyBackSprUpdate(float elapsedTime);
 private:
 
     std::unique_ptr<BasicsApplication> photonNet;

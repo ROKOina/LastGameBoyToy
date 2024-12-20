@@ -1138,9 +1138,9 @@ void PhotonLib::GameRecv(NetData recvData)
     if (recvData.isMasterClient)
     {
         //チームを保存
-        for (auto& s : saveInputPhoton)
+        for (int pId = 0; pId < 4; ++pId)
         {
-            s.teamID = recvData.gameData.teamID[s.playerId];
+            saveInputPhoton[pId].teamID = recvData.gameData.teamID[pId];
         }
     }
     //ゲーム開始フラグ
