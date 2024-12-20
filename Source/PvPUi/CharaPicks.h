@@ -24,14 +24,13 @@ public:
 private:
     // キャラ詳細（スキル表示、キャラ名、選択キャラ表示）
     void CharaDetails();
-
-    // キャラアイコン、決定処理
-    
-
+    // 決定処理
+    void DecisionButton();
     // 時間制限
     void TimeLimitSystem(float elapsedTime);
 
 private:
+
     struct CharacterInfo {
         std::shared_ptr<GameObject> chara;
         std::shared_ptr<Sprite> sprite;
@@ -40,8 +39,9 @@ private:
         int id;
     };
 
-
     // 選択されたキャラのID
     int selectedCharacterId = -1;
+    // 決定フラグ
+    bool decisionFlg = false;
 };
 
