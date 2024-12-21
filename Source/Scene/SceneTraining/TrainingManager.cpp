@@ -85,7 +85,32 @@ void TrainingManager::ChangeTutorialFlag()
     GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -0.115f,0.0f,3.489f });
     GameObjectManager::Instance().Find("player")->transform_->SetEulerRotation({0.0f,180.119f,0.0f});
     TrainingSystem::Instance().TrainingObjUnhide();
+    TutorialSystem::Instance().TutorialUIUnhind();
+    
     tutorialFlag = true;
+}
+
+void TrainingManager::ChangeTrainigFlag()
+{
+   
+    TutorialSystem::Instance().TutorialFlagClear();
+    TutorialSystem::Instance().TutorialUIDisplay();
+    tutorialFlag = false;
+}
+
+void TrainingManager::Changeblackout()
+{
+    //暗転
+    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+    GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
+    
+}
+
+void TrainingManager::Changelightchange()
+{
+    //暗転
+    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+    GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, parameters);
 }
 
 void TrainingManager::OnGUI()
@@ -468,6 +493,22 @@ void TrainingSystem::TrainingObjUnhide()
         GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->SetEnabled(false);
     }
 }
+
+
+void TrainingSystem::TrainingObjDisplay()
+{
+    GameObjectManager::Instance().Find("scarecrow1")->SetEnabled(true);
+    GameObjectManager::Instance().Find("scarecrow2")->SetEnabled(true);
+    GameObjectManager::Instance().Find("scarecrow3")->SetEnabled(true);
+    GameObjectManager::Instance().Find("scarecrow4")->SetEnabled(true);
+    GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(true);
+    GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->ReSpawn(1);
+
+    if (GameObjectManager::Instance().Find("ULTSKILLMAXITEM") != nullptr)
+    {
+        GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->SetEnabled(true);
+    }
+}
 #pragma endregion
 
 
@@ -483,8 +524,10 @@ void TutorialSystem::TutorialSystemStart()
         obj->SetName("testFont");
         std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
         font->position = { 0,0 };
-        font->str = L"ab";  //L付けてね
+        font->str = L"";  //L付けてね
         font->scale = 1.0f;
+        font->color.w = 0.0f;
+        font->SetEnabled(false);
     }
 
 #pragma region 移動
@@ -617,6 +660,12 @@ void TutorialSystem::TutorialManagerSystem(float elapsedTime)
 {
     switch (tutorialID)
     {
+    case TutorialID::BLACK:
+        BlackOutManager(elapsedTime);
+        break;
+    case TutorialID::LIGHT:
+        LightChangeManger(elapsedTime);
+        break;
     case TutorialID::MOVE:
         MoveTutorialManager(elapsedTime);
         break;
@@ -629,6 +678,12 @@ void TutorialSystem::TutorialManagerSystem(float elapsedTime)
     case TutorialID::ULT:
         UltTutorialManager(elapsedTime);
         break;
+    case TutorialID::ENDBLACK:
+        EndBlackTutorialManager(elapsedTime);
+        break;
+    case TutorialID::END:
+        EndTutorialManager(elapsedTime);
+        break;
     }
 }
 
@@ -637,28 +692,102 @@ void TutorialSystem::NextTutorial(TutorialID id)
     tutorialID = id;
 }
 
+
+//暗転
+void TutorialSystem::BlackOutManager(float elapsedTime)
+{
+    if (!flag)
+    {
+        TrainingManager::Instance().Changeblackout();
+        flag = true;
+    }
+
+    if (flag)
+    {
+        blackTimer += elapsedTime;
+    }
+
+    if (blackTime<blackTimer)
+    {
+        NextTutorial(TutorialID::LIGHT);
+        blackTimer = 0.0f;
+        flag = false;
+    }
+}
+
+//明転
+void TutorialSystem::LightChangeManger(float elapsedTime)
+{
+    if (!flag)
+    {
+        TrainingManager::Instance().Changelightchange();
+        GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->SetEnabled(true);
+        flag = true;
+    }
+    
+    if (flag)
+    {
+        GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+    }
+
+    if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w<1.0f)
+    {
+        NextTutorial(TutorialID::MOVE);
+        GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+        upFlag = true;
+        flag = false;
+    }
+
+}
+
 //移動のロジック
 void TutorialSystem::MoveTutorialManager(float elapsedTime)
 {
-    //タイマー更新
-    moveSubTitle[moveSubTitleIndex].subtitleTimer += elapsedTime;
+    
 
 
     InputVec = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetLeftStick();
 
-    if (moveSubTitleIndex != 3&&moveSubTitleIndex!=6&&moveSubTitleIndex!=9)
+    if (moveSubTitleIndex != 3 && moveSubTitleIndex != 6 && moveSubTitleIndex != 9)
     {
-        if (moveSubTitle[moveSubTitleIndex].subtitleTimer > moveSubTitle[moveSubTitleIndex].subtitleTime)
+        if (upFlag)
         {
-            if (moveSubTitleIndex == 12)
+            //タイマー更新
+            moveSubTitle[moveSubTitleIndex].subtitleTimer += elapsedTime;
+            if (moveSubTitle[moveSubTitleIndex].subtitleTimer > moveSubTitle[moveSubTitleIndex].subtitleTime)
             {
-                moveInspectionFlag = true;
-            }
-            else
-            {
-                moveSubTitleIndex += 1;
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    if (moveSubTitleIndex == 11)
+                    {
+                        moveInspectionFlag = true;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                    else
+                    {
+                        moveSubTitleIndex += 1;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                }
             }
         }
+        else if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
+
     }
     //横移動
     else if(moveSubTitleIndex==3)
@@ -673,15 +802,52 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
             moveAFlag = true;
         }
 
+
+
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
         if (moveAFlag && moveDFlag)
         {
-            moveSubTitleIndex += 1;
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    moveSubTitleIndex += 1;
+                }
+
+            }
         }
 
     }
     //縦移動
     else if (moveSubTitleIndex == 6)
     {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
         if (InputVec.y == 1.0f)
         {
             moveWFlag = true;
@@ -692,17 +858,59 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
             moveSFlag = true;
         }
 
+
+
         if (moveWFlag && moveSFlag)
         {
-            moveSubTitleIndex += 1;
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    moveSubTitleIndex += 1;
+                }
+
+            }
         }
     }
     //ジャンプ
     else if (moveSubTitleIndex == 9)
     {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
+
         if (CharacterInput::JumpButton_SPACE & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonDown())
         {
-            moveSubTitleIndex += 1;
+            jumpFlag = true;
+        }
+
+        if (jumpFlag)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    moveSubTitleIndex += 1;
+                }
+
+            }
         }
     }
 
@@ -718,31 +926,85 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
 void TutorialSystem::GunTutorialManager(float elapsedTime)
 {
-    //タイマー更新
-    gunSubTitle[gunSubTitleIndex].subtitleTimer += elapsedTime;
+    
 
 
     if (gunSubTitleIndex != 1)
     {
-        if (gunSubTitle[gunSubTitleIndex].subtitleTimer > gunSubTitle[gunSubTitleIndex].subtitleTime)
+        if (upFlag)
         {
-            if (gunSubTitleIndex == 4)
+            //タイマー更新
+            gunSubTitle[gunSubTitleIndex].subtitleTimer += elapsedTime;
+            if (gunSubTitle[gunSubTitleIndex].subtitleTimer > gunSubTitle[gunSubTitleIndex].subtitleTime)
             {
-                gunInspectionFlag = true;
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    if (gunSubTitleIndex == 3)
+                    {
+                        gunInspectionFlag = true;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                    else
+                    {
+                        gunSubTitleIndex += 1;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                }
             }
-            else
+        }
+        else if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
             {
-                gunSubTitleIndex += 1;
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
             }
         }
     }
     else if (gunSubTitleIndex==1)
     {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
         //攻撃終了処理＆攻撃処理
         if (CharacterInput::MainAttackButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
         {
-            gunSubTitleIndex += 1;
+            gunFlag = true;
         }
+
+        if (gunFlag)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    gunSubTitleIndex += 1;
+                }
+
+            }
+        }
+
+           
     }
 
 
@@ -759,31 +1021,83 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 
 void TutorialSystem::SkillTutorialManager(float elapsedTime)
 {
-    //タイマー更新
-    skillSubTitle[skillSubTitleIndex].subtitleTimer += elapsedTime;
 
 
     if (skillSubTitleIndex != 1)
     {
-        if (skillSubTitle[skillSubTitleIndex].subtitleTimer > skillSubTitle[skillSubTitleIndex].subtitleTime)
+        if (upFlag)
         {
-            if (skillSubTitleIndex == 4)
+            //タイマー更新
+            skillSubTitle[skillSubTitleIndex].subtitleTimer += elapsedTime;
+            if (skillSubTitle[skillSubTitleIndex].subtitleTimer > skillSubTitle[skillSubTitleIndex].subtitleTime)
             {
-                skillInspectionFlag = true;
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    if (skillSubTitleIndex == 3)
+                    {
+                        skillInspectionFlag = true;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                    else
+                    {
+                        skillSubTitleIndex += 1;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                }
             }
-            else
+        }
+        else if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
             {
-                skillSubTitleIndex += 1;
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
             }
         }
     }
     else if (skillSubTitleIndex == 1)
     {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
         //攻撃終了処理＆攻撃処理
         if (CharacterInput::MainSkillButton_E & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
         {
-            skillSubTitleIndex += 1;
+            skillFlag = true;
         }
+
+        if (skillFlag)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    skillSubTitleIndex += 1;
+                }
+
+            }
+        }
+          
     }
 
 
@@ -802,41 +1116,249 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 void TutorialSystem::UltTutorialManager(float elapsedTime)
 {
 
-    //タイマー更新
-    ultSubTitle[ultSubTitleIndex].subtitleTimer += elapsedTime;
 
 
     if (ultSubTitleIndex != 1)
     {
-        if (ultSubTitle[ultSubTitleIndex].subtitleTimer > ultSubTitle[ultSubTitleIndex].subtitleTime)
+        if (upFlag)
         {
-            if (ultSubTitleIndex == 5)
+            //タイマー更新
+            ultSubTitle[ultSubTitleIndex].subtitleTimer += elapsedTime;
+            if (ultSubTitle[ultSubTitleIndex].subtitleTimer > ultSubTitle[ultSubTitleIndex].subtitleTime)
             {
-                ultInspectionFlag = true;
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    if (ultSubTitleIndex == 4)
+                    {
+                        ultInspectionFlag = true;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                    else
+                    {
+                        ultSubTitleIndex += 1;
+                        upFlag = false;
+                        downFlag = true;
+                    }
+                }
             }
-            else
+        }
+        else if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
             {
-                ultSubTitleIndex += 1;
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
             }
         }
     }
     else if (ultSubTitleIndex == 1)
     {
+
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
         //攻撃終了処理＆攻撃処理
         if (CharacterInput::UltimetButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
         {
-            ultSubTitleIndex += 1;
+            ultFlag = true;
+           
         }
+
+        if (ultFlag)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    ultSubTitleIndex += 1;
+                }
+
+            }
+        }
+
+        
     }
 
     if (ultInspectionFlag)
     {
-        NextTutorial(TutorialID::END);
+        NextTutorial(TutorialID::ENDBLACK);
     }
 
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = ultSubTitle[ultSubTitleIndex].str;
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = ultSubTitle[ultSubTitleIndex].pos;
 
+
+}
+
+void TutorialSystem::EndBlackTutorialManager(float elapsedTime)
+{
+    if (!flag)
+    {
+        TrainingManager::Instance().Changeblackout();
+        flag = true;
+    }
+
+    if (flag)
+    {
+        blackTimer += elapsedTime;
+    }
+
+    if (blackTime < blackTimer)
+    {
+        TrainingSystem::Instance().TrainingObjDisplay();
+        blackTimer = 0.0f;
+        flag = false;
+        NextTutorial(TutorialID::END);
+    }
+}
+
+void TutorialSystem::EndTutorialManager(float elapsedTime)
+{
+    if (!flag)
+    {
+        TrainingManager::Instance().Changelightchange();
+
+        flag = true;
+    }
+
+    if (flag)
+    {
+        TrainingManager::Instance().ChangeTrainigFlag();
+    }
+}
+
+void TutorialSystem::TutorialFlagClear()
+{
+    tutorialID = 0;
+
+    moveSubTitleIndex = 0;
+    gunSubTitleIndex = 0;
+    skillSubTitleIndex = 0;
+    ultSubTitleIndex = 0;
+
+    lightTimer = 0.0f;
+
+    blackTimer = 0.0f;
+
+    moveInspectionFlag = false;         //動きのチュートリアル検査
+    gunInspectionFlag = false;          //銃のチュートリアル検査
+    skillInspectionFlag = false;        //スキルのチュートリアル検査
+    ultInspectionFlag = false;          //ウルトのチュートリアル検査
+
+    flag = false;
+
+    upFlag = false;
+    downFlag = false;
+    jumpFlag = false;
+    gunFlag = false;
+    skillFlag = false;
+    ultFlag = false;
+
+    moveAFlag = false;
+    moveDFlag = false;
+    moveWFlag = false;
+    moveSFlag = false;
+    moveJumpFlag = false;
+
+
+    // moveSubTitle のリセット
+    for (auto& subtitle : moveSubTitle)
+    {
+        subtitle.subtitleTimer = 0.0f;
+    }
+
+    // gunSubTitle のリセット
+    for (auto& subtitle : gunSubTitle)
+    {
+        subtitle.subtitleTimer = 0.0f;
+    }
+
+    // skillSubTitle のリセット
+    for (auto& subtitle : skillSubTitle)
+    {
+        subtitle.subtitleTimer = 0.0f;
+    }
+
+    // ultSubTitle のリセット
+    for (auto& subtitle : ultSubTitle)
+    {
+        subtitle.subtitleTimer = 0.0f;
+    }
+
+}
+
+void TutorialSystem::TutorialUIUnhind()
+{
+    GameObjectManager::Instance().Find("reticle")->SetEnabled(false);
+    GameObjectManager::Instance().Find("HpFrame")->SetEnabled(false);
+    GameObjectManager::Instance().Find("HpGauge")->SetEnabled(false);
+    GameObjectManager::Instance().Find("UltFrame")->SetEnabled(false);
+    GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(false);
+    GameObjectManager::Instance().Find("UltGauge")->SetEnabled(false);
+    GameObjectManager::Instance().Find("ultCore")->SetEnabled(false);
+
+    GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(false);
+    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
+    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
+    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
+    GameObjectManager::Instance().Find("Skill_E")->SetEnabled(false);
+    GameObjectManager::Instance().Find("SkillCore")->SetEnabled(false);
+
+
+    GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(false);
+    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
+    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
+    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
+    GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(false);
+    GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(false);
+    GameObjectManager::Instance().Find("Decoration")->SetEnabled(false);
+    GameObjectManager::Instance().Find("HitEffect")->SetEnabled(false);
+}
+
+void TutorialSystem::TutorialUIDisplay()
+{
+    GameObjectManager::Instance().Find("reticle")->SetEnabled(true);
+    GameObjectManager::Instance().Find("HpFrame")->SetEnabled(true);
+    GameObjectManager::Instance().Find("HpGauge")->SetEnabled(true);
+    GameObjectManager::Instance().Find("UltFrame")->SetEnabled(true);
+    GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(true);
+    GameObjectManager::Instance().Find("UltGauge")->SetEnabled(true);
+    GameObjectManager::Instance().Find("ultCore")->SetEnabled(true);
+
+    GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(true);
+    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(true);
+    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(true);
+    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(true);
+    GameObjectManager::Instance().Find("Skill_E")->SetEnabled(true);
+    GameObjectManager::Instance().Find("SkillCore")->SetEnabled(true);
+
+    GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(true);
+    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(true);
+    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(true);
+    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(true);
+    GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(true);
+    GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(true);
+    GameObjectManager::Instance().Find("Decoration")->SetEnabled(true);
+    GameObjectManager::Instance().Find("HitEffect")->SetEnabled(true);
 
 }
 
