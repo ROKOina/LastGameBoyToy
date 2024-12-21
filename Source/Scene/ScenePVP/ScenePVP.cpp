@@ -290,7 +290,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::FARAH, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj);
     }
 
     //snowparticle
@@ -556,6 +556,7 @@ void ScenePVP::TransitionUpdate(float elapsedTime)
         LobbyBackSprUpdate(elapsedTime);    //”wŒi
         break;
     case 2: //ƒLƒƒƒ‰‘I‘ð
+        CharaSelectUpdate(elapsedTime);
         LobbyBackSprUpdate(elapsedTime);    //”wŒi
         break;
     case 3: //ƒQ[ƒ€’†
@@ -951,6 +952,17 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                     net->SetTeamID(PVPGameSystem::TEAM_KIND::BLUE_GROUP, playerIDTeam);
             }
         }
+    }
+}
+
+void ScenePVP::CharaSelectUpdate(float elapsedTime)
+{
+    auto net = photonNet->GetPhotonLib();
+    //ƒsƒbƒNŠm’è
+    if (charaPicks->IsDecisionFlg())
+    {
+        charaPicks->SetViewCharaPicks(false);
+        net->PlayGameStart();
     }
 }
 

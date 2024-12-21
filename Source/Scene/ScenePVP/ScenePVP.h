@@ -54,6 +54,8 @@ private:
     void LobbySelectFontUpdate(float elapsedTime);  //fontUpdate
     //ロビー時
     void LobbyFontUpdate(float elapsedTime);    //fontUpdate
+    //キャラセレクト時
+    void CharaSelectUpdate(float elapsedTime);
     //背景Uodate
     void LobbyBackSprUpdate(float elapsedTime);
 private:
