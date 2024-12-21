@@ -769,6 +769,13 @@ int PhotonLib::GetTeamID(int playerID)
     return saveInputPhoton[playerID].teamID;
 }
 
+void PhotonLib::SetMyPickCharaID(int pickChara)
+{
+    int myPlayerID = GetMyPlayerID();
+    if (myPlayerID >= 0)
+        saveInputPhoton[myPlayerID].charaID = pickChara;
+}
+
 int PhotonLib::GetServerTime()
 {
     int serverTime = mLoadBalancingClient.getServerTime();
@@ -1169,6 +1176,7 @@ void PhotonLib::GameRecv(NetData recvData)
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1);
         net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
     }
+    saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
 
     //hp
     net1->GetComponent<CharaStatusCom>()->SetHitPoint(recvData.gameData.hp);
@@ -1335,6 +1343,16 @@ void PhotonLib::LobbyRecv(NetData recvData)
     if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
     
     //AddPlayer(recvData.photonId, recvData.playerId);
+
+    saveInputPhoton[recvData.playerId].charaID = recvData.lobbyData.charaID;
+
+    //ピック選択に移行
+    if (recvData.isMasterClient)
+    {
+        if (recvData.lobbyData.pickSelect == 1)
+            isCharaSelect = true;
+    }
+    charaState[recvData.playerId] = recvData.lobbyData.pickSelect;
 
     //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
@@ -1558,13 +1576,18 @@ void PhotonLib::sendLobbyData(void)
     //種別をロビーに
     netD.dataKind = NetData::DATA_KIND::LOBBY;
 
-    //マスタークライアントの場合はチームIDを送る
+    //キャラIDを送る
+    netD.lobbyData.charaID = saveInputPhoton[myPlayerID].charaID;
+
+    //マスタークライアントの場合
     if (GetIsMasterPlayer())
     {
+        //チームIDを送る
         for (int i = 0; i < 4; ++i)
             netD.lobbyData.teamID[i] = saveInputPhoton[i].teamID;
-
     }
+
+    netD.lobbyData.pickSelect = charaState[myPlayerID];
 
     //チャットを送る
     ::strncpy_s(netD.lobbyData.chat, sizeof(netD.lobbyData.chat), "0", sizeof(netD.lobbyData.chat));

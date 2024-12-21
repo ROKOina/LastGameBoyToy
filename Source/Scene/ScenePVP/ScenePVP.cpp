@@ -829,7 +829,7 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                 if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
                 {
                     auto net = photonNet->GetPhotonLib();
-                    //ゲーム開始
+                    //キャラピック開始
                     if (f.id == 2)
                     {
                         net->SetIsCharaSelect();
@@ -958,7 +958,16 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
 void ScenePVP::CharaSelectUpdate(float elapsedTime)
 {
     auto net = photonNet->GetPhotonLib();
-    //ピック確定
+
+    //キャラ被りを無くす
+    auto& netSaveInput = net->GetSaveInput();
+    //for (auto& s : netSaveInput)
+    //{
+    //    s.
+    //}
+
+    net->SetMyPickCharaID(charaPicks->GetSelectedCharacterId());
+    //ピック確定(全員ピックを確認したら)
     if (charaPicks->IsDecisionFlg())
     {
         charaPicks->SetViewCharaPicks(false);
