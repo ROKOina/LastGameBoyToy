@@ -137,6 +137,10 @@ public:
     //数字用に追加
     DirectX::XMFLOAT2 numUVScroll = { 0,0 };
 
+    //前後判定（ゲームオブジェクト追加された時だけソートする）
+    void SetOrderinLayer(int num) { orderinLayer = num; }
+    int GetOrderinLayer() { return orderinLayer; }
+
 private:
 
     //頂点構造体
@@ -175,6 +179,9 @@ private:
     bool hit = false;
     bool hitEnter = false;
     bool ontriiger = false;
+
+    //数字が大きいほど前に来る
+    int orderinLayer = 0;
 
     DirectX::XMFLOAT2 collisionPivot;
 };

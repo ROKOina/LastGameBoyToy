@@ -613,6 +613,12 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
     {
         spriteobject.emplace_back(spritecomp);
     }
+    //レイヤー順にソートする
+    std::sort(spriteobject.begin(), spriteobject.end(),
+        [&](std::weak_ptr<Sprite>& left, std::weak_ptr<Sprite>& right) {
+            return left.lock()->GetOrderinLayer() < right.lock()->GetOrderinLayer();
+        });
+
 
     //フォントオブジェクトがあれば入る
     std::shared_ptr<Font>fontcomp = obj->GetComponent<Font>();
