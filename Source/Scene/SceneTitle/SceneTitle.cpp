@@ -173,8 +173,8 @@ void SceneTitle::Initialize()
     //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
     auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
-    post->SetExposureZero();
-    post->SetParameter(1.4f, 1.0f, parameters);
+    post->SetExposureZero();    //ˆÃ“]
+    post->SetParameter(1.4f, 1.0f, parameters); //–¾“]
 }
 
 void SceneTitle::Finalize()
