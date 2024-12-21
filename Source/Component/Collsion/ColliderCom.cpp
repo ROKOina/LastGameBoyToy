@@ -1,6 +1,5 @@
 #include "ColliderCom.h"
 #include "Graphics\Graphics.h"
-#include "Component/System/TransformCom.h"
 #include "Component\Renderer\RendererCom.h"
 #include "NodeCollsionCom.h"
 #include <imgui.h>
@@ -122,6 +121,9 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
 
     DirectX::XMFLOAT3 spherePos = sphere->GetGameObject()->transform_->GetWorldPosition();
     float sphereRadius = sphere->GetRadius();
+    //Ç∑ÇËî≤ÇØîªíËóv
+    DirectX::XMFLOAT3 sphereOldPos = sphere->GetOldPos();
+    DirectX::XMVECTOR dCapsule = { sphereOldPos.x - spherePos.x,sphereOldPos.y - spherePos.y,sphereOldPos.z - spherePos.z };
 
     bool isHit = false;
 
@@ -148,6 +150,32 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
                         //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
                         break;
                     }
+
+                    //Ç∑ÇËî≤ÇØîªíË
+                    if (sphere->GetThroughJudge())
+                    {
+                        float l = sqrtf(DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, dCapsule)));
+                        dCapsule = DirectX::XMVector3Normalize(dCapsule);	// ê≥ãKâª
+
+                        FLOAT t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, { startPos.x - spherePos.x, startPos.y - spherePos.y, startPos.z - spherePos.z }));	// éÀâeí∑ÇÃéZèo
+                        DirectX::XMVECTOR Q = {};	// ç≈ãﬂì_
+                        if (t < 0)
+                            Q = DirectX::XMLoadFloat3(&spherePos);
+                        else if (t > l)
+                            Q = DirectX::XMLoadFloat3(&sphereOldPos);
+                        else
+                            Q = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&spherePos), DirectX::XMVectorScale(dCapsule, t));
+
+                        // åç∑îªíË
+                        DirectX::XMVECTOR Len = DirectX::XMVectorSubtract(Q, DirectX::XMLoadFloat3(&startPos));
+
+                        if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(Len, Len)) < (col.radius + sphereRadius) * (col.radius + sphereRadius))// Å¶ÇQèÊìØémÇ≈çÇë¨î‰är
+                        {
+                            isHit = true;
+                            //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
+                            break;
+                        }
+                    }
                 }
                 //clynder
                 else if (col.collsiontype == int(NodeCollsionCom::CollsionType::CYLINDER))
@@ -166,6 +194,18 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
                         isHit = true;
                         //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
                         break;
+                    }
+
+                    //Ç∑ÇËî≤ÇØîªíË
+                    if (sphere->GetThroughJudge())
+                    {
+                        if (Collision::IntersectCapsuleVsCylinder(DirectX::XMLoadFloat3(&spherePos), DirectX::XMLoadFloat3(&sphereOldPos), sphereRadius,
+                            DirectX::XMLoadFloat3(&startPos), DirectX::XMLoadFloat3(&endPos), col.radius))
+                        {
+                            isHit = true;
+                            //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
+                            break;
+                        }
                     }
                 }
                 //box
@@ -186,6 +226,18 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
                         isHit = true;
                         //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
                         break;
+                    }
+
+                    //Ç∑ÇËî≤ÇØîªíË
+                    if (sphere->GetThroughJudge())
+                    {
+                        if (Collision::IntersectCapsuleVsOBB(DirectX::XMLoadFloat3(&spherePos), DirectX::XMLoadFloat3(&sphereOldPos), sphereRadius,
+                            mat))
+                        {
+                            isHit = true;
+                            //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
+                            break;
+                        }
                     }
                 }
             }
@@ -211,6 +263,32 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
                         //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
                         break;
                     }
+
+                    //Ç∑ÇËî≤ÇØîªíË
+                    if (sphere->GetThroughJudge())
+                    {
+                        float l = sqrtf(DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, dCapsule)));
+                        dCapsule = DirectX::XMVector3Normalize(dCapsule);	// ê≥ãKâª
+
+                        FLOAT t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(dCapsule, { startPos.x - spherePos.x, startPos.y - spherePos.y, startPos.z - spherePos.z }));	// éÀâeí∑ÇÃéZèo
+                        DirectX::XMVECTOR Q = {};	// ç≈ãﬂì_
+                        if (t < 0)
+                            Q = DirectX::XMLoadFloat3(&spherePos);
+                        else if (t > l)
+                            Q = DirectX::XMLoadFloat3(&sphereOldPos);
+                        else
+                            Q = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&spherePos), DirectX::XMVectorScale(dCapsule, t));
+
+                        // åç∑îªíË
+                        DirectX::XMVECTOR Len = DirectX::XMVectorSubtract(Q, DirectX::XMLoadFloat3(&startPos));
+
+                        if (DirectX::XMVectorGetX(DirectX::XMVector3Dot(Len, Len)) < (col.radius + sphereRadius) * (col.radius + sphereRadius))// Å¶ÇQèÊìØémÇ≈çÇë¨î‰är
+                        {
+                            isHit = true;
+                            //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
+                            break;
+                        }
+                    }
                 }
 
                 //box
@@ -232,10 +310,25 @@ bool Collider::SphereVsNodeCollision(std::shared_ptr<Collider> otherSide, bool i
                         //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
                         break;
                     }
+
+                    //Ç∑ÇËî≤ÇØîªíË
+                    if (sphere->GetThroughJudge())
+                    {
+                        if (Collision::IntersectCapsuleVsOBB(DirectX::XMLoadFloat3(&spherePos), DirectX::XMLoadFloat3(&sphereOldPos), sphereRadius,
+                            mat))
+                        {
+                            isHit = true;
+                            //ìñÇΩÇ¡ÇƒÇ¢ÇÈéûì_Ç≈forï∂Çî≤ÇØÇÈ
+                            break;
+                        }
+                    }
                 }
             }
         }
     }
+
+    //ÇPÉtÉåÅ[ÉÄëOÇÃà íuï€ë∂
+    sphere->SetOldPos(sphere->GetGameObject()->transform_->GetWorldPosition());
 
     return isHit;
 }

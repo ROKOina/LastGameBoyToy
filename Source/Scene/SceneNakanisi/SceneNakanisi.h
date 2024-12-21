@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 #include "Scene/Scene.h"
 #include "Netwark/Photon/BasicsApplication.h"

@@ -13,9 +13,11 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
+#include<cereal\types\vector.hpp>
+#include <array>
 
-CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 2)
-CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 2)
+CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 3)
+CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 3)
 
 // シリアライズ
 namespace DirectX
@@ -117,16 +119,25 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
         CEREAL_NVP(strechscale),
         CEREAL_NVP(padding)
     );
-    // バージョン1には存在しないフィールドにはデフォルト値を与える
-    if (version == 1)
+
+    // バージョン1およびバージョン2には存在しないフィールドにはデフォルト値を与える
+    if (version == 1 || version == 2)
     {
         worldpos = 0;
+        iscurve = false; // バージョン3で追加されたフィールドにデフォルト値を設定
     }
     if (version >= 2)
     {
         archive
         (
             CEREAL_NVP(worldpos)
+        );
+    }
+    if (version >= 3)
+    {
+        archive
+        (
+            CEREAL_NVP(iscurve) // バージョン3以降でシリアライズ
         );
     }
 }
@@ -140,11 +151,13 @@ void GPUParticle::SaveParameter::serialize(Archive& archive, int version)
         CEREAL_NVP(m_depthS),
         CEREAL_NVP(m_textureName)
     );
+
     // バージョン1には存在しないフィールドにはデフォルト値を与える
-    if (version == 1)
+    if (version == 1 || version == 2)
     {
         m_deleteflag = false;
         deletetime = 0.0f;
+        curvepath = {};
     }
     if (version >= 2)
     {
@@ -152,6 +165,13 @@ void GPUParticle::SaveParameter::serialize(Archive& archive, int version)
         (
             CEREAL_NVP(m_deleteflag),
             CEREAL_NVP(deletetime)
+        );
+    }
+    if (version >= 3)
+    {
+        archive
+        (
+            CEREAL_NVP(curvepath) // バージョン3以降でシリアライズ
         );
     }
 }
@@ -230,6 +250,9 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
         filepath = filename;
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
     }
+
+    //カーブデータ読み込み
+    CurveDataLoding();
 }
 
 //初期設定
@@ -315,13 +338,39 @@ void GPUParticle::Update(float elapsedTime)
     dc->CSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
     dc->GSSetConstantBuffers((int)CB_INDEX::GPU_PARTICLE_SAVE, 1, m_constantbuffer.GetAddressOf());
 
-    //更新するコンピュートシェーダーをセットする
+    // コンピュートシェーダーセット
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
     dc->CSSetShader(m_updatecomputeshader.Get(), NULL, 0);
+
+    if (m_GSC.iscurve == 1)
+    {
+        ID3D11ShaderResourceView* srvs[] = { SSG_srv.Get(), color_srv.Get() };
+        dc->CSSetShaderResources(0, 2, srvs);
+    }
+
     const UINT thread_group_count_x = align(static_cast<UINT>(m_maxparticle), THREAD) / THREAD;
     dc->Dispatch(thread_group_count_x, 1, 1);
-    ID3D11UnorderedAccessView* null_unordered_access_view{};
-    dc->CSSetUnorderedAccessViews(0, 1, &null_unordered_access_view, NULL);
+
+    // リソースの解放
+    if (m_GSC.iscurve == 1)
+    {
+        ID3D11ShaderResourceView* null_srv[] = { nullptr, nullptr };
+        dc->CSSetShaderResources(0, 2, null_srv);
+    }
+
+    ID3D11UnorderedAccessView* null_uav = nullptr;
+    dc->CSSetUnorderedAccessViews(0, 1, &null_uav, NULL);
+
+#ifdef _DEBUG
+    // 曲線の更新（毎フレームや必要に応じて）
+    if (m_GSC.iscurve == 1)
+    {
+        Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
+        Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
+        UpdateCurveTexture(SSG, 2, 128, SSG_texture);
+        UpdateCurveTexture(color, 3, 128, color_texture);
+    }
+#endif // DEBUG_
 }
 
 //描画
@@ -446,6 +495,7 @@ void GPUParticle::SystemGUI()
     if (ImGui::Button("Load"))
     {
         LoadDesirialize();
+        CurveFilePathDataLoading();
         D3D11_TEXTURE2D_DESC texture2d_desc{};
         LoadTextureFromFile(Graphics::Instance().GetDevice(), m_p.m_textureName.c_str(), m_colormap.GetAddressOf(), &texture2d_desc);
     }
@@ -475,6 +525,8 @@ void GPUParticle::SystemGUI()
     ImGui::Checkbox(J(u8"ループ"), reinterpret_cast<bool*>(&m_GSC.isLoopFlg));
     ImGui::SameLine();
     ImGui::Checkbox(J(u8"停止"), &stopFlg);
+    ImGui::SameLine();
+    ImGui::Checkbox(J(u8"カーブ使用"), reinterpret_cast<bool*>(&m_GSC.iscurve));
     ImGui::Checkbox(J(u8"ストレッチビルボード"), reinterpret_cast<bool*>(&m_GSC.stretchFlag));
     ImGui::SameLine();
     ImGui::Checkbox(J(u8"パーティクル遅延なし"), reinterpret_cast<bool*>(&m_GSC.worldpos));
@@ -520,8 +572,186 @@ void GPUParticle::SystemGUI()
     ImGui::Combo("DepthState", &m_p.m_depthS, dsName, static_cast<int>(DEPTHSTATE::MAX), ARRAYSIZE(dsName));
 }
 
+ID3D11ShaderResourceView* GPUParticle::GenerateCurveTexture(Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution)
+{
+    Graphics& graphics = Graphics::Instance();
+    ID3D11Device* device = graphics.GetDevice();
+
+    // サンプリング結果を格納
+    std::vector<DirectX::XMFLOAT4> sampledData(resolution);
+    for (int i = 0; i < resolution; ++i)
+    {
+        float t = static_cast<float>(i) / (resolution - 1);
+        sampledData[i].x = curve[0]->Evaluate(t, true); // Smooth評価
+
+        if (elementalcount >= 1)
+        {
+            sampledData[i].y = curve[1]->Evaluate(t, true); // Smooth評価
+        }
+
+        if (elementalcount >= 2)
+        {
+            sampledData[i].z = curve[2]->Evaluate(t, true); // Smooth評価
+        }
+
+        if (elementalcount >= 3)
+        {
+            sampledData[i].w = curve[3]->Evaluate(t, true); // Smooth評価
+        }
+    }
+
+    // テクスチャ設定
+    D3D11_TEXTURE1D_DESC desc = {};
+    desc.Width = resolution;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = sampledData.data();
+    initData.SysMemPitch = resolution * sizeof(DirectX::XMFLOAT4);
+
+    // 1Dテクスチャの作成
+    HRESULT hr = device->CreateTexture1D(&desc, &initData, texture.GetAddressOf());
+    if (FAILED(hr))
+    {
+        return nullptr; // エラーハンドリング
+    }
+
+    // SRVの作成
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = desc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+    srvDesc.Texture1D.MipLevels = 1;
+
+    hr = device->CreateShaderResourceView(texture.Get(), &srvDesc, srv.GetAddressOf());
+
+    return SUCCEEDED(hr) ? srv.Get() : nullptr;
+}
+
+void GPUParticle::UpdateCurveTexture(Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture)
+{
+    if (!texture) return; // まだテクスチャが生成されていない場合
+
+    Graphics& graphics = Graphics::Instance();
+    ID3D11Device* device = graphics.GetDevice();
+    ID3D11DeviceContext* context = graphics.GetDeviceContext();
+
+    // サンプリング結果を格納
+    std::vector<DirectX::XMFLOAT4> sampledData(resolution);
+    for (int i = 0; i < resolution; ++i)
+    {
+        float t = static_cast<float>(i) / (resolution - 1);
+        sampledData[i].x = curve[0]->Evaluate(t, true); // Smooth評価
+
+        if (elementalcount >= 1)
+        {
+            sampledData[i].y = curve[1]->Evaluate(t, true); // Smooth評価
+        }
+
+        if (elementalcount >= 2)
+        {
+            sampledData[i].z = curve[2]->Evaluate(t, true); // Smooth評価
+        }
+
+        if (elementalcount >= 3)
+        {
+            sampledData[i].w = curve[3]->Evaluate(t, true); // Smooth評価
+        }
+    }
+
+    // テクスチャを更新
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    HRESULT hr = context->Map(texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(hr))
+    {
+        return; // エラーハンドリング
+    }
+
+    // 新しいデータをテクスチャにコピー
+    memcpy(mappedResource.pData, sampledData.data(), sampledData.size() * sizeof(DirectX::XMFLOAT4));
+
+    // マッピング解除
+    context->Unmap(texture.Get(), 0);
+}
+
+//カーブデータ読み込み
+void GPUParticle::CurveDataLoding()
+{
+    //カーブデータ作成
+    scale_curve = std::make_unique<Curve>(8);
+    speed_curve = std::make_unique<Curve>(8);
+    color_curve_r = std::make_unique<Curve>(8);
+    color_curve_g = std::make_unique<Curve>(8);
+    color_curve_b = std::make_unique<Curve>(8);
+    color_curve_a = std::make_unique<Curve>(8);
+    gravity_curve = std::make_unique<Curve>(8);
+
+    //カーブデータのファイルパス読み込み
+    CurveFilePathDataLoading();
+
+    // 各曲線に対応するテクスチャとSRVを生成
+    Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
+    Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
+    GenerateCurveTexture(SSG, 2, SSG_texture, SSG_srv, 128);
+    GenerateCurveTexture(color, 3, color_texture, color_srv, 128);
+}
+
+//カーブデータのファイルパス読み込み
+void GPUParticle::CurveFilePathDataLoading()
+{
+    // カーブのファイルパス読み込み
+    if (!m_p.curvepath.empty())
+    {
+        // ファイルパスが存在し、カーブオブジェクトも存在する場合のみ読み込む
+        if (m_p.curvepath.size() > 0 && !m_p.curvepath[0].empty() && scale_curve)
+            scale_curve->LoadCurve(m_p.curvepath[0]);
+
+        if (m_p.curvepath.size() > 1 && !m_p.curvepath[1].empty() && speed_curve)
+            speed_curve->LoadCurve(m_p.curvepath[1]);
+
+        if (m_p.curvepath.size() > 2 && !m_p.curvepath[2].empty() && color_curve_r)
+            color_curve_r->LoadCurve(m_p.curvepath[2]);
+
+        if (m_p.curvepath.size() > 3 && !m_p.curvepath[3].empty() && color_curve_g)
+            color_curve_g->LoadCurve(m_p.curvepath[3]);
+
+        if (m_p.curvepath.size() > 4 && !m_p.curvepath[4].empty() && color_curve_b)
+            color_curve_b->LoadCurve(m_p.curvepath[4]);
+
+        if (m_p.curvepath.size() > 5 && !m_p.curvepath[5].empty() && color_curve_a)
+            color_curve_a->LoadCurve(m_p.curvepath[5]);
+
+        if (m_p.curvepath.size() > 6 && !m_p.curvepath[6].empty() && gravity_curve)
+            gravity_curve->LoadCurve(m_p.curvepath[6]);
+    }
+}
+
+//カーブデータ保存
+void GPUParticle::CurveDataSave()
+{
+    // ファイルパスのリスト
+    m_p.curvepath =
+    {
+        scale_curve->GetFilePath(),
+        speed_curve->GetFilePath(),
+        color_curve_r->GetFilePath(),
+        color_curve_g->GetFilePath(),
+        color_curve_b->GetFilePath(),
+        color_curve_a->GetFilePath(),
+        gravity_curve->GetFilePath()
+    };
+}
+
 void GPUParticle::ParameterGUI()
 {
+    if (m_GSC.iscurve == 1)
+    {
+        CurveGUI();
+    }
     if (ImGui::TreeNode(J(u8"パーティクルの生成削除関係")))
     {
         ImGui::Checkbox(J(u8"削除フラグ"), &m_p.m_deleteflag);
@@ -639,6 +869,24 @@ void GPUParticle::EmitGUI()
         ImGui::DragFloat(J(u8"スパイラル強度"), &m_GSC.spiralstrong, 0.1f, 0.0f, 20.0f);
 
         ImGui::TreePop();
+    }
+}
+
+void GPUParticle::CurveGUI()
+{
+    bool value_change = false;
+    if (scale_curve != nullptr)if (scale_curve->ShowGraph("ScaleCurve"))value_change = true;
+    if (speed_curve != nullptr)if (speed_curve->ShowGraph("SpeedCurve"))value_change = true;
+    if (gravity_curve != nullptr)if (gravity_curve->ShowGraph("GravityCurve"))value_change = true;
+    if (color_curve_r != nullptr)if (color_curve_r->ShowGraph("RColorCurve"))value_change = true;
+    if (color_curve_g != nullptr)if (color_curve_g->ShowGraph("GColorCurve"))value_change = true;
+    if (color_curve_b != nullptr)if (color_curve_b->ShowGraph("BColorCurve"))value_change = true;
+    if (color_curve_a != nullptr)if (color_curve_a->ShowGraph("AColorCurve"))value_change = true;
+
+    if (ImGui::Button(J(u8"全てのカーブデータを保存")))
+    {
+        //カーブデータ保存
+        CurveDataSave();
     }
 }
 

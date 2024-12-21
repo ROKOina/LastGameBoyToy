@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component\System\Component.h"
+#include "Component\System\TransformCom.h"
 #include "Math/Collision.h"
 //当たり判定をするコンポーネントまとめてここに書く
 
@@ -164,7 +165,9 @@ public:
     const char* GetName() const override { return "SphereCollider"; }
 
     // 開始処理
-    void Start() override {}
+    void Start() override {
+        oldPos = GetGameObject()->transform_->GetWorldPosition();
+    }
 
     // 更新処理
     void Update(float elapsedTime) override {}
@@ -186,10 +189,20 @@ public:
     void SetWeight(float weight) { weight_ = weight; }
     float GetWeight() const { return weight_; }
 
+    void SetOldPos(DirectX::XMFLOAT3 pos) { oldPos = pos; }
+    DirectX::XMFLOAT3 GetOldPos() const { return oldPos; }
+
+    //すり抜け処理するか
+    void SetThroughJudge(bool setFlg) { isThroughJudge = setFlg; }
+    bool GetThroughJudge() { return isThroughJudge; }
+
     void SetPushBackObj(std::shared_ptr<GameObject> obj) { pushBackObj_ = obj; }
     std::weak_ptr<GameObject> GetPushBackObj() const { return pushBackObj_; }
 
 private:
+    bool isThroughJudge = false;    //すり抜け判定フラグ
+    DirectX::XMFLOAT3 oldPos;   //すり抜け判定用
+
     float radius_ = 0.5f;
 
     //押し返しするか

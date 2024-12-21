@@ -76,4 +76,7 @@ public:
     static GameObj JankratBulletFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);
     static GameObj JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, float force, float damage, int id);
     static GameObj JankratUlt(std::shared_ptr<GameObject>parent, DirectX::XMFLOAT3 pos, int damagepower);
+
+    //ソルジャースキル
+    static void SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, int damageValue = 10);
 };

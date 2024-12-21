@@ -12,9 +12,6 @@ Farah_BaseState::Farah_BaseState(CharacterCom* owner) : State(owner)
 }
 
 #pragma region ƒƒCƒ“UŒ‚
-void Farah_MainAttackState::Enter()
-{
-}
 void Farah_MainAttackState::Execute(const float& elapsedTime)
 {
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
@@ -56,9 +53,6 @@ void Farah_UltState::Enter()
 #pragma endregion
 
 #pragma region Eskill
-void Farah_ESkillState::Enter()
-{
-}
 void Farah_ESkillState::Execute(const float& elapsedTime)
 {
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—

@@ -82,17 +82,22 @@ public:
     int GetMyPhotonID();
     int GetMyPlayerID();
 
+    void SetRoomName(std::wstring wstr) { roomName = WStringToString(wstr); }
+
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
 
     //ゲームスタートしたか
     bool GetIsGamePlay() { return isGamePlay; }
+    void PlayGameStart() { if (GetIsMasterPlayer())isGamePlay = true; }
 
     //キャラセレクト中か
     bool GetIsCharaSelect() { return isCharaSelect; }
+    void SetIsCharaSelect() { if (GetIsMasterPlayer())isCharaSelect = true; }
 
     //ゲームモード登録
     int GetGameMode() { return gameMode; }
+    void SetGameMode(int mode) { gameMode = mode; }
 
     //入室許可
     bool IsJoinPermission() { return joinPermission; }
@@ -103,6 +108,10 @@ public:
     //参加人数
     float GetJoinNum();
 
+    //チームID設定
+    void SetTeamID(int teamID, int playerID);
+    int GetTeamID(int playerID);
+
     int GetServerTime();
     int GetServerTimeOffset();
 
@@ -112,9 +121,59 @@ public:
 
     int GetRoomPlayersNum();
     std::string GetRoomName();
+    //全ての部屋名を取得
+    std::vector<std::wstring> GetRoomNames();
 
+    int GetMasterPlayerID() { return masterPlayerID; }
+
+    //接続開始
+    void StartConnect() { connectFlg = true; }
     bool GetConnectBegin() { return connectBegin; }
     bool GetConnectNow() { return connectNow; }
+
+    //接続者情報
+    struct SaveInput
+    {
+        SaveInput()
+        {
+            inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
+        }
+        bool useFlg = false;    //使用されているか
+        std::string name = {};
+        int photonId;
+        int playerId;
+        std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
+
+        ////自分のIDから見たディレイ
+        //int myDelay = 50;
+
+        int teamID = 0;
+
+        //情報が更新されたか
+        bool isInputUpdate = false;
+
+        //キル数
+        int killCount = 0;
+
+        //次の入力情報を格納
+        struct NextInput
+        {
+            int oldFrame;
+            unsigned int inputDown = 0;
+            unsigned int input = 0;
+            unsigned int inputUp = 0;
+
+            DirectX::XMFLOAT2 leftStick = { 0,0 };
+            DirectX::XMFLOAT3 pos = { 0,0,0 };
+            DirectX::XMFLOAT4 rotato = { 0,0,0,1 };
+
+            DirectX::XMFLOAT3 fpsCameraDir = { 0,0,1 };
+
+            DirectX::XMFLOAT3 velocity = { 0,0,0 };
+        };
+        NextInput nextInput;
+    };
+    const std::vector<SaveInput>& GetSaveInput() const { return saveInputPhoton; }
 
     int SendMs();
 
@@ -215,48 +274,6 @@ private:
     //int sendMs = 35;
     int oldMs;
 
-    //各クライアントインプット保存
-    struct SaveInput
-    {
-        SaveInput()
-        {
-            inputBuf = std::make_unique<RingBuffer<SaveBuffer>>(500);
-        }
-        bool useFlg = false;    //使用されているか
-        std::string name = {};
-        int photonId;
-        int playerId;
-        std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
-
-        ////自分のIDから見たディレイ
-        //int myDelay = 50;
-
-        int teamID = 0;
-
-        //情報が更新されたか
-        bool isInputUpdate = false;
-
-        //キル数
-        int killCount = 0;
-
-        //次の入力情報を格納
-        struct NextInput
-        {
-            int oldFrame;
-            unsigned int inputDown = 0;
-            unsigned int input = 0;
-            unsigned int inputUp = 0;
-
-            DirectX::XMFLOAT2 leftStick = { 0,0 };
-            DirectX::XMFLOAT3 pos = { 0,0,0 };
-            DirectX::XMFLOAT4 rotato = { 0,0,0,1 };
-
-            DirectX::XMFLOAT3 fpsCameraDir = { 0,0,1 };
-
-            DirectX::XMFLOAT3 velocity = { 0,0,0 };
-        };
-        NextInput nextInput;
-    };
     std::vector<SaveInput> saveInputPhoton;
     //追加予約
     int addSavePhotonID[4] = { -1,-1,-1,-1 };   //要素がプレイヤーID、値がフォトンIDになる
@@ -288,7 +305,10 @@ private:
     std::string netName = {};
 
     //ゲームモード
-    int gameMode = -1;
+    int gameMode = 1;
+
+    //マスタープレイヤーID保存
+    int masterPlayerID = 0;
 
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ

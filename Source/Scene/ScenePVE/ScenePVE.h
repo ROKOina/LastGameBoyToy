@@ -27,9 +27,6 @@ public:
     // 描画処理
     void Render(float elapsedTime)override;
 
-    //UIのゲームオブジェクト生成
-    void CreateUiObject();
-
     //名前取得
     std::string GetName() const override { return "ScenePVE"; };
 private:

@@ -8,7 +8,7 @@ class HitProcessCom : public Component
 public:
     //myObjにキャラクターコンポーネントを入れる
     HitProcessCom(std::shared_ptr<GameObject> charaObj)
-        : hitIntervalTimer(0), myObj(charaObj)
+        : hitIntervalTimer(100), myObj(charaObj)
     {}
     ~HitProcessCom() override {}
 
@@ -57,7 +57,7 @@ private:
 
     //ヒット間隔(レイキャスト用)
     float hitIntervalTime = 0.1f;
-    float hitIntervalTimer;
+    float hitIntervalTimer=100;
 
     //与える数
     float value = 1.0f; //DAMAGE, HEAL, STAN
