@@ -17,6 +17,7 @@
 #include "Component\SkillObj\JankratMineCom.h"
 #include "KnockBackCom.h"
 #include "Component\System\SpawnCom.h"
+#include "OnGroundDeleteCom.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -188,7 +189,10 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     moveCom->SetFriction(0.0f);
 
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
-    moveCom->SetIsRaycast(false);
+    moveCom->SetIsRaycast(true);
+
+    //地面に当たれば作動するコンポーネント
+    colObj->AddComponent<OnGroundDeleteCom>();
 
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);

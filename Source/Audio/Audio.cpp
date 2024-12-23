@@ -1,6 +1,8 @@
 #include "SystemStruct/Misc.h"
 #include "Audio/Audio.h"
 
+#pragma comment(lib, "xaudio2.lib")
+
 // コンストラクタ
 Audio::Audio()
 {
@@ -12,16 +14,37 @@ Audio::Audio()
 
     UINT32 createFlags = 0;
 #if defined(DEBUG) || defined(_DEBUG)
-    //createFlags |= XAUDIO2_DEBUG_ENGINE;
+    createFlags |= XAUDIO2_DEBUG_ENGINE;
 #endif
 
-    // XAudio初期化
+    // XAudio2 の初期化
     hr = XAudio2Create(&xaudio_, createFlags);
-    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+    if (FAILED(hr))
+    {
+        throw std::runtime_error("Failed to initialize XAudio2.");
+    }
 
     // マスタリングボイス生成
     hr = xaudio_->CreateMasteringVoice(&masteringVoice_);
-    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+    if (FAILED(hr))
+    {
+        throw std::runtime_error("Failed to create mastering voice.");
+    }
+
+    // スピーカーチャネルマスクの取得
+    DWORD speakerChannelMask = SPEAKER_STEREO;
+    hr = masteringVoice_->GetChannelMask(&speakerChannelMask);
+    if (FAILED(hr) || speakerChannelMask == 0)
+    {
+        throw std::runtime_error("Failed to retrieve speaker channel mask or invalid channel mask.");
+    }
+
+    // X3DAudio 初期化
+    hr = X3DAudioInitialize(speakerChannelMask, X3DAUDIO_SPEED_OF_SOUND, x3dAudioHandle_);
+    if (FAILED(hr))
+    {
+        throw std::runtime_error("Failed to initialize X3DAudio.");
+    }
 
     // BGMとSEを一括登録
     RegisterAudioSources();
@@ -80,7 +103,6 @@ void Audio::RegisterAudioSources()
 
 void Audio::RegisterAudioSources(AUDIOID id, const char* filename)
 {
-    
 }
 
 // オーディオソース読み込み

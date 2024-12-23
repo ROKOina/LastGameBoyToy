@@ -15,7 +15,6 @@ void AudioCom::Update(float elapsedTime)
 
 void AudioCom::OnGUI()
 {
-
 }
 
 void AudioCom::RegisterSource(AUDIOID id, std::string name)
@@ -32,7 +31,6 @@ void AudioCom::RegisterSource(AUDIOID id, std::string name)
 void AudioObj::Update()
 {
     Feed();
-
     source->SetVolume(volume);
     source->SetPitch(pitch);
 }
@@ -51,7 +49,8 @@ bool AudioObj::Feed()
     {
         //Œ»Ý‚Ì‰¹—Ê‚ÆŽw’è‚³‚ê‚½‰¹—Ê‚ª“¯‚¶ê‡I—¹
         if (feedTargetValue == volume) {
-            feedFlag = false; return true; }
+            feedFlag = false; return true;
+        }
 
         //Žw’è‚³‚ê‚½‰¹—Ê‚É‹ß‚Ã‚¯‚é
         if ((feedTargetValue - volume) > 0.0f)
@@ -61,7 +60,7 @@ bool AudioObj::Feed()
         else
         {
             volume = max((volume - feedAddValue), feedTargetValue);
-        }  
+        }
     }
 
     return false;

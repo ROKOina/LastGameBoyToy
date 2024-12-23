@@ -14,7 +14,7 @@ public:
     void Start()override {};
 
     //çXêVèàóù
-    void Update(float elapsedTime)override {};
+    void Update(float elapsedTime)override;
 
     //ï`âÊ
     void Render();
@@ -47,6 +47,7 @@ private:
     {
         DirectX::XMFLOAT4X4 world;
         DirectX::XMFLOAT4X4 decalinverseprojection;
+        DirectX::XMFLOAT4 decalcolor = { 1,1,1,1 };
     };
     std::unique_ptr<ConstantBuffer<DecalConstantBuffer>>DCB;
 
@@ -57,4 +58,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader>vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>pixelshader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>inpulayout;
+
+    float deletetime = 0.0f;
+    float goodbyetime = 4.0f;
 };

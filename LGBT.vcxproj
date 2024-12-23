@@ -122,6 +122,7 @@
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\PvPUi\CharaPicks.h" />
     <ClInclude Include="External\DirectXTex\DDS.h" />
     <ClInclude Include="External\DirectXTex\DDSTextureLoader.h" />
@@ -286,6 +287,7 @@
     <ClInclude Include="Source\SystemStruct\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\PvPUi\CharaPicks.cpp" />
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />
     <ClCompile Include="External\DirectXTex\DirectXHelpers.cpp" />
