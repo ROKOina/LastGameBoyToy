@@ -219,22 +219,6 @@ void FarahCom::GroundBomber(float elapsedTime)
             movecom->ZeroVelocity();
             movecom->ZeroNonMaxSpeedVelocity();
             obj->GetComponent<SphereColliderCom>()->SetRadius(2.1f);
-
-            //デカール生成
-            std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
-            decal->SetName("decal");
-            std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
-
-            //ここでヒット種類を分別する
-            if (movecom->OnGround())
-            {
-                d->Add(movecom->GetHitPosition(), movecom->GetNormal(), 1.0f);
-            }
-
-            if (movecom->GetOnWall())
-            {
-                d->Add(movecom->GetWallHitPosition(), movecom->GetWallNormal(), 1.0f);
-            }
         }
 
         // 爆発フラグ処理
@@ -245,6 +229,22 @@ void FarahCom::GroundBomber(float elapsedTime)
             // 一度だけ Play を実行する
             if (!bullet.played)  // played フラグで制御
             {
+                //デカール生成
+                std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
+                decal->SetName("decal");
+                std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
+
+                //ここでヒット種類を分別する
+                if (movecom->OnGround())
+                {
+                    d->Add(movecom->GetHitPosition(), movecom->GetNormal(), 1.0f);
+                }
+
+                if (movecom->GetOnWall())
+                {
+                    d->Add(movecom->GetWallHitPosition(), movecom->GetWallNormal(), 1.0f);
+                }
+
                 obj->GetComponent<GPUParticle>()->SetEnabled(true);
                 obj->GetComponent<GPUParticle>()->Play();
                 bullet.played = true; // フラグを設定
