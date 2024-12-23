@@ -741,6 +741,32 @@ void PlayerUIManager::CreateBoostUI()
     }
 }
 
+void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
+{
+    allyHp = true;
+    //ロードするテクスチャを設定(アイコンができてから)
+    std::string name = "Data/Texture/PlayerUI/" + (std::string)netPlayer.lock()->GetComponent<CharacterCom>()->GetName() + "/CharaIcon.png";
+
+    //HpFrame
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
+        hpFrame->SetName("AllyHpFrame");
+        hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpFrame.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+    //HpGauge
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
+        std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
+        hpGauge->SetName("AllyHpGauge");
+        std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
+        gauge->SetMaxValue(netPlayer.lock()->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
+        float* i = netPlayer.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
+        gauge->SetVariableValue(i);
+    }
+
+}
+
 void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
 {
     player = obj;

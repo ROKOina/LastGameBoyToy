@@ -560,6 +560,8 @@ void ScenePVP::TransitionUpdate(float elapsedTime)
         LobbyBackSprUpdate(elapsedTime);    //”wŒi
         break;
     case 3: //ƒQ[ƒ€’†
+        GameUpdate(elapsedTime);
+
         break;
     }
 }
@@ -972,6 +974,31 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
     {
         charaPicks->SetViewCharaPicks(false);
         net->PlayGameStart();
+    }
+}
+
+void ScenePVP::GameUpdate(float elapsedTime)
+{
+    auto net = photonNet->GetPhotonLib();
+
+    //–¡•ûUI“o˜^
+    if (!PlayerUIManager::Instance().GetAllyHp())
+    {
+        auto& saveI = net->GetSaveInput();
+        auto& player = GameObjectManager::Instance().Find("player");
+        auto& netData = player->GetComponent<CharacterCom>()->GetNetCharaData();
+        for (auto& s : saveI)
+        {
+            if (!s.useFlg)continue;
+            if (netData.GetTeamID() != s.teamID)continue;
+
+            std::string name = "netPlayer" + std::to_string(s.photonId);
+            GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
+            if (!netPlayer)continue;
+
+            PlayerUIManager::Instance().CreateNetTeamUI(netPlayer);
+            break;
+        }
     }
 }
 
