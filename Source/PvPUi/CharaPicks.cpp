@@ -5,6 +5,12 @@
 #include "Component/System/GameObject.h"
 #include "Component/System/TransformCom.h"
 
+CharaPicks::CharaPicks()
+{
+    color          = { 1.0f, 1.0f, 1.0f, 1.0f };
+    selectColor = { 0.3f, 0.3f, 0.3f, 1.0f };
+}
+
 // キャラピックUI生成
 void CharaPicks::CreateCharaPicksUiObject()
 {
@@ -115,6 +121,13 @@ void CharaPicks::CreateCharaPicksUiObject()
         decision->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
     }
 
+    // キャラ選択UI
+    {
+        auto& charaPick = charaPicksCanvas->AddChildObject();
+        charaPick->SetName("CharaPick");
+        //charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
+    }
+
     // 時間制限
     {
         auto& timeLimit = charaPicksCanvas->AddChildObject();
@@ -167,6 +180,7 @@ void CharaPicks::CharaDetails()
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
             selected.name->SetEnabled(true);
+            selected.sprite->spc.color = selectColor;
             // スキル表示はここのコメント解除してね！
             //selected.skill->SetEnabled(true);
             selectedCharacterId = selected.id;
@@ -175,6 +189,7 @@ void CharaPicks::CharaDetails()
                 if (&other != &selected) {
                     other.name->SetEnabled(false);
                     other.skill->SetEnabled(false);
+                    other.sprite->spc.color = color;
                 }
             }
         }

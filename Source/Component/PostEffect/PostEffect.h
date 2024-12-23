@@ -112,6 +112,9 @@ public:
     MultiRenderTarget* GetMultiRenderTarget() const { return m_gBuffer.get(); }
     float m_criticaldepthvalue = 300.0f;
 
+    const POSTEFFECT& GetPostData() { return m_posteffect->data; }
+    void SetExposureZero() { m_posteffect->data.exposure = 0; }
+
 private:
     enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, fxaa, depthCopy, max };
     enum class pixelshader { deferred, colorGrading, cascadeshadow, fxaa, tonemap, max };

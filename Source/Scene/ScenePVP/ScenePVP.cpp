@@ -61,7 +61,11 @@ void ScenePVP::Initialize()
     //InitializePVP();
     InitializeLobbySelect();
 
-    InitializeCharaSelect();
+    charaPicks = std::make_shared<CharaPicks>();
+
+    // キャラピックUI生成
+    charaPicks->CreateCharaPicksUiObject();
+    charaPicks->SetViewCharaPicks(false);
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -79,6 +83,7 @@ void ScenePVP::InitializeLobbySelect()
     //背景
     std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
     lobbyBackParent->SetName("lobbyBackParent");
+    tempRemoveObj.emplace_back(lobbyBackParent);
 
     std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
     lobbyBack->SetName("lobbyBack");
@@ -136,6 +141,7 @@ void ScenePVP::InitializeLobby()
     //背景
     std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
     lobbyBackParent->SetName("lobbyBackParent");
+    tempRemoveObj.emplace_back(lobbyBackParent);
 
     std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
     lobbyBack->SetName("lobbyBack");
@@ -199,21 +205,30 @@ void ScenePVP::InitializeLobby()
 }
 
 void ScenePVP::InitializeCharaSelect()
-{
+{    
+    //背景
+    std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
+    lobbyBackParent->SetName("lobbyBackParent");
+    tempRemoveObj.emplace_back(lobbyBackParent);
 
-    charaPicks = std::make_shared<CharaPicks>();
-
-    // キャラピックUI生成
-    charaPicks->CreateCharaPicksUiObject();
-
-    //kari
+    std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
+    lobbyBack->SetName("lobbyBack");
+    auto& spr = lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
+    spr->SetOrderinLayer(-1);
+    //削除予定リストに追加
+    tempRemoveObj.emplace_back(lobbyBack);
+    //背景移動オブジェクト
+    for (int i = 0; i < 3; ++i)
     {
-        std::shared_ptr<GameObject> kariCHARASELECT = GameObjectManager::Instance().Create();
-        kariCHARASELECT->SetName("kariCHARASELECT");
-        kariCHARASELECT->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        std::shared_ptr<GameObject> lobbyBackRect = lobbyBackParent->AddChildObject();
+        lobbyBackRect->SetName(std::string("lobbyBackRect" + std::to_string(i)).c_str());
+        lobbyBackRect->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
         //削除予定リストに追加
-        tempRemoveObj.emplace_back(kariCHARASELECT);
+        tempRemoveObj.emplace_back(lobbyBackRect);
     }
+
+    //ピック画面起動
+    charaPicks->SetViewCharaPicks(true);
 }
 
 void ScenePVP::InitializePVP()
@@ -275,7 +290,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::FARAH, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj);
     }
 
     //snowparticle
@@ -538,9 +553,11 @@ void ScenePVP::TransitionUpdate(float elapsedTime)
     break;
     case 1: //ロビー
         LobbyFontUpdate(elapsedTime);   //font
-        //LobbyBackSprUpdate(elapsedTime);    //背景
+        LobbyBackSprUpdate(elapsedTime);    //背景
         break;
     case 2: //キャラ選択
+        CharaSelectUpdate(elapsedTime);
+        LobbyBackSprUpdate(elapsedTime);    //背景
         break;
     case 3: //ゲーム中
         break;
@@ -815,7 +832,7 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                     //ゲーム開始
                     if (f.id == 2)
                     {
-                        net->PlayGameStart();
+                        net->SetIsCharaSelect();
                     }
 
                     //ゲームモード
@@ -935,6 +952,17 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                     net->SetTeamID(PVPGameSystem::TEAM_KIND::BLUE_GROUP, playerIDTeam);
             }
         }
+    }
+}
+
+void ScenePVP::CharaSelectUpdate(float elapsedTime)
+{
+    auto net = photonNet->GetPhotonLib();
+    //ピック確定
+    if (charaPicks->IsDecisionFlg())
+    {
+        charaPicks->SetViewCharaPicks(false);
+        net->PlayGameStart();
     }
 }
 

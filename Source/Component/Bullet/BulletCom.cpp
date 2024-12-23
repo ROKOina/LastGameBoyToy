@@ -195,6 +195,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     colObj->AddComponent<OnGroundDeleteCom>();
 
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
+    coll->SetThroughJudge(true);    //‚·‚è”²‚¯”»’èˆ—’Ç‰Á
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(objPoint->GetName(), "player") == 0)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);

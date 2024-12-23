@@ -93,6 +93,7 @@ public:
 
     //キャラセレクト中か
     bool GetIsCharaSelect() { return isCharaSelect; }
+    void SetIsCharaSelect() { if (GetIsMasterPlayer())isCharaSelect = true; }
 
     //ゲームモード登録
     int GetGameMode() { return gameMode; }

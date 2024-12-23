@@ -131,6 +131,12 @@ void SceneTitle::Initialize()
             next->SetName("Training");
             next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
         }
+        //ÉQÅ[ÉÄèIóπ
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("endgame");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/endgame.ui", Sprite::SpriteShader::DEFALT, true);
+        }
 
         //ÉZÉåÉNÉgñ_
         {
@@ -163,6 +169,12 @@ void SceneTitle::Initialize()
         audioObj->Play("Title", true, 0.0f);
         audioObj->FeedStart("Title", 0.5f, 0.1f);
     }
+
+    //à√ì]Ç©ÇÁÇÕÇ∂Ç‹ÇÈÇÊÇ§Ç…
+    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+    auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+    post->SetExposureZero();    //à√ì]
+    post->SetParameter(1.4f, 1.0f, parameters); //ñæì]
 }
 
 void SceneTitle::Finalize()
@@ -228,9 +240,10 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
     //èâä˙âª
     std::vector<SceneName> names;
-    names.emplace_back("PVE", new ScenePVE, 560);
-    names.emplace_back("PVP", new ScenePVP, 750);
-    names.emplace_back("Training", new SceneTraining, 940);
+    names.emplace_back("PVE", new ScenePVE, 450);
+    names.emplace_back("PVP", new ScenePVP, 600);
+    names.emplace_back("Training", new SceneTraining, 750);
+    names.emplace_back("endgame", new SceneTraining, 900);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
     auto& selectB = canvas->GetChildFind("selectBow");
@@ -251,6 +264,13 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
+                canvas->GetChildFind("endgame")->GetComponent<Sprite>()->EasingPlay();
+
+                //ÉQÅ[ÉÄèIóπ
+                if (std::string(sprite->GetGameObject()->GetName()) == "endgame")
+                {   
+                    PostMessage(Graphics::Instance().GetHwnd(), WM_CLOSE, 0, 0);
+                }
 
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {

@@ -242,7 +242,7 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
     case WM_CREATE:
         break;
     case WM_KEYDOWN:
-        if (wParam == VK_ESCAPE) PostMessage(hWnd, WM_CLOSE, 0, 0);
+        //if (wParam == VK_ESCAPE) PostMessage(hWnd, WM_CLOSE, 0, 0);
         break;
     case WM_ENTERSIZEMOVE:
         // WM_EXITSIZEMOVE is sent when the user grabs the resize bars.

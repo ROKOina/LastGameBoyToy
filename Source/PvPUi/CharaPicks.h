@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <DirectXMath.h>
 
 // 前方宣言
 class GameObject;
@@ -8,7 +9,7 @@ class Sprite;
 class CharaPicks
 {
 public:
-    CharaPicks() {}
+    CharaPicks();
     ~CharaPicks() {}
 
     // キャラピックUI生成
@@ -21,6 +22,8 @@ public:
 
     // 選択されたキャラのIDを取得
     int GetSelectedCharacterId() const { return selectedCharacterId; }
+    //確定したか
+    bool IsDecisionFlg() const { return decisionFlg; }
 private:
     // キャラ詳細（スキル表示、キャラ名、選択キャラ表示）
     void CharaDetails();
@@ -43,5 +46,7 @@ private:
     int selectedCharacterId = -1;
     // 決定フラグ
     bool decisionFlg = false;
+
+    DirectX::XMFLOAT4 color, selectColor = {};
 };
 
