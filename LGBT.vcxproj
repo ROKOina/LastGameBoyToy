@@ -164,7 +164,6 @@
     <ClInclude Include="Source\Component\Character\CharacterCom.h" />
     <ClInclude Include="Source\Component\Character\CharaStatusCom.h" />
     <ClInclude Include="Source\Component\Character\FarahCom.h" />
-    <ClInclude Include="Source\Component\Character\HaveAllAttackCharacter.h" />
     <ClInclude Include="Source\Component\Character\InazawaCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\JankratCharacterCom.h" />
     <ClInclude Include="Source\Component\Character\Prop\NetCharaData.h" />
@@ -325,7 +324,6 @@
     <ClCompile Include="Source\Component\Character\CharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\CharaStatusCom.cpp" />
     <ClCompile Include="Source\Component\Character\FarahCom.cpp" />
-    <ClCompile Include="Source\Component\Character\HaveAllAttackCharacter.cpp" />
     <ClCompile Include="Source\Component\Character\InazawaCharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\JankratCharacterCom.cpp" />
     <ClCompile Include="Source\Component\Character\Prop\SetNodeWorldPosCom.cpp" />
