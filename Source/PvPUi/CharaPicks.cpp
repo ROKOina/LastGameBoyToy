@@ -121,6 +121,13 @@ void CharaPicks::CreateCharaPicksUiObject()
         decision->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
     }
 
+    // ƒLƒƒƒ‰‘I‘ðUI
+    {
+        auto& charaPick = charaPicksCanvas->AddChildObject();
+        charaPick->SetName("CharaPick");
+        //charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
+    }
+
     // ŽžŠÔ§ŒÀ
     {
         auto& timeLimit = charaPicksCanvas->AddChildObject();
