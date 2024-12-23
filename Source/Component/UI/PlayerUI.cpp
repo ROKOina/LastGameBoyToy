@@ -543,6 +543,8 @@ void PlayerUIManager::Register()
     CreateHpUI();
     //Boost
     CreateBoostUI();
+    //全員の使用キャラ表示
+    CreateNetUseCharaUI();
     ////////////////////////////////
 
     //キャラ固有のUI
@@ -739,6 +741,78 @@ void PlayerUIManager::CreateBoostUI()
 
         hpMemori->AddComponent<UI_BoosGauge>(boostCount);
     }
+}
+
+void PlayerUIManager::CreateNetUseCharaUI()
+{
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+    //味方
+    {
+        std::shared_ptr<GameObject> allyBack = canvas->AddChildObject();
+        allyBack->SetName("allyBack");
+        allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
+        //一人目
+        {   //122 341
+            std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
+            ally01->SetName("charaView01");
+            ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //二人目
+        {
+            std::shared_ptr<GameObject> ally02 = allyBack->AddChildObject();
+            ally02->SetName("charaView02");
+            ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+    }
+
+    //敵
+    {
+        std::shared_ptr<GameObject> enemyBack = canvas->AddChildObject();
+        enemyBack->SetName("enemyBack");
+        enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBackEnemy.ui", Sprite::SpriteShader::DEFALT, false);
+        //一人目
+        {
+            std::shared_ptr<GameObject> enemy01 = enemyBack->AddChildObject();
+            enemy01->SetName("charaView01");
+            enemy01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //二人目
+        {
+            std::shared_ptr<GameObject> enemy02 = enemyBack->AddChildObject();
+            enemy02->SetName("charaView02");
+            enemy02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+    }
+
+}
+
+void PlayerUIManager::NetUseCharaUIUpdate(int chara[4])
+{
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+
+    auto& charaView = [&](std::shared_ptr<GameObject> parentObj, int of)
+        {
+            auto& c01 = parentObj->GetChildFind("charaView01");
+            auto& c02 = parentObj->GetChildFind("charaView02");
+
+            //位置
+            c01->transform_->SetLocalPosition({ 122,0,0 });
+            c02->transform_->SetLocalPosition({ 341,0,0 });
+
+            //キャラIDを見て画像ずらす
+            if (chara[0 + of] >= 0)
+                c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * chara[0 + of];
+            if (chara[1 + of] >= 0)
+                c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * chara[1 + of];
+
+        };
+
+    auto& ally = canvas->GetChildFind("allyBack");
+    auto& enemy = canvas->GetChildFind("enemyBack");
+    if (ally)
+        charaView(ally,0);
+    if (enemy)
+        charaView(enemy,2);
 }
 
 void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)

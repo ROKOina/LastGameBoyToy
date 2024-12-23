@@ -217,6 +217,11 @@ public:
     //ブーストUI
     void CreateBoostUI();
 
+    //全員の使用キャラUI
+    void CreateNetUseCharaUI();
+    //使用キャラ更新
+    void NetUseCharaUIUpdate(int chara[4]);
+
     //味方HPUI
     void CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer);
     bool GetAllyHp() { return allyHp; }

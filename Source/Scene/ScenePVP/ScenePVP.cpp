@@ -982,11 +982,11 @@ void ScenePVP::GameUpdate(float elapsedTime)
     auto net = photonNet->GetPhotonLib();
 
     //味方UI登録
-    if (!PlayerUIManager::Instance().GetAllyHp())
-    {
-        auto& saveI = net->GetSaveInput();
+    auto& saveI = net->GetSaveInput();
         auto& player = GameObjectManager::Instance().Find("player");
         auto& netData = player->GetComponent<CharacterCom>()->GetNetCharaData();
+    if (!PlayerUIManager::Instance().GetAllyHp())
+    {
         for (auto& s : saveI)
         {
             if (!s.useFlg)continue;
@@ -1000,6 +1000,20 @@ void ScenePVP::GameUpdate(float elapsedTime)
             break;
         }
     }
+
+    //使用キャラUI更新
+    int charaID[4] = { -1,-1,-1,-1 };   //前２個は味方
+    for (auto& s : saveI)
+    {
+        if (!s.useFlg)continue;
+        if (netData.GetTeamID() == s.teamID)
+            if (charaID[0] < 0)charaID[0] = s.charaID;
+            else charaID[1] = s.charaID;
+        else
+            if (charaID[2] < 0)charaID[2] = s.charaID;
+            else charaID[3] = s.charaID;
+    }
+    PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID);
 }
 
 void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
