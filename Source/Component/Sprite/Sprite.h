@@ -18,6 +18,7 @@ public:
         BLUR,
         DISSOLVE,
         CHROMATICABERRATION,
+        GLITCH,
         MAX
     };
 
@@ -48,8 +49,6 @@ public:
 
     //イージング停止
     void StopEasing();
-
-
 
 private:
 

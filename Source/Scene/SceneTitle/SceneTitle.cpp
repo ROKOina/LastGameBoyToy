@@ -117,25 +117,25 @@ void SceneTitle::Initialize()
         {
             auto& next = obj->AddChildObject();
             next->SetName("PVE");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //PVP
         {
             auto& next = obj->AddChildObject();
             next->SetName("PVP");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //トレーニング
         {
             auto& next = obj->AddChildObject();
             next->SetName("Training");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //ゲーム終了
         {
             auto& next = obj->AddChildObject();
             next->SetName("endgame");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/endgame.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/endgame.ui", Sprite::SpriteShader::GLITCH, true);
         }
 
         //セレクト棒
@@ -268,7 +268,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
                 //ゲーム終了
                 if (std::string(sprite->GetGameObject()->GetName()) == "endgame")
-                {   
+                {
                     PostMessage(Graphics::Instance().GetHwnd(), WM_CLOSE, 0, 0);
                 }
 
