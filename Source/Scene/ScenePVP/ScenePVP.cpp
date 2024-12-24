@@ -81,24 +81,7 @@ void ScenePVP::Initialize()
 void ScenePVP::InitializeLobbySelect()
 {
     //背景
-    std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
-    lobbyBackParent->SetName("lobbyBackParent");
-    tempRemoveObj.emplace_back(lobbyBackParent);
-
-    std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
-    lobbyBack->SetName("lobbyBack");
-    lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
-    //削除予定リストに追加
-    tempRemoveObj.emplace_back(lobbyBack);
-    //背景移動オブジェクト
-    for (int i = 0; i < 3; ++i)
-    {
-        std::shared_ptr<GameObject> lobbyBackRect = lobbyBackParent->AddChildObject();
-        lobbyBackRect->SetName(std::string("lobbyBackRect" + std::to_string(i)).c_str());
-        lobbyBackRect->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
-        //削除予定リストに追加
-        tempRemoveObj.emplace_back(lobbyBackRect);
-    }
+    InitializeBack();
 
     //font
     std::shared_ptr<GameObject> FParent = GameObjectManager::Instance().Create();
@@ -312,7 +295,116 @@ void ScenePVP::InitializePVP()
         font->color = { 0,1,0,0.5 };
     }
 
+    //UI
+    std::shared_ptr<GameObject> gameModeUI = GameObjectManager::Instance().Create();
+    gameModeUI->SetName("gameModeUI");
+
+    switch (pvpGameSystem->GetGameMode())
+    {
+    case PVPGameSystem::GAME_MODE::Deathmatch:
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("time");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 900,0 };
+        font->scale = 1.5f;
+        font->color = { 1,1,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("killCountAlly");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1560,23 };
+        font->scale = 1.0f;
+        font->color = { 0,0,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("killCountEnemy");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1560,119 };
+        font->scale = 1.0f;
+        font->color = { 1,0,0,1 };
+    }
+    break;
+    }
+
+
 #pragma endregion
+}
+
+static int rectNum = 10;
+static int crossNum = 10;
+static int triangleNum = 3;
+void ScenePVP::InitializeBack()
+{
+    //背景
+    std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
+    lobbyBackParent->SetName("lobbyBackParent");
+    tempRemoveObj.emplace_back(lobbyBackParent);
+
+    std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
+    lobbyBack->SetName("lobbyBack");
+    lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
+    //削除予定リストに追加
+    tempRemoveObj.emplace_back(lobbyBack);
+    //背景移動オブジェクト
+    for (int r = 0; r < rectNum; ++r) //四角
+    {
+        std::shared_ptr<GameObject> lobbyBackRectSmall = lobbyBackParent->AddChildObject();
+        lobbyBackRectSmall->SetName(std::string("lobbyBackRectSmall" + std::to_string(r)).c_str());
+        auto& rss = lobbyBackRectSmall->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
+        rss->EasingPlay();
+        //削除予定リストに追加
+        tempRemoveObj.emplace_back(lobbyBackRectSmall);
+        std::shared_ptr<GameObject> lobbyBackRectBig = lobbyBackParent->AddChildObject();
+        lobbyBackRectBig->SetName(std::string("lobbyBackRectBig" + std::to_string(r)).c_str());
+        auto& rbs = lobbyBackRectBig->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
+        rbs->EasingPlay();
+        //削除予定リストに追加
+        tempRemoveObj.emplace_back(lobbyBackRectBig);
+    }
+
+    for (int c = 0; c < 2; ++c) //円
+    {
+        std::shared_ptr<GameObject> lobbyBackCircle = lobbyBackParent->AddChildObject();
+        lobbyBackCircle->SetName(std::string("lobbyBackCircle" + std::to_string(c)).c_str());
+        lobbyBackCircle->AddComponent<UiSystem>(std::string("Data/SerializeData/UIData/PVPScene/lobbyBackCircle0" + std::to_string(c + 1) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        //削除予定リストに追加
+        tempRemoveObj.emplace_back(lobbyBackCircle);
+    }
+
+    for (int b = 0; b < crossNum; ++b) //バツ
+    {
+        std::shared_ptr<GameObject> lobbyBackCross = lobbyBackParent->AddChildObject();
+        lobbyBackCross->SetName(std::string("lobbyBackCross" + std::to_string(b)).c_str());
+        auto& cs = lobbyBackCross->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackCross.ui", Sprite::SpriteShader::DEFALT, false);
+        cs->EasingPlay();
+        //削除予定リストに追加
+        tempRemoveObj.emplace_back(lobbyBackCross);
+    }
+
+    //for (int t = 0; t < triangleNum; ++t) //三角
+    //{
+    //    std::shared_ptr<GameObject> lobbyBackTriangle0 = lobbyBackParent->AddChildObject();
+    //    lobbyBackTriangle0->SetName(std::string("lobbyBackTriangle0" + std::to_string(t)).c_str());
+    //    auto& t0=lobbyBackTriangle0->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
+    //    t0->EasingPlay();
+    //    //削除予定リストに追加
+    //    tempRemoveObj.emplace_back(lobbyBackTriangle0);
+    //    std::shared_ptr<GameObject> lobbyBackTriangle1 = lobbyBackParent->AddChildObject();
+    //    lobbyBackTriangle1->SetName(std::string("lobbyBackTriangle1" + std::to_string(t)).c_str());
+    //    auto& t1 = lobbyBackTriangle1->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
+    //    t1->EasingPlay();
+    //    //削除予定リストに追加
+    //    tempRemoveObj.emplace_back(lobbyBackTriangle1);
+    //    std::shared_ptr<GameObject> lobbyBackTriangle2 = lobbyBackParent->AddChildObject();
+    //    lobbyBackTriangle2->SetName(std::string("lobbyBackTriangle2" + std::to_string(t)).c_str());
+    //    auto& t2 = lobbyBackTriangle2->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
+    //    t2->EasingPlay();
+    //    //削除予定リストに追加
+    //    tempRemoveObj.emplace_back(lobbyBackTriangle2);
+    //}
 }
 
 void ScenePVP::Finalize()
@@ -983,8 +1075,8 @@ void ScenePVP::GameUpdate(float elapsedTime)
 
     //味方UI登録
     auto& saveI = net->GetSaveInput();
-        auto& player = GameObjectManager::Instance().Find("player");
-        auto& netData = player->GetComponent<CharacterCom>()->GetNetCharaData();
+    auto& player = GameObjectManager::Instance().Find("player");
+    auto& netData = player->GetComponent<CharacterCom>()->GetNetCharaData();
     if (!PlayerUIManager::Instance().GetAllyHp())
     {
         for (auto& s : saveI)
@@ -1014,35 +1106,279 @@ void ScenePVP::GameUpdate(float elapsedTime)
             else charaID[3] = s.charaID;
     }
     PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID);
+
+    //ゲームモードUI更新
+    switch (pvpGameSystem->GetGameMode())
+    {
+    case PVPGameSystem::GAME_MODE::Deathmatch:
+    {
+        auto& gameModeUI = GameObjectManager::Instance().Find("gameModeUI");
+        auto& time = gameModeUI->GetChildFind("time")->GetComponent<Font>();
+        auto& killA = gameModeUI->GetChildFind("killCountAlly")->GetComponent<Font>();
+        auto& killE = gameModeUI->GetChildFind("killCountEnemy")->GetComponent<Font>();
+        auto& des = pvpGameSystem->GetDeathMatchData();
+        time->str = UTF8ToWString2(std::to_string(int(des.endTime - des.nowTime)));
+
+        //チームによって変える
+        if (netData.GetTeamID() == 0)
+        {
+            killA->str = UTF8ToWString2(std::to_string(des.teamData[0].killCount));
+            killE->str = UTF8ToWString2(std::to_string(des.teamData[1].killCount));
+        }
+        else
+        {
+            killA->str = UTF8ToWString2(std::to_string(des.teamData[1].killCount));
+            killE->str = UTF8ToWString2(std::to_string(des.teamData[0].killCount));
+        }
+    }
+    break;
+    }
 }
 
 void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
 {
-    static float speed[3] = {1000,1000,1000};
-    for (int i = 0; i < 3; ++i)
+    auto& lobbyBackParent = GameObjectManager::Instance().Find("lobbyBackParent");
+    for (int r = 0; r < rectNum; ++r) //四角
     {
-        auto& lobbyBackParent=GameObjectManager::Instance().Find("lobbyBackParent");
-        auto& childBack=lobbyBackParent->GetChildFind(std::string("lobbyBackRect" + std::to_string(i)).c_str());
-        auto& uis = childBack->GetComponent<UiSystem>();
-        //左に流れる
-        auto pos=childBack->transform_->GetWorldPosition();
-        pos.x += -speed[i] * elapsedTime;
-        childBack->transform_->SetWorldPosition(pos);
+        auto& lobbyBackRectSmall = lobbyBackParent->GetChildFind(std::string("lobbyBackRectSmall" + std::to_string(r)).c_str());
+        auto& lobbyBackRectBig = lobbyBackParent->GetChildFind(std::string("lobbyBackRectBig" + std::to_string(r)).c_str());
+        auto& rsUI = lobbyBackRectSmall->GetComponent<UiSystem>();
+        auto& rbUI = lobbyBackRectBig->GetComponent<UiSystem>();
 
-        //リセット
-        if (pos.x < -uis->spc.scale.x*100 * 3)
+        //再生していないなら初期化する
+        if (rsUI->GetEasingTime() > 1)
         {
-            //速さ
-            speed[i] = 100 + rand() % 150;
-
+            //色
+            int colorR = (rand() % 50) * 0.01f;
+            rsUI->spc.color = { 1,1,0,0.0f };
+            rbUI->spc.color = { 1,1,0,0.0f };
+            rsUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.6f };
+            rbUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.9f };
+            //回転
+            int angleR = rand() % 360;
+            rsUI->spc.easingangle = angleR+50;
+            rbUI->spc.easingangle = angleR;
             //大きさ
-            uis->spc.scale =
-            { 1.0f + ((rand() % 200) / 100.0f),1.0f + ((rand() % 200) / 100.0f) };
-
+            float sacleR = 0.1f + (rand() % 40) * 0.01f;
+            rsUI->spc.scale = { 0 ,0 };
+            rbUI->spc.scale = { 0 ,0 };
+            rsUI->spc.easingscale = { sacleR * 0.3f ,sacleR * 0.3f };
+            rbUI->spc.easingscale = { sacleR ,sacleR };
+            //時間
+            float timeR = 0.5f + (rand() % 200) * 0.01f;
+            rsUI->spc.timescale = timeR;
+            rbUI->spc.timescale = timeR;
             //位置
-            pos.x = 2320;
-            pos.y = (900 / 3) * i + rand() % (900 / 3);
-            childBack->transform_->SetWorldPosition(pos);
+            float posY = 50 + rand() % 980;
+            float posX = 50 + rand() % 1820;
+            rsUI->spc.position = { posX ,posY };
+            rbUI->spc.position = { posX ,posY };
+            int kakudo = rand() % 4;
+            int offSize = 50;
+            float offSizeSmall = 1.3f;
+            if (kakudo == 0)
+            {
+                rsUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                rbUI->spc.easingposition = { posX + offSize ,posY + offSize };
+            }
+            if (kakudo == 1)
+            {
+                rsUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                rbUI->spc.easingposition = { posX + offSize ,posY - offSize };
+            }
+            if (kakudo == 2)
+            {
+                rsUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                rbUI->spc.easingposition = { posX - offSize ,posY - offSize };
+            }
+            if (kakudo == 3)
+            {
+                rsUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                rbUI->spc.easingposition = { posX - offSize ,posY + offSize };
+            }
+
+            rsUI->GetEasingTimeReset();
+            rbUI->GetEasingTimeReset();
+            rsUI->EasingPlay();
+            rbUI->EasingPlay();
         }
     }
+
+    for (int c = 0; c < 2; ++c) //円
+    {
+        auto& lobbyBackCircle = lobbyBackParent->GetChildFind(std::string("lobbyBackCircle" + std::to_string(c)).c_str());
+        auto& cUI = lobbyBackCircle->GetComponent<UiSystem>();
+
+        //cUI
+        cUI->spc.angle += elapsedTime * (50 + 10 * c);
+    }
+
+    for (int b = 0; b < crossNum; b += 2) //バツ
+    {
+        auto& lobbyBackCrossSmall = lobbyBackParent->GetChildFind(std::string("lobbyBackCross" + std::to_string(b)).c_str());
+        auto& lobbyBackCrossBig = lobbyBackParent->GetChildFind(std::string("lobbyBackCross" + std::to_string(b + 1)).c_str());
+        auto& csUI = lobbyBackCrossSmall->GetComponent<UiSystem>();
+        auto& cbUI = lobbyBackCrossBig->GetComponent<UiSystem>();
+
+        //再生していないなら初期化する
+        if (csUI->GetEasingTime() > 1)
+        {
+            //色
+            int colorR = (rand() % 50) * 0.01f;
+            csUI->spc.color = { 1,1,0,0.0f };
+            cbUI->spc.color = { 1,1,0,0.0f };
+            csUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.3f };
+            cbUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.9f };
+            //回転
+            csUI->spc.angle = 0;
+            cbUI->spc.angle = 0;
+            csUI->spc.easingangle = 0;
+            cbUI->spc.easingangle = 0;
+            //大きさ
+            float sacleR = 0.1f + (rand() % 40) * 0.01f;
+            csUI->spc.scale = { sacleR * 0.8f ,sacleR * 0.8f };
+            cbUI->spc.scale = { sacleR ,sacleR };
+            csUI->spc.easingscale = { sacleR * 0.8f ,sacleR * 0.8f };
+            cbUI->spc.easingscale = { sacleR ,sacleR };
+            //時間
+            float timeR = 0.5f + (rand() % 200) * 0.01f;
+            csUI->spc.timescale = timeR;
+            cbUI->spc.timescale = timeR;
+            ////位置
+            //float posY = 50 + rand() % 980;
+            //float posX = 50 + rand() % 1820;
+            //csUI->spc.position = { posX ,posY };
+            //cbUI->spc.position = { posX-50* sacleR ,posY-80 * sacleR };
+            //csUI->spc.easingposition = { posX ,posY };
+            //cbUI->spc.easingposition = { posX-50 * sacleR ,posY-80 * sacleR };
+
+                        //位置
+            float posY = 50 + rand() % 980;
+            float posX = 50 + rand() % 1820;
+            csUI->spc.position = { posX ,posY };
+            cbUI->spc.position = { posX ,posY };
+            int kakudo = rand() % 4;
+            int offSize = 50;
+            float offSizeSmall = 1.3f;
+            if (kakudo == 0)
+            {
+                csUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                cbUI->spc.easingposition = { posX + offSize ,posY + offSize };
+            }
+            if (kakudo == 1)
+            {
+                csUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                cbUI->spc.easingposition = { posX + offSize ,posY - offSize };
+            }
+            if (kakudo == 2)
+            {
+                csUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                cbUI->spc.easingposition = { posX - offSize ,posY - offSize };
+            }
+            if (kakudo == 3)
+            {
+                csUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                cbUI->spc.easingposition = { posX - offSize ,posY + offSize };
+            }
+
+            csUI->GetEasingTimeReset();
+            cbUI->GetEasingTimeReset();
+            csUI->EasingPlay();
+            cbUI->EasingPlay();
+        }
+    }
+
+    //for (int t = 0; t < triangleNum; ++t) //三角
+    //{
+    //    auto& lobbyBackTriangle0 = lobbyBackParent->GetChildFind(std::string("lobbyBackTriangle0" + std::to_string(t)).c_str());
+    //    auto& lobbyBackTriangle1 = lobbyBackParent->GetChildFind(std::string("lobbyBackTriangle1" + std::to_string(t)).c_str());
+    //    auto& lobbyBackTriangle2 = lobbyBackParent->GetChildFind(std::string("lobbyBackTriangle2" + std::to_string(t)).c_str());
+    //    auto& t0UI = lobbyBackTriangle0->GetComponent<UiSystem>();
+    //    auto& t1UI = lobbyBackTriangle1->GetComponent<UiSystem>();
+    //    auto& t2UI = lobbyBackTriangle2->GetComponent<UiSystem>();
+
+    //    //再生していないなら初期化する
+    //    if (t0UI->GetEasingTime() > 1)
+    //    {
+    //        //進行方向
+    //        int kakudo = rand() % 4;
+    //        //色
+    //        t0UI->spc.color = { 0,0.5f,0.3f,0.3f };
+    //        t1UI->spc.color = { 0,0.5f,0.3f,0.6f };
+    //        t2UI->spc.color = { 0,0.5f,0.3f,0.9f };
+    //        t0UI->spc.easingcolor = { 0,0.5f,0.3f,0.3f };
+    //        t1UI->spc.easingcolor = { 0,0.5f,0.3f,0.6f };
+    //        t2UI->spc.easingcolor = { 0,0.5f,0.3f,0.9f };
+    //        //回転
+    //        float angle = 360 * (0.25f * kakudo);
+    //        t0UI->spc.angle = angle;
+    //        t1UI->spc.angle = angle;
+    //        t2UI->spc.angle = angle;
+    //        t0UI->spc.easingangle = angle;
+    //        t1UI->spc.easingangle = angle;
+    //        t2UI->spc.easingangle = angle;
+    //        //大きさ
+    //        float sacleR = 0.1f + (rand() % 40) * 0.01f;
+    //        t0UI->spc.scale = { sacleR * 0.5f ,sacleR*0.5f };
+    //        t1UI->spc.scale = { sacleR * 0.8f ,sacleR * 0.8f };
+    //        t2UI->spc.scale = { sacleR ,sacleR };
+    //        t0UI->spc.easingscale = { sacleR * 0.5f,sacleR * 0.5f };
+    //        t1UI->spc.easingscale = { sacleR * 0.8f ,sacleR * 0.8f };
+    //        t2UI->spc.easingscale = { sacleR ,sacleR };
+    //        //時間
+    //        float timeR = 0.5f + (rand() % 200) * 0.01f;
+    //        t0UI->spc.timescale = timeR;
+    //        t1UI->spc.timescale = timeR;
+    //        t2UI->spc.timescale = timeR;
+    //        //位置
+    //        float posY = 100 + rand() % 880;
+    //        float posX = 100 + rand() % 1720;
+    //        int offSize = 50;
+    //        int offPos = 200;
+    //        if (kakudo == 0)
+    //        {
+    //            t0UI->spc.position = { posX ,posY };
+    //            t1UI->spc.position = { posX ,posY - offSize };
+    //            t2UI->spc.position = { posX ,posY - offSize * 2 };
+    //            t0UI->spc.easingposition = { posX ,posY - offPos };
+    //            t1UI->spc.easingposition = { posX ,posY - offSize - offPos };
+    //            t2UI->spc.easingposition = { posX ,posY - offSize * 2 - offPos };
+    //        }
+    //        if (kakudo == 1)
+    //        {
+    //            t0UI->spc.position = { posX ,posY };
+    //            t1UI->spc.position = { posX + offSize  ,posY };
+    //            t2UI->spc.position = { posX + offSize * 2,posY };
+    //            t0UI->spc.easingposition = { posX + offPos  ,posY };
+    //            t1UI->spc.easingposition = { posX + offSize + offPos  ,posY };
+    //            t2UI->spc.easingposition = { posX + offSize * 2 + offPos ,posY };
+    //        }
+    //        if (kakudo == 2)
+    //        {
+    //            t0UI->spc.position = { posX ,posY };
+    //            t1UI->spc.position = { posX ,posY + offSize };
+    //            t2UI->spc.position = { posX ,posY + offSize * 2 };
+    //            t0UI->spc.easingposition = { posX ,posY + offPos };
+    //            t1UI->spc.easingposition = { posX ,posY + offSize + offPos };
+    //            t2UI->spc.easingposition = { posX ,posY + offSize * 2 + offPos };
+    //        }
+    //        if (kakudo == 3)
+    //        {
+    //            t0UI->spc.position = { posX ,posY };
+    //            t1UI->spc.position = { posX - offSize  ,posY };
+    //            t2UI->spc.position = { posX - offSize * 2,posY };
+    //            t0UI->spc.easingposition = { posX - offPos ,posY };
+    //            t1UI->spc.easingposition = { posX - offSize - offPos  ,posY };
+    //            t2UI->spc.easingposition = { posX - offSize * 2 - offPos  ,posY };
+    //        }
+
+
+    //        t0UI->GetEasingTimeReset();
+    //        t1UI->GetEasingTimeReset();
+    //        t2UI->GetEasingTimeReset();
+    //        t0UI->EasingPlay();
+    //        t1UI->EasingPlay();
+    //        t2UI->EasingPlay();
+    //    }
+    //}
 }

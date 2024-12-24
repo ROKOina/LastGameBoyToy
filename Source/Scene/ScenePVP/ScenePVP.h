@@ -26,6 +26,8 @@ public:
     void InitializeCharaSelect();
     //‰Šú‰»‚SiPVPj
     void InitializePVP();
+    //”wŒi‰Šú‰»
+    void InitializeBack();
 
     // I—¹‰»
     void Finalize()override;

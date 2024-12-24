@@ -1407,6 +1407,14 @@ void PhotonLib::sendGameData(void)
     int myPlayerID = GetMyPlayerID();
     netD.playerId = myPlayerID;
 
+    //マスタークライアントの場合
+    if (GetIsMasterPlayer())
+    {
+        //チームIDを送る
+        for (int i = 0; i < 4; ++i)
+            netD.gameData.teamID[i] = saveInputPhoton[i].teamID;
+    }
+
     //名前
     ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
 
