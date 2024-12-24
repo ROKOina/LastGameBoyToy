@@ -26,6 +26,8 @@ public:
     void InitializeCharaSelect();
     //初期化４（PVP）
     void InitializePVP();
+    //背景初期化
+    void InitializeBack();
 
     // 終了化
     void Finalize()override;
@@ -56,6 +58,8 @@ private:
     void LobbyFontUpdate(float elapsedTime);    //fontUpdate
     //キャラセレクト時
     void CharaSelectUpdate(float elapsedTime);
+    //ゲーム中時
+    void GameUpdate(float elapsedTime);
     //背景Uodate
     void LobbyBackSprUpdate(float elapsedTime);
 private:
@@ -75,12 +79,13 @@ private:
 
     struct LobbySelectFont
     {
-        LobbySelectFont(int id, std::wstring str, DirectX::XMFLOAT2 pos, float scale, bool col, int state)
-            :id(id), str(str), pos(pos), scale(scale), collision(col), state(state) {}
+        LobbySelectFont(int id, std::wstring str, DirectX::XMFLOAT2 pos, float scale, bool col, int state, DirectX::XMFLOAT4 color = {1,1,1,1})
+            :id(id), str(str), pos(pos), scale(scale), collision(col), state(state),color(color) {}
         int id;
         std::wstring str;
         DirectX::XMFLOAT2 pos;
         float scale;
+        DirectX::XMFLOAT4 color;
 
         bool collision;
         int state;  //切り替えよう
@@ -88,16 +93,16 @@ private:
     //ロビー選択
     std::vector<LobbySelectFont> lobbySelectFont =
     {
-        LobbySelectFont(0,L"新規部屋作成",{303,320},1.5f,true,0),
+        LobbySelectFont(0,L"新規部屋作成",{303,320},1.5f,true,0,{1,0.8f,0,1}),
         LobbySelectFont(1,L"ロビー名",{465,223},1,false,1),
         LobbySelectFont(2,L"",{784,223},1,false,1),   //ロビー名打ち込み用
         LobbySelectFont(3,L"作成",{1203,624},1.5f,true,1),
         LobbySelectFont(4,L"戻る",{100,700},1.5f,true,1),
 
-        LobbySelectFont(5,L"ロビー選択",{76,54},2,false,0),
-        LobbySelectFont(6,L"新規部屋作成",{76,54},2,false,1),
+        LobbySelectFont(5,L"ロビー選択",{76,54},2,false,0,{0.7f,0.0f,0.3f,1}),
+        LobbySelectFont(6,L"新規部屋作成",{76,54},2,false,1,{1,0.8f,0,1}),
 
-        LobbySelectFont(10,L"部屋参加",{906,320},1.5f,true,0),
+        LobbySelectFont(10,L"部屋参加",{906,320},1.5f,true,0,{1,0.8f,0,1}),
         LobbySelectFont(11,L"戻る",{100,700},1.5f,true,2),
         LobbySelectFont(12,L"入室",{1203,624},1.5f,true,2),
 

@@ -50,6 +50,12 @@ public:
     //イージング停止
     void StopEasing();
 
+    //イージング再生中か
+    bool IsPlayEasing() { return play; }
+    //イージング時間
+    float GetEasingTime() { return easingtime; }
+    void GetEasingTimeReset() { easingtime = 0; }
+
 private:
 
     //シリアライズ
