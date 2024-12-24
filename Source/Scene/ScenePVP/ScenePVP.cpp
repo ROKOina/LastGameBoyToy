@@ -31,6 +31,7 @@
 #include "Component\Sprite\Sprite.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Component\UI\Font.h"
+#include "Math/easing.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
@@ -114,6 +115,7 @@ void ScenePVP::InitializeLobbySelect()
         font->position = lf.pos;
         font->str = lf.str;  //L付けてね
         font->scale = lf.scale;
+        font->color = lf.color;
         //削除予定リストに追加
         tempRemoveObj.emplace_back(obj);
     }
@@ -122,24 +124,7 @@ void ScenePVP::InitializeLobbySelect()
 void ScenePVP::InitializeLobby()
 {    
     //背景
-    std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
-    lobbyBackParent->SetName("lobbyBackParent");
-    tempRemoveObj.emplace_back(lobbyBackParent);
-
-    std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
-    lobbyBack->SetName("lobbyBack");
-    lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
-    //削除予定リストに追加
-    tempRemoveObj.emplace_back(lobbyBack);
-    //背景移動オブジェクト
-    for (int i = 0; i < 3; ++i)
-    {
-        std::shared_ptr<GameObject> lobbyBackRect = lobbyBackParent->AddChildObject();
-        lobbyBackRect->SetName(std::string("lobbyBackRect" + std::to_string(i)).c_str());
-        lobbyBackRect->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
-        //削除予定リストに追加
-        tempRemoveObj.emplace_back(lobbyBackRect);
-    }
+    InitializeBack();
 
     //font
     std::shared_ptr<GameObject> FParent = GameObjectManager::Instance().Create();
@@ -182,6 +167,7 @@ void ScenePVP::InitializeLobby()
         font->position = lf.pos;
         font->str = lf.str;  //L付けてね
         font->scale = lf.scale;
+        font->color = lf.color;
         //削除予定リストに追加
         tempRemoveObj.emplace_back(obj);
     }
@@ -190,27 +176,8 @@ void ScenePVP::InitializeLobby()
 void ScenePVP::InitializeCharaSelect()
 {    
     //背景
-    std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
-    lobbyBackParent->SetName("lobbyBackParent");
-    tempRemoveObj.emplace_back(lobbyBackParent);
+    InitializeBack();    //ピック画面起動
 
-    std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
-    lobbyBack->SetName("lobbyBack");
-    auto& spr = lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
-    spr->SetOrderinLayer(-1);
-    //削除予定リストに追加
-    tempRemoveObj.emplace_back(lobbyBack);
-    //背景移動オブジェクト
-    for (int i = 0; i < 3; ++i)
-    {
-        std::shared_ptr<GameObject> lobbyBackRect = lobbyBackParent->AddChildObject();
-        lobbyBackRect->SetName(std::string("lobbyBackRect" + std::to_string(i)).c_str());
-        lobbyBackRect->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
-        //削除予定リストに追加
-        tempRemoveObj.emplace_back(lobbyBackRect);
-    }
-
-    //ピック画面起動
     charaPicks->SetViewCharaPicks(true);
 }
 
@@ -333,9 +300,9 @@ void ScenePVP::InitializePVP()
 #pragma endregion
 }
 
-static int rectNum = 10;
-static int crossNum = 10;
-static int triangleNum = 3;
+static const int rectNum = 10;
+static const int crossNum = 10;
+static const int triangleNum = 3;
 void ScenePVP::InitializeBack()
 {
     //背景
@@ -1148,54 +1115,62 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
         //再生していないなら初期化する
         if (rsUI->GetEasingTime() > 1)
         {
-            //色
-            int colorR = (rand() % 50) * 0.01f;
-            rsUI->spc.color = { 1,1,0,0.0f };
-            rbUI->spc.color = { 1,1,0,0.0f };
-            rsUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.6f };
-            rbUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.9f };
-            //回転
-            int angleR = rand() % 360;
-            rsUI->spc.easingangle = angleR+50;
-            rbUI->spc.easingangle = angleR;
             //大きさ
             float sacleR = 0.1f + (rand() % 40) * 0.01f;
             rsUI->spc.scale = { 0 ,0 };
             rbUI->spc.scale = { 0 ,0 };
-            rsUI->spc.easingscale = { sacleR * 0.3f ,sacleR * 0.3f };
+            rsUI->spc.easingscale = { sacleR * 0.8f ,sacleR * 0.8f };
             rbUI->spc.easingscale = { sacleR ,sacleR };
             //時間
-            float timeR = 0.5f + (rand() % 200) * 0.01f;
+            float timeR = 0.1f + (rand() % 150) * 0.01f;
             rsUI->spc.timescale = timeR;
             rbUI->spc.timescale = timeR;
             //位置
             float posY = 50 + rand() % 980;
             float posX = 50 + rand() % 1820;
+            //影遠さ
+            float shadowScale = (1920.0f - posX) / 1920.0f;
             rsUI->spc.position = { posX ,posY };
             rbUI->spc.position = { posX ,posY };
             int kakudo = rand() % 4;
             int offSize = 50;
-            float offSizeSmall = 1.3f;
+            float offPosSmall = 300;
             if (kakudo == 0)
             {
-                rsUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                rsUI->spc.easingposition = { posX + offSize - (offPosSmall* sacleR) * shadowScale ,posY + offSize + (offPosSmall * sacleR) * shadowScale };
                 rbUI->spc.easingposition = { posX + offSize ,posY + offSize };
             }
             if (kakudo == 1)
             {
-                rsUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                rsUI->spc.easingposition = { posX + offSize - (offPosSmall * sacleR) * shadowScale,posY - offSize + (offPosSmall * sacleR) * shadowScale };
                 rbUI->spc.easingposition = { posX + offSize ,posY - offSize };
             }
             if (kakudo == 2)
             {
-                rsUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                rsUI->spc.easingposition = { posX - offSize - (offPosSmall * sacleR) * shadowScale ,posY - offSize + (offPosSmall * sacleR) * shadowScale };
                 rbUI->spc.easingposition = { posX - offSize ,posY - offSize };
             }
             if (kakudo == 3)
             {
-                rsUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                rsUI->spc.easingposition = { posX - offSize - (offPosSmall * sacleR) * shadowScale,posY + offSize + (offPosSmall * sacleR) * shadowScale };
                 rbUI->spc.easingposition = { posX - offSize ,posY + offSize };
             }
+
+            //回転
+            rsUI->spc.angle = 0;
+            rbUI->spc.angle = 0;
+            float posxH = fabsf(posX - 1920 * 0.5f);
+            float angle = 120.0f * (posxH / (1920 * 0.5f));
+            if (posX > 1920 * 0.5f)angle *= -1;
+            rsUI->spc.easingangle = angle + (angle * 0.4f)* shadowScale;
+            rbUI->spc.easingangle = angle;
+            //色
+            float per = ((1920.f - posX) / 1920.0f) * 0.5f + (posY / 1080.0f) * 0.5f;
+            DirectX::XMFLOAT3 color = Mathf::Lerp({ 1,1,0 }, { 0,0.5f,1 }, Quart::easeOut(per * per));
+            rsUI->spc.color = { 1,1,0,0.0f };
+            rbUI->spc.color = { 1,1,0,0.0f };
+            rsUI->spc.easingcolor = { color.x,color.y,color.z,0.3f };
+            rbUI->spc.easingcolor = { color.x,color.y,color.z,1.9f };
 
             rsUI->GetEasingTimeReset();
             rbUI->GetEasingTimeReset();
@@ -1210,7 +1185,10 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
         auto& cUI = lobbyBackCircle->GetComponent<UiSystem>();
 
         //cUI
-        cUI->spc.angle += elapsedTime * (50 + 10 * c);
+        if (c == 0)
+            cUI->spc.angle += elapsedTime * (50 + 10 * c);
+        else
+            cUI->spc.angle -= elapsedTime * (50 + 10 * c);
     }
 
     for (int b = 0; b < crossNum; b += 2) //バツ
@@ -1223,63 +1201,62 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
         //再生していないなら初期化する
         if (csUI->GetEasingTime() > 1)
         {
-            //色
-            int colorR = (rand() % 50) * 0.01f;
-            csUI->spc.color = { 1,1,0,0.0f };
-            cbUI->spc.color = { 1,1,0,0.0f };
-            csUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.3f };
-            cbUI->spc.easingcolor = { 0,(0.5f + colorR) * 100.0f / 255.0f,100 / 255.0f,0.9f };
-            //回転
-            csUI->spc.angle = 0;
-            cbUI->spc.angle = 0;
-            csUI->spc.easingangle = 0;
-            cbUI->spc.easingangle = 0;
             //大きさ
             float sacleR = 0.1f + (rand() % 40) * 0.01f;
-            csUI->spc.scale = { sacleR * 0.8f ,sacleR * 0.8f };
-            cbUI->spc.scale = { sacleR ,sacleR };
+            csUI->spc.scale = { 0 ,0 };
+            cbUI->spc.scale = { 0 ,0 };
             csUI->spc.easingscale = { sacleR * 0.8f ,sacleR * 0.8f };
             cbUI->spc.easingscale = { sacleR ,sacleR };
             //時間
-            float timeR = 0.5f + (rand() % 200) * 0.01f;
+            float timeR = 0.3f + (rand() % 200) * 0.01f;
             csUI->spc.timescale = timeR;
             cbUI->spc.timescale = timeR;
-            ////位置
-            //float posY = 50 + rand() % 980;
-            //float posX = 50 + rand() % 1820;
-            //csUI->spc.position = { posX ,posY };
-            //cbUI->spc.position = { posX-50* sacleR ,posY-80 * sacleR };
-            //csUI->spc.easingposition = { posX ,posY };
-            //cbUI->spc.easingposition = { posX-50 * sacleR ,posY-80 * sacleR };
-
                         //位置
             float posY = 50 + rand() % 980;
             float posX = 50 + rand() % 1820;
+            //影遠さ
+            float shadowScale = (1920.0f - posX) / 1920.0f;
             csUI->spc.position = { posX ,posY };
             cbUI->spc.position = { posX ,posY };
             int kakudo = rand() % 4;
             int offSize = 50;
-            float offSizeSmall = 1.3f;
+            float offPosSmall = 150;
             if (kakudo == 0)
             {
-                csUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                csUI->spc.easingposition = { posX + offSize - (offPosSmall * sacleR)* shadowScale ,posY + offSize + (offPosSmall * sacleR) * shadowScale };
                 cbUI->spc.easingposition = { posX + offSize ,posY + offSize };
             }
             if (kakudo == 1)
             {
-                csUI->spc.easingposition = { posX + offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                csUI->spc.easingposition = { posX + offSize - (offPosSmall * sacleR) * shadowScale ,posY - offSize + (offPosSmall * sacleR) * shadowScale };
                 cbUI->spc.easingposition = { posX + offSize ,posY - offSize };
             }
             if (kakudo == 2)
             {
-                csUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY - offSize * offSizeSmall };
+                csUI->spc.easingposition = { posX - offSize - (offPosSmall * sacleR) * shadowScale ,posY - offSize + (offPosSmall * sacleR) * shadowScale };
                 cbUI->spc.easingposition = { posX - offSize ,posY - offSize };
             }
             if (kakudo == 3)
             {
-                csUI->spc.easingposition = { posX - offSize * offSizeSmall ,posY + offSize * offSizeSmall };
+                csUI->spc.easingposition = { posX - offSize - (offPosSmall * sacleR) * shadowScale ,posY + offSize + (offPosSmall * sacleR) * shadowScale };
                 cbUI->spc.easingposition = { posX - offSize ,posY + offSize };
             }
+
+            //回転
+            csUI->spc.angle = 0;
+            cbUI->spc.angle = 0;
+            float posxH = fabsf(posX - 1920 * 0.5f);
+            float angle = 180.0f * (posxH / (1920 * 0.5f));
+            if (posX > 1920 * 0.5f)angle *= -1;
+            csUI->spc.easingangle = angle + (angle * 0.4f)*shadowScale;
+            cbUI->spc.easingangle = angle;
+            //色
+            float per = ((1920.f - posX) / 1920.0f) * 0.5f + (posY / 1080.0f) * 0.5f;
+            DirectX::XMFLOAT3 color = Mathf::Lerp({ 1,1,0 }, { 0,0.5f,1 }, Quart::easeOut(per * per));
+            csUI->spc.color = { 1,1,0,0.0f };
+            cbUI->spc.color = { 1,1,0,0.0f };
+            csUI->spc.easingcolor = { color.x,color.y,color.z,0.3f };
+            cbUI->spc.easingcolor = { color.x,color.y,color.z,1.9f };
 
             csUI->GetEasingTimeReset();
             cbUI->GetEasingTimeReset();
