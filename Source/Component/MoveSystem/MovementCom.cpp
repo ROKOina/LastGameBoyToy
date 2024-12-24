@@ -41,6 +41,8 @@ void MovementCom::OnGUI()
 {
     ImGui::DragFloat3((char*)u8"速力", &velocity_.x, 0.1f, -100.0f, 100.0f);
     ImGui::DragFloat3((char*)u8"最大加速度", &nonMaxSpeedVelocity_.x);
+    ImGui::DragFloat3((char*)u8"レイキャストヒット位置", &hitPosition_.x);
+    ImGui::DragFloat3((char*)u8"レイキャストヒット法線", &hitNormal_.x);
     ImGui::DragFloat((char*)u8"重力", &gravity_, 0.01f, 0.0f, 100.0f);
     ImGui::DragFloat((char*)u8"重力影響度", &gravityeffect, 0.01f, 0.0f, 30.0f);
     ImGui::DragFloat((char*)u8"落下スピード", &fallspeed, 0.1f, -100.0f, 0.0f);
@@ -157,9 +159,19 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
             velocity_.y = 0;
             nonMaxSpeedVelocity_.y = 0;
             onGround_ = true;
+
+            // レイキャストが当たった位置と法線を保存
+            hitPosition_.x = buffer.block.position.x;
+            hitPosition_.y = buffer.block.position.y;
+            hitPosition_.z = buffer.block.position.z;
+            hitNormal_.x = buffer.block.normal.x;
+            hitNormal_.y = buffer.block.normal.y;
+            hitNormal_.z = buffer.block.normal.z;
         }
         else
         {
+            hitPosition_ = { 0,0,0 };
+            hitNormal_ = { 0,0,0 };
             position.y += moveVec * elapsedTime;
             onGround_ = false;
         }
@@ -209,6 +221,14 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
         if (isRaycast && PhysXLib::Instance().RayCast_PhysX(
             start, Mathf::Normalize(end - start), Mathf::Length(end - start) + advanceOffset, buffer, PhysXLib::CollisionLayer::Stage))
         {
+            // レイキャストが当たった位置と法線を保存
+            hitWallPosition_.x = buffer.block.position.x;
+            hitWallPosition_.y = buffer.block.position.y;
+            hitWallPosition_.z = buffer.block.position.z;
+            hitWallNormal_.x = buffer.block.normal.x;
+            hitWallNormal_.y = buffer.block.normal.y;
+            hitWallNormal_.z = buffer.block.normal.z;
+
             DirectX::XMFLOAT3 p = {};
             p.x = buffer.block.position.x;
             p.y = buffer.block.position.y;
@@ -253,6 +273,10 @@ void MovementCom::VelocityApplyPositionHorizontal(float elapsedTime, const Direc
             wasColliding = false;  // 壁に衝突していないので、補正をリセット
 
             onWall_ = false;
+
+            // レイキャストが当たらなかった場合、保存データをリセット
+            hitWallPosition_ = { 0, 0, 0 };
+            hitWallNormal_ = { 0, 0, 0 };
         }
     }
 
