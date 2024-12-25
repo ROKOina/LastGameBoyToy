@@ -161,7 +161,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
         std::shared_ptr<GameObject> cameraPost = obj->AddChildObject();
         cameraPost->SetName("cameraPostPlayer");
         std::shared_ptr<FPSCameraCom> fpscamera = cameraPost->AddComponent<FPSCameraCom>();
-        //fpscamera->ActiveCameraChange();
+        fpscamera->ActiveCameraChange();
 
         //ƒJƒƒ‰ˆÊ’u
         cameraPost->transform_->SetWorldPosition({ 0, 12.086f, 3.3050f });

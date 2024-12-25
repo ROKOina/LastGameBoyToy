@@ -344,15 +344,16 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                     AnimationCalculation::Instance().ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                 }
 
-                //AimIKの更新
-                if (GetGameObject()->GetComponent<AimIKCom>())
-                {
-                    GetGameObject()->GetComponent<AimIKCom>()->AimIK();
-                }
             }
 
             break;
         }
+    }
+
+    //AimIKの更新
+    if (GetGameObject()->GetComponent<AimIKCom>())
+    {
+        GetGameObject()->GetComponent<AimIKCom>()->AimIK();
     }
 
     // 最終フレーム処理
@@ -462,17 +463,17 @@ void AnimationCom::AnimationUpperUpdate(float elapsedTime)
                     }
                 }
 
-                //AimIKの更新
-                if (GetGameObject()->GetComponent<AimIKCom>())
-                {
-                    GetGameObject()->GetComponent<AimIKCom>()->AimIK();
-                }
-
                 upperNodeIndex++;
             }
 
             break;
         }
+    }
+
+    //AimIKの更新
+    if (GetGameObject()->GetComponent<AimIKCom>())
+    {
+        GetGameObject()->GetComponent<AimIKCom>()->AimIK();
     }
 
     //時間経過
@@ -592,11 +593,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                         }
                     }
 
-                    //AimIKの更新
-                    if (GetGameObject()->GetComponent<AimIKCom>())
-                    {
-                        GetGameObject()->GetComponent<AimIKCom>()->AimIK();
-                    }
                 }
                 else if (lowerBlendType == 1)
                 {
@@ -706,6 +702,12 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
 
             break;
         }
+    }
+
+    //AimIKの更新
+    if (GetGameObject()->GetComponent<AimIKCom>())
+    {
+        GetGameObject()->GetComponent<AimIKCom>()->AimIK();
     }
 
     //時間経過

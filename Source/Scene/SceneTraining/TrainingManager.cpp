@@ -1364,6 +1364,7 @@ void TutorialSystem::TutorialUIDisplay()
 
 void TutorialSystem::OnGui()
 {
+#ifdef _DEBUG
     if (ImGui::Begin("TutorialSystem", nullptr, ImGuiWindowFlags_None))
     {
         ImGui::DragInt("moveIndex", &moveSubTitleIndex);
@@ -1374,6 +1375,7 @@ void TutorialSystem::OnGui()
 
     }
     ImGui::End();
+#endif
 }
 
 #pragma endregion
