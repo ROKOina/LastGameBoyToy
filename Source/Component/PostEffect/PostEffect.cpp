@@ -63,10 +63,11 @@ void PostEffect::OnGUI()
         ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
         ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
-        ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
         ImGui::SliderFloat("blurstrength", &m_posteffect->data.blurstrength, +0.0f, +1.0f);
         ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
         ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
+        ImGui::SliderFloat("sepiastrength", &m_posteffect->data.sepiastrength, +0.0f, +1.0f);
+        ImGui::SliderFloat("negapogistrength", &m_posteffect->data.negapogistrength, +0.0f, +1.0f);
     }
 
     if (ImGui::TreeNode("shadow"))
@@ -280,6 +281,12 @@ void PostEffect::UpdatePostEffectParameter(float elapsedTime)
             break;
         case PostEffectParameter::BlurDecay:
             data.blurdecay = Lerp(data.blurdecay, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Sepia:
+            data.sepiastrength = Lerp(data.sepiastrength, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Nega:
+            data.negapogistrength = Lerp(data.negapogistrength, state.targetValue, elapsedTime * state.timeScale);
             break;
         default:
             break;
