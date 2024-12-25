@@ -166,6 +166,22 @@ Decal::Decal(const char* filename)
     LoadTextureFromFile(Graphics::Instance().GetDevice(), filename, decalmap.GetAddressOf(), NULL);
 }
 
+//更新処理
+void Decal::Update(float elapsedTime)
+{
+    deletetime += elapsedTime;
+
+    //アルファ値減少
+    DCB->data.decalcolor.w = (std::max)(0.0f, DCB->data.decalcolor.w - elapsedTime / 4);
+
+    //削除
+    if (deletetime > goodbyetime)
+    {
+        GameObjectManager::Instance().Remove(GetGameObject());
+        deletetime = 0.0f;
+    }
+}
+
 //描画
 void Decal::Render()
 {
@@ -229,17 +245,9 @@ void Decal::Render()
 }
 
 //imgui
-DirectX::XMFLOAT3 pos = {};
 void Decal::OnGUI()
 {
     ImGui::Text((char*)u8"リソース");
     ImGui::Image(decalmap.Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
-
-    if (ImGui::Button("Create"))
-    {
-        pos.x += 0.5f;
-        pos.y += 0.3f;
-        pos.z += 0.1f;
-        Add(pos, { 1,1,1 }, 5.0f);
-    }
+    ImGui::ColorEdit4("decalcolor", &DCB->data.decalcolor.x);
 }

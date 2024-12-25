@@ -173,38 +173,6 @@ private:
     float capsuleLength = 5;
 };
 
-class BaseCharacter_StanBallState : public BaseCharacter_BaseState
-{
-public:
-    BaseCharacter_StanBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    void Exit() override {};
-    void ImGui() override;
-    virtual const char* GetName() const override { return "StanBall"; }
-
-private:
-    float speed = 40;
-    float power = 1;
-};
-
-class BaseCharacter_KnockbackBallState : public BaseCharacter_BaseState
-{
-public:
-    BaseCharacter_KnockbackBallState(CharacterCom* owner) : BaseCharacter_BaseState(owner) {}
-
-    void Enter() override;
-    void Execute(const float& elapsedTime) override;
-    void Exit() override {};
-    void ImGui() override;
-    virtual const char* GetName() const override { return "KnockbackBall"; }
-
-private:
-    float speed = 40;
-    float power = 1;
-};
-
 class Ult_Attack_State : public BaseCharacter_BaseState
 {
 public:

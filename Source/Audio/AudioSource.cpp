@@ -31,6 +31,9 @@ void AudioSource::SetAudio(int id)
     {
         HRESULT hr = Audio::Instance().GetXAudio()->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+        // エミッターの初期化
+        emitter_.Initialize(resource_->GetWaveFormat());
     }
 }
 
@@ -53,9 +56,9 @@ void AudioSource::Play(bool loop, float volume)
     buffer.pAudioData = resource_->GetAudioData();
     buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
     buffer.Flags = XAUDIO2_END_OF_STREAM;
-    
+
     sourceVoice_->SubmitSourceBuffer(&buffer);
-    
+
     HRESULT hr = sourceVoice_->Start();
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     sourceVoice_->SetVolume(volume * 0.1f);
@@ -101,4 +104,33 @@ void AudioSource::AudioRelease()
         sourceVoice_->DestroyVoice();
         sourceVoice_ = nullptr;
     }
+}
+
+// 3Dオーディオの更新
+void AudioSource::Update3DAudio()
+{
+    // リスナーの更新
+    listener_.Update();
+
+    // エミッターの更新
+    emitter_.Update();
+
+    // X3DAudioの計算
+    X3DAUDIO_DSP_SETTINGS dspSettings = {};
+    float matrix[2] = {};
+    dspSettings.pMatrixCoefficients = matrix;
+    dspSettings.SrcChannelCount = emitter_.x3dEmitter.ChannelCount;
+    dspSettings.DstChannelCount = 2; // ステレオ出力
+
+    const X3DAUDIO_HANDLE* x3dHandle = Audio::Instance().GetX3DAudioHandle();
+
+    X3DAudioCalculate(*x3dHandle,
+        &listener_.x3dListener,
+        &emitter_.x3dEmitter,
+        X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER,
+        &dspSettings);
+
+    // 計算結果を反映
+    sourceVoice_->SetVolume(volumeControl * dspSettings.EmitterToListenerDistance);
+    sourceVoice_->SetFrequencyRatio(dspSettings.DopplerFactor);
 }

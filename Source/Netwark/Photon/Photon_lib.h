@@ -93,7 +93,14 @@ public:
 
     //キャラセレクト中か
     bool GetIsCharaSelect() { return isCharaSelect; }
-    void SetIsCharaSelect() { if (GetIsMasterPlayer())isCharaSelect = true; }
+    void SetIsCharaSelect() {
+        if (GetIsMasterPlayer()) {
+            int myPlayerID = GetMyPlayerID();
+            if (myPlayerID < 0)return;
+            charaState[myPlayerID] = 1;
+            isCharaSelect = true;
+        }
+    }
 
     //ゲームモード登録
     int GetGameMode() { return gameMode; }
@@ -111,6 +118,9 @@ public:
     //チームID設定
     void SetTeamID(int teamID, int playerID);
     int GetTeamID(int playerID);
+
+    //キャラID設定
+    void SetMyPickCharaID(int pickChara);
 
     int GetServerTime();
     int GetServerTimeOffset();
@@ -148,6 +158,8 @@ public:
         //int myDelay = 50;
 
         int teamID = 0;
+
+        int charaID = 0;
 
         //情報が更新されたか
         bool isInputUpdate = false;
@@ -286,6 +298,7 @@ private:
 
     //キャラ選択画面か
     bool isCharaSelect = false;
+    int charaState[4]; //1:選択中　2:キャラ確定
 
     //ゲーム中か
     bool isGamePlay = false;

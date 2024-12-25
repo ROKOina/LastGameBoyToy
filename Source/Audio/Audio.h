@@ -6,6 +6,7 @@
 
 #include "Audio/AudioSource.h"
 #include "Audio/AudioResource.h"
+#include <X3DAudio.h>
 
 enum class AUDIOID
 {
@@ -70,15 +71,19 @@ public:
 
     // オーディオ登録
     void RegisterAudioSources();
-    void RegisterAudioSources(AUDIOID id,const char* filename);
+    void RegisterAudioSources(AUDIOID id, const char* filename);
 
     IXAudio2* GetXAudio() const { return xaudio_; }
+    const X3DAUDIO_HANDLE* GetX3DAudioHandle() const { return &x3dAudioHandle_; }
 
 private:
     static inline std::unique_ptr<Audio> instance;
 
     IXAudio2* xaudio_ = nullptr;
     IXAudio2MasteringVoice* masteringVoice_ = nullptr;
+
+    // 3Dオーディオ関連
+    X3DAUDIO_HANDLE x3dAudioHandle_;
 
     std::map<AUDIOID, std::shared_ptr<AudioResource>> audioResources;
 };

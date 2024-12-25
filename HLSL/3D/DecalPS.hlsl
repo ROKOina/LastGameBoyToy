@@ -21,5 +21,5 @@ float4 main(float4 sv_position : SV_POSITION) : SV_TARGET
     color.rgb = pow(color.rgb, GAMMA);
     clip(color.a - 0.5);
 
-    return float4(color.rgb, color.a);
+    return float4(color.rgb * decalcolor.rgb, color.a * decalcolor.a);
 }

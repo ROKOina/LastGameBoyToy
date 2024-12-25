@@ -120,11 +120,23 @@ public:
     void SetStepOffset(float num) { stepOffset = num; }
     void SetAdvanceOffset(float num) { advanceOffset = num; }
 
+    //レイキャストがヒットした位置
+    const DirectX::XMFLOAT3& GetHitPosition() const { return hitPosition_; }
+    const DirectX::XMFLOAT3& GetWallHitPosition() const { return hitWallPosition_; }
+
+    //レイキャストがヒットした法線
+    const DirectX::XMFLOAT3& GetNormal()const { return hitNormal_; }
+    const DirectX::XMFLOAT3& GetWallNormal()const { return hitWallNormal_; }
+
 #pragma endregion
 
 private:
     DirectX::XMFLOAT3 velocity_ = { 0,0,0 };   //速力
     DirectX::XMFLOAT3 nonMaxSpeedVelocity_ = { 0,0,0 }; //最大スピードを無視した速力
+    DirectX::XMFLOAT3 hitPosition_ = {};       //レイキャスト当たった位置
+    DirectX::XMFLOAT3 hitWallPosition_ = {};   //レイキャスト当たった位置
+    DirectX::XMFLOAT3 hitNormal_ = {};         //レイキャストの法線を取得
+    DirectX::XMFLOAT3 hitWallNormal_ = {};     //レイキャストの法線を取得
     float gravity_ = GRAVITY_NORMAL;           //重力
     float gravityeffect = 30.0f;               //重力の影響度
     float fallspeed = -100.0f;                 //落ちるスピード
