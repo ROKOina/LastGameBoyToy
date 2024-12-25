@@ -6,6 +6,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Phsix\Physxlib.h"
+#include "Component\Renderer\DecalCom.h"
 
 //初期化
 void SoldierCom::Start()
@@ -131,19 +132,20 @@ void SoldierCom::HitObject()
                 if (PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
                 {
                     DirectX::XMFLOAT3 hitPosition;
+                    DirectX::XMFLOAT3 hitNormal;
                     // レイキャストが当たった位置と法線を保存
                     hitPosition.x = buffer.block.position.x;
                     hitPosition.y = buffer.block.position.y;
                     hitPosition.z = buffer.block.position.z;
+                    hitNormal.x = buffer.block.normal.x;
+                    hitNormal.y = buffer.block.normal.y;
+                    hitNormal.z = buffer.block.normal.z;
 
-                    //ヒットエフェクト生成
-                    std::shared_ptr<GameObject> hiteffectobject = GameObjectManager::Instance().Create();
-                    hiteffectobject->transform_->SetWorldPosition(hitPosition);
-                    hiteffectobject->SetName("HitEffect");
-                    std::shared_ptr<GPUParticle>Chiteffct = hiteffectobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/hanabi.gpuparticle", 1000);
-                    Chiteffct->Play();
-                    std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
-                    Ghiteffct->SetActive(true);
+                    //デカール生成
+                    std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
+                    decal->SetName("decal");
+                    std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
+                    d->Add(hitPosition, hitNormal, 1.0f);
                 }
             }
         }
