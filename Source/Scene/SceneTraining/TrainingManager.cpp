@@ -1308,35 +1308,35 @@ void TutorialSystem::TutorialFlagClear()
 
 void TutorialSystem::TutorialUIUnhind()
 {
-    GameObjectManager::Instance().Find("reticle")->SetEnabled(false);
-    GameObjectManager::Instance().Find("HpFrame")->SetEnabled(false);
-    GameObjectManager::Instance().Find("HpGauge")->SetEnabled(false);
-    GameObjectManager::Instance().Find("UltFrame")->SetEnabled(false);
-    GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(false);
-    GameObjectManager::Instance().Find("UltGauge")->SetEnabled(false);
-    GameObjectManager::Instance().Find("ultCore")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("reticle")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("HpFrame")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("HpGauge")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("UltFrame")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("UltGauge")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("ultCore")->SetEnabled(false);
 
-    GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(false);
-    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
-    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
-    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
-    GameObjectManager::Instance().Find("Skill_E")->SetEnabled(false);
-    GameObjectManager::Instance().Find("SkillCore")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("Skill_E")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("SkillCore")->SetEnabled(false);
 
 
-    GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(false);
-    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
-    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
-    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
-    GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(false);
-    GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(false);
-    GameObjectManager::Instance().Find("Decoration")->SetEnabled(false);
-    GameObjectManager::Instance().Find("HitEffect")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("Decoration")->SetEnabled(false);
+    //GameObjectManager::Instance().Find("HitEffect")->SetEnabled(false);
 }
 
 void TutorialSystem::TutorialUIDisplay()
 {
-    GameObjectManager::Instance().Find("reticle")->SetEnabled(true);
+    /*GameObjectManager::Instance().Find("reticle")->SetEnabled(true);
     GameObjectManager::Instance().Find("HpFrame")->SetEnabled(true);
     GameObjectManager::Instance().Find("HpGauge")->SetEnabled(true);
     GameObjectManager::Instance().Find("UltFrame")->SetEnabled(true);
@@ -1358,7 +1358,7 @@ void TutorialSystem::TutorialUIDisplay()
     GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(true);
     GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(true);
     GameObjectManager::Instance().Find("Decoration")->SetEnabled(true);
-    GameObjectManager::Instance().Find("HitEffect")->SetEnabled(true);
+    GameObjectManager::Instance().Find("HitEffect")->SetEnabled(true);*/
 
 }
 
