@@ -312,7 +312,8 @@ void ScenePVP::InitializeBack()
 
     std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
     lobbyBack->SetName("lobbyBack");
-    lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
+    auto& uiSys=lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
+    uiSys->SetOrderinLayer(-10);
     //削除予定リストに追加
     tempRemoveObj.emplace_back(lobbyBack);
     //背景移動オブジェクト
@@ -322,12 +323,14 @@ void ScenePVP::InitializeBack()
         lobbyBackRectSmall->SetName(std::string("lobbyBackRectSmall" + std::to_string(r)).c_str());
         auto& rss = lobbyBackRectSmall->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
         rss->EasingPlay();
+        rss->SetOrderinLayer(-5);
         //削除予定リストに追加
         tempRemoveObj.emplace_back(lobbyBackRectSmall);
         std::shared_ptr<GameObject> lobbyBackRectBig = lobbyBackParent->AddChildObject();
         lobbyBackRectBig->SetName(std::string("lobbyBackRectBig" + std::to_string(r)).c_str());
         auto& rbs = lobbyBackRectBig->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackRect.ui", Sprite::SpriteShader::DEFALT, false);
         rbs->EasingPlay();
+        rbs->SetOrderinLayer(-5);
         //削除予定リストに追加
         tempRemoveObj.emplace_back(lobbyBackRectBig);
     }
@@ -336,7 +339,8 @@ void ScenePVP::InitializeBack()
     {
         std::shared_ptr<GameObject> lobbyBackCircle = lobbyBackParent->AddChildObject();
         lobbyBackCircle->SetName(std::string("lobbyBackCircle" + std::to_string(c)).c_str());
-        lobbyBackCircle->AddComponent<UiSystem>(std::string("Data/SerializeData/UIData/PVPScene/lobbyBackCircle0" + std::to_string(c + 1) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        auto& uiC=lobbyBackCircle->AddComponent<UiSystem>(std::string("Data/SerializeData/UIData/PVPScene/lobbyBackCircle0" + std::to_string(c + 1) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        uiC->SetOrderinLayer(-5);
         //削除予定リストに追加
         tempRemoveObj.emplace_back(lobbyBackCircle);
     }
@@ -347,6 +351,7 @@ void ScenePVP::InitializeBack()
         lobbyBackCross->SetName(std::string("lobbyBackCross" + std::to_string(b)).c_str());
         auto& cs = lobbyBackCross->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackCross.ui", Sprite::SpriteShader::DEFALT, false);
         cs->EasingPlay();
+        cs->SetOrderinLayer(-5);
         //削除予定リストに追加
         tempRemoveObj.emplace_back(lobbyBackCross);
     }
