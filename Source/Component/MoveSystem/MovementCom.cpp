@@ -159,6 +159,7 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
             velocity_.y = 0;
             nonMaxSpeedVelocity_.y = 0;
             onGround_ = true;
+            onceGround = true;
 
             // レイキャストが当たった位置と法線を保存
             hitPosition_.x = buffer.block.position.x;
@@ -170,8 +171,6 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
         }
         else
         {
-            hitPosition_ = { 0,0,0 };
-            hitNormal_ = { 0,0,0 };
             position.y += moveVec * elapsedTime;
             onGround_ = false;
         }

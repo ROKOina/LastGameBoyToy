@@ -95,7 +95,6 @@ public:
 
 private:
     float cooldownTimer = 0.0f;  // クールタイムの残り時間（秒）
-    float ulttimer = 0.0f;       // ウルト時間
     float dashgaugemin = 4.0f;   // ダッシュゲージの最小値
     std::vector<FarahBullet> bullets;  // 弾丸リスト
 };

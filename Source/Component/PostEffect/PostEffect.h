@@ -120,7 +120,7 @@ public:
 
 private:
     enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, fxaa, depthCopy, max };
-    enum class pixelshader { deferred, colorGrading, cascadeshadow, fxaa, tonemap, max };
+    enum class pixelshader { deferred, colorGrading, cascadeshadow, fxaa, tonemap, charapick, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];
 

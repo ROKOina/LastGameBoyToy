@@ -47,7 +47,6 @@ Framework::Framework(HWND hWnd)
 // デストラクタ
 Framework::~Framework()
 {
-    //sceneGame.Finalize();
     SceneManager::Instance().Clear();
 
 #ifdef _DEBUG

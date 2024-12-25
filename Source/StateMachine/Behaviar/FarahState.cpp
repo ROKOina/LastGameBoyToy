@@ -47,8 +47,6 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
 #pragma region ultUŒ‚
 void Farah_UltState::Enter()
 {
-    moveCom.lock()->SetMoveAcceleration(5.0f);
-    charaCom.lock()->SetDashGaugeMins(2.0f);
 }
 #pragma endregion
 

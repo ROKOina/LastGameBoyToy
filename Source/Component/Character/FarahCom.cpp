@@ -15,7 +15,6 @@ constexpr float JUMP_FORCE = 12.62f;
 constexpr float RISING_FORCE = 13.0f;
 constexpr float COOLDOWN_TIME = 0.5f;
 constexpr float DASH_GAUGE_INCREMENT = 5.0f;
-constexpr float ULT_DURATION = 15.0f;
 
 // 初期化
 void FarahCom::Start()
@@ -128,8 +127,6 @@ void FarahCom::UltUpdate(float elapsedTime)
 {
     if (!UseUlt()) return;
 
-    ulttimer += elapsedTime;
-    if (ulttimer > ULT_DURATION)
     {
         ResetUlt();
     }
@@ -180,10 +177,7 @@ void FarahCom::AddDashGauge(float amount)
 // ウルトリセット
 void FarahCom::ResetUlt()
 {
-    dashgaugemin = 4.0f;
-    GetGameObject()->GetComponent<MovementCom>()->SetMoveAcceleration(3.0f);
     FinishUlt();
-    ulttimer = 0.0f;
 }
 
 // クールダウンの管理

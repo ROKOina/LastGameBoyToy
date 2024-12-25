@@ -1,5 +1,6 @@
 #include "SceneUeno.h"
 #include <Component\UI\PlayerUI.h>
+#include "Component\Collsion\ColliderCom.h"
 #include <Component\Light\LightCom.h>
 #include <Component\Camera\FreeCameraCom.h>
 #include <Component\Stage\GateGimmickCom.h>
@@ -10,6 +11,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include <Netwark\Photon\StdIO_UIListener.h>
 #include <Graphics\SkyBoxManager\SkyBoxManager.h>
+#include <Component\Collsion\NodeCollsionCom.h>
 
 //初期化
 void SceneUeno::Initialize()
@@ -48,6 +50,10 @@ void SceneUeno::Initialize()
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
+
+        //コライダー
+        std::shared_ptr<SphereColliderCom> c = stageObj->AddComponent<SphereColliderCom>();
+        c->SetMyTag(COLLIDER_TAG::Wall);
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
