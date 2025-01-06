@@ -51,8 +51,6 @@ void FarahCom::Update(float elapsedTime)
     ShotSecond();
     CharacterCom::Update(elapsedTime);
     GroundBomber(elapsedTime);
-    HitObject();
-    DecalUpdate();
 }
 
 // GUI
@@ -103,20 +101,6 @@ void FarahCom::MainAttackDown()
     //スキル発動中はリターン
     if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::SUB_SKILL)return;
 
-    //ウルト発動
-    if (UseUlt())
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
-
-        CurrentUltCount++;
-        if (CurrentUltCount >= MaxUltCount)
-        {
-            FinishUlt();
-        }
-
-        return;
-    }
-
     //アタック
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
     attackInputSave = false;
@@ -125,10 +109,8 @@ void FarahCom::MainAttackDown()
 // ウルトスキル
 void FarahCom::UltSkill()
 {
-    CurrentUltCount = 0;
-
     //ステートを初期化
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+    //attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
 //リロード（弾減らす処理は各自のキャラでする
@@ -227,7 +209,7 @@ void FarahCom::GroundBomber(float elapsedTime)
             {
                 //デカール生成
                 std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
-                decal->SetName("decal");
+                decal->SetName("bulletdecal");
                 std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
 
                 //ここでヒット種類を分別する
@@ -283,56 +265,6 @@ void FarahCom::RemoveBullet(const std::shared_ptr<GameObject>& obj)
 void FarahCom::ClearAllBullets()
 {
     bullets.clear();
-}
-
-//ウルトのヒットスキャンが当たった時の処理
-void FarahCom::HitObject()
-{
-    //ヒットスキャンが当たれば
-    if (attackray.lock())
-    {
-        auto& rayCol = attackray.lock()->GetComponent<Collider>();
-        if (rayCol)
-        {
-            //中西がやったステージと当たるヒットスキャン
-            if (rayCol->GetEnabled())
-            {
-                // 判定
-                PxRaycastBuffer buffer;
-                DirectX::XMFLOAT3 start = rayCol->GetGameObject()->transform_->GetWorldPosition();
-                DirectX::XMFLOAT3 end = start + GetFpsCameraDir() * 100;
-                if (PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
-                {
-                    // レイキャストが当たった位置と法線を保存
-                    hitPosition.x = buffer.block.position.x;
-                    hitPosition.y = buffer.block.position.y;
-                    hitPosition.z = buffer.block.position.z;
-                    hitNormal.x = buffer.block.normal.x;
-                    hitNormal.y = buffer.block.normal.y;
-                    hitNormal.z = buffer.block.normal.z;
-                }
-            }
-        }
-    }
-}
-
-//デカールの更新関数
-void FarahCom::DecalUpdate()
-{
-    //デカール生成
-    if (rayhit)
-    {
-        std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
-        decal->SetName("decal");
-        decalptr = decal->AddComponent<Decal>("Data/Texture/star.png");
-        decalptr->SetIsUpdate(false);
-        decalptr->Add(hitPosition, hitNormal, 3.0f);
-    }
-
-    if (decalptr != nullptr)
-    {
-        decalptr->UpdateSpot(0, hitPosition, hitNormal);
-    }
 }
 
 // 弾丸生成

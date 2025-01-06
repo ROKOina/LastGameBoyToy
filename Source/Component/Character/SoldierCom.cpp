@@ -146,6 +146,15 @@ void SoldierCom::HitObject()
                     decal->SetName("decal");
                     std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
                     d->Add(hitPosition, hitNormal, 1.0f);
+
+                    //ヒットエフェクト生成
+                    std::shared_ptr<GameObject>hiteffect = GameObjectManager::Instance().Create();
+                    hiteffect->SetName("HitEffect");
+                    hiteffect->transform_->SetWorldPosition(hitPosition);
+                    std::shared_ptr<GPUParticle>Chiteffct = hiteffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/groundhiteffect.gpuparticle", 1000);
+                    Chiteffct->Play();
+                    std::shared_ptr<CPUParticle>Ghiteffct = hiteffect->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
+                    Ghiteffct->SetActive(true);
                 }
             }
         }

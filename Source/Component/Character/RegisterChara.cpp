@@ -279,22 +279,6 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
         smokeeffct->SetActive(false);
     }
 
-    //ultのレイ追加
-    {
-        //レイを追加
-        std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
-        ultAttckChild->SetName("UltAttackChild");
-
-        //位置をカメラと一緒にする
-        ultAttckChild->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
-
-        std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
-        rayCol->SetEnabled(false);
-
-        //キャラクターに登録
-        obj->GetComponent<FarahCom>()->SetAttackRayObj(ultAttckChild);
-    }
-
     //SE
     {
         auto& au = obj->AddComponent<AudioCom>();

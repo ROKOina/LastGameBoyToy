@@ -51,9 +51,6 @@ public:
     //リロード（弾減らす処理は各自のキャラでする
     void Reload()override;
 
-    //攻撃ウルト取得
-    void SetAttackRayObj(std::shared_ptr<GameObject> obj) { attackray = obj; }
-
 private:
 
     // 銃の打つ間隔とマズルフラッシュ
@@ -83,12 +80,6 @@ private:
     // 全弾削除
     void ClearAllBullets();
 
-    //ウルトのヒットスキャンが当たった時の処理
-    void HitObject();
-
-    //デカールの更新関数
-    void DecalUpdate();
-
 public:
 
     // ゲージ減少速度設定
@@ -97,24 +88,8 @@ public:
     // 弾丸生成
     void AddBullet(const std::shared_ptr<GameObject>& obj);
 
-public:
-
-    bool rayhit = false;
-
 private:
     float cooldownTimer = 0.0f;  // クールタイムの残り時間（秒）
     float dashgaugemin = 4.0f;   // ダッシュゲージの最小値
     std::vector<FarahBullet> bullets;  // 弾丸リスト
-
-    //ヒットスキャン関係
-    std::weak_ptr<GameObject> attackray;
-    DirectX::XMFLOAT3 hitPosition;
-    DirectX::XMFLOAT3 hitNormal;
-
-    //ウルト関係
-    int MaxUltCount = 3;
-    int CurrentUltCount = 0;
-
-    //デカール取得
-    std::shared_ptr<Decal>decalptr;
 };
