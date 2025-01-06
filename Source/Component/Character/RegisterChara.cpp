@@ -134,7 +134,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 
         std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
         rayCol->SetMyTag(COLLIDER_TAG::Player);
-        rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::Wall);
+        rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
         rayCol->SetEnabled(false);
 
         //ダメージ処理用
@@ -277,6 +277,22 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
         smoke->SetName("smokeeffect");
         std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
         smokeeffct->SetActive(false);
+    }
+
+    //ultのレイ追加
+    {
+        //レイを追加
+        std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
+        ultAttckChild->SetName("UltAttackChild");
+
+        //位置をカメラと一緒にする
+        ultAttckChild->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
+
+        std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
+        rayCol->SetEnabled(false);
+
+        //キャラクターに登録
+        obj->GetComponent<FarahCom>()->SetAttackRayObj(ultAttckChild);
     }
 
     //SE
@@ -464,7 +480,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
         if (std::strcmp(obj->GetName(), "player") == 0)
             rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
         else
-            rayCol->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::Wall);
+            rayCol->SetJudgeTag(COLLIDER_TAG::Player);
 
         //ダメージ処理用
         std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);

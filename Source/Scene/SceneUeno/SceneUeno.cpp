@@ -51,10 +51,6 @@ void SceneUeno::Initialize()
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
 
-        //コライダー
-        std::shared_ptr<SphereColliderCom> c = stageObj->AddComponent<SphereColliderCom>();
-        c->SetMyTag(COLLIDER_TAG::Wall);
-
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
