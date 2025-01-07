@@ -70,6 +70,9 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
-    void ImGui() override;
+    void ImGui() override {};
     virtual const char* GetName() const override { return "UltAttack"; }
+
+private:
+    float time = 0.0f;
 };

@@ -62,6 +62,9 @@ private:
     //ジャンクラウルト生成関数
     void CreateJyankratUlt(const std::shared_ptr<GameObject>& obj);
 
+    //ソルジャーウルト生成関数
+    void CreateSoldierUlt(const std::shared_ptr<GameObject>& obj);
+
     //当たり判定
     void HitObject();
 
@@ -89,6 +92,7 @@ public:
         BEEM,
         GIMMICKMISSILE,
         JANKRATULT,
+        SOLDIERULT,
         MAX
     };
     ObjectType objtype = ObjectType::ENEMY;
