@@ -191,6 +191,8 @@ void CharaPicks::CharaDetails()
             selected.name->GetComponent<Sprite>()->EasingPlay();
             selected.name->GetComponent<Sprite>()->spc.onshot = true;
             selected.sprite->spc.color = selectColor;
+            selected.sprite->spc.scale = { 0.7f, 0.7f };
+            selected.sprite->EasingPlay();
             // スキル表示はここのコメント解除してね！
             //selected.skill->SetEnabled(true);
             selectedCharacterId = selected.id;
@@ -201,7 +203,9 @@ void CharaPicks::CharaDetails()
                     other.name->GetComponent<Sprite>()->StopEasing();
                     other.name->GetComponent<Sprite>()->spc.onshot = false;
                     other.skill->SetEnabled(false);
+                    other.sprite->StopEasing();
                     other.sprite->spc.color = color;
+                    other.sprite->spc.scale = {0.7f, 0.7f};
                 }
             }
         }
