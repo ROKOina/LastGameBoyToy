@@ -216,6 +216,8 @@ private:
     //デカール描画
     void DecalRender();
 
+
+
     //トレイル描画
     void TrailRender();
 

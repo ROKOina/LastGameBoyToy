@@ -62,7 +62,7 @@ public:
     ~UI_LockOn() {}
 
     // 名前取得
-    const char* GetName() const override { return "UI_BoostGauge"; }
+    const char* GetName() const override { return "UI_LockOn"; }
 
     // 開始処理
     void Start() override;
@@ -93,10 +93,10 @@ private:
     std::shared_ptr<GameObject> gaugeMask;
 
     std::shared_ptr<UiSystem> lockOnUi;         //lockOn
-    std::shared_ptr<UiSystem> lockOn2Ui;         //lockOn
-    std::shared_ptr<UiSystem> gaugeFrameUi;    //GaugeFrame
-    std::shared_ptr<UiSystem> gaugeUi;        //Gauge
-    std::shared_ptr<UiSystem> gaugeMaskUi;    //GaugeMask
+    std::shared_ptr<UiSystem> lockOn2Ui;        //lockOn
+    std::shared_ptr<UiSystem> gaugeFrameUi;     //GaugeFrame
+    std::shared_ptr<UiSystem> gaugeUi;          //Gauge
+    std::shared_ptr<UiSystem> gaugeMaskUi;      //GaugeMask
 
     float minAngle = 0.0f;
     float maxAngle = 0.0f;
@@ -181,6 +181,47 @@ private:
     std::weak_ptr<GameObject> player;
 };
 
+class UI_EnemyHp : public Component
+{
+public:
+    UI_EnemyHp();
+    ~UI_EnemyHp();
+
+    // 名前取得
+    const char* GetName() const override { return "UI_EnemyHp"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    void OnGUI()override;
+
+private:
+    
+};
+
+class UI_UltNum : public Component
+{
+public:
+    UI_UltNum();
+    ~UI_UltNum() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_UltNum"; }
+
+    // 開始処理
+    void Start() override {};
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    void OnGUI()override {};
+
+private:
+
+};
 //PlayerUIのマネージャー
 class PlayerUIManager
 {
@@ -216,6 +257,8 @@ public:
 
     //ブーストUI
     void CreateBoostUI();
+
+    void CreateEnemyHpUI() {};
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
   

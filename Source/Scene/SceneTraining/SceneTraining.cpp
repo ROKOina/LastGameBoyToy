@@ -88,7 +88,7 @@ void SceneTraining::Initialize()
     }
 
     //UIゲームオブジェクト生成
-    CreateUiObject();
+   // CreateUiObject();
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -111,11 +111,13 @@ void SceneTraining::Finalize()
 void SceneTraining::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-
     photonNet->run(elapsedTime);
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
+    //Ui更新
+    PlayerUIManager::Instance().UIUpdate(elapsedTime);
     TrainingManager::Instance().TrainingManagerUpdate(elapsedTime);
 }
 

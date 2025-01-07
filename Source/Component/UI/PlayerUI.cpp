@@ -4,6 +4,7 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
 #include"StateMachine\Behaviar\InazawaCharacterState.h"
+#include "Component\UI\Font.h"
 
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
@@ -517,6 +518,30 @@ void UI_Ult_Count::UpdateCore(float elapsedTime)
     }
 }
 
+UI_UltNum::UI_UltNum()
+{
+    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    obj->SetName("ultNumFont");
+    std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+    font->position = { 950,886 };
+    font->str = L"";  //L•t‚¯‚Ä‚Ë
+    font->scale = 0.75f;
+    font->color = { 1,1,1,0.75 };
+}
+
+void UI_UltNum::Update(float elapsedTIme)
+{
+ std::shared_ptr<GameObject> font =  GameObjectManager::Instance().Find("ultNumFont");
+ std::shared_ptr<GameObject> player =  GameObjectManager::Instance().Find("player");
+float  ultrate  =  *player->GetComponent<CharacterCom>()->GetUltGauge() / player->GetComponent<CharacterCom>()->GetUltGaugeMax();
+ultrate *= 100;
+if (int(ultrate) >= 10) {
+    font->GetComponent<Font>()->position = { 939,886 };
+}
+std::wstring numstr = std::to_wstring(int(ultrate));
+font->GetComponent<Font>()->str = numstr;
+}
+
 void PlayerUIManager::Register()
 {
     ////‹¤’Ê‚ÌUI////
@@ -542,6 +567,7 @@ void PlayerUIManager::Register()
     CreateHpUI();
     //Boost
     CreateBoostUI();
+
     ////////////////////////////////
 
     //ƒLƒƒƒ‰ŒÅ—L‚ÌUI
@@ -695,11 +721,18 @@ void PlayerUIManager::CreateUltUI()
         std::shared_ptr<GameObject> ultGauge = ultFrame->AddChildObject();
         ultGauge->SetName("UltGauge");
 
-        std::shared_ptr<UI_Skill>ultGaugeCmp = ultGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false, 1084, 890);
+       std::shared_ptr<UI_Skill>ultGaugeCmp = ultGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false, 1190, 960);
         std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
         ultGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
         float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
         ultGaugeCmp->SetVariableValue(i);
+    }
+    //ultNum
+    {
+        std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+        std::shared_ptr<GameObject> ultNum = ultFrame->AddChildObject();
+        ultNum->SetName("UltNum");
+        std::shared_ptr<UI_UltNum>ultnumCom = ultNum->AddComponent<UI_UltNum>();
     }
 }
 
@@ -745,3 +778,5 @@ void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
     player = obj;
     bookingRegister = true;
 }
+
+
