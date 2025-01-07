@@ -18,6 +18,7 @@ public:
         BLUR,
         DISSOLVE,
         CHROMATICABERRATION,
+        GLITCH,
         MAX
     };
 

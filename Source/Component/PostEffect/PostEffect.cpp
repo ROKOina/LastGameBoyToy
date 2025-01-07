@@ -28,6 +28,7 @@ PostEffect::PostEffect()
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\CascadeShadow.cso", m_pixelshaders[static_cast<int>(pixelshader::cascadeshadow)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\ToneMapPS.cso", m_pixelshaders[static_cast<int>(pixelshader::tonemap)].GetAddressOf());
     CreatePsFromCso(Graphics.GetDevice(), "Shader\\FXAA.cso", m_pixelshaders[static_cast<int>(pixelshader::fxaa)].GetAddressOf());
+    CreatePsFromCso(Graphics.GetDevice(), "Shader\\CharaPickPS.cso", m_pixelshaders[static_cast<int>(pixelshader::charapick)].GetAddressOf());
 
     //MultiRenderTargetçÏê¨
     m_gBuffer = std::make_unique<decltype(m_gBuffer)::element_type>(Graphics.GetDevice(), Graphics.GetScreenWidth(), Graphics.GetScreenHeight(), 6);
@@ -63,10 +64,11 @@ void PostEffect::OnGUI()
         ImGui::ColorEdit4("vignettecolor", &m_posteffect->data.vignettecolor.x);
         ImGui::DragFloat("vignettesize", &m_posteffect->data.vignettesize, 0.1f, 0.0f, 2.0f);
         ImGui::DragFloat("vignetteintensity", &m_posteffect->data.vignetteintensity, 0.1f, 0.0f, 2.0f);
-        ImGui::DragFloat4("ssrparameter", &m_posteffect->data.ssrparameter.x, 0.1f);
         ImGui::SliderFloat("blurstrength", &m_posteffect->data.blurstrength, +0.0f, +1.0f);
         ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
         ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
+        ImGui::SliderFloat("sepiastrength", &m_posteffect->data.sepiastrength, +0.0f, +1.0f);
+        ImGui::SliderFloat("negapogistrength", &m_posteffect->data.negapogistrength, +0.0f, +1.0f);
     }
 
     if (ImGui::TreeNode("shadow"))
@@ -98,6 +100,13 @@ void PostEffect::SetDeferredTarget()
 
     //skymapï`âÊ
     SkyBoxManager::Instance().DrawSkyBox(dc);
+
+    //charapick
+    //dc->OMSetBlendState(Graphics.GetBlendState(BLENDSTATE::NONE), nullptr, 0xFFFFFFFF);
+    //dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
+    //dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
+    //ID3D11ShaderResourceView* charapick[] = { m_offScreenBuffer[static_cast<size_t>(offscreen::offscreen)]->m_shaderresourceviews[0].Get() };
+    //FullScreenQuad::Instance().Blit(dc, charapick, 0, _countof(charapick), m_pixelshaders[static_cast<int>(pixelshader::charapick)].Get());
 
     //MultiRenderTargetÇÃï`âÊíiäK
     m_gBuffer->clear(dc);
@@ -280,6 +289,12 @@ void PostEffect::UpdatePostEffectParameter(float elapsedTime)
             break;
         case PostEffectParameter::BlurDecay:
             data.blurdecay = Lerp(data.blurdecay, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Sepia:
+            data.sepiastrength = Lerp(data.sepiastrength, state.targetValue, elapsedTime * state.timeScale);
+            break;
+        case PostEffectParameter::Nega:
+            data.negapogistrength = Lerp(data.negapogistrength, state.targetValue, elapsedTime * state.timeScale);
             break;
         default:
             break;

@@ -33,7 +33,12 @@ public:
     std::string GetName() const override { return "SceneTitle"; };
 
 private:
+
+    //uiの更新
     void UIUpdate(float elapsedTime);
+
+    //画面エフェクト実装
+    void ScreenEffect(float elapsedTime);
 
     AudioCom* audioObj;
 };

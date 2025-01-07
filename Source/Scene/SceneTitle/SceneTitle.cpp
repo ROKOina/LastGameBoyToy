@@ -117,25 +117,25 @@ void SceneTitle::Initialize()
         {
             auto& next = obj->AddChildObject();
             next->SetName("PVE");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //PVP
         {
             auto& next = obj->AddChildObject();
             next->SetName("PVP");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //トレーニング
         {
             auto& next = obj->AddChildObject();
             next->SetName("Training");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //ゲーム終了
         {
             auto& next = obj->AddChildObject();
             next->SetName("endgame");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/endgame.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/endgame.ui", Sprite::SpriteShader::GLITCH, true);
         }
 
         //セレクト棒
@@ -185,7 +185,11 @@ void SceneTitle::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
+    //UI更新
     UIUpdate(elapsedTime);
+
+    //画面エフェクト更新
+    ScreenEffect(elapsedTime);
 
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
@@ -268,7 +272,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
                 //ゲーム終了
                 if (std::string(sprite->GetGameObject()->GetName()) == "endgame")
-                {   
+                {
                     PostMessage(Graphics::Instance().GetHwnd(), WM_CLOSE, 0, 0);
                 }
 
@@ -298,4 +302,24 @@ void SceneTitle::UIUpdate(float elapsedTime)
     }
     //棒消す
     if (SceneManager::Instance().GetTransitionFlag())selectB->SetEnabled(false);
+}
+
+//画面エフェクト実装
+void SceneTitle::ScreenEffect(float elapsedTime)
+{
+    auto& posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+
+    // hue の更新
+    static float direction = 1.0f;
+    float hue = posteffect->GetPostData().hue + direction * elapsedTime;
+
+    // 方向の切り替え
+    if (hue >= 1.0f || hue <= -1.0f)
+    {
+        direction *= -1.0f; // 増減を反転
+        hue = std::clamp(hue, -1.0f, 1.0f); // hue を範囲内に調整
+    }
+
+    // 更新した hue を適用
+    posteffect->SetParameter(hue, 9.0f, { PostEffect::PostEffectParameter::Hue });
 }

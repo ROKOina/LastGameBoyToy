@@ -87,6 +87,7 @@ public:
 
     // 着地した瞬間のフラグを取得
     bool JustLanded() const { return justLanded_; }
+    bool GetOnceGround() const { return onceGround; }
 
     //壁の判定系
     bool GetOnWall() { return onWall_; }
@@ -141,6 +142,7 @@ private:
     float gravityeffect = 30.0f;               //重力の影響度
     float fallspeed = -100.0f;                 //落ちるスピード
     bool onGround_ = false;                    //地面についているか
+    bool onceGround = false;                   //一度だけ地面についてイルカ確認するフラグ
     bool wasOnGround_ = false;                 // 前フレームの着地状態
     bool justLanded_ = false;                  // 今フレームで着地した瞬間かどうか
     bool onWall_ = false;                      //壁についてるか

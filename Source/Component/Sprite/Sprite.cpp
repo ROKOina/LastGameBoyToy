@@ -187,6 +187,9 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
         LoadTextureFromFile(device, "Data\\Texture\\DissolveNoise.png", noiseshaderresourceview_.GetAddressOf(), &dissolveTexture2ddesc_);
         LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &rampTexture2ddesc_);
         break;
+    case SpriteShader::GLITCH:
+        PSPath = { "Shader\\GlitchPS.cso" };
+        break;
     default:
         assert(!"シェーダーがありません");
     }

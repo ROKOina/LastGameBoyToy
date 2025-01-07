@@ -1,5 +1,6 @@
 #include "SceneUeno.h"
 #include <Component\UI\PlayerUI.h>
+#include "Component\Collsion\ColliderCom.h"
 #include <Component\Light\LightCom.h>
 #include <Component\Camera\FreeCameraCom.h>
 #include <Component\Stage\GateGimmickCom.h>
@@ -10,6 +11,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include <Netwark\Photon\StdIO_UIListener.h>
 #include <Graphics\SkyBoxManager\SkyBoxManager.h>
+#include <Component\Collsion\NodeCollsionCom.h>
 
 //‰Šú‰»
 void SceneUeno::Initialize()

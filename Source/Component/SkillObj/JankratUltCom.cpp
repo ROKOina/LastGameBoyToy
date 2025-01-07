@@ -2,6 +2,7 @@
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\ColliderCom.h"
+#include "Component\Renderer\DecalCom.h"
 
 //更新処理
 void JankratUltCom::Update(float elapsedTime)
@@ -17,25 +18,22 @@ void JankratUltCom::Fire(float elapsedTime)
     const auto& move = GetGameObject()->GetComponent<MovementCom>();
     const auto& explosion = GetGameObject()->GetChildFind("explosion");
 
-    //地面判定
-    if (move->OnGround())
+    //着地した瞬間の処理
+    if (move->JustLanded() || move->GetJustHitWall())
     {
+        //地面判定
         plustime = true;
 
-        //着地した瞬間の処理
-        if (move->JustLanded())
-        {
-            move->SetIsRaycast(false);
-            move->ZeroNonMaxSpeedVelocity();
-            move->ZeroVelocity();
-            move->SetGravity(0.0f);
+        move->SetIsRaycast(false);
+        move->ZeroNonMaxSpeedVelocity();
+        move->ZeroVelocity();
+        move->SetGravity(0.0f);
 
-            //ここでパーティクルを停止
-            GetGameObject()->GetComponent<CPUParticle>()->SetActive(false);
+        //ここでパーティクルを停止
+        GetGameObject()->GetComponent<CPUParticle>()->SetActive(false);
 
-            //火災エフェクト再生
-            explosion->GetComponent<CPUParticle>()->SetActive(true);
-        }
+        //火災エフェクト再生
+        explosion->GetComponent<CPUParticle>()->SetActive(true);
     }
 
     //時間を更新する
@@ -55,6 +53,22 @@ void JankratUltCom::Fire(float elapsedTime)
     //時間になれば削除
     if (time > 9.0f)
     {
+        //デカール生成
+        std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
+        decal->SetName("decal");
+        std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/susu.png");
+
+        //ここでヒット種類を分別する
+        if (move->GetOnceGround())
+        {
+            d->Add(move->GetHitPosition(), move->GetNormal(), 1.0f);
+        }
+
+        if (move->GetOnWall())
+        {
+            d->Add(move->GetWallHitPosition(), move->GetWallNormal(), 1.0f);
+        }
+
         GameObjectManager::Instance().Remove(GetGameObject());
     }
 }
