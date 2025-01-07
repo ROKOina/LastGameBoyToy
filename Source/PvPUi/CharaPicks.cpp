@@ -178,8 +178,18 @@ void CharaPicks::CharaDetails()
 
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
+
+        if(!selected.name->GetComponent<Sprite>()->IsPlayEasing())
+        {
+            selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
+            selected.name->GetComponent<Sprite>()->spc.scale = { 0.63f, 0.63f };
+            selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f};
+        }
+
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
             selected.name->SetEnabled(true);
+            selected.name->GetComponent<Sprite>()->EasingPlay();
+            selected.name->GetComponent<Sprite>()->spc.onshot = true;
             selected.sprite->spc.color = selectColor;
             // スキル表示はここのコメント解除してね！
             //selected.skill->SetEnabled(true);
@@ -188,6 +198,8 @@ void CharaPicks::CharaDetails()
             for (auto& other : others) {
                 if (&other != &selected) {
                     other.name->SetEnabled(false);
+                    other.name->GetComponent<Sprite>()->StopEasing();
+                    other.name->GetComponent<Sprite>()->spc.onshot = false;
                     other.skill->SetEnabled(false);
                     other.sprite->spc.color = color;
                 }

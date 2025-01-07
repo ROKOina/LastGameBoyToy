@@ -518,215 +518,6 @@ void Sprite::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& 
     }
 }
 
-//イージングプレイ関数
-void Sprite::EasingPlay()
-{
-    savepos = spc.position;
-    savecolor = spc.color;
-    savescale = spc.scale;
-    saveangle = spc.angle;
-    play = true;
-}
-
-//当たり判定用短形
-void Sprite::DrawCollsionBox()
-{
-    Graphics& graphics = Graphics::Instance();
-    ID3D11Device* device = graphics.GetDevice();
-    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-
-    // スプライトと同じビューポートの設定
-    D3D11_VIEWPORT viewport{};
-    UINT num_viewports{ 1 };
-    dc->RSGetViewports(&num_viewports, &viewport);
-
-    // 座標とピボットの処理
-    float pivotX = (spc.pivot.x / spc.texSize.x);
-    float pivotY = (spc.pivot.y / spc.texSize.y);
-    // スケール倍したテクスチャサイズ
-    float texSizeX = spc.texSize.x * spc.scale.x;
-    float texSizeY = spc.texSize.y * spc.scale.y;
-
-    // スプライトの頂点座標の計算
-    //左上
-    float x0 = spc.position.x - pivotX * texSizeX;
-    float y0 = spc.position.y - pivotY * texSizeY;
-    //右上
-    float x1 = spc.position.x + (1 - pivotX) * texSizeX;
-    float y1 = spc.position.y - pivotY * texSizeY;
-    //左下
-    float x2 = spc.position.x - pivotX * texSizeX;
-    float y2 = spc.position.y + (1 - pivotY) * texSizeY;
-    //右下
-    float x3 = spc.position.x + (1 - pivotX) * texSizeX;
-    float y3 = spc.position.y + (1 - pivotY) * texSizeY;
-
-    auto rotate = [](float& x, float& y, float cx, float cy, float angle)
-        {
-            x -= cx;
-            y -= cy;
-
-            float cos{ cosf(DirectX::XMConvertToRadians(angle)) };
-            float sin{ sinf(DirectX::XMConvertToRadians(angle)) };
-            float tx{ x }, ty{ y };
-            x = cos * tx - sin * ty;
-            y = sin * tx + cos * ty;
-
-            x += cx;
-            y += cy;
-        };
-
-    float cx = spc.position.x + spc.collsionpositionoffset.x;
-    float cy = spc.position.y + spc.collsionpositionoffset.y;
-    rotate(x0, y0, cx, cy, spc.angle);
-    rotate(x1, y1, cx, cy, spc.angle);
-    rotate(x2, y2, cx, cy, spc.angle);
-    rotate(x3, y3, cx, cy, spc.angle);
-
-    // NDC空間への変換
-    x0 = 2.0f * x0 / viewport.Width - 1.0f;
-    y0 = 1.0f - 2.0f * y0 / viewport.Height;
-    x1 = 2.0f * x1 / viewport.Width - 1.0f;
-    y1 = 1.0f - 2.0f * y1 / viewport.Height;
-    x2 = 2.0f * x2 / viewport.Width - 1.0f;
-    y2 = 1.0f - 2.0f * y2 / viewport.Height;
-    x3 = 2.0f * x3 / viewport.Width - 1.0f;
-    y3 = 1.0f - 2.0f * y3 / viewport.Height;
-
-    // 当たり判定用の矩形を描画するための頂点
-    Vertex collisionVertices[]
-    {
-        { { x0, y0, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 0.0f, 0.0f } }, // 赤色で表示
-        { { x1, y1, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 1.0f, 0.0f } },
-        { { x2, y2, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 0.0f, 1.0f } },
-        { { x3, y3, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 1.0f, 1.0f } },
-    };
-
-    // 当たり判定用の矩形を描画するための頂点バッファの作成
-    D3D11_BUFFER_DESC buffer_desc{};
-    buffer_desc.ByteWidth = sizeof(collisionVertices);
-    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-    buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    D3D11_SUBRESOURCE_DATA subresource_data{};
-    subresource_data.pSysMem = collisionVertices;
-    ID3D11Buffer* collisionVertexBuffer = nullptr;
-    HRESULT hr = device->CreateBuffer(&buffer_desc, &subresource_data, &collisionVertexBuffer);
-    if (FAILED(hr)) {
-        LOG("当たり判定用頂点バッファの作成に失敗しました。HRESULT: 0x%X", hr);
-        return; // エラー処理
-    }
-
-    // 描画設定
-    UINT stride{ sizeof(Vertex) };
-    UINT offset{ 0 };
-    dc->IASetVertexBuffers(0, 1, &collisionVertexBuffer, &stride, &offset);
-    dc->PSSetShaderResources(0, 1, collsionshaderResourceView_.GetAddressOf());
-
-    // スプライトの矩形を描画
-    dc->Draw(4, 0);
-
-    // メモリの解放
-    if (collisionVertexBuffer) {
-        collisionVertexBuffer->Release();
-        collisionVertexBuffer = nullptr;
-    }
-}
-
-//いーじんぐ
-void Sprite::EasingSprite()
-{
-    Graphics& graphics = Graphics::Instance();
-    ID3D11Device* device = graphics.GetDevice();
-    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-
-    // スプライトと同じビューポートの設定
-    D3D11_VIEWPORT viewport{};
-    UINT num_viewports{ 1 };
-    dc->RSGetViewports(&num_viewports, &viewport);
-
-    // スプライトの位置とスケールにオフセット値を加算
-    float x0{ spc.easingposition.x - spc.easingscale.x * 0.5f };
-    float y0{ spc.easingposition.y - spc.easingscale.y * 0.5f };
-    float x1{ spc.easingposition.x + spc.easingscale.x * 0.5f };
-    float y1{ spc.easingposition.y - spc.easingscale.y * 0.5f };
-    float x2{ spc.easingposition.x - spc.easingscale.x * 0.5f };
-    float y2{ spc.easingposition.y + spc.easingscale.y * 0.5f };
-    float x3{ spc.easingposition.x + spc.easingscale.x * 0.5f };
-    float y3{ spc.easingposition.y + spc.easingscale.y * 0.5f };
-
-    auto rotate = [](float& x, float& y, float cx, float cy, float angle)
-        {
-            x -= cx;
-            y -= cy;
-
-            float cos{ cosf(DirectX::XMConvertToRadians(angle)) };
-            float sin{ sinf(DirectX::XMConvertToRadians(angle)) };
-            float tx{ x }, ty{ y };
-            x = cos * tx - sin * ty;
-            y = sin * tx + cos * ty;
-
-            x += cx;
-            y += cy;
-        };
-
-    float cx = spc.easingposition.x;
-    float cy = spc.easingposition.y;
-    rotate(x0, y0, cx, cy, spc.easingangle);
-    rotate(x1, y1, cx, cy, spc.easingangle);
-    rotate(x2, y2, cx, cy, spc.easingangle);
-    rotate(x3, y3, cx, cy, spc.easingangle);
-
-    // NDC空間への変換
-    x0 = 2.0f * x0 / viewport.Width - 1.0f;
-    y0 = 1.0f - 2.0f * y0 / viewport.Height;
-    x1 = 2.0f * x1 / viewport.Width - 1.0f;
-    y1 = 1.0f - 2.0f * y1 / viewport.Height;
-    x2 = 2.0f * x2 / viewport.Width - 1.0f;
-    y2 = 1.0f - 2.0f * y2 / viewport.Height;
-    x3 = 2.0f * x3 / viewport.Width - 1.0f;
-    y3 = 1.0f - 2.0f * y3 / viewport.Height;
-
-    //当たり判定用の矩形を描画するための頂点
-    Vertex easingVertices[]
-    {
-        { { x0, y0, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 0.0f / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
-        { { x1, y1, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
-        { { x2, y2, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
-        { { x3, y3, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
-    };
-
-    // いーじんぐ用の矩形を描画するための頂点バッファの作成
-    D3D11_BUFFER_DESC buffer_desc{};
-    buffer_desc.ByteWidth = sizeof(easingVertices);
-    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-    buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    D3D11_SUBRESOURCE_DATA subresource_data{};
-    subresource_data.pSysMem = easingVertices;
-    ID3D11Buffer* easingVertexBuffer = nullptr;
-    HRESULT hr = device->CreateBuffer(&buffer_desc, &subresource_data, &easingVertexBuffer);
-    if (FAILED(hr)) {
-        LOG("いーじんぐ用頂点バッファの作成に失敗しました。HRESULT: 0x%X", hr);
-        return; // エラー処理
-    }
-
-    // 描画設定
-    UINT stride{ sizeof(Vertex) };
-    UINT offset{ 0 };
-    dc->IASetVertexBuffers(0, 1, &easingVertexBuffer, &stride, &offset);
-    dc->PSSetShaderResources(0, 1, shaderResourceView_.GetAddressOf());
-
-    // スプライトの矩形を描画
-    dc->Draw(4, 0);
-
-    // メモリの解放
-    if (easingVertexBuffer) {
-        easingVertexBuffer->Release();
-        easingVertexBuffer = nullptr;
-    }
-}
-
 //imgui
 void Sprite::OnGUI()
 {
@@ -903,15 +694,6 @@ void Sprite::OnGUI()
     ImGui::DragFloat2("numUV", &numUVScroll.x, 0.01f);
 }
 
-void Sprite::LoadTexture(std::string filenaem)
-{
-    spc.filename = filenaem;
-    shaderResourceView_ = nullptr;
-    LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
-    spc.texSize.x = texture2ddesc_.Width;
-    spc.texSize.y = texture2ddesc_.Height;
-}
-
 //シリアライズ
 void Sprite::Serialize()
 {
@@ -978,6 +760,25 @@ void Sprite::LoadDeserialize()
     }
 }
 
+void Sprite::LoadTexture(std::string filenaem)
+{
+    spc.filename = filenaem;
+    shaderResourceView_ = nullptr;
+    LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
+    spc.texSize.x = texture2ddesc_.Width;
+    spc.texSize.y = texture2ddesc_.Height;
+}
+
+//イージングプレイ関数
+void Sprite::EasingPlay()
+{
+    savepos = spc.position;
+    savecolor = spc.color;
+    savescale = spc.scale;
+    saveangle = spc.angle;
+    play = true;
+}
+
 //イージング停止
 void Sprite::StopEasing()
 {
@@ -991,6 +792,205 @@ void Sprite::StopEasing()
         spc.color = savecolor;
         spc.scale = savescale;
         spc.angle = saveangle;
+    }
+}
+
+//いーじんぐ
+void Sprite::EasingSprite()
+{
+    Graphics& graphics = Graphics::Instance();
+    ID3D11Device* device = graphics.GetDevice();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+    // スプライトと同じビューポートの設定
+    D3D11_VIEWPORT viewport{};
+    UINT num_viewports{ 1 };
+    dc->RSGetViewports(&num_viewports, &viewport);
+
+    // スプライトの位置とスケールにオフセット値を加算
+    float x0{ spc.easingposition.x - spc.easingscale.x * 0.5f };
+    float y0{ spc.easingposition.y - spc.easingscale.y * 0.5f };
+    float x1{ spc.easingposition.x + spc.easingscale.x * 0.5f };
+    float y1{ spc.easingposition.y - spc.easingscale.y * 0.5f };
+    float x2{ spc.easingposition.x - spc.easingscale.x * 0.5f };
+    float y2{ spc.easingposition.y + spc.easingscale.y * 0.5f };
+    float x3{ spc.easingposition.x + spc.easingscale.x * 0.5f };
+    float y3{ spc.easingposition.y + spc.easingscale.y * 0.5f };
+
+    auto rotate = [](float& x, float& y, float cx, float cy, float angle)
+        {
+            x -= cx;
+            y -= cy;
+
+            float cos{ cosf(DirectX::XMConvertToRadians(angle)) };
+            float sin{ sinf(DirectX::XMConvertToRadians(angle)) };
+            float tx{ x }, ty{ y };
+            x = cos * tx - sin * ty;
+            y = sin * tx + cos * ty;
+
+            x += cx;
+            y += cy;
+        };
+
+    float cx = spc.easingposition.x;
+    float cy = spc.easingposition.y;
+    rotate(x0, y0, cx, cy, spc.easingangle);
+    rotate(x1, y1, cx, cy, spc.easingangle);
+    rotate(x2, y2, cx, cy, spc.easingangle);
+    rotate(x3, y3, cx, cy, spc.easingangle);
+
+    // NDC空間への変換
+    x0 = 2.0f * x0 / viewport.Width - 1.0f;
+    y0 = 1.0f - 2.0f * y0 / viewport.Height;
+    x1 = 2.0f * x1 / viewport.Width - 1.0f;
+    y1 = 1.0f - 2.0f * y1 / viewport.Height;
+    x2 = 2.0f * x2 / viewport.Width - 1.0f;
+    y2 = 1.0f - 2.0f * y2 / viewport.Height;
+    x3 = 2.0f * x3 / viewport.Width - 1.0f;
+    y3 = 1.0f - 2.0f * y3 / viewport.Height;
+
+    //当たり判定用の矩形を描画するための頂点
+    Vertex easingVertices[]
+    {
+        { { x0, y0, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 0.0f / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
+        { { x1, y1, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, 0.0f / texture2ddesc_.Height } },
+        { { x2, y2, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { 0.0f / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
+        { { x3, y3, 0.0f }, { spc.easingcolor.x,spc.easingcolor.y,spc.easingcolor.z,0.2f }, { (0.0f + static_cast<float>(texture2ddesc_.Width)) / texture2ddesc_.Width, (0.0f + static_cast<float>(texture2ddesc_.Height)) / texture2ddesc_.Height } },
+    };
+
+    // いーじんぐ用の矩形を描画するための頂点バッファの作成
+    D3D11_BUFFER_DESC buffer_desc{};
+    buffer_desc.ByteWidth = sizeof(easingVertices);
+    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+    buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    D3D11_SUBRESOURCE_DATA subresource_data{};
+    subresource_data.pSysMem = easingVertices;
+    ID3D11Buffer* easingVertexBuffer = nullptr;
+    HRESULT hr = device->CreateBuffer(&buffer_desc, &subresource_data, &easingVertexBuffer);
+    if (FAILED(hr)) {
+        LOG("いーじんぐ用頂点バッファの作成に失敗しました。HRESULT: 0x%X", hr);
+        return; // エラー処理
+    }
+
+    // 描画設定
+    UINT stride{ sizeof(Vertex) };
+    UINT offset{ 0 };
+    dc->IASetVertexBuffers(0, 1, &easingVertexBuffer, &stride, &offset);
+    dc->PSSetShaderResources(0, 1, shaderResourceView_.GetAddressOf());
+
+    // スプライトの矩形を描画
+    dc->Draw(4, 0);
+
+    // メモリの解放
+    if (easingVertexBuffer) {
+        easingVertexBuffer->Release();
+        easingVertexBuffer = nullptr;
+    }
+}
+
+//当たり判定用短形
+void Sprite::DrawCollsionBox()
+{
+    Graphics& graphics = Graphics::Instance();
+    ID3D11Device* device = graphics.GetDevice();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+    // スプライトと同じビューポートの設定
+    D3D11_VIEWPORT viewport{};
+    UINT num_viewports{ 1 };
+    dc->RSGetViewports(&num_viewports, &viewport);
+
+    // 座標とピボットの処理
+    float pivotX = (spc.pivot.x / spc.texSize.x);
+    float pivotY = (spc.pivot.y / spc.texSize.y);
+    // スケール倍したテクスチャサイズ
+    float texSizeX = spc.texSize.x * spc.scale.x;
+    float texSizeY = spc.texSize.y * spc.scale.y;
+
+    // スプライトの頂点座標の計算
+    //左上
+    float x0 = spc.position.x - pivotX * texSizeX;
+    float y0 = spc.position.y - pivotY * texSizeY;
+    //右上
+    float x1 = spc.position.x + (1 - pivotX) * texSizeX;
+    float y1 = spc.position.y - pivotY * texSizeY;
+    //左下
+    float x2 = spc.position.x - pivotX * texSizeX;
+    float y2 = spc.position.y + (1 - pivotY) * texSizeY;
+    //右下
+    float x3 = spc.position.x + (1 - pivotX) * texSizeX;
+    float y3 = spc.position.y + (1 - pivotY) * texSizeY;
+
+    auto rotate = [](float& x, float& y, float cx, float cy, float angle)
+        {
+            x -= cx;
+            y -= cy;
+
+            float cos{ cosf(DirectX::XMConvertToRadians(angle)) };
+            float sin{ sinf(DirectX::XMConvertToRadians(angle)) };
+            float tx{ x }, ty{ y };
+            x = cos * tx - sin * ty;
+            y = sin * tx + cos * ty;
+
+            x += cx;
+            y += cy;
+        };
+
+    float cx = spc.position.x + spc.collsionpositionoffset.x;
+    float cy = spc.position.y + spc.collsionpositionoffset.y;
+    rotate(x0, y0, cx, cy, spc.angle);
+    rotate(x1, y1, cx, cy, spc.angle);
+    rotate(x2, y2, cx, cy, spc.angle);
+    rotate(x3, y3, cx, cy, spc.angle);
+
+    // NDC空間への変換
+    x0 = 2.0f * x0 / viewport.Width - 1.0f;
+    y0 = 1.0f - 2.0f * y0 / viewport.Height;
+    x1 = 2.0f * x1 / viewport.Width - 1.0f;
+    y1 = 1.0f - 2.0f * y1 / viewport.Height;
+    x2 = 2.0f * x2 / viewport.Width - 1.0f;
+    y2 = 1.0f - 2.0f * y2 / viewport.Height;
+    x3 = 2.0f * x3 / viewport.Width - 1.0f;
+    y3 = 1.0f - 2.0f * y3 / viewport.Height;
+
+    // 当たり判定用の矩形を描画するための頂点
+    Vertex collisionVertices[]
+    {
+        { { x0, y0, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 0.0f, 0.0f } }, // 赤色で表示
+        { { x1, y1, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 1.0f, 0.0f } },
+        { { x2, y2, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 0.0f, 1.0f } },
+        { { x3, y3, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 1.0f, 1.0f } },
+    };
+
+    // 当たり判定用の矩形を描画するための頂点バッファの作成
+    D3D11_BUFFER_DESC buffer_desc{};
+    buffer_desc.ByteWidth = sizeof(collisionVertices);
+    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+    buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    D3D11_SUBRESOURCE_DATA subresource_data{};
+    subresource_data.pSysMem = collisionVertices;
+    ID3D11Buffer* collisionVertexBuffer = nullptr;
+    HRESULT hr = device->CreateBuffer(&buffer_desc, &subresource_data, &collisionVertexBuffer);
+    if (FAILED(hr)) {
+        LOG("当たり判定用頂点バッファの作成に失敗しました。HRESULT: 0x%X", hr);
+        return; // エラー処理
+    }
+
+    // 描画設定
+    UINT stride{ sizeof(Vertex) };
+    UINT offset{ 0 };
+    dc->IASetVertexBuffers(0, 1, &collisionVertexBuffer, &stride, &offset);
+    dc->PSSetShaderResources(0, 1, collsionshaderResourceView_.GetAddressOf());
+
+    // スプライトの矩形を描画
+    dc->Draw(4, 0);
+
+    // メモリの解放
+    if (collisionVertexBuffer) {
+        collisionVertexBuffer->Release();
+        collisionVertexBuffer = nullptr;
     }
 }
 
