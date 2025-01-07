@@ -48,6 +48,7 @@ void SceneTraining::Initialize()
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+        
     }
 
     //ライト
@@ -95,6 +96,9 @@ void SceneTraining::Initialize()
     //ネット大事
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
+
+    //最初にイベントカメラへ変更
+    GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
 }
 
 void SceneTraining::Finalize()

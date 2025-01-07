@@ -346,7 +346,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SpaceSkillPushing(elapsedTime);
     }
 
-    //野村追加 Rキー
+    //ウルトRキー
     if (CharacterInput::UltimetButton & GetButtonDown())
     {
         //ウルト発動フラグON

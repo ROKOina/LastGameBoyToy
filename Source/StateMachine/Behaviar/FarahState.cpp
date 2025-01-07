@@ -1,5 +1,7 @@
 #include "FarahState.h"
 #include "Component\Bullet\BulletCom.h"
+#include <Component\Collsion\ColliderCom.h>
+#include "Component\Particle\GPUParticle.h"
 
 //基底クラスです
 Farah_BaseState::Farah_BaseState(CharacterCom* owner) : State(owner)
@@ -47,8 +49,20 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
 #pragma region ult攻撃
 void Farah_UltState::Enter()
 {
-    moveCom.lock()->SetMoveAcceleration(5.0f);
-    charaCom.lock()->SetDashGaugeMins(2.0f);
+}
+void Farah_UltState::Execute(const float& elapsedTime)
+{
+    //腕アニメーションをする
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        armAnim->SetAnimationSeconds(0.3f);
+    }
+}
+void Farah_UltState::Exit()
+{
 }
 #pragma endregion
 

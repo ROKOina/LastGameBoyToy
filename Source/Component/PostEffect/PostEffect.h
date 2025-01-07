@@ -45,6 +45,8 @@ public:
         BlurStrength,
         BlurRadius,
         BlurDecay,
+        Sepia,
+        Nega,
         MAX
     };
 
@@ -87,11 +89,12 @@ private:
         float exposure = 1.4f;
         float vignettesize = 0.7f;
         float vignetteintensity = 0.01f;
-        DirectX::XMFLOAT4 ssrparameter = { 50.0f,10.0f,0.1f,1.0f };
         float blurstrength = {};
         float blurradius = { 1.0f };
         float blurdecay = { 0.999f };
-        float padding = {};
+        float sepiastrength = { 0.0f };
+        float negapogistrength = { 0.0f };
+        DirectX::XMFLOAT3 padding = {};
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
@@ -117,7 +120,7 @@ public:
 
 private:
     enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, fxaa, depthCopy, max };
-    enum class pixelshader { deferred, colorGrading, cascadeshadow, fxaa, tonemap, max };
+    enum class pixelshader { deferred, colorGrading, cascadeshadow, fxaa, tonemap, charapick, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];
 

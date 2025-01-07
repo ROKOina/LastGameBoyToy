@@ -342,6 +342,25 @@ void GPUParticle::Update(float elapsedTime)
     dc->CSSetUnorderedAccessViews(0, 1, m_particleuav.GetAddressOf(), NULL);
     dc->CSSetShader(m_updatecomputeshader.Get(), NULL, 0);
 
+    //ピクセルシェーダのサンプラーステート設定(謎わざわざ毎フレーム呼ばないといけないっぽい)
+    ID3D11SamplerState* santolers[] =
+    {
+        graphics.GetSamplerState(SAMPLEMODE::WRAP_POINT),
+        graphics.GetSamplerState(SAMPLEMODE::WRAP_LINEAR),
+        graphics.GetSamplerState(SAMPLEMODE::WRAP_ANISOTROPIC),
+        graphics.GetSamplerState(SAMPLEMODE::BLACK_BORDER_POINT),
+        graphics.GetSamplerState(SAMPLEMODE::BLACK_BORDER_LINEAR),
+        graphics.GetSamplerState(SAMPLEMODE::BLACK_BORDER_ANISOTROPIC),
+        graphics.GetSamplerState(SAMPLEMODE::WHITE_BORDER_POINT),
+        graphics.GetSamplerState(SAMPLEMODE::WHITE_BORDER_LINEAR),
+        graphics.GetSamplerState(SAMPLEMODE::WHITE_BORDER_ANISOTROPIC),
+        graphics.GetSamplerState(SAMPLEMODE::SHADOW),
+        graphics.GetSamplerState(SAMPLEMODE::TRANSPARENT_BORDER_POINT),
+        graphics.GetSamplerState(SAMPLEMODE::TRANSPARENT_BORDER_LINEAR),
+        graphics.GetSamplerState(SAMPLEMODE::TRANSPARENT_BORDER_ANISOTROPIC),
+    };
+    dc->CSSetSamplers(0, SAMPLEMODE::MAX, santolers);
+
     if (m_GSC.iscurve == 1)
     {
         ID3D11ShaderResourceView* srvs[] = { SSG_srv.Get(), color_srv.Get() };

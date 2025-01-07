@@ -6,6 +6,8 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\System\SpawnCom.h"
 #include "Component\System\TransformCom.h"
+#include "Component\MoveSystem\MovementCom.h"
+#include "Component\Renderer\DecalCom.h"
 
 //XVˆ—
 void JankratBulletCom::Update(float elapsedTime)

@@ -619,7 +619,6 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
             return left.lock()->GetOrderinLayer() < right.lock()->GetOrderinLayer();
         });
 
-
     //フォントオブジェクトがあれば入る
     std::shared_ptr<Font>fontcomp = obj->GetComponent<Font>();
     if (fontcomp)

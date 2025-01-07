@@ -381,7 +381,7 @@ void NodeCollsionCom::OnGUI()
                         break;
 
                     case NodeCollsionCom::CollsionType::BOX:
-                        ImGui::DragFloat3("Scale", &cp.scale.x, 0.1f, 0.0f, 5.0f);
+                        ImGui::DragFloat3("Scale", &cp.scale.x, 0.1f, 0.0f, 200.0f);
                         ImGui::DragFloat3("OffsetPos", &cp.offsetpos.x);
                         break;
 

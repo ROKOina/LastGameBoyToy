@@ -1,6 +1,6 @@
 #pragma once
 #include "Component/System/Component.h"
-
+#include "Component\Audio\AudioCom.h"
 
 
 
@@ -183,6 +183,7 @@ private:
     bool ultInspectionFlag = false;          //ウルトのチュートリアル検査
 
     bool flag = false;
+    bool linesFlag = false;
 
     bool upFlag = false;
     bool downFlag = false;
@@ -209,8 +210,9 @@ private:
         
 
         DirectX::XMFLOAT2 pos = { 0,0 };
-
         std::wstring str;
+
+        const char* Lines;
     };
 
     SubTitle moveSubTitle[12];
@@ -218,7 +220,7 @@ private:
     SubTitle skillSubTitle[4];
     SubTitle ultSubTitle[5];
 
-    
+    AudioCom* audioObj;
 
     
 };

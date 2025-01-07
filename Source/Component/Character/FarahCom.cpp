@@ -8,14 +8,13 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Bullet\BulletCom.h"
 #include "Component\Collsion\ColliderCom.h"
-#include "Component\Renderer\DecalCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 // 定数
 constexpr float JUMP_FORCE = 12.62f;
 constexpr float RISING_FORCE = 13.0f;
 constexpr float COOLDOWN_TIME = 0.5f;
 constexpr float DASH_GAUGE_INCREMENT = 5.0f;
-constexpr float ULT_DURATION = 15.0f;
 
 // 初期化
 void FarahCom::Start()
@@ -49,7 +48,6 @@ void FarahCom::Update(float elapsedTime)
 {
     HandleCooldown(elapsedTime);
     HandleBoostFlag();
-    UltUpdate(elapsedTime);
     ShotSecond();
     CharacterCom::Update(elapsedTime);
     GroundBomber(elapsedTime);
@@ -111,7 +109,8 @@ void FarahCom::MainAttackDown()
 // ウルトスキル
 void FarahCom::UltSkill()
 {
-    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
+    //ステートを初期化
+    //attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
 
 //リロード（弾減らす処理は各自のキャラでする
@@ -120,18 +119,6 @@ void FarahCom::Reload()
     if (currentBulletNum < maxBulletNum)
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
-}
-
-// ウルト更新
-void FarahCom::UltUpdate(float elapsedTime)
-{
-    if (!UseUlt()) return;
-
-    ulttimer += elapsedTime;
-    if (ulttimer > ULT_DURATION)
-    {
-        ResetUlt();
     }
 }
 
@@ -175,15 +162,6 @@ void FarahCom::SetCooldown(float time)
 void FarahCom::AddDashGauge(float amount)
 {
     dashGauge += amount;
-}
-
-// ウルトリセット
-void FarahCom::ResetUlt()
-{
-    dashgaugemin = 4.0f;
-    GetGameObject()->GetComponent<MovementCom>()->SetMoveAcceleration(3.0f);
-    FinishUlt();
-    ulttimer = 0.0f;
 }
 
 // クールダウンの管理
@@ -231,7 +209,7 @@ void FarahCom::GroundBomber(float elapsedTime)
             {
                 //デカール生成
                 std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
-                decal->SetName("decal");
+                decal->SetName("bulletdecal");
                 std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
 
                 //ここでヒット種類を分別する

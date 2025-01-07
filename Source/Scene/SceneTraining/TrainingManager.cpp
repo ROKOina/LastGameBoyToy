@@ -26,12 +26,12 @@
 #include <Component/UI/PlayerUI.h>
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
-#include "Component\Audio\AudioCom.h"
 #include "Component/Enemy/ScarecrowCom.h"
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component/Item/UltSkillMaxItem.h"
 #include "Component\UI\Font.h"
+
 
 TrainingManager::TrainingManager()
 {
@@ -530,53 +530,98 @@ void TutorialSystem::TutorialSystemStart()
         font->SetEnabled(false);
     }
 
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Audio");
+        audioObj = audio->AddComponent<AudioCom>().get();
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_01, "01");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_02, "02");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_03, "03");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_04, "04");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_05, "05");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_06, "06");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_07, "07");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_08, "08");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_09, "09");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_10, "10");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_11, "11");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_12, "12");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_13, "13");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_14, "14");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_15, "15");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_16, "16");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_17, "17");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_18, "18");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_19, "19");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_20, "20");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_21, "21");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_22, "22");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_23, "23");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_24, "24");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_25, "25");
+
+        
+    }
+
 #pragma region 移動
 
     moveSubTitle[0].str= L"ようこそ　チュートリアルへ";
+    moveSubTitle[0].Lines = "01";
     moveSubTitle[0].pos = {650.0f,80.0f};
     moveSubTitle[0].UIID = 0;
 
     moveSubTitle[1].str = L"今から基本的な操作方法を教えるのだ";
+    moveSubTitle[1].Lines = "02";
     moveSubTitle[1].pos = {553.0f,80.0f};
     moveSubTitle[1].UIID = 1;
 
     moveSubTitle[2].str = L"まずは、移動からなのだ";
+    moveSubTitle[2].Lines = "03";
     moveSubTitle[2].pos = { 701.0f,80.0f };
     moveSubTitle[2].UIID = 2;
 
     moveSubTitle[3].str = L"キーボードのADキーで左右移動なのだ";
+    moveSubTitle[3].Lines = "04";
     moveSubTitle[3].pos = { 539.0f,80.0f };
     moveSubTitle[3].UIID = 3;
 
     moveSubTitle[4].str = L"よくできたのだ";
+    moveSubTitle[4].Lines = "05";
     moveSubTitle[4].pos = { 806.0f,80.0f };
     moveSubTitle[4].UIID = 4;
 
     moveSubTitle[5].str = L"次は縦移動なのだ";
+    moveSubTitle[5].Lines = "06";
     moveSubTitle[5].pos = { 777.0f,80.0f };
     moveSubTitle[5].UIID = 5;
 
     moveSubTitle[6].str = L"キーボードのWSキーで縦移動なのだ";
+    moveSubTitle[6].Lines = "07";
     moveSubTitle[6].pos = { 556.0f,80.0f };
     moveSubTitle[6].UIID = 6;
 
     moveSubTitle[7].str = L"素晴らしいのだ";
+    moveSubTitle[7].Lines = "08";
     moveSubTitle[7].pos = { 809.0f,80.0f };
     moveSubTitle[7].UIID = 7;
 
     moveSubTitle[8].str = L"次はジャンプなのだ";
+    moveSubTitle[8].Lines = "09";
     moveSubTitle[8].pos = { 740.0f,80.0f };
     moveSubTitle[8].UIID = 8;
 
     moveSubTitle[9].str = L"キーボードのスペースキーでジャンプなのだ";
+    moveSubTitle[9].Lines = "10";
     moveSubTitle[9].pos = { 493.0f,80.0f };
     moveSubTitle[9].UIID = 9;
 
     moveSubTitle[10].str = L"天才なのだ";
+    moveSubTitle[10].Lines = "11";
     moveSubTitle[10].pos = { 834.0f,80.0f };
     moveSubTitle[10].UIID = 10;
 
     moveSubTitle[11].str = L"次は銃の説明なのだ";
+    moveSubTitle[11].Lines = "12";
     moveSubTitle[11].pos = { 715.0f,80.0f };
     moveSubTitle[11].UIID = 11;
 
@@ -585,18 +630,22 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region 銃セリフ
 
     gunSubTitle[0].str = L"銃の基本説明を教えるのだ";
+    gunSubTitle[0].Lines = "13";
     gunSubTitle[0].pos = {674.0f,80.0f};
     gunSubTitle[0].UIID = 0;
 
     gunSubTitle[1].str = L"マウスの左クリックで、発射なのだ";
+    gunSubTitle[1].Lines = "14";
     gunSubTitle[1].pos = { 571.0f,80.0f };
     gunSubTitle[1].UIID=1;
 
     gunSubTitle[2].str = L"よくできたのだ";
+    gunSubTitle[2].Lines = "15";
     gunSubTitle[2].pos = { 765.0f,80.0f };
     gunSubTitle[2].UIID =2;
 
     gunSubTitle[3].str = L"次はスキルの説明なのだ";
+    gunSubTitle[3].Lines = "16";
     gunSubTitle[3].pos = { 693.0f,80.0f};
     gunSubTitle[3].UIID=3;
 
@@ -604,18 +653,22 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region スキルセリフ
 
     skillSubTitle[0].str = L"スキルの基本操作を教えるのだ";
+    skillSubTitle[0].Lines = "17";
     skillSubTitle[0].pos = { 624.0f,80.0f };
     skillSubTitle[0].UIID = 0;
 
     skillSubTitle[1].str = L"キーボードのEキーで発動なのだ";
+    skillSubTitle[1].Lines = "18";
     skillSubTitle[1].pos = { 621.0f,80.0f };
     skillSubTitle[1].UIID =1;
 
     skillSubTitle[2].str = L"素晴らしいのだ";
+    skillSubTitle[2].Lines = "19";
     skillSubTitle[2].pos = { 780.0f,80.0f };
     skillSubTitle[2].UIID = 2;
 
     skillSubTitle[3].str = L"次はウルトの説明なのだ";
+    skillSubTitle[3].Lines = "20";
     skillSubTitle[3].pos = { 714.0f,80.0f };
     skillSubTitle[3].UIID=3;
 
@@ -623,22 +676,27 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region ウルトセリフ
 
     ultSubTitle[0].str = L"ウルトの基本操作を教えるのだ";
+    ultSubTitle[0].Lines = "21";
     ultSubTitle[0].pos = { 628.0f,80.0f};
     ultSubTitle[0].UIID = 0;
 
     ultSubTitle[1].str = L"キーボードのRキーで発動なのだ";
+    ultSubTitle[1].Lines = "22";
     ultSubTitle[1].pos = { 628.0f,80.0f};
     ultSubTitle[1].UIID = 1;
 
     ultSubTitle[2].str = L"天才なのだ";
+    ultSubTitle[2].Lines = "23";
     ultSubTitle[2].pos = { 827.0f,80.0f};
     ultSubTitle[2].UIID = 2;
 
     ultSubTitle[3].str = L"これでチュートリアルは終わりなのだ";
+    ultSubTitle[3].Lines = "24";
     ultSubTitle[3].pos = { 543.0f,80.0f};
     ultSubTitle[3].UIID = 3;
 
     ultSubTitle[4].str = L"Les’t enjoyなのだ";
+    ultSubTitle[4].Lines = "25";
     ultSubTitle[4].pos = { 742.0f,80.0f};
     ultSubTitle[4].UIID=5;
 
@@ -744,7 +802,11 @@ void TutorialSystem::LightChangeManger(float elapsedTime)
 void TutorialSystem::MoveTutorialManager(float elapsedTime)
 {
     
-
+    if (!linesFlag)
+    {
+        audioObj->Play(moveSubTitle[moveSubTitleIndex].Lines, false, 1.0f);
+        linesFlag = true;
+    }
 
     InputVec = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetLeftStick();
 
@@ -765,12 +827,14 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                         moveInspectionFlag = true;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
                     }
                     else
                     {
                         moveSubTitleIndex += 1;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
                     }
                 }
             }
@@ -827,6 +891,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                     upFlag = false;
                     downFlag = true;
                     moveSubTitleIndex += 1;
+                    linesFlag = false;
                 }
 
             }
@@ -871,6 +936,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                     upFlag = false;
                     downFlag = true;
                     moveSubTitleIndex += 1;
+                    linesFlag = false;
                 }
 
             }
@@ -908,6 +974,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                     upFlag = false;
                     downFlag = true;
                     moveSubTitleIndex += 1;
+                    linesFlag = false;
                 }
 
             }
@@ -926,7 +993,12 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
 void TutorialSystem::GunTutorialManager(float elapsedTime)
 {
-    
+
+    if (!linesFlag)
+    {
+        audioObj->Play(gunSubTitle[gunSubTitleIndex].Lines, false, 1.0f);
+        linesFlag = true;
+    }
 
 
     if (gunSubTitleIndex != 1)
@@ -946,12 +1018,14 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
                         gunInspectionFlag = true;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
                     }
                     else
                     {
                         gunSubTitleIndex += 1;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
                     }
                 }
             }
@@ -999,6 +1073,8 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
                     upFlag = false;
                     downFlag = true;
                     gunSubTitleIndex += 1;
+                    linesFlag = false;
+
                 }
 
             }
@@ -1022,6 +1098,11 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 void TutorialSystem::SkillTutorialManager(float elapsedTime)
 {
 
+    if (!linesFlag)
+    {
+        audioObj->Play(skillSubTitle[skillSubTitleIndex].Lines, false, 1.0f);
+        linesFlag = true;
+    }
 
     if (skillSubTitleIndex != 1)
     {
@@ -1040,12 +1121,16 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
                         skillInspectionFlag = true;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
+
                     }
                     else
                     {
                         skillSubTitleIndex += 1;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
+
                     }
                 }
             }
@@ -1093,6 +1178,8 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
                     upFlag = false;
                     downFlag = true;
                     skillSubTitleIndex += 1;
+                    linesFlag = false;
+
                 }
 
             }
@@ -1116,6 +1203,11 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 void TutorialSystem::UltTutorialManager(float elapsedTime)
 {
 
+    if (!linesFlag)
+    {
+        audioObj->Play(ultSubTitle[ultSubTitleIndex].Lines, false, 1.0f);
+        linesFlag = true;
+    }
 
 
     if (ultSubTitleIndex != 1)
@@ -1135,12 +1227,14 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
                         ultInspectionFlag = true;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
                     }
                     else
                     {
                         ultSubTitleIndex += 1;
                         upFlag = false;
                         downFlag = true;
+                        linesFlag = false;
                     }
                 }
             }
@@ -1190,6 +1284,7 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
                     upFlag = false;
                     downFlag = true;
                     ultSubTitleIndex += 1;
+                    linesFlag = false;
                 }
 
             }
