@@ -101,6 +101,9 @@ void FarahCom::MainAttackDown()
     //スキル発動中はリターン
     if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::SUB_SKILL)return;
 
+    //ウルト発動中
+    if (UseUlt())return;
+
     //アタック
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
     attackInputSave = false;
@@ -109,8 +112,8 @@ void FarahCom::MainAttackDown()
 // ウルトスキル
 void FarahCom::UltSkill()
 {
-    //ステートを初期化
-    //attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+    //ステートをウルトに変更
+    attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 
 //リロード（弾減らす処理は各自のキャラでする
