@@ -213,7 +213,7 @@ void FarahCom::GroundBomber(float elapsedTime)
                 //デカール生成
                 std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
                 decal->SetName("bulletdecal");
-                std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
+                std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/star.png");
 
                 //ここでヒット種類を分別する
                 if (movecom->OnGround())
