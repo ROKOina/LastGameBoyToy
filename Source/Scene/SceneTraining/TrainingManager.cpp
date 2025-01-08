@@ -31,6 +31,7 @@
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component/Item/UltSkillMaxItem.h"
 #include "Component\UI\Font.h"
+#include "Setting/Setting.h"
 
 
 TrainingManager::TrainingManager()
@@ -56,12 +57,37 @@ TutorialSystem::~TutorialSystem()
 #pragma region トレーニング統括
 void TrainingManager::TrainingManagerStart()
 {
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("traCanvas");
+
     TrainingSystem::Instance().TrainingSystemStart();
     TutorialSystem::Instance().TutorialSystemStart();
+
+    // INAZAWA
+    {
+        // タイトルへ
+        {
+            auto& name  = obj->AddChildObject();
+            name->SetName("title");
+            auto& spr=name->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTitle.ui", Sprite::SpriteShader::DEFALT, true);
+            spr->SetOrderinLayer(100);
+            name->SetEnabled(false);
+        }
+
+        // チュートリアルへ
+        {
+            auto& skill = obj->AddChildObject();
+            skill->SetName("tuto");
+            auto& spr = skill->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTutorial.ui", Sprite::SpriteShader::DEFALT, true);
+            spr->SetOrderinLayer(100);
+            skill->SetEnabled(false);
+        }
+    }
 }
 
 void TrainingManager::TrainingManagerUpdate(float elapsedTime)
 {
+    
     if (tutorialFlag)
     {
         //チュートリアル
@@ -72,6 +98,8 @@ void TrainingManager::TrainingManagerUpdate(float elapsedTime)
         //トレーニング
         TrainingSystem::Instance().TrainingSystemUpdate(elapsedTime);
     }
+
+    Setting();
 }
 
 void TrainingManager::TrainingManagerClear()
@@ -85,7 +113,6 @@ void TrainingManager::ChangeTutorialFlag()
     GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -0.115f,0.0f,3.489f });
     GameObjectManager::Instance().Find("player")->transform_->SetEulerRotation({0.0f,180.119f,0.0f});
     TrainingSystem::Instance().TrainingObjUnhide();
-    TutorialSystem::Instance().TutorialUIUnhind();
     
     tutorialFlag = true;
 }
@@ -94,7 +121,6 @@ void TrainingManager::ChangeTrainigFlag()
 {
    
     TutorialSystem::Instance().TutorialFlagClear();
-    TutorialSystem::Instance().TutorialUIDisplay();
     tutorialFlag = false;
 }
 
@@ -111,6 +137,44 @@ void TrainingManager::Changelightchange()
     //暗転
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, parameters);
+}
+
+void TrainingManager::Setting()
+{
+    auto& tuto = GameObjectManager::Instance().Find("tuto");
+    auto& title = GameObjectManager::Instance().Find("title");
+    
+    DirectX::XMFLOAT4 selectColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+    DirectX::XMFLOAT4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting())
+    {
+        tuto->SetEnabled(true);
+        title->SetEnabled(true);
+    }
+    else
+    {
+        tuto->SetEnabled(false);
+        title->SetEnabled(false);
+    }
+
+    if (tuto->GetComponent<Sprite>()->GetHitSprite())
+    {
+        tuto->GetComponent<Sprite>()->spc.color = selectColor;
+    }
+    else
+    {
+        tuto->GetComponent<Sprite>()->spc.color = Color;
+    }
+
+    if (title->GetComponent<Sprite>()->GetHitSprite())
+    {
+        title->GetComponent<Sprite>()->spc.color= selectColor;
+    }
+    else
+    {
+        title->GetComponent<Sprite>()->spc.color = Color;
+    }
 }
 
 void TrainingManager::OnGUI()
@@ -1401,61 +1465,7 @@ void TutorialSystem::TutorialFlagClear()
 
 }
 
-void TutorialSystem::TutorialUIUnhind()
-{
-    //GameObjectManager::Instance().Find("reticle")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("HpFrame")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("HpGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("UltFrame")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("UltGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("ultCore")->SetEnabled(false);
 
-    //GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_E")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillCore")->SetEnabled(false);
-
-
-    //GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Decoration")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("HitEffect")->SetEnabled(false);
-}
-
-void TutorialSystem::TutorialUIDisplay()
-{
-    /*GameObjectManager::Instance().Find("reticle")->SetEnabled(true);
-    GameObjectManager::Instance().Find("HpFrame")->SetEnabled(true);
-    GameObjectManager::Instance().Find("HpGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("UltFrame")->SetEnabled(true);
-    GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("UltGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("ultCore")->SetEnabled(true);
-
-    GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_E")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillCore")->SetEnabled(true);
-
-    GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(true);
-    GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Decoration")->SetEnabled(true);
-    GameObjectManager::Instance().Find("HitEffect")->SetEnabled(true);*/
-
-}
 
 void TutorialSystem::OnGui()
 {
