@@ -48,10 +48,10 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->SetEnabled(false);
             }
         }
-        // JANKRAT
+        // SANTORATTO
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("JANKRAT");
+            chara->SetName("Santoratto");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon2.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -62,10 +62,10 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->SetEnabled(false);
             }
         }
-        // 4
+        // MATYA-
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("chara4");
+            chara->SetName("Matya-");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon3.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -135,8 +135,8 @@ void CharaPicks::CharaDetails()
     std::vector<CharacterInfo> characters = {
         getCharacterInfo("INAZAWA", 0),
         getCharacterInfo("FARAH", 1),
-        getCharacterInfo("JANKRAT", 2),
-        getCharacterInfo("chara4", 3)
+        getCharacterInfo("Santoratto", 2),
+        getCharacterInfo("Matya-", 3)
     };
 
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
