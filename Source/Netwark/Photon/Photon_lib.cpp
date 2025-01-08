@@ -1182,6 +1182,9 @@ void PhotonLib::GameRecv(NetData recvData)
     //hp
     net1->GetComponent<CharaStatusCom>()->SetHitPoint(recvData.gameData.hp);
 
+    //ultGauge
+    net1->GetComponent<CharacterCom>()->SetUltGauge(recvData.gameData.ultGauge);
+
     int myPlayerID = GetMyPlayerID();
     auto& myPlayer = GameObjectManager::Instance().Find("player");
     if (!myPlayer)return;
@@ -1424,6 +1427,9 @@ void PhotonLib::sendGameData(void)
 
     //HP
     netD.gameData.hp = int(*myPlayer->GetComponent<CharaStatusCom>()->GetHitPoint());
+
+    //ultGauge
+    netD.gameData.ultGauge = float(*myPlayer->GetComponent<CharacterCom>()->GetUltGauge());
 
     //ダメージ情報送信
     auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
