@@ -125,7 +125,7 @@ void CharaPicks::CreateCharaPicksUiObject()
     {
         auto& charaPick = charaPicksCanvas->AddChildObject();
         charaPick->SetName("CharaPick");
-        //charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
+        charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaPick.ui", Sprite::SpriteShader::DEFALT, true);
     }
 
     // 時間制限
@@ -182,7 +182,7 @@ void CharaPicks::CharaDetails()
         if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
         {
             selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
-            selected.name->GetComponent<Sprite>()->spc.scale = { 0.63f, 0.63f };
+            selected.name->GetComponent<Sprite>()->spc.scale = { 1.0f, 1.0f };
             selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f };
         }
 
@@ -192,7 +192,7 @@ void CharaPicks::CharaDetails()
             selected.name->GetComponent<Sprite>()->spc.onshot = true;
 
             selected.sprite->spc.color = selectColor;
-            selected.sprite->spc.scale = { 0.7f, 0.7f };
+            selected.sprite->spc.scale = { 1.0f, 1.0f };
             selected.sprite->EasingPlay();
 
             // スキル表示はここのコメント解除してね！
@@ -209,7 +209,7 @@ void CharaPicks::CharaDetails()
 
                     other.sprite->StopEasing();
                     other.sprite->spc.color = color;
-                    other.sprite->spc.scale = { 0.7f, 0.7f };
+                    other.sprite->spc.scale = { 1.0f, 1.0f };
                 }
             }
         }
