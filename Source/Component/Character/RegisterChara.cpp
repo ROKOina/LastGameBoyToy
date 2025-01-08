@@ -279,6 +279,13 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
         smokeeffct->SetActive(false);
     }
 
+    //ult
+    {
+        std::shared_ptr<GameObject>ultobject = obj->AddChildObject();
+        ultobject->SetName("UltObject");
+        ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_UltSkill.gpuparticle", 2000);
+    }
+
     //SE
     {
         auto& au = obj->AddComponent<AudioCom>();
@@ -447,6 +454,14 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
         smoke->SetName("smokeeffect");
         std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
         smokeeffct->SetActive(false);
+    }
+
+    //ult
+    {
+        std::shared_ptr<GameObject>ultobject = obj->AddChildObject();
+        ultobject->SetName("UltObject");
+        ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/solder_ult_aura.gpuparticle", 2000);
+        ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
     }
 
     //ヒットスキャン

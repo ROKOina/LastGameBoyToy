@@ -49,20 +49,54 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
 #pragma region ult攻撃
 void Farah_UltState::Enter()
 {
+    owner->GetGameObject()->GetChildFind("UltObject")->GetComponent<GPUParticle>()->SetLoop(true);
+
+    //設定
+    charaCom.lock()->SetCurrentBulletNum(100);
+    charaCom.lock()->SetMaxBulletNum(100);
 }
 void Farah_UltState::Execute(const float& elapsedTime)
 {
-    //腕アニメーションをする
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    time += elapsedTime;
+
+    //攻撃終了処理＆攻撃処理
+    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
+        //腕アニメーションをする
+        if (std::string(owner->GetGameObject()->GetName()) == "player")
+        {
+            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+            auto& armAnim = arm->GetComponent<AnimationCom>();
+            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+            armAnim->SetAnimationSeconds(0.3f);
+        }
+
+        //上半身アニメーション?
+        owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+
+        //攻撃処理
+        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
+    }
+
+    if (time > 8.0f)
+    {
+        owner->GetGameObject()->GetChildFind("UltObject")->GetComponent<GPUParticle>()->SetLoop(false);
+
+        //ステート変更
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }
 void Farah_UltState::Exit()
 {
+    //発射間隔を短くする元に戻す
+    charaCom.lock()->SetCurrentBulletNum(5);
+    charaCom.lock()->SetMaxBulletNum(5);
+
+    //時間初期化
+    time = 0.0f;
+
+    //ult終了
+    charaCom.lock()->FinishUlt();
 }
 #pragma endregion
 

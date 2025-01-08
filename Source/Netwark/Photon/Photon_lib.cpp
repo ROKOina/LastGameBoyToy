@@ -109,6 +109,7 @@ void PhotonLib::update(float elapsedTime)
         }
         int myPlayerID = GetMyPlayerID();
         myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(myPlayerID);
+        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetMyChara(true);
     }
 
     switch (mState)

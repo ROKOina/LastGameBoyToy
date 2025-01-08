@@ -7,7 +7,7 @@
 
 CharaPicks::CharaPicks()
 {
-    color          = { 1.0f, 1.0f, 1.0f, 1.0f };
+    color = { 1.0f, 1.0f, 1.0f, 1.0f };
     selectColor = { 0.3f, 0.3f, 0.3f, 1.0f };
 }
 
@@ -33,14 +33,6 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName0.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill0.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
         }
         // FARAH
         {
@@ -55,21 +47,11 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName1.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill1.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
-
         }
-        // JANKRAT
+        // SANTORATTO
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("JANKRAT");
+            chara->SetName("Santoratto");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon2.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -79,20 +61,11 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName2.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill2.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
-
         }
-        // 4
+        // MATYA-
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("chara4");
+            chara->SetName("Matya-");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon3.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -102,15 +75,6 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName3.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill3.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
-
         }
     }
 
@@ -125,7 +89,7 @@ void CharaPicks::CreateCharaPicksUiObject()
     {
         auto& charaPick = charaPicksCanvas->AddChildObject();
         charaPick->SetName("CharaPick");
-        //charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
+        charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaPick.ui", Sprite::SpriteShader::DEFALT, true);
     }
 
     // 時間制限
@@ -163,7 +127,6 @@ void CharaPicks::CharaDetails()
             chara,
             chara->GetComponent<Sprite>(),
             chara->GetChildFind("name"),
-            chara->GetChildFind("skill"),
             id
         };
         };
@@ -172,24 +135,41 @@ void CharaPicks::CharaDetails()
     std::vector<CharacterInfo> characters = {
         getCharacterInfo("INAZAWA", 0),
         getCharacterInfo("FARAH", 1),
-        getCharacterInfo("JANKRAT", 2),
-        getCharacterInfo("chara4", 3)
+        getCharacterInfo("Santoratto", 2),
+        getCharacterInfo("Matya-", 3)
     };
 
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
+
+        // Spriteクラスで関数を作成（下記は無駄なコード）
+        if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
+        {
+            selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
+            selected.name->GetComponent<Sprite>()->spc.scale = { 1.0f, 1.0f };
+            selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f };
+        }
+
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
             selected.name->SetEnabled(true);
+            selected.name->GetComponent<Sprite>()->EasingPlay();
+            selected.name->GetComponent<Sprite>()->spc.onshot = true;
+
             selected.sprite->spc.color = selectColor;
-            // スキル表示はここのコメント解除してね！
-            //selected.skill->SetEnabled(true);
+            selected.sprite->spc.scale = { 1.0f, 1.0f };
+            selected.sprite->EasingPlay();
+
             selectedCharacterId = selected.id;
 
             for (auto& other : others) {
                 if (&other != &selected) {
                     other.name->SetEnabled(false);
-                    other.skill->SetEnabled(false);
+                    other.name->GetComponent<Sprite>()->StopEasing();
+                    other.name->GetComponent<Sprite>()->spc.onshot = false;
+
+                    other.sprite->StopEasing();
                     other.sprite->spc.color = color;
+                    other.sprite->spc.scale = { 1.0f, 1.0f };
                 }
             }
         }
@@ -205,12 +185,23 @@ void CharaPicks::CharaDetails()
 // 決定処理
 void CharaPicks::DecisionButton()
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
     auto& decisionButton = canvas->GetChildFind("decision");
     auto& sprite = decisionButton->GetComponent<Sprite>();
 
-    // 決定ボタンが押され、かつキャラが選択されている場合のみ処理を実行
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    // OKキーの演出
+    if (selectedCharacterId != -1 && sprite->GetHitSpriteEnter())
+    {
+        sprite->EasingPlay();
+    }
+    else if(!sprite->GetHitSprite())
+    {
+        sprite->spc.color = color;
+    }
+
+    // OKボタンが押され、かつキャラが選択されている場合のみ処理を実行
     if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
     {
         decisionFlg = true;

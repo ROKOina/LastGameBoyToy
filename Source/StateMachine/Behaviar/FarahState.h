@@ -59,5 +59,5 @@ public:
     virtual const char* GetName() const override { return "UltAttack"; }
 
 private:
-    std::shared_ptr<GameObject>rayobj;
+    float time = 0.0f;
 };

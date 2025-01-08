@@ -39,6 +39,7 @@
 #include "../SceneTitle/SceneTitle.h"
 
 #include "PvPUi/CharaPicks.h"
+#include "Setting/Setting.h"
 
 void ScenePVP::Initialize()
 {
@@ -477,6 +478,14 @@ void ScenePVP::Update(float elapsedTime)
     if (GameOneFlg)    //一回だけ入る
     {
         InitializePVP();
+    }
+
+    //設定からキャラピックを選んだ場合
+    auto& ss = SceneManager::Instance().GetSettingScreen();
+    if (ss->GetIsCharaSelect())
+    {
+        ss->SetViewSetting(false);
+        charaPicks->SetViewCharaPicks(true);
     }
 
     // キャラピック更新処理
@@ -1175,7 +1184,7 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             rsUI->spc.color = { 1,1,0,0.0f };
             rbUI->spc.color = { 1,1,0,0.0f };
             rsUI->spc.easingcolor = { color.x,color.y,color.z,0.3f };
-            rbUI->spc.easingcolor = { color.x,color.y,color.z,1.9f };
+            rbUI->spc.easingcolor = { color.x,color.y,color.z,0.8f };
 
             rsUI->GetEasingTimeReset();
             rbUI->GetEasingTimeReset();
@@ -1261,7 +1270,7 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             csUI->spc.color = { 1,1,0,0.0f };
             cbUI->spc.color = { 1,1,0,0.0f };
             csUI->spc.easingcolor = { color.x,color.y,color.z,0.3f };
-            cbUI->spc.easingcolor = { color.x,color.y,color.z,1.9f };
+            cbUI->spc.easingcolor = { color.x,color.y,color.z,0.8f };
 
             csUI->GetEasingTimeReset();
             cbUI->GetEasingTimeReset();

@@ -72,6 +72,9 @@ void SoldierCom::MainAttackDown()
     //スキル発動中はリターン
     if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::SUB_SKILL)return;
 
+    //ウルト発動中
+    if (UseUlt())return;
+
     //アタック
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
     attackInputSave = false;

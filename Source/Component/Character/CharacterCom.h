@@ -208,6 +208,7 @@ public:
 
     // shootTimeÇÃÉQÉbÉ^Å[
     float GetShootTime() const { return shootTime; }
+    void SetShootTime(float t) { shootTime = t; }
 
     void SetDashFlag(bool flag) { dashFlag = flag; }
     bool GetDashFlag() { return dashFlag; }
