@@ -198,9 +198,9 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     coll->SetThroughJudge(true);    //‚·‚è”²‚¯”»’èˆ—’Ç‰Á
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(objPoint->GetName(), "player") == 0)
-        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
     else
-        coll->SetJudgeTag(COLLIDER_TAG::Player);
+        coll->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
     coll->SetRadius(0.6f);
 
     //’e
@@ -649,9 +649,9 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(objPoint->GetName(), "player") == 0)
-        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
     else
-        coll->SetJudgeTag(COLLIDER_TAG::Player);
+        coll->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
     coll->SetRadius(0.6f);
 
     //’e

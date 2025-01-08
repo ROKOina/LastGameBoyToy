@@ -469,7 +469,7 @@ void StageEditorCom::TowerGimic(GameObj& place)
     std::shared_ptr<CPUParticle>cpuparticle = place->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/gimmicksmoke.cpuparticle", 50);
     cpuparticle->SetActive(false);
     std::shared_ptr<SphereColliderCom>collider = place->AddComponent<SphereColliderCom>();
-    collider->SetMyTag(COLLIDER_TAG::Enemy);
+    collider->SetMyTag(COLLIDER_TAG::UnderStand);
     collider->SetRadius(0.8f);
     std::shared_ptr<CharaStatusCom>status = place->AddComponent<CharaStatusCom>();
     status->SetInvincibleTime(0.2f);

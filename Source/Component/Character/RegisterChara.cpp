@@ -133,8 +133,18 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
         ultAttckChild->transform_->SetWorldPosition({ 0, 8.0821f, 3.3050f });
 
         std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
-        rayCol->SetMyTag(COLLIDER_TAG::Player);
-        rayCol->SetJudgeTag(COLLIDER_TAG::Enemy);
+
+        if (std::strcmp(obj->GetName(), "player") == 0)
+        {
+            rayCol->SetMyTag(COLLIDER_TAG::Player);
+            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::UnderStand);
+        }
+        else
+        {
+            rayCol->SetMyTag(COLLIDER_TAG::Enemy);
+            rayCol->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
+        }
+
         rayCol->SetEnabled(false);
 
         //ダメージ処理用
@@ -477,9 +487,9 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
         rayCol->SetEnabled(false);
         rayCol->SetMyTag(COLLIDER_TAG::Bullet);
         if (std::strcmp(obj->GetName(), "player") == 0)
-            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+            rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
         else
-            rayCol->SetJudgeTag(COLLIDER_TAG::Player);
+            rayCol->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
 
         //ダメージ処理用
         std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
