@@ -32,13 +32,9 @@ void AimIKCom::Start()
     }
 }
 
-static  DirectX::XMFLOAT3 cameraF = {0,0,0};
-static  DirectX::XMFLOAT4 AIMR = { 0,0,0,0 };
 //imgui
 void AimIKCom::OnGUI()
 {
-    ImGui::DragFloat3("cameraF", &cameraF.x);
-    ImGui::DragFloat4("AIMR", &AIMR.x);
 }
 
 //計算
@@ -53,7 +49,6 @@ void AimIKCom::AimIK()
     {
         // FPSカメラからターゲット位置を取得
         DirectX::XMFLOAT3 cameraForward = GetGameObject()->GetComponent<CharacterCom>()->GetFpsCameraDir();
-        cameraF = cameraForward;
         DirectX::XMFLOAT3 playerForward = GetGameObject()->transform_->GetWorldFront();
         DirectX::XMFLOAT3 playerRight = GetGameObject()->transform_->GetWorldRight();
 
@@ -73,10 +68,9 @@ void AimIKCom::AimIK()
         DirectX::XMVECTOR ROT = DirectX::XMQuaternionRotationRollPitchYaw(dot, 0, 0);
 
         // 現在の回転を補間して適用
-        DirectX::XMVECTOR currentQuat = DirectX::XMLoadFloat4(&aimbone.rotate);
-        DirectX::XMVECTOR newQuat = DirectX::XMQuaternionSlerp(currentQuat, ROT, 0.2f);
-        DirectX::XMStoreFloat4(&aimbone.rotate, newQuat);
-        AIMR = aimbone.rotate;
+        //DirectX::XMVECTOR currentQuat = DirectX::XMLoadFloat4(&aimbone.rotate);
+        //DirectX::XMVECTOR newQuat = DirectX::XMQuaternionSlerp(currentQuat, ROT, 0.2f);
+        DirectX::XMStoreFloat4(&aimbone.rotate, ROT);
     }
     else if (enemycopyname)
     {
