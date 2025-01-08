@@ -46,8 +46,6 @@ private:
     // Œˆ’èƒtƒ‰ƒO
     bool decisionFlg = false;
 
-    bool hitFlg = false;
-
     DirectX::XMFLOAT4 color, selectColor = {};
 };
 

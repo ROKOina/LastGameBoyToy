@@ -142,6 +142,7 @@ void CharaPicks::CharaDetails()
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
 
+        // Spriteクラスで関数を作成（下記は無駄なコード）
         if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
         {
             selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
@@ -184,23 +185,23 @@ void CharaPicks::CharaDetails()
 // 決定処理
 void CharaPicks::DecisionButton()
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
     auto& decisionButton = canvas->GetChildFind("decision");
     auto& sprite = decisionButton->GetComponent<Sprite>();
 
-    // 決定ボタンが押され、かつキャラが選択されている場合のみ処理を実行
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    // OKキーの演出
+    if (selectedCharacterId != -1 && sprite->GetHitSpriteEnter())
+    {
+        sprite->EasingPlay();
+    }
+    else if(!sprite->GetHitSprite())
+    {
+        sprite->spc.color = color;
+    }
 
-    //if (selectedCharacterId != -1 && sprite->GetHitSprite())
-    //{
-    //        sprite->EasingPlay();
-    //}
-    //else if (!sprite->GetHitSprite())
-    //{
-    //    hitFlg = true;
-    //    sprite->StopEasing();
-    //}
-
+    // OKボタンが押され、かつキャラが選択されている場合のみ処理を実行
     if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
     {
         decisionFlg = true;
