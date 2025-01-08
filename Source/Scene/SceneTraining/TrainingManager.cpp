@@ -32,6 +32,7 @@
 #include "Component/Item/UltSkillMaxItem.h"
 #include "Component\UI\Font.h"
 #include "Setting/Setting.h"
+#include "Scene\SceneTitle\SceneTitle.h"
 
 
 TrainingManager::TrainingManager()
@@ -81,6 +82,15 @@ void TrainingManager::TrainingManagerStart()
             auto& spr = skill->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTutorial.ui", Sprite::SpriteShader::DEFALT, true);
             spr->SetOrderinLayer(100);
             skill->SetEnabled(false);
+        }
+
+        // トレーニングモードへ
+        {
+            auto& traing = obj->AddChildObject();
+            traing->SetName("training");
+            auto& spr = traing->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTraining.ui", Sprite::SpriteShader::DEFALT, true);
+            spr->SetOrderinLayer(100);
+            traing->SetEnabled(false);
         }
     }
 }
@@ -141,39 +151,88 @@ void TrainingManager::Changelightchange()
 
 void TrainingManager::Setting()
 {
+
     auto& tuto = GameObjectManager::Instance().Find("tuto");
     auto& title = GameObjectManager::Instance().Find("title");
-    
+    auto& traing = GameObjectManager::Instance().Find("training");
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     DirectX::XMFLOAT4 selectColor = { 0.1f, 0.1f, 0.1f, 1.0f };
     DirectX::XMFLOAT4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+    //UI表示
     if (SceneManager::Instance().GetSettingScreen()->IsViewSetting())
     {
-        tuto->SetEnabled(true);
-        title->SetEnabled(true);
+        if (tutorialFlag)
+        {
+            traing->SetEnabled(true);
+            title->SetEnabled(true);
+        }
+        else
+        {
+            tuto->SetEnabled(true);
+            title->SetEnabled(true);
+        }
     }
     else
     {
         tuto->SetEnabled(false);
         title->SetEnabled(false);
+        traing->SetEnabled(false);
+        
     }
 
-    if (tuto->GetComponent<Sprite>()->GetHitSprite())
+
+    //チュートリアルへ
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting()&&tuto->GetComponent<Sprite>()->GetHitSprite()&&!tutorialFlag)
     {
         tuto->GetComponent<Sprite>()->spc.color = selectColor;
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+        {
+            TrainingManager::Instance().ChangeTutorialFlag();
+            SceneManager::Instance().GetSettingScreen()->SetViewSetting(false);
+           
+        }
     }
     else
     {
         tuto->GetComponent<Sprite>()->spc.color = Color;
     }
 
-    if (title->GetComponent<Sprite>()->GetHitSprite())
+
+    //タイトルへ
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && title->GetComponent<Sprite>()->GetHitSprite())
     {
         title->GetComponent<Sprite>()->spc.color= selectColor;
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+        {
+            SceneManager::Instance().ChangeScene(new SceneTitle);
+            TrainingManager::Instance().ChangeTrainigFlag();
+        }
     }
     else
     {
         title->GetComponent<Sprite>()->spc.color = Color;
+    }
+
+
+    //トレーニングモードへ
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && traing->GetComponent<Sprite>()->GetHitSprite())
+    {
+        traing->GetComponent<Sprite>()->spc.color = selectColor;
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+        {
+            TrainingManager::Instance().ChangeTrainigFlag();
+            TrainingSystem::Instance().TrainingObjDisplay();
+            SceneManager::Instance().GetSettingScreen()->SetViewSetting(false);
+        }
+    }
+    else
+    {
+        traing->GetComponent<Sprite>()->spc.color = Color;
     }
 }
 
@@ -457,10 +516,10 @@ void TrainingSystem::ShootingStartEndSystem()
     //開始処理
     if (GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->IsDeath()&&!shootingStartFlag)
     {
-       /* shootingStartFlag = true;
+        shootingStartFlag = true;
         GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
-        ShootingSpawnCrow();*/
-        TrainingManager::Instance().ChangeTutorialFlag();
+        ShootingSpawnCrow();
+        
     }
 
     //終了処理
@@ -1407,6 +1466,8 @@ void TutorialSystem::EndTutorialManager(float elapsedTime)
 
 void TutorialSystem::TutorialFlagClear()
 {
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 0.0f;
+
     tutorialID = 0;
 
     moveSubTitleIndex = 0;
@@ -1462,6 +1523,7 @@ void TutorialSystem::TutorialFlagClear()
     {
         subtitle.subtitleTimer = 0.0f;
     }
+
 
 }
 
