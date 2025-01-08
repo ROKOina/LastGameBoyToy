@@ -418,8 +418,11 @@ void Ult_Attack_State::Enter()
         gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
     }
 
-    //用意したエフェクトオブジェクト起動
-    arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
+    {
+        //用意したエフェクトオブジェクト起動
+        arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
+    }
 
     //音
     owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACKULTSHOOT");
