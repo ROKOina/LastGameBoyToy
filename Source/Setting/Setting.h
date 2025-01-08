@@ -22,6 +22,8 @@ public:
 
     int GetSensitivity() { return sensitivity; }
 
+    bool GetIsCharaSelect() { return isCharaSelect; }
+
 private:
     bool viewSetting = false;   //直接操作禁止
 
@@ -53,4 +55,7 @@ private:
 
     //swich文用変数
     int state = 0;
+
+    //キャラセレクトフラグ
+    bool isCharaSelect = false;
 };

@@ -724,6 +724,7 @@ void GameObjectManager::RemoveGameObjects()
         std::vector<std::weak_ptr<GameObject>> parentObj;
         for (const std::shared_ptr<GameObject>& obj : removeGameObject_)
         {
+            if (!obj)continue;
             obj->OnDestroy();
             EraseObject(startGameObject_, obj);
             EraseObject(updateGameObject_, obj);

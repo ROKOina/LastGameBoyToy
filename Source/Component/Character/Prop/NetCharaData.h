@@ -17,8 +17,11 @@ public:
     int GetCharaID() { return charaID; }
     void  SetCharaID(const int id) { charaID = id; }
 
+    void SetMyChara(bool flg) { myChara = flg; }
+
 private:
     int teamID = 0;   //自分のチーム
     int netPlayerID = 0;//どのクライアントがこのキャラを担当するか
     int charaID;    //キャラクター識別用
+    bool myChara = false;
 };

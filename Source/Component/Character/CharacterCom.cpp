@@ -19,19 +19,22 @@ void CharacterCom::Update(float elapsedTime)
 {
     auto& ss = SceneManager::Instance().GetSettingScreen();
     bool isViewSetting = ss->IsViewSetting();
+    if (netCharaData.myChara)
     {
-        //Ý’è‰æ–Ê‚ðŠJ‚­(P)
-        GamePad& gamePad = Input::Instance().GetGamePad();
-        if (GamePad::BTN_P & gamePad.GetButtonDown())
         {
-            if (isViewSetting)
+            //Ý’è‰æ–Ê‚ðŠJ‚­(P)
+            GamePad& gamePad = Input::Instance().GetGamePad();
+            if (GamePad::BTN_P & gamePad.GetButtonDown())
             {
-                ss->SetViewSetting(false);
-                ::SetCursorPos(500, 500);
-            }
-            else
-            {
-                ss->SetViewSetting(true);
+                if (isViewSetting)
+                {
+                    ss->SetViewSetting(false);
+                    ::SetCursorPos(500, 500);
+                }
+                else
+                {
+                    ss->SetViewSetting(true);
+                }
             }
         }
     }
