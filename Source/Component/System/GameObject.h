@@ -23,6 +23,7 @@ class Decal;
 class PostEffect;
 class Trail;
 class Font;
+class CharaStatusCom;
 
 // ゲームオブジェクト
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -172,6 +173,8 @@ public:
     //ゲームオブジェクトを探す
     std::shared_ptr<GameObject> Find(const char* name);
 
+    std::vector<std::weak_ptr<GameObject>> GetCharaObject() { return characterobject; }
+
     //シーンゲーム演出待ちフラグ
     bool GetIsSceneGameStart() { return isSceneGameStart_; }
     void SetIsSceneGameStart(bool flag) { isSceneGameStart_ = flag; }
@@ -284,6 +287,10 @@ private:
 
     //Font描画
     std::vector<std::weak_ptr<Font>>fontobject;
+
+    //キャラObject保存
+    std::vector<std::weak_ptr<GameObject>> characterobject;
+
 
     bool					isHiddenLister_ = false;
     bool					isHiddenDetail_ = false;

@@ -20,6 +20,7 @@
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include  "Component\UI\Font.h"
+#include "Component\Character\CharaStatusCom.h"
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -612,13 +613,19 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
     }
 
 
-    //スプライトオブジェクトがあれば入る
+    //fontオブジェクトがあれば入る
     std::shared_ptr<Font>fontcomp = obj->GetComponent<Font>();
     if (fontcomp)
     {
         fontobject.emplace_back(fontcomp);
     }
 
+    //characterStatusがあれば入る
+    std::shared_ptr<CharaStatusCom>characomp = obj->GetComponent<CharaStatusCom>();
+    if (characomp)
+    {
+        characterobject.emplace_back(obj);
+    }
 
     //インスタンスオブジェクトがあれば入る
     std::shared_ptr<InstanceRenderer>instancecomp = obj->GetComponent<InstanceRenderer>();

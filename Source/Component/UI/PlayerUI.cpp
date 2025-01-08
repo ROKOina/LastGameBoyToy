@@ -520,7 +520,8 @@ void UI_Ult_Count::UpdateCore(float elapsedTime)
 
 UI_UltNum::UI_UltNum()
 {
-    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltNum");
+    std::shared_ptr<GameObject> obj = ultFrame->AddChildObject();
     obj->SetName("ultNumFont");
     std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
     font->position = { 950,886 };
@@ -537,7 +538,14 @@ float  ultrate  =  *player->GetComponent<CharacterCom>()->GetUltGauge() / player
 ultrate *= 100;
 if (int(ultrate) >= 10) {
     font->GetComponent<Font>()->position = { 939,886 };
+    if (int(ultrate) >= 100) {
+        font->GetComponent<Font>()->position = { 930,886 };
+    }
 }
+else {
+    font->GetComponent<Font>()->position = { 950,886 };
+}
+ 
 std::wstring numstr = std::to_wstring(int(ultrate));
 font->GetComponent<Font>()->str = numstr;
 }
@@ -608,7 +616,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
     std::string iconName = "Data/Texture/KeyBoard/";
     CharacterCom::SkillCoolID skillNum;
     //à íuÇÇ∏ÇÁÇ∑íËêî
-    const float offset = 120.0f;
+    const DirectX::XMFLOAT2 offset = { -95.0f,-6.0f };
     switch (use_skill)
     {
     case Q:
@@ -634,14 +642,14 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
     std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
     skillFrame->SetName("Skill_Frame");
     auto& a = skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_02.ui", Sprite::SpriteShader::DEFALT, false);
-    a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+    a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
 
     //SkillMask
     {
         std::shared_ptr<GameObject> skillGaueHide = skillFrame->AddChildObject();
         skillGaueHide->SetName("SkillGaugeHide");
         auto& a = skillGaueHide->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillGaugeMask.ui", Sprite::SpriteShader::DEFALT, false);
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+        a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
     }
 
     //SkillGauge
@@ -653,7 +661,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         skillGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(skillNum));
         float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(skillNum);
         skillGaugeCmp->SetVariableValue(i);
-        skillGaugeCmp->spc.position = { skillGaugeCmp->spc.position.x - (count * offset),skillGaugeCmp->spc.position.y };
+        skillGaugeCmp->spc.position = { skillGaugeCmp->spc.position.x - (count * offset.x),skillGaugeCmp->spc.position.y };
     }
 
     //SkillFrame
@@ -661,8 +669,8 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         std::shared_ptr<GameObject> skillFrame2 = skillFrame->AddChildObject();
         skillFrame2->SetName("SkillFrame2");
         auto& a = skillFrame2->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
-        skillFrame2->transform_->SetWorldPosition({ skillFrame2->transform_->GetWorldPosition().x - (count * offset),skillFrame2->transform_->GetWorldPosition().y,0 });
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+        skillFrame2->transform_->SetWorldPosition({ skillFrame2->transform_->GetWorldPosition().x - (count * offset.x),skillFrame2->transform_->GetWorldPosition().y,0 });
+        a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y)};
     }
 
     //Skill_E
@@ -671,7 +679,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         skillIcon->SetName("Skill_E");
         auto& a = skillIcon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_E.ui", Sprite::SpriteShader::DEFALT, false);
         skillIcon->GetComponent<UiSystem>()->LoadTexture(name);
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+        a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
     }
 
     //KeyBoardIcon
@@ -680,7 +688,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         skillIcon->SetName("KeyIcon");
         auto& a = skillIcon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/KeyIcon.ui", Sprite::SpriteShader::DEFALT, false);
         skillIcon->GetComponent<UiSystem>()->LoadTexture(iconName);
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+        a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
     }
 }
 
@@ -778,5 +786,4 @@ void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
     player = obj;
     bookingRegister = true;
 }
-
 

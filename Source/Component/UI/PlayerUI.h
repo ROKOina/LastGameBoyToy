@@ -222,6 +222,7 @@ public:
 private:
 
 };
+
 //PlayerUIのマネージャー
 class PlayerUIManager
 {
