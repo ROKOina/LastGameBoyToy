@@ -124,9 +124,12 @@ void InazawaCharacterCom::MainAttackDown()
         attackUltCounter++;
         if (attackUltCounter >= attackUltCountMax)
         {
-            //エフェクト切る
-            GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
-            GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
+            if (std::string(GetGameObject()->GetName()) == "player")
+            {
+                //エフェクト切る
+                GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
+                GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
+            }
             FinishUlt();
         }
 
@@ -173,9 +176,13 @@ void InazawaCharacterCom::UltSkill()
 
     attackUltCounter = 0;
 
-    //エフェクト起動
-    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
-    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
+    if (std::string(GetGameObject()->GetName()) == "player")
+    {
+        //エフェクト起動
+        GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
+        GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
+    }
+
     //ステートを初期化
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
