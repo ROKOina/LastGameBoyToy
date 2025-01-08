@@ -687,7 +687,7 @@ void PhotonLib::DelayUpdate()
     if (saveInputPhoton.size() <= 0)return;
 
     int myPhotonID = GetMyPhotonID();
-    delayFrame = 0;
+    delayFrame = 30;
 
     for (int i = 0; i < saveInputPhoton.size(); ++i)    //Ž©•ªˆÈŠO
     {
