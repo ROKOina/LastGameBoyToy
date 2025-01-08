@@ -33,14 +33,6 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName0.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill0.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
         }
         // FARAH
         {
@@ -55,16 +47,6 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName1.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill1.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
-
         }
         // JANKRAT
         {
@@ -79,15 +61,6 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName2.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill2.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
-
         }
         // 4
         {
@@ -102,15 +75,6 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName3.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
-
-            // スキル表記
-            {
-                auto& skill = chara->AddChildObject();
-                skill->SetName("skill");
-                skill->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaSkill3.ui", Sprite::SpriteShader::DEFALT, false);
-                skill->SetEnabled(false);
-            }
-
         }
     }
 
@@ -163,7 +127,6 @@ void CharaPicks::CharaDetails()
             chara,
             chara->GetComponent<Sprite>(),
             chara->GetChildFind("name"),
-            chara->GetChildFind("skill"),
             id
         };
         };
@@ -195,8 +158,6 @@ void CharaPicks::CharaDetails()
             selected.sprite->spc.scale = { 1.0f, 1.0f };
             selected.sprite->EasingPlay();
 
-            // スキル表示はここのコメント解除してね！
-            //selected.skill->SetEnabled(true);
             selectedCharacterId = selected.id;
 
             for (auto& other : others) {
@@ -204,8 +165,6 @@ void CharaPicks::CharaDetails()
                     other.name->SetEnabled(false);
                     other.name->GetComponent<Sprite>()->StopEasing();
                     other.name->GetComponent<Sprite>()->spc.onshot = false;
-
-                    other.skill->SetEnabled(false);
 
                     other.sprite->StopEasing();
                     other.sprite->spc.color = color;
