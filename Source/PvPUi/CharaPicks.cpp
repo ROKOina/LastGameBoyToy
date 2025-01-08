@@ -7,7 +7,7 @@
 
 CharaPicks::CharaPicks()
 {
-    color          = { 1.0f, 1.0f, 1.0f, 1.0f };
+    color = { 1.0f, 1.0f, 1.0f, 1.0f };
     selectColor = { 0.3f, 0.3f, 0.3f, 1.0f };
 }
 
@@ -179,11 +179,11 @@ void CharaPicks::CharaDetails()
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
 
-        if(!selected.name->GetComponent<Sprite>()->IsPlayEasing())
+        if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
         {
             selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
             selected.name->GetComponent<Sprite>()->spc.scale = { 0.63f, 0.63f };
-            selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f};
+            selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f };
         }
 
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
@@ -209,7 +209,7 @@ void CharaPicks::CharaDetails()
 
                     other.sprite->StopEasing();
                     other.sprite->spc.color = color;
-                    other.sprite->spc.scale = {0.7f, 0.7f};
+                    other.sprite->spc.scale = { 0.7f, 0.7f };
                 }
             }
         }
@@ -231,6 +231,17 @@ void CharaPicks::DecisionButton()
 
     // 決定ボタンが押され、かつキャラが選択されている場合のみ処理を実行
     GamePad& gamePad = Input::Instance().GetGamePad();
+
+    //if (selectedCharacterId != -1 && sprite->GetHitSprite())
+    //{
+    //        sprite->EasingPlay();
+    //}
+    //else if (!sprite->GetHitSprite())
+    //{
+    //    hitFlg = true;
+    //    sprite->StopEasing();
+    //}
+
     if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
     {
         decisionFlg = true;
