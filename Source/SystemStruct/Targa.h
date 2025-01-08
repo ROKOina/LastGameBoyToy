@@ -14,17 +14,16 @@
 
 struct TargaHeader
 {
-	UINT8		idLength;			//  0:1 ヘッダのに続くID領域サイズ
-	UINT8		colorMapType;		//  1:1 CLUT有無(0/1)
-	UINT8		imageType;			//  2:1 形式 (1=Indx, 2=RGB, 他もあるけど略)
-	UINT8		colorMapStart[2];	//  3:2 CLUTインデックスの始点
-	UINT8		colorMapLength[2];	//  5:2 CLUTインデックス数
-	UINT8		colorMapDepth;		//  7:1 CLUTのbit数
-	UINT16		offsetX;			//  8:2 画像始点座標X
-	UINT16		offsetY;			// 10:2 画像始点座標Y
-	UINT16		width;				// 12:2 画像幅
-	UINT16		height;				// 14:2 画像高さ
-	UINT8		pixelDepth;			// 16:1 ピクセルのbit数
-	UINT8		imageDescriptor;	// 17:1 アトリビュート(略)0x00は左→右,下→上
+    UINT8		idLength;			//  0:1 ヘッダのに続くID領域サイズ
+    UINT8		colorMapType;		//  1:1 CLUT有無(0/1)
+    UINT8		imageType;			//  2:1 形式 (1=Indx, 2=RGB, 他もあるけど略)
+    UINT8		colorMapStart[2];	//  3:2 CLUTインデックスの始点
+    UINT8		colorMapLength[2];	//  5:2 CLUTインデックス数
+    UINT8		colorMapDepth;		//  7:1 CLUTのbit数
+    UINT16		offsetX;			//  8:2 画像始点座標X
+    UINT16		offsetY;			// 10:2 画像始点座標Y
+    UINT16		width;				// 12:2 画像幅
+    UINT16		height;				// 14:2 画像高さ
+    UINT8		pixelDepth;			// 16:1 ピクセルのbit数
+    UINT8		imageDescriptor;	// 17:1 アトリビュート(略)0x00は左→右,下→上
 };
-

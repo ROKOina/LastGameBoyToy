@@ -3,6 +3,7 @@
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Bullet\BulletCom.h"
+#include "Component\System\SpawnCom.h"
 
 //基底クラス
 Solder_BaseState::Solder_BaseState(CharacterCom* owner) : State(owner)
@@ -81,15 +82,31 @@ void Solder_MainAttackState::Exit()
 #pragma region ult攻撃
 void Solder_UltState::Enter()
 {
+    //ウルトオブジェクトを更新
+    auto& ultobj = owner->GetGameObject()->GetChildFind("UltObject");
+    ultobj->GetComponent<GPUParticle>()->SetLoop(true);
+    ultobj->GetComponent<SpawnCom>()->SetOnTrigger(true);
 }
 void Solder_UltState::Execute(const float& elapsedTime)
 {
+    time += elapsedTime;
+
+    //時間になれば終了
+    if (time > 8.0f)
+    {
+        //ウルトオブジェクトを更新しない
+        auto& ultobj = owner->GetGameObject()->GetChildFind("UltObject");
+        ultobj->GetComponent<GPUParticle>()->SetLoop(false);
+        ultobj->GetComponent<SpawnCom>()->SetOnTrigger(false);
+
+        //ステート変更
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
 }
 void Solder_UltState::Exit()
 {
-}
-void Solder_UltState::ImGui()
-{
+    //ult終了
+    charaCom.lock()->FinishUlt();
 }
 #pragma endregion
 

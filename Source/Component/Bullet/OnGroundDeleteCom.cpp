@@ -29,7 +29,10 @@ void OnGroundDeleteCom::IsGroundDelete()
         movecom->SetIsRaycast(false);
 
         //íœ
-        GameObjectManager::Instance().Remove(bullet->GetViewBullet().lock());
+        if (bullet != nullptr)
+        {
+            GameObjectManager::Instance().Remove(bullet->GetViewBullet().lock());
+        }
         GameObjectManager::Instance().Remove(GetGameObject());
     }
 }
