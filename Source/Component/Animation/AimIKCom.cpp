@@ -68,8 +68,6 @@ void AimIKCom::AimIK()
         DirectX::XMVECTOR ROT = DirectX::XMQuaternionRotationRollPitchYaw(dot, 0, 0);
 
         // åªç›ÇÃâÒì]Çï‚ä‘ÇµÇƒìKóp
-        //DirectX::XMVECTOR currentQuat = DirectX::XMLoadFloat4(&aimbone.rotate);
-        //DirectX::XMVECTOR newQuat = DirectX::XMQuaternionSlerp(currentQuat, ROT, 0.2f);
         DirectX::XMStoreFloat4(&aimbone.rotate, ROT);
     }
     else if (enemycopyname)

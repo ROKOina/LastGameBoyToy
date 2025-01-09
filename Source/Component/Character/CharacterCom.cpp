@@ -251,6 +251,27 @@ void CharacterCom::DashFewSub(float elapsedTime)
     }
 }
 
+//腕アニメーション再生
+void CharacterCom::HandleArmAnimation()
+{
+    if (std::string(GetGameObject()->GetName()) == "player")
+    {
+        const auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        const auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        const auto& anim = GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetUpperCurrentAnimationSeconds(0.3f);
+        armAnim->SetAnimationSeconds(0.3f);
+    }
+    else
+    {
+        const auto& anim = GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetAnimationSeconds(0.3f);
+    }
+}
+
 void CharacterCom::InputStateUpdate(float elapsedTime)
 {
     //ステート処理

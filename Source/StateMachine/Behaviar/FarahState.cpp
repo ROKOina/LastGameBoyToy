@@ -19,17 +19,8 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
     //攻撃終了処理＆攻撃処理
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        //腕アニメーションをする
-        if (std::string(owner->GetGameObject()->GetName()) == "player")
-        {
-            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-            auto& armAnim = arm->GetComponent<AnimationCom>();
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-            armAnim->SetAnimationSeconds(0.3f);
-        }
-
-        //上半身アニメーション?
-        owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+        //腕アニメーション再生
+        charaCom.lock()->HandleArmAnimation();
 
         //弾減らさないとリロードしない
         charaCom.lock()->AddCurrentBulletNum(-1);
@@ -62,17 +53,8 @@ void Farah_UltState::Execute(const float& elapsedTime)
     //攻撃終了処理＆攻撃処理
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        //腕アニメーションをする
-        if (std::string(owner->GetGameObject()->GetName()) == "player")
-        {
-            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-            auto& armAnim = arm->GetComponent<AnimationCom>();
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-            armAnim->SetAnimationSeconds(0.3f);
-        }
-
-        //上半身アニメーション?
-        owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+        //腕アニメーション再生
+        charaCom.lock()->HandleArmAnimation();
 
         //攻撃処理
         charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
@@ -103,14 +85,8 @@ void Farah_UltState::Exit()
 #pragma region Eskill
 void Farah_ESkillState::Execute(const float& elapsedTime)
 {
-    //攻撃終了処理＆攻撃処理
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
-    }
+    //腕アニメーション再生
+    charaCom.lock()->HandleArmAnimation();
 
     //攻撃処理
     charaCom.lock()->AddBullet(BulletCreate::FarahKnockBack(owner->GetGameObject(), 30.0f, 2.0f));
