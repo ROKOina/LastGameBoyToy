@@ -146,7 +146,7 @@ void CharaPicks::CharaDetails()
         if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
         {
             selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
-            selected.name->GetComponent<Sprite>()->spc.scale = { 1.0f, 1.0f };
+            selected.name->GetComponent<Sprite>()->spc.scale = { 0.9f, 0.9f };
             selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f };
         }
 
