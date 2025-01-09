@@ -1042,15 +1042,16 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
     bool pickTransition = true;
     for (auto& s : netSaveInput)
     {
-        if (!s.useFlg)continue;
-        if (s.charaID >= 0)continue;
-
-        //味方のキャラが確定ならピックに送る
-        if (s.teamID == net->GetTeamID(net->GetMyPlayerID()))
-            charaPicks->SetTeamPick(s.charaID);
+        if (!s.useFlg)continue; //ウーズフラグONなってる？
+        if (s.charaID >= 0)
+        {
+            //味方のキャラが確定ならピックに送る
+            if (s.teamID == net->GetTeamID(net->GetMyPlayerID()))
+                charaPicks->SetTeamPick(s.charaID);
+            continue;
+        }
 
         pickTransition = false;
-        break;
     }
     if (pickTransition) //ピック完了
     {
