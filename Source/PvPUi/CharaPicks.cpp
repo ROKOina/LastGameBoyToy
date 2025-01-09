@@ -186,13 +186,26 @@ void CharaPicks::CharaDetails()
             selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f };
         }
 
-        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
-            //チームが選んでいるキャラだった場合はリターン
-            if (selected.id == teamPick)
+        //チームが選んでいるキャラだった場合はリターン
+        if (selected.id == teamPick)
+        {
+            selected.name->SetEnabled(false);
+            selected.name->GetComponent<Sprite>()->StopEasing();
+            selected.name->GetComponent<Sprite>()->spc.onshot = false;
+
+            selected.skill->SetEnabled(false);
+
+            selected.sprite->StopEasing();
+
+            selected.sprite->spc.color = { 1,0,0,1 };
+            if (selectedCharacterId == selected.id)
             {
-                selected.sprite->spc.color = { 1,0,0,1 };
-                return;
+                selectedCharacterId = -1;
             }
+            return;
+        }
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
 
             selected.name->SetEnabled(true);
             selected.name->GetComponent<Sprite>()->EasingPlay();
