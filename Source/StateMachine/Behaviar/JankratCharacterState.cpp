@@ -50,27 +50,6 @@ bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos)
     return true;
 }
 
-// 腕アニメーション処理
-void JankratCharacter_BaseState::HandleArmAnimation() const
-{
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        const auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        const auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
-        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
-        anim->SetUpperCurrentAnimationSeconds(0.3f);
-        armAnim->SetAnimationSeconds(0.3f);
-    }
-    else
-    {
-        const auto& anim = owner->GetGameObject()->GetComponent<AnimationCom>();
-        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
-        anim->SetAnimationSeconds(0.3f);
-    }
-}
-
 // 弾丸を発射する処理
 void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
 {
@@ -116,7 +95,7 @@ void JankratCharacter_MainAtkState::Enter()
     }
 
     //腕アニメーション再生
-    HandleArmAnimation();
+    charaCom.lock()->HandleArmAnimation();
 
     // 銃の先端位置を取得
     DirectX::XMFLOAT3 gunPos;
@@ -164,8 +143,8 @@ void JankratCharacter_MainAtkState::ImGui()
 #pragma region 地雷設置
 void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
 {
-    //腕アニメーションをする
-    HandleArmAnimation();
+    //腕アニメーション再生
+    charaCom.lock()->HandleArmAnimation();
 
     //銃の位置から発射
     DirectX::XMFLOAT3 gunPos = {};
@@ -228,7 +207,7 @@ void JankratCharacter_UltState::Execute(const float& elapsedTime)
     }
 
     //腕アニメーション再生
-    HandleArmAnimation();
+    charaCom.lock()->HandleArmAnimation();
 
     if (const auto& bullet = charaComponent->GetHaveBullet())
     {
