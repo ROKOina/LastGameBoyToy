@@ -249,7 +249,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player1.mdl");
+    r->LoadModel("Data/Model/player_True/player2.mdl");
     r->SetDissolveThreshold(0.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
@@ -338,11 +338,12 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     }
 }
 
+//ƒWƒƒƒ“ƒNƒ‰‚Á‚Æ
 void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player1.mdl");
+    r->LoadModel("Data/Model/player_True/player3.mdl");
     r->SetDissolveThreshold(0.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
