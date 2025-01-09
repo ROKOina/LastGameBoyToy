@@ -250,6 +250,56 @@ void TrainingManager::OnGUI()
 #pragma region トレーニングモード
 void TrainingSystem::TrainingSystemStart()
 {
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingScoreF");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 768.0f,30.0f };
+        font->str = L"スコア";  //L付けてね
+        font->scale = 0.6f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingScoreI");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 784.0f,66.0f };
+        font->str = L"00";  //L付けてね
+        font->scale = 1.0f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingRestF");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1048.0f,30.0f };
+        font->str = L"残り";  //L付けてね
+        font->scale = 0.6f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingRestI");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1050.0f,66.0f };
+        font->str = L"00";  //L付けてね
+        font->scale = 1.0f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+
+
     //棒立ち案山子君
     {
         {
@@ -518,6 +568,10 @@ void TrainingSystem::ShootingStartEndSystem()
     {
         shootingStartFlag = true;
         GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
+        GameObjectManager::Instance().Find("trainingScoreF")->GetComponent<Font>()->SetEnabled(true);
+        GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->SetEnabled(true);
+        GameObjectManager::Instance().Find("trainingRestF")->GetComponent<Font>()->SetEnabled(true);
+        GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->SetEnabled(true);
         ShootingSpawnCrow();
         
     }
@@ -528,6 +582,11 @@ void TrainingSystem::ShootingStartEndSystem()
         GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(true);
         GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->ReSpawn(1);
         GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
+        GameObjectManager::Instance().Find("trainingScoreF")->GetComponent<Font>()->SetEnabled(false);
+        GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->SetEnabled(false);
+        GameObjectManager::Instance().Find("trainingRestF")->GetComponent<Font>()->SetEnabled(false);
+        GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->SetEnabled(false);
+
         shootingStartFlag = false;
         scarecrowCount = 0;
     }
@@ -536,7 +595,7 @@ void TrainingSystem::ShootingStartEndSystem()
 //射撃のロジック？
 void TrainingSystem::ShootingSystem(float elapsdTime)
 {
-       
+
     //時間切れでリスポーン
     if (!shootingIntervalFlag)
     {
@@ -555,27 +614,26 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         }
     }
     //倒してリスポーン
-    else if (!shootingIntervalFlag)
-    {
-        if (GameObjectManager::Instance().Find("scarecrow")->GetComponent<CharaStatusCom>()->IsDeath())
-        {
-            //案山子破棄
-            GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
 
-            //初期化
-            shootingIntervalFlag = true;
-            scarecrowLifeTimer = 0.0f;
-            shootingScore += 1;
-            scarecrowCount += 1;
-        }
+    if (!shootingIntervalFlag&& GameObjectManager::Instance().Find("scarecrow")->GetComponent<CharaStatusCom>()->IsDeath())
+    {
+        //案山子破棄
+        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
+
+        //初期化
+        shootingIntervalFlag = true;
+        scarecrowLifeTimer = 0.0f;
+        shootingScore += 1;
+        scarecrowCount += 1;
     }
+
 
     //次の案山子スポーンまでの信号待ち
     if (shootingIntervalFlag)
     {
         scarecrowSpawnIntervalTimer += elapsdTime;
         if (scarecrowSpawnIntervalTime < scarecrowSpawnIntervalTimer)
-        {   
+        {
             //案山子スポーン
             ShootingSpawnCrow();
 
@@ -584,7 +642,11 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
             shootingIntervalFlag = false;
         }
     }
-    
+
+    GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->str = std::to_wstring(shootingScore);
+    GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->str = std::to_wstring(scarecrowMaxTotal - scarecrowCount);
+
+
 }
 
 //アイテムスポーンシステム
