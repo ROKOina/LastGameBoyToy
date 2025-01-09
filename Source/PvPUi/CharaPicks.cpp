@@ -157,8 +157,6 @@ void CharaPicks::CharaDetails()
             selected.name->GetComponent<Sprite>()->StopEasing();
             selected.name->GetComponent<Sprite>()->spc.onshot = false;
 
-            selected.skill->SetEnabled(false);
-
             selected.sprite->StopEasing();
 
             selected.sprite->spc.color = { 1,0,0,1 };

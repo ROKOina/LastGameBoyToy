@@ -48,7 +48,7 @@ private:
     // 決定フラグ
     bool decisionFlg = false;
 
-    bool hitFlg = false;
+    //bool hitFlg = false;
 
     //チームがピックしているキャラ
     int teamPick = -1;
