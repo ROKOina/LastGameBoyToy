@@ -36,6 +36,8 @@ enum COLLIDER_TAG : uint64_t
     Bullet = 1 << 14,
     Impact = 1 << 15,
 
+    UnderStand = 1 << 21,   //’†—§
+
     Wall = 1 << 30,
 };
 static COLLIDER_TAG operator| (COLLIDER_TAG L, COLLIDER_TAG R)

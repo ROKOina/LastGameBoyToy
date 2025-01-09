@@ -343,7 +343,6 @@ void AnimationCom::AnimationUpdata(float elapsedTime)
                     //アニメーション計算
                     AnimationCalculation::Instance().ComputeAnimation(key0, key1, rate, model->GetNodes()[nodeIndex]);
                 }
-
             }
 
             break;
@@ -592,7 +591,6 @@ void AnimationCom::AnimationLowerUpdate(float elapsedTime)
                             AnimationCalculation::Instance().ComputeAnimation(key0, key1, rate, *lowerNodes[lowerNodeIndex]);
                         }
                     }
-
                 }
                 else if (lowerBlendType == 1)
                 {

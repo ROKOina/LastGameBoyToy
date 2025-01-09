@@ -51,14 +51,8 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        //˜rƒAƒjƒ[ƒVƒ‡ƒ“‚ð‚·‚é
-        if (std::string(owner->GetGameObject()->GetName()) == "player")
-        {
-            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-            auto& armAnim = arm->GetComponent<AnimationCom>();
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-            armAnim->SetAnimationSeconds(0.5f);
-        }
+        //˜rƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+        charaCom.lock()->HandleArmAnimation();
 
         //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
         charaCom.lock()->AddCurrentBulletNum(-1);
@@ -118,14 +112,8 @@ void Solder_ESkillState::Enter()
 }
 void Solder_ESkillState::Execute(const float& elapsedTime)
 {
-    //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
-    }
+    //˜rƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+    charaCom.lock()->HandleArmAnimation();
 
     //UŒ‚ˆ—(ƒXƒ^ƒ“ƒ{[ƒ‹)
     BulletCreate::SoldierStanBall(owner->GetGameObject(), 50.0f, 10.0f, 2.0f);
@@ -143,14 +131,8 @@ void Solder_RightClickSkillState::Enter()
 }
 void Solder_RightClickSkillState::Execute(const float& elapsedTime)
 {
-    //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
-    }
+    //˜rƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+    charaCom.lock()->HandleArmAnimation();
 
     //UŒ‚ˆ—
     BulletCreate::SoldierEskillBullet(owner->GetGameObject(), 50.0f, 20.0f);

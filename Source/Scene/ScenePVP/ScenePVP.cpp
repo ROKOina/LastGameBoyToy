@@ -1036,17 +1036,34 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
 
     //キャラ被りを無くす
     auto& netSaveInput = net->GetSaveInput();
-    //for (auto& s : netSaveInput)
-    //{
-    //    s.
-    //}
 
-    net->SetMyPickCharaID(charaPicks->GetSelectedCharacterId());
-    //ピック確定(全員ピックを確認したら)
-    if (charaPicks->IsDecisionFlg())
+
+    //全員ピック確認
+    bool pickTransition = true;
+    for (auto& s : netSaveInput)
     {
+        if (!s.useFlg)continue; //ウーズフラグONなってる？
+        if (s.charaID >= 0)
+        {
+            //味方のキャラが確定ならピックに送る
+            if (s.teamID == net->GetTeamID(net->GetMyPlayerID()))
+                charaPicks->SetTeamPick(s.charaID);
+            continue;
+        }
+
+        pickTransition = false;
+    }
+    if (pickTransition) //ピック完了
+    {
+        //ゲームスタート
         charaPicks->SetViewCharaPicks(false);
         net->PlayGameStart();
+    }
+
+    //ピック確定
+    if (charaPicks->IsDecisionFlg())
+    {
+        net->SetMyPickCharaID(charaPicks->GetSelectedCharacterId());
     }
 }
 

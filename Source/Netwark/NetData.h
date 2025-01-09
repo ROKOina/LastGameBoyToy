@@ -161,6 +161,8 @@ struct NetData
         std::array<int, 4> teamID;//ƒ`[ƒ€‚ÌID
         int charaID;    //ƒLƒƒƒ‰‚ÌID
         int hp;
+
+        float ultGauge;
     }gameData;
 
     //“üº‹–‰Â
@@ -216,6 +218,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 
         out << h.gameData.charaID << " ";
         out << h.gameData.hp << " ";
+        out << h.gameData.ultGauge << " ";
         out << h.gameData.teamID << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
     }
@@ -268,6 +271,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 
         in >> h.gameData.charaID;
         in >> h.gameData.hp;
+        in >> h.gameData.ultGauge;
         in >> h.gameData.teamID;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
     }

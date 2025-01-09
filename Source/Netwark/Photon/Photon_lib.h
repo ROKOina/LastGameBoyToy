@@ -159,7 +159,7 @@ public:
 
         int teamID = 0;
 
-        int charaID = 0;
+        int charaID = -1;
 
         //î•ñ‚ªXV‚³‚ê‚½‚©
         bool isInputUpdate = false;

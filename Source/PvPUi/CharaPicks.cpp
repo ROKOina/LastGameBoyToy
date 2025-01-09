@@ -146,11 +146,29 @@ void CharaPicks::CharaDetails()
         if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
         {
             selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
-            selected.name->GetComponent<Sprite>()->spc.scale = { 1.0f, 1.0f };
+            selected.name->GetComponent<Sprite>()->spc.scale = { 0.9f, 0.9f };
             selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f };
         }
 
+        //チームが選んでいるキャラだった場合はリターン
+        if (selected.id == teamPick)
+        {
+            selected.name->SetEnabled(false);
+            selected.name->GetComponent<Sprite>()->StopEasing();
+            selected.name->GetComponent<Sprite>()->spc.onshot = false;
+
+            selected.sprite->StopEasing();
+
+            selected.sprite->spc.color = { 1,0,0,1 };
+            if (selectedCharacterId == selected.id)
+            {
+                selectedCharacterId = -1;
+            }
+            return;
+        }
+
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
+
             selected.name->SetEnabled(true);
             selected.name->GetComponent<Sprite>()->EasingPlay();
             selected.name->GetComponent<Sprite>()->spc.onshot = true;

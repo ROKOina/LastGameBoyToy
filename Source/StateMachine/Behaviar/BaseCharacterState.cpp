@@ -403,32 +403,37 @@ void Ult_Attack_State::Enter()
     auto& ray = obj->GetComponent<RayColliderCom>();
     DirectX::XMFLOAT3 start = obj->transform_->GetWorldPosition();
 
-    auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
-    DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
+    DirectX::XMFLOAT3 front = owner->GetFpsCameraDir();
     DirectX::XMFLOAT3 end = start + front * 100;
 
     //エフェクト
-    auto& arm = camera->GetChildFind("armChild");
-    DirectX::XMFLOAT3 gunPos = {};
-    if (arm)
+    //auto& arm = owner->GetGameObject()->GetChildFind("armChild");
+    //DirectX::XMFLOAT3 gunPos = {};
+    //if (arm)
+    //{
+    //    const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+    //    const auto& node = model->FindNode("gun2");
+
+    //    gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+    //}
+
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
-        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-        const auto& node = model->FindNode("gun2");
+        auto& camera = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
+        auto& arm = camera->GetChildFind("armChild");
 
-        gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+        //用意したエフェクトオブジェクト起動
+        arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
+
+        //anim
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        armAnim->SetAnimationSeconds(0.3f);
     }
-
-    //用意したエフェクトオブジェクト起動
-    arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
 
     //音
     owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACKULTSHOOT");
     owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACKULTSHOOT", false, 10);
-
-    //anim
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-    armAnim->SetAnimationSeconds(0.3f);
 
     ray->SetStart(start);
     ray->SetEnd(end);
@@ -568,7 +573,7 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
         {
             if (owner->GetDashFlag())
             {
-                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
             }
             else
             {

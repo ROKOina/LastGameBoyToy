@@ -198,9 +198,9 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     coll->SetThroughJudge(true);    //Ç∑ÇËî≤ÇØîªíËèàóùí«â¡
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(objPoint->GetName(), "player") == 0)
-        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
     else
-        coll->SetJudgeTag(COLLIDER_TAG::Player);
+        coll->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
     coll->SetRadius(0.6f);
 
     //íe
@@ -474,6 +474,9 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
     bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
 
+    //ÇﬂÇÁÇﬂÇÁÇŸÇÃÇ§åN
+    bullet->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/maine_fire.gpuparticle", 400);
+
     //ë¨ìxê›íË
     std::shared_ptr<MovementCom> moveCom = bullet->AddComponent<MovementCom>();
     moveCom->SetGravity(0.0f);
@@ -649,9 +652,9 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(objPoint->GetName(), "player") == 0)
-        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+        coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
     else
-        coll->SetJudgeTag(COLLIDER_TAG::Player);
+        coll->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
     coll->SetRadius(0.6f);
 
     //íe
