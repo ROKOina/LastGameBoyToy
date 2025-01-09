@@ -15,6 +15,10 @@ void AudioCom::Update(float elapsedTime)
 
 void AudioCom::OnGUI()
 {
+    for (auto& audioObj : audioSources)
+    {
+        audioObj.second.GetSource()->OnGUI();
+    }
 }
 
 void AudioCom::RegisterSource(AUDIOID id, std::string name)
@@ -23,6 +27,7 @@ void AudioCom::RegisterSource(AUDIOID id, std::string name)
     {
         std::shared_ptr<AudioSource> source = std::make_shared<AudioSource>();
         source->SetAudio((int)id);
+        source->SetAudioName(name);
 
         audioSources[name].SetSource(source);
     }

@@ -75,7 +75,8 @@ public:
     // オーディオ呼び出し関数
     void SetAudio(int id);
     // 各オーディオ名設定
-    void SetAudioName(const char* setName) { this->name = setName; }
+    void SetAudioName(const std::string& setName) { this->name = setName; }
+    const char* GetAudioName() const { return name.c_str(); }
 
     // 再生
     void Play(bool loop, float volume = 1.0f);
@@ -105,5 +106,5 @@ private:
     bool isPlaying = false;
     bool isLooping = false;
 
-    const char* name = "";
+    std::string name = "";
 };
