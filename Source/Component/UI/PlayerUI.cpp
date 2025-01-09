@@ -743,6 +743,7 @@ void PlayerUIManager::CreateBoostUI()
     }
 }
 
+//TODO ITOKUN RAMUCHI
 void PlayerUIManager::CreateNetUseCharaUI()
 {
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
@@ -752,7 +753,7 @@ void PlayerUIManager::CreateNetUseCharaUI()
         allyBack->SetName("allyBack");
         allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
         //àÍêlñ⁄
-        {   //122 341
+        { 
             std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
             ally01->SetName("charaView01");
             ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
