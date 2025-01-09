@@ -28,7 +28,8 @@ private:
     //‰‰o‚Ì“Š‡
     void DirectionSupervision(float elapsedTime);
 
-
+    //Setting
+    void Setting();
 
 private:
     void DirectionFOne(float elapsedTime);
