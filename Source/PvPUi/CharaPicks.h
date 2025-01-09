@@ -40,7 +40,6 @@ private:
         std::shared_ptr<GameObject> chara;
         std::shared_ptr<Sprite> sprite;
         std::shared_ptr<GameObject> name;
-        std::shared_ptr<GameObject> skill;
         int id;
     };
 

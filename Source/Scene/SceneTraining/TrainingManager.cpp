@@ -31,6 +31,8 @@
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component/Item/UltSkillMaxItem.h"
 #include "Component\UI\Font.h"
+#include "Setting/Setting.h"
+#include "Scene\SceneTitle\SceneTitle.h"
 
 
 TrainingManager::TrainingManager()
@@ -56,12 +58,46 @@ TutorialSystem::~TutorialSystem()
 #pragma region トレーニング統括
 void TrainingManager::TrainingManagerStart()
 {
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("traCanvas");
+
     TrainingSystem::Instance().TrainingSystemStart();
     TutorialSystem::Instance().TutorialSystemStart();
+
+    // INAZAWA
+    {
+        // タイトルへ
+        {
+            auto& name  = obj->AddChildObject();
+            name->SetName("title");
+            auto& spr=name->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTitle.ui", Sprite::SpriteShader::DEFALT, true);
+            spr->SetOrderinLayer(100);
+            name->SetEnabled(false);
+        }
+
+        // チュートリアルへ
+        {
+            auto& skill = obj->AddChildObject();
+            skill->SetName("tuto");
+            auto& spr = skill->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTutorial.ui", Sprite::SpriteShader::DEFALT, true);
+            spr->SetOrderinLayer(100);
+            skill->SetEnabled(false);
+        }
+
+        // トレーニングモードへ
+        {
+            auto& traing = obj->AddChildObject();
+            traing->SetName("training");
+            auto& spr = traing->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTraining.ui", Sprite::SpriteShader::DEFALT, true);
+            spr->SetOrderinLayer(100);
+            traing->SetEnabled(false);
+        }
+    }
 }
 
 void TrainingManager::TrainingManagerUpdate(float elapsedTime)
 {
+    
     if (tutorialFlag)
     {
         //チュートリアル
@@ -72,6 +108,8 @@ void TrainingManager::TrainingManagerUpdate(float elapsedTime)
         //トレーニング
         TrainingSystem::Instance().TrainingSystemUpdate(elapsedTime);
     }
+
+    Setting();
 }
 
 void TrainingManager::TrainingManagerClear()
@@ -85,7 +123,6 @@ void TrainingManager::ChangeTutorialFlag()
     GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -0.115f,0.0f,3.489f });
     GameObjectManager::Instance().Find("player")->transform_->SetEulerRotation({0.0f,180.119f,0.0f});
     TrainingSystem::Instance().TrainingObjUnhide();
-    TutorialSystem::Instance().TutorialUIUnhind();
     
     tutorialFlag = true;
 }
@@ -94,7 +131,6 @@ void TrainingManager::ChangeTrainigFlag()
 {
    
     TutorialSystem::Instance().TutorialFlagClear();
-    TutorialSystem::Instance().TutorialUIDisplay();
     tutorialFlag = false;
 }
 
@@ -113,6 +149,93 @@ void TrainingManager::Changelightchange()
     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, parameters);
 }
 
+void TrainingManager::Setting()
+{
+
+    auto& tuto = GameObjectManager::Instance().Find("tuto");
+    auto& title = GameObjectManager::Instance().Find("title");
+    auto& traing = GameObjectManager::Instance().Find("training");
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    DirectX::XMFLOAT4 selectColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+    DirectX::XMFLOAT4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+    //UI表示
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting())
+    {
+        if (tutorialFlag)
+        {
+            traing->SetEnabled(true);
+            title->SetEnabled(true);
+        }
+        else
+        {
+            tuto->SetEnabled(true);
+            title->SetEnabled(true);
+        }
+    }
+    else
+    {
+        tuto->SetEnabled(false);
+        title->SetEnabled(false);
+        traing->SetEnabled(false);
+        
+    }
+
+
+    //チュートリアルへ
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting()&&tuto->GetComponent<Sprite>()->GetHitSprite()&&!tutorialFlag)
+    {
+        tuto->GetComponent<Sprite>()->spc.color = selectColor;
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+        {
+            TrainingManager::Instance().ChangeTutorialFlag();
+            SceneManager::Instance().GetSettingScreen()->SetViewSetting(false);
+           
+        }
+    }
+    else
+    {
+        tuto->GetComponent<Sprite>()->spc.color = Color;
+    }
+
+
+    //タイトルへ
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && title->GetComponent<Sprite>()->GetHitSprite())
+    {
+        title->GetComponent<Sprite>()->spc.color= selectColor;
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+        {
+            SceneManager::Instance().ChangeScene(new SceneTitle);
+            TrainingManager::Instance().ChangeTrainigFlag();
+        }
+    }
+    else
+    {
+        title->GetComponent<Sprite>()->spc.color = Color;
+    }
+
+
+    //トレーニングモードへ
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && traing->GetComponent<Sprite>()->GetHitSprite())
+    {
+        traing->GetComponent<Sprite>()->spc.color = selectColor;
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+        {
+            TrainingManager::Instance().ChangeTrainigFlag();
+            TrainingSystem::Instance().TrainingObjDisplay();
+            SceneManager::Instance().GetSettingScreen()->SetViewSetting(false);
+        }
+    }
+    else
+    {
+        traing->GetComponent<Sprite>()->spc.color = Color;
+    }
+}
+
 void TrainingManager::OnGUI()
 {
     TutorialSystem::Instance().OnGui();
@@ -127,6 +250,56 @@ void TrainingManager::OnGUI()
 #pragma region トレーニングモード
 void TrainingSystem::TrainingSystemStart()
 {
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingScoreF");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 768.0f,30.0f };
+        font->str = L"スコア";  //L付けてね
+        font->scale = 0.6f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingScoreI");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 784.0f,66.0f };
+        font->str = L"00";  //L付けてね
+        font->scale = 1.0f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingRestF");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1048.0f,30.0f };
+        font->str = L"残り";  //L付けてね
+        font->scale = 0.6f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+    //font
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("trainingRestI");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1050.0f,66.0f };
+        font->str = L"00";  //L付けてね
+        font->scale = 1.0f;
+        font->color.w = 1.0f;
+        font->SetEnabled(false);
+    }
+
+
+
     //棒立ち案山子君
     {
         {
@@ -393,10 +566,14 @@ void TrainingSystem::ShootingStartEndSystem()
     //開始処理
     if (GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->IsDeath()&&!shootingStartFlag)
     {
-       /* shootingStartFlag = true;
+        shootingStartFlag = true;
         GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
-        ShootingSpawnCrow();*/
-        TrainingManager::Instance().ChangeTutorialFlag();
+        GameObjectManager::Instance().Find("trainingScoreF")->GetComponent<Font>()->SetEnabled(true);
+        GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->SetEnabled(true);
+        GameObjectManager::Instance().Find("trainingRestF")->GetComponent<Font>()->SetEnabled(true);
+        GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->SetEnabled(true);
+        ShootingSpawnCrow();
+        
     }
 
     //終了処理
@@ -405,6 +582,11 @@ void TrainingSystem::ShootingStartEndSystem()
         GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(true);
         GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->ReSpawn(1);
         GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
+        GameObjectManager::Instance().Find("trainingScoreF")->GetComponent<Font>()->SetEnabled(false);
+        GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->SetEnabled(false);
+        GameObjectManager::Instance().Find("trainingRestF")->GetComponent<Font>()->SetEnabled(false);
+        GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->SetEnabled(false);
+
         shootingStartFlag = false;
         scarecrowCount = 0;
     }
@@ -413,7 +595,7 @@ void TrainingSystem::ShootingStartEndSystem()
 //射撃のロジック？
 void TrainingSystem::ShootingSystem(float elapsdTime)
 {
-       
+
     //時間切れでリスポーン
     if (!shootingIntervalFlag)
     {
@@ -432,27 +614,26 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         }
     }
     //倒してリスポーン
-    else if (!shootingIntervalFlag)
-    {
-        if (GameObjectManager::Instance().Find("scarecrow")->GetComponent<CharaStatusCom>()->IsDeath())
-        {
-            //案山子破棄
-            GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
 
-            //初期化
-            shootingIntervalFlag = true;
-            scarecrowLifeTimer = 0.0f;
-            shootingScore += 1;
-            scarecrowCount += 1;
-        }
+    if (!shootingIntervalFlag&& GameObjectManager::Instance().Find("scarecrow")->GetComponent<CharaStatusCom>()->IsDeath())
+    {
+        //案山子破棄
+        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
+
+        //初期化
+        shootingIntervalFlag = true;
+        scarecrowLifeTimer = 0.0f;
+        shootingScore += 1;
+        scarecrowCount += 1;
     }
+
 
     //次の案山子スポーンまでの信号待ち
     if (shootingIntervalFlag)
     {
         scarecrowSpawnIntervalTimer += elapsdTime;
         if (scarecrowSpawnIntervalTime < scarecrowSpawnIntervalTimer)
-        {   
+        {
             //案山子スポーン
             ShootingSpawnCrow();
 
@@ -461,7 +642,11 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
             shootingIntervalFlag = false;
         }
     }
-    
+
+    GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->str = std::to_wstring(shootingScore);
+    GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->str = std::to_wstring(scarecrowMaxTotal - scarecrowCount);
+
+
 }
 
 //アイテムスポーンシステム
@@ -1343,6 +1528,8 @@ void TutorialSystem::EndTutorialManager(float elapsedTime)
 
 void TutorialSystem::TutorialFlagClear()
 {
+    GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 0.0f;
+
     tutorialID = 0;
 
     moveSubTitleIndex = 0;
@@ -1399,63 +1586,10 @@ void TutorialSystem::TutorialFlagClear()
         subtitle.subtitleTimer = 0.0f;
     }
 
-}
-
-void TutorialSystem::TutorialUIUnhind()
-{
-    //GameObjectManager::Instance().Find("reticle")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("HpFrame")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("HpGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("UltFrame")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("UltGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("ultCore")->SetEnabled(false);
-
-    //GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_E")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillCore")->SetEnabled(false);
-
-
-    //GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("Decoration")->SetEnabled(false);
-    //GameObjectManager::Instance().Find("HitEffect")->SetEnabled(false);
-}
-
-void TutorialSystem::TutorialUIDisplay()
-{
-    /*GameObjectManager::Instance().Find("reticle")->SetEnabled(true);
-    GameObjectManager::Instance().Find("HpFrame")->SetEnabled(true);
-    GameObjectManager::Instance().Find("HpGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("UltFrame")->SetEnabled(true);
-    GameObjectManager::Instance().Find("UltHideGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("UltGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("ultCore")->SetEnabled(true);
-
-    GameObjectManager::Instance().Find("SkillFrame")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_E")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillCore")->SetEnabled(true);
-
-    GameObjectManager::Instance().Find("SkillFrame2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_Frame2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGaugeHide")->SetEnabled(true);
-    GameObjectManager::Instance().Find("SkillGauge")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Skill_SPACE")->SetEnabled(true);
-    GameObjectManager::Instance().Find("boostGauge2")->SetEnabled(true);
-    GameObjectManager::Instance().Find("Decoration")->SetEnabled(true);
-    GameObjectManager::Instance().Find("HitEffect")->SetEnabled(true);*/
 
 }
+
+
 
 void TutorialSystem::OnGui()
 {

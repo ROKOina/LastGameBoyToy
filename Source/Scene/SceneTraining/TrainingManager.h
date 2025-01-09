@@ -32,6 +32,8 @@ public:
 
     void Changeblackout();
     void Changelightchange();
+
+    void Setting();
 private:
 
     //最初はトレーニングモード
@@ -133,10 +135,6 @@ public:
 
     void TutorialFlagClear();
 
-    void TutorialUIUnhind();
-    void TutorialUIDisplay();
-
-
 public:
     //暗転
     void BlackOutManager(float elapsedTime);
@@ -159,8 +157,6 @@ public:
     void EndBlackTutorialManager(float elapsedTime);
 
     void EndTutorialManager(float elapsedTime);
-
-   
 
     void OnGui();
 private:
