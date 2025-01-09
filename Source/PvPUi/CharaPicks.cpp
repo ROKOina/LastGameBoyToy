@@ -187,6 +187,13 @@ void CharaPicks::CharaDetails()
         }
 
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
+            //チームが選んでいるキャラだった場合はリターン
+            if (selected.id == teamPick)
+            {
+                selected.sprite->spc.color = { 1,0,0,1 };
+                return;
+            }
+
             selected.name->SetEnabled(true);
             selected.name->GetComponent<Sprite>()->EasingPlay();
             selected.name->GetComponent<Sprite>()->spc.onshot = true;

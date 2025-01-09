@@ -24,6 +24,8 @@ public:
     int GetSelectedCharacterId() const { return selectedCharacterId; }
     //確定したか
     bool IsDecisionFlg() const { return decisionFlg; }
+    //チームが選んだキャラをセット
+    void SetTeamPick(int pick) { teamPick = pick; }
 private:
     // キャラ詳細（スキル表示、キャラ名、選択キャラ表示）
     void CharaDetails();
@@ -48,6 +50,9 @@ private:
     bool decisionFlg = false;
 
     bool hitFlg = false;
+
+    //チームがピックしているキャラ
+    int teamPick = -1;
 
     DirectX::XMFLOAT4 color, selectColor = {};
 };
