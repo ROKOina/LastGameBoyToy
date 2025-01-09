@@ -198,6 +198,7 @@ void CharaPicks::DecisionButton()
     }
     else if(!sprite->GetHitSprite())
     {
+        sprite->StopEasing();
         sprite->spc.color = color;
     }
 
