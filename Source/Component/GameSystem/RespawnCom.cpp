@@ -5,18 +5,22 @@
 #include "Scene\SceneTitle\SceneTitle.h"
 #include "Component\Camera\EventCameraManager.h"
 #include "Component\Character\CharaStatusCom.h"
+#include "Component\Renderer\RendererCom.h"
 
 void RespawnCom::Update(float elapsedTime)
 {
     GameObj player = GameObjectManager::Instance().Find("player");
 
     //落下したプレイヤーを殺す
-    if (!isRespawn && player->transform_->GetWorldPosition().y < playerDeathHeight)
+    if (!fallEvent && player->transform_->GetWorldPosition().y < playerDeathHeight)
     {
         auto& stateMachine = player->GetComponent<CharacterCom>()->GetMoveStateMachine();
-        stateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::DEATH);
+        CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+        status->AddDamagePoint(-200);
 
-        isRespawn = true;
+        //stateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::DEATH);
+
+        //fallEvent = true;
     }
 
     //リスポーン処理
@@ -55,6 +59,11 @@ void RespawnCom::Update(float elapsedTime)
                 auto& attackStateMachine = charaCom->GetAttackStateMachine();
                 moveStateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);                
                 attackStateMachine.ChangeState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+
+                //プレイヤー隠す
+                player->GetComponent<RendererCom>()->SetDissolveThreshold(1);
+                //FPS用オブジェクト映す
+                GameObjectManager::Instance().Find("armChild")->GetComponent<RendererCom>()->SetDissolveThreshold(0);
 
                 //最初にイベントカメラへ変更
                 GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();

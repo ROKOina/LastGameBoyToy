@@ -39,4 +39,5 @@ private:
     float playerDeathHeight = -50;
     float respawnTimer = 0.0f;
     bool isRespawn = false;
+    bool fallEvent = false;//—Ž‰º‚µ‚½‚©‚Ç‚¤‚©
 };
