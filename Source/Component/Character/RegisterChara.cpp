@@ -74,7 +74,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player1.mdl");
-    r->SetDissolveThreshold(0.0f);
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
@@ -165,6 +165,12 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
         eff->Play();
     }
 
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
+    }
+
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -250,7 +256,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player2.mdl");
-    r->SetDissolveThreshold(0.0f);
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
@@ -307,6 +313,12 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
         au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
     }
 
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
+    }
+
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -344,7 +356,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player3.mdl");
-    r->SetDissolveThreshold(0.0f);
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
     obj->AddComponent<AimIKCom>("spine2", nullptr);
@@ -381,6 +393,12 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     auto& pushBack = obj->AddComponent<PushBackCom>();
     pushBack->SetRadius(0.5f);
     pushBack->SetWeight(1);
+
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
+    }
 
     //煙のエフェクト
     {
@@ -428,7 +446,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player1.mdl");
-    r->SetDissolveThreshold(0.0f);
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
@@ -510,6 +528,12 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
         au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
         au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
         au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
+    }
+
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する

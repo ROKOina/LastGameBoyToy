@@ -26,6 +26,7 @@
 #include "SystemStruct\TimeManager.h"
 #include "Component\SkillObj\JankratUltCom.h"
 #include <Component\Bullet\OnGroundDeleteCom.h>
+#include "Component\System\HitProcessCom.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -421,6 +422,11 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     //ジャンクラのウルト制御
     obj->AddComponent<JankratUltCom>();
 
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(GetGameObject());
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(10.0f);
+
     //爆発物
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
     explosion->SetName("explosion");
@@ -448,6 +454,11 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     else
         collider->SetJudgeTag(COLLIDER_TAG::Player);
     collider->SetRadius(0.5f);
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(GetGameObject());
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(10.0f);
 }
 
 //当たり判定
