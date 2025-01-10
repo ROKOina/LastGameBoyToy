@@ -30,7 +30,10 @@ void RespawnCom::Update(float elapsedTime)
             break;
 
         case PVPGameSystem::GAME_MODE::Deathmatch:
-            if (!EventCameraManager::Instance().GetIsPlayEvent())
+
+            respawnTimer += elapsedTime;
+
+            if (respawnTimer >= 2.5f)//(!EventCameraManager::Instance().GetIsPlayEvent())
             {
                 CharacterCom* charaCom = player->GetComponent<CharacterCom>().get();
 
@@ -56,6 +59,7 @@ void RespawnCom::Update(float elapsedTime)
                 //最初にイベントカメラへ変更
                 GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
 
+                respawnTimer = 0.0f;
                 isRespawn = false;
             }
             break;
