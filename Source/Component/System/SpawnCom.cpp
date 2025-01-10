@@ -465,10 +465,10 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     collider->SetRadius(0.5f);
 
     //’e
-    //int netPlayerID = GetGameObject()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
-    //std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
-    //bulletCom->SetAliveTime(8.0f);
-    //bulletCom->SetDamageValue(-10);
+    int netPlayerID = player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
+    bulletCom->SetAliveTime(8.0f);
+    bulletCom->SetDamageValue(-10);
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(player);
