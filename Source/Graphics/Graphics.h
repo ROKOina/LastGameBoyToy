@@ -186,6 +186,9 @@ public:
     // 深度ステート の取得
     ID3D11DepthStencilState* GetDepthStencilState(DEPTHSTATE index) { return depthStencilStates[static_cast<int>(index)].Get(); }
 
+    //サンプラーステートの計算
+    ID3D11SamplerState* GetSamplerState(SAMPLEMODE index) { return samplerStates[static_cast<int>(index)].Get(); }
+
     //サンプラーステートの設定
     void SetSamplerState();
 

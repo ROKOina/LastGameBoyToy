@@ -166,6 +166,26 @@ Decal::Decal(const char* filename)
     LoadTextureFromFile(Graphics::Instance().GetDevice(), filename, decalmap.GetAddressOf(), NULL);
 }
 
+//更新処理
+void Decal::Update(float elapsedTime)
+{
+    //フラグで設定
+    if (IsUpdate)
+    {
+        deletetime += elapsedTime;
+
+        //アルファ値減少
+        DCB->data.decalcolor.w = (std::max)(0.0f, DCB->data.decalcolor.w - elapsedTime / 4);
+
+        //削除
+        if (deletetime > goodbyetime)
+        {
+            GameObjectManager::Instance().Remove(GetGameObject());
+            deletetime = 0.0f;
+        }
+    }
+}
+
 //描画
 void Decal::Render()
 {
@@ -216,6 +236,8 @@ void Decal::Render()
         dc->DrawIndexed(36, 0, 0);
 
         //描画ステート設定
+        const float BlendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        dc->OMSetBlendState(graphics.GetBlendState(BLENDSTATE::ALPHA), BlendFactor, 0xFFFFFFFF);
         dc->OMSetDepthStencilState(graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_OFF), 0);
         dc->RSSetState(graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_BACK));
         dc->VSSetShader(vertexshader.Get(), NULL, 0);
@@ -228,18 +250,25 @@ void Decal::Render()
     dc->RSSetState(cachedrasterizerstate.Get());
 }
 
+//位置更新
+void Decal::UpdateSpot(size_t index, const DirectX::XMFLOAT3& newPosition, const DirectX::XMFLOAT3& newNormal)
+{
+    if (index >= spots.size())
+    {
+        // 範囲外アクセスの防止
+        return;
+    }
+
+    // 指定されたデカールスポットのプロパティを更新
+    spots[index].position = newPosition;
+    spots[index].normal = newNormal;
+}
+
 //imgui
-DirectX::XMFLOAT3 pos = {};
 void Decal::OnGUI()
 {
     ImGui::Text((char*)u8"リソース");
     ImGui::Image(decalmap.Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
-
-    if (ImGui::Button("Create"))
-    {
-        pos.x += 0.5f;
-        pos.y += 0.3f;
-        pos.z += 0.1f;
-        Add(pos, { 1,1,1 }, 5.0f);
-    }
+    ImGui::ColorEdit4("decalcolor", &DCB->data.decalcolor.x);
+    ImGui::DragFloat3("colorscale", &DCB->data.colorscale.x, 0.1f, 0.0f, 400.0f);
 }

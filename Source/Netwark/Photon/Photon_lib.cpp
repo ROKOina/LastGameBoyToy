@@ -109,6 +109,7 @@ void PhotonLib::update(float elapsedTime)
         }
         int myPlayerID = GetMyPlayerID();
         myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(myPlayerID);
+        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetMyChara(true);
     }
 
     switch (mState)
@@ -128,6 +129,8 @@ void PhotonLib::update(float elapsedTime)
         oldMs = GetServerTime();
         break;
     case PhotonState::JOINED:
+        //マスタープレイヤーID保存
+        if (GetIsMasterPlayer())masterPlayerID = GetMyPlayerID();
         //情報送信
         if (GetServerTime() - oldMs > sendMs)
         {
@@ -684,7 +687,7 @@ void PhotonLib::DelayUpdate()
     if (saveInputPhoton.size() <= 0)return;
 
     int myPhotonID = GetMyPhotonID();
-    delayFrame = 0;
+    delayFrame = 30;
 
     for (int i = 0; i < saveInputPhoton.size(); ++i)    //自分以外
     {
@@ -757,6 +760,23 @@ float PhotonLib::GetJoinNum()
     return useC;
 }
 
+void PhotonLib::SetTeamID(int teamID, int playerID)
+{
+    saveInputPhoton[playerID].teamID = teamID;
+}
+
+int PhotonLib::GetTeamID(int playerID)
+{
+    return saveInputPhoton[playerID].teamID;
+}
+
+void PhotonLib::SetMyPickCharaID(int pickChara)
+{
+    int myPlayerID = GetMyPlayerID();
+    if (myPlayerID >= 0)
+        saveInputPhoton[myPlayerID].charaID = pickChara;
+}
+
 int PhotonLib::GetServerTime()
 {
     int serverTime = mLoadBalancingClient.getServerTime();
@@ -792,6 +812,18 @@ int PhotonLib::GetRoomPlayersNum()
 std::string PhotonLib::GetRoomName()
 {
     return WStringToString(mLoadBalancingClient.getCurrentlyJoinedRoom().getName().cstr());
+}
+
+std::vector<std::wstring> PhotonLib::GetRoomNames()
+{
+    std::vector<std::wstring> roomnames;
+    auto rooms = mLoadBalancingClient.getRoomList();
+    for (int i = 0; i < rooms.getSize(); ++i)
+    {
+        roomnames.emplace_back(rooms[i]->getName().cstr());
+    }
+
+    return roomnames;
 }
 
 int PhotonLib::SendMs()
@@ -996,7 +1028,10 @@ void PhotonLib::joinRoomEventAction(int playerNr, const ExitGames::Common::JVect
     {
         //追加
         if (GetIsMasterPlayer())
+        {
             AddPlayer(myPhotonID, 0);
+            saveInputPhoton[0].name = netName;
+        }
     }
 }
 //退出時
@@ -1036,18 +1071,28 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             //データ変換
             auto ne = NetDataRecvCast(WStringToString(jsString.cstr()));
 
-            //名前保存
-            saveInputPhoton[ne[0].playerId].name = ne[0].name;
-            //for (auto& s : saveInputPhoton)
-            //{
-            //    if (s.photonId != ne[0].photonId)continue;
 
-            //    if (s.name.size() <= 0)
-            //    {
-            //        s.name = ne[0].name;
-            //    }
-            //    break;
-            //}
+            if (ne[0].playerId >= 0)
+            {
+                //名前保存
+                saveInputPhoton[ne[0].playerId].name = ne[0].name;
+
+                //マスタープレイヤーID
+                if (ne[0].isMasterClient)
+                {
+                    masterPlayerID = ne[0].playerId;
+                }
+            }
+                //for (auto& s : saveInputPhoton)
+                //{
+                //    if (s.photonId != ne[0].photonId)continue;
+
+                //    if (s.name.size() <= 0)
+                //    {
+                //        s.name = ne[0].name;
+                //    }
+                //    break;
+                //}
 
             //ゲームモード保存
             if (!GetIsMasterPlayer())
@@ -1101,9 +1146,9 @@ void PhotonLib::GameRecv(NetData recvData)
     if (recvData.isMasterClient)
     {
         //チームを保存
-        for (auto& s : saveInputPhoton)
+        for (int pId = 0; pId < 4; ++pId)
         {
-            s.teamID = recvData.gameData.teamID[s.playerId];
+            saveInputPhoton[pId].teamID = recvData.gameData.teamID[pId];
         }
     }
     //ゲーム開始フラグ
@@ -1132,9 +1177,13 @@ void PhotonLib::GameRecv(NetData recvData)
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1);
         net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
     }
+    saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
 
     //hp
     net1->GetComponent<CharaStatusCom>()->SetHitPoint(recvData.gameData.hp);
+
+    //ultGauge
+    net1->GetComponent<CharacterCom>()->SetUltGauge(recvData.gameData.ultGauge);
 
     int myPlayerID = GetMyPlayerID();
     auto& myPlayer = GameObjectManager::Instance().Find("player");
@@ -1277,6 +1326,9 @@ void PhotonLib::JoinRecv(NetData recvData)
                 //    }
                 //}
 
+                //名前登録
+                saveInputPhoton[j.playerId].name = netName;
+
             }
         }
     }
@@ -1288,12 +1340,23 @@ void PhotonLib::LobbyRecv(NetData recvData)
     bool add = true;
     for (auto& s : saveInputPhoton)
     {
+        //登録済みなら追加しない
         if (s.photonId == recvData.photonId)add = false;
     }
     //キャラ追加リストに追加
     if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
     
     //AddPlayer(recvData.photonId, recvData.playerId);
+
+    saveInputPhoton[recvData.playerId].charaID = recvData.lobbyData.charaID;
+
+    //ピック選択に移行
+    if (recvData.isMasterClient)
+    {
+        if (recvData.lobbyData.pickSelect == 1)
+            isCharaSelect = true;
+    }
+    charaState[recvData.playerId] = recvData.lobbyData.pickSelect;
 
     //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
@@ -1348,6 +1411,14 @@ void PhotonLib::sendGameData(void)
     int myPlayerID = GetMyPlayerID();
     netD.playerId = myPlayerID;
 
+    //マスタークライアントの場合
+    if (GetIsMasterPlayer())
+    {
+        //チームIDを送る
+        for (int i = 0; i < 4; ++i)
+            netD.gameData.teamID[i] = saveInputPhoton[i].teamID;
+    }
+
     //名前
     ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
 
@@ -1356,6 +1427,9 @@ void PhotonLib::sendGameData(void)
 
     //HP
     netD.gameData.hp = int(*myPlayer->GetComponent<CharaStatusCom>()->GetHitPoint());
+
+    //ultGauge
+    netD.gameData.ultGauge = float(*myPlayer->GetComponent<CharacterCom>()->GetUltGauge());
 
     //ダメージ情報送信
     auto sendDatas = StaticSendDataManager::Instance().GetNetSendDatas();
@@ -1413,6 +1487,7 @@ void PhotonLib::sendJoinPermissionData(bool request)
     NetData& netD = n.emplace_back(NetData());
     int myPhotonID = GetMyPhotonID();
     netD.photonId = myPhotonID;
+    netD.playerId = -1;
     netD.isMasterClient = GetIsMasterPlayer();
     ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
 
@@ -1436,13 +1511,13 @@ void PhotonLib::sendJoinPermissionData(bool request)
         for (auto& j : joinManager) //申請リストから審議
         {
             //重複を防ぐ
-            bool breakFlg = false;
+            bool continueFlg = false;
             for (auto& jIn : joinList)
             {
                 if (j.jData.photonId == jIn)
-                    breakFlg = true;
+                    continueFlg = true;
             }
-            if (breakFlg)break;
+            if (continueFlg)continue;;
             joinList.emplace_back(j.jData.photonId);
 
             //データ送信
@@ -1476,6 +1551,7 @@ void PhotonLib::sendJoinPermissionData(bool request)
                         if (!saveInputPhoton[openID].useFlg)
                         {
                             join.playerId = openID;
+                            break;
                         }
                     }
                 }
@@ -1515,13 +1591,18 @@ void PhotonLib::sendLobbyData(void)
     //種別をロビーに
     netD.dataKind = NetData::DATA_KIND::LOBBY;
 
-    //マスタークライアントの場合はチームIDを送る
+    //キャラIDを送る
+    netD.lobbyData.charaID = saveInputPhoton[myPlayerID].charaID;
+
+    //マスタークライアントの場合
     if (GetIsMasterPlayer())
     {
+        //チームIDを送る
         for (int i = 0; i < 4; ++i)
             netD.lobbyData.teamID[i] = saveInputPhoton[i].teamID;
-
     }
+
+    netD.lobbyData.pickSelect = charaState[myPlayerID];
 
     //チャットを送る
     ::strncpy_s(netD.lobbyData.chat, sizeof(netD.lobbyData.chat), "0", sizeof(netD.lobbyData.chat));

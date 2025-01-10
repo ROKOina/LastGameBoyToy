@@ -25,6 +25,9 @@
 #include "Component\Character\CharacterCom.h"
 #include "SystemStruct\TimeManager.h"
 #include "Component\SkillObj\JankratUltCom.h"
+#include <Component\Bullet\OnGroundDeleteCom.h>
+#include "Component\System\HitProcessCom.h"
+#include "Component\Bullet\BulletCom.h"
 
 CEREAL_CLASS_VERSION(SpawnCom::SpawnParameter, 1)
 
@@ -175,7 +178,7 @@ void SpawnCom::OnGUI()
 
     if (ImGui::TreeNode((char*)u8"生成時のパラメータ"))
     {
-        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION","BEEM","GIMMICKMISSILE","FARAHULT" };
+        constexpr const char* objectTypeItems[] = { "ENEMY", "MISSILE","EXPLOSION","BEEM","GIMMICKMISSILE","FARAHULT" ,"SOLDIERULT" };
         static_assert(ARRAYSIZE(objectTypeItems) == static_cast<int>(ObjectType::MAX), "objectTypeItems Size Error!");
         ImGui::Combo((char*)u8"オブジェクトタイプ", &sp.objecttype, objectTypeItems, static_cast<int>(ObjectType::MAX));
         objtype = static_cast<ObjectType>(sp.objecttype);
@@ -225,6 +228,9 @@ void SpawnCom::SpawnGameObject(float elapsedTime)
         break;
     case ObjectType::JANKRATULT:
         CreateJyankratUlt(obj);
+        break;
+    case ObjectType::SOLDIERULT:
+        CreateSoldierUlt(obj);
         break;
     default:
         break;
@@ -417,11 +423,61 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     //ジャンクラのウルト制御
     obj->AddComponent<JankratUltCom>();
 
+    //弾
+    //int netPlayerID = obj->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    //std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netPlayerID);
+    //bulletCom->SetAliveTime(8.0f);
+    //bulletCom->SetDamageValue(-damageValue);
+
+    //判定用
+    //std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(GetGameObject());
+    //hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    //hit->SetValue(10.0f);
+
     //爆発物
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
     explosion->SetName("explosion");
     std::shared_ptr<CPUParticle>cpuparticle = explosion->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankratult_fire.cpuparticle", 400);
     cpuparticle->SetActive(false);
+}
+
+//ソルジャーウルト生成関数
+void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
+{
+    auto& player = GameObjectManager::Instance().Find("player");
+
+    obj->SetName("soldierult");
+    obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_ult_attack.gpuparticle", 200);
+    std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
+    moveCom->SetFriction(0.0f);
+    moveCom->SetGravity(0.0f);
+    moveCom->ApplyRandomForce(15.0f, 0);
+    moveCom->SetMoveMaxSpeed(28.0f);
+    moveCom->SetIsRaycast(true);
+    obj->AddComponent<OnGroundDeleteCom>();
+    const auto& collider = obj->AddComponent<SphereColliderCom>();
+    collider->SetEnabled(true);
+    collider->SetMyTag(COLLIDER_TAG::Bullet);
+    if (std::strcmp(player->GetName(), "player") == 0)
+    {
+        collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    }
+    else
+    {
+        collider->SetJudgeTag(COLLIDER_TAG::Player);
+        collider->SetRadius(0.5f);
+    }
+
+    //弾
+    int netPlayerID = player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
+    bulletCom->SetAliveTime(8.0f);
+    bulletCom->SetDamageValue(-10);
+
+    //判定用
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(player);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(10.0f);
 }
 
 //当たり判定

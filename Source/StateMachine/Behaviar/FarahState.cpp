@@ -1,5 +1,7 @@
 #include "FarahState.h"
 #include "Component\Bullet\BulletCom.h"
+#include <Component\Collsion\ColliderCom.h>
+#include "Component\Particle\GPUParticle.h"
 
 //Šî’êƒNƒ‰ƒX‚Å‚·
 Farah_BaseState::Farah_BaseState(CharacterCom* owner) : State(owner)
@@ -12,25 +14,13 @@ Farah_BaseState::Farah_BaseState(CharacterCom* owner) : State(owner)
 }
 
 #pragma region ƒƒCƒ“UŒ‚
-void Farah_MainAttackState::Enter()
-{
-}
 void Farah_MainAttackState::Execute(const float& elapsedTime)
 {
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
     {
-        //˜rƒAƒjƒ[ƒVƒ‡ƒ“‚ð‚·‚é
-        if (std::string(owner->GetGameObject()->GetName()) == "player")
-        {
-            auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-            auto& armAnim = arm->GetComponent<AnimationCom>();
-            armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-            armAnim->SetAnimationSeconds(0.3f);
-        }
-
-        //ã”¼gƒAƒjƒ[ƒVƒ‡ƒ“?
-        owner->GetGameObject()->GetComponent<AnimationCom>()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+        //˜rƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+        charaCom.lock()->HandleArmAnimation();
 
         //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
         charaCom.lock()->AddCurrentBulletNum(-1);
@@ -50,25 +40,53 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
 #pragma region ultUŒ‚
 void Farah_UltState::Enter()
 {
-    moveCom.lock()->SetMoveAcceleration(5.0f);
-    charaCom.lock()->SetDashGaugeMins(2.0f);
+    owner->GetGameObject()->GetChildFind("UltObject")->GetComponent<GPUParticle>()->SetLoop(true);
+
+    //Ý’è
+    charaCom.lock()->SetCurrentBulletNum(100);
+    charaCom.lock()->SetMaxBulletNum(100);
+}
+void Farah_UltState::Execute(const float& elapsedTime)
+{
+    time += elapsedTime;
+
+    //UŒ‚I—¹ˆ—•UŒ‚ˆ—
+    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
+    {
+        //˜rƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+        charaCom.lock()->HandleArmAnimation();
+
+        //UŒ‚ˆ—
+        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
+    }
+
+    if (time > 8.0f)
+    {
+        owner->GetGameObject()->GetChildFind("UltObject")->GetComponent<GPUParticle>()->SetLoop(false);
+
+        //ƒXƒe[ƒg•ÏX
+        ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+    }
+}
+void Farah_UltState::Exit()
+{
+    //”­ŽËŠÔŠu‚ð’Z‚­‚·‚éŒ³‚É–ß‚·
+    charaCom.lock()->SetCurrentBulletNum(5);
+    charaCom.lock()->SetMaxBulletNum(5);
+
+    //ŽžŠÔ‰Šú‰»
+    time = 0.0f;
+
+    //ultI—¹
+    charaCom.lock()->FinishUlt();
 }
 #pragma endregion
 
 #pragma region Eskill
-void Farah_ESkillState::Enter()
-{
-}
 void Farah_ESkillState::Execute(const float& elapsedTime)
 {
-    //UŒ‚I—¹ˆ—•UŒ‚ˆ—
-    if (std::string(owner->GetGameObject()->GetName()) == "player")
-    {
-        auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-        auto& armAnim = arm->GetComponent<AnimationCom>();
-        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-        armAnim->SetAnimationSeconds(0.3f);
-    }
+    //˜rƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+    charaCom.lock()->HandleArmAnimation();
 
     //UŒ‚ˆ—
     charaCom.lock()->AddBullet(BulletCreate::FarahKnockBack(owner->GetGameObject(), 30.0f, 2.0f));

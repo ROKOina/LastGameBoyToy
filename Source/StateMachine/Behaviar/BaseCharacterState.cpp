@@ -74,28 +74,27 @@ void BaseCharacter_BaseState::Hovering(float elapsedTime)
 }
 
 auto MakeNormalLowerAnimeParam = [](int index, bool loop)
-{
-    //下半身アニメーション用構造体
-    AnimationCom::PlayLowBodyAnimParam param =
     {
-        param.lowerAnimaOneId = index,
-        param.lowerAnimeTwoId = index,
-        param.lowerAnimeThreeId = index,
-        param.lowerAnimeFourId = index,
-        param.lowerAnimeFiveId = index,
-        param.lowerAnimaSixId = index,
-        param.lowerAnimaSevenId = index,
-        param.lowerAnimaEightId = index,
-        param.loop = loop,
-        param.rootFlag = false,
-        param.blendType = 0,
-        param.animeChangeRate = 0.2f,
-        param.animeBlendRate = 0.0f
+        //下半身アニメーション用構造体
+        AnimationCom::PlayLowBodyAnimParam param =
+        {
+            param.lowerAnimaOneId = index,
+            param.lowerAnimeTwoId = index,
+            param.lowerAnimeThreeId = index,
+            param.lowerAnimeFourId = index,
+            param.lowerAnimeFiveId = index,
+            param.lowerAnimaSixId = index,
+            param.lowerAnimaSevenId = index,
+            param.lowerAnimaEightId = index,
+            param.loop = loop,
+            param.rootFlag = false,
+            param.blendType = 0,
+            param.animeChangeRate = 0.2f,
+            param.animeBlendRate = 0.0f
+        };
+
+        return param;
     };
-
-    return param;
-};
-
 
 #pragma region Idle
 void BaseCharacter_IdleState::Enter()
@@ -122,7 +121,6 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
 }
 void BaseCharacter_IdleState::Exit()
 {
-
 }
 #pragma endregion
 
@@ -289,7 +287,6 @@ void BaseCharacter_DeathState::Enter()
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
 
-
         RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
         respawn->SetIsRespawn(true);
     }
@@ -396,38 +393,6 @@ void BaseCharacter_CapsuleState::ImGui()
 }
 #pragma endregion
 
-#pragma region StanBall
-void BaseCharacter_StanBallState::Enter()
-{
-    BulletCreate::DamageFire(owner->GetGameObject(), speed, power);
-}
-void BaseCharacter_StanBallState::Execute(const float& elapsedTime)
-{
-    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-}
-void BaseCharacter_StanBallState::ImGui()
-{
-    ImGui::DragFloat("speed", &speed);
-    ImGui::DragFloat("power", &power);
-}
-#pragma endregion
-
-#pragma region KnockbackBall
-void BaseCharacter_KnockbackBallState::Enter()
-{
-    BulletCreate::KnockbackFire(owner->GetGameObject(), speed, power);
-}
-void BaseCharacter_KnockbackBallState::Execute(const float& elapsedTime)
-{
-    ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-}
-void BaseCharacter_KnockbackBallState::ImGui()
-{
-    ImGui::DragFloat("speed", &speed);
-    ImGui::DragFloat("power", &power);
-}
-#pragma endregion
-
 #pragma region ULT_ATTACK
 void Ult_Attack_State::Enter()
 {
@@ -438,32 +403,37 @@ void Ult_Attack_State::Enter()
     auto& ray = obj->GetComponent<RayColliderCom>();
     DirectX::XMFLOAT3 start = obj->transform_->GetWorldPosition();
 
-    auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
-    DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
+    DirectX::XMFLOAT3 front = owner->GetFpsCameraDir();
     DirectX::XMFLOAT3 end = start + front * 100;
 
     //エフェクト
-    auto& arm = camera->GetChildFind("armChild");
-    DirectX::XMFLOAT3 gunPos = {};
-    if (arm)
+    //auto& arm = owner->GetGameObject()->GetChildFind("armChild");
+    //DirectX::XMFLOAT3 gunPos = {};
+    //if (arm)
+    //{
+    //    const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+    //    const auto& node = model->FindNode("gun2");
+
+    //    gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+    //}
+
+    if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
-        const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-        const auto& node = model->FindNode("gun2");
+        auto& camera = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
+        auto& arm = camera->GetChildFind("armChild");
 
-        gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
+        //用意したエフェクトオブジェクト起動
+        arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
+
+        //anim
+        auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        armAnim->SetAnimationSeconds(0.3f);
     }
-
-    //用意したエフェクトオブジェクト起動
-    arm->GetChildFind("attackUltMuzzleEff")->GetComponent<GPUParticle>()->Play();
 
     //音
     owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACKULTSHOOT");
     owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACKULTSHOOT", false, 10);
-
-    //anim
-    auto& armAnim = arm->GetComponent<AnimationCom>();
-    armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
-    armAnim->SetAnimationSeconds(0.3f);
 
     ray->SetStart(start);
     ray->SetEnd(end);
@@ -496,7 +466,7 @@ void BaseCharacter_ReloadState::Enter()
     else
     {
         auto& animCom = owner->GetGameObject()->GetComponent<AnimationCom>();
-        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
     }
 }
 
@@ -603,7 +573,7 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
         {
             if (owner->GetDashFlag())
             {
-                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
             }
             else
             {

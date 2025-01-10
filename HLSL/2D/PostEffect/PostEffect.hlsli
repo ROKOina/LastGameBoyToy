@@ -11,9 +11,10 @@ cbuffer CbPostEffect : register(b3)
     float exposure;
     float vignettesize;
     float vignetteintensity;
-    float4 ssrparameter;
     float blurstrength;
     float blurradius;
     float blurdecay;
-    float padding;
+    float sepiastrength;
+    float negapogistrength;
+    float3 padding;
 };

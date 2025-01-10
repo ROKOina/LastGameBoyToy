@@ -49,7 +49,6 @@ void AimIKCom::AimIK()
     {
         // FPSカメラからターゲット位置を取得
         DirectX::XMFLOAT3 cameraForward = GetGameObject()->GetComponent<CharacterCom>()->GetFpsCameraDir();
-
         DirectX::XMFLOAT3 playerForward = GetGameObject()->transform_->GetWorldFront();
         DirectX::XMFLOAT3 playerRight = GetGameObject()->transform_->GetWorldRight();
 
@@ -69,9 +68,7 @@ void AimIKCom::AimIK()
         DirectX::XMVECTOR ROT = DirectX::XMQuaternionRotationRollPitchYaw(dot, 0, 0);
 
         // 現在の回転を補間して適用
-        DirectX::XMVECTOR currentQuat = DirectX::XMLoadFloat4(&aimbone.rotate);
-        DirectX::XMVECTOR newQuat = DirectX::XMQuaternionSlerp(currentQuat, ROT, 0.2f);
-        DirectX::XMStoreFloat4(&aimbone.rotate, newQuat);
+        DirectX::XMStoreFloat4(&aimbone.rotate, ROT);
     }
     else if (enemycopyname)
     {

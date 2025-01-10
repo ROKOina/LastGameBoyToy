@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include "Graphics/ConstantBuffer.h"
+#include "SystemStruct\Curve.h"
 
 #define THREAD 1024
 
@@ -50,12 +51,28 @@ private:
     // 設定などパラメーター以外を扱うGUI
     void SystemGUI();
 
+    // カーブデータ用1Dテクスチャを作成する関数
+    ID3D11ShaderResourceView* GenerateCurveTexture(Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution);
+
+    //更新
+    void UpdateCurveTexture(Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture);
+
+    //カーブデータ読み込み
+    void CurveDataLoding();
+
+    //カーブデータのファイルパス読み込み
+    void CurveFilePathDataLoading();
+
+    //カーブデータ保存
+    void CurveDataSave();
+
     // パラメーター関係のGUI
     void ParameterGUI();
     void ColorGUI();
     void ScaleGUI();
     void SpeedGUI();
     void EmitGUI();
+    void CurveGUI();
 
 public:
 
@@ -136,6 +153,8 @@ public:
 
         float strechscale = { 1.0f };    //ストレッチビルボードの強度(伸びる時の大きさ)
         DirectX::XMFLOAT3 padding = {};
+        int iscurve = { false };
+        DirectX::XMFLOAT3 padding2 = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -147,11 +166,14 @@ public:
     {
         int m_blend = 2;
         int m_depthS = 2;
-        std::string	m_textureName;
+        std::string m_textureName;
 
         //ここから別バージョン
         bool m_deleteflag = false;
         float deletetime = 0.0f;
+
+        //別バージョン
+        std::vector<std::string> curvepath = {};
 
         template<class Archive>
         void serialize(Archive& archive, int version);
@@ -161,6 +183,23 @@ public:
     //アクティブ化
     void SetLoop(const bool& loop) { m_GSC.isLoopFlg = loop; }
     void SetStop(const bool& stopFlg) { this->stopFlg = stopFlg; }
+
+private:
+
+    //カーブで使いたいパラメータの定義
+    std::unique_ptr<Curve> scale_curve;
+    std::unique_ptr<Curve> speed_curve;
+    std::unique_ptr<Curve> color_curve_r;
+    std::unique_ptr<Curve> color_curve_g;
+    std::unique_ptr<Curve> color_curve_b;
+    std::unique_ptr<Curve> color_curve_a;
+    std::unique_ptr<Curve> gravity_curve;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> SSG_srv;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> color_srv;
+
+    Microsoft::WRL::ComPtr<ID3D11Texture1D> SSG_texture;
+    Microsoft::WRL::ComPtr<ID3D11Texture1D> color_texture;
 
 private:
     float emitTimer = 0.0f;
@@ -178,6 +217,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ComputeShader>m_initialzecomputeshader;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>m_colormap;
     Microsoft::WRL::ComPtr<ID3D11Buffer>m_constantbuffer;
+    Microsoft::WRL::ComPtr<ID3D11Texture1D>curvetexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>curveSRV;
     const size_t m_maxparticle = 0;
     std::string filepath = {};
 

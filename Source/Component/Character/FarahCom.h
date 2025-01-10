@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <memory>
+#include "Component\Renderer\DecalCom.h"
 
 class FarahCom : public CharacterCom
 {
@@ -52,9 +53,6 @@ public:
 
 private:
 
-    // ウルト更新
-    void UltUpdate(float elapsedTime);
-
     // 銃の打つ間隔とマズルフラッシュ
     void ShotSecond();
 
@@ -72,9 +70,6 @@ private:
 
     // ダッシュゲージ増加
     void AddDashGauge(float amount);
-
-    // ウルトリセット
-    void ResetUlt();
 
     // 地面で爆発処理
     void GroundBomber(float elapsedTime);
@@ -95,7 +90,6 @@ public:
 
 private:
     float cooldownTimer = 0.0f;  // クールタイムの残り時間（秒）
-    float ulttimer = 0.0f;       // ウルト時間
     float dashgaugemin = 4.0f;   // ダッシュゲージの最小値
     std::vector<FarahBullet> bullets;  // 弾丸リスト
 };

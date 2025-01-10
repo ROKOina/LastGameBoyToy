@@ -190,7 +190,7 @@ void BossCom::DamegaEvent(float elapsedTime)
     //HPŒ¸­‚ð”F’m‚·‚é
     if (previousHP - currentHP > 0)
     {
-        GameObjectManager::Instance().Find("BossHpGauge")->GetComponent<Sprite>()->EasingPlay();
+        //GameObjectManager::Instance().Find("BossHpGauge")->GetComponent<Sprite>()->EasingPlay();
     }
     // Œ»Ý‚ÌHP‚ðŽŸ‰ñ—p‚É•Û‘¶
     GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);

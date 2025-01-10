@@ -87,7 +87,7 @@ void SceneTitle::Initialize()
         obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
         obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/player_True/player.mdl");
+        r->LoadModel("Data/Model/player_True/player1.mdl");
         r->SetOutlineColor({ 0.000f, 0.282f, 1.000f });
         r->SetOutlineIntensity(10.0f);
         std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
@@ -117,19 +117,25 @@ void SceneTitle::Initialize()
         {
             auto& next = obj->AddChildObject();
             next->SetName("PVE");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //PVP
         {
             auto& next = obj->AddChildObject();
             next->SetName("PVP");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::GLITCH, true);
         }
         //トレーニング
         {
             auto& next = obj->AddChildObject();
             next->SetName("Training");
-            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::DEFALT, true);
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::GLITCH, true);
+        }
+        //ゲーム終了
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("endgame");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/endgame.ui", Sprite::SpriteShader::GLITCH, true);
         }
 
         //セレクト棒
@@ -163,6 +169,12 @@ void SceneTitle::Initialize()
         audioObj->Play("Title", true, 0.0f);
         audioObj->FeedStart("Title", 0.5f, 0.1f);
     }
+
+    //暗転からはじまるように
+    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+    auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+    post->SetExposureZero();    //暗転
+    post->SetParameter(1.4f, 1.0f, parameters); //明転
 }
 
 void SceneTitle::Finalize()
@@ -173,7 +185,11 @@ void SceneTitle::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
+    //UI更新
     UIUpdate(elapsedTime);
+
+    //画面エフェクト更新
+    ScreenEffect(elapsedTime);
 
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
@@ -228,9 +244,10 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
     //初期化
     std::vector<SceneName> names;
-    names.emplace_back("PVE", new ScenePVE, 560);
-    names.emplace_back("PVP", new ScenePVP, 750);
-    names.emplace_back("Training", new SceneTraining, 940);
+    names.emplace_back("PVE", new ScenePVE, 450);
+    names.emplace_back("PVP", new ScenePVP, 600);
+    names.emplace_back("Training", new SceneTraining, 750);
+    names.emplace_back("endgame", new SceneTraining, 900);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
     auto& selectB = canvas->GetChildFind("selectBow");
@@ -251,7 +268,14 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
                 canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
-           
+                canvas->GetChildFind("endgame")->GetComponent<Sprite>()->EasingPlay();
+
+                //ゲーム終了
+                if (std::string(sprite->GetGameObject()->GetName()) == "endgame")
+                {
+                    PostMessage(Graphics::Instance().GetHwnd(), WM_CLOSE, 0, 0);
+                }
+
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
                     audioObj->FeedStart("Title", 0.0f, elapsedTime);
@@ -278,4 +302,24 @@ void SceneTitle::UIUpdate(float elapsedTime)
     }
     //棒消す
     if (SceneManager::Instance().GetTransitionFlag())selectB->SetEnabled(false);
+}
+
+//画面エフェクト実装
+void SceneTitle::ScreenEffect(float elapsedTime)
+{
+    auto& posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+
+    // hue の更新
+    static float direction = 1.0f;
+    float hue = posteffect->GetPostData().hue + direction * elapsedTime;
+
+    // 方向の切り替え
+    if (hue >= 1.0f || hue <= -1.0f)
+    {
+        direction *= -1.0f; // 増減を反転
+        hue = std::clamp(hue, -1.0f, 1.0f); // hue を範囲内に調整
+    }
+
+    // 更新した hue を適用
+    posteffect->SetParameter(hue, 9.0f, { PostEffect::PostEffectParameter::Hue });
 }

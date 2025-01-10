@@ -11,6 +11,8 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Character\RemoveTimerCom.h"
 #include "Component\Audio\AudioCom.h"
+#include "Phsix\Physxlib.h"
+#include "Component\Renderer\DecalCom.h"
 
 void InazawaCharacterCom::Start()
 {
@@ -38,6 +40,7 @@ void InazawaCharacterCom::Update(float elapsedTime)
     CharacterCom::Update(elapsedTime);
 
     //ウルトエフェクト
+    bool objHitFlag = false;
     if (attackUltRayObj.lock())
     {
         auto& rayCol = attackUltRayObj.lock()->GetComponent<Collider>();
@@ -69,6 +72,33 @@ void InazawaCharacterCom::Update(float elapsedTime)
                     GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACK_ULT_BOOM");
                     GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACK_ULT_BOOM", false, 10);
                 }
+                objHitFlag = true;
+            }
+
+            if (rayCol->GetEnabled() && !objHitFlag)
+            {
+                // 判定
+                PxRaycastBuffer buffer;
+                DirectX::XMFLOAT3 start = rayCol->GetGameObject()->transform_->GetWorldPosition();
+                DirectX::XMFLOAT3 end = start + GetFpsCameraDir() * 100;
+                if (PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
+                {
+                    DirectX::XMFLOAT3 hitPosition;
+                    DirectX::XMFLOAT3 hitNormal;
+                    // レイキャストが当たった位置と法線を保存
+                    hitPosition.x = buffer.block.position.x;
+                    hitPosition.y = buffer.block.position.y;
+                    hitPosition.z = buffer.block.position.z;
+                    hitNormal.x = buffer.block.normal.x;
+                    hitNormal.y = buffer.block.normal.y;
+                    hitNormal.z = buffer.block.normal.z;
+
+                    //デカール生成
+                    std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
+                    decal->SetName("decal");
+                    std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/bullethole.png");
+                    d->Add(hitPosition, hitNormal, 1.0f);
+                }
             }
         }
     }
@@ -94,9 +124,12 @@ void InazawaCharacterCom::MainAttackDown()
         attackUltCounter++;
         if (attackUltCounter >= attackUltCountMax)
         {
-            //エフェクト切る
-            GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
-            GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
+            if (std::string(GetGameObject()->GetName()) == "player")
+            {
+                //エフェクト切る
+                GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(false);
+                GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(false);
+            }
             FinishUlt();
         }
 
@@ -143,9 +176,13 @@ void InazawaCharacterCom::UltSkill()
 
     attackUltCounter = 0;
 
-    //エフェクト起動
-    GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
-    GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
+    if (std::string(GetGameObject()->GetName()) == "player")
+    {
+        //エフェクト起動
+        GameObjectManager::Instance().Find("attackUltSide1")->GetComponent<GPUParticle>()->SetLoop(true);
+        GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
+    }
+
     //ステートを初期化
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }

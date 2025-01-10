@@ -208,6 +208,7 @@ public:
 
     // shootTimeのゲッター
     float GetShootTime() const { return shootTime; }
+    void SetShootTime(float t) { shootTime = t; }
 
     void SetDashFlag(bool flag) { dashFlag = flag; }
     bool GetDashFlag() { return dashFlag; }
@@ -220,6 +221,9 @@ public:
     int GetMaxBulletNum() { return maxBulletNum; }
     void SetMaxBulletNum(int num) { maxBulletNum = num; }
     void SetMaxBullet() { currentBulletNum = maxBulletNum; }
+
+    //腕アニメーション再生
+    void HandleArmAnimation();
 
 private:
     //入力ステート更新

@@ -14,7 +14,7 @@ public:
     void Start()override {};
 
     //更新処理
-    void Update(float elapsedTime)override {};
+    void Update(float elapsedTime)override;
 
     //描画
     void Render();
@@ -30,6 +30,18 @@ public:
     {
         spots.push_back({ position, normal, scale });
     }
+
+    //位置更新
+    void UpdateSpot(size_t index, const DirectX::XMFLOAT3& newPosition, const DirectX::XMFLOAT3& newNormal);
+
+public:
+
+    //更新フラグの取得
+    bool GetIsUpdate() const { return IsUpdate; }
+    void SetIsUpdate(bool value) { IsUpdate = value; }
+
+    //色スケール
+    void SetColorScale(DirectX::XMFLOAT3 colorscale) { DCB->data.colorscale = colorscale; }
 
 private:
 
@@ -47,6 +59,9 @@ private:
     {
         DirectX::XMFLOAT4X4 world;
         DirectX::XMFLOAT4X4 decalinverseprojection;
+        DirectX::XMFLOAT4 decalcolor = { 1,1,1,1 };
+        DirectX::XMFLOAT3 colorscale = { 1,1,1 };
+        float padding;
     };
     std::unique_ptr<ConstantBuffer<DecalConstantBuffer>>DCB;
 
@@ -57,4 +72,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11VertexShader>vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>pixelshader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>inpulayout;
+
+    float deletetime = 0.0f;
+    float goodbyetime = 4.0f;
+    bool IsUpdate = true;
 };

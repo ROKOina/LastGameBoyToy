@@ -133,6 +133,13 @@ void SettingScreen::CreateSettingUiObject()
         }
     }
 
+    //キャラセレクト
+    {
+        auto& charaSelect = obj->AddChildObject();
+        charaSelect->SetName("charaSelect");
+        charaSelect->AddComponent<Sprite>("Data/SerializeData/UIData/setting/charaSelect.ui", Sprite::SpriteShader::DEFALT, true);
+    }
+
     //ボタン位置と数字初期化
     int count = 0;
     for (auto& bar : barObj)
@@ -188,9 +195,6 @@ void SettingScreen::CreateSettingUiObject()
 
 void SettingScreen::SettingScreenUpdate(float elaspedTime)
 {
-
-
-   
     auto& frame = GameObjectManager::Instance().Find("settingFrame");
     auto& frameSprite = frame->GetComponent<Sprite>();
 
@@ -200,6 +204,7 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
         frameSprite->spc.color.w = 0.0f;
         return;
     }
+    //バー関係
     switch (state)
     {
     case 0:
@@ -301,10 +306,23 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
         }
     }
    
+    //キャラセレクト
+    auto& canvas = GameObjectManager::Instance().Find("settingCanvas");
+    auto& charaSelect = canvas->GetChildFind("charaSelect");
+    auto& charaSelectSpr = charaSelect->GetComponent<Sprite>();
+    charaSelectSpr->spc.color = { 1,1,1,1 };
+    if (charaSelectSpr->GetHitSprite())
+    {
+        charaSelectSpr->spc.color = { 0,0.5f,1,1 };
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButton())   //クリックされた場合
+            isCharaSelect = true;
+    }
 }
 
 void SettingScreen::SetViewSetting(bool flg)
 {
+    isCharaSelect = false;
     viewSetting = flg;
     auto& canvas = GameObjectManager::Instance().Find("settingCanvas");
     if (!canvas)return;

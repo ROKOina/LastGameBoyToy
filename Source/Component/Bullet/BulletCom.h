@@ -62,12 +62,6 @@ public:
     //ダメージ弾生成
     static void DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = 10);
 
-    //スタン弾生成
-    static void StanFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int stanValue = 3);
-
-    //ノックバック弾生成
-    static void KnockbackFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
-
     //ファラ通常弾
     static GameObj FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = 10);
     static GameObj FarahKnockBack(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
@@ -76,4 +70,8 @@ public:
     static GameObj JankratBulletFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);
     static GameObj JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, float force, float damage, int id);
     static GameObj JankratUlt(std::shared_ptr<GameObject>parent, DirectX::XMFLOAT3 pos, int damagepower);
+
+    //ソルジャースキル
+    static void SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, int damageValue = 10);
+    static void SoldierStanBall(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int stanValue = 3);
 };

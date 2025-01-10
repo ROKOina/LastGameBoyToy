@@ -20,19 +20,22 @@ void CharacterCom::Update(float elapsedTime)
 {
     auto& ss = SceneManager::Instance().GetSettingScreen();
     bool isViewSetting = ss->IsViewSetting();
+    if (netCharaData.myChara)
     {
-        //設定画面を開く(P)
-        GamePad& gamePad = Input::Instance().GetGamePad();
-        if (GamePad::BTN_P & gamePad.GetButtonDown())
         {
-            if (isViewSetting)
+            //設定画面を開く(P)
+            GamePad& gamePad = Input::Instance().GetGamePad();
+            if (GamePad::BTN_P & gamePad.GetButtonDown())
             {
-                ss->SetViewSetting(false);
-                ::SetCursorPos(500, 500);
-            }
-            else
-            {
-                ss->SetViewSetting(true);
+                if (isViewSetting)
+                {
+                    ss->SetViewSetting(false);
+                    ::SetCursorPos(500, 500);
+                }
+                else
+                {
+                    ss->SetViewSetting(true);
+                }
             }
         }
     }
@@ -249,6 +252,27 @@ void CharacterCom::DashFewSub(float elapsedTime)
     }
 }
 
+//腕アニメーション再生
+void CharacterCom::HandleArmAnimation()
+{
+    if (std::string(GetGameObject()->GetName()) == "player")
+    {
+        const auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        const auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        const auto& anim = GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetUpperCurrentAnimationSeconds(0.3f);
+        armAnim->SetAnimationSeconds(0.3f);
+    }
+    else
+    {
+        const auto& anim = GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetAnimationSeconds(0.3f);
+    }
+}
+
 void CharacterCom::InputStateUpdate(float elapsedTime)
 {
     //ステート処理
@@ -347,7 +371,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SpaceSkillPushing(elapsedTime);
     }
 
-    //野村追加 Rキー
+    //ウルトRキー
     if (CharacterInput::UltimetButton & GetButtonDown())
     {
         //ウルト発動フラグON

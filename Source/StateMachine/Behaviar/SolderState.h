@@ -29,8 +29,10 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
-    void ImGui() override;
     virtual const char* GetName() const override { return "MainAttack"; }
+
+private:
+    std::shared_ptr<GameObject>rayobj;
 };
 
 //Eスキル
@@ -41,9 +43,22 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit() override;
-    void ImGui() override;
+    void Exit() override {};
+    void ImGui() override {};
     virtual const char* GetName() const override { return "ESkill"; }
+};
+
+//右クリックスキル
+class Solder_RightClickSkillState : public Solder_BaseState
+{
+public:
+    Solder_RightClickSkillState(CharacterCom* owner) :Solder_BaseState(owner) {}
+
+    void Enter() override;
+    void Execute(const float& elapsedTime) override;
+    void Exit() override {};
+    void ImGui() override {};
+    virtual const char* GetName() const override { return "RightClickSkill"; }
 };
 
 //ult攻撃
@@ -55,6 +70,9 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
-    void ImGui() override;
+    void ImGui() override {};
     virtual const char* GetName() const override { return "UltAttack"; }
+
+private:
+    float time = 0.0f;
 };

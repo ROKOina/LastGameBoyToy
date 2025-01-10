@@ -13,6 +13,9 @@
 #include "Component\Animation\AimIKCom.h"
 #include "Component\Character\CharacterCom.h"
 #include "StateMachine\Behaviar\GateGimmickState.h"
+#include "Component\UI\Font.h"
+#include "Setting/Setting.h"
+#include "Scene\SceneTitle\SceneTitle.h"
 
 PVEDirection::PVEDirection()
 {
@@ -25,12 +28,62 @@ PVEDirection::~PVEDirection()
 void PVEDirection::Update(float elapsedTime)
 {
     DirectionSupervision(elapsedTime);
+
+    Setting();
+}
+
+void PVEDirection::Setting()
+{
+    DirectX::XMFLOAT4 selectColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+    DirectX::XMFLOAT4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    //UI表示
+    
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting())
+    {
+        GameObjectManager::Instance().Find("title")->SetEnabled(true);
+    }
+    else
+    {
+        GameObjectManager::Instance().Find("title")->SetEnabled(false);
+    }
+
+
+    //タイトルへ
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && GameObjectManager::Instance().Find("title")->GetComponent<Sprite>()->GetHitSprite())
+    {
+        GameObjectManager::Instance().Find("title")->GetComponent<Sprite>()->spc.color = selectColor;
+
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
+        {
+            SceneManager::Instance().ChangeScene(new SceneTitle);
+           
+        }
+    }
+    else
+    {
+        GameObjectManager::Instance().Find("title")->GetComponent<Sprite>()->spc.color = Color;
+    }
 }
 
 void PVEDirection::DirectionStart()
 {
+
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("pveCanvas");
+
+
     GameObjectManager::Instance().Find("BOSS")->GetComponent<AimIKCom>()->SetEnabled(false);
     GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetEnabled(false);
+
+    // タイトルへ
+    {
+        auto& name = obj->AddChildObject();
+        name->SetName("title");
+        auto& spr = name->AddComponent<Sprite>("Data/SerializeData/UIData/setting/pveGotoTitle.ui", Sprite::SpriteShader::DEFALT, true);
+        spr->SetOrderinLayer(100);
+        name->SetEnabled(false);
+    }
 
     {
         auto& armParts = GameObjectManager::Instance().Create();

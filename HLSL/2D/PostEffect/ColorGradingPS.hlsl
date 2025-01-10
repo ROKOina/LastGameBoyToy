@@ -163,47 +163,72 @@ float3 radialblur(float2 texcoord)
     return color;
 }
 
+//セピア
+float3 sepia(float3 currentcolor)
+{
+    float3x3 sepiaVals = float3x3
+    (
+        0.393, 0.769, 0.189, // Red
+        0.349, 0.686, 0.168, // Green
+        0.272, 0.534, 0.131 // Blue
+    );
+
+    float3 sepiaResult = mul(currentcolor.rgb, sepiaVals);
+    return saturate(sepiaResult); // 結果をクランプ
+}
+
+//ネガポジ反転
+float3 NegaPogi(float3 currentscale)
+{
+    return 1 - currentscale;
+}
+
 float4 main(VS_OUT pin) : SV_TARGET
 {
-    //指定されたミップマップレベルのテクスチャマップの次元情報を取得し、アスペクト比を計算
+    // 指定されたミップマップレベルのテクスチャマップの次元情報を取得し、アスペクト比を計算
     uint2 dimensions;
     uint mip_level = 0, number_of_samples;
     texturemaps.GetDimensions(mip_level, dimensions.x, dimensions.y, number_of_samples);
 
-    //テクスチャマップの幅と高さの比率
     const float aspect = (float) dimensions.y / dimensions.x;
 
-    //深度マップからピクセルの深度情報をサンプリング
+    // 深度マップからピクセルの深度情報をサンプリング
     float scene_depth = depth_map.Sample(sampler_states[BLACK_BORDER_LINEAR], pin.texcoord).r;
 
-    //深度値も NDC空間で使える(NDC座標に変換している)
+    // NDC座標に変換
     float4 ndc_position;
     ndc_position.x = pin.texcoord.x * +2 - 1;
     ndc_position.y = pin.texcoord.y * -2 + 1;
     ndc_position.z = scene_depth;
     ndc_position.w = 1;
 
-    //（NDC）をワールド座標に変換
+    // ワールド座標に変換
     float4 world_position = mul(ndc_position, inverseviewprojection);
     world_position = world_position / world_position.w;
 
     // シーンのテクスチャマップをサンプリング
     float4 sampled_color = texturemaps.Sample(sampler_states[POINT], pin.texcoord.xy);
 
-    //ラジアルブラー
-    sampled_color.rgb = lerp(sampled_color.rgb, radialblur(pin.texcoord).rgb, blurstrength);
-
-    // 輪郭線効果の描画 (輪郭線をエッジ部分にのみ適用)
-    sampled_color.rgb += OutlineEffect(pin.texcoord.xy, dimensions.x, dimensions.y, inverseviewprojection, cameraposition);
-
-    // ビネット効果の適用
-    sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
-
     // 明るさとコントラストの調整
     sampled_color.rgb = brightness_contrast(sampled_color.rgb, brightness, contrast);
 
     // 色相と彩度の調整
     sampled_color.rgb = hue_saturation(sampled_color.rgb, hue, saturation);
+
+    // ラジアルブラー
+    sampled_color.rgb = lerp(sampled_color.rgb, radialblur(pin.texcoord).rgb, blurstrength);
+
+    // 輪郭線効果の描画
+    sampled_color.rgb += OutlineEffect(pin.texcoord.xy, dimensions.x, dimensions.y, inverseviewprojection, cameraposition);
+
+    // ビネット効果の適用
+    sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
+
+    // セピア効果の適用
+    sampled_color.rgb = lerp(sampled_color.rgb, sepia(sampled_color.rgb), sepiastrength);
+
+    //ネガポジ反転
+    sampled_color.rgb = lerp(sampled_color.rgb, NegaPogi(sampled_color.rgb), negapogistrength);
 
     // 最終的な色を返す
     return sampled_color;

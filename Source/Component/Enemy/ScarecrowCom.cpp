@@ -6,7 +6,7 @@
 #include <Component\MoveSystem\MovementCom.h>
 #include "Component\Sprite\Sprite.h"
 
-//初期設定  
+//初期設定
 void ScarecrowCom::Start()
 {
     //ステート登録
@@ -14,7 +14,6 @@ void ScarecrowCom::Start()
     state.AddState(ScareCrowState::RANDOMIDLE, std::make_shared<Scarecrow_RandomIdleState>(this));
     state.AddState(ScareCrowState::MOVE, std::make_shared<Scarecrow_MoveState>(this));
     state.AddState(ScareCrowState::DEATH, std::make_shared<Scarecrow_DeathState>(this));
-    
 
     //初期ステート登録
     state.ChangeState(ScareCrowState::IDLE);
@@ -31,4 +30,3 @@ void ScarecrowCom::OnGUI()
 {
     state.ImGui();
 }
-

@@ -87,6 +87,7 @@ public:
 
     // 着地した瞬間のフラグを取得
     bool JustLanded() const { return justLanded_; }
+    bool GetOnceGround() const { return onceGround; }
 
     //壁の判定系
     bool GetOnWall() { return onWall_; }
@@ -120,15 +121,28 @@ public:
     void SetStepOffset(float num) { stepOffset = num; }
     void SetAdvanceOffset(float num) { advanceOffset = num; }
 
+    //レイキャストがヒットした位置
+    const DirectX::XMFLOAT3& GetHitPosition() const { return hitPosition_; }
+    const DirectX::XMFLOAT3& GetWallHitPosition() const { return hitWallPosition_; }
+
+    //レイキャストがヒットした法線
+    const DirectX::XMFLOAT3& GetNormal()const { return hitNormal_; }
+    const DirectX::XMFLOAT3& GetWallNormal()const { return hitWallNormal_; }
+
 #pragma endregion
 
 private:
     DirectX::XMFLOAT3 velocity_ = { 0,0,0 };   //速力
     DirectX::XMFLOAT3 nonMaxSpeedVelocity_ = { 0,0,0 }; //最大スピードを無視した速力
+    DirectX::XMFLOAT3 hitPosition_ = {};       //レイキャスト当たった位置
+    DirectX::XMFLOAT3 hitWallPosition_ = {};   //レイキャスト当たった位置
+    DirectX::XMFLOAT3 hitNormal_ = {};         //レイキャストの法線を取得
+    DirectX::XMFLOAT3 hitWallNormal_ = {};     //レイキャストの法線を取得
     float gravity_ = GRAVITY_NORMAL;           //重力
     float gravityeffect = 30.0f;               //重力の影響度
     float fallspeed = -100.0f;                 //落ちるスピード
     bool onGround_ = false;                    //地面についているか
+    bool onceGround = false;                   //一度だけ地面についてイルカ確認するフラグ
     bool wasOnGround_ = false;                 // 前フレームの着地状態
     bool justLanded_ = false;                  // 今フレームで着地した瞬間かどうか
     bool onWall_ = false;                      //壁についてるか
@@ -140,7 +154,7 @@ private:
     float moveMaxSpeed_ = 9.5f;                //最大速度
     float firstMoveMaxSpeed = 8.0f;            //初期最大速度
     float moveAcceleration_ = 3.0f;            //加速度
-    float stepOffset = 0.5f;                   //レイキャスト用(下向き)のオフセット
+    float stepOffset = 1.0f;                   //レイキャスト用(下向き)のオフセット
     float advanceOffset = 1.0f;                //レイキャスト用(横向き)のオフセット
     bool isRaycast = true;                     //レイキャストをするか（true：使用する）
     float risespeed = 1.5f;                    //上昇速度

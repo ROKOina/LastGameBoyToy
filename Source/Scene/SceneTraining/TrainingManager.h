@@ -1,6 +1,6 @@
 #pragma once
 #include "Component/System/Component.h"
-
+#include "Component\Audio\AudioCom.h"
 
 
 
@@ -25,10 +25,21 @@ public:
 
 public:
     void ChangeTutorialFlag();
+    void ChangeTrainigFlag();
+
+
+    //void LightManager();
+
+    void Changeblackout();
+    void Changelightchange();
+
+    void Setting();
 private:
 
     //最初はトレーニングモード
     bool tutorialFlag = false;
+
+    bool lightFlag = false;
 
 };
 
@@ -56,6 +67,8 @@ public:
 
     //トレーニングモードのオブジェクトを非表示
     void TrainingObjUnhide();
+    void TrainingObjDisplay();
+
 
 private:
     //射撃の開始処理と終了処理
@@ -112,14 +125,23 @@ public:
 public:
     //チュートリアルのID
     enum TutorialID
-    { MOVE, GUN, SKILL, ULT, END };
+    {BLACK, LIGHT, MOVE, GUN, SKILL, ULT, ENDBLACK, END };
 public:
     //チュートリアル管理システム
     void TutorialManagerSystem(float elapsedTime);
 
     //チュートリアルを進める
     void NextTutorial(TutorialID id);
+
+    void TutorialFlagClear();
+
 public:
+    //暗転
+    void BlackOutManager(float elapsedTime);
+
+    //明転
+   void LightChangeManger(float elapsedTime);
+
     //動きのチュートリアル管理
     void MoveTutorialManager(float elapsedTime);
 
@@ -132,6 +154,10 @@ public:
     //ウルトのチュートリアル管理
     void UltTutorialManager(float elapsedTime);
 
+    void EndBlackTutorialManager(float elapsedTime);
+
+    void EndTutorialManager(float elapsedTime);
+
     void OnGui();
 private:
 
@@ -142,10 +168,25 @@ private:
     int  skillSubTitleIndex = 0;
     int  ultSubTitleIndex = 0;
 
+    float lightTimer = 0.0f;
+    float lightTime = 2.0f;
+    float blackTimer = 0.0f;
+    float blackTime = 2.0f;
+
     bool moveInspectionFlag = false;         //動きのチュートリアル検査
     bool gunInspectionFlag = false;          //銃のチュートリアル検査
     bool skillInspectionFlag = false;        //スキルのチュートリアル検査
     bool ultInspectionFlag = false;          //ウルトのチュートリアル検査
+
+    bool flag = false;
+    bool linesFlag = false;
+
+    bool upFlag = false;
+    bool downFlag = false;
+    bool jumpFlag = false;
+    bool gunFlag = false;
+    bool skillFlag = false;
+    bool ultFlag = false;
 
     bool moveAFlag = false;
     bool moveDFlag = false;
@@ -162,12 +203,20 @@ private:
 
         float subtitleTimer = 0.0f;
         float subtitleTime = 1.0f;
-        float subtitleAlpha = 1.0f;
+        
+
+        DirectX::XMFLOAT2 pos = { 0,0 };
+        std::wstring str;
+
+        const char* Lines;
     };
 
-    SubTitle moveSubTitle[11];
-    SubTitle gunSubTitle[3];
-    SubTitle skillSubTitle[3];
+    SubTitle moveSubTitle[12];
+    SubTitle gunSubTitle[4];
+    SubTitle skillSubTitle[4];
     SubTitle ultSubTitle[5];
 
+    AudioCom* audioObj;
+
+    
 };

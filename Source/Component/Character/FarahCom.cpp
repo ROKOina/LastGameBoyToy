@@ -8,13 +8,13 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Bullet\BulletCom.h"
 #include "Component\Collsion\ColliderCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 // 定数
 constexpr float JUMP_FORCE = 12.62f;
 constexpr float RISING_FORCE = 13.0f;
 constexpr float COOLDOWN_TIME = 0.5f;
 constexpr float DASH_GAUGE_INCREMENT = 5.0f;
-constexpr float ULT_DURATION = 15.0f;
 
 // 初期化
 void FarahCom::Start()
@@ -48,7 +48,6 @@ void FarahCom::Update(float elapsedTime)
 {
     HandleCooldown(elapsedTime);
     HandleBoostFlag();
-    UltUpdate(elapsedTime);
     ShotSecond();
     CharacterCom::Update(elapsedTime);
     GroundBomber(elapsedTime);
@@ -102,6 +101,9 @@ void FarahCom::MainAttackDown()
     //スキル発動中はリターン
     if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::SUB_SKILL)return;
 
+    //ウルト発動中
+    if (UseUlt())return;
+
     //アタック
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
     attackInputSave = false;
@@ -110,6 +112,7 @@ void FarahCom::MainAttackDown()
 // ウルトスキル
 void FarahCom::UltSkill()
 {
+    //ステートをウルトに変更
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 
@@ -119,18 +122,6 @@ void FarahCom::Reload()
     if (currentBulletNum < maxBulletNum)
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
-}
-
-// ウルト更新
-void FarahCom::UltUpdate(float elapsedTime)
-{
-    if (!UseUlt()) return;
-
-    ulttimer += elapsedTime;
-    if (ulttimer > ULT_DURATION)
-    {
-        ResetUlt();
     }
 }
 
@@ -176,15 +167,6 @@ void FarahCom::AddDashGauge(float amount)
     dashGauge += amount;
 }
 
-// ウルトリセット
-void FarahCom::ResetUlt()
-{
-    dashgaugemin = 4.0f;
-    GetGameObject()->GetComponent<MovementCom>()->SetMoveAcceleration(3.0f);
-    FinishUlt();
-    ulttimer = 0.0f;
-}
-
 // クールダウンの管理
 void FarahCom::HandleCooldown(float elapsedTime)
 {
@@ -210,12 +192,13 @@ void FarahCom::GroundBomber(float elapsedTime)
 
         // 地面に接触
         auto& obj = bullet.obj;
-        if (obj->GetComponent<MovementCom>()->OnGround() || obj->GetComponent<MovementCom>()->GetOnWall())
+        auto& movecom = obj->GetComponent<MovementCom>();
+        if (movecom->OnGround() || movecom->GetOnWall())
         {
             bullet.bomberflag = true;
-            obj->GetComponent<MovementCom>()->SetIsRaycast(false);
-            obj->GetComponent<MovementCom>()->ZeroVelocity();
-            obj->GetComponent<MovementCom>()->ZeroNonMaxSpeedVelocity();
+            movecom->SetIsRaycast(false);
+            movecom->ZeroVelocity();
+            movecom->ZeroNonMaxSpeedVelocity();
             obj->GetComponent<SphereColliderCom>()->SetRadius(2.1f);
         }
 
@@ -227,6 +210,22 @@ void FarahCom::GroundBomber(float elapsedTime)
             // 一度だけ Play を実行する
             if (!bullet.played)  // played フラグで制御
             {
+                //デカール生成
+                std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
+                decal->SetName("bulletdecal");
+                std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/star.png");
+
+                //ここでヒット種類を分別する
+                if (movecom->OnGround())
+                {
+                    d->Add(movecom->GetHitPosition(), movecom->GetNormal(), 1.0f);
+                }
+
+                if (movecom->GetOnWall())
+                {
+                    d->Add(movecom->GetWallHitPosition(), movecom->GetWallNormal(), 1.0f);
+                }
+
                 obj->GetComponent<GPUParticle>()->SetEnabled(true);
                 obj->GetComponent<GPUParticle>()->Play();
                 bullet.played = true; // フラグを設定

@@ -161,6 +161,8 @@ struct NetData
         std::array<int, 4> teamID;//チームのID
         int charaID;    //キャラのID
         int hp;
+
+        float ultGauge;
     }gameData;
 
     //入室許可
@@ -181,6 +183,10 @@ struct NetData
     struct LobbyData    //2
     {
         std::array<int, 4> teamID;//チームのID
+
+        //ピック開始
+        int pickSelect; //1:ピック開始、2:ピック確定
+        int charaID;    //キャラのID
         char chat[500];
     }lobbyData;
 
@@ -212,6 +218,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 
         out << h.gameData.charaID << " ";
         out << h.gameData.hp << " ";
+        out << h.gameData.ultGauge << " ";
         out << h.gameData.teamID << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
     }
@@ -231,6 +238,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     {
         out << h.lobbyData.chat << " ";
         out << h.lobbyData.teamID << " ";
+        out << h.lobbyData.charaID << " ";
+        out << h.lobbyData.pickSelect << " ";
     }
 
     out << h.gameMode << " ";
@@ -262,6 +271,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
 
         in >> h.gameData.charaID;
         in >> h.gameData.hp;
+        in >> h.gameData.ultGauge;
         in >> h.gameData.teamID;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
     }
@@ -282,6 +292,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     {
         in >> h.lobbyData.chat;
         in >> h.lobbyData.teamID;
+        in >> h.lobbyData.charaID;
+        in >> h.lobbyData.pickSelect;
     }
 
     in >> h.gameMode;

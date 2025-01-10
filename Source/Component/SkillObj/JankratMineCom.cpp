@@ -2,6 +2,7 @@
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Renderer\DecalCom.h"
 
 void JankratMineCom::Update(float elapsedTime)
 {
@@ -42,6 +43,22 @@ void JankratMineCom::Update(float elapsedTime)
         if (lifeTimer >= lifeTime)
         {
             GameObjectManager::Instance().Remove(this->GetGameObject());
+
+            //デカール生成
+            std::shared_ptr<GameObject>decal = GameObjectManager::Instance().Create();
+            decal->SetName("decal");
+            std::shared_ptr<Decal>d = decal->AddComponent<Decal>("Data/Texture/susu.png");
+
+            //ここでヒット種類を分別する
+            if (moveCom->GetOnceGround())
+            {
+                d->Add(moveCom->GetHitPosition(), moveCom->GetNormal(), 1.0f);
+            }
+
+            if (moveCom->GetOnWall())
+            {
+                d->Add(moveCom->GetWallHitPosition(), moveCom->GetWallNormal(), 1.0f);
+            }
         }
         lifeTimer += elapsedTime;
     }
