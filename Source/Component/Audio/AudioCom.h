@@ -24,6 +24,9 @@ public:
     bool GetIsSource() { return source != nullptr; }
     bool GetFeedFlag() { return feedFlag; }
 
+    float& GetVolume() { return volume; }
+    bool& GetLoopFlag() { return loop; }
+
 private:
     std::shared_ptr<AudioSource> source;
 
@@ -77,4 +80,6 @@ public:
 
 private:
     std::map<std::string, AudioObj> audioSources;
+
+    std::string audioName = "";
 };
