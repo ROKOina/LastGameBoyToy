@@ -24,12 +24,12 @@ void RespawnCom::Update(float elapsedTime)
     {
         switch (gameMode)
         {
-        case RespawnCom::GameMode::PVE:
+        case PVPGameSystem::GAME_MODE::None:
             //PVE‚Íƒ^ƒCƒgƒ‹‚É‘JˆÚ
             SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 3);
             break;
 
-        case RespawnCom::GameMode::DeathMatch:
+        case PVPGameSystem::GAME_MODE::Deathmatch:
             if (!EventCameraManager::Instance().GetIsPlayEvent())
             {
                 CharacterCom* charaCom = player->GetComponent<CharacterCom>().get();

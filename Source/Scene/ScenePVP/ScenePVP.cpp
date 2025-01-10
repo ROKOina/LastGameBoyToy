@@ -32,6 +32,7 @@
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Component\UI\Font.h"
 #include "Math/easing.h"
+#include "Component\GameSystem\RespawnCom.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
@@ -242,6 +243,18 @@ void ScenePVP::InitializePVP()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj);
+
+        //リスポーン用
+        GameObj respawnObj = GameObjectManager::Instance().Create();
+        respawnObj->SetName("respawn");
+        RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
+        spawnCom->SetGameMode(pvpGameSystem->GetGameMode());
+
+        //仮のスポーン位置
+        spawnCom->AddRespawnPoses({ 5,1,5 });
+        spawnCom->AddRespawnPoses({ -5,1,5 });
+        spawnCom->AddRespawnPoses({ 5,1,-5 });
+        spawnCom->AddRespawnPoses({ -5,1,-5 });
     }
 
     //snowparticle
