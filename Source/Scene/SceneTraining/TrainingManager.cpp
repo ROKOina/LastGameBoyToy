@@ -589,6 +589,7 @@ void TrainingSystem::ShootingStartEndSystem()
 
         shootingStartFlag = false;
         scarecrowCount = 0;
+        shootingScore = 0;
     }
 }
 
