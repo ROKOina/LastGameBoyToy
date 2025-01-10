@@ -77,7 +77,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -259,7 +259,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -358,7 +358,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     r->LoadModel("Data/Model/player_True/player3.mdl");
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
@@ -449,7 +449,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>(nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
