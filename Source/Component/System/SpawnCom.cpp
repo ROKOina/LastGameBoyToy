@@ -459,10 +459,14 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Bullet);
     if (std::strcmp(player->GetName(), "player") == 0)
+    {
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+    }
     else
+    {
         collider->SetJudgeTag(COLLIDER_TAG::Player);
-    collider->SetRadius(0.5f);
+        collider->SetRadius(0.5f);
+    }
 
     //’e
     int netPlayerID = player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
