@@ -20,10 +20,10 @@ void CharaPicks::CreateCharaPicksUiObject()
 
     // 各キャラのUI設定
     {
-        // INAZAWA
+        // KANIZO-
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("INAZAWA");
+            chara->SetName("Kanizo-");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon0.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -34,10 +34,10 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->SetEnabled(false);
             }
         }
-        // FARAH
+        // FARAIC
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("FARAH");
+            chara->SetName("Faraic");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon1.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -133,8 +133,8 @@ void CharaPicks::CharaDetails()
 
     // キャラ、ID設定
     std::vector<CharacterInfo> characters = {
-        getCharacterInfo("INAZAWA", 0),
-        getCharacterInfo("FARAH", 1),
+        getCharacterInfo("Kanizo-", 0),
+        getCharacterInfo("Faraic", 1),
         getCharacterInfo("Santoratto", 2),
         getCharacterInfo("Matya-", 3)
     };
