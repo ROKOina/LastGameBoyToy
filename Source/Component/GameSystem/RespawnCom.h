@@ -37,5 +37,6 @@ private:
 
     std::vector<DirectX::XMFLOAT3> respawnPoses = {};
     float playerDeathHeight = -50;
+    float respawnTimer = 0.0f;
     bool isRespawn = false;
 };
