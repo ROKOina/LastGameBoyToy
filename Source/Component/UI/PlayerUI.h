@@ -185,21 +185,34 @@ class UI_EnemyHp : public Component
 {
 public:
     UI_EnemyHp();
-    ~UI_EnemyHp();
+    ~UI_EnemyHp() {};
 
     // 名前取得
     const char* GetName() const override { return "UI_EnemyHp"; }
-
+    
     // 開始処理
     void Start() override;
 
     // 更新処理
     void Update(float elapsedTime) override;
 
-    void OnGUI()override;
+    //ゲージ更新
+    void GaugeUpdate(float elapsedTime);
 
+    void SearchEnemy();
+
+    void Register();
+
+    void OnGUI()override {};
 private:
-    
+    bool enemyFLG = false;
+    bool displayFLG = false;
+
+    float oldHp= 0.0f;
+    float timer = 0.0f;
+    const float time = 5.0f;
+
+    std::shared_ptr<GameObject> enemyHp;
 };
 
 class UI_UltNum : public Component

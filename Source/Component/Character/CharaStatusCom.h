@@ -42,6 +42,7 @@ public:
     //リスポーンさせる関数
     void ReSpawn(int HP);
 
+
 private:
     float hitPoint = 100;
     float maxHitPoint = 100;              //HPの最大値

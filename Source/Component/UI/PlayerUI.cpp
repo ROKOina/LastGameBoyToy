@@ -4,6 +4,7 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
 #include"StateMachine\Behaviar\InazawaCharacterState.h"
+#include "Component\Collsion\ColliderCom.h"
 #include "Component\UI\Font.h"
 
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
@@ -236,6 +237,7 @@ void UI_LockOn::UpdateGauge(float elapsedTime, std::shared_ptr<GameObject> obj)
 {
     float hp = *obj->GetComponent<CharaStatusCom>()->GetHitPoint();
     float maxHp = obj->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+
     // 変化値がマイナスに行かないように補正
     hp = Mathf::Clamp(hp, 0.01f, maxHp);
 
@@ -787,3 +789,62 @@ void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
     bookingRegister = true;
 }
 
+UI_EnemyHp::UI_EnemyHp()
+{
+   
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+}
+
+void UI_EnemyHp::Start()
+{
+ 
+}
+void UI_EnemyHp::Update(float elasedTime)
+{
+    if (enemyFLG) {
+        GaugeUpdate(elasedTime);
+    }
+}
+
+void UI_EnemyHp::GaugeUpdate(float elapsedTime)
+{
+    float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
+    float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+    std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
+  
+
+    //前フレームのHpと現在のHpが違うなら
+    if (*Hp >= oldHp) {
+        displayFLG = true;
+        timer = 0.0f;
+        gauge->spc.color = { 1,1,1,1 };
+    }
+    
+    if (displayFLG) {
+        timer += elapsedTime;
+        if (time < timer) {
+            displayFLG = false;
+            timer = 0.0f;
+        }
+    }
+    else {
+        gauge->spc.color = { 0,0,0,0 };
+    }
+}
+
+void UI_EnemyHp::SearchEnemy()
+{
+    
+}
+
+void UI_EnemyHp::Register()
+{
+    enemyHp = this->GetGameObject()->AddChildObject();
+    enemyHp->AddComponent<UiGauge>(nullptr, Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_SUB);
+    oldHp = *this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
+    std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
+    float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
+    float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+    gauge->SetVariableValue(Hp);
+    gauge->SetMaxValue(MaxHp);
+}
