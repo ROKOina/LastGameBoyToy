@@ -430,9 +430,9 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     //bulletCom->SetDamageValue(-damageValue);
 
     //”»’è—p
-    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(GetGameObject());
-    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    hit->SetValue(10.0f);
+    //std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(GetGameObject());
+    //hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    //hit->SetValue(10.0f);
 
     //”š”­•¨
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
