@@ -1,9 +1,10 @@
 #include "CharaPicks.h"
 #include "Input/Input.h"
-
 #include "Component/Sprite/Sprite.h"
 #include "Component/System/GameObject.h"
 #include "Component/System/TransformCom.h"
+#include "Component\Renderer\RendererCom.h"
+#include "Component\Animation\AnimationCom.h"
 
 CharaPicks::CharaPicks()
 {
@@ -32,6 +33,20 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->SetName("name");
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName0.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
+            }
+
+            //3Dobject生成
+            {
+                std::shared_ptr<GameObject> obj = chara->AddChildObject();
+                obj->SetName("kanizo-player");
+                obj->SetEnabled(false);
+                obj->transform_->SetWorldPosition({ -0.191, 0.018, 1.802 });
+                obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+                obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
+                std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+                r->LoadModel("Data/Model/player_True/player1.mdl");
+                std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
+                anim->PlayAnimation(5, true);
             }
         }
         // FARAIC
@@ -141,7 +156,6 @@ void CharaPicks::CharaDetails()
 
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
-
         // Spriteクラスで関数を作成（下記は無駄なコード）
         if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
         {
@@ -168,7 +182,6 @@ void CharaPicks::CharaDetails()
         }
 
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
-
             selected.name->SetEnabled(true);
             selected.name->GetComponent<Sprite>()->EasingPlay();
             selected.name->GetComponent<Sprite>()->spc.onshot = true;
@@ -214,7 +227,7 @@ void CharaPicks::DecisionButton()
     {
         sprite->EasingPlay();
     }
-    else if(!sprite->GetHitSprite())
+    else if (!sprite->GetHitSprite())
     {
         sprite->StopEasing();
         sprite->spc.color = color;
@@ -224,7 +237,7 @@ void CharaPicks::DecisionButton()
     if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
     {
         decisionFlg = true;
-        decisionButton->SetEnabled(false);
+        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("freecamera"));
     }
 }
 
