@@ -24,6 +24,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     sample_point.y = 1 - sample_point.y;
 
     float3 color = skybox.SampleLevel(sampler_states[ANISOTROPIC], sample_point, 0).rgb;
+    color *= lerp(10.0, color, 0.1);
 
     color.rgb = pow(color, GAMMA);
     color.rgb = pow(color, 1.0 / GAMMA);
