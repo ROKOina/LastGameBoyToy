@@ -12,6 +12,7 @@
 #include <Netwark\Photon\StdIO_UIListener.h>
 #include <Graphics\SkyBoxManager\SkyBoxManager.h>
 #include <Component\Collsion\NodeCollsionCom.h>
+#include "Component\Renderer\VideoCom.h"
 
 //初期化
 void SceneUeno::Initialize()
@@ -75,6 +76,13 @@ void SceneUeno::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+    }
+
+    //テストvideo
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("testvideo");
+        obj->AddComponent<Video>("Data/Video/o.mp4");
     }
 
     //コンスタントバッファの初期化
