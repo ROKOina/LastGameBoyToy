@@ -295,7 +295,7 @@ void BaseCharacter_DeathState::Enter()
 void BaseCharacter_DeathState::Execute(const float& elapsedTime)
 {
     CharaStatusCom* stats = owner->GetGameObject()->GetComponent<CharaStatusCom>().get();
-    if (stats->IsDeath() && stats->GetHitPoint() > 0)
+    if (stats->IsDeath() && *stats->GetHitPoint() > 0)
     {
         stats->SetIsDeath(false);
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
