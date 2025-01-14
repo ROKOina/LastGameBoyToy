@@ -130,7 +130,7 @@ void SceneNakanisi::Initialize()
         RespawnCom* spawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
         obj->transform_->SetWorldPosition(spawn->GetRespawnPoses()[0]);
 
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj, true);
     }
 
     //snowparticle

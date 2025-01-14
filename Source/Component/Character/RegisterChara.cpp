@@ -43,6 +43,7 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
         break;
     }
 
+
     //Ž©ƒLƒƒƒ‰‚Ìê‡
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -278,7 +279,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
+    if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
@@ -378,7 +379,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
+    if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
@@ -455,7 +456,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
+    if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
@@ -493,7 +494,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
         rayCol->SetEnabled(false);
         rayCol->SetMyTag(COLLIDER_TAG::Bullet);
-        if (std::strcmp(obj->GetName(), "player") == 0)
+        if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
             rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
         else
             rayCol->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);

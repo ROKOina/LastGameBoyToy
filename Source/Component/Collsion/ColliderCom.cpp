@@ -11,6 +11,9 @@ void Collider::OnGUI()
 {
     bool hit = isHit;
     ImGui::Checkbox("isHit", &hit);
+
+    int myTag = myTag_;
+    ImGui::InputInt("myTag", &myTag);
 }
 
 //”»’è‘O‚ÌƒNƒŠƒA
