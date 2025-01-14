@@ -11,6 +11,7 @@
 #include "Scene/SceneTitle/SceneTitle.h"
 #include "Component\Audio\AudioCom.h"
 #include "Component\GameSystem\RespawnCom.h"
+#include "Component\Character\CharaStatusCom.h"
 
 //基底君
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
@@ -276,20 +277,34 @@ void BaseCharacter_DeathState::Enter()
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
 
-    //プレイヤー映す
-    owner->GetGameObject()->GetComponent<RendererCom>()->SetDissolveThreshold(0);
-    //FPS用オブジェクト隠す
-    GameObjectManager::Instance().Find("armChild")->GetComponent<RendererCom>()->SetDissolveThreshold(1);
+    RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
+    respawn->AddRespawnData(owner->GetGameObject());
 
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
+        //プレイヤー映す
+        owner->GetGameObject()->GetComponent<RendererCom>()->SetDissolveThreshold(0);
+        //FPS用オブジェクト隠す
+        GameObjectManager::Instance().Find("armChild")->GetComponent<RendererCom>()->SetDissolveThreshold(1);
+
         //イベントカメラ
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
-
-        RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
-        respawn->SetIsRespawn(true);
     }
+}
+void BaseCharacter_DeathState::Execute(const float& elapsedTime)
+{
+    CharaStatusCom* stats = owner->GetGameObject()->GetComponent<CharaStatusCom>().get();
+    if (stats->IsDeath() && *stats->GetHitPoint() > 0)
+    {
+        stats->SetIsDeath(false);
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+    }
+}
+void BaseCharacter_DeathState::Exit()
+{
+    //animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::UpperLowerAnimation);
+    //animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
 }
 #pragma endregion
 
@@ -466,7 +481,7 @@ void BaseCharacter_ReloadState::Enter()
     else
     {
         auto& animCom = owner->GetGameObject()->GetComponent<AnimationCom>();
-        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Reroad"), false);
     }
 }
 
@@ -573,7 +588,7 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
         {
             if (owner->GetDashFlag())
             {
-                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Dash"), true);
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
             }
             else
             {

@@ -16,6 +16,7 @@ void UiGauge::Start()
 
 void UiGauge::Update(float elapsedTime)
 {
+    if (variableValue == nullptr)return;
     //ƒQ[ƒW‚Ì”{—¦‚ğ‹‚ß‚é
     valueRate = *variableValue / maxValue;
     if (!isDebug) {

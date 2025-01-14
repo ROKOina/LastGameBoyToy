@@ -5,7 +5,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Model/Model.h"
 
-#define MAX_BONES 60
+#define MAX_BONES 65
 
 class ModelShader
 {

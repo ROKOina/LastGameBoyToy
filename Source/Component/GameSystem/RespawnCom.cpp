@@ -5,62 +5,79 @@
 #include "Scene\SceneTitle\SceneTitle.h"
 #include "Component\Camera\EventCameraManager.h"
 #include "Component\Character\CharaStatusCom.h"
+#include "Component\Renderer\RendererCom.h"
+#include "Component\Animation\AnimationCom.h"
 
 void RespawnCom::Update(float elapsedTime)
 {
     GameObj player = GameObjectManager::Instance().Find("player");
 
     //落下したプレイヤーを殺す
-    if (!isRespawn && player->transform_->GetWorldPosition().y < playerDeathHeight)
+    if (!fallEvent && player->transform_->GetWorldPosition().y < playerDeathHeight)
     {
-        auto& stateMachine = player->GetComponent<CharacterCom>()->GetMoveStateMachine();
-        stateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::DEATH);
-
-        isRespawn = true;
+        CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+        status->AddDamagePoint(-200);
     }
 
     //リスポーン処理
-    if (isRespawn)
+    for (auto& respawnData : respawnDatas)
     {
-        switch (gameMode)
+        respawnData->respawnTime += elapsedTime;
+
+        //死亡演出が終了したらリスポーン
+        if (respawnData->respawnTime >= 2.5f)
         {
-        case RespawnCom::GameMode::PVE:
-            //PVEはタイトルに遷移
-            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 3);
-            break;
+            CharacterCom* charaCom = respawnData->gameObj->GetComponent<CharacterCom>().get();
 
-        case RespawnCom::GameMode::DeathMatch:
-            if (!EventCameraManager::Instance().GetIsPlayEvent())
+            //プレイヤーならば
+            if (std::string(respawnData->gameObj->GetName()) == "player")
             {
-                CharacterCom* charaCom = player->GetComponent<CharacterCom>().get();
-
+                //位置移動
                 int spawnIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
-
-                //プレイヤーリスポーン処理
-
-                //位置
                 if (spawnIndex < 0) { spawnIndex = 0; }
                 player->transform_->SetWorldPosition(respawnPoses[spawnIndex]);
 
-                //パラメータ回復
-                CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-                status->ReSpawn(status->GetMaxHitpoint());
-
-                //ステートを通常に戻す
-                auto& moveStateMachine = charaCom->GetMoveStateMachine();
-                auto& attackStateMachine = charaCom->GetAttackStateMachine();
-                moveStateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);                
-                attackStateMachine.ChangeState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+                //プレイヤー隠す
+                player->GetComponent<RendererCom>()->SetDissolveThreshold(1);
+                //FPS用オブジェクト映す
+                GameObjectManager::Instance().Find("armChild")->GetComponent<RendererCom>()->SetDissolveThreshold(0);
 
                 //最初にイベントカメラへ変更
                 GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
-
-                isRespawn = false;
             }
-            break;
-        default:
-            break;
+
+            //パラメータ回復
+            CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+            status->ReSpawn(status->GetMaxHitpoint());
+
+            //アニメーションを死亡から待機へ
+            AnimationCom* animaCom = player->GetComponent<AnimationCom>().get();
+            animaCom->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
+            animaCom->PlayUpperBodyOnlyAnimation(animaCom->FindAnimation("Idle"), true, 1.0f);
+            for (int i = 0; i < 20; ++i)
+            {
+                animaCom->Update(elapsedTime);
+            }
+
+            //ステートを通常に戻す
+            auto& moveStateMachine = charaCom->GetMoveStateMachine();
+            auto& attackStateMachine = charaCom->GetAttackStateMachine();
+            moveStateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
+            attackStateMachine.ChangeState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
+  
+            endDatas.emplace_back(respawnData);
+        }
+    }
+
+    //リスポーン終了したオブジェクトをコンテナから出す
+    for (RespawnData* removeObj : endDatas)
+    {
+        std::vector<RespawnData*>::iterator it = std::find(respawnDatas.begin(), respawnDatas.end(), removeObj);
+        if (it != respawnDatas.end())
+        {
+            delete respawnDatas[respawnDatas.size() - 1];
+            respawnDatas.erase(it);
         }
     }
 }

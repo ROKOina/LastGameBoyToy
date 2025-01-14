@@ -31,7 +31,7 @@ struct INSTANCE_VS_IN
     row_major float4x4 transform : TRANSFORM;
 };
 
-#define MAX_BONES 60
+#define MAX_BONES 65
 cbuffer CbMesh : register(b1)
 {
     row_major float4x4 boneTransforms[MAX_BONES];

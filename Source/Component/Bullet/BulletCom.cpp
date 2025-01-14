@@ -487,6 +487,9 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     bullet->transform_->SetScale({ 0.01f,0.01f,0.01f });
     bullet->transform_->SetWorldPosition({ pos.x,pos.y,pos.z });
 
+    //ÇﬂÇÁÇﬂÇÁÇŸÇÃÇ§åN
+    bullet->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/maine_fire.gpuparticle", 400);
+
     //ë¨ìxê›íË
     std::shared_ptr<MovementCom> moveCom = bullet->AddComponent<MovementCom>();
     moveCom->SetGravity(0.0f);

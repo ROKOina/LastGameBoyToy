@@ -40,6 +40,7 @@ private:
         std::shared_ptr<GameObject> chara;
         std::shared_ptr<Sprite> sprite;
         std::shared_ptr<GameObject> name;
+        std::shared_ptr<GameObject> charamodel;
         int id;
     };
 
@@ -55,4 +56,3 @@ private:
 
     DirectX::XMFLOAT4 color, selectColor = {};
 };
-

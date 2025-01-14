@@ -88,6 +88,9 @@ void SceneTraining::Initialize()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
+    //UIゲームオブジェクト生成
+    //CreateUiObject();
+
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
@@ -112,7 +115,6 @@ void SceneTraining::Finalize()
 void SceneTraining::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-
     photonNet->run(elapsedTime);
 
     //UI生成
@@ -120,6 +122,9 @@ void SceneTraining::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
+    //Ui更新
+    PlayerUIManager::Instance().UIUpdate(elapsedTime);
     TrainingManager::Instance().TrainingManagerUpdate(elapsedTime);
 }
 

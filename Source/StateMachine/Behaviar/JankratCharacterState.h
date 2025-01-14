@@ -14,9 +14,6 @@ class JankratCharacter_BaseState : public State<CharacterCom>
 public:
     JankratCharacter_BaseState(CharacterCom* owner);
 
-    // 腕アニメーション処理
-    void HandleArmAnimation() const;
-
     // 弾丸を発射する処理
     void FireBullet(const GameObj& bullet);
 

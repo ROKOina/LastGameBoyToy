@@ -15,6 +15,7 @@
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
 
+
 void CharacterCom::Update(float elapsedTime)
 {
     auto& ss = SceneManager::Instance().GetSettingScreen();
@@ -116,7 +117,8 @@ void CharacterCom::Update(float elapsedTime)
         if (shootTimer >= shootTime)
         {
             //スキル発動中はリターン
-            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL
+            &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
             {
                 //弾切れならリロード
                 if (currentBulletNum > 0) {
@@ -251,6 +253,27 @@ void CharacterCom::DashFewSub(float elapsedTime)
     }
 }
 
+//腕アニメーション再生
+void CharacterCom::HandleArmAnimation()
+{
+    if (std::string(GetGameObject()->GetName()) == "player")
+    {
+        const auto& arm = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
+        const auto& armAnim = arm->GetComponent<AnimationCom>();
+        armAnim->PlayAnimation(armAnim->FindAnimation("FPS_shoot"), false);
+        const auto& anim = GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetUpperCurrentAnimationSeconds(0.3f);
+        armAnim->SetAnimationSeconds(0.3f);
+    }
+    else
+    {
+        const auto& anim = GetGameObject()->GetComponent<AnimationCom>();
+        anim->PlayUpperBodyOnlyAnimation(anim->FindAnimation("shoot"), false);
+        anim->SetAnimationSeconds(0.3f);
+    }
+}
+
 void CharacterCom::InputStateUpdate(float elapsedTime)
 {
     //ステート処理
@@ -275,7 +298,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //弾切れなら自動的にリロード
-        if (currentBulletNum > 0)
+        if (currentBulletNum > 0 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
         {
             MainAttackDown();
         }
@@ -295,7 +318,8 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    if (CharacterInput::MainAttackButton & GetButtonDown())
+    if (CharacterInput::MainAttackButton & GetButtonDown() 
+    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD))
     {
         if (shootTimer < shootTime)
         {
@@ -513,7 +537,7 @@ void CharacterCom::Vinetto(float elapsedTime)
     }
 
     // 現在のHPを次回用に保存
-    GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
+    //GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
 }
 
 void CharacterCom::StanUpdate(float elapsedTime)

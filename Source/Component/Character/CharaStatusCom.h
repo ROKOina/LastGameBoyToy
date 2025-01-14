@@ -38,9 +38,11 @@ public:
     bool IsInvincible() const { return currentInvincibleTime > 0.0f; }
 
     bool IsDeath() { return isDeath; }
-    
+    void SetIsDeath(bool flag) { isDeath = flag; }
+
     //ƒŠƒXƒ|[ƒ“‚³‚¹‚éŠÖ”
     void ReSpawn(int HP);
+
 
 private:
     float hitPoint = 100;

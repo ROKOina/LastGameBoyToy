@@ -32,6 +32,7 @@
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Component\UI\Font.h"
 #include "Math/easing.h"
+#include "Component\GameSystem\RespawnCom.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
@@ -123,7 +124,7 @@ void ScenePVP::InitializeLobbySelect()
 }
 
 void ScenePVP::InitializeLobby()
-{    
+{
     //背景
     InitializeBack();
 
@@ -175,7 +176,7 @@ void ScenePVP::InitializeLobby()
 }
 
 void ScenePVP::InitializeCharaSelect()
-{    
+{
     //背景
     InitializeBack();    //ピック画面起動
 
@@ -196,14 +197,6 @@ void ScenePVP::InitializePVP()
     }
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 #endif
-
-    //イベント用カメラ
-    {
-        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
-        eventCamera->SetName("eventcamera");
-        eventCamera->AddComponent<EventCameraCom>();
-        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-    }
 
     //ステージ
     {
@@ -242,6 +235,26 @@ void ScenePVP::InitializePVP()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,0,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
+
+        //リスポーン用
+        GameObj respawnObj = GameObjectManager::Instance().Create();
+        respawnObj->SetName("respawn");
+        RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
+        spawnCom->SetGameMode(pvpGameSystem->GetGameMode());
+
+        //仮のスポーン位置
+        spawnCom->AddRespawnPoses({ 5,1,5 });
+        spawnCom->AddRespawnPoses({ -5,1,5 });
+        spawnCom->AddRespawnPoses({ 5,1,-5 });
+        spawnCom->AddRespawnPoses({ -5,1,-5 });
+    }
+
+    //イベント用カメラ
+    {
+        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
+        eventCamera->SetName("eventcamera");
+        eventCamera->AddComponent<EventCameraCom>();
+        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
     //snowparticle
@@ -249,18 +262,6 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("snowparticle");
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
-    }
-
-    //Font参考例
-    //font
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("testFont");
-        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->position = { 0,0 };
-        font->str = L"ab";  //L付けてね
-        font->scale = 1.0f;
-        font->color = { 0,1,0,0.5 };
     }
 
     //UI
@@ -297,6 +298,8 @@ void ScenePVP::InitializePVP()
     break;
     }
 
+    //キャラピックオブジェクトを消去
+    GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
 
 #pragma endregion
 }
@@ -313,7 +316,7 @@ void ScenePVP::InitializeBack()
 
     std::shared_ptr<GameObject> lobbyBack = lobbyBackParent->AddChildObject();
     lobbyBack->SetName("lobbyBack");
-    auto& uiSys=lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
+    auto& uiSys = lobbyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBack.ui", Sprite::SpriteShader::DEFALT, false);
     uiSys->SetOrderinLayer(-10);
     //削除予定リストに追加
     tempRemoveObj.emplace_back(lobbyBack);
@@ -340,7 +343,7 @@ void ScenePVP::InitializeBack()
     {
         std::shared_ptr<GameObject> lobbyBackCircle = lobbyBackParent->AddChildObject();
         lobbyBackCircle->SetName(std::string("lobbyBackCircle" + std::to_string(c)).c_str());
-        auto& uiC=lobbyBackCircle->AddComponent<UiSystem>(std::string("Data/SerializeData/UIData/PVPScene/lobbyBackCircle0" + std::to_string(c + 1) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        auto& uiC = lobbyBackCircle->AddComponent<UiSystem>(std::string("Data/SerializeData/UIData/PVPScene/lobbyBackCircle0" + std::to_string(c + 1) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
         uiC->SetOrderinLayer(-5);
         //削除予定リストに追加
         tempRemoveObj.emplace_back(lobbyBackCircle);
@@ -356,28 +359,6 @@ void ScenePVP::InitializeBack()
         //削除予定リストに追加
         tempRemoveObj.emplace_back(lobbyBackCross);
     }
-
-    //for (int t = 0; t < triangleNum; ++t) //三角
-    //{
-    //    std::shared_ptr<GameObject> lobbyBackTriangle0 = lobbyBackParent->AddChildObject();
-    //    lobbyBackTriangle0->SetName(std::string("lobbyBackTriangle0" + std::to_string(t)).c_str());
-    //    auto& t0=lobbyBackTriangle0->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
-    //    t0->EasingPlay();
-    //    //削除予定リストに追加
-    //    tempRemoveObj.emplace_back(lobbyBackTriangle0);
-    //    std::shared_ptr<GameObject> lobbyBackTriangle1 = lobbyBackParent->AddChildObject();
-    //    lobbyBackTriangle1->SetName(std::string("lobbyBackTriangle1" + std::to_string(t)).c_str());
-    //    auto& t1 = lobbyBackTriangle1->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
-    //    t1->EasingPlay();
-    //    //削除予定リストに追加
-    //    tempRemoveObj.emplace_back(lobbyBackTriangle1);
-    //    std::shared_ptr<GameObject> lobbyBackTriangle2 = lobbyBackParent->AddChildObject();
-    //    lobbyBackTriangle2->SetName(std::string("lobbyBackTriangle2" + std::to_string(t)).c_str());
-    //    auto& t2 = lobbyBackTriangle2->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
-    //    t2->EasingPlay();
-    //    //削除予定リストに追加
-    //    tempRemoveObj.emplace_back(lobbyBackTriangle2);
-    //}
 }
 
 void ScenePVP::Finalize()
@@ -623,7 +604,7 @@ void ScenePVP::TransitionUpdate(float elapsedTime)
     case 0: //ロビー選択
         LobbySelectFontUpdate(elapsedTime); //font
         LobbyBackSprUpdate(elapsedTime);    //背景
-    break;
+        break;
     case 1: //ロビー
         LobbyFontUpdate(elapsedTime);   //font
         LobbyBackSprUpdate(elapsedTime);    //背景
@@ -894,7 +875,6 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
             ui->spc.scale.x = 0.096f * font->str.length() * font->scale;
             ui->spc.scale.y = 0.096f * font->scale;
 
-
             //判定
             if (ui->GetHitSprite())
             {
@@ -1037,7 +1017,6 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
     //キャラ被りを無くす
     auto& netSaveInput = net->GetSaveInput();
 
-
     //全員ピック確認
     bool pickTransition = true;
     for (auto& s : netSaveInput)
@@ -1168,7 +1147,7 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             float offPosSmall = 300;
             if (kakudo == 0)
             {
-                rsUI->spc.easingposition = { posX + offSize - (offPosSmall* sacleR) * shadowScale ,posY + offSize + (offPosSmall * sacleR) * shadowScale };
+                rsUI->spc.easingposition = { posX + offSize - (offPosSmall * sacleR) * shadowScale ,posY + offSize + (offPosSmall * sacleR) * shadowScale };
                 rbUI->spc.easingposition = { posX + offSize ,posY + offSize };
             }
             if (kakudo == 1)
@@ -1193,7 +1172,7 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             float posxH = fabsf(posX - 1920 * 0.5f);
             float angle = 120.0f * (posxH / (1920 * 0.5f));
             if (posX > 1920 * 0.5f)angle *= -1;
-            rsUI->spc.easingangle = angle + (angle * 0.4f)* shadowScale;
+            rsUI->spc.easingangle = angle + (angle * 0.4f) * shadowScale;
             rbUI->spc.easingangle = angle;
             //色
             float per = ((1920.f - posX) / 1920.0f) * 0.5f + (posY / 1080.0f) * 0.5f;
@@ -1242,7 +1221,7 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             float timeR = 0.3f + (rand() % 200) * 0.01f;
             csUI->spc.timescale = timeR;
             cbUI->spc.timescale = timeR;
-                        //位置
+            //位置
             float posY = 50 + rand() % 980;
             float posX = 50 + rand() % 1820;
             //影遠さ
@@ -1254,7 +1233,7 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             float offPosSmall = 150;
             if (kakudo == 0)
             {
-                csUI->spc.easingposition = { posX + offSize - (offPosSmall * sacleR)* shadowScale ,posY + offSize + (offPosSmall * sacleR) * shadowScale };
+                csUI->spc.easingposition = { posX + offSize - (offPosSmall * sacleR) * shadowScale ,posY + offSize + (offPosSmall * sacleR) * shadowScale };
                 cbUI->spc.easingposition = { posX + offSize ,posY + offSize };
             }
             if (kakudo == 1)
@@ -1279,7 +1258,7 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             float posxH = fabsf(posX - 1920 * 0.5f);
             float angle = 180.0f * (posxH / (1920 * 0.5f));
             if (posX > 1920 * 0.5f)angle *= -1;
-            csUI->spc.easingangle = angle + (angle * 0.4f)*shadowScale;
+            csUI->spc.easingangle = angle + (angle * 0.4f) * shadowScale;
             cbUI->spc.easingangle = angle;
             //色
             float per = ((1920.f - posX) / 1920.0f) * 0.5f + (posY / 1080.0f) * 0.5f;
@@ -1295,98 +1274,4 @@ void ScenePVP::LobbyBackSprUpdate(float elapsedTime)
             cbUI->EasingPlay();
         }
     }
-
-    //for (int t = 0; t < triangleNum; ++t) //三角
-    //{
-    //    auto& lobbyBackTriangle0 = lobbyBackParent->GetChildFind(std::string("lobbyBackTriangle0" + std::to_string(t)).c_str());
-    //    auto& lobbyBackTriangle1 = lobbyBackParent->GetChildFind(std::string("lobbyBackTriangle1" + std::to_string(t)).c_str());
-    //    auto& lobbyBackTriangle2 = lobbyBackParent->GetChildFind(std::string("lobbyBackTriangle2" + std::to_string(t)).c_str());
-    //    auto& t0UI = lobbyBackTriangle0->GetComponent<UiSystem>();
-    //    auto& t1UI = lobbyBackTriangle1->GetComponent<UiSystem>();
-    //    auto& t2UI = lobbyBackTriangle2->GetComponent<UiSystem>();
-
-    //    //再生していないなら初期化する
-    //    if (t0UI->GetEasingTime() > 1)
-    //    {
-    //        //進行方向
-    //        int kakudo = rand() % 4;
-    //        //色
-    //        t0UI->spc.color = { 0,0.5f,0.3f,0.3f };
-    //        t1UI->spc.color = { 0,0.5f,0.3f,0.6f };
-    //        t2UI->spc.color = { 0,0.5f,0.3f,0.9f };
-    //        t0UI->spc.easingcolor = { 0,0.5f,0.3f,0.3f };
-    //        t1UI->spc.easingcolor = { 0,0.5f,0.3f,0.6f };
-    //        t2UI->spc.easingcolor = { 0,0.5f,0.3f,0.9f };
-    //        //回転
-    //        float angle = 360 * (0.25f * kakudo);
-    //        t0UI->spc.angle = angle;
-    //        t1UI->spc.angle = angle;
-    //        t2UI->spc.angle = angle;
-    //        t0UI->spc.easingangle = angle;
-    //        t1UI->spc.easingangle = angle;
-    //        t2UI->spc.easingangle = angle;
-    //        //大きさ
-    //        float sacleR = 0.1f + (rand() % 40) * 0.01f;
-    //        t0UI->spc.scale = { sacleR * 0.5f ,sacleR*0.5f };
-    //        t1UI->spc.scale = { sacleR * 0.8f ,sacleR * 0.8f };
-    //        t2UI->spc.scale = { sacleR ,sacleR };
-    //        t0UI->spc.easingscale = { sacleR * 0.5f,sacleR * 0.5f };
-    //        t1UI->spc.easingscale = { sacleR * 0.8f ,sacleR * 0.8f };
-    //        t2UI->spc.easingscale = { sacleR ,sacleR };
-    //        //時間
-    //        float timeR = 0.5f + (rand() % 200) * 0.01f;
-    //        t0UI->spc.timescale = timeR;
-    //        t1UI->spc.timescale = timeR;
-    //        t2UI->spc.timescale = timeR;
-    //        //位置
-    //        float posY = 100 + rand() % 880;
-    //        float posX = 100 + rand() % 1720;
-    //        int offSize = 50;
-    //        int offPos = 200;
-    //        if (kakudo == 0)
-    //        {
-    //            t0UI->spc.position = { posX ,posY };
-    //            t1UI->spc.position = { posX ,posY - offSize };
-    //            t2UI->spc.position = { posX ,posY - offSize * 2 };
-    //            t0UI->spc.easingposition = { posX ,posY - offPos };
-    //            t1UI->spc.easingposition = { posX ,posY - offSize - offPos };
-    //            t2UI->spc.easingposition = { posX ,posY - offSize * 2 - offPos };
-    //        }
-    //        if (kakudo == 1)
-    //        {
-    //            t0UI->spc.position = { posX ,posY };
-    //            t1UI->spc.position = { posX + offSize  ,posY };
-    //            t2UI->spc.position = { posX + offSize * 2,posY };
-    //            t0UI->spc.easingposition = { posX + offPos  ,posY };
-    //            t1UI->spc.easingposition = { posX + offSize + offPos  ,posY };
-    //            t2UI->spc.easingposition = { posX + offSize * 2 + offPos ,posY };
-    //        }
-    //        if (kakudo == 2)
-    //        {
-    //            t0UI->spc.position = { posX ,posY };
-    //            t1UI->spc.position = { posX ,posY + offSize };
-    //            t2UI->spc.position = { posX ,posY + offSize * 2 };
-    //            t0UI->spc.easingposition = { posX ,posY + offPos };
-    //            t1UI->spc.easingposition = { posX ,posY + offSize + offPos };
-    //            t2UI->spc.easingposition = { posX ,posY + offSize * 2 + offPos };
-    //        }
-    //        if (kakudo == 3)
-    //        {
-    //            t0UI->spc.position = { posX ,posY };
-    //            t1UI->spc.position = { posX - offSize  ,posY };
-    //            t2UI->spc.position = { posX - offSize * 2,posY };
-    //            t0UI->spc.easingposition = { posX - offPos ,posY };
-    //            t1UI->spc.easingposition = { posX - offSize - offPos  ,posY };
-    //            t2UI->spc.easingposition = { posX - offSize * 2 - offPos  ,posY };
-    //        }
-
-
-    //        t0UI->GetEasingTimeReset();
-    //        t1UI->GetEasingTimeReset();
-    //        t2UI->GetEasingTimeReset();
-    //        t0UI->EasingPlay();
-    //        t1UI->EasingPlay();
-    //        t2UI->EasingPlay();
-    //    }
-    //}
 }

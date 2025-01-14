@@ -43,6 +43,11 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
         break;
     }
 
+    //キャラが登録された時にHP表示用のコンポーネントを用意する
+    if (obj->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Enemy) {
+     obj->AddComponent<UI_EnemyHp>();
+     obj->GetComponent<UI_EnemyHp>()->Register();
+    }
 
     //自キャラの場合
     if (std::strcmp(obj->GetName(), "player") == 0)
@@ -81,11 +86,11 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player.mdl");
-    r->SetDissolveThreshold(0.0f);
-    obj->AddComponent<AimIKCom>("spine2", nullptr);
+    r->LoadModel("Data/Model/player_True/player1.mdl");
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player1.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -173,6 +178,12 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         eff->Play();
     }
 
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
+    }
+
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -257,11 +268,11 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player.mdl");
-    r->SetDissolveThreshold(0.0f);
-    obj->AddComponent<AimIKCom>("spine2", nullptr);
+    r->LoadModel("Data/Model/player_True/player2.mdl");
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player2.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -315,6 +326,12 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
         au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
     }
 
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
+    }
+
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -350,17 +367,17 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player.mdl");
-    r->SetDissolveThreshold(0.0f);
+    r->LoadModel("Data/Model/player_True/player3.mdl");
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player3.nodecollsion");
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
     charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
-    charaCom->SetUseSkill(USE_SKILL::E);
+    charaCom->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //HPの初期設定
     status->SetMaxHitPoint(200);
@@ -388,6 +405,12 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     auto& pushBack = obj->AddComponent<PushBackCom>();
     pushBack->SetRadius(0.5f);
     pushBack->SetWeight(1);
+
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
+    }
 
     //煙のエフェクト
     {
@@ -434,11 +457,11 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player.mdl");
-    r->SetDissolveThreshold(0.0f);
-    obj->AddComponent<AimIKCom>("spine2", nullptr);
+    r->LoadModel("Data/Model/player_True/player4.mdl");
+    r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<AimIKCom>("spine2", nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player4.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -517,6 +540,12 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
         au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
         au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
+    }
+
+    //ネットでは見える化
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetDissolveThreshold(0.0f);
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する

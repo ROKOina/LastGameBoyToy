@@ -112,7 +112,7 @@ void SceneNakanisi::Initialize()
         GameObj respawnObj = GameObjectManager::Instance().Create();
         respawnObj->SetName("respawn");
         RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
-        spawnCom->SetGameMode(RespawnCom::GameMode::DeathMatch);
+        spawnCom->SetGameMode(PVPGameSystem::GAME_MODE::Deathmatch);
 
         StageEditorCom::PlaceObject spawnObj = stageEdit->GetPlaceObject("Spawn");
         for (auto& obj : spawnObj.objList)

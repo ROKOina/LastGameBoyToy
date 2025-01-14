@@ -222,6 +222,9 @@ public:
     void SetMaxBulletNum(int num) { maxBulletNum = num; }
     void SetMaxBullet() { currentBulletNum = maxBulletNum; }
 
+    //腕アニメーション再生
+    void HandleArmAnimation();
+
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);

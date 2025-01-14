@@ -87,7 +87,7 @@ void SceneTitle::Initialize()
         obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
         obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/player_True/player.mdl");
+        r->LoadModel("Data/Model/player_True/player1.mdl");
         r->SetOutlineColor({ 0.000f, 0.282f, 1.000f });
         r->SetOutlineIntensity(10.0f);
         std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
