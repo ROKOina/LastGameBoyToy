@@ -121,6 +121,11 @@ void StageEditorCom::Update(float elapsedTime)
     }
 }
 
+void StageEditorCom::OnDestroy()
+{
+    PhysXLib::Instance().DeletePhysxActor();
+}
+
 void StageEditorCom::OnGUI()
 {
     //配置開始ボタン

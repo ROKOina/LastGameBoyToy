@@ -27,7 +27,8 @@ public:
     //‰Šú‰»
     void Initialize();
 
-    //I—¹‰»
+    //Á‹
+    void DeletePhysxActor();
 
     //XVˆ—
     void Update(float elapsedTime);

@@ -22,7 +22,7 @@ public:
     void Update(float elapsedTime);
 
     // ”jŠüˆ—
-    void OnDestroy() {}
+    void OnDestroy();
 
     // GUI•`‰æ
     void OnGUI();
