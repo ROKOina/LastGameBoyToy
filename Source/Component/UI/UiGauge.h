@@ -18,7 +18,6 @@ public:
     // XVˆ—
     void Update(float elapsedTime) override;
 
-private:
-
+public:
     int changeValue = 0;
 };

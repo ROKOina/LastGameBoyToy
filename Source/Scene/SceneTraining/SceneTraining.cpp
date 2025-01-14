@@ -89,7 +89,7 @@ void SceneTraining::Initialize()
     }
 
     //UIゲームオブジェクト生成
-    CreateUiObject();
+    //CreateUiObject();
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();

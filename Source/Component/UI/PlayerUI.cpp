@@ -911,12 +911,12 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
     float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
     float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
     std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
-  
 
     //‘OƒtƒŒ[ƒ€‚ÌHp‚ÆŒ»Ý‚ÌHp‚ªˆá‚¤‚È‚ç
-    if (*Hp >= oldHp) {
+    if (*Hp != oldHp) {
         displayFLG = true;
         timer = 0.0f;
+        oldHp = *Hp;
         gauge->spc.color = { 1,1,1,1 };
     }
     
@@ -940,11 +940,15 @@ void UI_EnemyHp::SearchEnemy()
 void UI_EnemyHp::Register()
 {
     enemyHp = this->GetGameObject()->AddChildObject();
-    enemyHp->AddComponent<UiGauge>(nullptr, Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_SUB);
+    enemyHp->SetName("enemyHp");
+    enemyHp->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/EnemyHp.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);
     oldHp = *this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
+    enemyFLG = true;
     std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
     float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
     float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+    gauge->spc.objectname = GetGameObject()->GetName();
+    gauge->originalTexSize = { 200,100 };
     gauge->SetVariableValue(Hp);
     gauge->SetMaxValue(MaxHp);
 }
