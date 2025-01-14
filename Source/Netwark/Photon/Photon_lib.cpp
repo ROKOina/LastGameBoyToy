@@ -562,6 +562,11 @@ void PhotonLib::NetInputUpdate()
             s.nextInput.input |= b.input;
             s.nextInput.inputUp |= b.inputUp;
 
+            if (CharacterInput::SubAttackButton & b.inputDown)
+            {
+                int v = 0;
+            }
+
             s.isInputUpdate = true;
         }
 

@@ -245,8 +245,8 @@ void SceneTitle::UIUpdate(float elapsedTime)
     //èâä˙âª
     std::vector<SceneName> names;
     names.emplace_back("PVE", new ScenePVE, 450);
-    names.emplace_back("PVP", new ScenePVP, 600);
-    names.emplace_back("Training", new SceneTraining, 750);
+    names.emplace_back("PVP", new ScenePVP, 570);
+    names.emplace_back("Training", new SceneTraining, 690);
     names.emplace_back("endgame", new SceneTraining, 900);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
