@@ -38,10 +38,6 @@ void RespawnCom::Update(float elapsedTime)
                 if (spawnIndex < 0) { spawnIndex = 0; }
                 player->transform_->SetWorldPosition(respawnPoses[spawnIndex]);
 
-                //パラメータ回復
-                CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-                status->ReSpawn(status->GetMaxHitpoint());
-
                 //プレイヤー隠す
                 player->GetComponent<RendererCom>()->SetDissolveThreshold(1);
                 //FPS用オブジェクト映す
@@ -50,6 +46,10 @@ void RespawnCom::Update(float elapsedTime)
                 //最初にイベントカメラへ変更
                 GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
             }
+
+            //パラメータ回復
+            CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+            status->ReSpawn(status->GetMaxHitpoint());
 
             //アニメーションを死亡から待機へ
             AnimationCom* animaCom = player->GetComponent<AnimationCom>().get();
