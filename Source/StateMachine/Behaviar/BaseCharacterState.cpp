@@ -11,6 +11,7 @@
 #include "Scene/SceneTitle/SceneTitle.h"
 #include "Component\Audio\AudioCom.h"
 #include "Component\GameSystem\RespawnCom.h"
+#include "Component\Character\CharaStatusCom.h"
 
 //基底君
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
@@ -289,6 +290,14 @@ void BaseCharacter_DeathState::Enter()
         //イベントカメラ
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
+    }
+}
+void BaseCharacter_DeathState::Execute(const float& elapsedTime)
+{
+    CharaStatusCom* stats = owner->GetGameObject()->GetComponent<CharaStatusCom>().get();
+    if (!stats->IsDeath() && stats->GetHitPoint() > 0)
+    {
+        ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
 }
 void BaseCharacter_DeathState::Exit()
