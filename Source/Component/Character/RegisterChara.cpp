@@ -45,8 +45,8 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
 
     //キャラが登録された時にHP表示用のコンポーネントを用意する
     if (obj->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Enemy) {
-     obj->AddComponent<UI_EnemyHp>();
-     obj->GetComponent<UI_EnemyHp>()->Register();
+        obj->AddComponent<UI_EnemyHp>();
+        obj->GetComponent<UI_EnemyHp>()->Register();
     }
 
     //自キャラの場合
@@ -182,6 +182,18 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
         r->SetDissolveThreshold(0.0f);
+    }
+
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
@@ -332,6 +344,17 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
         r->SetDissolveThreshold(0.0f);
     }
 
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -410,6 +433,17 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
         r->SetDissolveThreshold(0.0f);
+    }
+
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
     }
 
     //煙のエフェクト
@@ -546,6 +580,17 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
         r->SetDissolveThreshold(0.0f);
+    }
+
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
