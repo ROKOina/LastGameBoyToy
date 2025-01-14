@@ -281,14 +281,14 @@ void BaseCharacter_DeathState::Enter()
     //FPS用オブジェクト隠す
     GameObjectManager::Instance().Find("armChild")->GetComponent<RendererCom>()->SetDissolveThreshold(1);
 
+    RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
+    respawn->AddRespawnData(owner->GetGameObject());
+
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
         //イベントカメラ
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/playerDeath.eventcamera");
-
-        RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
-        respawn->SetIsRespawn(true);
     }
 }
 #pragma endregion
