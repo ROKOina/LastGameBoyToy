@@ -79,6 +79,9 @@ public:
     void Play(bool loop, float volume = 1.0f);
     void Play();
 
+    // エミッター再生
+    void EmitterPlay(float volume = 1.0f);
+
     // 停止
     void Stop();
 
@@ -92,6 +95,8 @@ public:
     // 3Dオーディオの更新
     void Update3DAudio();
 
+    Listener GetListener() { return listener_; }
+    Emitter GetEmitter_() { return emitter_; }
 private:
     IXAudio2SourceVoice* sourceVoice_ = nullptr;
     std::shared_ptr<AudioResource>	resource_;

@@ -24,29 +24,57 @@ void AudioSource::Play(bool loop, float volume)
 
     // 音量調整反映用
     volumeControl = volume;
-    volume = volumeControl;
-
     // ループ制御
     isLooping = loop;
-    loop = isLooping;
 
     // ソースボイスにデータを送信
     XAUDIO2_BUFFER buffer = { 0 };
     buffer.AudioBytes = resource_->GetAudioBytes();
     buffer.pAudioData = resource_->GetAudioData();
-    buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
+    buffer.LoopCount = isLooping ? XAUDIO2_LOOP_INFINITE : 0;
     buffer.Flags = XAUDIO2_END_OF_STREAM;
 
-    sourceVoice_->SubmitSourceBuffer(&buffer);
+    HRESULT hr = sourceVoice_->SubmitSourceBuffer(&buffer);
+    if (FAILED(hr)) throw std::runtime_error("Failed to submit source buffer.");
 
-    HRESULT hr = sourceVoice_->Start();
-    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-    sourceVoice_->SetVolume(volume * 0.1f);
+    hr = sourceVoice_->Start();
+    if (FAILED(hr)) throw std::runtime_error("Failed to start source voice.");
+
+    sourceVoice_->SetVolume(volumeControl * 0.1f);
 }
 
 void AudioSource::Play()
 {
     Play(isLooping, volumeControl);
+}
+
+// エミッター再生
+void AudioSource::EmitterPlay(float volume)
+{
+    // 音量調整反映用
+    volumeControl = volume;
+
+    // ソースボイスにデータを送信
+    XAUDIO2_BUFFER buffer = { 0 };
+    buffer.AudioBytes = resource_->GetAudioBytes();
+    buffer.pAudioData = resource_->GetAudioData();
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+    if (buffer.pAudioData == nullptr || buffer.AudioBytes == 0) {
+        assert("ソースボイスにデータに問題あり");
+        return;
+    }
+
+    // 3Dオーディオの更新
+    Update3DAudio();
+
+    // エミッター再生
+    sourceVoice_->Stop();
+    sourceVoice_->FlushSourceBuffers();
+    sourceVoice_->SubmitSourceBuffer(&buffer);
+
+    HRESULT hr = sourceVoice_->Start();
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }
 
 // 停止
@@ -97,7 +125,7 @@ void AudioSource::Update3DAudio()
 
     // X3DAudioの計算
     X3DAUDIO_DSP_SETTINGS dspSettings = {};
-    float matrix[2] = {};
+    float matrix[8] = {};
     dspSettings.pMatrixCoefficients = matrix;
     dspSettings.SrcChannelCount = emitter_.x3dEmitter.ChannelCount;
     dspSettings.DstChannelCount = 2; // ステレオ出力
@@ -111,6 +139,7 @@ void AudioSource::Update3DAudio()
         &dspSettings);
 
     // 計算結果を反映
-    sourceVoice_->SetVolume(volumeControl * dspSettings.EmitterToListenerDistance);
     sourceVoice_->SetFrequencyRatio(dspSettings.DopplerFactor);
+    sourceVoice_->SetOutputMatrix(nullptr, dspSettings.SrcChannelCount, dspSettings.DstChannelCount, matrix);
+    sourceVoice_->SetVolume(volumeControl * dspSettings.EmitterToListenerDistance);
 }
