@@ -349,13 +349,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SubAttackPushing();
     }
 
+    //if (CharacterInput::MainSkillButton_E & GetButtonDown()
+    //    && IsSkillCoolMax(SkillCoolID::Q))
+    //{
+    //    skillCools[SkillCoolID::Q].timer = 0;
+    //    MainSkill();
+    //}
     if (CharacterInput::MainSkillButton_E & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::Q))
-    {
-        skillCools[SkillCoolID::Q].timer = 0;
-        MainSkill();
-    }
-    if (CharacterInput::SubSkillButton_C & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::E))
     {
         skillCools[SkillCoolID::E].timer = 0;
@@ -513,7 +513,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
 //ビネット効果
 void CharacterCom::Vinetto(float elapsedTime)
 {
-    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
+    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetVinetHp(); // 最大HP
     float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
 
     auto& postEff = GameObjectManager::Instance().Find("posteffect");
@@ -537,7 +537,7 @@ void CharacterCom::Vinetto(float elapsedTime)
     }
 
     // 現在のHPを次回用に保存
-    //GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetVinetHp(currentHP);
 }
 
 void CharacterCom::StanUpdate(float elapsedTime)

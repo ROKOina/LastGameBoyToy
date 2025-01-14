@@ -562,6 +562,18 @@ void PhotonLib::NetInputUpdate()
             s.nextInput.input |= b.input;
             s.nextInput.inputUp |= b.inputUp;
 
+
+            ////if (0 < b.inputDown)
+            //if (CharacterInput::SubAttackButton & b.inputDown)
+            //{
+            //    for (auto& ffb : ff)
+            //    {
+            //        if (ffb == b.inputDown)
+            //            int bb = 0;
+            //    }
+            //    ff.emplace_back(b.inputDown);
+            //}
+
             s.isInputUpdate = true;
         }
 
@@ -1174,7 +1186,12 @@ void PhotonLib::GameRecv(NetData recvData)
         net1 = GameObjectManager::Instance().Create();
         net1->SetName(name.c_str());
 
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1);
+        bool team = false;
+        
+        if (saveInputPhoton[GetMyPlayerID()].teamID == saveInputPhoton[recvData.playerId].teamID)
+            team = true;
+
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
         net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
     }
     saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
@@ -1252,7 +1269,7 @@ void PhotonLib::GameRecv(NetData recvData)
         SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
 
         SaveBuffer currentInput = saveInputPhoton[recvData.playerId].inputBuf->GetHead();
-        if (currentInput.frame < newInput.frame)	//新しいフレームから始める
+        if (currentInput.frame < newInput.frame || currentInput.frame == 0)	//新しいフレームから始める
             saveInputPhoton[recvData.playerId].inputBuf->Enqueue(newInput);
     }
     ////保存情報

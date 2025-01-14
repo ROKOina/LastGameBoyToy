@@ -27,6 +27,8 @@ public:
     float* GetHitPoint() { return &hitPoint; }
     void   SetMaxHitPoint(float value) { maxHitPoint = value; }
     float  GetMaxHitpoint() { return maxHitPoint; }
+    void SetVinetHp(float value) { vinetHp = value; }
+    float GetVinetHp() { return vinetHp; }
 
     // HP‚ÌŒ¸­‚Æ‘‰Á
     void AddDamagePoint(float value);
@@ -46,6 +48,7 @@ public:
 
 private:
     float hitPoint = 100;
+    float vinetHp = 100;
     float maxHitPoint = 100;              //HP‚ÌÅ‘å’l
     float invincibleTime = 3.0f;        // –³“GŠÔ‚Ì’·‚³i•bj
     float currentInvincibleTime = 0.0f; // c‚è‚Ì–³“GŠÔ

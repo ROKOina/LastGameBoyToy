@@ -197,7 +197,11 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetThroughJudge(true);    //すり抜け判定処理追加
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(objPoint->GetName(), "player") == 0)
+    //敵か味方か判断する
+    bool team = false;
+    if (objPoint->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(objPoint->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
@@ -289,7 +293,10 @@ GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, floa
 
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(objPoint->GetName(), "player") == 0)
+    bool team = false;
+    if (objPoint->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(objPoint->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
@@ -389,7 +396,10 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
 
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(objPoint->GetName(), "player") == 0)
+    bool team = false;
+    if (objPoint->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(objPoint->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
@@ -433,7 +443,10 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(parent->GetName(), "player") == 0)
+    bool team = false;
+    if (parent->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(parent->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
@@ -496,7 +509,10 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(parent->GetName(), "player") == 0)
+    bool team = false;
+    if (parent->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(parent->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
@@ -514,7 +530,7 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
     //コライダー
     std::shared_ptr<SphereColliderCom> childColl = kcockBack->AddComponent<SphereColliderCom>();
     childColl->SetMyTag(COLLIDER_TAG::Impact);
-    if (std::strcmp(parent->GetName(), "player") == 0)
+    if (std::strcmp(parent->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
@@ -551,7 +567,10 @@ GameObj BulletCreate::JankratUlt(std::shared_ptr<GameObject> parent, DirectX::XM
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(parent->GetName(), "player") == 0)
+    bool team = false;
+    if (parent->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(parent->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
@@ -651,7 +670,10 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
 
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(objPoint->GetName(), "player") == 0)
+    bool team = false;
+    if (objPoint->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(objPoint->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
@@ -745,7 +767,10 @@ void BulletCreate::SoldierStanBall(std::shared_ptr<GameObject> objPoint, float b
 
     std::shared_ptr<SphereColliderCom> coll = colObj->AddComponent<SphereColliderCom>();
     coll->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(objPoint->GetName(), "player") == 0)
+    bool team = false;
+    if (objPoint->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+        team = true;
+    if (std::strcmp(objPoint->GetName(), "player") == 0 || team)
         coll->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         coll->SetJudgeTag(COLLIDER_TAG::Player);
