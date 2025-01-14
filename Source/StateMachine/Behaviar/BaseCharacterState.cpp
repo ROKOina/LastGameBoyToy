@@ -466,7 +466,7 @@ void BaseCharacter_ReloadState::Enter()
     else
     {
         auto& animCom = owner->GetGameObject()->GetComponent<AnimationCom>();
-        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
+        animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Reroad"), false);
     }
 }
 

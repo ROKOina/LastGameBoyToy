@@ -1,9 +1,11 @@
 #include "CharaPicks.h"
 #include "Input/Input.h"
-
 #include "Component/Sprite/Sprite.h"
 #include "Component/System/GameObject.h"
 #include "Component/System/TransformCom.h"
+#include "Component\Renderer\RendererCom.h"
+#include "Component\Animation\AnimationCom.h"
+#include <Component\Camera\FreeCameraCom.h>
 
 CharaPicks::CharaPicks()
 {
@@ -14,16 +16,31 @@ CharaPicks::CharaPicks()
 // キャラピックUI生成
 void CharaPicks::CreateCharaPicksUiObject()
 {
+    //キャラピック専用カメラ
+    {
+        std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
+        freeCamera->SetName("charapickcamera");
+        freeCamera->transform_->SetWorldPosition({ 0.044f, 1.674f, -1.450f });
+        freeCamera->transform_->SetEulerRotation({ -0.160f,-5.440f,0.0f });
+        std::shared_ptr<FreeCameraCom> camera = freeCamera->AddComponent<FreeCameraCom>();
+        camera->SetFocusPos({ -0.264f,1.683f,1.785f });
+        camera->SetFocus({ -0.145f,1.680f,0.541f });
+        camera->SetEye({ 0.044f,1.674f,-1.450f });
+        camera->SetDistance(3.249f);
+        camera->SetUpdate(false);
+    }
+    GameObjectManager::Instance().Find("charapickcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+
     // キャラピックキャンパス
     auto& charaPicksCanvas = GameObjectManager::Instance().Create();
     charaPicksCanvas->SetName("CharaPicksCanvas");
 
     // 各キャラのUI設定
     {
-        // INAZAWA
+        // KANIZO-
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("INAZAWA");
+            chara->SetName("Kanizo-");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon0.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -33,11 +50,25 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName0.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
+
+            //3Dobject生成
+            {
+                std::shared_ptr<GameObject> obj = charaPicksCanvas->AddChildObject();
+                obj->SetName("Kanizo-Player");
+                obj->transform_->SetWorldPosition({ -0.191, 0.018, 1.802 });
+                obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+                obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
+                std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+                r->LoadModel("Data/Model/player_True/player1.mdl");
+                r->SetEnabled(false);
+                std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
+                anim->PlayAnimation(5, true);
+            }
         }
-        // FARAH
+        // FARAIC
         {
             auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("FARAH");
+            chara->SetName("Faraic");
             chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon1.ui", Sprite::SpriteShader::DEFALT, true);
 
             // 名前表記
@@ -46,6 +77,20 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->SetName("name");
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName1.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
+            }
+
+            //3Dobject生成
+            {
+                std::shared_ptr<GameObject> obj = charaPicksCanvas->AddChildObject();
+                obj->SetName("FaraicPlayer");
+                obj->transform_->SetWorldPosition({ -0.191, 0.018, 1.802 });
+                obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+                obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
+                std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+                r->LoadModel("Data/Model/player_True/player2.mdl");
+                std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
+                anim->PlayAnimation(5, true);
+                r->SetEnabled(false);
             }
         }
         // SANTORATTO
@@ -61,6 +106,20 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName2.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
             }
+
+            //3Dobject生成
+            {
+                std::shared_ptr<GameObject> obj = charaPicksCanvas->AddChildObject();
+                obj->SetName("SantorattoPlayer");
+                obj->transform_->SetWorldPosition({ -0.191, 0.018, 1.802 });
+                obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+                obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
+                std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+                r->LoadModel("Data/Model/player_True/player3.mdl");
+                std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
+                anim->PlayAnimation(5, true);
+                r->SetEnabled(false);
+            }
         }
         // MATYA-
         {
@@ -74,6 +133,20 @@ void CharaPicks::CreateCharaPicksUiObject()
                 name->SetName("name");
                 name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName3.ui", Sprite::SpriteShader::DEFALT, false);
                 name->SetEnabled(false);
+            }
+
+            //3Dobject生成
+            {
+                std::shared_ptr<GameObject> obj = charaPicksCanvas->AddChildObject();
+                obj->SetName("Matya-Player");
+                obj->transform_->SetWorldPosition({ -0.191, 0.018, 1.802 });
+                obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+                obj->transform_->SetEulerRotation({ 0.0f,209.99f,0.0f });
+                std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+                r->LoadModel("Data/Model/player_True/player4.mdl");
+                std::shared_ptr<AnimationCom>anim = obj->AddComponent<AnimationCom>();
+                anim->PlayAnimation(5, true);
+                r->SetEnabled(false);
             }
         }
     }
@@ -89,7 +162,7 @@ void CharaPicks::CreateCharaPicksUiObject()
     {
         auto& charaPick = charaPicksCanvas->AddChildObject();
         charaPick->SetName("CharaPick");
-        charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaPick.ui", Sprite::SpriteShader::DEFALT, true);
+        charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaPick.ui", Sprite::SpriteShader::GLITCH, true);
     }
 
     // 時間制限
@@ -109,7 +182,10 @@ void CharaPicks::CharaPicksUpdate(float elapsedTime)
     TimeLimitSystem(elapsedTime);
 
     // 決定処理
-    DecisionButton();
+    if (GameObjectManager::Instance().Find("CharaPicksCanvas") != nullptr)
+    {
+        DecisionButton();
+    }
 }
 
 // キャラ詳細
@@ -121,27 +197,28 @@ void CharaPicks::CharaDetails()
     GamePad& gamePad = Input::Instance().GetGamePad();
     auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
 
-    auto getCharacterInfo = [&](const std::string& charaName, int id) -> CharacterInfo {
+    auto getCharacterInfo = [&](const std::string& charaName, const std::string& objectname, int id) -> CharacterInfo {
         auto& chara = canvas->GetChildFind(charaName.c_str());
+        auto& charamodel = canvas->GetChildFind(objectname.c_str());
         return {
             chara,
             chara->GetComponent<Sprite>(),
             chara->GetChildFind("name"),
+            charamodel,
             id
         };
         };
 
     // キャラ、ID設定
     std::vector<CharacterInfo> characters = {
-        getCharacterInfo("INAZAWA", 0),
-        getCharacterInfo("FARAH", 1),
-        getCharacterInfo("Santoratto", 2),
-        getCharacterInfo("Matya-", 3)
+        getCharacterInfo("Kanizo-","Kanizo-Player", 0),
+        getCharacterInfo("Faraic", "FaraicPlayer",1),
+        getCharacterInfo("Santoratto","SantorattoPlayer", 2),
+        getCharacterInfo("Matya-", "Matya-Player",3)
     };
 
     // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
     auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
-
         // Spriteクラスで関数を作成（下記は無駄なコード）
         if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
         {
@@ -154,6 +231,7 @@ void CharaPicks::CharaDetails()
         if (selected.id == teamPick)
         {
             selected.name->SetEnabled(false);
+            selected.charamodel->GetComponent<RendererCom>()->SetEnabled(false);
             selected.name->GetComponent<Sprite>()->StopEasing();
             selected.name->GetComponent<Sprite>()->spc.onshot = false;
 
@@ -168,8 +246,8 @@ void CharaPicks::CharaDetails()
         }
 
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
-
             selected.name->SetEnabled(true);
+            selected.charamodel->GetComponent<RendererCom>()->SetEnabled(true);
             selected.name->GetComponent<Sprite>()->EasingPlay();
             selected.name->GetComponent<Sprite>()->spc.onshot = true;
 
@@ -182,6 +260,7 @@ void CharaPicks::CharaDetails()
             for (auto& other : others) {
                 if (&other != &selected) {
                     other.name->SetEnabled(false);
+                    other.charamodel->GetComponent<RendererCom>()->SetEnabled(false);
                     other.name->GetComponent<Sprite>()->StopEasing();
                     other.name->GetComponent<Sprite>()->spc.onshot = false;
 
@@ -214,7 +293,7 @@ void CharaPicks::DecisionButton()
     {
         sprite->EasingPlay();
     }
-    else if(!sprite->GetHitSprite())
+    else if (!sprite->GetHitSprite())
     {
         sprite->StopEasing();
         sprite->spc.color = color;
@@ -224,7 +303,7 @@ void CharaPicks::DecisionButton()
     if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
     {
         decisionFlg = true;
-        decisionButton->SetEnabled(false);
+        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("charapickcamera"));
     }
 }
 
@@ -242,7 +321,10 @@ void CharaPicks::SetViewCharaPicks(bool flg)
     if (!charaPicksCanvas) return;
 
     if (flg)
+    {
         charaPicksCanvas->SetEnabled(true);
+        GameObjectManager::Instance().Find("lobbyBackParent")->SetEnabled(false);
+    }
     else
         charaPicksCanvas->SetEnabled(false);
 }

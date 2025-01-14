@@ -60,6 +60,7 @@ public:
     void PlayEventCamera(std::string eventName);
 
     bool GetIsPlayEvent() { return isEventPlay; }
+    float GetEventEndTime() { return saveEventCameraBuff.ECTra[saveEventCameraBuff.ECTra.size() - 1].frame; }
 
 private:
     //フォーカスポジションから見たカメラポジションを返す

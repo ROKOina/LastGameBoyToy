@@ -1,14 +1,14 @@
 #pragma once
 #include "Component/System/Component.h"
-#include "PVPGameSystem\PVPGameSystem.h"
+#include "PVPGameSystem/PVPGameSystem.h"
 
 class RespawnCom :public Component
 {
 public:
-    enum class GameMode
+    struct RespawnData
     {
-        PVE,
-        DeathMatch,
+        GameObject* gameObj;
+        float respawnTime;
     };
 
 public:
@@ -37,5 +37,10 @@ private:
 
     std::vector<DirectX::XMFLOAT3> respawnPoses = {};
     float playerDeathHeight = -50;
+    float respawnTimer = 0.0f;
     bool isRespawn = false;
+    bool fallEvent = false;//—Ž‰º‚µ‚½‚©‚Ç‚¤‚©
+
+    std::vector<RespawnData> respawnDatas;
+    std::vector<RespawnData> endDatas;
 };

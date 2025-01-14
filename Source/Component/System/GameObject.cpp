@@ -19,7 +19,8 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
-#include  "Component\UI\Font.h"
+#include "Component\UI\Font.h"
+#include "Component\Renderer\VideoCom.h"
 #include "Component\Character\CharaStatusCom.h"
 
 //ゲームオブジェクト
@@ -368,6 +369,9 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     RenderUseDepth();
     InstanceRenderUseDepth();
 
+    //video描画
+    VideoRender();
+
     //トレイル描画
     TrailRender();
 
@@ -653,6 +657,13 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
     if (trailcomp)
     {
         trailobject.emplace_back(trailcomp);
+    }
+
+    //videoオブジェクトがあれば入る
+    std::shared_ptr<Video>videocomp = obj->GetComponent<Video>();
+    if (videocomp)
+    {
+        videoobject.emplace_back(videocomp);
     }
 
     obj->Start();
@@ -1127,6 +1138,20 @@ void GameObjectManager::FontRender(const DirectX::XMFLOAT4X4& view, const Direct
     }
 }
 
+//video描画
+void GameObjectManager::VideoRender()
+{
+    if (videoobject.size() <= 0)return;
+
+    for (std::weak_ptr<Video>& v : videoobject)
+    {
+        if (!v.lock()->GetGameObject()->GetEnabled())continue;
+        if (!v.lock()->GetEnabled())continue;
+
+        v.lock()->Render();
+    }
+}
+
 //オブジェクト解放
 void GameObjectManager::EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj)
 {
@@ -1252,6 +1277,16 @@ void GameObjectManager::EraseComponet()
         {
             trailobject.erase(trailobject.begin() + t);
             --t;
+        }
+    }
+
+    //video解放
+    for (int v = 0; v < videoobject.size(); ++v)
+    {
+        if (videoobject[v].expired())
+        {
+            videoobject.erase(videoobject.begin() + v);
+            --v;
         }
     }
 

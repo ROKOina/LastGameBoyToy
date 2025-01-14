@@ -23,6 +23,7 @@ class Decal;
 class PostEffect;
 class Trail;
 class Font;
+class Video;
 class CharaStatusCom;
 
 // ゲームオブジェクト
@@ -230,6 +231,9 @@ private:
     //スプライト描画
     void FontRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    //video描画
+    void VideoRender();
+
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
 
@@ -291,6 +295,9 @@ private:
     //キャラObject保存
     std::vector<std::shared_ptr<GameObject>> characterobject;
 
+
+    //video描画
+    std::vector<std::weak_ptr<Video>>videoobject;
 
     bool					isHiddenLister_ = false;
     bool					isHiddenDetail_ = false;
