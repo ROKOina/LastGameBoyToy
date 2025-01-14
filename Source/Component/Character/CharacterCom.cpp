@@ -513,7 +513,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
 //ビネット効果
 void CharacterCom::Vinetto(float elapsedTime)
 {
-    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
+    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetVinetHp(); // 最大HP
     float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
 
     auto& postEff = GameObjectManager::Instance().Find("posteffect");
@@ -537,7 +537,7 @@ void CharacterCom::Vinetto(float elapsedTime)
     }
 
     // 現在のHPを次回用に保存
-    //GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetVinetHp(currentHP);
 }
 
 void CharacterCom::StanUpdate(float elapsedTime)
