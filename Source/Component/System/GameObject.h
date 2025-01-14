@@ -174,7 +174,7 @@ public:
     //ゲームオブジェクトを探す
     std::shared_ptr<GameObject> Find(const char* name);
 
-    std::vector<std::shared_ptr<GameObject>> GetCharaObject() { return characterobject; }
+    std::vector<std::weak_ptr<GameObject>> GetCharaObject() { return characterobject; }
 
     //シーンゲーム演出待ちフラグ
     bool GetIsSceneGameStart() { return isSceneGameStart_; }
@@ -293,7 +293,7 @@ private:
     std::vector<std::weak_ptr<Font>>fontobject;
 
     //キャラObject保存
-    std::vector<std::shared_ptr<GameObject>> characterobject;
+    std::vector<std::weak_ptr<GameObject>> characterobject;
 
 
     //video描画
