@@ -272,7 +272,10 @@ public:
     //ブーストUI
     void CreateBoostUI();
 
+    //敵HP
     void CreateEnemyHpUI() {};
+
+    void CreatePlayerIcon();
 
     //全員の使用キャラUI
     void CreateNetUseCharaUI();

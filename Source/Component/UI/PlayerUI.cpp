@@ -785,6 +785,16 @@ void PlayerUIManager::CreateBoostUI()
     }
 }
 
+void PlayerUIManager::CreatePlayerIcon()
+{
+    //ロードするテクスチャを設定
+    std::string name = "Data/Texture/PlayerUI/CharaIcon/"+ (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() +".png";
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+    std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
+    auto& a = reticle->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    a->LoadTexture(name);
+}
+
 void PlayerUIManager::CreateNetUseCharaUI()
 {
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
