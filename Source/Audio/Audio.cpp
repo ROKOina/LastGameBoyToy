@@ -36,15 +36,13 @@ Audio::Audio()
     hr = masteringVoice_->GetChannelMask(&speakerChannelMask);
     if (FAILED(hr) || speakerChannelMask == 0)
     {
+        speakerChannelMask = SPEAKER_STEREO;  // æ“¾¸”s‚ÉƒfƒtƒHƒ‹ƒg‚ğÄİ’è
         throw std::runtime_error("Failed to retrieve speaker channel mask or invalid channel mask.");
     }
 
     // X3DAudio ‰Šú‰»
     hr = X3DAudioInitialize(speakerChannelMask, X3DAUDIO_SPEED_OF_SOUND, x3dAudioHandle_);
-    if (FAILED(hr))
-    {
-        throw std::runtime_error("Failed to initialize X3DAudio.");
-    }
+    _ASSERT_EXPR(SUCCEEDED(hr), "Failed to initialize X3DAudio.");
 
     // BGM‚ÆSE‚ğˆêŠ‡“o˜^
     RegisterAudioSources();

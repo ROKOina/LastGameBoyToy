@@ -3,10 +3,6 @@
 #include "Math\easing.h"
 #include "Math\Mathf.h"
 
-void AudioSource::OnGUI()
-{
-}
-
 void AudioSource::SetAudio(int id)
 {
     resource_ = Audio::Instance().GetAudioResource(static_cast<AUDIOID>(id));

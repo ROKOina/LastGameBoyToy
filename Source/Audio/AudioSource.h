@@ -70,13 +70,10 @@ public:
     void Update(float elapsedTime) override {};
 
     const char* GetName() const override { return "Audio"; }
-    void OnGUI() override;
+    void OnGUI() override {}
 
     // オーディオ呼び出し関数
     void SetAudio(int id);
-    // 各オーディオ名設定
-    void SetAudioName(const std::string& setName) { this->name = setName; }
-    const char* GetAudioName() const { return name.c_str(); }
 
     // 再生
     void Play(bool loop, float volume = 1.0f);
@@ -100,11 +97,9 @@ private:
     std::shared_ptr<AudioResource>	resource_;
 
     Listener listener_;   // リスナー情報
-    Emitter emitter_;     // エミッター情報
+    Emitter emitter_;    // エミッター情報
 
     float volumeControl = 1.0f;
     bool isPlaying = false;
     bool isLooping = false;
-
-    std::string name = "";
 };
