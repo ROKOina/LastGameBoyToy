@@ -60,21 +60,6 @@ void ScenePVP::Initialize()
         obj->AddComponent<Light>(nullptr);
     }
 
-    //フリーカメラ
-    {
-        std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
-        freeCamera->SetName("freecamera");
-        //freeCamera->transform_->SetWorldPosition({ -2.394f, 0.644f, -2.916f });
-        //freeCamera->transform_->SetEulerRotation({ -12.959f,359.176f,0.0f });
-        std::shared_ptr<FreeCameraCom> camera = freeCamera->AddComponent<FreeCameraCom>();
-        //camera->SetFocusPos({ -2.436f,1.322f,0.033f });
-        //camera->SetFocus({ -2.422f,1.092f,-0.967f });
-        //camera->SetEye({ -2.394f,0.644f,-2.916f });
-        //camera->SetDistance(3.026f);
-        camera->SetUpdate(true);
-    }
-    GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
-
     //ロビー選択から始まる
     //InitializePVP();
     InitializeLobbySelect();
@@ -264,6 +249,14 @@ void ScenePVP::InitializePVP()
         spawnCom->AddRespawnPoses({ -5,1,-5 });
     }
 
+    //イベント用カメラ
+    {
+        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
+        eventCamera->SetName("eventcamera");
+        eventCamera->AddComponent<EventCameraCom>();
+        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
+
     //snowparticle
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -306,7 +299,7 @@ void ScenePVP::InitializePVP()
     }
 
     //キャラピックオブジェクトを消去
-    //GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
+    GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
 
 #pragma endregion
 }
@@ -366,28 +359,6 @@ void ScenePVP::InitializeBack()
         //削除予定リストに追加
         tempRemoveObj.emplace_back(lobbyBackCross);
     }
-
-    //for (int t = 0; t < triangleNum; ++t) //三角
-    //{
-    //    std::shared_ptr<GameObject> lobbyBackTriangle0 = lobbyBackParent->AddChildObject();
-    //    lobbyBackTriangle0->SetName(std::string("lobbyBackTriangle0" + std::to_string(t)).c_str());
-    //    auto& t0=lobbyBackTriangle0->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
-    //    t0->EasingPlay();
-    //    //削除予定リストに追加
-    //    tempRemoveObj.emplace_back(lobbyBackTriangle0);
-    //    std::shared_ptr<GameObject> lobbyBackTriangle1 = lobbyBackParent->AddChildObject();
-    //    lobbyBackTriangle1->SetName(std::string("lobbyBackTriangle1" + std::to_string(t)).c_str());
-    //    auto& t1 = lobbyBackTriangle1->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
-    //    t1->EasingPlay();
-    //    //削除予定リストに追加
-    //    tempRemoveObj.emplace_back(lobbyBackTriangle1);
-    //    std::shared_ptr<GameObject> lobbyBackTriangle2 = lobbyBackParent->AddChildObject();
-    //    lobbyBackTriangle2->SetName(std::string("lobbyBackTriangle2" + std::to_string(t)).c_str());
-    //    auto& t2 = lobbyBackTriangle2->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyBackTriangle.ui", Sprite::SpriteShader::DEFALT, false);
-    //    t2->EasingPlay();
-    //    //削除予定リストに追加
-    //    tempRemoveObj.emplace_back(lobbyBackTriangle2);
-    //}
 }
 
 void ScenePVP::Finalize()

@@ -23,6 +23,7 @@ class Decal;
 class PostEffect;
 class Trail;
 class Font;
+class Video;
 
 // ゲームオブジェクト
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -225,6 +226,9 @@ private:
     //スプライト描画
     void FontRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    //video描画
+    void VideoRender();
+
     //オブジェクト解放
     void EraseObject(std::vector<std::shared_ptr<GameObject>>& objs, std::shared_ptr<GameObject> removeObj);
 
@@ -282,6 +286,9 @@ private:
 
     //Font描画
     std::vector<std::weak_ptr<Font>>fontobject;
+
+    //video描画
+    std::vector<std::weak_ptr<Video>>videoobject;
 
     bool					isHiddenLister_ = false;
     bool					isHiddenDetail_ = false;

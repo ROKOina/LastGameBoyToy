@@ -203,7 +203,7 @@ int Framework::Run()
         }
     }
 
-    //// ComPtr用リーク型名表示　作成
+    // ComPtr用リーク型名表示　作成
     //typedef HRESULT(__stdcall* fPtr)(const IID&, void**);
     //HMODULE hDll = GetModuleHandleW(L"dxgidebug.dll");
     //fPtr DXGIGetDebugInterface = (fPtr)GetProcAddress(hDll, "DXGIGetDebugInterface");
