@@ -1269,7 +1269,7 @@ void PhotonLib::GameRecv(NetData recvData)
         SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
 
         SaveBuffer currentInput = saveInputPhoton[recvData.playerId].inputBuf->GetHead();
-        if (currentInput.frame < newInput.frame)	//新しいフレームから始める
+        if (currentInput.frame < newInput.frame || currentInput.frame == 0)	//新しいフレームから始める
             saveInputPhoton[recvData.playerId].inputBuf->Enqueue(newInput);
     }
     ////保存情報
