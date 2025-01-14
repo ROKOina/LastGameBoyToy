@@ -5,7 +5,7 @@
 struct RespawnData
 {
     GameObject* gameObj;
-    float respawnTime;
+    float respawnTime = 0;
 };
 
 class RespawnCom :public Component

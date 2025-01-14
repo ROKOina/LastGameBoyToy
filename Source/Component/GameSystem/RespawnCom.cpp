@@ -15,7 +15,6 @@ void RespawnCom::Update(float elapsedTime)
     //落下したプレイヤーを殺す
     if (!fallEvent && player->transform_->GetWorldPosition().y < playerDeathHeight)
     {
-        auto& stateMachine = player->GetComponent<CharacterCom>()->GetMoveStateMachine();
         CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
         status->AddDamagePoint(-200);
     }
@@ -26,7 +25,7 @@ void RespawnCom::Update(float elapsedTime)
         respawnData->respawnTime += elapsedTime;
 
         //死亡演出が終了したらリスポーン
-        if (respawnTimer >= 2.5f)
+        if (respawnData->respawnTime >= 2.5f)
         {
             CharacterCom* charaCom = player->GetComponent<CharacterCom>().get();
 
@@ -55,7 +54,7 @@ void RespawnCom::Update(float elapsedTime)
             //アニメーションを死亡から待機へ
             AnimationCom* animaCom = player->GetComponent<AnimationCom>().get();
             animaCom->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
-            animaCom->PlayAnimation(animaCom->FindAnimation("Idle"), true, 1.0f);
+            animaCom->PlayUpperBodyOnlyAnimation(animaCom->FindAnimation("Idle"), true, 1.0f);
             for (int i = 0; i < 20; ++i)
             {
                 animaCom->Update(elapsedTime);
