@@ -5,20 +5,6 @@
 
 void AudioSource::OnGUI()
 {
-    ImGui::Text("Audio Name: %s", name.c_str());
-
-    ImGui::Checkbox("Loop", &isLooping);
-    ImGui::SameLine();
-
-    if (ImGui::Button("Play")) {
-            Play(isLooping, volumeControl);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Stop")) {
-        Stop();
-    }
-    ImGui::SameLine();
-    ImGui::SliderFloat("Volume", &volumeControl, 0.0f, 1.0f);
 }
 
 void AudioSource::SetAudio(int id)

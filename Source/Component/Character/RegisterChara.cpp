@@ -77,7 +77,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player1.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -259,7 +259,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player2.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -358,14 +358,14 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     r->LoadModel("Data/Model/player_True/player3.mdl");
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player3.nodecollsion");
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
     charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
-    charaCom->SetUseSkill(USE_SKILL::E);
+    charaCom->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //HP‚Ì‰ŠúÝ’è
     status->SetMaxHitPoint(200);
@@ -445,11 +445,11 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player1.mdl");
+    r->LoadModel("Data/Model/player_True/player4.mdl");
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player.nodecollsion");
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player4.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 

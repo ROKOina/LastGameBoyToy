@@ -64,10 +64,8 @@ void JankratCharacterCom::SubSkill()
     {
         //ínóãê›íu
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
-    }
-    else
-    {
-        ResetSkillCoolTimer(SkillCoolID::E);
+        //SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 0.1f);
+        //ResetSkillCoolTimer(SkillCoolID::LeftClick);
     }
 }
 

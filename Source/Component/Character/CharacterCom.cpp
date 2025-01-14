@@ -534,7 +534,7 @@ void CharacterCom::Vinetto(float elapsedTime)
     }
 
     // Œ»Ý‚ÌHP‚ðŽŸ‰ñ—p‚É•Û‘¶
-    GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
+    //GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
 }
 
 void CharacterCom::StanUpdate(float elapsedTime)
