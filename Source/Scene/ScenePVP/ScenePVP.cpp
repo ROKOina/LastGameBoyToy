@@ -249,6 +249,14 @@ void ScenePVP::InitializePVP()
         spawnCom->AddRespawnPoses({ -5,1,-5 });
     }
 
+    //イベント用カメラ
+    {
+        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
+        eventCamera->SetName("eventcamera");
+        eventCamera->AddComponent<EventCameraCom>();
+        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
+
     //snowparticle
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
