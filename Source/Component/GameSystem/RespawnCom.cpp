@@ -27,7 +27,7 @@ void RespawnCom::Update(float elapsedTime)
         //死亡演出が終了したらリスポーン
         if (respawnData->respawnTime >= 2.5f)
         {
-            CharacterCom* charaCom = player->GetComponent<CharacterCom>().get();
+            CharacterCom* charaCom = respawnData->gameObj->GetComponent<CharacterCom>().get();
 
             //プレイヤーならば
             if (std::string(respawnData->gameObj->GetName()) == "player")
