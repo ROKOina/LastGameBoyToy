@@ -562,10 +562,17 @@ void PhotonLib::NetInputUpdate()
             s.nextInput.input |= b.input;
             s.nextInput.inputUp |= b.inputUp;
 
-            if (CharacterInput::SubAttackButton & b.inputDown)
-            {
-                int v = 0;
-            }
+
+            ////if (0 < b.inputDown)
+            //if (CharacterInput::SubAttackButton & b.inputDown)
+            //{
+            //    for (auto& ffb : ff)
+            //    {
+            //        if (ffb == b.inputDown)
+            //            int bb = 0;
+            //    }
+            //    ff.emplace_back(b.inputDown);
+            //}
 
             s.isInputUpdate = true;
         }
