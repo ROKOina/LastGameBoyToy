@@ -325,13 +325,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SubAttackPushing();
     }
 
+    //if (CharacterInput::MainSkillButton_E & GetButtonDown()
+    //    && IsSkillCoolMax(SkillCoolID::Q))
+    //{
+    //    skillCools[SkillCoolID::Q].timer = 0;
+    //    MainSkill();
+    //}
     if (CharacterInput::MainSkillButton_E & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::Q))
-    {
-        skillCools[SkillCoolID::Q].timer = 0;
-        MainSkill();
-    }
-    if (CharacterInput::SubSkillButton_C & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::E))
     {
         skillCools[SkillCoolID::E].timer = 0;
