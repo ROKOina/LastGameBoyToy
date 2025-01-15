@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <DirectXMath.h>
+#include <string>
 
 // 前方宣言
 class GameObject;
@@ -31,12 +32,17 @@ private:
     void CharaDetails();
     // 決定処理
     void DecisionButton();
-    // 時間制限
-    void TimeLimitSystem(float elapsedTime);
 
+    //キャラのUI追加関数
+    void AddCharacterUI(std::shared_ptr<GameObject> parent, const char* charaName,
+        const char* iconPath, const char* namePath,
+        const char* skillIconPath1, const char* skillIconPath2,
+        const char* ultIconPath, const char* modelPath,
+        const char* video1, const char* video2, const char* video3);
 private:
 
-    struct CharacterInfo {
+    struct CharacterInfo
+    {
         std::shared_ptr<GameObject> chara;
         std::shared_ptr<Sprite> sprite;
         std::shared_ptr<GameObject> name;
@@ -48,8 +54,6 @@ private:
     int selectedCharacterId = -1;
     // 決定フラグ
     bool decisionFlg = false;
-
-    //bool hitFlg = false;
 
     //チームがピックしているキャラ
     int teamPick = -1;
