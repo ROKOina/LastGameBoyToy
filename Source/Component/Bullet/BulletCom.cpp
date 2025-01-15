@@ -126,14 +126,21 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     trail->SetTransform(viewObj->transform_->GetWorldTransform());
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    float ya;
-    if (cameraObj)
-        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
-    else
-        ya = 1.5f;
 
-    firePos.y += ya;
-    viewObj->transform_->SetWorldPosition(firePos);
+    //ネットの銃口
+    if (!cameraObj)
+    {
+        auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
+        for (auto& b : saveB)
+        {
+            if (CharacterInput::MainAttackButton & b.inputUp)
+            {
+                fpsDir = b.fpsDir;
+                firePos = b.gunPos;
+                break;
+            }
+        }
+    }
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
@@ -141,8 +148,10 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     float gravity = g - (g - 0.3) * power;
     moveCom->SetGravity(gravity);
     moveCom->SetFriction(0.0f);
-
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+
+    //ネット用
+    viewObj->transform_->SetWorldPosition(firePos);
 
     //銃口から発射する
     if (cameraObj)
@@ -232,14 +241,21 @@ GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, floa
     viewObj->SetName("damageballView");
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    float ya;
-    if (cameraObj)
-        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
-    else
-        ya = 1.5f;
 
-    firePos.y += ya;
-    viewObj->transform_->SetWorldPosition(firePos);
+    //ネットの銃口
+    if (!cameraObj)
+    {
+        auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
+        for (auto& b : saveB)
+        {
+            if (CharacterInput::MainAttackButton & b.inputUp)
+            {
+                fpsDir = b.fpsDir;
+                firePos = b.gunPos;
+                break;
+            }
+        }
+    }
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
@@ -247,6 +263,9 @@ GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, floa
     moveCom->SetFriction(0.0f);
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
+
+    //ネット用
+    viewObj->transform_->SetWorldPosition(firePos);
 
     //銃口から発射する
     if (cameraObj)
@@ -333,20 +352,30 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
     viewObj->SetName("damageballView");
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    float ya;
-    if (cameraObj)
-        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
-    else
-        ya = 1.5f;
 
-    firePos.y += ya;
-    viewObj->transform_->SetWorldPosition(firePos);
+    //ネットの銃口
+    if (!cameraObj)
+    {
+        auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
+        for (auto& b : saveB)
+        {
+            if (CharacterInput::MainSkillButton_E & b.inputDown)
+            {
+                fpsDir = b.fpsDir;
+                firePos = b.gunPos;
+                break;
+            }
+        }
+    }
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
     moveCom->SetGravity(0.0f);
     moveCom->SetFriction(0.0f);
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
+
+    //ネット用
+    viewObj->transform_->SetWorldPosition(firePos);
 
     //銃口から発射する
     if (cameraObj)
@@ -614,14 +643,21 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     bulletgpuparticle->Play();
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    float ya;
-    if (cameraObj)
-        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
-    else
-        ya = 1.5f;
 
-    firePos.y += ya;
-    viewObj->transform_->SetWorldPosition(firePos);
+    //ネットの銃口
+    if (!cameraObj)
+    {
+        auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
+        for (auto& b : saveB)
+        {
+            if (CharacterInput::MainSkillButton_E & b.inputDown)
+            {
+                fpsDir = b.fpsDir;
+                firePos = b.gunPos;
+                break;
+            }
+        }
+    }
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
@@ -629,6 +665,9 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     moveCom->SetFriction(0.0f);
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
+
+    //ネット用
+    viewObj->transform_->SetWorldPosition(firePos);
 
     //銃口から発射する
     if (cameraObj)
@@ -711,14 +750,21 @@ void BulletCreate::SoldierStanBall(std::shared_ptr<GameObject> objPoint, float b
     bulletgpuparticle->Play();
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-    float ya;
-    if (cameraObj)
-        ya = cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
-    else
-        ya = 1.5f;
 
-    firePos.y += ya;
-    viewObj->transform_->SetWorldPosition(firePos);
+    //ネットの銃口
+    if (!cameraObj)
+    {
+        auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
+        for (auto& b : saveB)
+        {
+            if (CharacterInput::MainSkillButton_E & b.inputDown)
+            {
+                fpsDir = b.fpsDir;
+                firePos = b.gunPos;
+                break;
+            }
+        }
+    }
 
     //弾発射
     std::shared_ptr<MovementCom> moveCom = viewObj->AddComponent<MovementCom>();
@@ -726,6 +772,9 @@ void BulletCreate::SoldierStanBall(std::shared_ptr<GameObject> objPoint, float b
     moveCom->SetFriction(0.0f);
     moveCom->SetNonMaxSpeedVelocity(fpsDir * bulletSpeed);
     moveCom->SetIsRaycast(false);
+
+    //ネット用
+    viewObj->transform_->SetWorldPosition(firePos);
 
     //銃口から発射する
     if (cameraObj)

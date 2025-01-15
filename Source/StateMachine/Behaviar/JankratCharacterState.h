@@ -30,6 +30,9 @@ protected:
     float fireVecY = 0.35f;
     float explosiontime = 1.5f;
 
+    DirectX::XMFLOAT3 DIR = {};
+    DirectX::XMFLOAT3 POS = {};
+
 protected:
     std::weak_ptr<JankratCharacterCom> charaCom;
     std::weak_ptr<MovementCom> moveCom;

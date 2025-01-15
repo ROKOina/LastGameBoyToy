@@ -84,20 +84,22 @@ void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
     jankratBullet->SetExplosionTime(explosiontime);
 
     // e‚Ìæ’[ˆÊ’u‚ÆƒJƒƒ‰•ûŒü‚ðŽg—p‚µ‚Ä’eŠÛ‚ð”­ŽË
-    DirectX::XMFLOAT3 gunPos = {}, fireDir;
-    if (GetGunTipPosition(gunPos, fireDir, CharacterInput::MainAttackButton | CharacterInput::UltimetButton))
-    {
+    //DirectX::XMFLOAT3 gunPos = {}, fireDir;
+    //if (GetGunTipPosition(gunPos, fireDir, CharacterInput::MainAttackButton | CharacterInput::UltimetButton))
+    //{
         // ”­ŽË•ûŒü‚ðŒvŽZ
-        fireDir = Mathf::Normalize({
-            owner->GetFpsCameraDir().x,
-            owner->GetFpsCameraDir().y + fireVecY,
-            owner->GetFpsCameraDir().z
-            });
+    DirectX::XMFLOAT3  fireDir;
 
-        // ’eŠÛ‚Ì‰ŠúˆÊ’u‚Æ‰‘¬“x‚ðÝ’è
-        bullet->transform_->SetWorldPosition(gunPos);
-        rigid->AddForce(fireDir * force);
-    }
+    fireDir = Mathf::Normalize({
+        DIR.x,
+        DIR.y + fireVecY,
+        DIR.z
+        });
+
+    // ’eŠÛ‚Ì‰ŠúˆÊ’u‚Æ‰‘¬“x‚ðÝ’è
+    bullet->transform_->SetWorldPosition(POS);
+    rigid->AddForce(fireDir * force);
+    //}
 }
 
 #pragma region ’Êí’e
@@ -121,6 +123,8 @@ void JankratCharacter_MainAtkState::Enter()
         // ’eŠÛ‚ðì¬‚µƒZƒbƒg
         const auto& bullet = BulletCreate::JankratBulletFire(owner->GetGameObject(), gunPos, charaCom.lock()->GetNetCharaData().GetCharaID());
         charaComponent->SetHaveBullet(bullet);
+        DIR = dir;
+        POS = gunPos;
     }
 }
 void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
@@ -213,6 +217,8 @@ void JankratCharacter_UltState::Enter()
         // ’eŠÛ‚ðì¬‚µƒZƒbƒg
         const auto& bullet = BulletCreate::JankratUlt(owner->GetGameObject(), gunPos, 5.0f);
         charaComponent->SetHaveBullet(bullet);
+        DIR = dir;
+        POS = gunPos;
     }
 }
 void JankratCharacter_UltState::Execute(const float& elapsedTime)
