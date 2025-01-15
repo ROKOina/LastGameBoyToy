@@ -99,6 +99,7 @@ void Solder_UltState::Execute(const float& elapsedTime)
 }
 void Solder_UltState::Exit()
 {
+    time = 0.0f;
     //ultI—¹
     charaCom.lock()->FinishUlt();
 }
