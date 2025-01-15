@@ -38,7 +38,8 @@ private:
         const char* iconPath, const char* namePath,
         const char* skillIconPath1, const char* skillIconPath2,
         const char* ultIconPath, const char* modelPath,
-        const char* video1, const char* video2, const char* video3);
+        const char* video1, const char* video2, const char* video3,
+        const char* videoname1, const char* videoname2, const char* ultvideoname);
 private:
 
     struct CharacterInfo
@@ -47,6 +48,9 @@ private:
         std::shared_ptr<Sprite> sprite;
         std::shared_ptr<GameObject> name;
         std::shared_ptr<GameObject> charamodel;
+        std::shared_ptr<GameObject> video1;
+        std::shared_ptr<GameObject> video2;
+        std::shared_ptr<GameObject> ultvideo;
         int id;
     };
 

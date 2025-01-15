@@ -81,6 +81,9 @@ public:
     bool GetSpawnFlag()const { return spawnflag; }
     void SetSpawnFlag(bool flag) { spawnflag = flag; }
 
+    //セットオブジェクト
+    void SetParentObjectKun(std::weak_ptr<GameObject>o) { parent = o; }
+
 public:
 
     //オブジェクトのenum
@@ -122,6 +125,9 @@ private:
     bool spwntrigger = false;
     bool spawnflag = false;
     std::string filepath = {};
+
+    //ジャンクラ用のゲームオブジェクト取得
+    std::weak_ptr<GameObject>parent;
 
     //削除時間
     float deletetime = 0.0f;

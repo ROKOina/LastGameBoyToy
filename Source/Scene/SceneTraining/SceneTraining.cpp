@@ -88,9 +88,6 @@ void SceneTraining::Initialize()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
-    //UIゲームオブジェクト生成
-    //CreateUiObject();
-
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 

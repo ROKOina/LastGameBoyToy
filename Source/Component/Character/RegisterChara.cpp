@@ -536,7 +536,8 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         std::shared_ptr<GameObject>ultobject = obj->AddChildObject();
         ultobject->SetName("UltObject");
         ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/solder_ult_aura.gpuparticle", 2000);
-        ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
+        auto& spawn = ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
+        spawn->SetParentObjectKun(obj);
     }
 
     //ヒットスキャン
