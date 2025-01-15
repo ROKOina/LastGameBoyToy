@@ -50,7 +50,7 @@ void CharaPicks::CreateCharaPicksUiObject()
         AddCharacterUI(charaPicksCanvas, "Faraic", "Data/SerializeData/UIData/CharaPick/charaIcon1.ui",
             "Data/SerializeData/UIData/CharaPick/charaName1.ui", "Data/SerializeData/UIData/CharaPick/farahc_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/farahc_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/farahc_ulticon.ui",
-            "Data/Model/player_True/player2.mdl", "Data/Video/farahick_RightClick.mp4", "Data/Video/farahick_ESkill.mp4", "Data/Video/farahick_ult.mp4",
+            "Data/Model/player_True/player2.mdl", "Data/Video/farahick_ESkill.mp4", "Data/Video/farahick_RightClick.mp4", "Data/Video/farahick_ult.mp4",
             "Faraic-video1", "Faraic-video2", "Faraic-ultvideo");
 
         // SANTORATTO
@@ -221,12 +221,12 @@ void CharaPicks::CharaDetails(float elapsedTime)
             }
         };
 
-    auto updatechara = [&](CharacterInfo& selected)
+    auto updatechara = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others)
         {
-            static const float interval = 90.0f; // 全体の繰り返し時間
-            static const float rightSkillTime = 30.0f; // RightSkill の時間
-            static const float eSkillTime = 60.0f;     // ESkill の時間
-            static const float ultTime = 90.0f;        // Ult の時間
+            static const float interval = 60.0f; // 全体の繰り返し時間
+            static const float rightSkillTime = 20.0f; // RightSkill の時間
+            static const float eSkillTime = 40.0f;     // ESkill の時間
+            static const float ultTime = 60.0f;        // Ult の時間
 
             if (triger)
             {
@@ -239,35 +239,47 @@ void CharaPicks::CharaDetails(float elapsedTime)
                 }
             }
 
-            if (triger && selectedCharacterId == selected.id) // 選択されたキャラクターのみ更新
+            // 選択されたキャラクターのみ更新
+            if (selectedCharacterId == selected.id)
             {
-                // 状態更新
+                // 状態に応じた設定値
+                int rightSkillFlag = 1, eSkillFlag = 1, ultFlag = 1;
+                bool video1Enabled = false, video2Enabled = false, ultVideoEnabled = false;
+
                 if (plustime < rightSkillTime)
                 {
-                    selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = 0;
-                    selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
-                    selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = 1;
-                    selected.video1->SetEnabled(true);
-                    selected.video2->SetEnabled(false);
-                    selected.ultvideo->SetEnabled(false);
+                    rightSkillFlag = 0;
+                    video1Enabled = true;
                 }
                 else if (plustime < eSkillTime)
                 {
-                    selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
-                    selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = 0;
-                    selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = 1;
-                    selected.video1->SetEnabled(false);
-                    selected.video2->SetEnabled(true);
-                    selected.ultvideo->SetEnabled(false);
+                    eSkillFlag = 0;
+                    video2Enabled = true;
                 }
                 else if (plustime < ultTime)
                 {
-                    selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
-                    selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
-                    selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = 0;
-                    selected.video1->SetEnabled(false);
-                    selected.video2->SetEnabled(false);
-                    selected.ultvideo->SetEnabled(true);
+                    ultFlag = 0;
+                    ultVideoEnabled = true;
+                }
+
+                // 共通処理で適用
+                selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = rightSkillFlag;
+                selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = eSkillFlag;
+                selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = ultFlag;
+
+                selected.video1->SetEnabled(video1Enabled);
+                selected.video2->SetEnabled(video2Enabled);
+                selected.ultvideo->SetEnabled(ultVideoEnabled);
+            }
+
+            // 他のキャラクターをリセット
+            for (auto& other : others)
+            {
+                if (other.id != selectedCharacterId)
+                {
+                    other.video1->SetEnabled(false);
+                    other.video2->SetEnabled(false);
+                    other.ultvideo->SetEnabled(false);
                 }
             }
         };
@@ -277,7 +289,7 @@ void CharaPicks::CharaDetails(float elapsedTime)
     {
         std::vector<CharacterInfo> others = characters;
         others.erase(others.begin() + i);
-        updatechara(characters[i]);
+        updatechara(characters[i], others);
         handleCharacterSelection(characters[i], others);
     }
 }

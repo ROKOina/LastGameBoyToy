@@ -55,7 +55,7 @@ float4 main(VS_OUT pin) : SV_TARGET
         discard;
 
     // 背景色 (ベース色) とエフェクトを設定
-    float4 base = float4(0.8, 0.8, 0.8, 0.4);
+    float4 base = float4(0.4, 0.8, 1.0, 0.4); // RGBA: Water blue
     float glow = absin(time * 0.01) * 0.01 + 0.01; // 点滅速度をさらに遅く調整
 
     // アニメーション係数の計算
