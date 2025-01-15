@@ -38,7 +38,8 @@ private:
         const char* iconPath, const char* namePath,
         const char* skillIconPath1, const char* skillIconPath2,
         const char* ultIconPath, const char* modelPath,
-        const char* video1, const char* video2, const char* video3);
+        const char* video1, const char* video2, const char* video3,
+        const char* videoname1/* const char* videoname2, const char* ultvideoname*/);
 private:
 
     struct CharacterInfo
