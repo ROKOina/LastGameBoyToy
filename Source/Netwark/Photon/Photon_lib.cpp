@@ -65,8 +65,28 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 void PhotonLib::update(float elapsedTime)
 {
     auto& myPlayer = GameObjectManager::Instance().Find("player");
+
     if (myPlayer)
     {
+        //銃口の位置
+        DirectX::XMFLOAT3 gunPos = {};
+        {
+            const auto& cameraObj = myPlayer->GetChildFind("cameraPostPlayer");
+            const auto& arm = cameraObj->GetChildFind("armChild");
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
+
+            if (gunNode)
+            {
+                gunPos =
+                {
+                    gunNode->worldTransform._41,
+                    gunNode->worldTransform._42,
+                    gunNode->worldTransform._43
+                };
+            }
+        }
+
         int myPhotonID = GetMyPhotonID();
         for (auto& s : saveInputPhoton)
         {
@@ -93,6 +113,9 @@ void PhotonLib::update(float elapsedTime)
             //速力
             DirectX::XMFLOAT3 velo = myPlayer->GetComponent<MovementCom>()->GetVelocity();
             save.velo = velo;
+
+            //銃口の位置
+            save.gunPos = gunPos;
 
             s.inputBuf->Enqueue(save);
 
@@ -534,6 +557,9 @@ void PhotonLib::NetInputUpdate()
         saveB = s.inputBuf->GetHeadFromSize(100);
 
         bool isInputInit = false;
+
+        //入力を保存
+        auto& saveBuffer = StaticSendDataManager::Instance().GetSaveBuffer(s.playerId);
         for (auto& b : saveB)
         {
             //前回のフレームから今回のフレームからディレイした分までの入力を保存
@@ -542,6 +568,9 @@ void PhotonLib::NetInputUpdate()
 
             if (!isInputInit)	//最初に入った時に入力初期化
             {
+                //入力リセット
+                saveBuffer.clear();
+
                 s.nextInput.inputDown = 0;
                 s.nextInput.input = 0;
                 s.nextInput.inputUp = 0;
@@ -557,6 +586,9 @@ void PhotonLib::NetInputUpdate()
 
                 isInputInit = true;
             }
+
+            //入力保存
+            saveBuffer.emplace_back(b);
 
             s.nextInput.inputDown |= b.inputDown;
             s.nextInput.input |= b.input;

@@ -6,6 +6,8 @@
 #include "Component\SkillObj\JankratMineCom.h"
 #include "Component\Bullet\JankratBulletCom.h"
 
+#include "Netwark/Photon/StaticSendDataManager.h"
+
 //基底クラス君
 JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -148,10 +150,27 @@ void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
 
     //銃の位置から発射
     DirectX::XMFLOAT3 gunPos = {};
+    DirectX::XMFLOAT3 dir = owner->GetGameObject()->GetComponent<CharacterCom>()->GetFpsCameraDir();
     if (GetGunTipPosition(gunPos))
     {
+        //ネットの銃口
+        if (std::string(owner->GetGameObject()->GetName()) != "player")
+        {
+            auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(owner->GetNetCharaData().GetNetPlayerID());
+            for (auto& b : saveB)
+            {
+                if (CharacterInput::MainSkillButton_E & b.inputDown)
+                {
+                    dir = b.fpsDir;
+                    gunPos = b.gunPos;
+                    break;
+                }
+            }
+        }
+
+
         // 弾丸を作成しセット
-        charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, 100.0f, 20, charaCom.lock()->GetNetCharaData().GetCharaID()));
+        charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, dir, 100.0f, 20, charaCom.lock()->GetNetCharaData().GetCharaID()));
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }

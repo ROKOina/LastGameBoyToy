@@ -476,10 +476,11 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
     return bullet;
 }
 
-GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, float force, float damage, int id)
+GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, DirectX::XMFLOAT3 dir, float force, float damage, int id)
 {
     //発射位置算出用変数定義
-    DirectX::XMFLOAT3 fpsDir = parent->GetComponent<CharacterCom>()->GetFpsCameraDir();
+    DirectX::XMFLOAT3 fpsDir = dir;
+    //DirectX::XMFLOAT3 fpsDir = parent->GetComponent<CharacterCom>()->GetFpsCameraDir();
 
     //弾丸オブジェクト生成
     GameObj bullet = GameObjectManager::Instance().Create();
