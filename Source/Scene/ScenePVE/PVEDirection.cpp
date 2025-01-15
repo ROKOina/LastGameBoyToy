@@ -16,6 +16,8 @@
 #include "Component\UI\Font.h"
 #include "Setting/Setting.h"
 #include "Scene\SceneTitle\SceneTitle.h"
+#include <Component/UI/UiSystem.h>
+#include <Component/Character/RegisterChara.h>
 
 PVEDirection::PVEDirection()
 {
@@ -66,24 +68,40 @@ void PVEDirection::Setting()
     }
 }
 
-void PVEDirection::DirectionStart()
+
+void PVEDirection::CharaSlect(float elapsedTime)
 {
+    if (!flag)
+    {
+        charaPicks->SetViewCharaPicks(true);
+        flag = true;
+    }
 
-    auto& obj = GameObjectManager::Instance().Create();
-    obj->SetName("pveCanvas");
+    // キャラピック更新処理
+    charaPicks->CharaPicksUpdate(elapsedTime);
 
+    if (charaPicks->IsDecisionFlg())
+    {
+        RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()));
+        charaPicks->SetViewCharaPicks(false);
+        CharaSelectFlag = true;
+        flag = false;
+        directionNumber += 1;
+    }
+}
 
+void PVEDirection::InitializeBack()
+{
+    //背景
+    std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
+    lobbyBackParent->SetName("lobbyBackParent");
+    tempRemoveObj.emplace_back(lobbyBackParent);
+}
+
+void PVEDirection::InitializeChara()
+{
     GameObjectManager::Instance().Find("BOSS")->GetComponent<AimIKCom>()->SetEnabled(false);
     GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetEnabled(false);
-
-    // タイトルへ
-    {
-        auto& name = obj->AddChildObject();
-        name->SetName("title");
-        auto& spr = name->AddComponent<Sprite>("Data/SerializeData/UIData/setting/pveGotoTitle.ui", Sprite::SpriteShader::DEFALT, true);
-        spr->SetOrderinLayer(100);
-        name->SetEnabled(false);
-    }
 
     {
         auto& armParts = GameObjectManager::Instance().Create();
@@ -149,6 +167,35 @@ void PVEDirection::DirectionStart()
 
     //最初にイベントカメラへ変更
     GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+}
+
+void PVEDirection::DirectionStart()
+{
+
+    auto& obj = GameObjectManager::Instance().Create();
+    obj->SetName("pveCanvas");
+
+
+    // タイトルへ
+    {
+        auto& name = obj->AddChildObject();
+        name->SetName("title");
+        auto& spr = name->AddComponent<Sprite>("Data/SerializeData/UIData/setting/pveGotoTitle.ui", Sprite::SpriteShader::DEFALT, true);
+        spr->SetOrderinLayer(100);
+        name->SetEnabled(false);
+    }
+
+
+    charaPicks = std::make_shared<CharaPicks>();
+
+    ///////////////////////ここにキャラ選択の中身入れれば元に戻る//////////////////////////////////
+    InitializeChara();
+
+    InitializeBack();
+
+    // キャラピックUI生成
+    charaPicks->CreateCharaPicksUiObject();
+    charaPicks->SetViewCharaPicks(false);
 
     directionNumber = 0;
 }
@@ -164,27 +211,30 @@ void PVEDirection::DirectionSupervision(float elapsedTime)
     switch (directionNumber)
     {
     case 0:
-        DirectionFOne(elapsedTime);
+        CharaSlect(elapsedTime);
         break;
     case 1:
-        DirectionFTwo(elapsedTime);
+        DirectionFOne(elapsedTime);
         break;
     case 2:
-        DirectionFEnd(elapsedTime);
+        DirectionFTwo(elapsedTime);
         break;
     case 3:
-        DirectionCOne(elapsedTime);
+        DirectionFEnd(elapsedTime);
         break;
     case 4:
-        DirectionCTwo(elapsedTime);
+        DirectionCOne(elapsedTime);
         break;
     case 5:
-        DirectionCThi(elapsedTime);
+        DirectionCTwo(elapsedTime);
         break;
     case 6:
-        DirectionCFou(elapsedTime);
+        DirectionCThi(elapsedTime);
         break;
     case 7:
+        DirectionCFou(elapsedTime);
+        break;
+    case 8:
         DirectionCEnd(elapsedTime);
         break;
     }
@@ -195,6 +245,8 @@ void PVEDirection::DirectionFOne(float elapsedTime)
 {
     if (!flag)
     {
+        
+
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
 
