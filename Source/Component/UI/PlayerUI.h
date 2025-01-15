@@ -285,6 +285,7 @@ public:
     //–¡•ûHPUI
     void CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer);
     bool GetAllyHp() { return allyHp; }
+    void ResetAllyHp() { allyHp = false; }
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
   
