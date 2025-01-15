@@ -609,7 +609,8 @@ GameObj BulletCreate::JankratUlt(std::shared_ptr<GameObject> parent, DirectX::XM
     coll->SetRadius(0.5f);
 
     //spawncomponent•t—^
-    bullet->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/jankrat_ult.spawn");
+    auto& spawn = bullet->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/jankrat_ult.spawn");
+    spawn->SetParentObjectKun(parent);
 
     //’e
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
