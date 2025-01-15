@@ -27,11 +27,12 @@ private:
     DirectX::XMFLOAT2 maxPos = {};
 };
 
+
 class UI_BoosGauge : public Component
 {
     //コンポーネントオーバーライド
 public:
-    UI_BoosGauge(int num);
+    UI_BoosGauge();
     ~UI_BoosGauge() {}
 
     // 名前取得
@@ -44,10 +45,15 @@ public:
     void Update(float elapsedTime) override;
 
 private:
-    std::vector<std::shared_ptr<GameObject>>   gauges;
-    std::vector<std::shared_ptr<GameObject>>   frames;
+    std::shared_ptr<GameObject> frame;  //外枠
+    std::shared_ptr<GameObject> gauge;  //ゲージ
+    std::shared_ptr<GameObject> mask;   //マスク
+
+    int minAngle = 0;
+    int maxAngle = 90;
+
     int  num;
-    float maxDashGauge;                  //ダッシュゲージの総量を保持
+    float maxDashGauge;                 //ダッシュゲージの総量を保持
     float* value;                       //ダッシュゲージの現在の値
     float separateValue;                //区切りの値
     DirectX::XMFLOAT2 originlTexSize;   //元のテクスチャーサイズ
@@ -184,14 +190,14 @@ private:
 class UI_EnemyHp : public Component
 {
 public:
-    UI_EnemyHp();
+    UI_EnemyHp() {};
     ~UI_EnemyHp() {};
 
     // 名前取得
     const char* GetName() const override { return "UI_EnemyHp"; }
     
     // 開始処理
-    void Start() override;
+    void Start() override {};
 
     // 更新処理
     void Update(float elapsedTime) override;
@@ -199,8 +205,7 @@ public:
     //ゲージ更新
     void GaugeUpdate(float elapsedTime);
 
-    void SearchEnemy();
-
+    //登録
     void Register();
 
     void OnGUI()override {};
@@ -275,7 +280,11 @@ public:
     //敵HP
     void CreateEnemyHpUI() {};
 
+    //キャラアイコン
     void CreatePlayerIcon();
+
+    //ヒットエフェクト  
+    void CreateHitEffect();
 
     //全員の使用キャラUI
     void CreateNetUseCharaUI();
