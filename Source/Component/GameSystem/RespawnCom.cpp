@@ -80,4 +80,5 @@ void RespawnCom::Update(float elapsedTime)
             respawnDatas.erase(it);
         }
     }
+    endDatas.clear();
 }
