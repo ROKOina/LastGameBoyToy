@@ -156,6 +156,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
     //èeå˚Ç©ÇÁî≠éÀÇ∑ÇÈ
     if (cameraObj)
     {
+        firePos.y += cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
         auto& arm = cameraObj->GetChildFind("armChild");
         if (arm)
         {
@@ -241,7 +242,6 @@ GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, floa
     viewObj->SetName("damageballView");
 
     DirectX::XMFLOAT3 firePos = objPoint->transform_->GetWorldPosition();
-
     //ÉlÉbÉgÇÃèeå˚
     if (!cameraObj)
     {
@@ -270,6 +270,7 @@ GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, floa
     //èeå˚Ç©ÇÁî≠éÀÇ∑ÇÈ
     if (cameraObj)
     {
+        firePos.y += cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
         auto& arm = cameraObj->GetChildFind("armChild");
         if (arm)
         {
@@ -380,6 +381,7 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
     //èeå˚Ç©ÇÁî≠éÀÇ∑ÇÈ
     if (cameraObj)
     {
+        firePos.y += cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
         auto& arm = cameraObj->GetChildFind("armChild");
         if (arm)
         {
@@ -672,6 +674,7 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     //èeå˚Ç©ÇÁî≠éÀÇ∑ÇÈ
     if (cameraObj)
     {
+        firePos.y += cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
         auto& arm = cameraObj->GetChildFind("armChild");
         if (arm)
         {
@@ -779,6 +782,7 @@ void BulletCreate::SoldierStanBall(std::shared_ptr<GameObject> objPoint, float b
     //èeå˚Ç©ÇÁî≠éÀÇ∑ÇÈ
     if (cameraObj)
     {
+        firePos.y += cameraObj->transform_->GetLocalPosition().y * objPoint->transform_->GetScale().y;
         auto& arm = cameraObj->GetChildFind("armChild");
         if (arm)
         {
