@@ -152,8 +152,8 @@ void CharaPicks::CharaDetails()
             chara.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->spc.onshot = false;
             chara.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->StopEasing();
             chara.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->spc.onshot = false;
-            chara.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->StopEasing();
-            chara.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = false;
+            //chara.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->StopEasing();
+            //chara.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = false;
 
             chara.sprite->StopEasing();
             chara.sprite->spc.color = defaultColor;
@@ -167,7 +167,7 @@ void CharaPicks::CharaDetails()
             initializeSprite(selected.name->GetComponent<Sprite>(), { 2200.0f, 200.0f }, { 0.9f, 0.9f }, { 1.0f, 1.0f, 1.0f, 0.0f });
             initializeSprite(selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>(), { 2200.0f, 50.0f }, {}, {});
             initializeSprite(selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>(), { 2200.0f, 190.0f }, {}, {});
-            initializeSprite(selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>(), { 2200.0f, 0.0f }, {}, {});
+            //initializeSprite(selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>(), { 2200.0f, 0.0f }, {}, {});
 
             // チームが既に選んでいるキャラだった場合
             if (selected.id == teamPick)
@@ -191,8 +191,8 @@ void CharaPicks::CharaDetails()
                 selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->spc.onshot = true;
                 selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->EasingPlay();
                 selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->spc.onshot = true;
-                selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->EasingPlay();
-                selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = true;
+                //selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->EasingPlay();
+                //selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = true;
 
                 selected.sprite->spc.color = selectColor;
                 selected.sprite->spc.scale = { 0.4f, 0.4f };
