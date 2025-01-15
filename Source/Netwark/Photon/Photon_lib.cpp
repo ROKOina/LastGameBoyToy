@@ -673,6 +673,7 @@ void PhotonLib::NetCharaInput()
         if (!netPlayer)continue;
 
         auto& chara = netPlayer->GetComponent<CharacterCom>();
+        chara->GetNetCharaData().SetTeamID(saveInputPhoton[s.playerId].teamID);
 
         chara->SetUserInput(s.nextInput.input);
         chara->SetUserInputDown(s.nextInput.inputDown);
@@ -1209,23 +1210,29 @@ void PhotonLib::GameRecv(NetData recvData)
     std::string name = "netPlayer" + std::to_string(recvData.photonId);
     GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
 
+    int myPlayerID = GetMyPlayerID();
+
     //プレイヤー追加
-    if (!net1)
+    if (myPlayerID >= 0)
     {
-        //AddPlayer(recvData.photonId, recvData.playerId);
+        if (!net1)
+        {
+            //AddPlayer(recvData.photonId, recvData.playerId);
 
-        //netプレイヤー
-        net1 = GameObjectManager::Instance().Create();
-        net1->SetName(name.c_str());
+            //netプレイヤー
+            net1 = GameObjectManager::Instance().Create();
+            net1->SetName(name.c_str());
 
-        bool team = false;
-        
-        if (saveInputPhoton[GetMyPlayerID()].teamID == saveInputPhoton[recvData.playerId].teamID)
-            team = true;
+            bool team = false;
 
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
-        net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+            if (saveInputPhoton[myPlayerID].teamID == saveInputPhoton[recvData.playerId].teamID)
+                team = true;
+
+            RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
+            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+        }
     }
+
     saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
 
     //hp
@@ -1234,7 +1241,6 @@ void PhotonLib::GameRecv(NetData recvData)
     //ultGauge
     net1->GetComponent<CharacterCom>()->SetUltGauge(recvData.gameData.ultGauge);
 
-    int myPlayerID = GetMyPlayerID();
     auto& myPlayer = GameObjectManager::Instance().Find("player");
     if (!myPlayer)return;
 
