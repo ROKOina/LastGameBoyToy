@@ -63,7 +63,7 @@ void CharaPicks::CreateCharaPicksUiObject()
         AddCharacterUI(charaPicksCanvas, "Matya-", "Data/SerializeData/UIData/CharaPick/charaIcon3.ui",
             "Data/SerializeData/UIData/CharaPick/charaName3.ui", "Data/SerializeData/UIData/CharaPick/matha_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/matha_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/matha_ulticon.ui",
-            "Data/Model/player_True/player4.mdl", "Data/Video/inazo_RightClick.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_ult.mp4",
+            "Data/Model/player_True/player4.mdl", "Data/Video/solder_RightClick.mp4", "Data/Video/solder_ESkill.mp4", "Data/Video/solder_Ult.mp4",
             "Matya-video1", "Matya-video2", "Matya-ultvideo");
     }
 
