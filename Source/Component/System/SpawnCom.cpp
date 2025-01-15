@@ -444,8 +444,6 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
 //ソルジャーウルト生成関数
 void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
 {
-    auto& player = GetGameObject()->GetParent();
-
     obj->SetName("soldierult");
     obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_ult_attack.gpuparticle", 200);
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
@@ -458,7 +456,7 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(player->GetName(), "player") == 0)
+    if (std::strcmp(parent.lock()->GetName(), "player") == 0)
     {
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     }
@@ -469,13 +467,13 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     }
 
     //弾
-    int netPlayerID = player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    int netPlayerID = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
     bulletCom->SetAliveTime(8.0f);
     bulletCom->SetDamageValue(-10);
 
     //判定用
-    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(player);
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(parent.lock());
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(10.0f);
 }
