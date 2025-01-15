@@ -414,7 +414,10 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(parent.lock()->GetName(), "player") == 0)
+
+    int playerTeam = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    int myTeam = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    if (playerTeam == myTeam)
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         collider->SetJudgeTag(COLLIDER_TAG::Player);
@@ -456,7 +459,10 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(parent.lock()->GetName(), "player") == 0)
+
+    int playerTeam = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    int myTeam = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    if (playerTeam== myTeam)
     {
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     }
