@@ -18,7 +18,7 @@ public:
     void FireBullet(const GameObj& bullet);
 
     // e‚Ìæ’[ˆÊ’u‚ğæ“¾
-    bool GetGunTipPosition(DirectX::XMFLOAT3& outGunPos) const;
+    bool GetGunTipPosition(DirectX::XMFLOAT3& outGunPos, DirectX::XMFLOAT3& dir, unsigned int gamePad) const;
 
 protected:
     float mass = 1.0f;
