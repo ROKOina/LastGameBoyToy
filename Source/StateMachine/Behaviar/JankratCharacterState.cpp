@@ -212,7 +212,7 @@ void JankratCharacter_UltState::Enter()
     // 銃の先端位置を取得
     DirectX::XMFLOAT3 gunPos = {};
     DirectX::XMFLOAT3 dir = {};
-    if (GetGunTipPosition(gunPos, dir, CharacterInput::MainAttackButton))
+    if (GetGunTipPosition(gunPos, dir, CharacterInput::UltimetButton))
     {
         // 弾丸を作成しセット
         const auto& bullet = BulletCreate::JankratUlt(owner->GetGameObject(), gunPos, 5.0f);
