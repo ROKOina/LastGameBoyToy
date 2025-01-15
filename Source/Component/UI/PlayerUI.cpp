@@ -902,7 +902,7 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
 {
     allyHp = true;
     //ロードするテクスチャを設定(アイコンができてから)
-    std::string name = "Data/Texture/PlayerUI/" + (std::string)netPlayer.lock()->GetComponent<CharacterCom>()->GetName() + "/CharaIcon.png";
+    std::string name = "Data/Texture/PlayerUI/CharaIcon/"+ (std::string)netPlayer.lock()->GetComponent<CharacterCom>()->GetName()+".png";
 
     //HpFrame
     {
@@ -920,6 +920,13 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         gauge->SetMaxValue(netPlayer.lock()->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
         float* i = netPlayer.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
         gauge->SetVariableValue(i);
+    }
+    //Icon
+    {
+        std::shared_ptr<GameObject> icon = GameObjectManager::Instance().Find("AllyHpFrame")->AddChildObject();
+        icon->SetName("AllyIcon");
+        std::shared_ptr<UiSystem>iconUi = icon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/AllyIcon.ui", Sprite::SpriteShader::DEFALT,false);
+        iconUi->LoadTexture(name);
     }
 
 }
