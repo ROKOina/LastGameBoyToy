@@ -1229,6 +1229,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
             RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
             net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetTeamID(recvData.gameData.teamID[recvData.playerId]);
         }
     }
 
