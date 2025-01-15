@@ -73,6 +73,13 @@ void PVEDirection::CharaSlect(float elapsedTime)
 {
     if (!flag)
     {
+        GameObjectManager::Instance().Find("BOSS")->SetEnabled(false);
+        GameObjectManager::Instance().Find("stage")->SetEnabled(false);
+        GameObjectManager::Instance().Find("player")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Gate0")->SetEnabled(false);
+       
+       
+
         charaPicks->SetViewCharaPicks(true);
         flag = true;
     }
@@ -83,6 +90,11 @@ void PVEDirection::CharaSlect(float elapsedTime)
     if (charaPicks->IsDecisionFlg())
     {
         RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()));
+        GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
+        GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+        GameObjectManager::Instance().Find("player")->SetEnabled(true);
+        GameObjectManager::Instance().Find("Gate0")->SetEnabled(true);
+        GameObjectManager::Instance().Find(charName[charaPicks->GetSelectedCharacterId()].c_str())->SetEnabled(false);
         charaPicks->SetViewCharaPicks(false);
         CharaSelectFlag = true;
         flag = false;
