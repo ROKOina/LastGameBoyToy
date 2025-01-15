@@ -273,19 +273,19 @@ void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* 
     //1番目のスキルアイコン
     auto& skillIcon1 = name->AddChildObject();
     skillIcon1->SetName("Rightskillicon");
-    auto& skillsprite1 = skillIcon1->AddComponent<Sprite>(skillIconPath1, Sprite::SpriteShader::DEFALT, true);
+    auto& skillsprite1 = skillIcon1->AddComponent<Sprite>(skillIconPath1, Sprite::SpriteShader::HOLO, true);
     skillsprite1->SetOrderinLayer(1);
 
     //2番目のスキルアイコン
     auto& skillIcon2 = name->AddChildObject();
     skillIcon2->SetName("Eskillicon");
-    auto& skillsprite2 = skillIcon2->AddComponent<Sprite>(skillIconPath2, Sprite::SpriteShader::DEFALT, true);
+    auto& skillsprite2 = skillIcon2->AddComponent<Sprite>(skillIconPath2, Sprite::SpriteShader::HOLO, true);
     skillsprite2->SetOrderinLayer(2);
 
     //ultのスキルアイコン
     auto& ultIcon = name->AddChildObject();
     ultIcon->SetName("ultIcon");
-    auto& ultsprite2 = ultIcon->AddComponent<Sprite>(ultIconPath, Sprite::SpriteShader::DEFALT, true);
+    auto& ultsprite2 = ultIcon->AddComponent<Sprite>(ultIconPath, Sprite::SpriteShader::HOLO, true);
     ultsprite2->SetOrderinLayer(3);
 
     //video1

@@ -190,6 +190,9 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     case SpriteShader::GLITCH:
         PSPath = { "Shader\\GlitchPS.cso" };
         break;
+    case SpriteShader::HOLO:
+        PSPath = { "Shader\\HoloGlennPS.cso" };
+        break;
     default:
         assert(!"シェーダーがありません");
     }

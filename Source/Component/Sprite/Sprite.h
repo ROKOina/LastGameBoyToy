@@ -19,6 +19,7 @@ public:
         DISSOLVE,
         CHROMATICABERRATION,
         GLITCH,
+        HOLO,
         MAX
     };
 
