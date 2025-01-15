@@ -32,7 +32,7 @@ public:
     virtual const char* GetName() const override { return "MainAttack"; }
 
 private:
-    std::shared_ptr<GameObject>rayobj;
+    std::weak_ptr<GameObject>rayobj;
 };
 
 //EƒXƒLƒ‹
