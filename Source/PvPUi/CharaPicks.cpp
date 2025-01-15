@@ -56,7 +56,7 @@ void CharaPicks::CreateCharaPicksUiObject()
         AddCharacterUI(charaPicksCanvas, "Santoratto", "Data/SerializeData/UIData/CharaPick/charaIcon2.ui",
             "Data/SerializeData/UIData/CharaPick/charaName2.ui", "Data/SerializeData/UIData/CharaPick/santorat_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/santorat_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/santorat_ulticon.ui",
-            "Data/Model/player_True/player3.mdl", "Data/Video/inazo_RightClick.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_ult.mp4",
+            "Data/Model/player_True/player3.mdl", "Data/Video/jankurat_Eskill.mp4", "Data/Video/jankurat_Eskill.mp4", "Data/Video/jankurat_ult.mp4",
             "Santoratto-video1", "Santoratto-video2", "Santoratto-ultvideo");
 
         // MATYA-
