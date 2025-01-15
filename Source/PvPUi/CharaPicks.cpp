@@ -42,29 +42,29 @@ void CharaPicks::CreateCharaPicksUiObject()
         AddCharacterUI(charaPicksCanvas, "Kanizo-", "Data/SerializeData/UIData/CharaPick/charaIcon0.ui",
             "Data/SerializeData/UIData/CharaPick/charaName0.ui", "Data/SerializeData/UIData/CharaPick/kanizo_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/kanizo_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/kanizo_ultskillicon.ui",
-            "Data/Model/player_True/player1.mdl", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4",
-            "kanizo-video1"/*, "kanizo-video2", "kanizo-ultvideo"*/);
+            "Data/Model/player_True/player1.mdl", "Data/Video/inazo_RightClick.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_ult.mp4",
+            "kanizo-video1", "kanizo-video2", "kanizo-ultvideo");
 
         // FARAIC
         AddCharacterUI(charaPicksCanvas, "Faraic", "Data/SerializeData/UIData/CharaPick/charaIcon1.ui",
             "Data/SerializeData/UIData/CharaPick/charaName1.ui", "Data/SerializeData/UIData/CharaPick/farahc_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/farahc_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/farahc_ulticon.ui",
-            "Data/Model/player_True/player2.mdl", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4",
-            "Faraic-video1"/*, "Faraic-video2", "Faraic-ultvideo"*/);
+            "Data/Model/player_True/player2.mdl", "Data/Video/farahick_RightClick.mp4", "Data/Video/farahick_ESkill.mp4", "Data/Video/farahick_ult.mp4",
+            "Faraic-video1", "Faraic-video2", "Faraic-ultvideo");
 
         // SANTORATTO
         AddCharacterUI(charaPicksCanvas, "Santoratto", "Data/SerializeData/UIData/CharaPick/charaIcon2.ui",
             "Data/SerializeData/UIData/CharaPick/charaName2.ui", "Data/SerializeData/UIData/CharaPick/santorat_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/santorat_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/santorat_ulticon.ui",
-            "Data/Model/player_True/player3.mdl", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4",
-            "Santoratto-video1"/*, "Santoratto-video2", "Santoratto-ultvideo"*/);
+            "Data/Model/player_True/player3.mdl", "Data/Video/inazo_RightClick.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_ult.mp4",
+            "Santoratto-video1", "Santoratto-video2", "Santoratto-ultvideo");
 
         // MATYA-
         AddCharacterUI(charaPicksCanvas, "Matya-", "Data/SerializeData/UIData/CharaPick/charaIcon3.ui",
             "Data/SerializeData/UIData/CharaPick/charaName3.ui", "Data/SerializeData/UIData/CharaPick/matha_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/matha_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/matha_ulticon.ui",
-            "Data/Model/player_True/player4.mdl", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_Eskill.mp4",
-            "Matya-video1"/*, "Matya-video2", "Matya-ultvideo"*/);
+            "Data/Model/player_True/player4.mdl", "Data/Video/inazo_RightClick.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_ult.mp4",
+            "Matya-video1", "Matya-video2", "Matya-ultvideo");
     }
 
     // 決定ボタン
@@ -111,16 +111,22 @@ void CharaPicks::CharaDetails()
     auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
 
     // キャラクター情報を取得する関数
-    auto getCharacterInfo = [&](const std::string& charaName, const std::string& objectName, int id) -> CharacterInfo
+    auto getCharacterInfo = [&](const std::string& charaName, const std::string& objectName, const char* videoname1, const char* videoname2, const char* ultvideoname, int id) -> CharacterInfo
         {
             auto& chara = canvas->GetChildFind(charaName.c_str());
             auto& charamodel = canvas->GetChildFind(objectName.c_str());
+            auto& video1 = canvas->GetChildFind(videoname1);
+            auto& video2 = canvas->GetChildFind(videoname2);
+            auto& ultvideo = canvas->GetChildFind(ultvideoname);
             return
             {
                 chara,
                 chara->GetComponent<Sprite>(),
                 chara->GetChildFind("name"),
                 charamodel,
+                video1,
+                video2,
+                ultvideo,
                 id
             };
         };
@@ -128,10 +134,10 @@ void CharaPicks::CharaDetails()
     // キャラ、ID設定
     std::vector<CharacterInfo> characters =
     {
-        getCharacterInfo("Kanizo-", "Kanizo-Player", 0),
-        getCharacterInfo("Faraic", "FaraicPlayer", 1),
-        getCharacterInfo("Santoratto", "SantorattoPlayer", 2),
-        getCharacterInfo("Matya-", "Matya-Player", 3)
+        getCharacterInfo("Kanizo-", "Kanizo-Player","kanizo-video1","kanizo-video2","kanizo-ultvideo", 0),
+        getCharacterInfo("Faraic", "FaraicPlayer","Faraic-video1","Faraic-video2","Faraic-ultvideo", 1),
+        getCharacterInfo("Santoratto", "SantorattoPlayer","Santoratto-video1","Santoratto-video2","Santoratto-ultvideo", 2),
+        getCharacterInfo("Matya-", "Matya-Player", "Matya-video1","Matya-video2","Matya-ultvideo",3)
     };
 
     // 共通のスプライト初期化処理
@@ -250,7 +256,7 @@ void CharaPicks::DecisionButton()
 }
 
 //キャラのUI追加関数
-void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* charaName, const char* iconPath, const char* namePath, const char* skillIconPath1, const char* skillIconPath2, const char* ultIconPath, const char* modelPath, const char* video1, const char* video2, const char* video3, const char* videoname1/*, const char* videoname2, const char* ultvideoname*/)
+void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* charaName, const char* iconPath, const char* namePath, const char* skillIconPath1, const char* skillIconPath2, const char* ultIconPath, const char* modelPath, const char* video1, const char* video2, const char* video3, const char* videoname1, const char* videoname2, const char* ultvideoname)
 {
     // キャラアイコン
     auto& chara = parent->AddChildObject();
@@ -293,7 +299,7 @@ void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* 
 
     //video2
     auto& skillvideo2 = parent->AddChildObject();
-    skillvideo2->SetName("videoname2");
+    skillvideo2->SetName(videoname2);
     skillvideo2->AddComponent<Video>(video2);
     skillvideo2->transform_->SetWorldPosition({ -2.730f,0.724f,1.765f });
     skillvideo2->transform_->SetEulerRotation({ 0.0f,-32.0f,0.0f });
@@ -302,7 +308,7 @@ void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* 
 
     //ult
     auto& ultvideo = parent->AddChildObject();
-    ultvideo->SetName("ultvideoname");
+    ultvideo->SetName(ultvideoname);
     ultvideo->AddComponent<Video>(video3);
     ultvideo->transform_->SetWorldPosition({ -2.730f,0.724f,1.765f });
     ultvideo->transform_->SetEulerRotation({ 0.0f,-32.0f,0.0f });
