@@ -26,7 +26,6 @@ Texture2D texturemaps : register(t0);
 
 float3 HueShift(float3 color, float shift)
 {
-    // 色相をシフトする簡易的な変換
     float angle = shift * 3.14159 * 2.0; // 色相のシフト角度
     float3 k = float3(0.57735, 0.57735, 0.57735); // 標準的なRGB軸の正規化ベクトル
     float3 p = cos(angle) * color + sin(angle) * cross(k, color) + (1.0 - cos(angle)) * dot(k, color) * k;
@@ -37,6 +36,12 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     // テクスチャから色をサンプルし、リニア空間に変換
     float4 color = texturemaps.Sample(sampler_states[TRANSPARENT_BORDER_LINEAR], pin.texcoord);
+
+    //フラグなら
+    if (onflag)
+    {
+        return color;
+    }
 
     // 逆ガンマ補正でリニア空間に変換 (通常のガンマ値は 2.2)
     color.rgb = pow(color.rgb, GAMMA);
@@ -50,21 +55,21 @@ float4 main(VS_OUT pin) : SV_TARGET
         discard;
 
     // 背景色 (ベース色) とエフェクトを設定
-    float4 base = float4(1.0, 1.0, 1.0, 0.4);
-    float glow = absin(time * 0.01) * 0.5 + 0.5; // 点滅速度を遅く
+    float4 base = float4(0.8, 0.8, 0.8, 0.4);
+    float glow = absin(time * 0.01) * 0.01 + 0.01; // 点滅速度をさらに遅く調整
 
     // アニメーション係数の計算
-    float L = 2800.0 + 50.0 * cos(time / 50.0); // 動きをゆっくりに調整
+    float L = 2800.0 + 50.0 * cos(time / 5000.0); // 動きをさらにゆっくりに調整
     float P = 25.0;
     float N = 27.0; // should be #defines
-    float M = 250.0 + 50.0 * sin(time / 50.0); // 動きをゆっくりに調整
+    float M = 250.0 + 50.0 * sin(time / 5000.0); // 動きをさらにゆっくりに調整
     float x = pin.texcoord.x;
     float y = pin.texcoord.y;
 
-    float a = absincos((x - 2.0 * y) / L + time * 0.075, P) * absincos(time * 0.15 + y / M, N);
+    float a = absincos((x - 2.0 * y) / L + time * 0.01875, P) * absincos(time * 0.0375 + y / M, N);
 
     // 色相を時間に応じてシフト
-    color.rgb = HueShift(color.rgb, absin(time * 0.05)); // 色の変化速度も遅く
+    color.rgb = HueShift(color.rgb, absin(time * 0.8)); // 色の変化速度も大幅に遅く
 
     // 輝きを追加
     color.rgb += glow * 0.2;

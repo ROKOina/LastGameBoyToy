@@ -7,6 +7,7 @@
 #include "Component\Animation\AnimationCom.h"
 #include <Component\Camera\FreeCameraCom.h>
 #include "Component\Renderer\VideoCom.h"
+#include "SystemStruct\TimeManager.h"
 
 CharaPicks::CharaPicks()
 {
@@ -92,7 +93,7 @@ void CharaPicks::CreateCharaPicksUiObject()
 void CharaPicks::CharaPicksUpdate(float elapsedTime)
 {
     // 各キャラ詳細
-    CharaDetails();
+    CharaDetails(elapsedTime);
 
     // 決定処理
     if (GameObjectManager::Instance().Find("CharaPicksCanvas") != nullptr)
@@ -102,7 +103,7 @@ void CharaPicks::CharaPicksUpdate(float elapsedTime)
 }
 
 // キャラ詳細
-void CharaPicks::CharaDetails()
+void CharaPicks::CharaDetails(float elapsedTime)
 {
     // 決定していたら操作不可
     if (decisionFlg) return;
@@ -204,6 +205,8 @@ void CharaPicks::CharaDetails()
                 selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->EasingPlay();
                 selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = true;
 
+                triger = true;
+
                 selected.sprite->spc.color = selectColor;
                 selected.sprite->spc.scale = { 0.4f, 0.4f };
                 selected.sprite->EasingPlay();
@@ -218,11 +221,63 @@ void CharaPicks::CharaDetails()
             }
         };
 
+    auto updatechara = [&](CharacterInfo& selected)
+        {
+            static const float interval = 90.0f; // 全体の繰り返し時間
+            static const float rightSkillTime = 30.0f; // RightSkill の時間
+            static const float eSkillTime = 60.0f;     // ESkill の時間
+            static const float ultTime = 90.0f;        // Ult の時間
+
+            if (triger)
+            {
+                plustime += elapsedTime;
+
+                // 時間の繰り返し処理
+                if (plustime >= interval)
+                {
+                    plustime = 0.0f;
+                }
+            }
+
+            if (triger && selectedCharacterId == selected.id) // 選択されたキャラクターのみ更新
+            {
+                // 状態更新
+                if (plustime < rightSkillTime)
+                {
+                    selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = 0;
+                    selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
+                    selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = 1;
+                    selected.video1->SetEnabled(true);
+                    selected.video2->SetEnabled(false);
+                    selected.ultvideo->SetEnabled(false);
+                }
+                else if (plustime < eSkillTime)
+                {
+                    selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
+                    selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = 0;
+                    selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = 1;
+                    selected.video1->SetEnabled(false);
+                    selected.video2->SetEnabled(true);
+                    selected.ultvideo->SetEnabled(false);
+                }
+                else if (plustime < ultTime)
+                {
+                    selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
+                    selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = 1;
+                    selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = 0;
+                    selected.video1->SetEnabled(false);
+                    selected.video2->SetEnabled(false);
+                    selected.ultvideo->SetEnabled(true);
+                }
+            }
+        };
+
     // 各キャラクターを処理
     for (size_t i = 0; i < characters.size(); ++i)
     {
         std::vector<CharacterInfo> others = characters;
         others.erase(others.begin() + i);
+        updatechara(characters[i]);
         handleCharacterSelection(characters[i], others);
     }
 }

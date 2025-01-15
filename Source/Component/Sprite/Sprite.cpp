@@ -654,6 +654,7 @@ void Sprite::OnGUI()
         ImGui::DragFloat((char*)u8"クリップ時間", &constants.cliptime, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"ディゾルブ量", &constants.edgethreshold, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"縁オフセット", &constants.edgeoffset, 0.1f, 0.0f, 1.0f);
+        ImGui::Checkbox((char*)u8"発光フラグ", reinterpret_cast<bool*>(&constants.onflag));
         ImGui::TreePop();
     }
 

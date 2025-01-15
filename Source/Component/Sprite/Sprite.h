@@ -126,7 +126,8 @@ public:
         float cliptime = 0.0f;
         float edgethreshold = 1.0f;
         float edgeoffset = 0.0f;
-        DirectX::XMFLOAT2 padding = {};
+        int onflag = 1;
+        float padding = {};
     };
     SaveConstantsParameter constants;
 
