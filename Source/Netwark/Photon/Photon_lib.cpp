@@ -65,8 +65,28 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 void PhotonLib::update(float elapsedTime)
 {
     auto& myPlayer = GameObjectManager::Instance().Find("player");
+
     if (myPlayer)
     {
+        //銃口の位置
+        DirectX::XMFLOAT3 gunPos = {};
+        {
+            const auto& cameraObj = myPlayer->GetChildFind("cameraPostPlayer");
+            const auto& arm = cameraObj->GetChildFind("armChild");
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
+
+            if (gunNode)
+            {
+                gunPos =
+                {
+                    gunNode->worldTransform._41,
+                    gunNode->worldTransform._42,
+                    gunNode->worldTransform._43
+                };
+            }
+        }
+
         int myPhotonID = GetMyPhotonID();
         for (auto& s : saveInputPhoton)
         {
@@ -93,6 +113,9 @@ void PhotonLib::update(float elapsedTime)
             //速力
             DirectX::XMFLOAT3 velo = myPlayer->GetComponent<MovementCom>()->GetVelocity();
             save.velo = velo;
+
+            //銃口の位置
+            save.gunPos = gunPos;
 
             s.inputBuf->Enqueue(save);
 
@@ -534,6 +557,9 @@ void PhotonLib::NetInputUpdate()
         saveB = s.inputBuf->GetHeadFromSize(100);
 
         bool isInputInit = false;
+
+        //入力を保存
+        auto& saveBuffer = StaticSendDataManager::Instance().GetSaveBuffer(s.playerId);
         for (auto& b : saveB)
         {
             //前回のフレームから今回のフレームからディレイした分までの入力を保存
@@ -542,6 +568,9 @@ void PhotonLib::NetInputUpdate()
 
             if (!isInputInit)	//最初に入った時に入力初期化
             {
+                //入力リセット
+                saveBuffer.clear();
+
                 s.nextInput.inputDown = 0;
                 s.nextInput.input = 0;
                 s.nextInput.inputUp = 0;
@@ -557,6 +586,9 @@ void PhotonLib::NetInputUpdate()
 
                 isInputInit = true;
             }
+
+            //入力保存
+            saveBuffer.emplace_back(b);
 
             s.nextInput.inputDown |= b.inputDown;
             s.nextInput.input |= b.input;
@@ -641,6 +673,7 @@ void PhotonLib::NetCharaInput()
         if (!netPlayer)continue;
 
         auto& chara = netPlayer->GetComponent<CharacterCom>();
+        chara->GetNetCharaData().SetTeamID(saveInputPhoton[s.playerId].teamID);
 
         chara->SetUserInput(s.nextInput.input);
         chara->SetUserInputDown(s.nextInput.inputDown);
@@ -1177,23 +1210,29 @@ void PhotonLib::GameRecv(NetData recvData)
     std::string name = "netPlayer" + std::to_string(recvData.photonId);
     GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
 
+    int myPlayerID = GetMyPlayerID();
+
     //プレイヤー追加
-    if (!net1)
+    if (myPlayerID >= 0)
     {
-        //AddPlayer(recvData.photonId, recvData.playerId);
+        if (!net1)
+        {
+            //AddPlayer(recvData.photonId, recvData.playerId);
 
-        //netプレイヤー
-        net1 = GameObjectManager::Instance().Create();
-        net1->SetName(name.c_str());
+            //netプレイヤー
+            net1 = GameObjectManager::Instance().Create();
+            net1->SetName(name.c_str());
 
-        bool team = false;
-        
-        if (saveInputPhoton[GetMyPlayerID()].teamID == saveInputPhoton[recvData.playerId].teamID)
-            team = true;
+            bool team = false;
 
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
-        net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+            if (saveInputPhoton[myPlayerID].teamID == saveInputPhoton[recvData.playerId].teamID)
+                team = true;
+
+            RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
+            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+        }
     }
+
     saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
 
     //hp
@@ -1202,7 +1241,6 @@ void PhotonLib::GameRecv(NetData recvData)
     //ultGauge
     net1->GetComponent<CharacterCom>()->SetUltGauge(recvData.gameData.ultGauge);
 
-    int myPlayerID = GetMyPlayerID();
     auto& myPlayer = GameObjectManager::Instance().Find("player");
     if (!myPlayer)return;
 

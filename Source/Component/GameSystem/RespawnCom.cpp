@@ -20,7 +20,7 @@ void RespawnCom::Update(float elapsedTime)
     }
 
     //ƒŠƒXƒ|[ƒ“ˆ—
-    for (auto& respawnData : respawnDatas)
+    for (RespawnData* respawnData : respawnDatas)
     {
         respawnData->respawnTime += elapsedTime;
 
@@ -80,4 +80,5 @@ void RespawnCom::Update(float elapsedTime)
             respawnDatas.erase(it);
         }
     }
+    endDatas.clear();
 }

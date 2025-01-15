@@ -68,7 +68,7 @@ public:
 
     //ジャンクラの弾
     static GameObj JankratBulletFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);
-    static GameObj JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, float force, float damage, int id);
+    static GameObj JankratMineFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, DirectX::XMFLOAT3 dir, float force, float damage, int id);
     static GameObj JankratUlt(std::shared_ptr<GameObject>parent, DirectX::XMFLOAT3 pos, int damagepower);
 
     //ソルジャースキル

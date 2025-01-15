@@ -961,6 +961,7 @@ void GameObjectManager::RenderShadow()
     //‰e•`‰æ
     for (std::weak_ptr<RendererCom>& modelrender : renderSortObject_)
     {
+        if (modelrender.expired())continue;
         if (!modelrender.lock()->GetGameObject()->GetEnabled())continue;
         if (!modelrender.lock()->GetEnabled())continue;
 

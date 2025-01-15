@@ -79,6 +79,9 @@ void ScenePVP::Initialize()
 
     //ゲームシステム
     pvpGameSystem = std::make_unique<PVPGameSystem>();
+
+    //UI初期化
+    PlayerUIManager::Instance().ResetAllyHp();
 }
 
 void ScenePVP::InitializeLobbySelect()

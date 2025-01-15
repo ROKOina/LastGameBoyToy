@@ -18,7 +18,7 @@ public:
     void FireBullet(const GameObj& bullet);
 
     // e‚Ìæ’[ˆÊ’u‚ğæ“¾
-    bool GetGunTipPosition(DirectX::XMFLOAT3& outGunPos) const;
+    bool GetGunTipPosition(DirectX::XMFLOAT3& outGunPos, DirectX::XMFLOAT3& dir, unsigned int gamePad) const;
 
 protected:
     float mass = 1.0f;
@@ -29,6 +29,9 @@ protected:
     float addGravity = -0.8f;
     float fireVecY = 0.35f;
     float explosiontime = 1.5f;
+
+    DirectX::XMFLOAT3 DIR = {};
+    DirectX::XMFLOAT3 POS = {};
 
 protected:
     std::weak_ptr<JankratCharacterCom> charaCom;
