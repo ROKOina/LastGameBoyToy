@@ -401,6 +401,8 @@ void SpawnCom::CreateGimmickMissile(const std::shared_ptr<GameObject>& obj)
 //ジャンクラウルト生成関数
 void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
 {
+    auto& player = GetGameObject()->GetParent();
+
     obj->SetName("jankratfireball");
     obj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/jankratult_fireball.cpuparticle", 400);
     std::shared_ptr<MovementCom>move = obj->AddComponent<MovementCom>();
@@ -414,7 +416,7 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(GameObjectManager::Instance().Find("player")->GetName(), "player") == 0)
+    if (std::strcmp(player->GetName(), "player") == 0)
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         collider->SetJudgeTag(COLLIDER_TAG::Player);
@@ -424,15 +426,15 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     obj->AddComponent<JankratUltCom>();
 
     //弾
-    //int netPlayerID = obj->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
-    //std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netPlayerID);
-    //bulletCom->SetAliveTime(8.0f);
-    //bulletCom->SetDamageValue(-damageValue);
+    int netPlayerID = player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
+    bulletCom->SetAliveTime(8.0f);
+    bulletCom->SetDamageValue(-10);
 
     //判定用
-    //std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(GetGameObject());
-    //hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    //hit->SetValue(10.0f);
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(player);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(10.0f);
 
     //爆発物
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
@@ -444,7 +446,7 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
 //ソルジャーウルト生成関数
 void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
 {
-    auto& player = GameObjectManager::Instance().Find("player");
+    auto& player = GetGameObject()->GetParent();
 
     obj->SetName("soldierult");
     obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_ult_attack.gpuparticle", 200);
