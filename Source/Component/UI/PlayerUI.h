@@ -215,7 +215,7 @@ private:
 
     float oldHp= 0.0f;
     float timer = 0.0f;
-    const float time = 5.0f;
+    const float time = 1.0f;
 
     std::shared_ptr<GameObject> enemyHp;
 };
