@@ -36,6 +36,13 @@ void SettingScreen::CreateSettingUiObject()
         settingTitle->AddComponent<Sprite>("Data/SerializeData/UIData/setting/settingTitle.ui", Sprite::SpriteShader::DEFALT, false);
     }
 
+    //‘€ìà–¾
+    {
+        auto& Manual = obj->AddChildObject();
+        Manual->SetName("Manual");
+        Manual->AddComponent<Sprite>("Data/SerializeData/UIData/setting/manual.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+
     std::vector<int> barInitial;
     //Š´“x
     {
@@ -310,16 +317,28 @@ void SettingScreen::SetViewSetting(bool flg)
     auto& canvas = GameObjectManager::Instance().Find("settingCanvas");
     if (!canvas)return;
 
+    auto& charaui = GameObjectManager::Instance().Find("Canvas");
+
     //•\Ž¦Ý’è‚ð‚·‚é
     if (flg)
     {
         if (canvas)
             canvas->SetEnabled(true);
+
+        if (charaui != nullptr)
+        {
+            charaui->SetEnabled(false);
+        }
     }
     else
     {
         if (canvas)
             canvas->SetEnabled(false);
+
+        if (charaui != nullptr)
+        {
+            charaui->SetEnabled(true);
+        }
     }
 }
 
