@@ -3,7 +3,10 @@
 #include "Component\UI\UiGauge.h"
 #include "Component\Character\RegisterChara.h"
 #include "Component\Character\CharacterCom.h"
+#include "PVPGameSystem\PVPGameSystem.h"
 #include <map>
+
+
 
 class UI_Skill : public UiSystem
 {
@@ -220,6 +223,26 @@ private:
     std::shared_ptr<GameObject> enemyHp;
 };
 
+class UI_GameJudge : public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam);
+    ~UI_GameJudge() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_BoostGauge"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+private:
+    std::vector<std::weak_ptr<GameObject>> circles;
+    
+};
+
 class UI_UltNum : public Component
 {
 public:
@@ -295,12 +318,21 @@ public:
     void CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer);
     bool GetAllyHp() { return allyHp; }
 
+    //勝敗表示UI
+    void CreateGameJudgeUI(); 
+
+    void SetVictryTeam(PVPGameSystem::TEAM_KIND victryTeam) { this->victryTeam = victryTeam;}
+
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
-  
+
 private:
     bool bookingRegister = false;
     
     std::weak_ptr<GameObject> player;
 
+    bool isEndGame = false;
+
     bool allyHp = false;    //味方HP表示済み
+
+    PVPGameSystem::TEAM_KIND victryTeam = PVPGameSystem::TEAM_KIND::DRAW;
 };

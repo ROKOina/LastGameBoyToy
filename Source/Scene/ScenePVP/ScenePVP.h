@@ -8,6 +8,7 @@
 // 前方宣言
 class CharaPicks;
 
+
 //リザルトシーン
 class ScenePVP :public Scene
 {
@@ -47,7 +48,7 @@ private:
     void NewObject();
 
     //ゲームシステム更新
-    void GameSystemUpdate(float elapsedTime);
+    void GameSyste0mUpdate(float elapsedTime);
 
     //画面に応じた更新処理
     void TransitionUpdate(float elapsedTime);
@@ -64,7 +65,7 @@ private:
     void LobbyBackSprUpdate(float elapsedTime);
 private:
 
-    std::shared_ptr<CharaPicks>          charaPicks;
+    std::shared_ptr<CharaPicks>        charaPicks;
     std::unique_ptr<BasicsApplication> photonNet;
 
     bool isGame = false;
