@@ -220,7 +220,8 @@ void GameObjectManager::CreateNowTimeSaveComponent(std::shared_ptr<GameObject> o
 // 削除
 void GameObjectManager::Remove(std::shared_ptr<GameObject> obj)
 {
-    removeGameObject_.insert(obj);
+    if (obj)
+        removeGameObject_.insert(obj);
 }
 
 //即削除（危険出来れば使わない方がいいかも）
