@@ -1185,7 +1185,9 @@ void PhotonLib::GameRecv(NetData recvData)
         if (s.photonId == recvData.photonId)add = false;
     }
     //キャラ追加リストに追加
-    if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
+    if (add)
+        if (recvData.playerId >= 0)
+            addSavePhotonID[recvData.playerId] = recvData.photonId;
 
     //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
@@ -1225,15 +1227,17 @@ void PhotonLib::GameRecv(NetData recvData)
 
             bool team = false;
 
-            if (saveInputPhoton[myPlayerID].teamID == saveInputPhoton[recvData.playerId].teamID)
-                team = true;
+            if (recvData.playerId >= 0)
+                if (saveInputPhoton[myPlayerID].teamID == saveInputPhoton[recvData.playerId].teamID)
+                    team = true;
 
             RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
             net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
         }
     }
 
-    saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
+    if (recvData.playerId >= 0)
+        saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
 
     //hp
     net1->GetComponent<CharaStatusCom>()->SetHitPoint(recvData.gameData.hp);
@@ -1306,15 +1310,18 @@ void PhotonLib::GameRecv(NetData recvData)
         }
     }
 
-    //保存情報
-        //入力
-    for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
+    if (recvData.playerId >= 0)
     {
-        SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
+        //保存情報
+            //入力
+        for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
+        {
+            SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
 
-        SaveBuffer currentInput = saveInputPhoton[recvData.playerId].inputBuf->GetHead();
-        if (currentInput.frame < newInput.frame || currentInput.frame == 0)	//新しいフレームから始める
-            saveInputPhoton[recvData.playerId].inputBuf->Enqueue(newInput);
+            SaveBuffer currentInput = saveInputPhoton[recvData.playerId].inputBuf->GetHead();
+            if (currentInput.frame < newInput.frame || currentInput.frame == 0)	//新しいフレームから始める
+                saveInputPhoton[recvData.playerId].inputBuf->Enqueue(newInput);
+        }
     }
     ////保存情報
     //for (auto& s : saveInputPhoton)
@@ -1405,11 +1412,14 @@ void PhotonLib::LobbyRecv(NetData recvData)
         if (s.photonId == recvData.photonId)add = false;
     }
     //キャラ追加リストに追加
-    if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
+    if (add)
+        if (recvData.playerId >= 0)
+            addSavePhotonID[recvData.playerId] = recvData.photonId;
     
     //AddPlayer(recvData.photonId, recvData.playerId);
 
-    saveInputPhoton[recvData.playerId].charaID = recvData.lobbyData.charaID;
+    if (recvData.playerId >= 0)
+        saveInputPhoton[recvData.playerId].charaID = recvData.lobbyData.charaID;
 
     //ピック選択に移行
     if (recvData.isMasterClient)
@@ -1417,7 +1427,8 @@ void PhotonLib::LobbyRecv(NetData recvData)
         if (recvData.lobbyData.pickSelect == 1)
             isCharaSelect = true;
     }
-    charaState[recvData.playerId] = recvData.lobbyData.pickSelect;
+    if (recvData.playerId >= 0)
+        charaState[recvData.playerId] = recvData.lobbyData.pickSelect;
 
     //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
@@ -1436,7 +1447,8 @@ void PhotonLib::LobbyRecv(NetData recvData)
 
 void PhotonLib::DeathMatchRecv(NetData recvData)
 {
-    saveInputPhoton[recvData.playerId].killCount = recvData.deathMatchData.killCount;
+    if (recvData.playerId >= 0)
+        saveInputPhoton[recvData.playerId].killCount = recvData.deathMatchData.killCount;
     //for (auto& s : saveInputPhoton)
     //{
     //    if (s.playerId == recvData.playerId)
