@@ -245,9 +245,7 @@ void PhotonLib::update(float elapsedTime)
     NetInputUpdate();
     MyCharaInput();
     NetCharaInput();
-
 }
-
 
 void PhotonLib::ImGui()
 {
@@ -279,7 +277,7 @@ void PhotonLib::ImGui()
                         charaID = charaIndex;
 
                         //キャラ変更
-                        RegisterChara::Instance().ChangeChara("player",RegisterChara::CHARA_LIST(charaID));
+                        RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaID));
 
                         ImGui::TreePop();
                         break;
@@ -343,7 +341,6 @@ void PhotonLib::ImGui()
         }
         ImGui::TreePop();
     }
-    
 
     //マスタークライアントか
     bool isMaster = GetIsMasterPlayer();
@@ -541,7 +538,6 @@ void PhotonLib::ChatImGui()
     }
 
     ImGui::End();
-
 }
 
 void PhotonLib::NetInputUpdate()
@@ -594,7 +590,6 @@ void PhotonLib::NetInputUpdate()
             s.nextInput.inputDown |= b.inputDown;
             s.nextInput.input |= b.input;
             s.nextInput.inputUp |= b.inputUp;
-
 
             ////if (0 < b.inputDown)
             //if (CharacterInput::SubAttackButton & b.inputDown)
@@ -1055,7 +1050,6 @@ void PhotonLib::onAvailableRegions(const ExitGames::Common::JVector<ExitGames::C
     }
 }
 
-
 #pragma endregion
 
 ///////////////↓↓↓↓↓           ↓よく使う関数↓           ↓↓↓↓↓///////////////
@@ -1117,7 +1111,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             //データ変換
             auto ne = NetDataRecvCast(WStringToString(jsString.cstr()));
 
-
             if (ne[0].playerId >= 0)
             {
                 //名前保存
@@ -1129,18 +1122,18 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                     masterPlayerID = ne[0].playerId;
                 }
             }
-                //for (auto& s : saveInputPhoton)
-                //{
-                //    if (s.photonId != ne[0].photonId)continue;
+            //for (auto& s : saveInputPhoton)
+            //{
+            //    if (s.photonId != ne[0].photonId)continue;
 
-                //    if (s.name.size() <= 0)
-                //    {
-                //        s.name = ne[0].name;
-                //    }
-                //    break;
-                //}
+            //    if (s.name.size() <= 0)
+            //    {
+            //        s.name = ne[0].name;
+            //    }
+            //    break;
+            //}
 
-            //ゲームモード保存
+        //ゲームモード保存
             if (!GetIsMasterPlayer())
             {
                 gameMode = ne[0].gameMode;
@@ -1397,7 +1390,6 @@ void PhotonLib::JoinRecv(NetData recvData)
 
                 //名前登録
                 saveInputPhoton[j.playerId].name = netName;
-
             }
         }
     }
@@ -1416,7 +1408,7 @@ void PhotonLib::LobbyRecv(NetData recvData)
     if (add)
         if (recvData.playerId >= 0)
             addSavePhotonID[recvData.playerId] = recvData.photonId;
-    
+
     //AddPlayer(recvData.photonId, recvData.playerId);
 
     if (recvData.playerId >= 0)
@@ -1600,7 +1592,7 @@ void PhotonLib::sendJoinPermissionData(bool request)
             join.photonId = j.jData.photonId;
             join.playerId = j.jData.playerId;
             join.joinPermission = false;
-            join.joinRequest =false;
+            join.joinRequest = false;
             //４人まで追加
             int useCount = GetJoinNum();
             if (useCount < 4)
@@ -1643,7 +1635,6 @@ void PhotonLib::sendJoinPermissionData(bool request)
     mLoadBalancingClient.opRaiseEvent(true, event, 0);
     //特定のナンバーに送信
     //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
-
 }
 
 void PhotonLib::sendLobbyData(void)
@@ -1780,7 +1771,7 @@ void PhotonLib::AddPlayer(int photonID, int playerID)
     //}
     //else
     //{
-        saveInputPhoton[playerID].playerId = playerID;
+    saveInputPhoton[playerID].playerId = playerID;
     //    pID = playerID;
     //}
     ////プレイヤーID決定

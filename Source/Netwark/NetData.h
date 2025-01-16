@@ -67,7 +67,7 @@ static std::stringstream& operator<<(std::stringstream& out, const std::array<in
 
 struct SaveBuffer
 {
-    int frame;
+    int frame = {};
     unsigned int inputDown = 0;
     unsigned int input = 0;
     unsigned int inputUp = 0;
@@ -100,7 +100,7 @@ static void VectorSaveBufferOut(std::stringstream& out, std::vector<SaveBuffer>&
 }
 static void VectorSaveBufferIn(std::stringstream& in, std::vector<SaveBuffer>& vec)
 {
-    int size;
+    int size = {};
     in >> size;
     for (int i = 0; i < size; ++i)
     {
@@ -131,7 +131,6 @@ static void Vector3In(std::stringstream& in, std::array<DirectX::XMFLOAT3, 4>& v
     in >> vec[3];
 }
 
-
 struct NetData
 {
     //データ種別
@@ -143,62 +142,62 @@ struct NetData
         //ゲームモード
         DEATHMATCH,
     };
-    int dataKind;
-    bool isMasterClient;
-    int photonId;   //ネット識別(入ってきた順番)
-    int playerId;   //プレイヤー識別(ホストが0~3を振り分け)
+    int dataKind = {};
+    bool isMasterClient = false;
+    int photonId = {};   //ネット識別(入ってきた順番)
+    int playerId = {};   //プレイヤー識別(ホストが0~3を振り分け)
     char name[50];
 
     //ゲーム中
     struct GameData //0
     {
-        int startTime;
+        int startTime = {};
 
-        std::vector<SaveBuffer> saveInputBuf;
+        std::vector<SaveBuffer> saveInputBuf = {};
 
         //要素番号をplayerIdと合わせる
-        std::array<int, 4> damageData;//キャラに与えたダメージ
-        std::array<int, 4> healData;//キャラに与えたヒール
-        std::array<float, 4> stanData;//キャラに与えたスタン
+        std::array<int, 4> damageData = {};//キャラに与えたダメージ
+        std::array<int, 4> healData = {};//キャラに与えたヒール
+        std::array<float, 4> stanData = {};//キャラに与えたスタン
         std::array<DirectX::XMFLOAT3, 4> knockbackData = {};//ノックバックを与える
         std::array<DirectX::XMFLOAT3, 4> movePosData = {};//移動位置を与える
-        std::array<int, 4> teamID;//チームのID
-        int charaID;    //キャラのID
-        int hp;
+        std::array<int, 4> teamID = {};//チームのID
+        int charaID = {};    //キャラのID
+        int hp = {};
 
-        float ultGauge;
+        float ultGauge = {};
     }gameData;
 
     //入室許可
-    int joinNum;    //下のJoinDataをどれだけおくるか
+    int joinNum = {};    //下のJoinDataをどれだけおくるか
     struct JoinData //1
     {
         //入室申請
-        bool joinRequest;
+        bool joinRequest = false;
 
         //入室許可(ホストのみ)
-        bool joinPermission;
-        int photonId;
-        int playerId;
+        bool joinPermission = false;
+        int photonId = {};
+        int playerId = {};
     };
-    std::vector<JoinData> joinData;
+    std::vector<JoinData> joinData = {};
 
     //ロビー中
     struct LobbyData    //2
     {
-        std::array<int, 4> teamID;//チームのID
+        std::array<int, 4> teamID = {};//チームのID
 
         //ピック開始
-        int pickSelect; //1:ピック開始、2:ピック確定
-        int charaID;    //キャラのID
+        int pickSelect = {}; //1:ピック開始、2:ピック確定
+        int charaID = {};    //キャラのID
         char chat[500];
     }lobbyData;
 
-    int gameMode;   //ゲームモード(ホストが決定)
+    int gameMode = {};   //ゲームモード(ホストが決定)
     //デスマッチ
     struct DeathMatchData   //3
     {
-        int killCount;
+        int killCount = {};
     }deathMatchData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
