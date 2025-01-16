@@ -1251,7 +1251,13 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.damageData[id] > 0)
         {
-            myPlayer->GetComponent<CharaStatusCom>()->AddDamagePoint(-recvData.gameData.damageData[id]);
+            auto& hp = myPlayer->GetComponent<CharaStatusCom>();
+            if (hp->GetHitPoint() <= 0)return;
+            hp->AddDamagePoint(-recvData.gameData.damageData[id]);
+
+            ////‚Æ‚Ç‚ß‚ðŽh‚³‚ê‚½“G‚ð•Û‘¶
+            //if (hp->GetHitPoint() <= 0)
+
             break;
         }
     }

@@ -10,10 +10,15 @@ void SettingScreen::CreateSettingUiObject()
 {
     ResetObj();
 
+    {
+        auto& DiaLog = GameObjectManager::Instance().Create();
+        DiaLog->SetName("DiaLog");
+        DiaLog->AddComponent<Sprite>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    }
+
     //settingCanvas
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("settingCanvas");
-
 
     //外枠
     {
@@ -22,7 +27,6 @@ void SettingScreen::CreateSettingUiObject()
         frame->AddComponent<Sprite>("Data/SerializeData/UIData/setting/settingFrame.ui", Sprite::SpriteShader::DEFALT, false);
         frame->GetComponent<Sprite>()->spc.scale = { 0,0 };
         frame->GetComponent<Sprite>()->spc.color.w = 0;
-
     }
 
     //設定
@@ -30,6 +34,13 @@ void SettingScreen::CreateSettingUiObject()
         auto& settingTitle = obj->AddChildObject();
         settingTitle->SetName("settingTitle");
         settingTitle->AddComponent<Sprite>("Data/SerializeData/UIData/setting/settingTitle.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+
+    //操作説明
+    {
+        auto& Manual = obj->AddChildObject();
+        Manual->SetName("Manual");
+        Manual->AddComponent<Sprite>("Data/SerializeData/UIData/setting/manual.ui", Sprite::SpriteShader::DEFALT, false);
     }
 
     std::vector<int> barInitial;
@@ -133,13 +144,6 @@ void SettingScreen::CreateSettingUiObject()
         }
     }
 
-    //キャラセレクト
-    {
-        auto& charaSelect = obj->AddChildObject();
-        charaSelect->SetName("charaSelect");
-        charaSelect->AddComponent<Sprite>("Data/SerializeData/UIData/setting/charaSelect.ui", Sprite::SpriteShader::DEFALT, true);
-    }
-
     //ボタン位置と数字初期化
     int count = 0;
     for (auto& bar : barObj)
@@ -168,7 +172,6 @@ void SettingScreen::CreateSettingUiObject()
         if (!buttonSprite)continue;
         buttonSprite->spc.position.x = sx + barSizeX * vPer
             + buttonSprite->spc.texSize.x * buttonSprite->spc.scale.x;
-
 
         //数値を変える
         std::string names[3] = { "num1","num10","num100" };
@@ -200,7 +203,7 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
 
     if (!viewSetting) {
         state = 0;
-        frameSprite->spc.scale = {0,0};
+        frameSprite->spc.scale = { 0,0 };
         frameSprite->spc.color.w = 0.0f;
         return;
     }
@@ -213,7 +216,7 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
         }
 
         if (frameSprite->spc.color.w <= 1.0f) {
-            frameSprite->spc.color.w +=elaspedTime * 6.0f;
+            frameSprite->spc.color.w += elaspedTime * 6.0f;
         }
 
         if (frameSprite->spc.scale.x >= 1.0f && frameSprite->spc.color.w >= 1.0f) {
@@ -305,19 +308,6 @@ void SettingScreen::SettingScreenUpdate(float elaspedTime)
             };
         }
     }
-   
-    //キャラセレクト
-    auto& canvas = GameObjectManager::Instance().Find("settingCanvas");
-    auto& charaSelect = canvas->GetChildFind("charaSelect");
-    auto& charaSelectSpr = charaSelect->GetComponent<Sprite>();
-    charaSelectSpr->spc.color = { 1,1,1,1 };
-    if (charaSelectSpr->GetHitSprite())
-    {
-        charaSelectSpr->spc.color = { 0,0.5f,1,1 };
-        GamePad& gamePad = Input::Instance().GetGamePad();
-        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButton())   //クリックされた場合
-            isCharaSelect = true;
-    }
 }
 
 void SettingScreen::SetViewSetting(bool flg)
@@ -327,16 +317,28 @@ void SettingScreen::SetViewSetting(bool flg)
     auto& canvas = GameObjectManager::Instance().Find("settingCanvas");
     if (!canvas)return;
 
+    auto& charaui = GameObjectManager::Instance().Find("Canvas");
+
     //表示設定をする
     if (flg)
     {
         if (canvas)
             canvas->SetEnabled(true);
+
+        if (charaui != nullptr)
+        {
+            charaui->SetEnabled(false);
+        }
     }
     else
     {
         if (canvas)
             canvas->SetEnabled(false);
+
+        if (charaui != nullptr)
+        {
+            charaui->SetEnabled(true);
+        }
     }
 }
 
