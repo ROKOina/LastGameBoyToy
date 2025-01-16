@@ -39,6 +39,29 @@ void PhysXLib::Initialize()
     }
 }
 
+void PhysXLib::DeletePhysxActor()
+{
+    // シーン内のアクターを取得
+    PxU32 actorCount = gScene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+    if (actorCount == 0) {
+        return; // アクターがない場合は処理不要
+    }
+
+    // アクターのポインタを格納する配列を用意
+    PxActor** actors = new PxActor * [actorCount];
+    gScene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, actors, actorCount);
+
+    // 各アクターをシーンから削除
+    for (PxU32 i = 0; i < actorCount; ++i) {
+        gScene->removeActor(*actors[i]);
+        // アクターのメモリ解放（必要なら）
+        actors[i]->release();
+    }
+
+    // 配列を解放
+    delete[] actors;
+}
+
 #define SAFE_RELEASE(p) {if (p) { (p)->release(); (p) = nullptr; }}
 void PhysXLib::Finalize()
 {
@@ -109,7 +132,7 @@ bool PhysXLib::RayCast_PhysX(const DirectX::XMFLOAT3& origin, const DirectX::XMF
     return gScene->raycast(start, dir, maxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
 }
 
-void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepath, std::string key, float worldScale, CollisionLayer layer)
+void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepath, std::string key, float worldScale, CollisionLayer layer, std::vector<PxRigidActor*>& vec)
 {
     //判定の形
     int convexIndex = INT_MAX;
@@ -130,7 +153,7 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepat
         //形状によってビットを立てる
         ShapeType shapeType = ShapeType::None;
         if (node.parentIndex == triangleIndex) { shapeType = ShapeType::Triangle; }
-        if (node.parentIndex == convexIndex) { shapeType = ShapeType::Convex; }
+        if (node.parentIndex == convexIndex) { shapeType = ShapeType::Triangle; }
         if (node.parentIndex == boxIndex) { shapeType = ShapeType::Box; }
 
         //ビットが立っていた場合Modelの形を取得する
@@ -177,7 +200,7 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepat
             data.rotate = node.rotate;
             data.scale = Mathf::TransformSampleScale(answer);
 
-            GenerateCollider(data);
+            vec.emplace_back(GenerateCollider(data));
         }
     }
 }
