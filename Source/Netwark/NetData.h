@@ -143,7 +143,7 @@ struct NetData
         DEATHMATCH,
     };
     int dataKind = {};
-    bool isMasterClient;
+    bool isMasterClient = false;
     int photonId = {};   //ネット識別(入ってきた順番)
     int playerId = {};   //プレイヤー識別(ホストが0~3を振り分け)
     char name[50];
@@ -153,7 +153,7 @@ struct NetData
     {
         int startTime = {};
 
-        std::vector<SaveBuffer> saveInputBuf;
+        std::vector<SaveBuffer> saveInputBuf = {};
 
         //要素番号をplayerIdと合わせる
         std::array<int, 4> damageData = {};//キャラに与えたダメージ
@@ -173,14 +173,14 @@ struct NetData
     struct JoinData //1
     {
         //入室申請
-        bool joinRequest;
+        bool joinRequest = false;
 
         //入室許可(ホストのみ)
-        bool joinPermission;
+        bool joinPermission = false;
         int photonId = {};
         int playerId = {};
     };
-    std::vector<JoinData> joinData;
+    std::vector<JoinData> joinData = {};
 
     //ロビー中
     struct LobbyData    //2
