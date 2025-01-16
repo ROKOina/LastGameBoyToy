@@ -15,7 +15,6 @@
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
 
-
 void CharacterCom::Update(float elapsedTime)
 {
     auto& ss = SceneManager::Instance().GetSettingScreen();
@@ -23,9 +22,9 @@ void CharacterCom::Update(float elapsedTime)
     if (netCharaData.myChara)
     {
         {
-            //設定画面を開く(P)
+            //設定画面を開く(ESC)
             GamePad& gamePad = Input::Instance().GetGamePad();
-            if (GamePad::BTN_P & gamePad.GetButtonDown())
+            if (GamePad::ESC & gamePad.GetButtonDown())
             {
                 if (isViewSetting)
                 {
@@ -118,7 +117,7 @@ void CharacterCom::Update(float elapsedTime)
         {
             //スキル発動中はリターン
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL
-            &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+                && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
             {
                 //弾切れならリロード
                 if (currentBulletNum > 0) {
@@ -318,18 +317,18 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    if (CharacterInput::MainAttackButton & GetButtonDown() 
-    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD))
-    {
-        if (shootTimer < shootTime)
+    if (CharacterInput::MainAttackButton & GetButtonDown()
+        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD))
         {
-            attackInputSave = true; //先行入力保存
-            return;
-        }
+            if (shootTimer < shootTime)
+            {
+                attackInputSave = true; //先行入力保存
+                return;
+            }
 
-        //弾切れなら自動的にリロード
-        currentBulletNum > 0 ?
-            MainAttackDown() : Reload();
+            //弾切れなら自動的にリロード
+            currentBulletNum > 0 ?
+                MainAttackDown() : Reload();
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
