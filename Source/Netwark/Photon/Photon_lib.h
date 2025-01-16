@@ -56,7 +56,7 @@ private:
     bool connectNow = false;
 
     //部屋名
-    std::string roomName;
+    std::string roomName = {};
     //charaID
     std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
     {
@@ -150,8 +150,8 @@ public:
         }
         bool useFlg = false;    //使用されているか
         std::string name = {};
-        int photonId;
-        int playerId;
+        int photonId = {};
+        int playerId = {};
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
         ////自分のIDから見たディレイ
@@ -170,7 +170,7 @@ public:
         //次の入力情報を格納
         struct NextInput
         {
-            int oldFrame;
+            int oldFrame = {};
             unsigned int inputDown = 0;
             unsigned int input = 0;
             unsigned int inputUp = 0;
@@ -284,7 +284,7 @@ private:
     //送信頻度（ms）
     int sendMs = 1000 / 60.0f * 5;
     //int sendMs = 35;
-    int oldMs;
+    int oldMs = {};
 
     std::vector<SaveInput> saveInputPhoton;
     //追加予約
@@ -325,6 +325,6 @@ private:
 
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ
-    std::string chat;   //チャット
-    std::vector<std::string> chatList;
+    std::string chat = {};   //チャット
+    std::vector<std::string> chatList = {};
 };
