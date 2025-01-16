@@ -1517,7 +1517,8 @@ void PhotonLib::sendGameData(void)
 
     //自分の入力を送る
     //先頭20フレームの入力を送る
-    netD.gameData.saveInputBuf = saveInputPhoton[myPlayerID].inputBuf->GetHeadFromSize(20);
+    if (myPlayerID >= 0)
+        netD.gameData.saveInputBuf = saveInputPhoton[myPlayerID].inputBuf->GetHeadFromSize(20);
     //for (auto& s : saveInputPhoton)
     //{
     //    if (s.photonId != myPhotonID)continue;
@@ -1653,7 +1654,8 @@ void PhotonLib::sendLobbyData(void)
     netD.dataKind = NetData::DATA_KIND::LOBBY;
 
     //キャラIDを送る
-    netD.lobbyData.charaID = saveInputPhoton[myPlayerID].charaID;
+    if (myPlayerID >= 0)
+        netD.lobbyData.charaID = saveInputPhoton[myPlayerID].charaID;
 
     //マスタークライアントの場合
     if (GetIsMasterPlayer())
@@ -1663,7 +1665,8 @@ void PhotonLib::sendLobbyData(void)
             netD.lobbyData.teamID[i] = saveInputPhoton[i].teamID;
     }
 
-    netD.lobbyData.pickSelect = charaState[myPlayerID];
+    if (myPlayerID >= 0)
+        netD.lobbyData.pickSelect = charaState[myPlayerID];
 
     //チャットを送る
     ::strncpy_s(netD.lobbyData.chat, sizeof(netD.lobbyData.chat), "0", sizeof(netD.lobbyData.chat));
@@ -1719,7 +1722,8 @@ void PhotonLib::sendDeathMatchData(void)
     netD.dataKind = NetData::DATA_KIND::DEATHMATCH;
 
     //切る数取得
-    netD.deathMatchData.killCount = saveInputPhoton[myPlayerID].killCount;
+    if (myPlayerID >= 0)
+        netD.deathMatchData.killCount = saveInputPhoton[myPlayerID].killCount;
     //for (auto& s : saveInputPhoton)
     //{
     //    if (s.playerId == myPlayerID)
