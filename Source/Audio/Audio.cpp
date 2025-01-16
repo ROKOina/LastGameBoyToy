@@ -46,6 +46,8 @@ Audio::Audio()
 
     // BGMとSEを一括登録
     RegisterAudioSources();
+
+    RegisterAudioSourcesTest();
 }
 
 // デストラクタ
@@ -69,7 +71,13 @@ Audio::~Audio()
     CoUninitialize();
 }
 
-// BGMとSEを一括登録
+// オーディオソース読み込み
+std::shared_ptr<AudioResource> Audio::LoadAudioSource(const char* filename)
+{
+    return std::make_shared<AudioResource>(filename);
+}
+
+//BGMとSEを一括登録
 void Audio::RegisterAudioSources()
 {
     audioResources[AUDIOID::BGM] = LoadAudioSource("Data/AudioData/TestAudio/BGM.wav");
@@ -126,18 +134,41 @@ void Audio::RegisterAudioSources()
     audioResources[AUDIOID::TUTOLINES_25] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/025_L.wav");
 }
 
-void Audio::RegisterAudioSources(AUDIOID id, const char* filename)
+void Audio::RegisterAudioSourcesTest()
 {
+    audioResourcesTest[AUDIOID::BGM] = LoadAudioSource("Data/AudioData/TestAudio/BGM.wav");
+    RegisterAudioName(AUDIOID::BGM, "BGM");
+
+    audioResourcesTest[AUDIOID::SE] = LoadAudioSource("Data/AudioData/TestAudio/SE.wav");
+    RegisterAudioName(AUDIOID::SE, "SE");
 }
 
-// オーディオソース読み込み
-std::shared_ptr<AudioResource> Audio::LoadAudioSource(const char* filename)
+void Audio::RegisterAudioName(AUDIOID id, const std::string& name)
 {
-    return std::make_shared<AudioResource>(filename);
+    audioNames[id] = name;
 }
 
-// 登録されたオーディオソースを取得
+std::string Audio::GetAudioName(AUDIOID id) const
+{
+    auto it = audioNames.find(id);
+    if (it != audioNames.end()) {
+        return it->second;
+    }
+    return "";
+}
+
+
+//登録されたオーディオソースを取得
 std::shared_ptr<AudioResource> Audio::GetAudioResource(AUDIOID id)
 {
     return audioResources.at(id);
+}
+
+std::shared_ptr<AudioResource> Audio::GetAudioResourceID(AUDIOID id)
+{
+    auto it = audioResourcesTest.find(id);
+    if (it != audioResourcesTest.end()) {
+        return it->second;
+    }
+    return nullptr;
 }

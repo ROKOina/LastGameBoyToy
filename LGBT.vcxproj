@@ -122,6 +122,7 @@
     </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Component\Audio\AudioSourceCom.h" />
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
     <ClInclude Include="Source\Graphics\Video.h" />
@@ -288,6 +289,7 @@
     <ClInclude Include="Source\SystemStruct\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Component\Audio\AudioSourceCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
     <ClCompile Include="Source\Graphics\Video.cpp" />

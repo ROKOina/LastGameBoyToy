@@ -3,6 +3,7 @@
 #include <xaudio2.h>
 #include <cassert>
 #include <map>
+#include <string>
 
 #include "Audio/AudioSource.h"
 #include "Audio/AudioResource.h"
@@ -81,13 +82,11 @@ public:
         assert(instance == nullptr);
         instance = std::make_unique<Audio>();
     }
-
     static void Finalize()
     {
         assert(instance != nullptr);
         instance.reset();
     }
-
     // インスタンス取得
     static Audio& Instance() {
         assert(instance != nullptr);
@@ -98,9 +97,15 @@ public:
     std::shared_ptr<AudioResource> LoadAudioSource(const char* filename);
     std::shared_ptr<AudioResource> GetAudioResource(AUDIOID id);
 
+    std::shared_ptr<AudioResource> GetAudioResourceID(AUDIOID id);
     // オーディオ登録
     void RegisterAudioSources();
-    void RegisterAudioSources(AUDIOID id, const char* filename);
+
+    void RegisterAudioSourcesTest();
+
+    // IDと名前の登録関数
+    void RegisterAudioName(AUDIOID id, const std::string& name);
+    std::string GetAudioName(AUDIOID id) const;
 
     IXAudio2* GetXAudio() const { return xaudio_; }
     const X3DAUDIO_HANDLE* GetX3DAudioHandle() const { return &x3dAudioHandle_; }
@@ -115,4 +120,7 @@ private:
     X3DAUDIO_HANDLE x3dAudioHandle_;
 
     std::map<AUDIOID, std::shared_ptr<AudioResource>> audioResources;
+
+    std::map<AUDIOID, std::shared_ptr<AudioResource>> audioResourcesTest;
+    std::map<AUDIOID, std::string> audioNames;  // IDと名前の紐付け
 };
