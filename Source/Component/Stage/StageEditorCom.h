@@ -59,6 +59,7 @@ private:
         TestNakanisi,
         TowerGimic,
         GateGimic,
+        SpawnGimic,
         Max,
     };
 
@@ -66,6 +67,7 @@ private:
     static void TestNakanisi(GameObj& place);
     static void TowerGimic(GameObj& place);
     static void GateGimic(GameObj& place);
+    static void SpawnGimic(GameObj& place);
 
     GenerateFunc generateFunc[(int)GenerateFuncName::Max] =
     {
@@ -74,6 +76,7 @@ private:
         TestNakanisi,
         TowerGimic,
         GateGimic,
+        SpawnGimic,
     };
 
 public:

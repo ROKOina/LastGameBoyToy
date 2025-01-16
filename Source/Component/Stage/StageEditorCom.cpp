@@ -203,7 +203,8 @@ void StageEditorCom::OnGUI()
                 "None",
                 "TestNakanisi",
                 "TowerGimic",
-                "GateGimic"
+                "GateGimic",
+                "SpawnGimic"
             };
             int funcIndex = (int)objName.second.func;
             ImGui::Combo((char*)u8"¶¬ŠÖ”", &funcIndex, FuncName, (int)GenerateFuncName::Max);
@@ -495,4 +496,9 @@ void StageEditorCom::GateGimic(GameObj& place)
     place->AddComponent<GateGimmick>();
     RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Convex).get();
     rigid->SetRigidScale(1);
+}
+
+void StageEditorCom::SpawnGimic(GameObj& place)
+{
+    place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/spawn.gpuparticle", 1000);
 }
