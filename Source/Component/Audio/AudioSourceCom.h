@@ -1,13 +1,14 @@
 #pragma once
-#include <X3DAudio.h>
 #include <memory>
 #include <xaudio2.h>
+
 #include "Audio/Audio.h"
 #include "Audio/AudioResource.h"
 #include "Component\System\Component.h"
+#include <X3DAudio.h>
 
 // リスナー情報
-struct Listener
+struct Listener_
 {
     X3DAUDIO_LISTENER x3dListener = {};
     DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
@@ -36,7 +37,7 @@ struct Listener
 };
 
 // エミッター情報
-struct Emitter
+struct Emitter_
 {
     X3DAUDIO_EMITTER x3dEmitter = {};
     DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
@@ -93,19 +94,18 @@ public:
     // 3Dオーディオの更新
     void Update3DAudio();
 
-    Listener GetListener() { return listener_; }
-    Emitter GetEmitter_() { return emitter_; }
+    Listener_ GetListener() { return listener_; }
+    Emitter_ GetEmitter_() { return emitter_; }
 private:
     IXAudio2SourceVoice* sourceVoice_ = nullptr;
     std::shared_ptr<AudioResource>	resource_;
     std::shared_ptr<AudioResource>	resourceTest_;
 
-    Listener listener_;   // リスナー情報
-    Emitter emitter_;    // エミッター情報
+    Listener_ listener_;   // リスナー情報
+    Emitter_ emitter_;    // エミッター情報
 
     float volumeControl = 1.0f;
     bool isPlaying = false;
     bool isLooping = false;
-
 };
 

@@ -1,5 +1,4 @@
 #include "AudioSourceCom.h"
-#include "AudioSourceCom.h"
 
 #include "SystemStruct/Misc.h"
 #include "Math\easing.h"
