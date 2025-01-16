@@ -113,6 +113,7 @@ enum class SHADER_ID_MODEL
 
     // 以降、フォワード描画
     FAKE_DEPTH,
+    HOLO,
 
     // 以降、半透明オブジェクト
     AREA_EFFECT_CIRCLE,
