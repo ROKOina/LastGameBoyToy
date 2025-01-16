@@ -68,5 +68,7 @@ private:
     float deleyTime = 2.0f;
     bool flag = false; 
 
+    bool deleyFlag = false;
+
     bool CharaSelectFlag = false;
 };

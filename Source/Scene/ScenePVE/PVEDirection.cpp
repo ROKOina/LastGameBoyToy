@@ -81,6 +81,8 @@ void PVEDirection::CharaSlect(float elapsedTime)
         GameObjectManager::Instance().Find("Reactar1")->SetEnabled(false);
         GameObjectManager::Instance().Find("Reactar2")->SetEnabled(false);
         GameObjectManager::Instance().Find("Reactar3")->SetEnabled(false);
+        //GameObjectManager::Instance().Find("cameraPostPlayer")->SetEnabled(false);
+        //GameObjectManager::Instance().Find("armChild")->SetEnabled(false);
        
        
 
@@ -93,21 +95,35 @@ void PVEDirection::CharaSlect(float elapsedTime)
 
     if (charaPicks->IsDecisionFlg())
     {
-        RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()));
-        GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
-        GameObjectManager::Instance().Find("stage")->SetEnabled(true);
-        GameObjectManager::Instance().Find("player")->SetEnabled(true);
-        GameObjectManager::Instance().Find("Gate0")->SetEnabled(true);
-        GameObjectManager::Instance().Find("Reactar0")->SetEnabled(true);
-        GameObjectManager::Instance().Find("Reactar1")->SetEnabled(true);
-        GameObjectManager::Instance().Find("Reactar2")->SetEnabled(true);
-        GameObjectManager::Instance().Find("Reactar3")->SetEnabled(true);
-        GameObjectManager::Instance().Find(charName[charaPicks->GetSelectedCharacterId()].c_str())->SetEnabled(false);
-        charaPicks->SetViewCharaPicks(false);
-        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
-        CharaSelectFlag = true;
-        flag = false;
-        directionNumber += 1;
+        if (!deleyFlag)
+        {
+            RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()));
+            GameObjectManager::Instance().Find(charName[charaPicks->GetSelectedCharacterId()].c_str())->SetEnabled(false);
+            charaPicks->SetViewCharaPicks(false);
+            GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
+            deleyFlag = true;
+            GameObjectManager::Instance().Find("player")->SetEnabled(false);
+        }
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
+        deleyTimer += elapsedTime;
+        if (deleyTime < deleyTimer)
+        {
+            GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
+            GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+            GameObjectManager::Instance().Find("player")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Gate0")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar0")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar1")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar2")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar3")->SetEnabled(true);
+            //GameObjectManager::Instance().Find("cameraPostPlayer")->SetEnabled(true);
+            //GameObjectManager::Instance().Find("armChild")->SetEnabled(true);
+
+            CharaSelectFlag = true;
+            flag = false;
+            directionNumber += 1;
+        }
     }
 }
 
@@ -266,10 +282,11 @@ void PVEDirection::DirectionFOne(float elapsedTime)
 {
     if (!flag)
     {
-        
-
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
+        //暗転
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, parameters);
 
         //イベントシーン用の歩きステートへ遷移
         GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
