@@ -76,7 +76,7 @@ void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
     // 弾丸の物理プロパティ設定
     rigid->SetMass(mass);
     rigid->SetRestitution(restitution);
-    rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true);
+    rigid->SetRigidFlag(physx::PxRigidBodyFlag::PxRigidBodyFlag::eENABLE_SPECULATIVE_CCD, true);
 
     // 弾丸の寿命と重力設定
     jankratBullet->SetLifeTime(bulletLifeTimer);

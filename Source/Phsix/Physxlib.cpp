@@ -153,7 +153,7 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepat
         //形状によってビットを立てる
         ShapeType shapeType = ShapeType::None;
         if (node.parentIndex == triangleIndex) { shapeType = ShapeType::Triangle; }
-        if (node.parentIndex == convexIndex) { shapeType = ShapeType::Triangle; }
+        if (node.parentIndex == convexIndex) { shapeType = ShapeType::Convex; }
         if (node.parentIndex == boxIndex) { shapeType = ShapeType::Box; }
 
         //ビットが立っていた場合Modelの形を取得する
