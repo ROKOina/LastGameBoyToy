@@ -4,10 +4,14 @@
 #include "Math\easing.h"
 #include "Math\Mathf.h"
 
+void AudioSourceCom::OnGUI()
+{
+
+}
+
 void AudioSourceCom::SetAudio(int id)
 {
-    resource_ = Audio::Instance().GetAudioResource(static_cast<AUDIOID>(id));
-    resourceTest_ = Audio::Instance().GetAudioResourceID(static_cast<AUDIOID>(id));
+    resource_ = Audio::Instance().GetAudioResourceID(static_cast<AUDIOID>(id));
 
     if (resource_ != nullptr)
     {
@@ -16,15 +20,6 @@ void AudioSourceCom::SetAudio(int id)
 
         // エミッターの初期化
         emitter_.Initialize(resource_->GetWaveFormat());
-    }
-
-    if (resourceTest_ != nullptr)
-    {
-        HRESULT hr = Audio::Instance().GetXAudio()->CreateSourceVoice(&sourceVoice_, &resourceTest_->GetWaveFormat());
-        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-        // エミッターの初期化
-        emitter_.Initialize(resourceTest_->GetWaveFormat());
     }
 }
 

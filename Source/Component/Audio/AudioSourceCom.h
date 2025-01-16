@@ -69,7 +69,7 @@ public:
     void Update(float elapsedTime) override {};
 
     const char* GetName() const override { return "Audio"; }
-    void OnGUI() override {}
+    void OnGUI() override;
 
     // オーディオ呼び出し関数
     void SetAudio(int id);
@@ -99,7 +99,6 @@ public:
 private:
     IXAudio2SourceVoice* sourceVoice_ = nullptr;
     std::shared_ptr<AudioResource>	resource_;
-    std::shared_ptr<AudioResource>	resourceTest_;
 
     Listener_ listener_;   // リスナー情報
     Emitter_ emitter_;    // エミッター情報
