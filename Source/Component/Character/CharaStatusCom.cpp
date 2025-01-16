@@ -29,6 +29,9 @@ void CharaStatusCom::AddDamagePoint(float value)
         hitPoint += value;
         frameDamage += value;
 
+        if (hitPoint <= 0)
+            int bb = 0;
+
         // ダメージを受けたら無敵時間をリセット
         currentInvincibleTime = invincibleTime;
     }
