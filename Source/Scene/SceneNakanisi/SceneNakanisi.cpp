@@ -52,7 +52,7 @@ void SceneNakanisi::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
-        obj->AddComponent<Light>(nullptr);
+        obj->AddComponent<Light>("Data/SerializeData/LightData/pvp.light");
     }
 
 #ifdef _DEBUG
@@ -130,7 +130,7 @@ void SceneNakanisi::Initialize()
 
         //スポーン位置を設定
         RespawnCom* spawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
-        obj->transform_->SetWorldPosition({0,50,0});
+        obj->transform_->SetWorldPosition({ 0,50,0 });
 
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj, true);
     }

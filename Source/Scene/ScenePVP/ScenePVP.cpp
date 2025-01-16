@@ -57,7 +57,7 @@ void ScenePVP::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
-        obj->AddComponent<Light>(nullptr);
+        obj->AddComponent<Light>("Data/SerializeData/LightData/pvp.light");
     }
 
     //ロビー選択から始まる
