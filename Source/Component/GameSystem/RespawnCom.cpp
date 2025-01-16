@@ -38,6 +38,10 @@ void RespawnCom::Update(float elapsedTime)
                 if (spawnIndex < 0) { spawnIndex = 0; }
                 player->transform_->SetWorldPosition(respawnPoses[spawnIndex]);
 
+                //パラメータ回復
+                CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+                status->ReSpawn(status->GetMaxHitpoint());
+
                 //プレイヤー隠す
                 player->GetComponent<RendererCom>()->SetDissolveThreshold(1);
                 //FPS用オブジェクト映す
@@ -48,8 +52,8 @@ void RespawnCom::Update(float elapsedTime)
             }
 
             //パラメータ回復
-            CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-            status->ReSpawn(status->GetMaxHitpoint());
+            CharaStatusCom* status = respawnData->gameObj->GetComponent<CharaStatusCom>().get();
+            status->SetIsDeath(false);
 
             //アニメーションを死亡から待機へ
             AnimationCom* animaCom = player->GetComponent<AnimationCom>().get();
@@ -73,11 +77,7 @@ void RespawnCom::Update(float elapsedTime)
     //リスポーン終了したオブジェクトをコンテナから出す
     for (RespawnData* removeObj : endDatas)
     {
-        std::vector<RespawnData*>::iterator it = std::find(respawnDatas.begin(), respawnDatas.end(), removeObj);
-        if (it != respawnDatas.end())
-        {
-            delete respawnDatas[respawnDatas.size() - 1];
-            respawnDatas.erase(it);
-        }
+        respawnDatas.erase(std::remove(respawnDatas.begin(), respawnDatas.end(), removeObj), respawnDatas.end());
     }
+    endDatas.clear();
 }
