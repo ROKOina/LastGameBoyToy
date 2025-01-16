@@ -16,7 +16,7 @@ void RespawnCom::Update(float elapsedTime)
     if (!fallEvent && player->transform_->GetWorldPosition().y < playerDeathHeight)
     {
         CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-        status->AddDamagePoint(-200);
+        status->AddDamagePoint(-200, -1);
     }
 
     //ƒŠƒXƒ|[ƒ“ˆ—

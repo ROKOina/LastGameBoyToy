@@ -44,7 +44,7 @@ void HitProcessCom::Update(float elapsedTime)
                 chara->SetIsHitAttack(true);
 
             //ƒ_ƒ[ƒW‚ð—^‚¦‚é
-            stats->AddDamagePoint(-value);
+            stats->AddDamagePoint(-value, -1);
 
             continue;
         }

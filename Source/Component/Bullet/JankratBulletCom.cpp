@@ -8,6 +8,7 @@
 #include "Component\System\TransformCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Component\Renderer\DecalCom.h"
+#include "Component\Character\CharacterCom.h"
 
 //更新処理
 void JankratBulletCom::Update(float elapsedTime)
@@ -107,8 +108,17 @@ void JankratBulletCom::ApplyDirectHitDamage()
             std::shared_ptr<CPUParticle>Ghiteffct = hiteffectobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/hitsmokeeffect.cpuparticle", 100);
             Ghiteffct->SetActive(true);
 
+            int id = -1;
+            if (auto& chara = charaObj.lock())
+            {
+                if (auto& charaCom = chara->GetComponent<CharacterCom>())
+                {
+                    id = charaCom->GetNetCharaData().GetNetPlayerID();
+                }
+            }
+
             //ダメージを与える
-            chara->AddDamagePoint(-damageValue);
+            chara->AddDamagePoint(-damageValue, id);
 
             //消す処理
             GameObjectManager::Instance().Remove(this->GetGameObject());

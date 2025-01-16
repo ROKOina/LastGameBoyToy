@@ -252,6 +252,12 @@ void PhotonLib::update(float elapsedTime)
                 saveDeath[d].killCon = false;
             }
         }
+
+        //ƒfƒXID•Û‘¶
+        auto& deathFlag = StaticSendDataManager::Instance().GetDeathID(d);
+        if (deathFlag)
+            saveDeath[d].onDeath = deathFlag;
+        deathFlag = false;
     }
 
     DelayUpdate();
@@ -1288,7 +1294,7 @@ void PhotonLib::GameRecv(NetData recvData)
         {
             auto& hp = myPlayer->GetComponent<CharaStatusCom>();
             if (*hp->GetHitPoint() <= 0)return;
-            hp->AddDamagePoint(-recvData.gameData.damageData[id]);
+            hp->AddDamagePoint(-recvData.gameData.damageData[id], recvData.playerId);
 
             //‚Æ‚Ç‚ß‚ðŽh‚³‚ê‚½“G‚ð•Û‘¶
             if (*hp->GetHitPoint() <= 0)

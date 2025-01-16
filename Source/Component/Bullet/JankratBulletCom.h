@@ -38,6 +38,7 @@ public:
     void SetExplosionTime(float explosionTime_) { explosionTime = explosionTime_; }
     float GetExplosionTime() { return explosionTime; }
 
+    void SetCharaGameObj(std::shared_ptr<GameObject> obj) { charaObj = obj; }
 private:
 
     //”š”­‚³‚¹‚é
@@ -56,4 +57,7 @@ private:
     int damageValue = 10;
 
     float addGravity = 0.0f;
+
+    //’e‚ð‘Å‚Á‚Ä‚¢‚éƒLƒƒƒ‰‚ð•Û‘¶
+    std::weak_ptr<GameObject> charaObj;
 };

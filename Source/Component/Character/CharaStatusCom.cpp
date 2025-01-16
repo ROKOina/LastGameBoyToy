@@ -1,4 +1,5 @@
 #include "CharaStatusCom.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 // 更新処理
 void CharaStatusCom::Update(float elapsedTime)
@@ -22,18 +23,28 @@ void CharaStatusCom::Update(float elapsedTime)
 }
 
 // HPの減少処理（無敵時間を考慮）
-void CharaStatusCom::AddDamagePoint(float value)
+void CharaStatusCom::AddDamagePoint(float value, int playerID)
 {
     if (!IsInvincible())
     {
-        hitPoint += value;
-        frameDamage += value;
+        if (hitPoint > 0)
+        {
+            hitPoint += value;
+            frameDamage += value;
 
-        if (hitPoint <= 0)
-            int bb = 0;
+            // ダメージを受けたら無敵時間をリセット
+            currentInvincibleTime = invincibleTime;
 
-        // ダメージを受けたら無敵時間をリセット
-        currentInvincibleTime = invincibleTime;
+            //死亡時プレイヤーID保存
+            if (playerID >= 0)
+            {
+                if (hitPoint <= 0)
+                {
+                    //キルした相手を保存
+                    StaticSendDataManager::Instance().GetDeathID(playerID) = true;
+                }
+            }
+        }
     }
 }
 

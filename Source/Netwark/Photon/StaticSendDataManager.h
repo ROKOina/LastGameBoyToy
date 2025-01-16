@@ -74,6 +74,9 @@ private:
     //’lŽó‚¯“n‚µ—p
 public:
     std::vector<SaveBuffer>& GetSaveBuffer(int playerID) { return saveBuffer[playerID]; }
+    bool& GetDeathID(int id) { return deathID[id]; }
+
 private:
     std::vector<SaveBuffer> saveBuffer[5];
+    bool deathID[4];    //ƒLƒ‹‚³‚ê‚½‘ŠŽè‚ð•Û‘¶
 };

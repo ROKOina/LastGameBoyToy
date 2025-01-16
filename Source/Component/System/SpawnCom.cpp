@@ -503,7 +503,8 @@ void SpawnCom::HitObject()
                     {
                         if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                         {
-                            status->AddDamagePoint(-15);
+                            int id = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+                            status->AddDamagePoint(-15, id);
                         }
                     }
                 }

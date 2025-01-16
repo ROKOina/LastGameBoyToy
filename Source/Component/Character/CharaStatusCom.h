@@ -31,7 +31,7 @@ public:
     float GetVinetHp() { return vinetHp; }
 
     // HP‚ÌŒ¸­‚Æ‘‰Á
-    void AddDamagePoint(float value);
+    void AddDamagePoint(float value, int playerID); //ID‚ª‚È‚¢ê‡‚Í-1
     void AddHealPoint(float value) { hitPoint += value; }
     float GetFrameDamage() { return frameDamage; }
 
