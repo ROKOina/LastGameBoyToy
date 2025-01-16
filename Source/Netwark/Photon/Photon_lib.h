@@ -286,7 +286,7 @@ private:
     //int sendMs = 35;
     int oldMs = {};
 
-    std::vector<SaveInput> saveInputPhoton;
+    std::vector<SaveInput> saveInputPhoton = {};
     //追加予約
     int addSavePhotonID[4] = { -1,-1,-1,-1 };   //要素がプレイヤーID、値がフォトンIDになる
 
@@ -309,7 +309,7 @@ private:
         NetData::JoinData jData;
         std::string joinName;
     };
-    std::vector<JoinManager> joinManager;
+    std::vector<JoinManager> joinManager = {};
     bool joinPermission = false;    //入室許可
 
     //遅延フレーム
