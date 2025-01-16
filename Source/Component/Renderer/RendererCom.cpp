@@ -257,7 +257,7 @@ void RendererCom::OnGUI()
 
 #ifdef _DEBUG
     MaterialSelector();
-
+    ImGui::DragFloat2("TextureScroll", &texturescroll.x, 0.1f, 0.0f, 200.0f);
 #endif // _DEBUG
 
     if (variousConstant.get() != nullptr) {
@@ -300,6 +300,8 @@ void RendererCom::ChangeMaterialParameter()
             materials[i]->alpha = p.alpha;
         }
     }
+
+    m_modelshader->m_objectconstants->data.scroll = texturescroll;
 }
 
 #include "SystemStruct\Framework.h"

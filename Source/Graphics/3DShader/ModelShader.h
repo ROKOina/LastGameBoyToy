@@ -32,7 +32,10 @@ public:
     struct objectconstants
     {
         DirectX::XMFLOAT4X4 BoneTransforms[MAX_BONES] = {};
+        DirectX::XMFLOAT2 scroll = { 1.0f,1.0f };
+        DirectX::XMFLOAT2 meshdummy = {};
     };
+    std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
 
     //サブセットのコンスタントバッファ
     struct subsetconstants
@@ -56,7 +59,6 @@ public:
     };
 
 private:
-    std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
     std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
     std::unique_ptr<ConstantBuffer<m_general>> m_generalconstants;
 

@@ -24,7 +24,7 @@ VS_OUT main(VS_IN vin)
     vout.binormal = normalize(cross(vout.tangent, vout.normal)); // バイノーマルを計算
     vout.color.rgb = vin.color.rgb * materialcolor.rgb; // 頂点色とマテリアル色を掛け合わせる
     vout.color.a = vin.color.a * materialcolor.a; // アルファ値も適用
-    vout.texcoord = vin.texcoord; // テクスチャ座標
+    vout.texcoord = vin.texcoord * scroll; // テクスチャ座標
 
     return vout;
 }
