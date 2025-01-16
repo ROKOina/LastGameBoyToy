@@ -64,6 +64,17 @@ static std::stringstream& operator<<(std::stringstream& out, const std::array<in
     out << h[0] << " " << h[1] << " " << h[2] << " " << h[3];
     return out;
 }
+//bool
+static std::stringstream& operator>>(std::stringstream& in, std::array<bool, 4>& h)
+{
+    in >> bool(h[0]) >> bool(h[1]) >> bool(h[2]) >> bool(h[3]);
+    return in;
+}
+static std::stringstream& operator<<(std::stringstream& out, const std::array<bool, 4>& h)
+{
+    out << h[0] << " " << h[1] << " " << h[2] << " " << h[3];
+    return out;
+}
 
 struct SaveBuffer
 {
@@ -167,6 +178,9 @@ struct NetData
         int hp;
 
         float ultGauge;
+
+        std::array<bool, 4> deathID;    //キルされたらIDをtrueに
+        std::array<bool, 4> isKillCount;   //キル数カウントしたらtrueに
     }gameData;
 
     //入室許可
@@ -224,6 +238,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         out << h.gameData.hp << " ";
         out << h.gameData.ultGauge << " ";
         out << h.gameData.teamID << " ";
+        out << h.gameData.deathID << " ";
+        out << h.gameData.isKillCount << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
     }
 
@@ -277,6 +293,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
         in >> h.gameData.hp;
         in >> h.gameData.ultGauge;
         in >> h.gameData.teamID;
+        in >> h.gameData.deathID;
+        in >> h.gameData.isKillCount;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
     }
 

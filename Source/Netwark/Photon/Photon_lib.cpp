@@ -241,6 +241,19 @@ void PhotonLib::update(float elapsedTime)
         }
     }
 
+    //キルカウントリセット
+    for (int d = 0; d < 4; ++d)
+    {
+        if (saveDeath[d].deathCountTimer >= 0)
+        {
+            saveDeath[d].deathCountTimer -= elapsedTime;
+            if (saveDeath[d].deathCountTimer <= 0)
+            {
+                saveDeath[d].killCon = false;
+            }
+        }
+    }
+
     DelayUpdate();
     NetInputUpdate();
     MyCharaInput();
@@ -1212,9 +1225,9 @@ void PhotonLib::GameRecv(NetData recvData)
 
     int myPlayerID = GetMyPlayerID();
 
-    //プレイヤー追加
     if (myPlayerID >= 0)
     {
+    //プレイヤー追加
         if (!net1)
         {
             //AddPlayer(recvData.photonId, recvData.playerId);
@@ -1230,6 +1243,28 @@ void PhotonLib::GameRecv(NetData recvData)
 
             RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
             net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+        }
+
+        //キルをカウント
+        if (recvData.gameData.deathID[myPlayerID])
+        {
+            if (saveDeath[myPlayerID].deathCountTimer <= 0)
+            {
+                saveDeath[myPlayerID].deathCountTimer = 5;
+                saveDeath[myPlayerID].killCon = true;
+                saveInputPhoton[myPlayerID].killCount++;
+
+            }
+        }
+
+        //自分のデス確認
+        for (int myD = 0; myD < 4; ++myD)
+        {
+            if (recvData.gameData.isKillCount[myD])
+            {
+                //デスを確認
+                saveDeath[myD].onDeath = false;
+            }
         }
     }
 
@@ -1255,8 +1290,9 @@ void PhotonLib::GameRecv(NetData recvData)
             if (hp->GetHitPoint() <= 0)return;
             hp->AddDamagePoint(-recvData.gameData.damageData[id]);
 
-            ////とどめを刺された敵を保存
-            //if (hp->GetHitPoint() <= 0)
+            //とどめを刺された敵を保存
+            if (hp->GetHitPoint() <= 0)
+                saveDeath[id].onDeath = true;
 
             break;
         }
@@ -1510,6 +1546,17 @@ void PhotonLib::sendGameData(void)
             netD.gameData.knockbackData[data.playerID] += data.valueF3;
         else if (data.sendType == 4)	//移動位置
             netD.gameData.movePosData[data.playerID] = data.valueF3;
+    }
+
+    //デスされた相手に送る
+    for (int d = 0; d < 4; ++d)
+    {
+        netD.gameData.deathID[d] = saveDeath[d].onDeath;
+    }
+    //キル確認したら送る
+    for (int d = 0; d < 4; ++d)
+    {
+        netD.gameData.isKillCount[d] = saveDeath[d].killCon;
     }
 
     //キャラIDを送る

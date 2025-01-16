@@ -323,6 +323,15 @@ private:
     //マスタープレイヤーID保存
     int masterPlayerID = 0;
 
+    //デス保存
+    struct SaveDeath
+    {
+        bool onDeath=false;   //キルされた時にtrue
+        bool killCon=false;    //キル確認用
+        float deathCountTimer = -1;   //重複阻止
+    };
+    SaveDeath saveDeath[4];
+
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ
     std::string chat;   //チャット
