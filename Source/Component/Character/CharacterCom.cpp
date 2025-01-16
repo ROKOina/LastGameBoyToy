@@ -206,6 +206,8 @@ void CharacterCom::OnGUI()
         ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
         ImGui::InputInt("netID", &netCharaData.netPlayerID);
 
+        ImGui::InputInt("killID", &netCharaData.killID);
+
         ImGui::TreePop();
     }
 

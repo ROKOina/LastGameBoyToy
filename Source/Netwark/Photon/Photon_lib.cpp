@@ -1259,7 +1259,7 @@ void PhotonLib::GameRecv(NetData recvData)
                 saveDeath[myPlayerID].deathCountTimer = 5;
                 saveDeath[myPlayerID].killCon = true;
                 saveInputPhoton[myPlayerID].killCount++;
-
+                net1->GetComponent<CharacterCom>()->GetNetCharaData().SetKillID(recvData.playerId);
             }
         }
 
