@@ -11,7 +11,7 @@ RigidBodyCom::RigidBodyCom(bool isStatic, PhysXLib::ShapeType type)
 
 RigidBodyCom::~RigidBodyCom()
 {
-    //if(rigidActor) rigidActor->release();
+    if(rigidActor) rigidActor->release();
 }
 
 void RigidBodyCom::Start()

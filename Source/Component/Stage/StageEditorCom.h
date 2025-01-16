@@ -5,6 +5,7 @@
 #include <Math\Collision.h>
 #include <functional>
 #include "Component\Renderer\RendererCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 using GenerateFunc = std::function<void(GameObj my)>;
 
@@ -108,4 +109,5 @@ private:
     std::list<GameObj> objList;
 
     float playerDeathHeight = -50;
+    std::vector<PxRigidActor*> rigidActors;
 };

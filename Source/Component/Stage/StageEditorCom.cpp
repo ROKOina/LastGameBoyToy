@@ -18,7 +18,6 @@
 #include <filesystem>
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
-#include "Component\Phsix\RigidBodyCom.h"
 #include "Component\System\SpawnCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "StageGimmickCom.h"
@@ -123,7 +122,10 @@ void StageEditorCom::Update(float elapsedTime)
 
 void StageEditorCom::OnDestroy()
 {
-    PhysXLib::Instance().DeletePhysxActor();
+    for (auto& rigid : rigidActors)
+    {
+        if (rigid) rigid->release();
+    }
 }
 
 void StageEditorCom::OnGUI()
@@ -262,7 +264,7 @@ void StageEditorCom::PlaceStageRigidCollider(std::string filePath, std::string d
     PhysXLib::Instance().GenerateComplexCollider(
         ResourceManager::Instance().GetModelResource(path.c_str()).get(),
         filePath, key,
-        scale, PhysXLib::CollisionLayer::Stage);
+        scale, PhysXLib::CollisionLayer::Stage, rigidActors);
 }
 
 void StageEditorCom::FileRead(std::string& path)
