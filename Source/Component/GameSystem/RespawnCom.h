@@ -1,16 +1,15 @@
 #pragma once
 #include "Component/System/Component.h"
-#include "PVPGameSystem\PVPGameSystem.h"
+#include "PVPGameSystem/PVPGameSystem.h"
+
+struct RespawnData
+{
+    GameObject* gameObj;
+    float respawnTime = 0;
+};
 
 class RespawnCom :public Component
 {
-public:
-    enum class GameMode
-    {
-        PVE,
-        DeathMatch,
-    };
-
 public:
     RespawnCom() {};
     ~RespawnCom() {};
@@ -29,6 +28,13 @@ public:
     PVPGameSystem::GAME_MODE GetGameMode() { return gameMode; }
     void SetGameMode(PVPGameSystem::GAME_MODE mode) { gameMode = mode; }
 
+    void AddRespawnData(std::shared_ptr<GameObject> obj) 
+    { 
+        RespawnData* res = new RespawnData; 
+        res->gameObj = obj.get();
+        respawnDatas.emplace_back(res);
+    }
+
     bool GetIsRespawn() { return isRespawn; }
     void SetIsRespawn(bool flag) { isRespawn = flag; }
 
@@ -39,4 +45,8 @@ private:
     float playerDeathHeight = -50;
     float respawnTimer = 0.0f;
     bool isRespawn = false;
+    bool fallEvent = false;//—Ž‰º‚µ‚½‚©‚Ç‚¤‚©
+
+    std::vector<RespawnData*> respawnDatas;
+    std::vector<RespawnData*> endDatas;
 };

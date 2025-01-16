@@ -78,7 +78,7 @@ void SceneTraining::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,1,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj,true);
     }
 
     //snowparticle
@@ -112,7 +112,6 @@ void SceneTraining::Finalize()
 void SceneTraining::Update(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-
     photonNet->run(elapsedTime);
 
     //UIê∂ê¨
@@ -120,6 +119,9 @@ void SceneTraining::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+
+    //UiçXêV
+    PlayerUIManager::Instance().UIUpdate(elapsedTime);
     TrainingManager::Instance().TrainingManagerUpdate(elapsedTime);
 }
 

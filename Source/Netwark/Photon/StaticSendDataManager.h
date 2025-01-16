@@ -2,6 +2,8 @@
 
 #include "../RingBuffer.h"
 #include <DirectXMath.h>
+#include <vector>
+#include "../NetData.h"
 
 //クライアントに送信する情報を管理する
 class StaticSendDataManager
@@ -68,4 +70,10 @@ public:
 
 private:
     std::unique_ptr<RingBuffer<NetSendData>> sendGameData;
+
+    //値受け渡し用
+public:
+    std::vector<SaveBuffer>& GetSaveBuffer(int playerID) { return saveBuffer[playerID]; }
+private:
+    std::vector<SaveBuffer> saveBuffer[5];
 };

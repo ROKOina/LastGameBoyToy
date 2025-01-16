@@ -27,6 +27,8 @@ public:
     float* GetHitPoint() { return &hitPoint; }
     void   SetMaxHitPoint(float value) { maxHitPoint = value; }
     float  GetMaxHitpoint() { return maxHitPoint; }
+    void SetVinetHp(float value) { vinetHp = value; }
+    float GetVinetHp() { return vinetHp; }
 
     // HPの減少と増加
     void AddDamagePoint(float value);
@@ -38,12 +40,15 @@ public:
     bool IsInvincible() const { return currentInvincibleTime > 0.0f; }
 
     bool IsDeath() { return isDeath; }
-    
+    void SetIsDeath(bool flag) { isDeath = flag; }
+
     //リスポーンさせる関数
     void ReSpawn(int HP);
 
+
 private:
     float hitPoint = 100;
+    float vinetHp = 100;
     float maxHitPoint = 100;              //HPの最大値
     float invincibleTime = 3.0f;        // 無敵時間の長さ（秒）
     float currentInvincibleTime = 0.0f; // 残りの無敵時間

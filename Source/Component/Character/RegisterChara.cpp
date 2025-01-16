@@ -23,24 +23,30 @@
 #include "Component\UI\PlayerUI.h"
 #include "Component\Character\SoldierCom.h"
 
-void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj)
+void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     switch (list)
     {
     case CHARA_LIST::INAZAWA:
-        InazawaChara(obj);
+        InazawaChara(obj, myTeam);
         break;
     case CHARA_LIST::FARAH:
-        FarahCharacter(obj);
+        FarahCharacter(obj, myTeam);
         break;
     case CHARA_LIST::JANKRAT:
-        JankratChara(obj);
+        JankratChara(obj, myTeam);
         break;
     case CHARA_LIST::SOLIDER:
-        SoldireChar(obj);
+        SoldireChar(obj, myTeam);
         break;
     default:
         break;
+    }
+
+    //キャラが登録された時にHP表示用のコンポーネントを用意する
+    if (obj->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Enemy) {
+        obj->AddComponent<UI_EnemyHp>();
+        obj->GetComponent<UI_EnemyHp>()->Register();
     }
 
     //自キャラの場合
@@ -52,10 +58,17 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
 
 void RegisterChara::ChangeChara(std::string objName, CHARA_LIST list)
 {
+    int teamID = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+
     auto& gameobjM = GameObjectManager::Instance();
     std::weak_ptr<GameObject> p2 = gameobjM.Find(objName.c_str());
     if (!p2.lock())return;
     if (int(list) >= int(CHARA_LIST::MAX))return;
+
+    //チーム分けをする
+    int CT = p2.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    bool team = false;
+    if (teamID == CT)team = true;
 
     //削除
     gameobjM.RemoveNowTime(p2);
@@ -64,12 +77,12 @@ void RegisterChara::ChangeChara(std::string objName, CHARA_LIST list)
     std::shared_ptr<GameObject> p = gameobjM.Create();
     p->SetName(objName.c_str());
     p->transform_->SetWorldPosition({ 0,0,0 });
-    RegisterChara::Instance().SetCharaComponet(list, p);
+    RegisterChara::Instance().SetCharaComponet(list, p, team);
     //gameobjM.CreateNowTimeSaveComponent(p);
 }
 
 //稲澤キャラ
-void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
+void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
@@ -77,7 +90,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>(nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player1.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -95,7 +108,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
+    if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
@@ -134,7 +147,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 
         std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
 
-        if (std::strcmp(obj->GetName(), "player") == 0)
+        if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         {
             rayCol->SetMyTag(COLLIDER_TAG::Player);
             rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::UnderStand);
@@ -169,6 +182,18 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
         r->SetDissolveThreshold(0.0f);
+    }
+
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
@@ -251,7 +276,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj)
 }
 
 //ファラ
-void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
+void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
@@ -259,7 +284,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>(nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player2.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -277,7 +302,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
+    if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
@@ -319,6 +344,17 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
         r->SetDissolveThreshold(0.0f);
     }
 
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -350,22 +386,21 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj)
     }
 }
 
-//ジャンクラっと
-void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
+void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     r->LoadModel("Data/Model/player_True/player3.mdl");
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
-    obj->AddComponent<NodeCollsionCom>(nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player3.nodecollsion");
     obj->AddComponent<AimIKCom>("spine2", nullptr);
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
     charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
-    charaCom->SetUseSkill(USE_SKILL::E);
+    charaCom->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //HPの初期設定
     status->SetMaxHitPoint(200);
@@ -384,7 +419,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
+    if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
@@ -398,6 +433,17 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
         r->SetDissolveThreshold(0.0f);
+    }
+
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
     }
 
     //煙のエフェクト
@@ -441,15 +487,15 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj)
 }
 
 //ソルジャー
-void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
+void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-    r->LoadModel("Data/Model/player_True/player1.mdl");
+    r->LoadModel("Data/Model/player_True/player4.mdl");
     r->SetDissolveThreshold(1.0f);
     obj->AddComponent<AnimationCom>();
     obj->AddComponent<AimIKCom>("spine2", nullptr);
-    obj->AddComponent<NodeCollsionCom>(nullptr);
+    obj->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/player4.nodecollsion");
     std::shared_ptr<MovementCom> m = obj->AddComponent<MovementCom>();
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
 
@@ -467,7 +513,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
     box->SetSize(DirectX::XMFLOAT3(0.5f, 1.4f, 0.5f));
     box->SetOffsetPosition(DirectX::XMFLOAT3(0, 1.5f, 0));
-    if (std::strcmp(obj->GetName(), "player") == 0)
+    if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
@@ -490,7 +536,8 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
         std::shared_ptr<GameObject>ultobject = obj->AddChildObject();
         ultobject->SetName("UltObject");
         ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/solder_ult_aura.gpuparticle", 2000);
-        ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
+        auto& spawn = ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
+        spawn->SetParentObjectKun(obj);
     }
 
     //ヒットスキャン
@@ -505,7 +552,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
         std::shared_ptr<RayColliderCom> rayCol = ultAttckChild->AddComponent<RayColliderCom>();
         rayCol->SetEnabled(false);
         rayCol->SetMyTag(COLLIDER_TAG::Bullet);
-        if (std::strcmp(obj->GetName(), "player") == 0)
+        if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
             rayCol->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet | COLLIDER_TAG::UnderStand);
         else
             rayCol->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
@@ -534,6 +581,17 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj)
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
         r->SetDissolveThreshold(0.0f);
+    }
+
+    if (!myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 1.0f, 0.0f, 0.0f });
+        r->SetOutlineIntensity(11.5f);
+    }
+    if (myTeam && std::strcmp(obj->GetName(), "player") != 0)
+    {
+        r->SetOutlineColor({ 0.0f, 0.0f, 1.0f });
+        r->SetOutlineIntensity(11.5f);
     }
 
     //腕とカメラの処理カメラをプレイヤーの子どもにして制御する

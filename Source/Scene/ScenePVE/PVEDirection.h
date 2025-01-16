@@ -2,7 +2,7 @@
 
 #include "Component/Animation/AnimationCom.h"
 #include "Component/System/Component.h"
-
+#include "PvPUi/CharaPicks.h"
 //PVEの演出統括
 class PVEDirection
 {
@@ -24,6 +24,9 @@ public:
 
     void DirectionEnd();
 
+    bool GetCharaSelect() { return CharaSelectFlag; }
+    void SetCharaSelect(bool flag) { CharaSelectFlag = flag; }
+
 private:
     //演出の統括
     void DirectionSupervision(float elapsedTime);
@@ -31,7 +34,15 @@ private:
     //Setting
     void Setting();
 
+    //背景初期化
+    void InitializeBack();
+
+    void InitializeChara();
 private:
+
+    void CharaSlect(float elapsedTime);
+
+
     void DirectionFOne(float elapsedTime);
     void DirectionFTwo(float elapsedTime);
     void DirectionFEnd(float elapsedTIme);
@@ -47,10 +58,15 @@ private:
 
     std::shared_ptr<TransformCom>t;
     std::weak_ptr<AnimationCom> animationCom;
+    std::shared_ptr<CharaPicks>   charaPicks;  //PVPのキャラ選択をここでも使用
+    std::vector<std::weak_ptr<GameObject>> tempRemoveObj;   //画面切り替え時に削除するオブジェクト
+    std::string charName[4] = { "Kanizo-Player","FaraicPlayer","SantorattoPlayer","Matya-Player"};
 
     int directionNumber = 0;
 
     float deleyTimer = 0;
     float deleyTime = 2.0f;
     bool flag = false; 
+
+    bool CharaSelectFlag = false;
 };

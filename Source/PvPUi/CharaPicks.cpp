@@ -1,9 +1,13 @@
 #include "CharaPicks.h"
 #include "Input/Input.h"
-
 #include "Component/Sprite/Sprite.h"
 #include "Component/System/GameObject.h"
 #include "Component/System/TransformCom.h"
+#include "Component\Renderer\RendererCom.h"
+#include "Component\Animation\AnimationCom.h"
+#include <Component\Camera\FreeCameraCom.h>
+#include "Component\Renderer\VideoCom.h"
+#include "SystemStruct\TimeManager.h"
 
 CharaPicks::CharaPicks()
 {
@@ -14,68 +18,54 @@ CharaPicks::CharaPicks()
 // キャラピックUI生成
 void CharaPicks::CreateCharaPicksUiObject()
 {
+    //キャラピック専用カメラ
+    {
+        std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
+        freeCamera->SetName("charapickcamera");
+        freeCamera->transform_->SetWorldPosition({ 0.044f, 1.674f, -1.450f });
+        freeCamera->transform_->SetEulerRotation({ -0.160f,-5.440f,0.0f });
+        std::shared_ptr<FreeCameraCom> camera = freeCamera->AddComponent<FreeCameraCom>();
+        camera->SetFocusPos({ -0.264f,1.683f,1.785f });
+        camera->SetFocus({ -0.145f,1.680f,0.541f });
+        camera->SetEye({ 0.044f,1.674f,-1.450f });
+        camera->SetDistance(3.249f);
+        camera->SetUpdate(false);
+    }
+    GameObjectManager::Instance().Find("charapickcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+
     // キャラピックキャンパス
     auto& charaPicksCanvas = GameObjectManager::Instance().Create();
     charaPicksCanvas->SetName("CharaPicksCanvas");
 
-    // 各キャラのUI設定
+    //各キャラのUI
     {
         // KANIZO-
-        {
-            auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("Kanizo-");
-            chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon0.ui", Sprite::SpriteShader::DEFALT, true);
+        AddCharacterUI(charaPicksCanvas, "Kanizo-", "Data/SerializeData/UIData/CharaPick/charaIcon0.ui",
+            "Data/SerializeData/UIData/CharaPick/charaName0.ui", "Data/SerializeData/UIData/CharaPick/kanizo_rightclickskillicon.ui",
+            "Data/SerializeData/UIData/CharaPick/kanizo_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/kanizo_ultskillicon.ui",
+            "Data/Model/player_True/player1.mdl", "Data/Video/inazo_RightClick.mp4", "Data/Video/inazo_Eskill.mp4", "Data/Video/inazo_ult.mp4",
+            "kanizo-video1", "kanizo-video2", "kanizo-ultvideo");
 
-            // 名前表記
-            {
-                auto& name = chara->AddChildObject();
-                name->SetName("name");
-                name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName0.ui", Sprite::SpriteShader::DEFALT, false);
-                name->SetEnabled(false);
-            }
-        }
         // FARAIC
-        {
-            auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("Faraic");
-            chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon1.ui", Sprite::SpriteShader::DEFALT, true);
+        AddCharacterUI(charaPicksCanvas, "Faraic", "Data/SerializeData/UIData/CharaPick/charaIcon1.ui",
+            "Data/SerializeData/UIData/CharaPick/charaName1.ui", "Data/SerializeData/UIData/CharaPick/farahc_rightclickskillicon.ui",
+            "Data/SerializeData/UIData/CharaPick/farahc_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/farahc_ulticon.ui",
+            "Data/Model/player_True/player2.mdl", "Data/Video/farahick_ESkill.mp4", "Data/Video/farahick_RightClick.mp4", "Data/Video/farahick_ult.mp4",
+            "Faraic-video1", "Faraic-video2", "Faraic-ultvideo");
 
-            // 名前表記
-            {
-                auto& name = chara->AddChildObject();
-                name->SetName("name");
-                name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName1.ui", Sprite::SpriteShader::DEFALT, false);
-                name->SetEnabled(false);
-            }
-        }
         // SANTORATTO
-        {
-            auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("Santoratto");
-            chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon2.ui", Sprite::SpriteShader::DEFALT, true);
+        AddCharacterUI(charaPicksCanvas, "Santoratto", "Data/SerializeData/UIData/CharaPick/charaIcon2.ui",
+            "Data/SerializeData/UIData/CharaPick/charaName2.ui", "Data/SerializeData/UIData/CharaPick/santorat_rightclickskillicon.ui",
+            "Data/SerializeData/UIData/CharaPick/santorat_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/santorat_ulticon.ui",
+            "Data/Model/player_True/player3.mdl", "Data/Video/jankurat_Eskill.mp4", "Data/Video/jankurat_Eskill.mp4", "Data/Video/jankurat_ult.mp4",
+            "Santoratto-video1", "Santoratto-video2", "Santoratto-ultvideo");
 
-            // 名前表記
-            {
-                auto& name = chara->AddChildObject();
-                name->SetName("name");
-                name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName2.ui", Sprite::SpriteShader::DEFALT, false);
-                name->SetEnabled(false);
-            }
-        }
         // MATYA-
-        {
-            auto& chara = charaPicksCanvas->AddChildObject();
-            chara->SetName("Matya-");
-            chara->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaIcon3.ui", Sprite::SpriteShader::DEFALT, true);
-
-            // 名前表記
-            {
-                auto& name = chara->AddChildObject();
-                name->SetName("name");
-                name->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaName3.ui", Sprite::SpriteShader::DEFALT, false);
-                name->SetEnabled(false);
-            }
-        }
+        AddCharacterUI(charaPicksCanvas, "Matya-", "Data/SerializeData/UIData/CharaPick/charaIcon3.ui",
+            "Data/SerializeData/UIData/CharaPick/charaName3.ui", "Data/SerializeData/UIData/CharaPick/matha_rightclickskillicon.ui",
+            "Data/SerializeData/UIData/CharaPick/matha_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/matha_ulticon.ui",
+            "Data/Model/player_True/player4.mdl", "Data/Video/solder_RightClick.mp4", "Data/Video/solder_ESkill.mp4", "Data/Video/solder_Ult.mp4",
+            "Matya-video1", "Matya-video2", "Matya-ultvideo");
     }
 
     // 決定ボタン
@@ -89,7 +79,7 @@ void CharaPicks::CreateCharaPicksUiObject()
     {
         auto& charaPick = charaPicksCanvas->AddChildObject();
         charaPick->SetName("CharaPick");
-        charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaPick.ui", Sprite::SpriteShader::DEFALT, true);
+        charaPick->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/charaPick.ui", Sprite::SpriteShader::GLITCH, true);
     }
 
     // 時間制限
@@ -103,17 +93,17 @@ void CharaPicks::CreateCharaPicksUiObject()
 void CharaPicks::CharaPicksUpdate(float elapsedTime)
 {
     // 各キャラ詳細
-    CharaDetails();
-
-    // 時間制限システム
-    TimeLimitSystem(elapsedTime);
+    CharaDetails(elapsedTime);
 
     // 決定処理
-    DecisionButton();
+    if (GameObjectManager::Instance().Find("CharaPicksCanvas") != nullptr)
+    {
+        DecisionButton();
+    }
 }
 
 // キャラ詳細
-void CharaPicks::CharaDetails()
+void CharaPicks::CharaDetails(float elapsedTime)
 {
     // 決定していたら操作不可
     if (decisionFlg) return;
@@ -121,81 +111,185 @@ void CharaPicks::CharaDetails()
     GamePad& gamePad = Input::Instance().GetGamePad();
     auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
 
-    auto getCharacterInfo = [&](const std::string& charaName, int id) -> CharacterInfo {
-        auto& chara = canvas->GetChildFind(charaName.c_str());
-        return {
-            chara,
-            chara->GetComponent<Sprite>(),
-            chara->GetChildFind("name"),
-            id
-        };
+    // キャラクター情報を取得する関数
+    auto getCharacterInfo = [&](const std::string& charaName, const std::string& objectName, const char* videoname1, const char* videoname2, const char* ultvideoname, int id) -> CharacterInfo
+        {
+            auto& chara = canvas->GetChildFind(charaName.c_str());
+            auto& charamodel = canvas->GetChildFind(objectName.c_str());
+            auto& video1 = canvas->GetChildFind(videoname1);
+            auto& video2 = canvas->GetChildFind(videoname2);
+            auto& ultvideo = canvas->GetChildFind(ultvideoname);
+            return
+            {
+                chara,
+                chara->GetComponent<Sprite>(),
+                chara->GetChildFind("name"),
+                charamodel,
+                video1,
+                video2,
+                ultvideo,
+                id
+            };
         };
 
     // キャラ、ID設定
-    std::vector<CharacterInfo> characters = {
-        getCharacterInfo("Kanizo-", 0),
-        getCharacterInfo("Faraic", 1),
-        getCharacterInfo("Santoratto", 2),
-        getCharacterInfo("Matya-", 3)
+    std::vector<CharacterInfo> characters =
+    {
+        getCharacterInfo("Kanizo-", "Kanizo-Player","kanizo-video1","kanizo-video2","kanizo-ultvideo", 0),
+        getCharacterInfo("Faraic", "FaraicPlayer","Faraic-video1","Faraic-video2","Faraic-ultvideo", 1),
+        getCharacterInfo("Santoratto", "SantorattoPlayer","Santoratto-video1","Santoratto-video2","Santoratto-ultvideo", 2),
+        getCharacterInfo("Matya-", "Matya-Player", "Matya-video1","Matya-video2","Matya-ultvideo",3)
     };
 
-    // クリックするとスキル表示、キャラ名、選択キャラ、アイコンが表示
-    auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others) {
-
-        // Spriteクラスで関数を作成（下記は無駄なコード）
-        if (!selected.name->GetComponent<Sprite>()->IsPlayEasing())
+    // 共通のスプライト初期化処理
+    auto initializeSprite = [](std::shared_ptr<Sprite> sprite, const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& scale, const DirectX::XMFLOAT4& color)
         {
-            selected.name->GetComponent<Sprite>()->spc.position = { 2200.0f, 200.0f };
-            selected.name->GetComponent<Sprite>()->spc.scale = { 0.9f, 0.9f };
-            selected.name->GetComponent<Sprite>()->spc.color = { 1.0f, 1.0f, 1.0f, 0.0f };
-        }
-
-        //チームが選んでいるキャラだった場合はリターン
-        if (selected.id == teamPick)
-        {
-            selected.name->SetEnabled(false);
-            selected.name->GetComponent<Sprite>()->StopEasing();
-            selected.name->GetComponent<Sprite>()->spc.onshot = false;
-
-            selected.sprite->StopEasing();
-
-            selected.sprite->spc.color = { 1,0,0,1 };
-            if (selectedCharacterId == selected.id)
+            if (!sprite->IsPlayEasing())
             {
-                selectedCharacterId = -1;
+                sprite->spc.position = position;
+                sprite->spc.scale = scale;
+                sprite->spc.color = color;
             }
-            return;
-        }
-
-        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite()) {
-
-            selected.name->SetEnabled(true);
-            selected.name->GetComponent<Sprite>()->EasingPlay();
-            selected.name->GetComponent<Sprite>()->spc.onshot = true;
-
-            selected.sprite->spc.color = selectColor;
-            selected.sprite->spc.scale = { 1.0f, 1.0f };
-            selected.sprite->EasingPlay();
-
-            selectedCharacterId = selected.id;
-
-            for (auto& other : others) {
-                if (&other != &selected) {
-                    other.name->SetEnabled(false);
-                    other.name->GetComponent<Sprite>()->StopEasing();
-                    other.name->GetComponent<Sprite>()->spc.onshot = false;
-
-                    other.sprite->StopEasing();
-                    other.sprite->spc.color = color;
-                    other.sprite->spc.scale = { 1.0f, 1.0f };
-                }
-            }
-        }
         };
 
-    for (size_t i = 0; i < characters.size(); ++i) {
+    // 選択解除処理
+    auto resetCharacter = [](CharacterInfo& chara, const DirectX::XMFLOAT4& defaultColor, const DirectX::XMFLOAT2& defaultScale)
+        {
+            chara.name->SetEnabled(false);
+            chara.charamodel->GetComponent<RendererCom>()->SetEnabled(false);
+            chara.name->GetComponent<Sprite>()->StopEasing();
+            chara.name->GetComponent<Sprite>()->spc.onshot = false;
+            chara.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->StopEasing();
+            chara.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->spc.onshot = false;
+            chara.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->StopEasing();
+            chara.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->spc.onshot = false;
+            chara.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->StopEasing();
+            chara.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = false;
+
+            chara.sprite->StopEasing();
+            chara.sprite->spc.color = defaultColor;
+            chara.sprite->spc.scale = defaultScale;
+        };
+
+    // キャラ選択処理
+    auto handleCharacterSelection = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others)
+        {
+            // 初期化
+            initializeSprite(selected.name->GetComponent<Sprite>(), { 2200.0f, 200.0f }, { 0.9f, 0.9f }, { 1.0f, 1.0f, 1.0f, 0.0f });
+            initializeSprite(selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>(), { 2200.0f, 50.0f }, {}, {});
+            initializeSprite(selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>(), { 2200.0f, 190.0f }, {}, {});
+            initializeSprite(selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>(), { 2200.0f, 250.0f }, {}, {});
+
+            // チームが既に選んでいるキャラだった場合
+            if (selected.id == teamPick)
+            {
+                resetCharacter(selected, { 1, 0, 0, 1 }, { 0.4f, 0.4f });
+                if (selectedCharacterId == selected.id)
+                {
+                    selectedCharacterId = -1;
+                }
+                return;
+            }
+
+            // キャラ選択処理
+            if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite())
+            {
+                selected.name->SetEnabled(true);
+                selected.charamodel->GetComponent<RendererCom>()->SetEnabled(true);
+                selected.name->GetComponent<Sprite>()->EasingPlay();
+                selected.name->GetComponent<Sprite>()->spc.onshot = true;
+                selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->EasingPlay();
+                selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->spc.onshot = true;
+                selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->EasingPlay();
+                selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->spc.onshot = true;
+                selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->EasingPlay();
+                selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = true;
+
+                triger = true;
+
+                selected.sprite->spc.color = selectColor;
+                selected.sprite->spc.scale = { 0.4f, 0.4f };
+                selected.sprite->EasingPlay();
+
+                selectedCharacterId = selected.id;
+
+                // 他のキャラクターをリセット
+                for (auto& other : others)
+                {
+                    resetCharacter(other, color, { 0.4f, 0.4f });
+                }
+            }
+        };
+
+    auto updatechara = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others)
+        {
+            static const float interval = 60.0f; // 全体の繰り返し時間
+            static const float rightSkillTime = 20.0f; // RightSkill の時間
+            static const float eSkillTime = 40.0f;     // ESkill の時間
+            static const float ultTime = 60.0f;        // Ult の時間
+
+            if (triger)
+            {
+                plustime += elapsedTime;
+
+                // 時間の繰り返し処理
+                if (plustime >= interval)
+                {
+                    plustime = 0.0f;
+                }
+            }
+
+            // 選択されたキャラクターのみ更新
+            if (selectedCharacterId == selected.id)
+            {
+                // 状態に応じた設定値
+                int rightSkillFlag = 1, eSkillFlag = 1, ultFlag = 1;
+                bool video1Enabled = false, video2Enabled = false, ultVideoEnabled = false;
+
+                if (plustime < rightSkillTime)
+                {
+                    rightSkillFlag = 0;
+                    video1Enabled = true;
+                }
+                else if (plustime < eSkillTime)
+                {
+                    eSkillFlag = 0;
+                    video2Enabled = true;
+                }
+                else if (plustime < ultTime)
+                {
+                    ultFlag = 0;
+                    ultVideoEnabled = true;
+                }
+
+                // 共通処理で適用
+                selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = rightSkillFlag;
+                selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = eSkillFlag;
+                selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = ultFlag;
+
+                selected.video1->SetEnabled(video1Enabled);
+                selected.video2->SetEnabled(video2Enabled);
+                selected.ultvideo->SetEnabled(ultVideoEnabled);
+            }
+
+            // 他のキャラクターをリセット
+            for (auto& other : others)
+            {
+                if (other.id != selectedCharacterId)
+                {
+                    other.video1->SetEnabled(false);
+                    other.video2->SetEnabled(false);
+                    other.ultvideo->SetEnabled(false);
+                }
+            }
+        };
+
+    // 各キャラクターを処理
+    for (size_t i = 0; i < characters.size(); ++i)
+    {
         std::vector<CharacterInfo> others = characters;
         others.erase(others.begin() + i);
+        updatechara(characters[i], others);
         handleCharacterSelection(characters[i], others);
     }
 }
@@ -214,7 +308,7 @@ void CharaPicks::DecisionButton()
     {
         sprite->EasingPlay();
     }
-    else if(!sprite->GetHitSprite())
+    else if (!sprite->GetHitSprite())
     {
         sprite->StopEasing();
         sprite->spc.color = color;
@@ -224,15 +318,82 @@ void CharaPicks::DecisionButton()
     if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
     {
         decisionFlg = true;
-        decisionButton->SetEnabled(false);
+        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("charapickcamera"));
     }
 }
 
-// 時間制限システム
-void CharaPicks::TimeLimitSystem(float elapsedTime)
+//キャラのUI追加関数
+void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* charaName, const char* iconPath, const char* namePath, const char* skillIconPath1, const char* skillIconPath2, const char* ultIconPath, const char* modelPath, const char* video1, const char* video2, const char* video3, const char* videoname1, const char* videoname2, const char* ultvideoname)
 {
-    // 制限時間は設定できるように
-    // 制限時間あり、なし切り替えれるようにする
+    // キャラアイコン
+    auto& chara = parent->AddChildObject();
+    chara->SetName(charaName);
+    chara->AddComponent<Sprite>(iconPath, Sprite::SpriteShader::DEFALT, true);
+
+    // 名前表記
+    auto& name = chara->AddChildObject();
+    name->SetName("name");
+    auto& namesprite = name->AddComponent<Sprite>(namePath, Sprite::SpriteShader::DEFALT, false);
+    namesprite->SetOrderinLayer(0);
+    name->SetEnabled(false);
+
+    //1番目のスキルアイコン
+    auto& skillIcon1 = name->AddChildObject();
+    skillIcon1->SetName("Rightskillicon");
+    auto& skillsprite1 = skillIcon1->AddComponent<Sprite>(skillIconPath1, Sprite::SpriteShader::HOLO, true);
+    skillsprite1->SetOrderinLayer(1);
+
+    //2番目のスキルアイコン
+    auto& skillIcon2 = name->AddChildObject();
+    skillIcon2->SetName("Eskillicon");
+    auto& skillsprite2 = skillIcon2->AddComponent<Sprite>(skillIconPath2, Sprite::SpriteShader::HOLO, true);
+    skillsprite2->SetOrderinLayer(2);
+
+    //ultのスキルアイコン
+    auto& ultIcon = name->AddChildObject();
+    ultIcon->SetName("ultIcon");
+    auto& ultsprite2 = ultIcon->AddComponent<Sprite>(ultIconPath, Sprite::SpriteShader::HOLO, true);
+    ultsprite2->SetOrderinLayer(3);
+
+    //video1
+    auto& skillvideo1 = parent->AddChildObject();
+    skillvideo1->SetName(videoname1);
+    skillvideo1->AddComponent<Video>(video1);
+    skillvideo1->transform_->SetWorldPosition({ -2.730f,0.724f,1.765f });
+    skillvideo1->transform_->SetEulerRotation({ 0.0f,-32.0f,0.0f });
+    skillvideo1->transform_->SetScale({ 1.6f,1.6f,1.0f });
+    skillvideo1->SetEnabled(false);
+
+    //video2
+    auto& skillvideo2 = parent->AddChildObject();
+    skillvideo2->SetName(videoname2);
+    skillvideo2->AddComponent<Video>(video2);
+    skillvideo2->transform_->SetWorldPosition({ -2.730f,0.724f,1.765f });
+    skillvideo2->transform_->SetEulerRotation({ 0.0f,-32.0f,0.0f });
+    skillvideo2->transform_->SetScale({ 1.6f,1.6f,1.0f });
+    skillvideo2->SetEnabled(false);
+
+    //ult
+    auto& ultvideo = parent->AddChildObject();
+    ultvideo->SetName(ultvideoname);
+    ultvideo->AddComponent<Video>(video3);
+    ultvideo->transform_->SetWorldPosition({ -2.730f,0.724f,1.765f });
+    ultvideo->transform_->SetEulerRotation({ 0.0f,-32.0f,0.0f });
+    ultvideo->transform_->SetScale({ 1.6f,1.6f,1.0f });
+    ultvideo->SetEnabled(false);
+
+    // 3Dオブジェクト生成
+    auto& obj = parent->AddChildObject();
+    std::string playerName = std::string(charaName) + "Player";
+    obj->SetName(playerName.c_str());
+    obj->transform_->SetWorldPosition({ -0.191f, 0.018f, 1.802f });
+    obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
+    obj->transform_->SetEulerRotation({ 0.0f, 209.99f, 0.0f });
+    auto& r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+    r->LoadModel(modelPath);
+    auto& anim = obj->AddComponent<AnimationCom>();
+    anim->PlayAnimation(5, true);
+    r->SetEnabled(false);
 }
 
 // キャラピック表示設定
@@ -242,7 +403,10 @@ void CharaPicks::SetViewCharaPicks(bool flg)
     if (!charaPicksCanvas) return;
 
     if (flg)
+    {
         charaPicksCanvas->SetEnabled(true);
+        GameObjectManager::Instance().Find("lobbyBackParent")->SetEnabled(false);
+    }
     else
         charaPicksCanvas->SetEnabled(false);
 }

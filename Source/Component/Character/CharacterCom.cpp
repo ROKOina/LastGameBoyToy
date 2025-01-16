@@ -15,6 +15,7 @@
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
 
+
 void CharacterCom::Update(float elapsedTime)
 {
     auto& ss = SceneManager::Instance().GetSettingScreen();
@@ -116,7 +117,8 @@ void CharacterCom::Update(float elapsedTime)
         if (shootTimer >= shootTime)
         {
             //スキル発動中はリターン
-            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL)
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL
+            &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
             {
                 //弾切れならリロード
                 if (currentBulletNum > 0) {
@@ -296,7 +298,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //弾切れなら自動的にリロード
-        if (currentBulletNum > 0)
+        if (currentBulletNum > 0 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
         {
             MainAttackDown();
         }
@@ -316,7 +318,8 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    if (CharacterInput::MainAttackButton & GetButtonDown())
+    if (CharacterInput::MainAttackButton & GetButtonDown() 
+    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD))
     {
         if (shootTimer < shootTime)
         {
@@ -346,13 +349,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SubAttackPushing();
     }
 
+    //if (CharacterInput::MainSkillButton_E & GetButtonDown()
+    //    && IsSkillCoolMax(SkillCoolID::Q))
+    //{
+    //    skillCools[SkillCoolID::Q].timer = 0;
+    //    MainSkill();
+    //}
     if (CharacterInput::MainSkillButton_E & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::Q))
-    {
-        skillCools[SkillCoolID::Q].timer = 0;
-        MainSkill();
-    }
-    if (CharacterInput::SubSkillButton_C & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::E))
     {
         skillCools[SkillCoolID::E].timer = 0;
@@ -510,7 +513,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
 //ビネット効果
 void CharacterCom::Vinetto(float elapsedTime)
 {
-    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint(); // 最大HP
+    float previousHP = GetGameObject()->GetComponent<CharaStatusCom>()->GetVinetHp(); // 最大HP
     float currentHP = *GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();    // 現在HP
 
     auto& postEff = GameObjectManager::Instance().Find("posteffect");
@@ -534,7 +537,7 @@ void CharacterCom::Vinetto(float elapsedTime)
     }
 
     // 現在のHPを次回用に保存
-    GetGameObject()->GetComponent<CharaStatusCom>()->SetMaxHitPoint(currentHP);
+    GetGameObject()->GetComponent<CharaStatusCom>()->SetVinetHp(currentHP);
 }
 
 void CharacterCom::StanUpdate(float elapsedTime)

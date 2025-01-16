@@ -19,11 +19,11 @@ Solder_BaseState::Solder_BaseState(CharacterCom* owner) : State(owner)
 void Solder_MainAttackState::Enter()
 {
     rayobj = owner->GetGameObject()->GetChildFind("mainattack");
-    if (!rayobj)return;
+    if (!rayobj.lock())return;
 
     //レイ設定
-    auto& ray = rayobj->GetComponent<RayColliderCom>();
-    DirectX::XMFLOAT3 start = rayobj->transform_->GetWorldPosition();
+    auto& ray = rayobj.lock()->GetComponent<RayColliderCom>();
+    DirectX::XMFLOAT3 start = rayobj.lock()->transform_->GetWorldPosition();
 
     //カメラ取得
     auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
@@ -40,7 +40,7 @@ void Solder_MainAttackState::Enter()
 }
 void Solder_MainAttackState::Execute(const float& elapsedTime)
 {
-    auto& ray = rayobj->GetComponent<RayColliderCom>();
+    auto& ray = rayobj.lock()->GetComponent<RayColliderCom>();
 
     //レイキャストOFF
     if (CharacterInput::MainAttackButton & owner->GetButton())
@@ -99,6 +99,7 @@ void Solder_UltState::Execute(const float& elapsedTime)
 }
 void Solder_UltState::Exit()
 {
+    time = 0.0f;
     //ult終了
     charaCom.lock()->FinishUlt();
 }

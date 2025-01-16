@@ -4,6 +4,9 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
 #include"StateMachine\Behaviar\InazawaCharacterState.h"
+#include "Component\Collsion\ColliderCom.h"
+#include "Component\UI\UiFlag.h"
+#include "Component\UI\Font.h"
 
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
@@ -34,85 +37,49 @@ void UI_Skill::Update(float elapsedTime)
     this->UiSystem::Update(elapsedTime);
 }
 
-UI_BoosGauge::UI_BoosGauge(int num)
+
+UI_BoosGauge::UI_BoosGauge()
 {
-    player = GameObjectManager::Instance().Find("player");
-    for (int i = 0; i < num; i++) {
-        //ブースト回数だけUIを増やす
-        //<Frame>//
-        std::shared_ptr<GameObject> BoostFrame = GameObjectManager::Instance().Create();
-        std::string name = "BoostFrame_";
-        std::string number = std::to_string(i);
-        name += number;
-        std::shared_ptr<UiSystem> frame = BoostFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrame.ui", Sprite::SpriteShader::DEFALT, false);
-        BoostFrame->SetName(name.c_str());
-        //位置調整
-        frame->spc.position = { frame->spc.position.x + (i * (frame->spc.texSize.x * frame->spc.scale.x)) ,frame->spc.position.y - i * 19.0f };
 
-        //<Gauge//
-        std::shared_ptr<GameObject> BoostGauge = GameObjectManager::Instance().Create();
-        name = "BoostGauge_";
-        name += number;
-        BoostGauge->SetName(name.c_str());
-        std::shared_ptr<UiSystem> gauge = BoostGauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostGauge.ui", Sprite::SpriteShader::DEFALT, false);
-        gauge->SetVariableValue(player.lock()->GetComponent<CharacterCom>()->GetDashGauge());
-        //位置調整
-        gauge->spc.position = { gauge->spc.position.x + (i * (gauge->spc.texSize.x * gauge->spc.scale.x)) ,gauge->spc.position.y - i * 19.0f };
+    //ゲージのマスク
+    mask = GameObjectManager::Instance().Create();
+    mask->SetName("Mask");
+    mask->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostMaskVer2.ui", Sprite::SpriteShader::DEFALT, false);
 
-        originlTexSize = gauge->spc.texSize;
-        frames.emplace_back(BoostFrame);
-        gauges.emplace_back(BoostGauge);
-    }
+    //ゲージの外枠
+    frame = GameObjectManager::Instance().Create();
+    frame->SetName("GaugeFrame");
+    frame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostFrameVer2.ui", Sprite::SpriteShader::DEFALT, false);
+    
 
-    this->num = num;
-    maxDashGauge = player.lock()->GetComponent<CharacterCom>()->GetDahsGaugeMax();
-    value = player.lock()->GetComponent<CharacterCom>()->GetDashGauge();
-
-    //区切りの値を求める
-    separateValue = maxDashGauge / num;
+    //ゲージ本体
+    gauge = GameObjectManager::Instance().Create();
+    gauge->SetName("Gauge");
+    gauge->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BoostGaugeVer2.ui", Sprite::SpriteShader::DEFALT, false);
+   
+  
 }
 
 void UI_BoosGauge::Start()
 {
-    //なぜかinitializeでは親子付けできなかった
-    //親子付け
-    for (int i = 0; i < num; i++) {
-        this->GetGameObject()->AddChildObject(frames.at(i));
-        this->GetGameObject()->AddChildObject(gauges.at(i));
-    }
+    this->GetGameObject()->AddChildObject(frame);
+    this->GetGameObject()->AddChildObject(mask);
+    this->GetGameObject()->AddChildObject(gauge);
 }
 
 void UI_BoosGauge::Update(float elapsedTime)
 {
-    std::shared_ptr<UiSystem> gauge = gauges.at(0).get()->GetComponent<UiSystem>();
-    std::shared_ptr<UiSystem> gauge2 = gauges.at(1).get()->GetComponent<UiSystem>();
+    std::weak_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
+    float dushGauge = *player.lock()->GetComponent<CharacterCom>()->GetDashGauge();
+    float maxDushgauge = player.lock()->GetComponent<CharacterCom>()->GetDahsGaugeMax();
 
-    // 変化値がマイナスに行かないように補正
-    *value = Mathf::Clamp(*value, 0.01f, maxDashGauge);
-    float valueRate;
     //ゲージの倍率を求める
-    valueRate = *value / (maxDashGauge);
+    float  valueRate = dushGauge / maxDushgauge;
+    valueRate = 1 - valueRate;
+    float addAngle = maxAngle * valueRate;
 
-    for (int i = 0; i < num; i++)
-    {
-        std::shared_ptr<UiSystem> gaugeSegment = gauges.at(i).get()->GetComponent<UiSystem>();
-        float segmentStart = separateValue * i;       // 現在のゲージの開始位置
-        float segmentEnd = separateValue * (i + 1);   // 現在のゲージの終了位置
-
-        if (*value > segmentEnd) {
-            // セグメントがフルの場合
-            gaugeSegment->spc.texSize = { originlTexSize.x, gaugeSegment->spc.texSize.y };
-        }
-        else if (*value > segmentStart) {
-            // セグメントが部分的に埋まっている場合
-            float partialRate = (*value - segmentStart) / separateValue; // セグメント内の比率
-            gaugeSegment->spc.texSize = { originlTexSize.x * partialRate, gaugeSegment->spc.texSize.y };
-        }
-        else {
-            // セグメントが空の場合
-            gaugeSegment->spc.texSize = { 0, gaugeSegment->spc.texSize.y };
-        }
-    }
+    mask->GetComponent<UiSystem>()->spc.angle = minAngle + addAngle;
+    mask->GetComponent<UiSystem>()->spc.angle = Mathf::Clamp(mask->GetComponent<UiSystem>()->spc.angle,minAngle,maxAngle);
 }
 
 UI_LockOn::UI_LockOn(int num, float min, float max)
@@ -235,6 +202,7 @@ void UI_LockOn::UpdateGauge(float elapsedTime, std::shared_ptr<GameObject> obj)
 {
     float hp = *obj->GetComponent<CharaStatusCom>()->GetHitPoint();
     float maxHp = obj->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+
     // 変化値がマイナスに行かないように補正
     hp = Mathf::Clamp(hp, 0.01f, maxHp);
 
@@ -517,6 +485,89 @@ void UI_Ult_Count::UpdateCore(float elapsedTime)
     }
 }
 
+UI_UltNum::UI_UltNum()
+{
+    std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltNum");
+    std::shared_ptr<GameObject> obj = ultFrame->AddChildObject();
+    obj->SetName("ultNumFont");
+    std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+    font->position = { 950,886 };
+    font->str = L"";  //L付けてね
+    font->scale = 0.75f;
+    font->color = { 1,1,1,0.75 };
+}
+
+void UI_UltNum::Update(float elapsedTIme)
+{
+ std::shared_ptr<GameObject> font =  GameObjectManager::Instance().Find("ultNumFont");
+ std::shared_ptr<GameObject> player =  GameObjectManager::Instance().Find("player");
+float  ultrate  =  *player->GetComponent<CharacterCom>()->GetUltGauge() / player->GetComponent<CharacterCom>()->GetUltGaugeMax();
+ultrate *= 100;
+if (int(ultrate) >= 10) {
+    font->GetComponent<Font>()->position = { 939,886 };
+    if (int(ultrate) >= 100) {
+        font->GetComponent<Font>()->position = { 930,886 };
+    }
+}
+else {
+    font->GetComponent<Font>()->position = { 950,886 };
+}
+ 
+std::wstring numstr = std::to_wstring(int(ultrate));
+font->GetComponent<Font>()->str = numstr;
+}
+
+
+void UI_EnemyHp::Update(float elasedTime)
+{
+
+    if (enemyFLG) {
+        GaugeUpdate(elasedTime);
+    }
+}
+
+void UI_EnemyHp::GaugeUpdate(float elapsedTime)
+{
+    float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
+    float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+    std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
+
+    //前フレームのHpと現在のHpが違うなら
+    if (*Hp != oldHp) {
+        displayFLG = true;
+        timer = 0.0f;
+        oldHp = *Hp;
+        gauge->spc.color = { 1,1,1,1 };
+    }
+
+    if (displayFLG) {
+        timer += elapsedTime;
+        if (time < timer) {
+            displayFLG = false;
+            timer = 0.0f;
+        }
+    }
+    else {
+        gauge->spc.color = { 0,0,0,0 };
+    }
+}
+
+void UI_EnemyHp::Register()
+{
+    enemyHp = this->GetGameObject()->AddChildObject();
+    enemyHp->SetName("enemyHp");
+    enemyHp->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/EnemyHp.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);
+    oldHp = *this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
+    enemyFLG = true;
+    std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
+    float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
+    float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+    gauge->spc.objectname = GetGameObject()->GetName();
+    gauge->originalTexSize = { 200,100 };
+    gauge->SetVariableValue(Hp);
+    gauge->SetMaxValue(MaxHp);
+}
+
 void PlayerUIManager::Register()
 {
     ////共通のUI////
@@ -541,10 +592,18 @@ void PlayerUIManager::Register()
     CreateUltUI();
     //Hp
     CreateHpUI();
-    //Boost
+
+    //ブースト
     CreateBoostUI();
+
     //全員の使用キャラ表示
     CreateNetUseCharaUI();
+
+    //キャラアイコン
+    CreatePlayerIcon();
+
+    //Hitエフェクト
+    CreateHitEffect();
     ////////////////////////////////
 
     //キャラ固有のUI
@@ -564,6 +623,7 @@ void PlayerUIManager::Register()
         break;
     }
 }
+
 
 void PlayerUIManager::UIUpdate(float elapsedTime)
 {
@@ -585,7 +645,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
     std::string iconName = "Data/Texture/KeyBoard/";
     CharacterCom::SkillCoolID skillNum;
     //位置をずらす定数
-    const float offset = 120.0f;
+    const DirectX::XMFLOAT2 offset = { -95.0f,-6.0f };
     switch (use_skill)
     {
     case Q:
@@ -597,7 +657,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         skillNum = CharacterCom::SkillCoolID::E;
         break;
     case RIGHT_CLICK:
-        name += "skill_Q.png";
+        name += "skill_RightClick.png";
         iconName += "mouse_right_outline.png";
         skillNum = CharacterCom::SkillCoolID::LeftClick;
         break;
@@ -607,40 +667,33 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
 
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
 
-    //SkillFrame2
+    //SkillFrame
     std::shared_ptr<GameObject> skillFrame = canvas->AddChildObject();
     skillFrame->SetName("Skill_Frame");
     auto& a = skillFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_02.ui", Sprite::SpriteShader::DEFALT, false);
-    a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+    a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
+
 
     //SkillMask
     {
         std::shared_ptr<GameObject> skillGaueHide = skillFrame->AddChildObject();
         skillGaueHide->SetName("SkillGaugeHide");
         auto& a = skillGaueHide->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillGaugeMask.ui", Sprite::SpriteShader::DEFALT, false);
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+        a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
     }
 
     //SkillGauge
     {
         std::shared_ptr<GameObject> skillGauge = skillFrame->AddChildObject();
         skillGauge->SetName("SkillGauge");
-        std::shared_ptr<UI_Skill>skillGaugeCmp = skillGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge1.ui", Sprite::SpriteShader::DEFALT, false, 997, 908);
+        std::shared_ptr<UI_Skill>skillGaugeCmp = skillGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/SkillGauge1.ui", Sprite::SpriteShader::DEFALT, false, 997, 908 -  count* offset.y);
         std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
         skillGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetSkillCoolTime(skillNum));
         float* i = player->GetComponent<CharacterCom>()->GetSkillCoolTimerPointer(skillNum);
         skillGaugeCmp->SetVariableValue(i);
-        skillGaugeCmp->spc.position = { skillGaugeCmp->spc.position.x - (count * offset),skillGaugeCmp->spc.position.y };
+        skillGaugeCmp->spc.position = { skillGaugeCmp->spc.position.x - (count * offset.x),skillGaugeCmp->spc.position.y };
     }
 
-    //SkillFrame
-    {
-        std::shared_ptr<GameObject> skillFrame2 = skillFrame->AddChildObject();
-        skillFrame2->SetName("SkillFrame2");
-        auto& a = skillFrame2->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/SkillFrame1_01.ui", Sprite::SpriteShader::DEFALT, false);
-        skillFrame2->transform_->SetWorldPosition({ skillFrame2->transform_->GetWorldPosition().x - (count * offset),skillFrame2->transform_->GetWorldPosition().y,0 });
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
-    }
 
     //Skill_E
     {
@@ -648,7 +701,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         skillIcon->SetName("Skill_E");
         auto& a = skillIcon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Skill_E.ui", Sprite::SpriteShader::DEFALT, false);
         skillIcon->GetComponent<UiSystem>()->LoadTexture(name);
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+        a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
     }
 
     //KeyBoardIcon
@@ -657,7 +710,7 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         skillIcon->SetName("KeyIcon");
         auto& a = skillIcon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/KeyIcon.ui", Sprite::SpriteShader::DEFALT, false);
         skillIcon->GetComponent<UiSystem>()->LoadTexture(iconName);
-        a->spc.position = { a->spc.position.x - (count * offset),a->spc.position.y };
+        a->spc.position = { a->spc.position.x - (count * offset.x),a->spc.position.y - (count * offset.y) };
     }
 }
 
@@ -698,11 +751,18 @@ void PlayerUIManager::CreateUltUI()
         std::shared_ptr<GameObject> ultGauge = ultFrame->AddChildObject();
         ultGauge->SetName("UltGauge");
 
-        std::shared_ptr<UI_Skill>ultGaugeCmp = ultGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false, 1084, 890);
+       std::shared_ptr<UI_Skill>ultGaugeCmp = ultGauge->AddComponent<UI_Skill>("Data/SerializeData/UIData/Player/UltGauge.ui", Sprite::SpriteShader::DEFALT, false, 1190, 960);
         std::shared_ptr<GameObject>player = GameObjectManager::Instance().Find("player");
         ultGaugeCmp->SetMaxValue(player->GetComponent<CharacterCom>()->GetUltGaugeMax());
         float* i = player->GetComponent<CharacterCom>()->GetUltGauge();
         ultGaugeCmp->SetVariableValue(i);
+    }
+    //ultNum
+    {
+        std::shared_ptr<GameObject> ultFrame = GameObjectManager::Instance().Find("UltFrame");
+        std::shared_ptr<GameObject> ultNum = ultFrame->AddChildObject();
+        ultNum->SetName("UltNum");
+        std::shared_ptr<UI_UltNum>ultnumCom = ultNum->AddComponent<UI_UltNum>();
     }
 }
 
@@ -732,17 +792,41 @@ void PlayerUIManager::CreateHpUI()
 
 void PlayerUIManager::CreateBoostUI()
 {
-    int boostCount = player.lock()->GetComponent<CharacterCom>()->GetDahsGaugeMax() / 5;
     //Boost
     {
         std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
         std::shared_ptr<GameObject> hpMemori = canvas->AddChildObject();
-        hpMemori->SetName("boostGauge2");
+        hpMemori->SetName("boostGauge");
 
-        hpMemori->AddComponent<UI_BoosGauge>(boostCount);
+        hpMemori->AddComponent<UI_BoosGauge>();
     }
 }
 
+void PlayerUIManager::CreatePlayerIcon()
+{
+    //ロードするテクスチャを設定
+    std::string name = "Data/Texture/PlayerUI/CharaIcon/"+ (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() +".png";
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+    std::shared_ptr<GameObject> reticle = canvas->AddChildObject();
+    auto& a = reticle->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaIcon.ui", Sprite::SpriteShader::DEFALT, false);
+    a->LoadTexture(name);
+}
+
+void PlayerUIManager::CreateHitEffect()
+{
+    bool* isHit =   player.lock()->GetComponent<CharacterCom>()->GetIsHitAttack();
+
+    //Boost
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hit = canvas->AddChildObject();
+        hit->SetName("HitEffect");
+
+        hit->AddComponent<UiFlag>("Data/SerializeData/UIData/Player/HitEffect.ui", Sprite::SpriteShader::DEFALT, false,isHit);
+    }
+}
+
+//TODO ITOKUN RAMUCHI
 void PlayerUIManager::CreateNetUseCharaUI()
 {
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
@@ -752,7 +836,7 @@ void PlayerUIManager::CreateNetUseCharaUI()
         allyBack->SetName("allyBack");
         allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
         //一人目
-        {   //122 341
+        { 
             std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
             ally01->SetName("charaView01");
             ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
@@ -819,7 +903,7 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
 {
     allyHp = true;
     //ロードするテクスチャを設定(アイコンができてから)
-    std::string name = "Data/Texture/PlayerUI/" + (std::string)netPlayer.lock()->GetComponent<CharacterCom>()->GetName() + "/CharaIcon.png";
+    std::string name = "Data/Texture/PlayerUI/CharaIcon/"+ (std::string)netPlayer.lock()->GetComponent<CharacterCom>()->GetName()+".png";
 
     //HpFrame
     {
@@ -838,6 +922,13 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         float* i = netPlayer.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
         gauge->SetVariableValue(i);
     }
+    //Icon
+    {
+        std::shared_ptr<GameObject> icon = GameObjectManager::Instance().Find("AllyHpFrame")->AddChildObject();
+        icon->SetName("AllyIcon");
+        std::shared_ptr<UiSystem>iconUi = icon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/AllyIcon.ui", Sprite::SpriteShader::DEFALT,false);
+        iconUi->LoadTexture(name);
+    }
 
 }
 
@@ -846,3 +937,4 @@ void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)
     player = obj;
     bookingRegister = true;
 }
+

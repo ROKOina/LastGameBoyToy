@@ -123,6 +123,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
+    <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
+    <ClInclude Include="Source\Graphics\Video.h" />
     <ClInclude Include="Source\PvPUi\CharaPicks.h" />
     <ClInclude Include="External\DirectXTex\DDS.h" />
     <ClInclude Include="External\DirectXTex\DDSTextureLoader.h" />
@@ -287,6 +289,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
+    <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
+    <ClCompile Include="Source\Graphics\Video.cpp" />
     <ClCompile Include="Source\PvPUi\CharaPicks.cpp" />
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />
     <ClCompile Include="External\DirectXTex\DirectXHelpers.cpp" />
@@ -442,6 +446,7 @@
     <None Include="HLSL\3D\Light.hlsli" />
     <None Include="HLSL\3D\PBR+IBLFunction.hlsli" />
     <None Include="HLSL\3D\Shadow.hlsli" />
+    <None Include="HLSL\3D\Video.hlsli" />
     <None Include="HLSL\Common.hlsli" />
     <None Include="HLSL\compute\GPUParticle.hlsli" />
     <None Include="HLSL\Constants.hlsli" />
@@ -465,6 +470,10 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\2D\GlitchPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\HoloGlennPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
@@ -613,6 +622,14 @@
     <FxCompile Include="HLSL\3D\ToonPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\VideoPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\VideoVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\compute\GPUParticleCS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
