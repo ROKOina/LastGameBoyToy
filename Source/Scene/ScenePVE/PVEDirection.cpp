@@ -77,6 +77,10 @@ void PVEDirection::CharaSlect(float elapsedTime)
         GameObjectManager::Instance().Find("stage")->SetEnabled(false);
         GameObjectManager::Instance().Find("player")->SetEnabled(false);
         GameObjectManager::Instance().Find("Gate0")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Reactar0")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Reactar1")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Reactar2")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Reactar3")->SetEnabled(false);
        
        
 
@@ -94,8 +98,13 @@ void PVEDirection::CharaSlect(float elapsedTime)
         GameObjectManager::Instance().Find("stage")->SetEnabled(true);
         GameObjectManager::Instance().Find("player")->SetEnabled(true);
         GameObjectManager::Instance().Find("Gate0")->SetEnabled(true);
+        GameObjectManager::Instance().Find("Reactar0")->SetEnabled(true);
+        GameObjectManager::Instance().Find("Reactar1")->SetEnabled(true);
+        GameObjectManager::Instance().Find("Reactar2")->SetEnabled(true);
+        GameObjectManager::Instance().Find("Reactar3")->SetEnabled(true);
         GameObjectManager::Instance().Find(charName[charaPicks->GetSelectedCharacterId()].c_str())->SetEnabled(false);
         charaPicks->SetViewCharaPicks(false);
+        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
         CharaSelectFlag = true;
         flag = false;
         directionNumber += 1;
