@@ -7,6 +7,7 @@
 #include "Component\Animation\AnimationCom.h"
 #include <Component\Camera\FreeCameraCom.h>
 #include "Component\Renderer\VideoCom.h"
+#include "SystemStruct\TimeManager.h"
 
 CharaPicks::CharaPicks()
 {
@@ -49,7 +50,7 @@ void CharaPicks::CreateCharaPicksUiObject()
         AddCharacterUI(charaPicksCanvas, "Faraic", "Data/SerializeData/UIData/CharaPick/charaIcon1.ui",
             "Data/SerializeData/UIData/CharaPick/charaName1.ui", "Data/SerializeData/UIData/CharaPick/farahc_rightclickskillicon.ui",
             "Data/SerializeData/UIData/CharaPick/farahc_Eskillicon.ui", "Data/SerializeData/UIData/CharaPick/farahc_ulticon.ui",
-            "Data/Model/player_True/player2.mdl", "Data/Video/farahick_RightClick.mp4", "Data/Video/farahick_ESkill.mp4", "Data/Video/farahick_ult.mp4",
+            "Data/Model/player_True/player2.mdl", "Data/Video/farahick_ESkill.mp4", "Data/Video/farahick_RightClick.mp4", "Data/Video/farahick_ult.mp4",
             "Faraic-video1", "Faraic-video2", "Faraic-ultvideo");
 
         // SANTORATTO
@@ -92,7 +93,7 @@ void CharaPicks::CreateCharaPicksUiObject()
 void CharaPicks::CharaPicksUpdate(float elapsedTime)
 {
     // 各キャラ詳細
-    CharaDetails();
+    CharaDetails(elapsedTime);
 
     // 決定処理
     if (GameObjectManager::Instance().Find("CharaPicksCanvas") != nullptr)
@@ -102,7 +103,7 @@ void CharaPicks::CharaPicksUpdate(float elapsedTime)
 }
 
 // キャラ詳細
-void CharaPicks::CharaDetails()
+void CharaPicks::CharaDetails(float elapsedTime)
 {
     // 決定していたら操作不可
     if (decisionFlg) return;
@@ -204,6 +205,8 @@ void CharaPicks::CharaDetails()
                 selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->EasingPlay();
                 selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->spc.onshot = true;
 
+                triger = true;
+
                 selected.sprite->spc.color = selectColor;
                 selected.sprite->spc.scale = { 0.4f, 0.4f };
                 selected.sprite->EasingPlay();
@@ -218,11 +221,75 @@ void CharaPicks::CharaDetails()
             }
         };
 
+    auto updatechara = [&](CharacterInfo& selected, std::vector<CharacterInfo>& others)
+        {
+            static const float interval = 60.0f; // 全体の繰り返し時間
+            static const float rightSkillTime = 20.0f; // RightSkill の時間
+            static const float eSkillTime = 40.0f;     // ESkill の時間
+            static const float ultTime = 60.0f;        // Ult の時間
+
+            if (triger)
+            {
+                plustime += elapsedTime;
+
+                // 時間の繰り返し処理
+                if (plustime >= interval)
+                {
+                    plustime = 0.0f;
+                }
+            }
+
+            // 選択されたキャラクターのみ更新
+            if (selectedCharacterId == selected.id)
+            {
+                // 状態に応じた設定値
+                int rightSkillFlag = 1, eSkillFlag = 1, ultFlag = 1;
+                bool video1Enabled = false, video2Enabled = false, ultVideoEnabled = false;
+
+                if (plustime < rightSkillTime)
+                {
+                    rightSkillFlag = 0;
+                    video1Enabled = true;
+                }
+                else if (plustime < eSkillTime)
+                {
+                    eSkillFlag = 0;
+                    video2Enabled = true;
+                }
+                else if (plustime < ultTime)
+                {
+                    ultFlag = 0;
+                    ultVideoEnabled = true;
+                }
+
+                // 共通処理で適用
+                selected.name->GetChildFind("Rightskillicon")->GetComponent<Sprite>()->constants.onflag = rightSkillFlag;
+                selected.name->GetChildFind("Eskillicon")->GetComponent<Sprite>()->constants.onflag = eSkillFlag;
+                selected.name->GetChildFind("ultIcon")->GetComponent<Sprite>()->constants.onflag = ultFlag;
+
+                selected.video1->SetEnabled(video1Enabled);
+                selected.video2->SetEnabled(video2Enabled);
+                selected.ultvideo->SetEnabled(ultVideoEnabled);
+            }
+
+            // 他のキャラクターをリセット
+            for (auto& other : others)
+            {
+                if (other.id != selectedCharacterId)
+                {
+                    other.video1->SetEnabled(false);
+                    other.video2->SetEnabled(false);
+                    other.ultvideo->SetEnabled(false);
+                }
+            }
+        };
+
     // 各キャラクターを処理
     for (size_t i = 0; i < characters.size(); ++i)
     {
         std::vector<CharacterInfo> others = characters;
         others.erase(others.begin() + i);
+        updatechara(characters[i], others);
         handleCharacterSelection(characters[i], others);
     }
 }
@@ -273,19 +340,19 @@ void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* 
     //1番目のスキルアイコン
     auto& skillIcon1 = name->AddChildObject();
     skillIcon1->SetName("Rightskillicon");
-    auto& skillsprite1 = skillIcon1->AddComponent<Sprite>(skillIconPath1, Sprite::SpriteShader::DEFALT, true);
+    auto& skillsprite1 = skillIcon1->AddComponent<Sprite>(skillIconPath1, Sprite::SpriteShader::HOLO, true);
     skillsprite1->SetOrderinLayer(1);
 
     //2番目のスキルアイコン
     auto& skillIcon2 = name->AddChildObject();
     skillIcon2->SetName("Eskillicon");
-    auto& skillsprite2 = skillIcon2->AddComponent<Sprite>(skillIconPath2, Sprite::SpriteShader::DEFALT, true);
+    auto& skillsprite2 = skillIcon2->AddComponent<Sprite>(skillIconPath2, Sprite::SpriteShader::HOLO, true);
     skillsprite2->SetOrderinLayer(2);
 
     //ultのスキルアイコン
     auto& ultIcon = name->AddChildObject();
     ultIcon->SetName("ultIcon");
-    auto& ultsprite2 = ultIcon->AddComponent<Sprite>(ultIconPath, Sprite::SpriteShader::DEFALT, true);
+    auto& ultsprite2 = ultIcon->AddComponent<Sprite>(ultIconPath, Sprite::SpriteShader::HOLO, true);
     ultsprite2->SetOrderinLayer(3);
 
     //video1

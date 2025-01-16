@@ -29,7 +29,7 @@ public:
     void SetTeamPick(int pick) { teamPick = pick; }
 private:
     // キャラ詳細（スキル表示、キャラ名、選択キャラ表示）
-    void CharaDetails();
+    void CharaDetails(float elapsedTime);
     // 決定処理
     void DecisionButton();
 
@@ -61,6 +61,10 @@ private:
 
     //チームがピックしているキャラ
     int teamPick = -1;
+
+    //経過時間
+    float plustime = 0.0f;
+    bool triger = false;
 
     DirectX::XMFLOAT4 color, selectColor = {};
 };

@@ -16,5 +16,6 @@ cbuffer SpriteConstants : register(b0)
     float cliptime;
     float edgethreshold;
     float edgeoffset;
-    float2 padding;
+    int onflag;
+    float padding;
 };
