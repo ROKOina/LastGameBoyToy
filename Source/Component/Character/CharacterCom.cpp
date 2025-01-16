@@ -318,17 +318,17 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
     if (CharacterInput::MainAttackButton & GetButtonDown()
-        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD))
+        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+    {
+        if (shootTimer < shootTime)
         {
-            if (shootTimer < shootTime)
-            {
-                attackInputSave = true; //先行入力保存
-                return;
-            }
+            attackInputSave = true; //先行入力保存
+            return;
+        }
 
-            //弾切れなら自動的にリロード
-            currentBulletNum > 0 ?
-                MainAttackDown() : Reload();
+        //弾切れなら自動的にリロード
+        currentBulletNum > 0 ?
+            MainAttackDown() : Reload();
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
