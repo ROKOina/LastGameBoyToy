@@ -559,6 +559,7 @@ void PhotonLib::NetInputUpdate()
         bool isInputInit = false;
 
         //“ü—Í‚ð•Û‘¶
+        if (s.playerId < 0)continue;
         auto& saveBuffer = StaticSendDataManager::Instance().GetSaveBuffer(s.playerId);
         for (auto& b : saveB)
         {
