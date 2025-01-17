@@ -572,10 +572,10 @@ UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
 {
     std::shared_ptr<GameObject> tunder = GameObjectManager::Instance().Create();
     tunder->SetName("Tunder");
-    tunder->AddComponent<UiSystem>(nullptr,Sprite::SpriteShader::DEFALT,false);
+    tunder->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Tunder.ui", Sprite::SpriteShader::DEFALT, false);
     std::shared_ptr<GameObject> font = GameObjectManager::Instance().Create();
     font->SetName("Font");
-    font->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    font->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Victry.ui", Sprite::SpriteShader::DEFALT, false);
     for (int i = 0; i <= 3; i++)
     {
         std::shared_ptr<GameObject> circle = GameObjectManager::Instance().Create();
