@@ -38,7 +38,9 @@ Shader/
 *.cod
 *.cso
 
-git rm --cached Data/NETNAME.txt
+# NETNANEOut
+NETNANE/
+*.txt
 
 #DDS out
 *.DDS
