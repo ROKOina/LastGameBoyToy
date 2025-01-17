@@ -319,8 +319,8 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    if (CharacterInput::MainAttackButton & GetButtonDown()
-        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+    if (CharacterInput::MainAttackButton & GetButtonDown() 
+    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
     {
         if (shootTimer < shootTime)
         {

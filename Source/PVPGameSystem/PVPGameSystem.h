@@ -11,6 +11,7 @@ public:
         RED_GROUP,
         BLUE_GROUP,
         DRAW,
+        Max,
     };
 
     enum class GAME_MODE
@@ -70,6 +71,8 @@ public:
     bool IsGameEnd() { return isEndGame; }
     //勝利チーム
     TEAM_KIND GetVictoryTeam() { return victoryTeam; }
+
+    void OnGUI();
 
 private:
     //各ゲームモード更新

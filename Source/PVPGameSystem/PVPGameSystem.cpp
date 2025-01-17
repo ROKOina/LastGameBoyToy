@@ -1,5 +1,5 @@
 #include "PVPGameSystem.h"
-
+#include "imgui.h"
 void PVPGameSystem::update(float elapsedTime)
 {
 	switch (gameMode)
@@ -14,6 +14,24 @@ void PVPGameSystem::update(float elapsedTime)
 		ButtonUpdate();
 		break;
 	}
+}
+
+void PVPGameSystem::OnGUI()
+{
+	const char* victryTeams[] = {
+	"Red",
+	"Bule",
+	"Draw"
+	};
+	int cuurentNum = static_cast<int>(victoryTeam);
+	ImGui::Begin("PVPGameSystem");
+	// ImGuiのComboウィジェット
+	if (ImGui::Combo("VictoryTeam", &cuurentNum, victryTeams, static_cast<int>(TEAM_KIND::Max))) {
+		// Comboで選択が変更された場合、値を更新
+		victoryTeam = static_cast<TEAM_KIND>(cuurentNum);
+	}
+	ImGui::Checkbox("isWEnd",&isEndGame);
+ImGui::End();
 }
 
 void PVPGameSystem::DeathmatchUpdate()

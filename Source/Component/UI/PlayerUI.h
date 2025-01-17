@@ -3,7 +3,10 @@
 #include "Component\UI\UiGauge.h"
 #include "Component\Character\RegisterChara.h"
 #include "Component\Character\CharacterCom.h"
+#include "PVPGameSystem\PVPGameSystem.h"
 #include <map>
+
+
 
 class UI_Skill : public UiSystem
 {
@@ -215,9 +218,29 @@ private:
 
     float oldHp= 0.0f;
     float timer = 0.0f;
-    const float time = 5.0f;
+    const float time = 1.0f;
 
     std::shared_ptr<GameObject> enemyHp;
+};
+
+class UI_GameJudge : public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam);
+    ~UI_GameJudge() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_BoostGauge"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+private:
+    std::vector<std::weak_ptr<GameObject>> circles;
+    
 };
 
 class UI_UltNum : public Component
@@ -296,12 +319,20 @@ public:
     bool GetAllyHp() { return allyHp; }
     void ResetAllyHp() { allyHp = false; }
 
+    //勝敗表示UI
+    void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
+    bool GetIsEndFLG() { return isEndFLG; }
+
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
-  
+
 private:
     bool bookingRegister = false;
     
     std::weak_ptr<GameObject> player;
 
+    bool isEndFLG = false;
+
     bool allyHp = false;    //味方HP表示済み
+
+   
 };
