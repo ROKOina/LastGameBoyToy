@@ -654,6 +654,9 @@ void Sprite::OnGUI()
         ImGui::DragFloat((char*)u8"クリップ時間", &constants.cliptime, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"ディゾルブ量", &constants.edgethreshold, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"縁オフセット", &constants.edgeoffset, 0.1f, 0.0f, 1.0f);
+        ImGui::DragFloat((char*)u8"アニメーション速度", &constants.framerate, 0.1f, 0.0f, 60.0f);
+        ImGui::InputInt((char*)u8"スプライトの列数", &constants.columns);
+        ImGui::InputInt((char*)u8"スプライトの行数", &constants.rows);
         ImGui::Checkbox((char*)u8"発光フラグ", reinterpret_cast<bool*>(&constants.onflag));
         ImGui::TreePop();
     }

@@ -278,7 +278,10 @@ void BaseCharacter_DeathState::Enter()
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
 
     RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
-    respawn->AddRespawnData(owner->GetGameObject());
+    if (respawn)
+    {
+        respawn->AddRespawnData(owner->GetGameObject());
+    }
 
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {

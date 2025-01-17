@@ -127,7 +127,10 @@ public:
         float edgethreshold = 1.0f;
         float edgeoffset = 0.0f;
         int onflag = 1;
-        float padding = {};
+        float framerate = { 0.0f };
+        int columns = { 1 };
+        int rows = { 1 };
+        DirectX::XMFLOAT2 padding = {};
     };
     SaveConstantsParameter constants;
 
