@@ -38,9 +38,6 @@ Shader/
 *.cod
 *.cso
 
-# NETNANEOut
-/Data/NETNANE/*.txt
-
 #DDS out
 *.DDS
 
