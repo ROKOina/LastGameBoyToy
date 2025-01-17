@@ -240,6 +240,8 @@ void PVEDirection::DirectionStart()
 void PVEDirection::DirectionEnd()
 {
     flag = false;
+    CharaSelectFlag = false;
+    deleyFlag = false;
 }
 
 //ƒV[ƒ“‰‰o“Š‡
