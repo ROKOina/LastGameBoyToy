@@ -70,9 +70,6 @@ void JankratBulletCom::TriggerExplosion()
     const auto& sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
     sphere->SetRadius(sphere->GetRadius() * 2.5f);
 
-    // ダメージを減少させる
-    damageValue *= 0.8f;
-
     // 剛体をキネマティックに変更
     const auto& rigid = GetGameObject()->GetComponent<RigidBodyCom>().get();
     rigid->SetRigidFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
