@@ -33,6 +33,7 @@
 #include "Component\UI\Font.h"
 #include "Math/easing.h"
 #include "Component\GameSystem\RespawnCom.h"
+#include "Component\System\CrownCom.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
@@ -290,6 +291,46 @@ void ScenePVP::InitializePVP()
         font->position = { 829,23 };
         font->scale = 1.0f;
         font->color = { 1,0,0,1 };
+    }
+    break;
+    case PVPGameSystem::GAME_MODE::Crown:
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("time");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 900,0 };
+        font->scale = 1.5f;
+        font->color = { 1,1,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("crownCountAlly");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1091,23 };
+        font->scale = 1.0f;
+        font->color = { 0,0,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("crownCountEnemy");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 829,23 };
+        font->scale = 1.0f;
+        font->color = { 1,0,0,1 };
+    }
+    //王冠オブジェクト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("crown");
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        obj->transform_->SetScale({ 0.5f, 0.5f, 0.5f });
+        obj->transform_->SetWorldPosition({ 0, 10, 0 });
+        auto& move = obj->AddComponent<MovementCom>();
+        auto& col = obj->AddComponent<SphereColliderCom>();
+        col->SetMyTag(COLLIDER_TAG::Crown);
+        col->SetJudgeTag(COLLIDER_TAG::Player);
+        obj->AddComponent<CrownCom>();
     }
     break;
     }
@@ -557,7 +598,19 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     }
     break;
     case PVPGameSystem::GAME_MODE::Crown:
+    {
+        //王冠所持時間をネットに送信
+        auto& crown = GameObjectManager::Instance().Find("crown")->GetComponent<CrownCom>();
+        if (net->GetMyPlayerID() >= 0)
+            net->SetCrownTimer(net->GetMyPlayerID(), crown->GetHaveTimer());
+        
 
+        //ゲームシステムに送信
+        auto& DM = pvpGameSystem->GetCrownData();
+        DM.teamData[PVPGameSystem::TEAM_KIND::RED_GROUP].crownTime = net->GetCrownTimerCount(PVPGameSystem::TEAM_KIND::RED_GROUP);
+        DM.teamData[PVPGameSystem::TEAM_KIND::BLUE_GROUP].crownTime = net->GetCrownTimerCount(PVPGameSystem::TEAM_KIND::BLUE_GROUP);
+        DM.nowTime = net->GetNowTime();
+    }
         break;
     case PVPGameSystem::GAME_MODE::Button:
 
@@ -1107,6 +1160,28 @@ void ScenePVP::GameUpdate(float elapsedTime)
         {
             killA->str = UTF8ToWString2(std::to_string(des.teamData[1].killCount));
             killE->str = UTF8ToWString2(std::to_string(des.teamData[0].killCount));
+        }
+    }
+    break;
+    case PVPGameSystem::GAME_MODE::Crown:
+    {
+        auto& gameModeUI = GameObjectManager::Instance().Find("gameModeUI");
+        auto& time = gameModeUI->GetChildFind("time")->GetComponent<Font>();
+        auto& crownA = gameModeUI->GetChildFind("crownCountAlly")->GetComponent<Font>();
+        auto& crownE = gameModeUI->GetChildFind("crownCountEnemy")->GetComponent<Font>();
+        auto& cro = pvpGameSystem->GetCrownData();
+        time->str = UTF8ToWString2(std::to_string(int(cro.endTime - cro.nowTime)));
+
+        //チームによって変える
+        if (netData.GetTeamID() == 0)
+        {
+            crownA->str = UTF8ToWString2(std::to_string(cro.teamData[0].crownTime));
+            crownE->str = UTF8ToWString2(std::to_string(cro.teamData[1].crownTime));
+        }
+        else
+        {
+            crownA->str = UTF8ToWString2(std::to_string(cro.teamData[1].crownTime));
+            crownE->str = UTF8ToWString2(std::to_string(cro.teamData[0].crownTime));
         }
     }
     break;

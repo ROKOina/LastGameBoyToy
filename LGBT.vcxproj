@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
+    <ClInclude Include="Source\Component\System\CrownCom.h" />
     <ClInclude Include="Source\Graphics\Video.h" />
     <ClInclude Include="Source\PvPUi\CharaPicks.h" />
     <ClInclude Include="External\DirectXTex\DDS.h" />
@@ -287,6 +288,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
+    <ClCompile Include="Source\Component\System\CrownCom.cpp" />
     <ClCompile Include="Source\Graphics\Video.cpp" />
     <ClCompile Include="Source\PvPUi\CharaPicks.cpp" />
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />

@@ -1,5 +1,4 @@
 #include "SpawnCom.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Animation/AnimationCom.h"
 #include <cstdlib>
 #include <cmath>

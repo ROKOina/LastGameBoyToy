@@ -152,6 +152,7 @@ struct NetData
 
         //ゲームモード
         DEATHMATCH,
+        CROWN,
     };
     int dataKind = {};
     bool isMasterClient = false;
@@ -213,6 +214,13 @@ struct NetData
     {
         int killCount = {};
     }deathMatchData;
+    //王冠
+    struct CrownData   //4
+    {
+        float crownTimer = {};
+        DirectX::XMFLOAT3 lastPos = {}; //王冠を落とした時の位置
+        bool haveCrown = false; //所持しているか
+    }crownData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
@@ -265,6 +273,12 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::DEATHMATCH)
     {
         out << h.deathMatchData.killCount << " ";
+    }
+    if (h.dataKind == NetData::DATA_KIND::CROWN)
+    {
+        out << h.crownData.crownTimer << " ";
+        out << h.crownData.lastPos << " ";
+        out << h.crownData.haveCrown << " ";
     }
 
     return out;
@@ -321,6 +335,12 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::DEATHMATCH)
     {
         in >> h.deathMatchData.killCount;
+    }
+    if (h.dataKind == NetData::DATA_KIND::CROWN)
+    {
+        in >> h.crownData.crownTimer;
+        in >> h.crownData.lastPos;
+        in >> h.crownData.haveCrown;
     }
 
     return in;
