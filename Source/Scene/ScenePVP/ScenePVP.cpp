@@ -276,7 +276,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
         obj->SetName("killCountAlly");
         std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->position = { 1560,23 };
+        font->position = { 1091,23 };
         font->scale = 1.0f;
         font->color = { 0,0,1,1 };
     }
@@ -284,7 +284,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
         obj->SetName("killCountEnemy");
         std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->position = { 1560,119 };
+        font->position = { 829,23 };
         font->scale = 1.0f;
         font->color = { 1,0,0,1 };
     }
