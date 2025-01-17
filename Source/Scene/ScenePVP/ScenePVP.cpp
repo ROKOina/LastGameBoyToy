@@ -325,7 +325,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
         r->LoadModel("Data/Model/player_arm/player_arm.mdl");
         obj->transform_->SetScale({ 0.5f, 0.5f, 0.5f });
-        obj->transform_->SetWorldPosition({ 0, 10, 0 });
+        obj->transform_->SetWorldPosition({ 3.4f, 20, 8.1f });
         auto& move = obj->AddComponent<MovementCom>();
         auto& col = obj->AddComponent<SphereColliderCom>();
         col->SetMyTag(COLLIDER_TAG::Crown);
