@@ -770,6 +770,7 @@ void Sprite::LoadTexture(std::string filenaem)
     LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
     spc.texSize.x = texture2ddesc_.Width;
     spc.texSize.y = texture2ddesc_.Height;
+    spc.scale = { 1,1 };
 }
 
 //イージングプレイ関数

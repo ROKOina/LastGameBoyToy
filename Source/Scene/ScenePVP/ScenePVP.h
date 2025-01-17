@@ -48,7 +48,7 @@ private:
     void NewObject();
 
     //ゲームシステム更新
-    void GameSyste0mUpdate(float elapsedTime);
+    void GameSystemUpdate(float elapsedTime);
 
     //画面に応じた更新処理
     void TransitionUpdate(float elapsedTime);

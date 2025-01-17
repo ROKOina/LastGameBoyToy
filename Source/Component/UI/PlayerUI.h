@@ -319,9 +319,8 @@ public:
     bool GetAllyHp() { return allyHp; }
 
     //èüîsï\é¶UI
-    void CreateGameJudgeUI(); 
-
-    void SetVictryTeam(PVPGameSystem::TEAM_KIND victryTeam) { this->victryTeam = victryTeam;}
+    void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
+    bool GetIsEndFLG() { return isEndFLG; }
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
 
@@ -330,9 +329,9 @@ private:
     
     std::weak_ptr<GameObject> player;
 
-    bool isEndGame = false;
+    bool isEndFLG = false;
 
     bool allyHp = false;    //ñ°ï˚HPï\é¶çœÇ›
 
-    PVPGameSystem::TEAM_KIND victryTeam = PVPGameSystem::TEAM_KIND::DRAW;
+   
 };

@@ -395,9 +395,13 @@ void ScenePVP::Update(float elapsedTime)
     //終わり
     if (pvpGameSystem->IsGameEnd())
     {
+        //一回だけ通す
+        if (!PlayerUIManager::Instance().GetIsEndFLG()) {
+            PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
+        }
         //仮遷移
-        if (!SceneManager::Instance().GetTransitionFlag())
-            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+       // if (!SceneManager::Instance().GetTransitionFlag())
+       //     SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //画面切り替え処理
@@ -492,6 +496,7 @@ void ScenePVP::Render(float elapsedTime)
     //オブジェクト生成関数
 #ifdef _DEBUG
     NewObject();
+    pvpGameSystem->OnGUI();
 #endif
 
     //オブジェクト描画
