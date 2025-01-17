@@ -1,13 +1,4 @@
-#include <stdlib.h>
-#include <filesystem>
-#include <WICTextureLoader.h>
-#include <DDSTextureLoader.h>
-#include <map>
-
 #include "Texture.h"
-#include "Graphics/Graphics.h"
-#include "SystemStruct\Misc.h"
-#include "SystemStruct\Logger.h"
 
 //DDSTexture読み込み
 static std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;
@@ -27,18 +18,38 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const char* filename, ID3D11Sh
     }
     else
     {
-        std::filesystem::path dds_filename(wideFilename);
-        dds_filename.replace_extension("dds");
-        if (std::filesystem::exists(dds_filename.c_str()))
+        std::filesystem::path filepath(wideFilename);
+
+        // DDSファイルの存在を確認
+        std::filesystem::path dds_filepath = filepath;
+        dds_filepath.replace_extension("dds");
+
+        if (std::filesystem::exists(dds_filepath))
         {
-            hr = DirectX::CreateDDSTextureFromFile(device, dds_filename.c_str(), resource.GetAddressOf(), shader_resource_view);
+            // DDSテクスチャの読み込み
+            hr = DirectX::CreateDDSTextureFromFile(device, dds_filepath.c_str(), resource.GetAddressOf(), shader_resource_view);
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
         }
         else
         {
-            hr = DirectX::CreateWICTextureFromFile(device, wideFilename.c_str(), resource.GetAddressOf(), shader_resource_view);
-            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+            // HDRファイルの存在を確認
+            std::filesystem::path hdr_filepath = filepath;
+            hdr_filepath.replace_extension("hdr");
+
+            if (std::filesystem::exists(hdr_filepath))
+            {
+                // HDRテクスチャの読み込み
+                hr = LoadHDRTexture(device, hdr_filepath.c_str(), resource, shader_resource_view);
+                _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+            }
+            else
+            {
+                // その他のWIC対応フォーマットの読み込み
+                hr = DirectX::CreateWICTextureFromFile(device, filepath.c_str(), resource.GetAddressOf(), shader_resource_view);
+                _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+            }
         }
+
         resources.insert(make_pair(wideFilename, *shader_resource_view));
     }
 
@@ -51,6 +62,59 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const char* filename, ID3D11Sh
     }
 
     return hr;
+}
+
+HRESULT LoadHDRTexture(ID3D11Device* device, const std::wstring& filename, Microsoft::WRL::ComPtr<ID3D11Resource>& resource, ID3D11ShaderResourceView** shader_resource_view)
+{
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(false); // HDRファイルの読み込み時に上下反転を設定
+
+    // stb_imageでHDRファイルを読み込む
+    float* hdrData = stbi_loadf(std::string(filename.begin(), filename.end()).c_str(), &width, &height, &channels, 4);
+    if (!hdrData)
+    {
+        return E_FAIL; // HDRファイル読み込み失敗
+    }
+
+    // テクスチャの説明を作成
+    D3D11_TEXTURE2D_DESC texDesc = {};
+    texDesc.Width = width;
+    texDesc.Height = height;
+    texDesc.MipLevels = 1;
+    texDesc.ArraySize = 1;
+    texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT; // HDRは浮動小数点フォーマット
+    texDesc.SampleDesc.Count = 1;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    // 初期化データ
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = hdrData;
+    initData.SysMemPitch = width * 4 * sizeof(float);
+
+    // テクスチャ作成
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    HRESULT hr = device->CreateTexture2D(&texDesc, &initData, texture.GetAddressOf());
+    stbi_image_free(hdrData); // 読み込みデータの解放
+    if (FAILED(hr))
+    {
+        return hr; // テクスチャ作成失敗
+    }
+
+    // シェーダーリソースビュー作成
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = texDesc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+
+    hr = device->CreateShaderResourceView(texture.Get(), &srvDesc, shader_resource_view);
+    if (FAILED(hr))
+    {
+        return hr;
+    }
+
+    resource = texture; // リソースを保持
+    return S_OK;
 }
 
 //解放処理

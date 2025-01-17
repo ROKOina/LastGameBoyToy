@@ -151,7 +151,7 @@ void SceneTitle::Initialize()
 
     // スカイボックスの設定
     std::array<const char*, 4> filepath = {
-      "Data\\Texture\\DayInTheClouds4k.DDS",
+      "Data\\Texture\\DayInTheClouds4k.hdr",
       "Data\\Texture\\diffuse_iem.dds",
       "Data\\Texture\\specular_pmrem.dds",
       "Data\\Texture\\lut_ggx.DDS"
