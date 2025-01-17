@@ -45,6 +45,7 @@ public:
     //リスポーンさせる関数
     void ReSpawn(int HP);
 
+    int GetLastDamageID() { return lastDamageID; }
 
 private:
     float hitPoint = 100;
@@ -55,4 +56,7 @@ private:
     float frameDamage = 0.0f;           // このフレーム中に受けたダメージ
 
     bool isDeath = false;   //死亡フラグ
+
+    int lastDamageID = -1;  //最後に攻撃してきた相手
+    float lastDamageTimer = 0.0f;   //リセット時間
 };
