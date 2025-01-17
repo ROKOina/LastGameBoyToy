@@ -201,7 +201,7 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
         Hovering(elapsedTime);
     }
 
-    if (!animationCom.lock()->IsPlayAnimation())
+    if (!animationCom.lock()->IsPlayLowerAnimation())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
     }
@@ -254,13 +254,13 @@ void BaseCharacter_Landing::Execute(const float& elapsedTime)
     }
 
     //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation())
+    if (!animationCom.lock()->IsPlayLowerAnimation())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
 
     //移動
-    if (owner->IsPushLeftStick() && !animationCom.lock()->IsPlayAnimation())
+    if (owner->IsPushLeftStick() && !animationCom.lock()->IsPlayLowerAnimation())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
