@@ -588,11 +588,11 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
         {
             if (owner->GetDashFlag())
             {
-                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Walk_Forward"), true);
             }
             else
             {
-                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Walk_Forward"), true);
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
             }
         }
 
@@ -606,8 +606,8 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
 
     case CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP:
         isPlayer ?
-            animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_middle"), false) :
-            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_middle"), false);
+            animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_middle"), true) :
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_middle"), true);
         break;
 
     case CharacterCom::CHARACTER_MOVE_ACTIONS::LANDING:
