@@ -93,13 +93,15 @@ void Solder_UltState::Execute(const float& elapsedTime)
         ultobj->GetComponent<GPUParticle>()->SetLoop(false);
         ultobj->GetComponent<SpawnCom>()->SetOnTrigger(false);
 
+        //時間を初期化
+        time = 0.0f;
+
         //ステート変更
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }
 void Solder_UltState::Exit()
 {
-    time = 0.0f;
     //ult終了
     charaCom.lock()->FinishUlt();
 }

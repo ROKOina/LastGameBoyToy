@@ -568,6 +568,51 @@ void UI_EnemyHp::Register()
     gauge->SetMaxValue(MaxHp);
 }
 
+UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
+{
+    std::shared_ptr<GameObject> tunder = GameObjectManager::Instance().Create();
+    tunder->SetName("Tunder");
+    tunder->AddComponent<UiSystem>(nullptr,Sprite::SpriteShader::DEFALT,false);
+    std::shared_ptr<GameObject> font = GameObjectManager::Instance().Create();
+    font->SetName("Font");
+    font->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    for (int i = 0; i <= 3; i++)
+    {
+        std::shared_ptr<GameObject> circle = GameObjectManager::Instance().Create();
+        std::string name = "circle_" + std::to_string(i);
+        circle->SetName(name.c_str());
+        circle->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+        circles.emplace_back(circle);
+    }
+    std::weak_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
+
+    //勝敗に応じてロードするテクスチャ変更
+    if (victryTeam == player.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID()) {
+        tunder->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Thunder.png");
+        font->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Victory.png");
+    }
+    else {
+        tunder->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/DefeatTunder.png");
+        font->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Defeat.png");
+    }
+
+}
+
+void UI_GameJudge::Start()
+{
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Tunder"));
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Font"));
+    for (auto& circle : circles)
+    {
+        this->GetGameObject()->AddChildObject(circle.lock());
+    }
+}
+
+void UI_GameJudge::Update(float elaspedTime)
+{
+    
+}
+
 void PlayerUIManager::Register()
 {
     ////共通のUI////
@@ -604,6 +649,7 @@ void PlayerUIManager::Register()
 
     //Hitエフェクト
     CreateHitEffect();
+
     ////////////////////////////////
 
     //キャラ固有のUI
@@ -930,6 +976,20 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         iconUi->LoadTexture(name);
     }
 
+}
+
+void PlayerUIManager::CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam)
+{
+    //一度だけ通る
+    isEndFLG = true;
+    //Judge
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hit = canvas->AddChildObject();
+        hit->SetName("GameJudge");
+        //勝利したチーム番号を引数で送る
+        hit->AddComponent<UI_GameJudge>(victryTeam);
+    }
 }
 
 void PlayerUIManager::BookingRegistrationUI(std::shared_ptr<GameObject> obj)

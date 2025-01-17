@@ -34,9 +34,15 @@ void RespawnCom::Update(float elapsedTime)
             {
                 //位置移動
                 int spawnIndex = 0;
+                int teamIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
+                spawnIndex %= 2;
+
+                teamIndex = charaCom->GetNetCharaData().GetTeamID();
+
                 if (spawnIndex < 0) { spawnIndex = 0; }
-                player->transform_->SetWorldPosition(respawnPoses[spawnIndex]);
+                if (teamIndex < 0) { teamIndex = 0; }
+                player->transform_->SetWorldPosition(respawnPoses[spawnIndex + teamIndex]);
 
                 //パラメータ回復
                 CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
