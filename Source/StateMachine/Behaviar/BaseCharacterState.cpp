@@ -115,7 +115,7 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown() && moveCom.lock()->OnGround())
+    if (CharacterInput::JumpButton_SPACE & owner->GetButtonDown() && moveCom.lock()->OnGround())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
@@ -165,7 +165,7 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown() && moveCom.lock()->OnGround())
+    if (CharacterInput::JumpButton_SPACE & owner->GetButtonDown() && moveCom.lock()->OnGround())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
@@ -248,7 +248,7 @@ void BaseCharacter_Landing::Execute(const float& elapsedTime)
     }
 
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown())
+    if (CharacterInput::JumpButton_SPACE & owner->GetButtonDown())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
@@ -613,7 +613,7 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
     case CharacterCom::CHARACTER_MOVE_ACTIONS::LANDING:
         isPlayer ?
             animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_end"), false) :
-            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_end"), false);        break;
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_end"), false);
         break;
 
     default:

@@ -67,7 +67,8 @@ public:
         MAX,
     };
 
-    enum class CHARACTER_MOVE_ACTIONS {
+    enum class CHARACTER_MOVE_ACTIONS
+    {
         IDLE,
         MOVE,
         DASH,
@@ -80,8 +81,8 @@ public:
     };
 
     //çUåÇÇ‚ÉXÉLÉãÇégÇ¡ÇΩéûÇÃãììÆ
-    enum class CHARACTER_ATTACK_ACTIONS {
-        PANTCH,
+    enum class CHARACTER_ATTACK_ACTIONS
+    {
         RELOAD,
         MAIN_ATTACK,
         SUB_ATTACK,
