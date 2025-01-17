@@ -15,6 +15,7 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
 #include "Component\Stage\StageEditorCom.h"
+#include "Component\System\CrownCom.h"
 
 #include "PVPGameSystem/PVPGameSystem.h"
 
@@ -260,6 +261,43 @@ void PhotonLib::update(float elapsedTime)
         deathFlag = false;
     }
 
+    //クラウン
+    for (int c = 0; c < 4; ++c)
+    {
+        auto& crownObj = GameObjectManager::Instance().Find("crown");
+        saveCrown.fallTimer[c] -= elapsedTime;
+        if (saveCrown.isCrownFall[c])   //誰かが手放した時
+        {
+            saveCrown.isCrownFall[c] = false;
+
+            if (crownObj)
+            {
+                auto& crown = crownObj->GetComponent<CrownCom>();
+                crown->DelCrown();
+                //位置を代入
+                crownObj->transform_->SetWorldPosition(saveCrown.crownFallPos);
+            }
+        }
+
+        if (saveCrown.haveID >= 0)
+        {
+            if (crownObj)
+            {
+                auto& crown = crownObj->GetComponent<CrownCom>();
+                if (!crown->RegisteredCrown())
+                {
+                    std::string name = "netPlayer" + std::to_string(saveInputPhoton[saveCrown.haveID].photonId);
+                    GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+                    if (net1)
+                    {
+                        crown->GetCrown(net1);
+                    }
+
+                }
+            }
+        }
+    }
+
     DelayUpdate();
     NetInputUpdate();
     MyCharaInput();
@@ -357,6 +395,16 @@ void PhotonLib::ImGui()
         for (auto& s : saveInputPhoton)
         {
             ImGui::InputInt(std::string(s.name).c_str(), &s.killCount);
+        }
+        ImGui::TreePop();
+    }
+
+    //クラウン所持時間
+    if (ImGui::TreeNode("crown"))
+    {
+        for (auto& s : saveInputPhoton)
+        {
+            ImGui::DragFloat(std::string(s.name).c_str(), &s.crownTimer);
         }
         ImGui::TreePop();
     }
@@ -781,6 +829,17 @@ int PhotonLib::GetKillCount(int team)
     return count;
 }
 
+float PhotonLib::GetCrownTimerCount(int team)
+{
+    float count = 0;
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.teamID == team)
+            count += s.crownTimer;
+    }
+    return count;
+}
+
 int PhotonLib::GetMyPhotonID()
 {
     int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
@@ -884,6 +943,13 @@ std::vector<std::wstring> PhotonLib::GetRoomNames()
     }
 
     return roomnames;
+}
+
+void PhotonLib::SetCrownTimer(int playerID,float timer)
+{
+    if (playerID < 0)return;
+
+    saveInputPhoton[playerID].crownTimer = timer;
 }
 
 int PhotonLib::SendMs()
@@ -1181,6 +1247,10 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                 if (isGamePlay)
                     DeathMatchRecv(ne[0]);
                 break;
+            case NetData::DATA_KIND::CROWN:
+                if (isGamePlay)
+                    CrownRecv(ne[0]);
+                break;
             }
         }
         break;
@@ -1295,10 +1365,6 @@ void PhotonLib::GameRecv(NetData recvData)
             auto& hp = myPlayer->GetComponent<CharaStatusCom>();
             if (*hp->GetHitPoint() <= 0)return;
             hp->AddDamagePoint(-recvData.gameData.damageData[id], recvData.playerId);
-
-            //とどめを刺された敵を保存
-            if (*hp->GetHitPoint() <= 0)
-                saveDeath[recvData.playerId].onDeath = true;
 
             break;
         }
@@ -1486,14 +1552,39 @@ void PhotonLib::DeathMatchRecv(NetData recvData)
 {
     if (recvData.playerId >= 0)
         saveInputPhoton[recvData.playerId].killCount = recvData.deathMatchData.killCount;
-    //for (auto& s : saveInputPhoton)
-    //{
-    //    if (s.playerId == recvData.playerId)
-    //    {
-    //        s.killCount = recvData.deathMatchData.killCount;
-    //        break;
-    //    }
-    //}
+}
+
+void PhotonLib::CrownRecv(NetData recvData)
+{
+    //所持ID
+    if (recvData.crownData.haveCrown)
+        saveCrown.haveID = recvData.playerId;
+    else    //所持していないとき
+    {   
+        if (saveCrown.haveID == recvData.playerId)  //手放し処理
+        {
+            saveCrown.haveID = -1;
+        }
+    }
+
+
+    if (recvData.playerId >= 0)
+    {
+        //クラウン所持時間
+        saveInputPhoton[recvData.playerId].crownTimer = recvData.crownData.crownTimer;
+
+        //クラウンを落とした位置
+        if (Mathf::Length(recvData.crownData.lastPos) > 0.1f)
+        {
+            if (saveCrown.fallTimer[recvData.playerId] <= 0)    //２回目取らないため
+            {
+                saveCrown.isCrownFall[recvData.playerId] = true;
+                saveCrown.fallTimer[recvData.playerId] = 1;
+                saveCrown.crownFallPos = recvData.crownData.lastPos;
+            }
+        }
+    }
+    
 }
 
 //送信
@@ -1754,7 +1845,8 @@ void PhotonLib::sendGameModeData(void)
             sendDeathMatchData();
             break;
             case int(PVPGameSystem::GAME_MODE::Crown) :
-                break;
+                sendCrownData();
+            break;
                 case int(PVPGameSystem::GAME_MODE::Button) :
                     break;
     }
@@ -1791,6 +1883,69 @@ void PhotonLib::sendDeathMatchData(void)
     //        break;
     //    }
     //}
+
+    std::stringstream s = NetDataSendCast(n);
+    auto ne = NetDataRecvCast(s.str());
+    event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
+    int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
+    //自分以外全員に送信
+    mLoadBalancingClient.opRaiseEvent(true, event, 0);
+    //特定のナンバーに送信
+    //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+}
+
+void PhotonLib::sendCrownData(void)
+{
+    ExitGames::Common::Hashtable event;
+    std::vector<NetData> n;
+    NetData& netD = n.emplace_back(NetData());
+    //ID
+    int myPhotonID = GetMyPhotonID();
+    netD.photonId = myPhotonID;
+    //ID
+    int myPlayerID = GetMyPlayerID();
+    netD.playerId = myPlayerID;
+    netD.isMasterClient = GetIsMasterPlayer();
+    ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
+
+    //gamemode
+    netD.gameMode = gameMode;
+
+    //種別をクラウンに
+    netD.dataKind = NetData::DATA_KIND::CROWN;
+
+    //クラウン所持時間送信
+    if (myPlayerID >= 0)
+        netD.crownData.crownTimer = saveInputPhoton[myPlayerID].crownTimer;
+
+    //クラウン所持しているか
+    netD.crownData.haveCrown = false;
+    auto& crownObj = GameObjectManager::Instance().Find("crown");
+    if (crownObj)
+    {
+        auto& crown = crownObj->GetComponent<CrownCom>();
+        netD.crownData.haveCrown = crown->HaveCrown();  //所持中か
+
+
+        //手ばした時の位置を送る
+        netD.crownData.lastPos = { 0,0,0 };
+        DirectX::XMFLOAT3 lPos = crown->GetLastPos();
+        if (Mathf::Length(lPos) > 0.1f) //１フレームだけ送られる
+        {
+            saveCrown.slowFrame = 5;    //5フレーム送る
+            saveCrown.myCrownFallPos = lPos;
+            crownObj->transform_->SetWorldPosition(lPos);
+        }
+        if (saveCrown.slowFrame > 0)
+        {
+            saveCrown.slowFrame--;
+            netD.crownData.lastPos = saveCrown.myCrownFallPos;   //手放した時の位置
+        }
+        else
+        {
+            netD.crownData.lastPos = { 0,0,0 };
+        }
+    }
 
     std::stringstream s = NetDataSendCast(n);
     auto ne = NetDataRecvCast(s.str());

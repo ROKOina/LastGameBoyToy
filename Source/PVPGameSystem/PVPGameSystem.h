@@ -26,13 +26,13 @@ public:
     //デスマッチ勝敗必要情報
     struct DeathMatchData   //ゲーム
     {
-        int victoryCount = 10;  //勝ちキル数
+        int victoryCount = 5;  //勝ちキル数
         float endTime = 10000; //終了時間(秒)
 
         float nowTime = 0;
         struct DeathMatchTeamData   //チームごと
         {
-            int killCount;
+            int killCount = 0;
         };
         DeathMatchTeamData teamData[2];
     };
@@ -40,8 +40,12 @@ public:
     //王冠勝敗必要情報
     struct CrownData   //ゲーム
     {
+        float endTime = 10000; //終了時間(秒)
+
+        float nowTime = 0;
         struct CrownTeamData   //チームごと
         {
+            float crownTime = 0;
         };
         CrownTeamData teamData[2];
     };
