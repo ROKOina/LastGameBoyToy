@@ -25,13 +25,13 @@ public:
     //送信情報
     struct NetSendData
     {
-        int playerID; //送信相手
+        int playerID = {}; //送信相手
 
-        int sendType;   //0:damage 1:heal 2:stan 3:knockback 4:movePos
+        int sendType = {};   //0:damage 1:heal 2:stan 3:knockback 4:movePos
 
-        int valueI;
-        float valueF;
-        DirectX::XMFLOAT3 valueF3;
+        int valueI = {};
+        float valueF = {};
+        DirectX::XMFLOAT3 valueF3 = {};
     };
 
     //ダメージを送信

@@ -251,8 +251,8 @@ private:
     void UltUpdate(float elapsedTime);
 
 protected:
-    StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>   moveStateMachine;
-    StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
+    StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>   moveStateMachine = {};
+    StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine = {};
     GameObject* cameraObj = nullptr;    //自分のキャラの場合だけ入る
 
     bool useMoveFlag = true;//falseにするとmoveStateを使わない
@@ -333,5 +333,5 @@ private:
 
     bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
 
-    NetCharaData netCharaData;  //ネット関連
+    NetCharaData netCharaData = {};  //ネット関連
 };

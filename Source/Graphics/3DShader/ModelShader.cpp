@@ -38,6 +38,10 @@ ModelShader::ModelShader(SHADER_ID_MODEL shader)
         VSPath = { "Shader\\DefaltVS.cso" };
         PSPath = { "Shader\\SilhouettePS.cso" };
         break;
+    case SHADER_ID_MODEL::HOLO:
+        VSPath = { "Shader\\DefaltVS.cso" };
+        PSPath = { "Shader\\HoloPS.cso" };
+        break;
 
     default:
         assert(!"ˆø”‚ÌShader‚É‘z’è‚³‚ê‚Ä‚¢‚È‚¢’l‚ª“ü‚ê‚ç‚ê‚Ä‚¢‚é");

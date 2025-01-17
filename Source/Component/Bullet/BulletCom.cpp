@@ -734,7 +734,7 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
-    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
     hit->SetValue(damageValue);
 }
 

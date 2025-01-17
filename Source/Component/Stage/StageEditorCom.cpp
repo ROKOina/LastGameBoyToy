@@ -18,7 +18,6 @@
 #include <filesystem>
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
-#include "Component\Phsix\RigidBodyCom.h"
 #include "Component\System\SpawnCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "StageGimmickCom.h"
@@ -121,6 +120,14 @@ void StageEditorCom::Update(float elapsedTime)
     }
 }
 
+void StageEditorCom::OnDestroy()
+{
+    for (auto& rigid : rigidActors)
+    {
+        if (rigid) rigid->release();
+    }
+}
+
 void StageEditorCom::OnGUI()
 {
     //配置開始ボタン
@@ -196,7 +203,9 @@ void StageEditorCom::OnGUI()
                 "None",
                 "TestNakanisi",
                 "TowerGimic",
-                "GateGimic"
+                "GateGimic",
+                "SpawnGimic",
+                "Plane"
             };
             int funcIndex = (int)objName.second.func;
             ImGui::Combo((char*)u8"生成関数", &funcIndex, FuncName, (int)GenerateFuncName::Max);
@@ -235,7 +244,17 @@ GameObj StageEditorCom::ObjectPlace(std::string objType, DirectX::XMFLOAT3 posit
 
     obj->AddComponent<NodeCollsionCom>(collision_filename);
 
-    RendererCom* render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
+    RendererCom* render;
+
+    if (placeObjcts[objType.c_str()].func == GenerateFuncName::Plan)
+    {
+        render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::HOLO, BLENDSTATE::ADD, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_NONE, true, false).get();
+    }
+    else
+    {
+        render = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false).get();
+    }
+
     render->LoadModel(model_filename);
 
     //生成関数があれば起動
@@ -257,7 +276,7 @@ void StageEditorCom::PlaceStageRigidCollider(std::string filePath, std::string d
     PhysXLib::Instance().GenerateComplexCollider(
         ResourceManager::Instance().GetModelResource(path.c_str()).get(),
         filePath, key,
-        scale, PhysXLib::CollisionLayer::Stage);
+        scale, PhysXLib::CollisionLayer::Stage, rigidActors);
 }
 
 void StageEditorCom::FileRead(std::string& path)
@@ -487,5 +506,17 @@ void StageEditorCom::GateGimic(GameObj& place)
 {
     place->AddComponent<GateGimmick>();
     RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Convex).get();
+    rigid->SetRigidScale(1);
+}
+
+void StageEditorCom::SpawnGimic(GameObj& place)
+{
+    place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/spawn.gpuparticle", 1000);
+}
+
+void StageEditorCom::PlaneGimic(GameObj& place)
+{
+    //place->AddComponent<GateGimmick>();
+    RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Triangle).get();
     rigid->SetRigidScale(1);
 }
