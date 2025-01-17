@@ -62,16 +62,15 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         if (std::string(owner->GetGameObject()->GetName()) == "player")
         {
             auto& arm = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild");
-            auto& armAnim = arm->GetComponent<AnimationCom>();
-
-            //腕アニメーション再生
-            charaCom.lock()->HandleArmAnimation();
 
             auto& charge = arm->GetChildFind("chargeEff");
             charge->GetComponent<GPUParticle>()->SetLoop(false);
             auto& chargeMax = arm->GetChildFind("chargeMaxEff");
             chargeMax->GetComponent<GPUParticle>()->SetLoop(false);
         }
+
+        //腕アニメーション再生
+        charaCom.lock()->HandleArmAnimation();
 
         //弾減らさないとリロードしない
         charaCom.lock()->AddCurrentBulletNum(-1);
@@ -86,6 +85,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         //射撃間隔タイマー起動
         owner->GetGameObject()->GetComponent<InazawaCharacterCom>()->ResetShootTimer();
 
+        //ステート変更
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }
