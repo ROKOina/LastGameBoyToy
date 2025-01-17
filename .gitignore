@@ -38,10 +38,6 @@ Shader/
 *.cod
 *.cso
 
-#txt out
-Data/
-*.txt
-
 #DDS out
 *.DDS
 
