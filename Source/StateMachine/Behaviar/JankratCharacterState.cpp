@@ -173,7 +173,7 @@ void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
     if (GetGunTipPosition(gunPos, dir, CharacterInput::MainSkillButton_E))
     {
         // ’eŠÛ‚ðì¬‚µƒZƒbƒg
-        charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, dir, 100.0f, 20, charaCom.lock()->GetNetCharaData().GetCharaID()));
+        charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, dir, 100.0f, 50, charaCom.lock()->GetNetCharaData().GetCharaID()));
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }

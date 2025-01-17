@@ -238,7 +238,8 @@ void ScenePVP::InitializePVP()
         obj->SetName("player");
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
 
-        int id = obj->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+        //ネットIDによって位置分け
+        int id = photonNet->GetPhotonLib()->GetMyPlayerID();
         obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[id]);
     }
 
