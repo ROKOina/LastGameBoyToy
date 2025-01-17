@@ -240,6 +240,8 @@ void ScenePVP::InitializePVP()
 
         //ネットIDによって位置分け
         int id = photonNet->GetPhotonLib()->GetMyPlayerID();
+        int teamId = photonNet->GetPhotonLib()->GetTeamID(id);
+        id = (id % 2) - teamId;
         obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[id]);
     }
 
