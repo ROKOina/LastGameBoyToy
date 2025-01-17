@@ -489,6 +489,9 @@ void ScenePVE::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
+    //UI生成
+    //PlayerUIManager::Instance().UIUpdate(elapsedTime);
+
     if (PVEDirection::Instance().GetCharaSelect())
     {
         //UI生成
