@@ -398,8 +398,8 @@ void ScenePVP::Update(float elapsedTime)
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
         //‰¼‘JˆÚ
-       // if (!SceneManager::Instance().GetTransitionFlag())
-       //     SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+       if (!SceneManager::Instance().GetTransitionFlag())
+           SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //‰æ–ÊØ‚è‘Ö‚¦ˆ—
