@@ -220,7 +220,8 @@ void GameObjectManager::CreateNowTimeSaveComponent(std::shared_ptr<GameObject> o
 // 削除
 void GameObjectManager::Remove(std::shared_ptr<GameObject> obj)
 {
-    removeGameObject_.insert(obj);
+    if (obj)
+        removeGameObject_.insert(obj);
 }
 
 //即削除（危険出来れば使わない方がいいかも）
@@ -961,6 +962,7 @@ void GameObjectManager::RenderShadow()
     //影描画
     for (std::weak_ptr<RendererCom>& modelrender : renderSortObject_)
     {
+        if (modelrender.expired())continue;
         if (!modelrender.lock()->GetGameObject()->GetEnabled())continue;
         if (!modelrender.lock()->GetEnabled())continue;
 

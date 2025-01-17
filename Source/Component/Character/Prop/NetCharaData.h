@@ -19,9 +19,14 @@ public:
 
     void SetMyChara(bool flg) { myChara = flg; }
 
+    void SetKillID(int id) { killID = id; }
+    int GetKillID() { return killID; }
+
 private:
     int teamID = 0;   //自分のチーム
     int netPlayerID = 0;//どのクライアントがこのキャラを担当するか
     int charaID;    //キャラクター識別用
     bool myChara = false;
+
+    int killID = -1;    //キルした相手保存
 };

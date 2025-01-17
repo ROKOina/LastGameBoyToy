@@ -56,7 +56,7 @@ private:
     bool connectNow = false;
 
     //部屋名
-    std::string roomName;
+    std::string roomName = {};
     //charaID
     std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
     {
@@ -150,8 +150,8 @@ public:
         }
         bool useFlg = false;    //使用されているか
         std::string name = {};
-        int photonId;
-        int playerId;
+        int photonId = {};
+        int playerId = {};
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
         ////自分のIDから見たディレイ
@@ -170,7 +170,7 @@ public:
         //次の入力情報を格納
         struct NextInput
         {
-            int oldFrame;
+            int oldFrame = {};
             unsigned int inputDown = 0;
             unsigned int input = 0;
             unsigned int inputUp = 0;
@@ -284,9 +284,9 @@ private:
     //送信頻度（ms）
     int sendMs = 1000 / 60.0f * 5;
     //int sendMs = 35;
-    int oldMs;
+    int oldMs = {};
 
-    std::vector<SaveInput> saveInputPhoton;
+    std::vector<SaveInput> saveInputPhoton = {};
     //追加予約
     int addSavePhotonID[4] = { -1,-1,-1,-1 };   //要素がプレイヤーID、値がフォトンIDになる
 
@@ -309,7 +309,7 @@ private:
         NetData::JoinData jData;
         std::string joinName;
     };
-    std::vector<JoinManager> joinManager;
+    std::vector<JoinManager> joinManager = {};
     bool joinPermission = false;    //入室許可
 
     //遅延フレーム
@@ -323,8 +323,17 @@ private:
     //マスタープレイヤーID保存
     int masterPlayerID = 0;
 
+    //デス保存
+    struct SaveDeath
+    {
+        bool onDeath=false;   //キルされた時にtrue
+        bool killCon=false;    //キル確認用
+        float deathCountTimer = -1;   //重複阻止
+    };
+    SaveDeath saveDeath[4];
+
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ
-    std::string chat;   //チャット
-    std::vector<std::string> chatList;
+    std::string chat = {};   //チャット
+    std::vector<std::string> chatList = {};
 };

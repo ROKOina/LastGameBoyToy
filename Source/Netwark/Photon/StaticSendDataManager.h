@@ -2,6 +2,8 @@
 
 #include "../RingBuffer.h"
 #include <DirectXMath.h>
+#include <vector>
+#include "../NetData.h"
 
 //クライアントに送信する情報を管理する
 class StaticSendDataManager
@@ -23,13 +25,13 @@ public:
     //送信情報
     struct NetSendData
     {
-        int playerID; //送信相手
+        int playerID = {}; //送信相手
 
-        int sendType;   //0:damage 1:heal 2:stan 3:knockback 4:movePos
+        int sendType = {};   //0:damage 1:heal 2:stan 3:knockback 4:movePos
 
-        int valueI;
-        float valueF;
-        DirectX::XMFLOAT3 valueF3;
+        int valueI = {};
+        float valueF = {};
+        DirectX::XMFLOAT3 valueF3 = {};
     };
 
     //ダメージを送信
@@ -68,4 +70,13 @@ public:
 
 private:
     std::unique_ptr<RingBuffer<NetSendData>> sendGameData;
+
+    //値受け渡し用
+public:
+    std::vector<SaveBuffer>& GetSaveBuffer(int playerID) { return saveBuffer[playerID]; }
+    bool& GetDeathID(int id) { return deathID[id]; }
+
+private:
+    std::vector<SaveBuffer> saveBuffer[5];
+    bool deathID[4];    //キルされた相手を保存
 };

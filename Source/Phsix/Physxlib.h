@@ -27,7 +27,8 @@ public:
     //初期化
     void Initialize();
 
-    //終了化
+    //消去
+    void DeletePhysxActor();
 
     //更新処理
     void Update(float elapsedTime);
@@ -93,7 +94,7 @@ public:
 
 
     //オブジェクトの塊を分解してColliderを作る（スタティック専用・主にステージで使う）
-    void GenerateComplexCollider(ModelResource* model, std::string filepath, std::string key, float worldScale, CollisionLayer layer);
+    void GenerateComplexCollider(ModelResource* model, std::string filepath, std::string key, float worldScale, CollisionLayer layer, std::vector<PxRigidActor*>& vec);
 
     //当たり判定作成
     physx::PxRigidActor* GenerateCollider(RigidData& data);

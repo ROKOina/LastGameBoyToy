@@ -57,7 +57,7 @@ void ScenePVP::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
-        obj->AddComponent<Light>(nullptr);
+        obj->AddComponent<Light>("Data/SerializeData/LightData/pvp.light");
     }
 
     //ロビー選択から始まる
@@ -79,6 +79,9 @@ void ScenePVP::Initialize()
 
     //ゲームシステム
     pvpGameSystem = std::make_unique<PVPGameSystem>();
+
+    //UI初期化
+    PlayerUIManager::Instance().ResetAllyHp();
 }
 
 void ScenePVP::InitializeLobbySelect()
@@ -203,36 +206,19 @@ void ScenePVP::InitializePVP()
         auto& stageObj = GameObjectManager::Instance().Create();
         stageObj->SetName("stage");
         stageObj->transform_->SetWorldPosition({ 0, 0, 0 });
-        stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+
+        float size = 0.05f;
+        stageObj->transform_->SetScale({ size, size, size });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        r->LoadModel("Data/Model/AbeStage/AbeStage_light.mdl");
         stageObj->AddComponent<RayCollisionCom>("Data/canyon/stage.collision");
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/", "StageJson/ColliderStage.mdl", "__", 0.005f);
+        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "AbeStage_light.mdl", "__", size);
         //Jsonからオブジェクト配置
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
-        //配置したステージオブジェクトの中からGateを取得
-        StageEditorCom::PlaceObject placeObj = stageEdit->GetPlaceObject("Gate");
-        for (auto& obj : placeObj.objList)
-        {
-            DirectX::XMFLOAT3 pos = obj->transform_->GetWorldPosition();
-
-            GateGimmick* gate = obj->GetComponent<GateGimmick>().get();
-            gate->SetDownPos(pos);
-            gate->SetUpPos({ pos.x, 1.85f, pos.z });
-            gate->SetMoveSpeed(0.1f);
-        }
-    }
-
-    //プレイヤー
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("player");
-        obj->transform_->SetWorldPosition({ 0,0,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage_Spawn.json");
 
         //リスポーン用
         GameObj respawnObj = GameObjectManager::Instance().Create();
@@ -240,11 +226,23 @@ void ScenePVP::InitializePVP()
         RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
         spawnCom->SetGameMode(pvpGameSystem->GetGameMode());
 
-        //仮のスポーン位置
-        spawnCom->AddRespawnPoses({ 5,1,5 });
-        spawnCom->AddRespawnPoses({ -5,1,5 });
-        spawnCom->AddRespawnPoses({ 5,1,-5 });
-        spawnCom->AddRespawnPoses({ -5,1,-5 });
+        //スポーン位置設定
+        StageEditorCom::PlaceObject spawnObj = stageEdit->GetPlaceObject("Spawn");
+        for (auto& res : spawnObj.objList)
+        {
+            spawnCom->AddRespawnPoses(res->transform_->GetWorldPosition());
+        }
+
+        //プレイヤー
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("player");
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
+
+        //ネットIDによって位置分け
+        int id = photonNet->GetPhotonLib()->GetMyPlayerID();
+        int teamId = photonNet->GetPhotonLib()->GetTeamID(id);
+        id = (id % 2) - teamId;
+        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[id]);
     }
 
     //イベント用カメラ
@@ -281,7 +279,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
         obj->SetName("killCountAlly");
         std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->position = { 1560,23 };
+        font->position = { 1091,23 };
         font->scale = 1.0f;
         font->color = { 0,0,1,1 };
     }
@@ -289,7 +287,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
         obj->SetName("killCountEnemy");
         std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->position = { 1560,119 };
+        font->position = { 829,23 };
         font->scale = 1.0f;
         font->color = { 1,0,0,1 };
     }

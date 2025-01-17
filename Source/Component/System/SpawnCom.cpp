@@ -414,7 +414,10 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(GameObjectManager::Instance().Find("player")->GetName(), "player") == 0)
+
+    int playerTeam = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    int myTeam = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    if (playerTeam == myTeam)
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     else
         collider->SetJudgeTag(COLLIDER_TAG::Player);
@@ -424,15 +427,15 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     obj->AddComponent<JankratUltCom>();
 
     //弾
-    //int netPlayerID = obj->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
-    //std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netPlayerID);
-    //bulletCom->SetAliveTime(8.0f);
-    //bulletCom->SetDamageValue(-damageValue);
+    int netPlayerID = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
+    bulletCom->SetAliveTime(8.0f);
+    bulletCom->SetDamageValue(-10);
 
     //判定用
-    //std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(GetGameObject());
-    //hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    //hit->SetValue(10.0f);
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(parent.lock());
+    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    hit->SetValue(10.0f);
 
     //爆発物
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
@@ -444,8 +447,6 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
 //ソルジャーウルト生成関数
 void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
 {
-    auto& player = GameObjectManager::Instance().Find("player");
-
     obj->SetName("soldierult");
     obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_ult_attack.gpuparticle", 200);
     std::shared_ptr<MovementCom> moveCom = obj->AddComponent<MovementCom>();
@@ -458,7 +459,10 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     const auto& collider = obj->AddComponent<SphereColliderCom>();
     collider->SetEnabled(true);
     collider->SetMyTag(COLLIDER_TAG::Bullet);
-    if (std::strcmp(player->GetName(), "player") == 0)
+
+    int playerTeam = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    int myTeam = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+    if (playerTeam== myTeam)
     {
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     }
@@ -469,13 +473,13 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     }
 
     //弾
-    int netPlayerID = player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+    int netPlayerID = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = obj->AddComponent<BulletCom>(netPlayerID);
     bulletCom->SetAliveTime(8.0f);
     bulletCom->SetDamageValue(-10);
 
     //判定用
-    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(player);
+    std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(parent.lock());
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(10.0f);
 }
@@ -499,7 +503,8 @@ void SpawnCom::HitObject()
                     {
                         if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                         {
-                            status->AddDamagePoint(-15);
+                            int id = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+                            status->AddDamagePoint(-15, id);
                         }
                     }
                 }

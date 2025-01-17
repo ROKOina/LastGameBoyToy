@@ -65,8 +65,28 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 void PhotonLib::update(float elapsedTime)
 {
     auto& myPlayer = GameObjectManager::Instance().Find("player");
+
     if (myPlayer)
     {
+        //銃口の位置
+        DirectX::XMFLOAT3 gunPos = {};
+        {
+            const auto& cameraObj = myPlayer->GetChildFind("cameraPostPlayer");
+            const auto& arm = cameraObj->GetChildFind("armChild");
+            const auto& model = arm->GetComponent<RendererCom>()->GetModel();
+            const auto& gunNode = model->FindNode("gun2"); // 銃の先端ボーン名（仮名）
+
+            if (gunNode)
+            {
+                gunPos =
+                {
+                    gunNode->worldTransform._41,
+                    gunNode->worldTransform._42,
+                    gunNode->worldTransform._43
+                };
+            }
+        }
+
         int myPhotonID = GetMyPhotonID();
         for (auto& s : saveInputPhoton)
         {
@@ -93,6 +113,9 @@ void PhotonLib::update(float elapsedTime)
             //速力
             DirectX::XMFLOAT3 velo = myPlayer->GetComponent<MovementCom>()->GetVelocity();
             save.velo = velo;
+
+            //銃口の位置
+            save.gunPos = gunPos;
 
             s.inputBuf->Enqueue(save);
 
@@ -218,13 +241,30 @@ void PhotonLib::update(float elapsedTime)
         }
     }
 
+    //キルカウントリセット
+    for (int d = 0; d < 4; ++d)
+    {
+        if (saveDeath[d].deathCountTimer >= 0)
+        {
+            saveDeath[d].deathCountTimer -= elapsedTime;
+            if (saveDeath[d].deathCountTimer <= 0)
+            {
+                saveDeath[d].killCon = false;
+            }
+        }
+
+        //デスID保存
+        auto& deathFlag = StaticSendDataManager::Instance().GetDeathID(d);
+        if (deathFlag)
+            saveDeath[d].onDeath = deathFlag;
+        deathFlag = false;
+    }
+
     DelayUpdate();
     NetInputUpdate();
     MyCharaInput();
     NetCharaInput();
-
 }
-
 
 void PhotonLib::ImGui()
 {
@@ -256,7 +296,7 @@ void PhotonLib::ImGui()
                         charaID = charaIndex;
 
                         //キャラ変更
-                        RegisterChara::Instance().ChangeChara("player",RegisterChara::CHARA_LIST(charaID));
+                        RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaID));
 
                         ImGui::TreePop();
                         break;
@@ -320,7 +360,6 @@ void PhotonLib::ImGui()
         }
         ImGui::TreePop();
     }
-    
 
     //マスタークライアントか
     bool isMaster = GetIsMasterPlayer();
@@ -518,7 +557,6 @@ void PhotonLib::ChatImGui()
     }
 
     ImGui::End();
-
 }
 
 void PhotonLib::NetInputUpdate()
@@ -534,6 +572,10 @@ void PhotonLib::NetInputUpdate()
         saveB = s.inputBuf->GetHeadFromSize(100);
 
         bool isInputInit = false;
+
+        //入力を保存
+        if (s.playerId < 0)continue;
+        auto& saveBuffer = StaticSendDataManager::Instance().GetSaveBuffer(s.playerId);
         for (auto& b : saveB)
         {
             //前回のフレームから今回のフレームからディレイした分までの入力を保存
@@ -542,6 +584,9 @@ void PhotonLib::NetInputUpdate()
 
             if (!isInputInit)	//最初に入った時に入力初期化
             {
+                //入力リセット
+                saveBuffer.clear();
+
                 s.nextInput.inputDown = 0;
                 s.nextInput.input = 0;
                 s.nextInput.inputUp = 0;
@@ -558,10 +603,12 @@ void PhotonLib::NetInputUpdate()
                 isInputInit = true;
             }
 
+            //入力保存
+            saveBuffer.emplace_back(b);
+
             s.nextInput.inputDown |= b.inputDown;
             s.nextInput.input |= b.input;
             s.nextInput.inputUp |= b.inputUp;
-
 
             ////if (0 < b.inputDown)
             //if (CharacterInput::SubAttackButton & b.inputDown)
@@ -641,6 +688,7 @@ void PhotonLib::NetCharaInput()
         if (!netPlayer)continue;
 
         auto& chara = netPlayer->GetComponent<CharacterCom>();
+        chara->GetNetCharaData().SetTeamID(saveInputPhoton[s.playerId].teamID);
 
         chara->SetUserInput(s.nextInput.input);
         chara->SetUserInputDown(s.nextInput.inputDown);
@@ -1021,7 +1069,6 @@ void PhotonLib::onAvailableRegions(const ExitGames::Common::JVector<ExitGames::C
     }
 }
 
-
 #pragma endregion
 
 ///////////////↓↓↓↓↓           ↓よく使う関数↓           ↓↓↓↓↓///////////////
@@ -1083,7 +1130,6 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             //データ変換
             auto ne = NetDataRecvCast(WStringToString(jsString.cstr()));
 
-
             if (ne[0].playerId >= 0)
             {
                 //名前保存
@@ -1095,18 +1141,18 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
                     masterPlayerID = ne[0].playerId;
                 }
             }
-                //for (auto& s : saveInputPhoton)
-                //{
-                //    if (s.photonId != ne[0].photonId)continue;
+            //for (auto& s : saveInputPhoton)
+            //{
+            //    if (s.photonId != ne[0].photonId)continue;
 
-                //    if (s.name.size() <= 0)
-                //    {
-                //        s.name = ne[0].name;
-                //    }
-                //    break;
-                //}
+            //    if (s.name.size() <= 0)
+            //    {
+            //        s.name = ne[0].name;
+            //    }
+            //    break;
+            //}
 
-            //ゲームモード保存
+        //ゲームモード保存
             if (!GetIsMasterPlayer())
             {
                 gameMode = ne[0].gameMode;
@@ -1152,7 +1198,9 @@ void PhotonLib::GameRecv(NetData recvData)
         if (s.photonId == recvData.photonId)add = false;
     }
     //キャラ追加リストに追加
-    if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
+    if (add)
+        if (recvData.playerId >= 0)
+            addSavePhotonID[recvData.playerId] = recvData.photonId;
 
     //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
@@ -1177,24 +1225,56 @@ void PhotonLib::GameRecv(NetData recvData)
     std::string name = "netPlayer" + std::to_string(recvData.photonId);
     GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
 
-    //プレイヤー追加
-    if (!net1)
+    int myPlayerID = GetMyPlayerID();
+
+    if (myPlayerID >= 0)
     {
-        //AddPlayer(recvData.photonId, recvData.playerId);
+    //プレイヤー追加
+        if (!net1)
+        {
+            //AddPlayer(recvData.photonId, recvData.playerId);
 
-        //netプレイヤー
-        net1 = GameObjectManager::Instance().Create();
-        net1->SetName(name.c_str());
+            //netプレイヤー
+            net1 = GameObjectManager::Instance().Create();
+            net1->SetName(name.c_str());
 
-        bool team = false;
-        
-        if (saveInputPhoton[GetMyPlayerID()].teamID == saveInputPhoton[recvData.playerId].teamID)
-            team = true;
+            bool team = false;
 
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
-        net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+            if (recvData.playerId >= 0)
+                if (saveInputPhoton[myPlayerID].teamID == saveInputPhoton[recvData.playerId].teamID)
+                    team = true;
+
+            RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
+            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+        }
+
+        //キルをカウント
+        if (recvData.gameData.deathID[myPlayerID])
+        {
+            if (saveDeath[myPlayerID].deathCountTimer <= 0)
+            {
+                saveDeath[myPlayerID].deathCountTimer = 5;
+                saveDeath[myPlayerID].killCon = true;
+                saveInputPhoton[myPlayerID].killCount++;
+                auto& myPlayer = GameObjectManager::Instance().Find("player");
+                if (myPlayer)
+                    myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetKillID(recvData.playerId);
+            }
+        }
+
+        //自分のデス確認
+        for (int myD = 0; myD < 4; ++myD)
+        {
+            if (recvData.gameData.isKillCount[myD])
+            {
+                //デスを確認
+                saveDeath[myD].onDeath = false;
+            }
+        }
     }
-    saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
+
+    if (recvData.playerId >= 0)
+        saveInputPhoton[recvData.playerId].charaID = recvData.gameData.charaID;
 
     //hp
     net1->GetComponent<CharaStatusCom>()->SetHitPoint(recvData.gameData.hp);
@@ -1202,7 +1282,6 @@ void PhotonLib::GameRecv(NetData recvData)
     //ultGauge
     net1->GetComponent<CharacterCom>()->SetUltGauge(recvData.gameData.ultGauge);
 
-    int myPlayerID = GetMyPlayerID();
     auto& myPlayer = GameObjectManager::Instance().Find("player");
     if (!myPlayer)return;
 
@@ -1213,7 +1292,14 @@ void PhotonLib::GameRecv(NetData recvData)
 
         if (recvData.gameData.damageData[id] > 0)
         {
-            myPlayer->GetComponent<CharaStatusCom>()->AddDamagePoint(-recvData.gameData.damageData[id]);
+            auto& hp = myPlayer->GetComponent<CharaStatusCom>();
+            if (*hp->GetHitPoint() <= 0)return;
+            hp->AddDamagePoint(-recvData.gameData.damageData[id], recvData.playerId);
+
+            //とどめを刺された敵を保存
+            if (*hp->GetHitPoint() <= 0)
+                saveDeath[recvData.playerId].onDeath = true;
+
             break;
         }
     }
@@ -1262,15 +1348,18 @@ void PhotonLib::GameRecv(NetData recvData)
         }
     }
 
-    //保存情報
-        //入力
-    for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
+    if (recvData.playerId >= 0)
     {
-        SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
+        //保存情報
+            //入力
+        for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
+        {
+            SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
 
-        SaveBuffer currentInput = saveInputPhoton[recvData.playerId].inputBuf->GetHead();
-        if (currentInput.frame < newInput.frame || currentInput.frame == 0)	//新しいフレームから始める
-            saveInputPhoton[recvData.playerId].inputBuf->Enqueue(newInput);
+            SaveBuffer currentInput = saveInputPhoton[recvData.playerId].inputBuf->GetHead();
+            if (currentInput.frame < newInput.frame || currentInput.frame == 0)	//新しいフレームから始める
+                saveInputPhoton[recvData.playerId].inputBuf->Enqueue(newInput);
+        }
     }
     ////保存情報
     //for (auto& s : saveInputPhoton)
@@ -1345,7 +1434,6 @@ void PhotonLib::JoinRecv(NetData recvData)
 
                 //名前登録
                 saveInputPhoton[j.playerId].name = netName;
-
             }
         }
     }
@@ -1361,11 +1449,14 @@ void PhotonLib::LobbyRecv(NetData recvData)
         if (s.photonId == recvData.photonId)add = false;
     }
     //キャラ追加リストに追加
-    if (add)addSavePhotonID[recvData.playerId] = recvData.photonId;
-    
+    if (add)
+        if (recvData.playerId >= 0)
+            addSavePhotonID[recvData.playerId] = recvData.photonId;
+
     //AddPlayer(recvData.photonId, recvData.playerId);
 
-    saveInputPhoton[recvData.playerId].charaID = recvData.lobbyData.charaID;
+    if (recvData.playerId >= 0)
+        saveInputPhoton[recvData.playerId].charaID = recvData.lobbyData.charaID;
 
     //ピック選択に移行
     if (recvData.isMasterClient)
@@ -1373,7 +1464,8 @@ void PhotonLib::LobbyRecv(NetData recvData)
         if (recvData.lobbyData.pickSelect == 1)
             isCharaSelect = true;
     }
-    charaState[recvData.playerId] = recvData.lobbyData.pickSelect;
+    if (recvData.playerId >= 0)
+        charaState[recvData.playerId] = recvData.lobbyData.pickSelect;
 
     //マスタークライアントからの受信の場合
     if (recvData.isMasterClient)
@@ -1392,7 +1484,8 @@ void PhotonLib::LobbyRecv(NetData recvData)
 
 void PhotonLib::DeathMatchRecv(NetData recvData)
 {
-    saveInputPhoton[recvData.playerId].killCount = recvData.deathMatchData.killCount;
+    if (recvData.playerId >= 0)
+        saveInputPhoton[recvData.playerId].killCount = recvData.deathMatchData.killCount;
     //for (auto& s : saveInputPhoton)
     //{
     //    if (s.playerId == recvData.playerId)
@@ -1468,12 +1561,24 @@ void PhotonLib::sendGameData(void)
             netD.gameData.movePosData[data.playerID] = data.valueF3;
     }
 
+    //デスされた相手に送る
+    for (int d = 0; d < 4; ++d)
+    {
+        netD.gameData.deathID[d] = saveDeath[d].onDeath;
+    }
+    //キル確認したら送る
+    for (int d = 0; d < 4; ++d)
+    {
+        netD.gameData.isKillCount[d] = saveDeath[d].killCon;
+    }
+
     //キャラIDを送る
     netD.gameData.charaID = myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();
 
     //自分の入力を送る
     //先頭20フレームの入力を送る
-    netD.gameData.saveInputBuf = saveInputPhoton[myPlayerID].inputBuf->GetHeadFromSize(20);
+    if (myPlayerID >= 0)
+        netD.gameData.saveInputBuf = saveInputPhoton[myPlayerID].inputBuf->GetHeadFromSize(20);
     //for (auto& s : saveInputPhoton)
     //{
     //    if (s.photonId != myPhotonID)continue;
@@ -1542,7 +1647,7 @@ void PhotonLib::sendJoinPermissionData(bool request)
             join.photonId = j.jData.photonId;
             join.playerId = j.jData.playerId;
             join.joinPermission = false;
-            join.joinRequest =false;
+            join.joinRequest = false;
             //４人まで追加
             int useCount = GetJoinNum();
             if (useCount < 4)
@@ -1585,7 +1690,6 @@ void PhotonLib::sendJoinPermissionData(bool request)
     mLoadBalancingClient.opRaiseEvent(true, event, 0);
     //特定のナンバーに送信
     //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
-
 }
 
 void PhotonLib::sendLobbyData(void)
@@ -1609,7 +1713,8 @@ void PhotonLib::sendLobbyData(void)
     netD.dataKind = NetData::DATA_KIND::LOBBY;
 
     //キャラIDを送る
-    netD.lobbyData.charaID = saveInputPhoton[myPlayerID].charaID;
+    if (myPlayerID >= 0)
+        netD.lobbyData.charaID = saveInputPhoton[myPlayerID].charaID;
 
     //マスタークライアントの場合
     if (GetIsMasterPlayer())
@@ -1619,7 +1724,8 @@ void PhotonLib::sendLobbyData(void)
             netD.lobbyData.teamID[i] = saveInputPhoton[i].teamID;
     }
 
-    netD.lobbyData.pickSelect = charaState[myPlayerID];
+    if (myPlayerID >= 0)
+        netD.lobbyData.pickSelect = charaState[myPlayerID];
 
     //チャットを送る
     ::strncpy_s(netD.lobbyData.chat, sizeof(netD.lobbyData.chat), "0", sizeof(netD.lobbyData.chat));
@@ -1675,7 +1781,8 @@ void PhotonLib::sendDeathMatchData(void)
     netD.dataKind = NetData::DATA_KIND::DEATHMATCH;
 
     //切る数取得
-    netD.deathMatchData.killCount = saveInputPhoton[myPlayerID].killCount;
+    if (myPlayerID >= 0)
+        netD.deathMatchData.killCount = saveInputPhoton[myPlayerID].killCount;
     //for (auto& s : saveInputPhoton)
     //{
     //    if (s.playerId == myPlayerID)
@@ -1719,7 +1826,7 @@ void PhotonLib::AddPlayer(int photonID, int playerID)
     //}
     //else
     //{
-        saveInputPhoton[playerID].playerId = playerID;
+    saveInputPhoton[playerID].playerId = playerID;
     //    pID = playerID;
     //}
     ////プレイヤーID決定

@@ -317,6 +317,7 @@ public:
     //ñ°ï˚HPUI
     void CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer);
     bool GetAllyHp() { return allyHp; }
+    void ResetAllyHp() { allyHp = false; }
 
     //èüîsï\é¶UI
     void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);

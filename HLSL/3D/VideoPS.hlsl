@@ -23,7 +23,6 @@ float4 main(VS_OUT pin) : SV_TARGET
     float u = VideoTexture.Sample(sampler_states[LINEAR], float2(pin.texcoord.x * 0.5, 0.50 + pin.texcoord.y * 0.25)).r;
     float v = VideoTexture.Sample(sampler_states[LINEAR], float2(pin.texcoord.x * 0.5, 0.75 + pin.texcoord.y * 0.25)).r;
     float4 color = float4(YUVToRGB(float3(y, u, v)), 1.f);
-    color.rgb = pow(color, GAMMA);
-    color.rgb = pow(color, 1.0 / GAMMA);
+    color.rgb = pow(color, 1.5);
     return color;
 }

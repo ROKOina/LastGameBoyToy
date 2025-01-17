@@ -20,6 +20,7 @@ void GateGimmick::Update(float elapsedTime)
 
     DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
     trans.p = { pos.x, pos.y, pos.z };
+    rigid->SetPxTransform(trans);
 
     //ステート更新処理
     state.Update(elapsedTime);

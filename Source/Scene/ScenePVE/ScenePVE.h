@@ -34,4 +34,6 @@ private:
     std::unique_ptr<BasicsApplication> photonNet;
 
     bool battleClymax = false;
+
+    bool flag = false;
 };

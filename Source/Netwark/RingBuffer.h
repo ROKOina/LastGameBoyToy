@@ -113,6 +113,6 @@ private:
     //T* head = nullptr;
     //T* tail = nullptr;
     int headIndex = -1;
-    size_t cap;     //最大サイズ
-    size_t size;    //現在のサイズ
+    size_t cap = {};     //最大サイズ
+    size_t size = {};    //現在のサイズ
 };

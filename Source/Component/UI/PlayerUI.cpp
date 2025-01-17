@@ -520,6 +520,7 @@ font->GetComponent<Font>()->str = numstr;
 
 void UI_EnemyHp::Update(float elasedTime)
 {
+
     if (enemyFLG) {
         GaugeUpdate(elasedTime);
     }

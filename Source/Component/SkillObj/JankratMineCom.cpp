@@ -13,7 +13,7 @@ void JankratMineCom::Update(float elapsedTime)
     {
         //当たり判定の半径増やす
         SphereColliderCom* sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
-        sphere->SetRadius(sphere->GetRadius() * 2.5f);
+        sphere->SetRadius(sphere->GetRadius() * 3.5f);
         sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
 
         //ノックバック判定をONにする

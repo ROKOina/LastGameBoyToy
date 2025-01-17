@@ -16,11 +16,11 @@ void RespawnCom::Update(float elapsedTime)
     if (!fallEvent && player->transform_->GetWorldPosition().y < playerDeathHeight)
     {
         CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-        status->AddDamagePoint(-200);
+        status->AddDamagePoint(-200, -1);
     }
 
     //リスポーン処理
-    for (auto& respawnData : respawnDatas)
+    for (RespawnData* respawnData : respawnDatas)
     {
         respawnData->respawnTime += elapsedTime;
 
@@ -34,9 +34,19 @@ void RespawnCom::Update(float elapsedTime)
             {
                 //位置移動
                 int spawnIndex = 0;
+                int teamIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
+                spawnIndex %= 2;
+
+                teamIndex = charaCom->GetNetCharaData().GetTeamID();
+
                 if (spawnIndex < 0) { spawnIndex = 0; }
-                player->transform_->SetWorldPosition(respawnPoses[spawnIndex]);
+                if (teamIndex < 0) { teamIndex = 0; }
+                player->transform_->SetWorldPosition(respawnPoses[spawnIndex + teamIndex]);
+
+                //パラメータ回復
+                CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+                status->ReSpawn(status->GetMaxHitpoint());
 
                 //プレイヤー隠す
                 player->GetComponent<RendererCom>()->SetDissolveThreshold(1);
@@ -48,8 +58,8 @@ void RespawnCom::Update(float elapsedTime)
             }
 
             //パラメータ回復
-            CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-            status->ReSpawn(status->GetMaxHitpoint());
+            CharaStatusCom* status = respawnData->gameObj->GetComponent<CharaStatusCom>().get();
+            status->SetIsDeath(false);
 
             //アニメーションを死亡から待機へ
             AnimationCom* animaCom = player->GetComponent<AnimationCom>().get();
@@ -73,11 +83,7 @@ void RespawnCom::Update(float elapsedTime)
     //リスポーン終了したオブジェクトをコンテナから出す
     for (RespawnData* removeObj : endDatas)
     {
-        std::vector<RespawnData*>::iterator it = std::find(respawnDatas.begin(), respawnDatas.end(), removeObj);
-        if (it != respawnDatas.end())
-        {
-            delete respawnDatas[respawnDatas.size() - 1];
-            respawnDatas.erase(it);
-        }
+        respawnDatas.erase(std::remove(respawnDatas.begin(), respawnDatas.end(), removeObj), respawnDatas.end());
     }
+    endDatas.clear();
 }
