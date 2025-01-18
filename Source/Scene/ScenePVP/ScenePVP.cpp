@@ -94,6 +94,20 @@ void ScenePVP::Initialize()
         obj->AddComponent<Light>("Data/SerializeData/LightData/pvp.light");
     }
 
+    //ダメージ
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("DamageCircles");
+
+        for (int i = 0; i < 4; ++i)
+        {
+            std::shared_ptr<GameObject> damageC =obj->AddChildObject();
+            damageC->SetName(("DamageCircle"+std::to_string(i)).c_str());
+            damageC->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/damageCircle.ui", Sprite::SpriteShader::DEFALT, false);
+            damageC->SetEnabled(false);
+        }
+    }
+
     //ロビー選択から始まる
     //InitializePVP();
     InitializeLobbySelect();
@@ -490,6 +504,51 @@ void ScenePVP::Update(float elapsedTime)
     GameSystemUpdate(elapsedTime);
     pvpGameSystem->update(elapsedTime);
 
+    //ダメージ表記UI
+    auto& damages = StaticSendDataManager::Instance().GetDamagePos();
+    auto& d = GameObjectManager::Instance().Find("DamageCircles");
+    for (auto& dm : d->GetChildren())
+    {
+        auto& dmUI = dm.lock()->GetComponent<UiSystem>();
+        if (!dmUI->IsPlayEasing())
+            dm.lock()->SetEnabled(false);
+    }
+    for (auto& damPos : damages)
+    {
+        for (auto& dm : d->GetChildren())
+        {
+            auto& dmUI = dm.lock()->GetComponent<UiSystem>();
+            if (dmUI->IsPlayEasing())continue;
+            //位置で回転する
+            auto& player = GameObjectManager::Instance().Find("player");
+            if (player)
+            {
+                DirectX::XMFLOAT3 pos = player->transform_->GetWorldPosition();
+                DirectX::XMFLOAT3 posF = player->transform_->GetWorldFront();
+                pos.y = 0;
+                damPos.y = 0;
+                posF.y = 0;
+                DirectX::XMFLOAT3 posP = Mathf::Normalize(damPos - pos);
+                posF = Mathf::Normalize(posF);
+                float angle = 0;
+                if (Mathf::Cross(posP, posF).y < 0) //ひだりがわ
+                    angle = 180.0f * (Mathf::Dot(posP, posF) * 0.5f * -1.0f + 0.5f);
+                else
+                    angle = 180 + 180.0f * (1.0f - (Mathf::Dot(posP, posF) * 0.5f * -1.0f + 0.5f));
+                dmUI->spc.angle = angle;
+                dmUI->spc.easingangle = angle;
+            }
+
+            //UIイージング設定
+            dm.lock()->SetEnabled(true);
+            dmUI->spc.scale = { 0.5f,0.5f };
+            dmUI->spc.color = { 1,0,0,0.7f };
+            dmUI->EasingPlay();
+            break;
+        }
+    }
+    damages.clear();
+
     //終わり
     if (pvpGameSystem->IsGameEnd())
     {
@@ -497,9 +556,9 @@ void ScenePVP::Update(float elapsedTime)
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
-       // //仮遷移
-       //if (!SceneManager::Instance().GetTransitionFlag())
-       //    SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+        //仮遷移
+       if (!SceneManager::Instance().GetTransitionFlag())
+           SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //画面切り替え処理

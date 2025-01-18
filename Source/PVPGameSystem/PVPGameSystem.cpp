@@ -69,6 +69,17 @@ void PVPGameSystem::DeathmatchUpdate()
 
 void PVPGameSystem::CrownUpdate()
 {
+	//クラウン所持時間
+	for (int i = 0; i < 2; ++i)
+	{
+		if (crownData.teamData[i].crownTime > crownData.haveWinTime)
+		{
+			isEndGame = true;	//ゲーム終了
+			victoryTeam = TEAM_KIND(i);	//勝利チーム
+			return;
+		}
+	}
+
 	//タイムアップ
 	if (crownData.nowTime >= crownData.endTime)
 	{

@@ -1368,6 +1368,7 @@ void PhotonLib::GameRecv(NetData recvData)
     if (!myPlayer)return;
 
     //ダメージ情報
+    bool isDamage = false;
     for (int id = 0; id < recvData.gameData.damageData.size(); ++id)
     {
         if (id != myPlayerID)continue;
@@ -1377,7 +1378,7 @@ void PhotonLib::GameRecv(NetData recvData)
             auto& hp = myPlayer->GetComponent<CharaStatusCom>();
             if (*hp->GetHitPoint() <= 0)return;
             hp->AddDamagePoint(-recvData.gameData.damageData[id], recvData.playerId);
-
+            isDamage = true;
             break;
         }
     }
@@ -1430,6 +1431,7 @@ void PhotonLib::GameRecv(NetData recvData)
     {
         //保存情報
             //入力
+        DirectX::XMFLOAT3 nowPos = {};
         for (int i = recvData.gameData.saveInputBuf.size() - 1; i >= 0; --i)
         {
             SaveBuffer newInput = recvData.gameData.saveInputBuf[i];
@@ -1437,6 +1439,12 @@ void PhotonLib::GameRecv(NetData recvData)
             SaveBuffer currentInput = saveInputPhoton[recvData.playerId].inputBuf->GetHead();
             if (currentInput.frame < newInput.frame || currentInput.frame == 0)	//新しいフレームから始める
                 saveInputPhoton[recvData.playerId].inputBuf->Enqueue(newInput);
+            nowPos = newInput.pos;
+        }
+        if (isDamage)   //ダメージを受けていたら
+        {
+            auto& damages = StaticSendDataManager::Instance().GetDamagePos();
+            damages.emplace_back(nowPos);   //敵の位置を保存
         }
     }
     ////保存情報

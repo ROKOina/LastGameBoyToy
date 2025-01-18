@@ -44,6 +44,8 @@ public:
         float endTime = 10000; //I—¹ŠÔ(•b)
 
         float nowTime = 0;
+
+        float haveWinTime = 120;
         struct CrownTeamData   //ƒ`[ƒ€‚²‚Æ
         {
             float crownTime = 0;
