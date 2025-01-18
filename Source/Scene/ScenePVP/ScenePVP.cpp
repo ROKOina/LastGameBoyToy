@@ -652,15 +652,16 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
         //カウントダウン時はタイマーをリセット
         net->ResetNowTime();
 
-        //タイマー更新
         float countTimerTemp = countTimer - net->GetCountNowTime();
         auto& gameModeUI = GameObjectManager::Instance().Find("gameModeUI");
-        if (gameModeUI){
+        if (gameModeUI) {
+            //タイマー更新
             auto& countT = gameModeUI->GetChildFind("countTime");
             if (countT) {
                 auto& time = gameModeUI->GetChildFind("countTime")->GetComponent<Font>();
                 time->str = UTF8ToWString2(std::to_string(int(countTimerTemp) + 1));
             }
+            //カウントダウン終了前にゲームモード説明イージング
             if (countTimerTemp < 0.6f)
             {
                 auto& mode = gameModeUI->GetChildFind("GameMode");
@@ -676,6 +677,20 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
             }
         }
 
+        //キャラの動きを止める
+        for (auto& s : net->GetSaveInput())
+        {
+            if (!s.useFlg)continue;
+
+            std::string name = "netPlayer" + std::to_string(s.photonId);
+            GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+            if (!net1)continue;
+            net1->GetComponent<CharacterCom>()->SetStartCountDown(true);
+        }
+        auto& p = GameObjectManager::Instance().Find("player");
+        if (p)
+            p->GetComponent<CharacterCom>()->SetStartCountDown(true);
+
         //カウントダウン終了処理
         if (countTimerTemp < 0)
         {
@@ -686,6 +701,19 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
             mode->SetEnabled(false);
             auto& modeE = gameModeUI->GetChildFind("GameModeExp");
             modeE->SetEnabled(false);
+            //キャラの動きを再開
+            for (auto& s : net->GetSaveInput())
+            {
+                if (!s.useFlg)continue;
+
+                std::string name = "netPlayer" + std::to_string(s.photonId);
+                GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+                if (!net1)continue;
+                net1->GetComponent<CharacterCom>()->SetStartCountDown(false);
+            }
+            auto& p = GameObjectManager::Instance().Find("player");
+            if (p)
+                p->GetComponent<CharacterCom>()->SetStartCountDown(false);
         }
     }
 

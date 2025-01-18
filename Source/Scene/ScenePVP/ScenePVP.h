@@ -139,6 +139,6 @@ private:
 
     //ゲーム開始時UI表示用変数
     bool isCountDown = true;    //カウントダウン中か
-    float countTimer = 5;   //秒数
+    float countTimer = 10;   //秒数
 
 };

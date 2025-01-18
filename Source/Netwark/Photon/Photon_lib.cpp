@@ -1300,6 +1300,7 @@ void PhotonLib::GameRecv(NetData recvData)
     {
         //タイマー合わせる
         startTime = recvData.gameData.startTime;
+        countTime = recvData.gameData.countTime;
     }
 
     //仮オブジェ
@@ -1693,6 +1694,7 @@ void PhotonLib::sendGameData(void)
 
     //タイマー
     netD.gameData.startTime = startTime;
+    netD.gameData.countTime = countTime;
 
     std::stringstream s = NetDataSendCast(n);
     event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));

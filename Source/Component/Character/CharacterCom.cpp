@@ -552,7 +552,7 @@ void CharacterCom::StanUpdate(float elapsedTime)
         stanTimer -= elapsedTime;
     }
 
-    if (!isStan)return;
+    if (!isStan && !startCountDown)return;
 
     //ƒXƒ^ƒ“’†‚È‚ç
 

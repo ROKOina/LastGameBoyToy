@@ -164,6 +164,7 @@ struct NetData
     struct GameData //0
     {
         int startTime = {};
+        int countTime = {};
 
         std::vector<SaveBuffer> saveInputBuf = {};
 
@@ -233,6 +234,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::GAME)
     {
         out << h.gameData.startTime << " ";
+        out << h.gameData.countTime << " ";
         out << h.gameData.damageData << " ";
         out << h.gameData.healData << " ";
         out << h.gameData.stanData << " ";
@@ -294,6 +296,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::GAME)
     {
         in >> h.gameData.startTime;
+        in >> h.gameData.countTime;
         in >> h.gameData.damageData;
         in >> h.gameData.healData;
         in >> h.gameData.stanData;

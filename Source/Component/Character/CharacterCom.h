@@ -226,6 +226,9 @@ public:
     //腕アニメーション再生
     void HandleArmAnimation();
 
+    //ゲーム開始前カウントダウン
+    void SetStartCountDown(bool flg) { startCountDown = flg; }
+
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);
@@ -333,6 +336,8 @@ private:
     float lerpSpeed = 4.0f;
 
     bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
+
+    bool startCountDown = false; //ゲーム開始前カウントダウン
 
     NetCharaData netCharaData = {};  //ネット関連
 };
