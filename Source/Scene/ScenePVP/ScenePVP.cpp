@@ -31,6 +31,7 @@
 #include "Component\Sprite\Sprite.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Component\UI\Font.h"
+#include "Component\UI\UiEasingEnabledRemove.h"
 #include "Math/easing.h"
 #include "Component\GameSystem\RespawnCom.h"
 #include "Component\System\CrownCom.h"
@@ -335,7 +336,14 @@ void ScenePVP::InitializePVP()
             obj->SetName("GameModeExp");
             obj->AddComponent<UiSystem>(("Data/SerializeData/UIData/PVPScene/GameModeExp" + std::to_string(int(pvpGameSystem->GetGameMode())) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
         }
-
+        //ƒQ[ƒ€ŠJn
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameStart");
+            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
+            obj->SetEnabled(false);
+            obj->AddComponent<UiEasingEnabledRemoveCom>();
+        }
     }
 
     switch (pvpGameSystem->GetGameMode())
@@ -773,6 +781,10 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
             auto& p = GameObjectManager::Instance().Find("player");
             if (p)
                 p->GetComponent<CharacterCom>()->SetStartCountDown(false);
+
+            auto& start = gameModeUI->GetChildFind("GameStart");
+            start->SetEnabled(true);
+            start->GetComponent<UiSystem>()->EasingPlay();
         }
     }
 
