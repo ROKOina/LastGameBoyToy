@@ -181,6 +181,7 @@ void PhotonLib::update(float elapsedTime)
                     }
                     //スタート時間保存
                     startTime = GetServerTime();
+                    countTime = GetServerTime();
                 }
                 firstStartGame = true;
                 //ゲーム中情報送信
@@ -867,6 +868,16 @@ bool PhotonLib::GetIsMasterPlayer()
 float PhotonLib::GetNowTime()
 {
     return (GetServerTime() - startTime) / 1000.0f;
+}
+
+float PhotonLib::GetCountNowTime()
+{
+    return (GetServerTime() - countTime) / 1000.0f;
+}
+
+void PhotonLib::ResetNowTime()
+{
+    startTime = GetServerTime();
 }
 
 float PhotonLib::GetJoinNum()

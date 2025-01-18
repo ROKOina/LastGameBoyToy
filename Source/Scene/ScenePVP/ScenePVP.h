@@ -125,7 +125,7 @@ private:
 
         LobbySelectFont(10,L"ゲームモード",{1260,52},1.5f,false,0),
         LobbySelectFont(11,L"チームデスマッチ",{1435,201},1,true,0),
-        LobbySelectFont(12,L"王冠",{1435,281},1,true,0),
+        LobbySelectFont(12,L"クラウンスティール",{1435,281},1,true,0),
 
         //ネット名用
         LobbySelectFont(20,L"",{536,218},1.0f,true,2),
@@ -136,4 +136,9 @@ private:
 
     int fontState = 0;
     int joinRoomCount = -1; //部屋参加時登録用
+
+    //ゲーム開始時UI表示用変数
+    bool isCountDown = true;    //カウントダウン中か
+    float countTimer = 5;   //秒数
+
 };

@@ -107,4 +107,11 @@ void CrownCom::IsCrownNonHaveUpdate(float elapsedTime)
             haveObj = c.gameObject; //Žæ“¾
         }
     }
+
+    //ƒNƒ‰ƒEƒ“—Ž‰ºŽž
+    if (GetGameObject()->transform_->GetWorldPosition().y < playerDeathHeight)
+    {
+        //‰ŠúˆÊ’u‚É–ß‚·
+        GetGameObject()->transform_->SetWorldPosition({ 3.4f, 20, 8.1f });
+    }
 }

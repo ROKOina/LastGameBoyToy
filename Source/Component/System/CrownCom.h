@@ -49,4 +49,7 @@ private:
     std::weak_ptr<GameObject> haveObj;  //所持者
     DirectX::XMFLOAT3 lastPos = {};
     float secondGetTimer = 0;   //死亡時取らないように
+
+    //リスポーンコンポーネントに合わせる
+    float playerDeathHeight = -50;  //クラウン落ちたとき用
 };

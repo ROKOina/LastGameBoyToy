@@ -113,6 +113,9 @@ public:
 
     //今の試合時間
     float GetNowTime();
+    float GetCountNowTime();
+    //試合時間リセット
+    void ResetNowTime();
 
     //参加人数
     float GetJoinNum();
@@ -308,6 +311,7 @@ private:
 
     //タイマースタート時間
     int startTime = 0;
+    int countTime = 0;  //カウントダウンタイマー
 
     //キャラ選択画面か
     bool isCharaSelect = false;

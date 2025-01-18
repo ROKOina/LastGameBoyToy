@@ -43,6 +43,39 @@
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
 
+// UTF-8 (std::string) → UTF-16 (std::wstring) 変換
+std::wstring UTF8ToWString2(const std::string& str) {
+    std::wstring result;
+    size_t i = 0;
+    while (i < str.size()) {
+        unsigned char c = str[i];
+        if (c <= 0x7F) {
+            result.push_back(c);
+            ++i;
+        }
+        else if ((c & 0xE0) == 0xC0) {
+            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+            result.push_back(wc);
+            i += 2;
+        }
+        else if ((c & 0xF0) == 0xE0) {
+            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+            result.push_back(wc);
+            i += 3;
+        }
+        else if ((c & 0xF8) == 0xF0) {
+            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+            result.push_back(wc);
+            i += 4;
+        }
+        else {
+            // 不正なUTF-8データを無視する
+            ++i;
+        }
+    }
+    return result;
+}
+
 void ScenePVP::Initialize()
 {
     Graphics& graphics = Graphics::Instance();
@@ -265,6 +298,32 @@ void ScenePVP::InitializePVP()
     std::shared_ptr<GameObject> gameModeUI = GameObjectManager::Instance().Create();
     gameModeUI->SetName("gameModeUI");
 
+    //カウントダウンUI
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("countTime");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 900,560 };
+        font->scale = 4.5f;
+        font->color = { 0,0.2f,0.7f,1 };
+    }
+    //ゲーム開始
+    {
+        //ゲームモード
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameMode");
+            obj->AddComponent<UiSystem>(("Data/SerializeData/UIData/PVPScene/GameMode" + std::to_string(int(pvpGameSystem->GetGameMode())) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        }
+        //説明
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameModeExp");
+            obj->AddComponent<UiSystem>(("Data/SerializeData/UIData/PVPScene/GameModeExp" + std::to_string(int(pvpGameSystem->GetGameMode())) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        }
+
+    }
+
     switch (pvpGameSystem->GetGameMode())
     {
     case PVPGameSystem::GAME_MODE::Deathmatch:
@@ -438,9 +497,9 @@ void ScenePVP::Update(float elapsedTime)
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
-        //仮遷移
-       if (!SceneManager::Instance().GetTransitionFlag())
-           SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+       // //仮遷移
+       //if (!SceneManager::Instance().GetTransitionFlag())
+       //    SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //画面切り替え処理
@@ -586,6 +645,50 @@ void ScenePVP::NewObject()
 void ScenePVP::GameSystemUpdate(float elapsedTime)
 {
     auto net = photonNet->GetPhotonLib();
+
+    //カウントダウン時処理
+    if (isCountDown)
+    {
+        //カウントダウン時はタイマーをリセット
+        net->ResetNowTime();
+
+        //タイマー更新
+        float countTimerTemp = countTimer - net->GetCountNowTime();
+        auto& gameModeUI = GameObjectManager::Instance().Find("gameModeUI");
+        if (gameModeUI){
+            auto& countT = gameModeUI->GetChildFind("countTime");
+            if (countT) {
+                auto& time = gameModeUI->GetChildFind("countTime")->GetComponent<Font>();
+                time->str = UTF8ToWString2(std::to_string(int(countTimerTemp) + 1));
+            }
+            if (countTimerTemp < 0.6f)
+            {
+                auto& mode = gameModeUI->GetChildFind("GameMode");
+                if (mode) {
+                    auto& spr = mode->GetComponent<UiSystem>();
+                    if (!spr->IsPlayEasing())spr->EasingPlay();
+                }
+                auto& modeE = gameModeUI->GetChildFind("GameModeExp");
+                if (modeE) {
+                    auto& spr = modeE->GetComponent<UiSystem>();
+                    if (!spr->IsPlayEasing())spr->EasingPlay();
+                }
+            }
+        }
+
+        //カウントダウン終了処理
+        if (countTimerTemp < 0)
+        {
+            isCountDown = false;
+            auto& countT = gameModeUI->GetChildFind("countTime");
+            countT->SetEnabled(false);
+            auto& mode = gameModeUI->GetChildFind("GameMode");
+            mode->SetEnabled(false);
+            auto& modeE = gameModeUI->GetChildFind("GameModeExp");
+            modeE->SetEnabled(false);
+        }
+    }
+
     //各ゲームモード必要情報更新
     switch (pvpGameSystem->GetGameMode())
     {
@@ -616,39 +719,6 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
 
         break;
     }
-}
-
-// UTF-8 (std::string) → UTF-16 (std::wstring) 変換
-std::wstring UTF8ToWString2(const std::string& str) {
-    std::wstring result;
-    size_t i = 0;
-    while (i < str.size()) {
-        unsigned char c = str[i];
-        if (c <= 0x7F) {
-            result.push_back(c);
-            ++i;
-        }
-        else if ((c & 0xE0) == 0xC0) {
-            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
-            result.push_back(wc);
-            i += 2;
-        }
-        else if ((c & 0xF0) == 0xE0) {
-            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
-            result.push_back(wc);
-            i += 3;
-        }
-        else if ((c & 0xF8) == 0xF0) {
-            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
-            result.push_back(wc);
-            i += 4;
-        }
-        else {
-            // 不正なUTF-8データを無視する
-            ++i;
-        }
-    }
-    return result;
 }
 
 void ScenePVP::TransitionUpdate(float elapsedTime)
@@ -1175,13 +1245,13 @@ void ScenePVP::GameUpdate(float elapsedTime)
         //チームによって変える
         if (netData.GetTeamID() == 0)
         {
-            crownA->str = UTF8ToWString2(std::to_string(cro.teamData[0].crownTime));
-            crownE->str = UTF8ToWString2(std::to_string(cro.teamData[1].crownTime));
+            crownA->str = UTF8ToWString2(std::to_string(int(cro.teamData[0].crownTime)));
+            crownE->str = UTF8ToWString2(std::to_string(int(cro.teamData[1].crownTime)));
         }
         else
         {
-            crownA->str = UTF8ToWString2(std::to_string(cro.teamData[1].crownTime));
-            crownE->str = UTF8ToWString2(std::to_string(cro.teamData[0].crownTime));
+            crownA->str = UTF8ToWString2(std::to_string(int(cro.teamData[1].crownTime)));
+            crownE->str = UTF8ToWString2(std::to_string(int(cro.teamData[0].crownTime)));
         }
     }
     break;
