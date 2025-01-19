@@ -23,7 +23,6 @@
 #include "Component\Stage\StageEditorCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\Particle\GPUParticle.h"
-#include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
@@ -148,15 +147,6 @@ void SceneTitle::Initialize()
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
-
-    // スカイボックスの設定
-    std::array<const char*, 4> filepath = {
-      "Data\\Texture\\DayInTheClouds4k.hdr",
-      "Data\\Texture\\diffuse_iem.dds",
-      "Data\\Texture\\specular_pmrem.dds",
-      "Data\\Texture\\lut_ggx.DDS"
-    };
-    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
 
     {
         GameObj audio = GameObjectManager::Instance().Create();

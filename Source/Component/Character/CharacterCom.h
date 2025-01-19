@@ -189,13 +189,14 @@ public:
     //スキルクールダウン系
     enum SkillCoolID
     {
-        Q, E, R, LeftShift, Space, LeftClick, MAX
+        Q, E, R, LeftShift, Space, RightClick, MAX
     };
     void SetSkillCoolTime(SkillCoolID id, float time) { skillCools[id].time = time; }
     float GetSkillCoolTime(SkillCoolID id) { return skillCools[id].time; }
     float* GetSkillCoolTimerPointer(SkillCoolID id) { return &skillCools[id].timer; }
     void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
+    bool IsSkillJustCooled(SkillCoolID id, float limittime);
 
     //ネット関連変数ゲッター
     NetCharaData& GetNetCharaData() { return netCharaData; }
@@ -216,6 +217,7 @@ public:
 
     //残弾
     int GetCurrentBulletNum() { return currentBulletNum; }
+    int* GetCurrentBulletNumPointer() { return &currentBulletNum; }
     void SetCurrentBulletNum(int num) { currentBulletNum = num; }
     void AddCurrentBulletNum(int num) { currentBulletNum += num; }
 
@@ -271,8 +273,12 @@ protected:
     //スキルクールダウン
     struct SkillCoolTime
     {
-        float time = 0;
-        float timer = 100;
+        float time = 0.0f;
+        float timer = 100.0f;
+        bool useskill = false;
+        bool coolflag = false;
+        float coolJustFrameCounter = 0.0f;        // スキルが溜まった直後のフレーム数カウント
+        float limitTime = 0.0f;
     };
     SkillCoolTime skillCools[SkillCoolID::MAX];
 
