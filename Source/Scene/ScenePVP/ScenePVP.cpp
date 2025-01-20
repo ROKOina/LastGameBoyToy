@@ -707,6 +707,7 @@ int ScenePVP::GetPlayerTeamIndex(int playerID)
     //自分のチーム
     int teamIndex = -1;
     teamIndex = StaticSendDataManager::Instance().GetTeamNum(playerID);
+    teamIndex == 0 ? teamIndex = 1 : teamIndex = 0;
 
     //どの出現位置なのか
     int spawnIndex = 0;
