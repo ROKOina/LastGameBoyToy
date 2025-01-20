@@ -303,14 +303,14 @@ void ScenePVP::InitializePVP()
         //同じチームのプレイヤーを探す
         for (int i = 0; i < 4; ++i)
         {
-            int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
+            int teamFlag = photonNet->GetPhotonLib()->GetTeamID(i);
             if (teamIndex == teamFlag && myPlayerID != i)
             {
                 if (i > myPlayerID)
                 {
                     spawnIndex = 0;
                 }
-                else
+                else if(i < myPlayerID)
                 {
                     spawnIndex = 1;
                 }
