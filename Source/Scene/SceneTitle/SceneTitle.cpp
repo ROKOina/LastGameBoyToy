@@ -170,6 +170,17 @@ void SceneTitle::Initialize()
         audioObj->FeedStart("Title", 0.5f, 0.1f);
     }
 
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Audio");
+        audioSource = audio->AddComponent<AudioSourceCom>().get();
+        audioSource->AddAudio(static_cast<int>(AUDIOID::BGM));
+        audioSource->AddAudio(static_cast<int>(AUDIOID::SE));
+
+        //audioSource->AudioPlay(static_cast<int>(AUDIOID::BGM), true);
+        //audioSource->FeedStart(static_cast<int>(AUDIOID::BGM), 0.5f, 0.1f);
+    }
+
     //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
     auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
@@ -281,6 +292,8 @@ void SceneTitle::UIUpdate(float elapsedTime)
                     audioObj->FeedStart("Title", 0.0f, elapsedTime);
                     audioObj->Play("Enter", false, 1.0f);
 
+                    //audioSource->FeedStart(static_cast<int>(AUDIOID::SE), 0.0f, elapsedTime);
+                    //audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);
                     //ˆÃ“]
                     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
@@ -291,6 +304,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
             }
             //ƒZƒŒƒNƒg–_ˆë•ÏX
             if (sprite->GetHitSpriteEnter()) { audioObj->Stop("Cursor"); audioObj->Play("Cursor", false, 1.0f); }
+            //if (sprite->GetHitSpriteEnter()) { audioSource->Stop(static_cast<int>(AUDIOID::SE)); audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);}
             selectB->SetEnabled(true);
             DirectX::XMFLOAT3 sP = selectB->transform_->GetWorldPosition();
             sP.y = s.y;

@@ -63,32 +63,35 @@ class AudioSourceCom : public Component
 {
 public:
     AudioSourceCom() = default;
-    ~AudioSourceCom() override { Stop(); }
+    ~AudioSourceCom() override { StopAll(); }
 
     void Start() override {}
-    void Update(float elapsedTime) override {};
+    void Update(float elapsedTime) override;
 
     const char* GetName() const override { return "Audio"; }
     void OnGUI() override;
 
-    // オーディオ呼び出し関数
-    void SetAudio(int id);
+    // オーディオの追加
+    void AddAudio(int id);
 
     // 再生
-    void Play(bool loop, float volume = 1.0f);
-    void Play();
+    void AudioPlay(int id);
+    void AudioPlay(int id, bool loop, float volume = 1.0f);
+
+    // 停止
+    void Stop(int id);
+    void StopAll();
+
+    void SetVolume(int id, float volume);
+    void SetLoop(int id, bool loop);
 
     // エミッター再生
     void EmitterPlay(float volume = 1.0f);
 
-    // 停止
-    void Stop();
+    // 音量フェード制御
+    void FeedStart(int id, float targetValue, float add);
+    bool Feed(int id);
 
-    bool Feed(float targetValue, float elapsedTime);
-
-    IXAudio2SourceVoice* GetSourceVoice() { return sourceVoice_; }
-    void SetVolume(float volume) { sourceVoice_->SetVolume(volume); }
-    void SetPitch(float value) { sourceVoice_->SetFrequencyRatio(value); }
     void AudioRelease();
 
     // 3Dオーディオの更新
@@ -97,14 +100,24 @@ public:
     Listener_ GetListener() { return listener_; }
     Emitter_ GetEmitter_() { return emitter_; }
 private:
-    IXAudio2SourceVoice* sourceVoice_ = nullptr;
-    std::shared_ptr<AudioResource>	resource_;
+    struct FeedState {
+        float currentVolume = 1.0f;
+        float targetVolume = 1.0f;
+        float feedStep = 0.0f;
+        bool isFeeding = false;
+    };
+
+private:
+    std::map<int, IXAudio2SourceVoice*> sourceVoices_;
+    std::map<int, std::shared_ptr<AudioResource>> resources_;
+    std::map<int, std::string> audioNames_;
+    std::map<int, bool> loopFlags_;
+    std::map<int, float> volumeControls_;
+    std::map<int, FeedState> feedStates_;  // フィード状態
 
     Listener_ listener_;   // リスナー情報
     Emitter_ emitter_;    // エミッター情報
 
-    float volumeControl = 1.0f;
     bool isPlaying = false;
-    bool isLooping = false;
 };
 

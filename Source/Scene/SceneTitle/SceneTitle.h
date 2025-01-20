@@ -9,6 +9,7 @@
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 #include "Component\Audio\AudioCom.h"
+#include "Component/Audio/AudioSourceCom.h"
 
 //タイトルシーン
 class SceneTitle :public Scene
@@ -41,4 +42,5 @@ private:
     void ScreenEffect(float elapsedTime);
 
     AudioCom* audioObj;
+    AudioSourceCom* audioSource;
 };
