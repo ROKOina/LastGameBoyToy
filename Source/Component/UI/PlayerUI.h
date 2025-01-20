@@ -418,6 +418,9 @@ public:
     bool GetAllyHp() { return allyHp; }
     void ResetAllyHp() { allyHp = false; }
 
+    //死亡時のネットを挟んだアイコン表示
+    void NetDeathIcon(std::weak_ptr<GameObject>netPlayer);
+
     //勝敗表示UI
     void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
     bool GetIsEndFLG() { return isEndFLG; }

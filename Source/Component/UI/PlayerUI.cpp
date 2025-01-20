@@ -1235,12 +1235,26 @@ void PlayerUIManager::CreateNetUseCharaUI()
             std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
             ally01->SetName("charaView01");
             ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+
+            //死亡したらの処理
+            {
+                std::shared_ptr<GameObject>DeathIcon = ally01->AddChildObject();
+                DeathIcon->SetName("DeathIcon");
+                DeathIcon->AddComponent<Sprite>("Data/SerializeData/UIData/Player/CharaView/net_death_icon1.ui", Sprite::SpriteShader::DEFALT, false);
+            }
         }
         //二人目
         {
             std::shared_ptr<GameObject> ally02 = allyBack->AddChildObject();
             ally02->SetName("charaView02");
             ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+
+            //死亡したらの処理
+            {
+                std::shared_ptr<GameObject>DeathIcon = ally02->AddChildObject();
+                DeathIcon->SetName("DeathIcon");
+                DeathIcon->AddComponent<Sprite>("Data/SerializeData/UIData/Player/CharaView/net_death_icon2.ui", Sprite::SpriteShader::DEFALT, false);
+            }
         }
     }
 
@@ -1254,12 +1268,26 @@ void PlayerUIManager::CreateNetUseCharaUI()
             std::shared_ptr<GameObject> enemy01 = enemyBack->AddChildObject();
             enemy01->SetName("charaView01");
             enemy01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+
+            //死亡したらの処理
+            {
+                std::shared_ptr<GameObject>DeathIcon = enemy01->AddChildObject();
+                DeathIcon->SetName("DeathIcon");
+                DeathIcon->AddComponent<Sprite>("Data/SerializeData/UIData/Player/CharaView/net_death_icon3.ui", Sprite::SpriteShader::DEFALT, false);
+            }
         }
         //二人目
         {
             std::shared_ptr<GameObject> enemy02 = enemyBack->AddChildObject();
             enemy02->SetName("charaView02");
             enemy02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+
+            //死亡したらの処理
+            {
+                std::shared_ptr<GameObject>DeathIcon = enemy02->AddChildObject();
+                DeathIcon->SetName("DeathIcon");
+                DeathIcon->AddComponent<Sprite>("Data/SerializeData/UIData/Player/CharaView/net_death_icon4.ui", Sprite::SpriteShader::DEFALT, false);
+            }
         }
     }
 }
@@ -1272,10 +1300,16 @@ void PlayerUIManager::NetUseCharaUIUpdate(int chara[4])
         {
             auto& c01 = parentObj->GetChildFind("charaView01");
             auto& c02 = parentObj->GetChildFind("charaView02");
+            auto& deathicon1 = c01->GetChildFind("DeathIcon");
+            auto& deathicon2 = c02->GetChildFind("DeathIcon");
 
             //位置
             c01->transform_->SetLocalPosition({ 122,0,0 });
             c02->transform_->SetLocalPosition({ 341,0,0 });
+
+            //位置を無理やり補正
+            deathicon1->transform_->SetLocalPosition({ -1573.559f,0,0 });
+            deathicon2->transform_->SetLocalPosition({ -1558.791f,0,0 });
 
             //キャラIDを見て画像ずらす
             if (chara[0 + of] >= 0)
@@ -1322,6 +1356,57 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         std::shared_ptr<UiSystem>iconUi = icon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/AllyIcon.ui", Sprite::SpriteShader::DEFALT, false);
         iconUi->LoadTexture(name);
     }
+}
+
+//死亡時のネットを挟んだアイコン表示
+void PlayerUIManager::NetDeathIcon(std::weak_ptr<GameObject> netPlayer)
+{
+    auto& netplayerkun = netPlayer.lock()->GetComponent<CharacterCom>();
+    auto& netplayerstatus = netPlayer.lock()->GetComponent<CharaStatusCom>();
+    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 0)
+    {
+        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("allyBack")->GetChildFind("charaView01")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
+        sprite->SetEnabled(netplayerstatus->IsDeath());
+    }
+
+    //auto& playerstatus = netPlayer.lock()->GetComponent<CharaStatusCom>();
+
+    //auto& charaView = [&](std::shared_ptr<GameObject> parentObj, int of)
+    //    {
+    //        auto& c01 = parentObj->GetChildFind("charaView01");
+    //        auto& c02 = parentObj->GetChildFind("charaView02");
+    //        auto& deathicon1 = c01->GetChildFind("DeathIcon");
+    //        auto& deathicon2 = c02->GetChildFind("DeathIcon");
+
+    //        //起動
+    //        //sprite->SetEnabled(playerstatus->IsDeath());
+
+    //        //イージング発動
+    //        //if (playerstatus->IsDeathFrame())
+    //        //{
+    //        //    sprite->EasingPlay();
+    //        //}
+
+    //        //イージング停止
+    //        //if (!sprite->GetEnabled())
+    //        //{
+    //        //    sprite->spc.scale = { 0.3f,0.3f };
+    //        //    sprite->spc.color = { 1,1,1,1 };
+    //        //}
+
+    //        //キャラIDを見て画像ずらす
+    //        //if (chara[0 + of] >= 0)
+    //        //    c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * chara[0 + of];
+    //        //if (chara[1 + of] >= 0)
+    //        //    c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * chara[1 + of];
+    //    };
+
+    //auto& ally = canvas->GetChildFind("allyBack");
+    //auto& enemy = canvas->GetChildFind("enemyBack");
+    //if (ally)
+    //    charaView(ally, 0);
+    //if (enemy)
+    //    charaView(enemy, 2);
 }
 
 void PlayerUIManager::CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam)

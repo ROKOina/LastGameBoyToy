@@ -439,8 +439,8 @@ void ScenePVP::Update(float elapsedTime)
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
         //仮遷移
-       if (!SceneManager::Instance().GetTransitionFlag())
-           SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+        if (!SceneManager::Instance().GetTransitionFlag())
+            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //画面切り替え処理
@@ -603,7 +603,6 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
         auto& crown = GameObjectManager::Instance().Find("crown")->GetComponent<CrownCom>();
         if (net->GetMyPlayerID() >= 0)
             net->SetCrownTimer(net->GetMyPlayerID(), crown->GetHaveTimer());
-        
 
         //ゲームシステムに送信
         auto& DM = pvpGameSystem->GetCrownData();
@@ -611,7 +610,7 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
         DM.teamData[PVPGameSystem::TEAM_KIND::BLUE_GROUP].crownTime = net->GetCrownTimerCount(PVPGameSystem::TEAM_KIND::BLUE_GROUP);
         DM.nowTime = net->GetNowTime();
     }
-        break;
+    break;
     case PVPGameSystem::GAME_MODE::Button:
 
         break;
@@ -1120,6 +1119,7 @@ void ScenePVP::GameUpdate(float elapsedTime)
             if (!netPlayer)continue;
 
             PlayerUIManager::Instance().CreateNetTeamUI(netPlayer);
+            PlayerUIManager::Instance().NetDeathIcon(netPlayer);
             break;
         }
     }
