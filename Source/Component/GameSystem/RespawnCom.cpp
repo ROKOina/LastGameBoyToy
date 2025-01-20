@@ -52,6 +52,8 @@ void RespawnCom::Update(float elapsedTime)
                         {
                             spawnIndex = 1;
                         }
+
+                        break;
                     }
                 }
 
