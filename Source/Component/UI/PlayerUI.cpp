@@ -1363,9 +1363,28 @@ void PlayerUIManager::NetDeathIcon(std::weak_ptr<GameObject> netPlayer)
 {
     auto& netplayerkun = netPlayer.lock()->GetComponent<CharacterCom>();
     auto& netplayerstatus = netPlayer.lock()->GetComponent<CharaStatusCom>();
+
     if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 0)
     {
         auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("allyBack")->GetChildFind("charaView01")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
+        sprite->SetEnabled(netplayerstatus->IsDeath());
+    }
+
+    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 1)
+    {
+        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("allyBack")->GetChildFind("charaView02")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
+        sprite->SetEnabled(netplayerstatus->IsDeath());
+    }
+
+    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 2)
+    {
+        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("enemyBack")->GetChildFind("charaView01")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
+        sprite->SetEnabled(netplayerstatus->IsDeath());
+    }
+
+    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 3)
+    {
+        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("enemyBack")->GetChildFind("charaView02")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
         sprite->SetEnabled(netplayerstatus->IsDeath());
     }
 
