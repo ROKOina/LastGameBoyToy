@@ -70,6 +70,10 @@ void Farah_UltState::Execute(const float& elapsedTime)
 }
 void Farah_UltState::Exit()
 {
+    //’e”‚ğŒ³‚É–ß‚·
+    charaCom.lock()->SetCurrentBulletNum(10);
+    charaCom.lock()->SetMaxBulletNum(10);
+
     //ŠÔ‰Šú‰»
     time = 0.0f;
 

@@ -1,0 +1,9 @@
+diff a/Source/StateMachine/Behaviar/FarahState.cpp b/Source/StateMachine/Behaviar/FarahState.cpp	(rejected hunks)
+@@ -70,7 +70,6 @@
+ }
+ void Farah_UltState::Exit()
+ {
+-    charaCom.lock()->SetCurrentBulletNum(5);
+     //���ԏ�����
+     time = 0.0f;
+ 
