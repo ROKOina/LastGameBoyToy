@@ -12,6 +12,7 @@
 #include <Component\Stage\StageEditorCom.h>
 #include "Component\UI\Font.h"
 #include "Input\Input.h"
+#include "Graphics/SkyBoxManager/SkyBoxManager.h"
 
 //初期化
 void SceneLGBT::Initialize()
@@ -77,6 +78,15 @@ void SceneLGBT::Initialize()
         font->scale = 1.0f;
         font->color.w = 1.0f;
     }
+
+    // スカイボックスの設定
+    std::array<const char*, 4> filepath = {
+      "Data\\Texture\\DayInTheClouds4k.hdr",
+      "Data\\Texture\\diffuse_iem.dds",
+      "Data\\Texture\\specular_pmrem.dds",
+      "Data\\Texture\\lut_ggx.DDS"
+    };
+    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();

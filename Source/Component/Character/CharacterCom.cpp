@@ -216,21 +216,27 @@ void CharacterCom::OnGUI()
         ImGui::DragFloat("shootTimer", &shootTimer);
         ImGui::DragFloat("QTime", &skillCools[SkillCoolID::Q].time);
         ImGui::DragFloat("QTimer", &skillCools[SkillCoolID::Q].timer);
+        ImGui::Checkbox("QFlag", &skillCools[SkillCoolID::Q].useskill);
         ImGui::Separator();
         ImGui::DragFloat("ETime", &skillCools[SkillCoolID::E].time);
         ImGui::DragFloat("ETimer", &skillCools[SkillCoolID::E].timer);
+        ImGui::Checkbox("EFlag", &skillCools[SkillCoolID::E].useskill);
         ImGui::Separator();
         ImGui::DragFloat("LSTime", &skillCools[SkillCoolID::LeftShift].time);
         ImGui::DragFloat("LSTimer", &skillCools[SkillCoolID::LeftShift].timer);
+        ImGui::Checkbox("LSFlag", &skillCools[SkillCoolID::LeftShift].useskill);
         ImGui::Separator();
         ImGui::DragFloat("SpaceTime", &skillCools[SkillCoolID::Space].time);
         ImGui::DragFloat("SpaceTimer", &skillCools[SkillCoolID::Space].timer);
+        ImGui::Checkbox("SpaceFlag", &skillCools[SkillCoolID::Space].useskill);
         ImGui::Separator();
-        ImGui::DragFloat("LeftClickTime", &skillCools[SkillCoolID::LeftClick].time);
-        ImGui::DragFloat("LeftClickTimer", &skillCools[SkillCoolID::LeftClick].timer);
+        ImGui::DragFloat("RightClickTime", &skillCools[SkillCoolID::RightClick].time);
+        ImGui::DragFloat("RightClickTimer", &skillCools[SkillCoolID::RightClick].timer);
+        ImGui::Checkbox("RightClickFlag", &skillCools[SkillCoolID::RightClick].useskill);
         ImGui::Separator();
         ImGui::DragFloat("RTime", &skillCools[SkillCoolID::R].time);
         ImGui::DragFloat("RTimer", &skillCools[SkillCoolID::R].timer);
+        ImGui::Checkbox("RFlag", &skillCools[SkillCoolID::R].useskill);
 
         ImGui::TreePop();
     }
@@ -252,6 +258,12 @@ void CharacterCom::DashFewSub(float elapsedTime)
         //速度を普通に
         dashSpeed = dashSpeedNormal;
     }
+}
+
+bool CharacterCom::IsSkillJustCooled(SkillCoolID id, float limittime)
+{
+    skillCools[id].limitTime = limittime;             //比較時間
+    return skillCools[id].coolflag;
 }
 
 //腕アニメーション再生
@@ -319,8 +331,8 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    if (CharacterInput::MainAttackButton & GetButtonDown() 
-    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+    if (CharacterInput::MainAttackButton & GetButtonDown()
+        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
     {
         if (shootTimer < shootTime)
         {
@@ -340,9 +352,10 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
 #endif // DEBUG_
 
     if (CharacterInput::SubAttackButton & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::LeftClick))
+        && IsSkillCoolMax(SkillCoolID::RightClick))
     {
-        skillCools[SkillCoolID::LeftClick].timer = 0;
+        skillCools[SkillCoolID::RightClick].timer = 0;
+        skillCools[SkillCoolID::RightClick].useskill = true;
         SubAttackDown();
     }
     else if (CharacterInput::SubAttackButton & GetButton())
@@ -360,12 +373,14 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         && IsSkillCoolMax(SkillCoolID::E))
     {
         skillCools[SkillCoolID::E].timer = 0;
+        skillCools[SkillCoolID::E].useskill = true;
         SubSkill();
     }
 
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         skillCools[SkillCoolID::Space].timer = 0;
+        skillCools[SkillCoolID::Space].useskill = true;
         SpaceSkill();
     }
 
@@ -501,6 +516,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
             if (dashGauge <= 0)
             {
                 skillCools[SkillCoolID::LeftShift].timer = 0;
+                skillCools[SkillCoolID::LeftShift].useskill = true;
                 posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
             }
         }
@@ -568,7 +584,27 @@ void CharacterCom::CoolUpdate(float elapsedTime)
 {
     for (int i = 0; i < SkillCoolID::MAX; ++i)
     {
+        // スキルタイマーを更新
         skillCools[i].timer += elapsedTime;
+
+        if (skillCools[i].useskill && skillCools[i].time <= skillCools[i].timer)
+        {
+            skillCools[i].useskill = false;
+            skillCools[i].coolflag = true;
+        }
+
+        //trueになれば時間を更新
+        if (skillCools[i].coolflag)
+        {
+            skillCools[i].coolJustFrameCounter += elapsedTime;
+        }
+
+        //比較してcoolJustFrameCounterが超えればfalseにする
+        if (skillCools[i].coolJustFrameCounter > skillCools[i].limitTime)
+        {
+            skillCools[i].coolflag = false;
+            skillCools[i].coolJustFrameCounter = 0.0f;
+        }
     }
 }
 
@@ -584,6 +620,22 @@ void CharacterCom::UltUpdate(float elapsedTime)
     else
     {
         isMaxUlt = false; // max未到達ならfalseに戻す
+    }
+
+    // UIのON/OFF
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+    if (canvas != nullptr)
+    {
+        auto& UltUI = canvas->GetChildFind("UltFrame");
+        if (UltUI != nullptr)
+        {
+            if (std::string(GetGameObject()->GetName()) == "player")
+            {
+                UltUI->GetChildFind("UltThunder_IN")->SetEnabled(isMaxUlt);
+                UltUI->GetChildFind("UltThunder_Right")->SetEnabled(isMaxUlt);
+                UltUI->GetChildFind("UltThunder_Left")->SetEnabled(isMaxUlt);
+            }
+        }
     }
 
     // 状態を記録

@@ -39,8 +39,12 @@ public:
     void SetInvincibleTime(float time) { invincibleTime = time; }
     bool IsInvincible() const { return currentInvincibleTime > 0.0f; }
 
+    //死亡フラグ
     bool IsDeath() { return isDeath; }
     void SetIsDeath(bool flag) { isDeath = flag; }
+
+    //死亡フラグが立った時1度だけtrueになるフラグ
+    bool IsDeathFrame() { return isDeathFrame; }
 
     //リスポーンさせる関数
     void ReSpawn(int HP);
@@ -56,6 +60,8 @@ private:
     float frameDamage = 0.0f;           // このフレーム中に受けたダメージ
 
     bool isDeath = false;   //死亡フラグ
+    bool isDeathFrame = false; //死亡フラグが立った時一度だけ入るフラグ
+    bool wasDeath = false; // 前フレームの死亡状態
 
     int lastDamageID = -1;  //最後に攻撃してきた相手
     float lastDamageTimer = 0.0f;   //リセット時間

@@ -37,10 +37,6 @@ void FarahCom::Start()
     // 初期ステート設定
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
-
-    //弾数をセット
-    currentBulletNum = 5;
-    maxBulletNum = 5;
 }
 
 // 更新処理

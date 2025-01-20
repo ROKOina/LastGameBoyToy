@@ -288,10 +288,37 @@ void ScenePVP::InitializePVP()
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
 
         //ネットIDによって位置分け
-        int id = photonNet->GetPhotonLib()->GetMyPlayerID();
-        int teamId = photonNet->GetPhotonLib()->GetTeamID(id);
-        id = (id % 2) + teamId;
-        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[id]);
+
+        //自分のID
+        int myPlayerID = 0;
+        myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
+
+        //自分のチーム
+        int teamIndex = -1;
+        teamIndex = photonNet->GetPhotonLib()->GetTeamID(myPlayerID);
+
+        //どの出現位置なのか
+        int spawnIndex = 0;
+
+        //同じチームのプレイヤーを探す
+        for (int i = 0; i < 4; ++i)
+        {
+            int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
+            if (teamIndex == teamFlag && myPlayerID != i)
+            {
+                if (i > myPlayerID)
+                {
+                    spawnIndex = 0;
+                }
+                else
+                {
+                    spawnIndex = 1;
+                }
+
+                break;
+            }
+        }
+        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[spawnIndex + (teamIndex * 2)]);
     }
 
     //イベント用カメラ
@@ -583,9 +610,9 @@ void ScenePVP::Update(float elapsedTime)
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
-       // //仮遷移
-       //if (!SceneManager::Instance().GetTransitionFlag())
-       //    SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+        //仮遷移
+        if (!SceneManager::Instance().GetTransitionFlag())
+            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //画面切り替え処理
@@ -833,7 +860,6 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
         auto& crown = GameObjectManager::Instance().Find("crown")->GetComponent<CrownCom>();
         if (net->GetMyPlayerID() >= 0)
             net->SetCrownTimer(net->GetMyPlayerID(), crown->GetHaveTimer());
-        
 
         //ゲームシステムに送信
         auto& DM = pvpGameSystem->GetCrownData();
@@ -841,7 +867,7 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
         DM.teamData[PVPGameSystem::TEAM_KIND::BLUE_GROUP].crownTime = net->GetCrownTimerCount(PVPGameSystem::TEAM_KIND::BLUE_GROUP);
         DM.nowTime = net->GetNowTime();
     }
-        break;
+    break;
     case PVPGameSystem::GAME_MODE::Button:
 
         break;
@@ -1317,6 +1343,21 @@ void ScenePVP::GameUpdate(float elapsedTime)
             if (!netPlayer)continue;
 
             PlayerUIManager::Instance().CreateNetTeamUI(netPlayer);
+            break;
+        }
+    }
+
+    //敵味方関係なく登録
+    {
+        for (auto& s : saveI)
+        {
+            if (!s.useFlg)continue;
+
+            std::string name = "netPlayer" + std::to_string(s.photonId);
+            GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
+            if (!netPlayer)continue;
+
+            PlayerUIManager::Instance().NetDeathIcon(netPlayer);
             break;
         }
     }
