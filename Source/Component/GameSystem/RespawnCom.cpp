@@ -33,8 +33,6 @@ void RespawnCom::Update(float elapsedTime)
             //プレイヤーならば
             if (std::string(respawnData->gameObj->GetName()) == "player")
             {
-     
-
                 //位置移動
                 int spawnIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
