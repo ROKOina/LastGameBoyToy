@@ -344,6 +344,25 @@ void ScenePVP::InitializePVP()
             obj->SetEnabled(false);
             obj->AddComponent<UiEasingEnabledRemoveCom>();
         }
+        //ゲームモード横のエフェクト
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameModeSideEff");
+            {
+                std::shared_ptr<GameObject> effLeft = obj->AddChildObject();
+                effLeft->SetName("GameModeLeftEff");
+                auto& ui = effLeft->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameModeEffLeft.ui", Sprite::SpriteShader::DEFALT, false);
+                ui->constants.rows = 6;
+                ui->constants.framerate = 10;
+            }
+            {
+                std::shared_ptr<GameObject> effLeft = obj->AddChildObject();
+                effLeft->SetName("GameModeRightEff");
+                auto& ui = effLeft->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameModeEffRight.ui", Sprite::SpriteShader::DEFALT, false);
+                ui->constants.rows = 6;
+                ui->constants.framerate = 10;
+            }
+        }
     }
 
     switch (pvpGameSystem->GetGameMode())
@@ -564,9 +583,9 @@ void ScenePVP::Update(float elapsedTime)
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
-        //仮遷移
-       if (!SceneManager::Instance().GetTransitionFlag())
-           SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+       // //仮遷移
+       //if (!SceneManager::Instance().GetTransitionFlag())
+       //    SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //画面切り替え処理
@@ -741,6 +760,13 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
                     auto& spr = modeE->GetComponent<UiSystem>();
                     if (!spr->IsPlayEasing())spr->EasingPlay();
                 }
+                auto& sideEff = gameModeUI->GetChildFind("GameModeSideEff");
+                if (sideEff){
+                    auto& sprL = sideEff->GetChildFind("GameModeLeftEff")->GetComponent<UiSystem>();
+                    if (!sprL->IsPlayEasing())sprL->EasingPlay();
+                    auto& sprR = sideEff->GetChildFind("GameModeRightEff")->GetComponent<UiSystem>();
+                    if (!sprR->IsPlayEasing())sprR->EasingPlay();
+                }
             }
         }
 
@@ -768,6 +794,8 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
             mode->SetEnabled(false);
             auto& modeE = gameModeUI->GetChildFind("GameModeExp");
             modeE->SetEnabled(false);
+            auto& sideEff = gameModeUI->GetChildFind("GameModeSideEff");
+            sideEff->SetEnabled(false);
             //キャラの動きを再開
             for (auto& s : net->GetSaveInput())
             {
