@@ -42,6 +42,8 @@ public:
     //名前取得
     std::string GetName() const override { return "ScenePVP"; };
 
+    static int GetPlayerTeamIndex(int playerID);
+
 private:
 
     //オブジェクト生成関数

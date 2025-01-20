@@ -300,25 +300,7 @@ void ScenePVP::InitializePVP()
         //どの出現位置なのか
         int spawnIndex = 0;
 
-        //同じチームのプレイヤーを探す
-        for (int i = 0; i < 4; ++i)
-        {
-            int teamFlag = photonNet->GetPhotonLib()->GetTeamID(i);
-            if (teamIndex == teamFlag && myPlayerID != i)
-            {
-                if (i > myPlayerID)
-                {
-                    spawnIndex = 0;
-                }
-                else if(i < myPlayerID)
-                {
-                    spawnIndex = 1;
-                }
-
-                break;
-            }
-        }
-        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[spawnIndex + (teamIndex * 2)]);
+        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[GetPlayerTeamIndex(myPlayerID)]);
     }
 
     //イベント用カメラ
@@ -718,6 +700,37 @@ void ScenePVP::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
+}
+
+int ScenePVP::GetPlayerTeamIndex(int playerID)
+{
+    //自分のチーム
+    int teamIndex = -1;
+    teamIndex = StaticSendDataManager::Instance().GetTeamNum(playerID);
+
+    //どの出現位置なのか
+    int spawnIndex = 0;
+
+    //同じチームのプレイヤーを探す
+    for (int i = 0; i < 4; ++i)
+    {
+        int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
+        if (teamIndex == teamFlag && playerID != i)
+        {
+            if (i > playerID)
+            {
+                spawnIndex = 0;
+            }
+            else if (i < playerID)
+            {
+                spawnIndex = 1;
+            }
+
+            break;
+        }
+    }
+
+    return spawnIndex + (teamIndex * 2);
 }
 
 //オブジェクト生成関数
