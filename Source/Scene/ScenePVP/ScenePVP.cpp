@@ -1119,6 +1119,20 @@ void ScenePVP::GameUpdate(float elapsedTime)
             if (!netPlayer)continue;
 
             PlayerUIManager::Instance().CreateNetTeamUI(netPlayer);
+            break;
+        }
+    }
+
+    //“G–¡•ûŠÖŒW‚È‚­“o˜^
+    {
+        for (auto& s : saveI)
+        {
+            if (!s.useFlg)continue;
+
+            std::string name = "netPlayer" + std::to_string(s.photonId);
+            GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
+            if (!netPlayer)continue;
+
             PlayerUIManager::Instance().NetDeathIcon(netPlayer);
             break;
         }
