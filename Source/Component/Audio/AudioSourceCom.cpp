@@ -22,18 +22,18 @@ void AudioSourceCom::Update(float elapsedTime)
 // 3Dオーディオの更新
 void AudioSourceCom::Update3DAudio()
 {
-    // リスナーの更新
+    // リスナーとエミッターを更新
     listener_.Update();
-
-    // エミッターの更新
     emitter_.Update();
 
     // X3DAudioの計算
     X3DAUDIO_DSP_SETTINGS dspSettings = {};
-    float matrix[8] = {};
-    dspSettings.pMatrixCoefficients = matrix;
     dspSettings.SrcChannelCount = emitter_.x3dEmitter.ChannelCount;
     dspSettings.DstChannelCount = 2; // ステレオ出力
+
+    // 必要なマトリックスのメモリ確保
+    std::vector<FLOAT32> matrix(dspSettings.SrcChannelCount * dspSettings.DstChannelCount);
+    dspSettings.pMatrixCoefficients = matrix.data();
 
     const X3DAUDIO_HANDLE* x3dHandle = Audio::Instance().GetX3DAudioHandle();
 
@@ -47,10 +47,11 @@ void AudioSourceCom::Update3DAudio()
     for (auto& [id, voice] : sourceVoices_)
     {
         voice->SetFrequencyRatio(dspSettings.DopplerFactor);
-        voice->SetOutputMatrix(nullptr, dspSettings.SrcChannelCount, dspSettings.DstChannelCount, matrix);
+        voice->SetOutputMatrix(nullptr, dspSettings.SrcChannelCount, dspSettings.DstChannelCount, dspSettings.pMatrixCoefficients);
         voice->SetVolume(volumeControls_[id] * dspSettings.EmitterToListenerDistance);
     }
 }
+
 void AudioSourceCom::OnGUI()
 {
     for (const auto& [id, name] : audioNames_)
@@ -180,32 +181,74 @@ void AudioSourceCom::StopAll()
 }
 
 // エミッター再生
-void AudioSourceCom::EmitterPlay(float volume)
+void AudioSourceCom::EmitterPlay(int id)
 {
-    //// 音量調整反映用
-    //volumeControl = volume;
+    // 音源が存在するか確認
+    if (sourceVoices_.find(id) == sourceVoices_.end() || !resources_[id])
+    {
+        assert("指定されたIDのソースボイスが存在しません");
+        return;
+    }
 
-    //// ソースボイスにデータを送信
-    //XAUDIO2_BUFFER buffer = { 0 };
-    //buffer.AudioBytes = resource_->GetAudioBytes();
-    //buffer.pAudioData = resource_->GetAudioData();
-    //buffer.Flags = XAUDIO2_END_OF_STREAM;
+    // 対応するソースボイスを取得
+    IXAudio2SourceVoice* sourceVoice = sourceVoices_[id];
 
-    //if (buffer.pAudioData == nullptr || buffer.AudioBytes == 0) {
-    //    assert("ソースボイスにデータに問題あり");
-    //    return;
-    //}
+    // XAUDIO2_BUFFERの設定
+    XAUDIO2_BUFFER buffer = {};
+    buffer.AudioBytes = resources_[id]->GetAudioBytes();
+    buffer.pAudioData = resources_[id]->GetAudioData();
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
 
-    //// 3Dオーディオの更新
-    //Update3DAudio();
+    // ソースボイスのバッファをフラッシュして再送信
+    sourceVoice->Stop();
+    sourceVoice->FlushSourceBuffers();
+    sourceVoice->SubmitSourceBuffer(&buffer);
 
-    //// エミッター再生
-    //sourceVoice_->Stop();
-    //sourceVoice_->FlushSourceBuffers();
-    //sourceVoice_->SubmitSourceBuffer(&buffer);
+    // 3Dオーディオの更新
+    Update3DAudio();
 
-    //HRESULT hr = sourceVoice_->Start();
-    //_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+    // 再生開始
+    HRESULT hr = sourceVoice->Start();
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+}
+void AudioSourceCom::EmitterPlay(int id, bool loop, float volume)
+{
+    // 音源が存在するか確認
+    if (sourceVoices_.find(id) == sourceVoices_.end() || !resources_[id])
+    {
+        assert("指定されたIDのソースボイスが存在しません");
+        return;
+    }
+
+    // 対応するソースボイスを取得
+    IXAudio2SourceVoice* sourceVoice = sourceVoices_[id];
+
+    // XAUDIO2_BUFFERの設定
+    XAUDIO2_BUFFER buffer = {};
+    buffer.AudioBytes = resources_[id]->GetAudioBytes();
+    buffer.pAudioData = resources_[id]->GetAudioData();
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+    // ループ設定
+    if (loop)
+    {
+        buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+    }
+
+    // ボリューム設定
+    volumeControls_[id] = volume;
+
+    // ソースボイスのバッファをフラッシュして再送信
+    sourceVoice->Stop();
+    sourceVoice->FlushSourceBuffers();
+    sourceVoice->SubmitSourceBuffer(&buffer);
+
+    // 3Dオーディオの更新
+    Update3DAudio();
+
+    // 再生開始
+    HRESULT hr = sourceVoice->Start();
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }
 
 // 音量設定
@@ -269,14 +312,14 @@ bool AudioSourceCom::Feed(int id)
 
 void AudioSourceCom::AudioRelease()
 {
-    for (auto& pair : sourceVoices_)
+    for (auto& [id, voice] : sourceVoices_)
     {
-        if (pair.second)
-        {
-            pair.second->DestroyVoice();
-        }
+        voice->DestroyVoice();
     }
     sourceVoices_.clear();
     resources_.clear();
     audioNames_.clear();
+    loopFlags_.clear();
+    volumeControls_.clear();
+    feedStates_.clear();
 }

@@ -86,7 +86,8 @@ public:
     void SetLoop(int id, bool loop);
 
     // エミッター再生
-    void EmitterPlay(float volume = 1.0f);
+    void EmitterPlay(int id);
+    void EmitterPlay(int id, bool loop, float volume);
 
     // 音量フェード制御
     void FeedStart(int id, float targetValue, float add);
