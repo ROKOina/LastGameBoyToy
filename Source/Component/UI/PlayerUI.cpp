@@ -7,6 +7,7 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\UI\UiFlag.h"
 #include "Component\UI\Font.h"
+#include "Scene\ScenePVP\ScenePVP.h"
 
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
@@ -1364,7 +1365,9 @@ void PlayerUIManager::NetDeathIcon(std::weak_ptr<GameObject> netPlayer)
     auto& netplayerkun = netPlayer.lock()->GetComponent<CharacterCom>();
     auto& netplayerstatus = netPlayer.lock()->GetComponent<CharaStatusCom>();
 
-    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 0)
+    int playerID = ScenePVP::GetPlayerTeamIndex(netplayerkun->GetNetCharaData().GetNetPlayerID());
+
+    if (playerID == 0)
     {
         auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("allyBack")->GetChildFind("charaView01")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
         sprite->SetEnabled(netplayerstatus->IsDeath());
@@ -1383,7 +1386,7 @@ void PlayerUIManager::NetDeathIcon(std::weak_ptr<GameObject> netPlayer)
         }
     }
 
-    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 1)
+    if (playerID == 1)
     {
         auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("allyBack")->GetChildFind("charaView02")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
         sprite->SetEnabled(netplayerstatus->IsDeath());
@@ -1402,7 +1405,7 @@ void PlayerUIManager::NetDeathIcon(std::weak_ptr<GameObject> netPlayer)
         }
     }
 
-    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 2)
+    if (playerID == 2)
     {
         auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("enemyBack")->GetChildFind("charaView01")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
         sprite->SetEnabled(netplayerstatus->IsDeath());
@@ -1421,7 +1424,7 @@ void PlayerUIManager::NetDeathIcon(std::weak_ptr<GameObject> netPlayer)
         }
     }
 
-    if (netplayerkun->GetNetCharaData().GetNetPlayerID() == 3)
+    if (playerID == 3)
     {
         auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("enemyBack")->GetChildFind("charaView02")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
         sprite->SetEnabled(netplayerstatus->IsDeath());
