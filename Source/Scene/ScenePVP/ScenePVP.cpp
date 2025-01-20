@@ -240,17 +240,25 @@ void ScenePVP::InitializePVP()
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
 
         //ネットIDによって位置分け
-        int spawnIndex = 0;
-        spawnIndex = photonNet->GetPhotonLib()->GetMyPlayerID();
-        int teamIndex = -1;
-        teamIndex = photonNet->GetPhotonLib()->GetTeamID(spawnIndex);
 
+        //自分のID
+        int myPlayerID = 0;
+        myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
+
+        //自分のチーム
+        int teamIndex = -1;
+        teamIndex = photonNet->GetPhotonLib()->GetTeamID(myPlayerID);
+
+        //どの出現位置なのか
+        int spawnIndex = 0;
+
+        //同じチームのプレイヤーを探す
         for (int i = 0; i < 4; ++i)
         {
             int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
-            if (teamIndex == teamFlag && spawnIndex != i)
+            if (teamIndex == teamFlag && myPlayerID != i)
             {
-                if (i > spawnIndex)
+                if (i > myPlayerID)
                 {
                     spawnIndex = 0;
                 }
@@ -258,6 +266,8 @@ void ScenePVP::InitializePVP()
                 {
                     spawnIndex = 1;
                 }
+
+                break;
             }
         }
         obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[spawnIndex + (teamIndex * 2)]);
