@@ -1361,41 +1361,40 @@ void ScenePVP::GameUpdate(float elapsedTime)
         }
     }
 
-    //“G–¡•ûŠÖŒW‚È‚­“o˜^
-    {
-        for (auto& s : saveI)
-        {
-            if (!s.useFlg)continue;
-
-            std::string name = "netPlayer" + std::to_string(s.photonId);
-            GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
-            if (!netPlayer)continue;
-
-            //if (netData.GetTeamID() == s.teamID)
-            //    if (charaID[0] < 0)charaID[0] = s.charaID;
-            //    else charaID[1] = s.charaID;
-            //else
-            //    if (charaID[2] < 0)charaID[2] = s.charaID;
-            //    else charaID[3] = s.charaID;
-
-            PlayerUIManager::Instance().NetDeathIcon(netPlayer);
-            break;
-        }
-    }
-
     //Žg—pƒLƒƒƒ‰UIXV
     int charaID[4] = { -1,-1,-1,-1 };   //‘O‚QŒÂ‚Í–¡•û
+    int PhotonID[4] = { -1,-1,-1,-1 };  //‘O‚QŒÂ‚Í–¡•û
     for (auto& s : saveI)
     {
         if (!s.useFlg)continue;
-        if (1 == s.teamID)
-            if (charaID[0] < 0)charaID[0] = s.charaID;
-            else charaID[1] = s.charaID;
+        if (netData.GetTeamID() == s.teamID)
+        {
+            if (charaID[0] < 0)
+            {
+                charaID[0] = s.charaID;
+                PhotonID[0] = s.photonId;
+            }
+            else
+            {
+                charaID[1] = s.charaID;
+                PhotonID[1] = s.photonId;
+            }
+        }
         else
-            if (charaID[2] < 0)charaID[2] = s.charaID;
-            else charaID[3] = s.charaID;
+        {
+            if (charaID[2] < 0)
+            {
+                charaID[2] = s.charaID;
+                PhotonID[2] = s.photonId;
+            }
+            else
+            {
+                charaID[3] = s.charaID;
+                PhotonID[3] = s.photonId;
+            }
+        }
     }
-    PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID);
+    PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID, PhotonID);
 
     //ƒQ[ƒ€ƒ‚[ƒhUIXV
     switch (pvpGameSystem->GetGameMode())

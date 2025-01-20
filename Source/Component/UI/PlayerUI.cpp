@@ -1293,7 +1293,7 @@ void PlayerUIManager::CreateNetUseCharaUI()
     }
 }
 
-void PlayerUIManager::NetUseCharaUIUpdate(int chara[4])
+void PlayerUIManager::NetUseCharaUIUpdate(int chara[4], int photonid[4])
 {
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
 
@@ -1302,7 +1302,9 @@ void PlayerUIManager::NetUseCharaUIUpdate(int chara[4])
             auto& c01 = parentObj->GetChildFind("charaView01");
             auto& c02 = parentObj->GetChildFind("charaView02");
             auto& deathicon1 = c01->GetChildFind("DeathIcon");
+            auto& sprite1 = c01->GetChildFind("DeathIcon")->GetComponent<Sprite>();
             auto& deathicon2 = c02->GetChildFind("DeathIcon");
+            auto& sprite2 = c02->GetChildFind("DeathIcon")->GetComponent<Sprite>();
 
             //位置
             c01->transform_->SetLocalPosition({ 122,0,0 });
@@ -1317,6 +1319,63 @@ void PlayerUIManager::NetUseCharaUIUpdate(int chara[4])
                 c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * chara[0 + of];
             if (chara[1 + of] >= 0)
                 c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * chara[1 + of];
+
+            if (photonid[0 + of] >= 0)
+            {
+                std::string name = "netPlayer" + std::to_string(photonid[0 + of]);
+                GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
+
+                if (!netPlayer)
+                {
+                    netPlayer = GameObjectManager::Instance().Find("player");
+                }
+
+                auto& characom = netPlayer->GetComponent<CharacterCom>();
+                auto& charastatuscom = netPlayer->GetComponent<CharaStatusCom>();
+
+                sprite1->SetEnabled(charastatuscom->IsDeath());
+
+                //イージング発動
+                if (charastatuscom->IsDeathFrame())
+                {
+                    sprite1->EasingPlay();
+                }
+
+                //イージング停止
+                if (!sprite1->GetEnabled())
+                {
+                    sprite1->spc.scale = { 0.3f,0.3f };
+                    sprite1->spc.color = { 1,1,1,1 };
+                }
+            }
+            if (photonid[1 + of] >= 0)
+            {
+                std::string name = "netPlayer" + std::to_string(photonid[1 + of]);
+                GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
+
+                if (!netPlayer)
+                {
+                    netPlayer = GameObjectManager::Instance().Find("player");
+                }
+
+                auto& characom = netPlayer->GetComponent<CharacterCom>();
+                auto& charastatuscom = netPlayer->GetComponent<CharaStatusCom>();
+
+                sprite2->SetEnabled(charastatuscom->IsDeath());
+
+                //イージング発動
+                if (charastatuscom->IsDeathFrame())
+                {
+                    sprite2->EasingPlay();
+                }
+
+                //イージング停止
+                if (!sprite2->GetEnabled())
+                {
+                    sprite2->spc.scale = { 0.3f,0.3f };
+                    sprite2->spc.color = { 1,1,1,1 };
+                }
+            }
         };
 
     auto& ally = canvas->GetChildFind("allyBack");
@@ -1360,89 +1419,66 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
 }
 
 //死亡時のネットを挟んだアイコン表示
-void PlayerUIManager::NetDeathIcon(std::weak_ptr<GameObject> netPlayer)
-{
-    auto& netplayerkun = netPlayer.lock()->GetComponent<CharacterCom>();
-    auto& netplayerstatus = netPlayer.lock()->GetComponent<CharaStatusCom>();
-
-    int playerID = ScenePVP::GetPlayerTeamIndex(netplayerkun->GetNetCharaData().GetNetPlayerID());
-
-    if (playerID == 0)
-    {
-        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("allyBack")->GetChildFind("charaView01")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
-        sprite->SetEnabled(netplayerstatus->IsDeath());
-
-        //イージング発動
-        if (netplayerstatus->IsDeathFrame())
-        {
-            sprite->EasingPlay();
-        }
-
-        //イージング停止
-        if (!sprite->GetEnabled())
-        {
-            sprite->spc.scale = { 0.3f,0.3f };
-            sprite->spc.color = { 1,1,1,1 };
-        }
-    }
-
-    if (playerID == 1)
-    {
-        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("allyBack")->GetChildFind("charaView02")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
-        sprite->SetEnabled(netplayerstatus->IsDeath());
-
-        //イージング発動
-        if (netplayerstatus->IsDeathFrame())
-        {
-            sprite->EasingPlay();
-        }
-
-        //イージング停止
-        if (!sprite->GetEnabled())
-        {
-            sprite->spc.scale = { 0.3f,0.3f };
-            sprite->spc.color = { 1,1,1,1 };
-        }
-    }
-
-    if (playerID == 2)
-    {
-        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("enemyBack")->GetChildFind("charaView01")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
-        sprite->SetEnabled(netplayerstatus->IsDeath());
-
-        //イージング発動
-        if (netplayerstatus->IsDeathFrame())
-        {
-            sprite->EasingPlay();
-        }
-
-        //イージング停止
-        if (!sprite->GetEnabled())
-        {
-            sprite->spc.scale = { 0.3f,0.3f };
-            sprite->spc.color = { 1,1,1,1 };
-        }
-    }
-
-    if (playerID == 3)
-    {
-        auto& sprite = GameObjectManager::Instance().Find("Canvas")->GetChildFind("enemyBack")->GetChildFind("charaView02")->GetChildFind("DeathIcon")->GetComponent<Sprite>();
-        sprite->SetEnabled(netplayerstatus->IsDeath());
-
-        //イージング発動
-        if (netplayerstatus->IsDeathFrame())
-        {
-            sprite->EasingPlay();
-        }
-
-        //イージング停止
-        if (!sprite->GetEnabled())
-        {
-            sprite->spc.scale = { 0.3f,0.3f };
-            sprite->spc.color = { 1,1,1,1 };
-        }
-    }
-}
+//void PlayerUIManager::NetDeathIcon(int chara[4], std::weak_ptr<GameObject>owner)
+//{
+//    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+//
+//    auto& characom = owner.lock()->GetComponent<CharacterCom>();
+//    auto& charastatuscom = owner.lock()->GetComponent<CharaStatusCom>();
+//
+//    auto& charaView = [&](std::shared_ptr<GameObject> parentObj, int of)
+//        {
+//            auto& c01 = parentObj->GetChildFind("charaView01");
+//            auto& c02 = parentObj->GetChildFind("charaView02");
+//            auto& deathicon1 = c01->GetChildFind("DeathIcon");
+//            auto& sprite1 = deathicon1->GetComponent<Sprite>();
+//            auto& deathicon2 = c02->GetChildFind("DeathIcon");
+//            auto& sprite2 = deathicon2->GetComponent<Sprite>();
+//
+//            ////キャラIDを見る
+//            //if (chara[0 + of] >= 0)
+//            //{
+//            //    sprite1->SetEnabled(charastatuscom->IsDeath());
+//
+//            //    //イージング発動
+//            //    if (charastatuscom->IsDeathFrame())
+//            //    {
+//            //        sprite1->EasingPlay();
+//            //    }
+//
+//            //    //イージング停止
+//            //    if (!sprite1->GetEnabled())
+//            //    {
+//            //        sprite1->spc.scale = { 0.3f,0.3f };
+//            //        sprite1->spc.color = { 1,1,1,1 };
+//            //    }
+//            //}
+//            //if (chara[1 + of] >= 0)
+//            //{
+//            //    sprite2->SetEnabled(charastatuscom->IsDeath());
+//
+//            //    //イージング発動
+//            //    if (charastatuscom->IsDeathFrame())
+//            //    {
+//            //        sprite2->EasingPlay();
+//            //    }
+//
+//            //    //イージング停止
+//            //    if (!sprite2->GetEnabled())
+//            //    {
+//            //        sprite2->spc.scale = { 0.3f,0.3f };
+//            //        sprite2->spc.color = { 1,1,1,1 };
+//            //    }
+//            //}
+//        };
+//
+//    auto& ally = canvas->GetChildFind("allyBack");
+//    auto& enemy = canvas->GetChildFind("enemyBack");
+//    if (ally)
+//        charaView(ally, 0);
+//    if (enemy)
+//        charaView(enemy, 2);
+//}
 
 void PlayerUIManager::CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam)
 {

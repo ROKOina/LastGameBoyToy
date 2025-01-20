@@ -411,7 +411,7 @@ public:
     //全員の使用キャラUI
     void CreateNetUseCharaUI();
     //使用キャラ更新
-    void NetUseCharaUIUpdate(int chara[4]);
+    void NetUseCharaUIUpdate(int chara[4], int photonid[4]);
 
     //味方HPUI
     void CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer);
@@ -419,7 +419,7 @@ public:
     void ResetAllyHp() { allyHp = false; }
 
     //死亡時のネットを挟んだアイコン表示
-    void NetDeathIcon(std::weak_ptr<GameObject>netPlayer);
+    //void NetDeathIcon(int chara[4], std::weak_ptr<GameObject>owner/*std::weak_ptr<GameObject>netPlayer, std::weak_ptr<GameObject>owner*/);
 
     //勝敗表示UI
     void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
