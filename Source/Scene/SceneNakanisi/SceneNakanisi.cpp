@@ -92,6 +92,14 @@ void SceneNakanisi::Initialize()
     //    }
     //}
 
+    //Numberkun
+    //{
+    //    auto& obj = GameObjectManager::Instance().Create();
+    //    obj->SetName("Number");
+    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::NUMBER, BLENDSTATE::ALPHA, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_NONE, false, false);
+    //    r->LoadModel("Data/Model/AbeStage/Plane.mdl");
+    //}
+
     //ステージ
     {
         auto& stageObj = GameObjectManager::Instance().Create();

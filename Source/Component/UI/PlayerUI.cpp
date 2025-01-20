@@ -1137,6 +1137,11 @@ void PlayerUIManager::CreatePlayerIcon()
     charaicon->SetName("CharaIcon");
     auto& a = charaicon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaIcon.ui", Sprite::SpriteShader::DEFALT, false);
     a->LoadTexture(name);
+
+    std::shared_ptr<GameObject> dokuroicon = char_fire->AddChildObject();
+    dokuroicon->SetName("Dokuro");
+    dokuroicon->AddComponent<UI_DeathComp>();
+    auto& dokurosprite = dokuroicon->AddComponent<Sprite>("Data/SerializeData/UIData/Player/dokuro.ui", Sprite::SpriteShader::DEFALT, false);
 }
 
 //銃のアイコンとか
@@ -1349,4 +1354,30 @@ void UI_SkillComp::Update(float elapsedTime)
     std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
     auto& playerchara = player->GetComponent<CharacterCom>();
     GetGameObject()->GetComponent<UiSystem>()->SetEnabled(playerchara->IsSkillJustCooled(skill, 0.5f));
+}
+
+void UI_DeathComp::Update(float elapsedTime)
+{
+    std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
+    auto& playerstatus = player->GetComponent<CharaStatusCom>();
+    auto& sprite = GetGameObject()->GetComponent<Sprite>();
+    auto& charaicon = GameObjectManager::Instance().Find("CharaIcon")->GetComponent<UiSystem>();
+
+    //起動
+    sprite->SetEnabled(playerstatus->IsDeath());
+
+    //イージング発動
+    if (playerstatus->IsDeathFrame())
+    {
+        sprite->EasingPlay();
+        charaicon->spc.color = { 1,1,1,0.4f };
+    }
+
+    //イージング停止
+    if (!sprite->GetEnabled())
+    {
+        sprite->spc.scale = { 0.3f,0.3f };
+        sprite->spc.color = { 1,1,1,1 };
+        charaicon->spc.color = { 1,1,1,1 };
+    }
 }

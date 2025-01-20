@@ -9,6 +9,12 @@ void CharaStatusCom::Update(float elapsedTime)
         isDeath = true;
     }
 
+    // isDeathFrame ‚Ìˆ—
+    isDeathFrame = (isDeath && !wasDeath);
+
+    // Œ»İ‚Ì isDeath ó‘Ô‚ğ‹L˜^
+    wasDeath = isDeath;
+
     frameDamage = 0.0f;
 
     // –³“GŠÔ‚ÌŒ¸­ˆ—
@@ -77,6 +83,6 @@ void CharaStatusCom::OnGUI()
     ImGui::DragFloat("HP", &hitPoint);
     ImGui::DragFloat("Invincible Time", &invincibleTime, 0.1f, 0.0f, 10.0f);
     ImGui::Text("Current Invincible Time: %.2f", currentInvincibleTime);
-
+    ImGui::Checkbox("isDeathFrame", &isDeathFrame);
     ImGui::InputInt("lastDamageID", &lastDamageID);
 }
