@@ -298,6 +298,15 @@ void PhotonLib::update(float elapsedTime)
         }
     }
 
+    //É`Å[ÉÄï€ë∂
+    for (auto& s : saveInputPhoton)
+    {
+        if (!s.useFlg)continue;
+        auto& teamFlag = StaticSendDataManager::Instance().GetTeamNum(s.playerId);
+        teamFlag = false;
+        if (s.teamID == 0)teamFlag = true;
+    }
+
     DelayUpdate();
     NetInputUpdate();
     MyCharaInput();
