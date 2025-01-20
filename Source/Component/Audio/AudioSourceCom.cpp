@@ -19,6 +19,38 @@ void AudioSourceCom::Update(float elapsedTime)
     }
 }
 
+// 3Dオーディオの更新
+void AudioSourceCom::Update3DAudio()
+{
+    // リスナーの更新
+    listener_.Update();
+
+    // エミッターの更新
+    emitter_.Update();
+
+    // X3DAudioの計算
+    X3DAUDIO_DSP_SETTINGS dspSettings = {};
+    float matrix[8] = {};
+    dspSettings.pMatrixCoefficients = matrix;
+    dspSettings.SrcChannelCount = emitter_.x3dEmitter.ChannelCount;
+    dspSettings.DstChannelCount = 2; // ステレオ出力
+
+    const X3DAUDIO_HANDLE* x3dHandle = Audio::Instance().GetX3DAudioHandle();
+
+    X3DAudioCalculate(*x3dHandle,
+        &listener_.x3dListener,
+        &emitter_.x3dEmitter,
+        X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER,
+        &dspSettings);
+
+    // 計算結果を反映
+    for (auto& [id, voice] : sourceVoices_)
+    {
+        voice->SetFrequencyRatio(dspSettings.DopplerFactor);
+        voice->SetOutputMatrix(nullptr, dspSettings.SrcChannelCount, dspSettings.DstChannelCount, matrix);
+        voice->SetVolume(volumeControls_[id] * dspSettings.EmitterToListenerDistance);
+    }
+}
 void AudioSourceCom::OnGUI()
 {
     for (const auto& [id, name] : audioNames_)
@@ -103,7 +135,6 @@ void AudioSourceCom::AudioPlay(int id)
         sourceVoice->Start();
     }
 }
-
 void AudioSourceCom::AudioPlay(int id, bool loop, float volume)
 {
     auto it = sourceVoices_.find(id);
@@ -139,7 +170,6 @@ void AudioSourceCom::Stop(int id)
         it->second->FlushSourceBuffers();
     }
 }
-
 void AudioSourceCom::StopAll()
 {
     for (auto& [id, voice] : sourceVoices_)
@@ -187,7 +217,6 @@ void AudioSourceCom::SetVolume(int id, float volume)
         volumeControls_[id] = volume;
     }
 }
-
 // ループ設定
 void AudioSourceCom::SetLoop(int id, bool loop)
 {
@@ -204,7 +233,6 @@ void AudioSourceCom::FeedStart(int id, float targetValue, float add)
         feedState.isFeeding = true;
     }
 }
-
 // 指定された値に音量を近づけていく
 bool AudioSourceCom::Feed(int id)
 {
@@ -251,37 +279,4 @@ void AudioSourceCom::AudioRelease()
     sourceVoices_.clear();
     resources_.clear();
     audioNames_.clear();
-}
-
-// 3Dオーディオの更新
-void AudioSourceCom::Update3DAudio()
-{
-    // リスナーの更新
-    listener_.Update();
-
-    // エミッターの更新
-    emitter_.Update();
-
-    // X3DAudioの計算
-    X3DAUDIO_DSP_SETTINGS dspSettings = {};
-    float matrix[8] = {};
-    dspSettings.pMatrixCoefficients = matrix;
-    dspSettings.SrcChannelCount = emitter_.x3dEmitter.ChannelCount;
-    dspSettings.DstChannelCount = 2; // ステレオ出力
-
-    const X3DAUDIO_HANDLE* x3dHandle = Audio::Instance().GetX3DAudioHandle();
-
-    X3DAudioCalculate(*x3dHandle,
-        &listener_.x3dListener,
-        &emitter_.x3dEmitter,
-        X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER,
-        &dspSettings);
-
-    // 計算結果を反映
-    for (auto& [id, voice] : sourceVoices_)
-    {
-        voice->SetFrequencyRatio(dspSettings.DopplerFactor);
-        voice->SetOutputMatrix(nullptr, dspSettings.SrcChannelCount, dspSettings.DstChannelCount, matrix);
-        voice->SetVolume(volumeControls_[id] * dspSettings.EmitterToListenerDistance);
-    }
 }
