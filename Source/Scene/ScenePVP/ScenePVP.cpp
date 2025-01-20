@@ -240,10 +240,27 @@ void ScenePVP::InitializePVP()
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
 
         //ネットIDによって位置分け
-        int id = photonNet->GetPhotonLib()->GetMyPlayerID();
-        int teamId = photonNet->GetPhotonLib()->GetTeamID(id);
-        id = (id % 2) + teamId;
-        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[id]);
+        int spawnIndex = 0;
+        spawnIndex = photonNet->GetPhotonLib()->GetMyPlayerID();
+        int teamIndex = -1;
+        teamIndex = photonNet->GetPhotonLib()->GetTeamID(spawnIndex);
+
+        for (int i = 0; i < 4; ++i)
+        {
+            int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
+            if (teamIndex == teamFlag && spawnIndex != i)
+            {
+                if (i > spawnIndex)
+                {
+                    spawnIndex = 0;
+                }
+                else
+                {
+                    spawnIndex = 1;
+                }
+            }
+        }
+        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[spawnIndex + (teamIndex * 2)]);
     }
 
     //イベント用カメラ
