@@ -629,9 +629,12 @@ void CharacterCom::UltUpdate(float elapsedTime)
         auto& UltUI = canvas->GetChildFind("UltFrame");
         if (UltUI != nullptr)
         {
-            UltUI->GetChildFind("UltThunder_IN")->SetEnabled(isMaxUlt);
-            UltUI->GetChildFind("UltThunder_Right")->SetEnabled(isMaxUlt);
-            UltUI->GetChildFind("UltThunder_Left")->SetEnabled(isMaxUlt);
+            if (std::string(GetGameObject()->GetName()) == "player")
+            {
+                UltUI->GetChildFind("UltThunder_IN")->SetEnabled(isMaxUlt);
+                UltUI->GetChildFind("UltThunder_Right")->SetEnabled(isMaxUlt);
+                UltUI->GetChildFind("UltThunder_Left")->SetEnabled(isMaxUlt);
+            }
         }
     }
 
