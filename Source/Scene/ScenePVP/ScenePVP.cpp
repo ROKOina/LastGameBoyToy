@@ -102,8 +102,8 @@ void ScenePVP::Initialize()
 
         for (int i = 0; i < 4; ++i)
         {
-            std::shared_ptr<GameObject> damageC =obj->AddChildObject();
-            damageC->SetName(("DamageCircle"+std::to_string(i)).c_str());
+            std::shared_ptr<GameObject> damageC = obj->AddChildObject();
+            damageC->SetName(("DamageCircle" + std::to_string(i)).c_str());
             damageC->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/damageCircle.ui", Sprite::SpriteShader::DEFALT, false);
             damageC->SetEnabled(false);
         }
@@ -802,7 +802,7 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
                     if (!spr->IsPlayEasing())spr->EasingPlay();
                 }
                 auto& sideEff = gameModeUI->GetChildFind("GameModeSideEff");
-                if (sideEff){
+                if (sideEff) {
                     auto& sprL = sideEff->GetChildFind("GameModeLeftEff")->GetComponent<UiSystem>();
                     if (!sprL->IsPlayEasing())sprL->EasingPlay();
                     auto& sprR = sideEff->GetChildFind("GameModeRightEff")->GetComponent<UiSystem>();
@@ -1371,6 +1371,13 @@ void ScenePVP::GameUpdate(float elapsedTime)
             GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
             if (!netPlayer)continue;
 
+            //if (netData.GetTeamID() == s.teamID)
+            //    if (charaID[0] < 0)charaID[0] = s.charaID;
+            //    else charaID[1] = s.charaID;
+            //else
+            //    if (charaID[2] < 0)charaID[2] = s.charaID;
+            //    else charaID[3] = s.charaID;
+
             PlayerUIManager::Instance().NetDeathIcon(netPlayer);
             break;
         }
@@ -1381,7 +1388,7 @@ void ScenePVP::GameUpdate(float elapsedTime)
     for (auto& s : saveI)
     {
         if (!s.useFlg)continue;
-        if (netData.GetTeamID() == s.teamID)
+        if (1 == s.teamID)
             if (charaID[0] < 0)charaID[0] = s.charaID;
             else charaID[1] = s.charaID;
         else
