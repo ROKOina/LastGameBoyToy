@@ -1352,6 +1352,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
         //弾数を合わせる
         net1->GetComponent<CharacterCom>()->GetNetCharaData().SetBulletNum(recvData.gameData.bulletNum);
+        saveInputPhoton[myPlayerID].bulletNum = recvData.gameData.bulletNum;
 
         //キルをカウント
         if (recvData.gameData.deathID[myPlayerID])
