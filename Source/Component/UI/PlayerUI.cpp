@@ -675,10 +675,10 @@ UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
 {
     std::shared_ptr<GameObject> tunder = GameObjectManager::Instance().Create();
     tunder->SetName("Tunder");
-    tunder->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Tunder.ui", Sprite::SpriteShader::DEFALT, false);
+    tunder->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
     std::shared_ptr<GameObject> font = GameObjectManager::Instance().Create();
     font->SetName("Font");
-    font->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Victry.ui", Sprite::SpriteShader::DEFALT, false);
+    font->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
     for (int i = 0; i <= 3; i++)
     {
         std::shared_ptr<GameObject> circle = GameObjectManager::Instance().Create();
@@ -1226,7 +1226,7 @@ void PlayerUIManager::CreateHitEffect()
     }
 }
 
-void PlayerUIManager::CreateKillEffect() 
+void PlayerUIManager::CreateKillEffect()
 {
     //Boost
     {
@@ -1558,25 +1558,24 @@ UI_KillEffect::UI_KillEffect()
 {
     std::shared_ptr<GameObject> Skull = GameObjectManager::Instance().Create();
     Skull->SetName("killSkull");
-    Skull->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/KillEffect.ui",Sprite::SpriteShader::DEFALT,false);
+    Skull->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/KillEffect.ui", Sprite::SpriteShader::DEFALT, false);
 }
 
 void UI_KillEffect::Start()
 {
-   //親子付け
+    //親子付け
     this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("killSkull"));
 }
 
 void UI_KillEffect::Update(float elapsedTime)
 {
-   
-   for (int i = 0; i < 4; i++) {
-       if (StaticSendDataManager::Instance().GetKillID(i)) {
-           effectFLG = true;
-           StaticSendDataManager::Instance().GetKillID(i) = false;
-       }
-   }
-   EffectUpdat(elapsedTime);
+    for (int i = 0; i < 4; i++) {
+        if (StaticSendDataManager::Instance().GetKillID(i)) {
+            effectFLG = true;
+            StaticSendDataManager::Instance().GetKillID(i) = false;
+        }
+    }
+    EffectUpdat(elapsedTime);
 }
 
 void UI_KillEffect::EffectUpdat(float elapsedTime)
