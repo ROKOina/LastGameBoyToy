@@ -1583,11 +1583,8 @@ void UI_KillEffect::EffectUpdat(float elapsedTime)
     std::shared_ptr<UiSystem> skull = GameObjectManager::Instance().Find("killSkull")->GetComponent<UiSystem>();
     if (effectFLG) {
         effectFLG = false;
-        skull->spc.color = { 1,1,1,1 };
         skull->EasingPlay();
     }
     if (!skull->IsPlayEasing()) {
-        //effectFLG = false;
-        skull->spc.color = { 1,1,1,0 };
     }
 }
