@@ -102,8 +102,8 @@ void ScenePVP::Initialize()
 
         for (int i = 0; i < 4; ++i)
         {
-            std::shared_ptr<GameObject> damageC =obj->AddChildObject();
-            damageC->SetName(("DamageCircle"+std::to_string(i)).c_str());
+            std::shared_ptr<GameObject> damageC = obj->AddChildObject();
+            damageC->SetName(("DamageCircle" + std::to_string(i)).c_str());
             damageC->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/damageCircle.ui", Sprite::SpriteShader::DEFALT, false);
             damageC->SetEnabled(false);
         }
@@ -300,25 +300,7 @@ void ScenePVP::InitializePVP()
         //どの出現位置なのか
         int spawnIndex = 0;
 
-        //同じチームのプレイヤーを探す
-        for (int i = 0; i < 4; ++i)
-        {
-            int teamFlag = photonNet->GetPhotonLib()->GetTeamID(i);
-            if (teamIndex == teamFlag && myPlayerID != i)
-            {
-                if (i > myPlayerID)
-                {
-                    spawnIndex = 0;
-                }
-                else if(i < myPlayerID)
-                {
-                    spawnIndex = 1;
-                }
-
-                break;
-            }
-        }
-        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[spawnIndex + (teamIndex * 2)]);
+        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[GetPlayerTeamIndex(myPlayerID)]);
     }
 
     //イベント用カメラ
@@ -720,6 +702,38 @@ void ScenePVP::Render(float elapsedTime)
     EventCameraManager::Instance().EventCameraImGui();
 }
 
+int ScenePVP::GetPlayerTeamIndex(int playerID)
+{
+    //自分のチーム
+    int teamIndex = -1;
+    teamIndex = StaticSendDataManager::Instance().GetTeamNum(playerID);
+    teamIndex == 0 ? teamIndex = 1 : teamIndex = 0;
+
+    //どの出現位置なのか
+    int spawnIndex = 0;
+
+    //同じチームのプレイヤーを探す
+    for (int i = 0; i < 4; ++i)
+    {
+        int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
+        if (teamIndex == teamFlag && playerID != i)
+        {
+            if (i > playerID)
+            {
+                spawnIndex = 0;
+            }
+            else if (i < playerID)
+            {
+                spawnIndex = 1;
+            }
+
+            break;
+        }
+    }
+
+    return spawnIndex + (teamIndex * 2);
+}
+
 //オブジェクト生成関数
 void ScenePVP::NewObject()
 {
@@ -788,7 +802,7 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
                     if (!spr->IsPlayEasing())spr->EasingPlay();
                 }
                 auto& sideEff = gameModeUI->GetChildFind("GameModeSideEff");
-                if (sideEff){
+                if (sideEff) {
                     auto& sprL = sideEff->GetChildFind("GameModeLeftEff")->GetComponent<UiSystem>();
                     if (!sprL->IsPlayEasing())sprL->EasingPlay();
                     auto& sprR = sideEff->GetChildFind("GameModeRightEff")->GetComponent<UiSystem>();
@@ -1347,34 +1361,40 @@ void ScenePVP::GameUpdate(float elapsedTime)
         }
     }
 
-    //敵味方関係なく登録
-    {
-        for (auto& s : saveI)
-        {
-            if (!s.useFlg)continue;
-
-            std::string name = "netPlayer" + std::to_string(s.photonId);
-            GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
-            if (!netPlayer)continue;
-
-            PlayerUIManager::Instance().NetDeathIcon(netPlayer);
-            break;
-        }
-    }
-
     //使用キャラUI更新
     int charaID[4] = { -1,-1,-1,-1 };   //前２個は味方
+    int PhotonID[4] = { -1,-1,-1,-1 };  //前２個は味方
     for (auto& s : saveI)
     {
         if (!s.useFlg)continue;
         if (netData.GetTeamID() == s.teamID)
-            if (charaID[0] < 0)charaID[0] = s.charaID;
-            else charaID[1] = s.charaID;
+        {
+            if (charaID[0] < 0)
+            {
+                charaID[0] = s.charaID;
+                PhotonID[0] = s.photonId;
+            }
+            else
+            {
+                charaID[1] = s.charaID;
+                PhotonID[1] = s.photonId;
+            }
+        }
         else
-            if (charaID[2] < 0)charaID[2] = s.charaID;
-            else charaID[3] = s.charaID;
+        {
+            if (charaID[2] < 0)
+            {
+                charaID[2] = s.charaID;
+                PhotonID[2] = s.photonId;
+            }
+            else
+            {
+                charaID[3] = s.charaID;
+                PhotonID[3] = s.photonId;
+            }
+        }
     }
-    PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID);
+    PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID, PhotonID);
 
     //ゲームモードUI更新
     switch (pvpGameSystem->GetGameMode())
