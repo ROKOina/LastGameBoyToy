@@ -21,4 +21,13 @@ public:
 
     //–¼‘OŽæ“¾
     std::string GetName() const override { return "SceneResult"; };
+
+public:
+    struct ResultData
+    {
+        int killNum = 0;
+        int deathNum = 0;
+
+        //•K—v‚È•ª‘«‚µ‚Ä‚¢‚­
+    };
 };
