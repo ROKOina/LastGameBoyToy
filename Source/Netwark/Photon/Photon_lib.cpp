@@ -293,7 +293,6 @@ void PhotonLib::update(float elapsedTime)
                     {
                         crown->GetCrown(net1);
                     }
-
                 }
             }
         }
@@ -976,7 +975,7 @@ std::vector<std::wstring> PhotonLib::GetRoomNames()
     return roomnames;
 }
 
-void PhotonLib::SetCrownTimer(int playerID,float timer)
+void PhotonLib::SetCrownTimer(int playerID, float timer)
 {
     if (playerID < 0)return;
 
@@ -1331,7 +1330,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
     if (myPlayerID >= 0)
     {
-    //プレイヤー追加
+        //プレイヤー追加
         if (!net1)
         {
             //AddPlayer(recvData.photonId, recvData.playerId);
@@ -1365,9 +1364,15 @@ void PhotonLib::GameRecv(NetData recvData)
                 auto& myPlayer = GameObjectManager::Instance().Find("player");
                 if (myPlayer)
                     myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetKillID(recvData.playerId);
+            }
+        }
 
+        for (int pID = 0; pID < 4; ++pID)
+        {
+            if (recvData.gameData.deathID[pID])
+            {
                 //キルしたIDを保存
-                StaticSendDataManager::Instance().GetKillID(recvData.playerId) = true;
+                StaticSendDataManager::Instance().GetKillID(pID, recvData.playerId) = true;
             }
         }
 
@@ -1607,13 +1612,12 @@ void PhotonLib::CrownRecv(NetData recvData)
     if (recvData.crownData.haveCrown)
         saveCrown.haveID = recvData.playerId;
     else    //所持していないとき
-    {   
+    {
         if (saveCrown.haveID == recvData.playerId)  //手放し処理
         {
             saveCrown.haveID = -1;
         }
     }
-
 
     if (recvData.playerId >= 0)
     {
@@ -1631,7 +1635,6 @@ void PhotonLib::CrownRecv(NetData recvData)
             }
         }
     }
-    
 }
 
 //送信
@@ -1897,7 +1900,7 @@ void PhotonLib::sendGameModeData(void)
             break;
             case int(PVPGameSystem::GAME_MODE::Crown) :
                 sendCrownData();
-            break;
+                break;
                 case int(PVPGameSystem::GAME_MODE::Button) :
                     break;
     }
@@ -1976,7 +1979,6 @@ void PhotonLib::sendCrownData(void)
     {
         auto& crown = crownObj->GetComponent<CrownCom>();
         netD.crownData.haveCrown = crown->HaveCrown();  //所持中か
-
 
         //手ばした時の位置を送る
         netD.crownData.lastPos = { 0,0,0 };

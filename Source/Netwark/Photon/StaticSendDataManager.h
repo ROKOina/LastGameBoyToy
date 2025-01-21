@@ -75,14 +75,14 @@ private:
 public:
     std::vector<SaveBuffer>& GetSaveBuffer(int playerID) { return saveBuffer[playerID]; }
     bool& GetDeathID(int id) { return deathID[id]; }
-    bool& GetKillID(int id) { return killID[id]; }
+    bool& GetKillID(int killID, int deathID) { return killlog[killID][deathID]; }
     std::vector<DirectX::XMFLOAT3>& GetDamagePos() { return damagePostPos; }
     int& GetTeamNum(int id) { return teamNum[id]; }
 
 private:
     std::vector<SaveBuffer> saveBuffer[5];
-    bool deathID[4];    //キルされた相手を保存
-    bool killID[4];    //キルした相手を保存
+    bool deathID[4] = {};    //キルされた相手を保存
+    bool killlog[4][4] = {};    //[キルID][デスID]
     std::vector<DirectX::XMFLOAT3> damagePostPos = {};
-    int teamNum[4] = { -1,-1,-1,-1 };    //[]playerID  0:赤 1:青 -1:なし 
+    int teamNum[4] = { -1,-1,-1,-1 };    //[]playerID  0:赤 1:青 -1:なし
 };

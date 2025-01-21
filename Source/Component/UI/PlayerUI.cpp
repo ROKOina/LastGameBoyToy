@@ -755,6 +755,9 @@ void PlayerUIManager::Register()
     CreateHitEffect();
 
     CreateKillEffect();
+
+    //キルログ
+    KillLog();
     ////////////////////////////////
 
     //キャラ固有のUI
@@ -1238,6 +1241,66 @@ void PlayerUIManager::CreateKillEffect()
     }
 }
 
+//キルログ
+void PlayerUIManager::KillLog()
+{
+    //for (int i = 0; i < 4; i++)
+    //{
+    //    effectFLGTimer[i] -= elapsedTime;
+    //    if (effectFLGTimer[i] > 0)continue;
+
+    //    auto& player = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>();
+    //    auto& killflg = StaticSendDataManager::Instance().GetKillID(player->GetNetCharaData().GetNetPlayerID(), i);
+
+    //    if (killflg)
+    //    {
+    //        effectFLG = true;
+
+    //        killflg = false;
+    //        effectFLGTimer[i] = 3;
+    //    }
+    //}
+
+    //std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+    ////味方
+    //{
+    //    std::shared_ptr<GameObject> allyBack = canvas->AddChildObject();
+    //    allyBack->SetName("KilllogAlly");
+    //    allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
+    //    //一人目
+    //    {
+    //        std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
+    //        ally01->SetName("Ally1");
+    //        ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+    //    }
+    //    //二人目
+    //    {
+    //        std::shared_ptr<GameObject> ally02 = allyBack->AddChildObject();
+    //        ally02->SetName("Ally2");
+    //        ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+    //    }
+    //}
+
+    ////敵
+    //{
+    //    std::shared_ptr<GameObject> enemyBack = canvas->AddChildObject();
+    //    enemyBack->SetName("KillLogEnemy");
+    //    enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBackEnemy.ui", Sprite::SpriteShader::DEFALT, false);
+    //    //一人目
+    //    {
+    //        std::shared_ptr<GameObject> enemy01 = enemyBack->AddChildObject();
+    //        enemy01->SetName("Enemy1");
+    //        enemy01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+    //    }
+    //    //二人目
+    //    {
+    //        std::shared_ptr<GameObject> enemy02 = enemyBack->AddChildObject();
+    //        enemy02->SetName("Enemy2");
+    //        enemy02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+    //    }
+    //}
+}
+
 //TODO ITOKUN RAMUCHI
 void PlayerUIManager::CreateNetUseCharaUI()
 {
@@ -1434,68 +1497,6 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
     }
 }
 
-//死亡時のネットを挟んだアイコン表示
-//void PlayerUIManager::NetDeathIcon(int chara[4], std::weak_ptr<GameObject>owner)
-//{
-//    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-//
-//    auto& characom = owner.lock()->GetComponent<CharacterCom>();
-//    auto& charastatuscom = owner.lock()->GetComponent<CharaStatusCom>();
-//
-//    auto& charaView = [&](std::shared_ptr<GameObject> parentObj, int of)
-//        {
-//            auto& c01 = parentObj->GetChildFind("charaView01");
-//            auto& c02 = parentObj->GetChildFind("charaView02");
-//            auto& deathicon1 = c01->GetChildFind("DeathIcon");
-//            auto& sprite1 = deathicon1->GetComponent<Sprite>();
-//            auto& deathicon2 = c02->GetChildFind("DeathIcon");
-//            auto& sprite2 = deathicon2->GetComponent<Sprite>();
-//
-//            ////キャラIDを見る
-//            //if (chara[0 + of] >= 0)
-//            //{
-//            //    sprite1->SetEnabled(charastatuscom->IsDeath());
-//
-//            //    //イージング発動
-//            //    if (charastatuscom->IsDeathFrame())
-//            //    {
-//            //        sprite1->EasingPlay();
-//            //    }
-//
-//            //    //イージング停止
-//            //    if (!sprite1->GetEnabled())
-//            //    {
-//            //        sprite1->spc.scale = { 0.3f,0.3f };
-//            //        sprite1->spc.color = { 1,1,1,1 };
-//            //    }
-//            //}
-//            //if (chara[1 + of] >= 0)
-//            //{
-//            //    sprite2->SetEnabled(charastatuscom->IsDeath());
-//
-//            //    //イージング発動
-//            //    if (charastatuscom->IsDeathFrame())
-//            //    {
-//            //        sprite2->EasingPlay();
-//            //    }
-//
-//            //    //イージング停止
-//            //    if (!sprite2->GetEnabled())
-//            //    {
-//            //        sprite2->spc.scale = { 0.3f,0.3f };
-//            //        sprite2->spc.color = { 1,1,1,1 };
-//            //    }
-//            //}
-//        };
-//
-//    auto& ally = canvas->GetChildFind("allyBack");
-//    auto& enemy = canvas->GetChildFind("enemyBack");
-//    if (ally)
-//        charaView(ally, 0);
-//    if (enemy)
-//        charaView(enemy, 2);
-//}
-
 void PlayerUIManager::CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam)
 {
     //一度だけ通る
@@ -1569,10 +1570,21 @@ void UI_KillEffect::Start()
 
 void UI_KillEffect::Update(float elapsedTime)
 {
-    for (int i = 0; i < 4; i++) {
-        if (StaticSendDataManager::Instance().GetKillID(i)) {
-            effectFLG = true;
-            StaticSendDataManager::Instance().GetKillID(i) = false;
+    effectFLGTimer -= elapsedTime;
+
+    auto& player = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>();
+    for (int i = 0; i < 4; i++)
+    {
+        auto& killflg = StaticSendDataManager::Instance().GetKillID(player->GetNetCharaData().GetNetPlayerID(), i);
+        if (killflg)
+        {
+            if (effectFLGTimer < 0)
+            {
+                effectFLG = true;
+                effectFLGTimer = 3;
+            }
+
+            killflg = false;
         }
     }
     EffectUpdat(elapsedTime);
