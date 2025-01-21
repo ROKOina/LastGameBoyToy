@@ -361,6 +361,31 @@ public:
     void OnGUI()override {};
 };
 
+class UI_KillEffect : public Component
+{
+public:
+    UI_KillEffect();
+    ~UI_KillEffect() {};
+
+    // 名前取得
+    const char* GetName() const override { return "KillEffect"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //エフェクトの更新
+    void EffectUpdat(float elapsedTime);
+
+    //gui
+    void OnGUI()override {};
+
+private:
+  bool  effectFLG;
+};
+
 //PlayerUIのマネージャー
 class PlayerUIManager
 {
@@ -407,6 +432,9 @@ public:
 
     //ヒットエフェクト
     void CreateHitEffect();
+
+    //キルエフェクト
+    void CreateKillEffect();
 
     //全員の使用キャラUI
     void CreateNetUseCharaUI();

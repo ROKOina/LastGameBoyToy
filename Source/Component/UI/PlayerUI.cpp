@@ -8,6 +8,7 @@
 #include "Component\UI\UiFlag.h"
 #include "Component\UI\Font.h"
 #include "Scene\ScenePVP\ScenePVP.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
@@ -753,6 +754,7 @@ void PlayerUIManager::Register()
     //Hitエフェクト
     CreateHitEffect();
 
+    CreateKillEffect();
     ////////////////////////////////
 
     //キャラ固有のUI
@@ -1149,13 +1151,14 @@ void PlayerUIManager::CreatePlayerIcon()
 void PlayerUIManager::CreateGunIcon()
 {
     //ロードするテクスチャを設定
-    std::string name = "Data/Texture/PlayerUI/GunIcon/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + ".png";
+    //std::string name = "Data/Texture/PlayerUI/GunIcon/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + ".png";
+    std::string name = "Data/Texture/PlayerUI/weapon_icon.png";
 
     {
         std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
         std::shared_ptr<GameObject> gunicon = canvas->AddChildObject();
         gunicon->SetName("GunIcon");
-        auto& spritegun = gunicon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GunIcon.ui", Sprite::SpriteShader::DEFALT, false);
+        auto& spritegun = gunicon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/MainWeponIcon.ui", Sprite::SpriteShader::DEFALT, false);
         spritegun->LoadTexture(name);
     }
 
@@ -1164,7 +1167,7 @@ void PlayerUIManager::CreateGunIcon()
         std::shared_ptr<GameObject> gunicon = GameObjectManager::Instance().Find("GunIcon");
         std::shared_ptr<GameObject> up = gunicon->AddChildObject();
         up->SetName("upbar");
-        auto& a = up->AddComponent<Sprite>("Data/SerializeData/UIData/Player/downbar.ui", Sprite::SpriteShader::DEFALT, false);
+        auto& a = up->AddComponent<Sprite>("Data/SerializeData/UIData/Player/upbar.ui", Sprite::SpriteShader::DEFALT, false);
     }
 
     //下側の線
@@ -1172,7 +1175,7 @@ void PlayerUIManager::CreateGunIcon()
         std::shared_ptr<GameObject> gunicon = GameObjectManager::Instance().Find("GunIcon");
         std::shared_ptr<GameObject> down = gunicon->AddChildObject();
         down->SetName("downbar");
-        auto& a = down->AddComponent<Sprite>("Data/SerializeData/UIData/Player/upbar.ui", Sprite::SpriteShader::DEFALT, false);
+        auto& a = down->AddComponent<Sprite>("Data/SerializeData/UIData/Player/downbar.ui", Sprite::SpriteShader::DEFALT, false);
     }
 
     //max弾数
@@ -1208,6 +1211,7 @@ void PlayerUIManager::CreateGunIcon()
     }
 }
 
+//ヒットエフェクト
 void PlayerUIManager::CreateHitEffect()
 {
     bool* isHit = player.lock()->GetComponent<CharacterCom>()->GetIsHitAttack();
@@ -1219,6 +1223,18 @@ void PlayerUIManager::CreateHitEffect()
         hit->SetName("HitEffect");
 
         hit->AddComponent<UiFlag>("Data/SerializeData/UIData/Player/HitEffect.ui", Sprite::SpriteShader::DEFALT, false, isHit);
+    }
+}
+
+void PlayerUIManager::CreateKillEffect()
+{
+    //Boost
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hit = canvas->AddChildObject();
+        hit->SetName("KillEffect");
+
+        hit->AddComponent<UI_KillEffect>();
     }
 }
 
@@ -1535,5 +1551,40 @@ void UI_DeathComp::Update(float elapsedTime)
         sprite->spc.scale = { 0.3f,0.3f };
         sprite->spc.color = { 1,1,1,1 };
         charaicon->spc.color = { 1,1,1,1 };
+    }
+}
+
+UI_KillEffect::UI_KillEffect()
+{
+    std::shared_ptr<GameObject> Skull = GameObjectManager::Instance().Create();
+    Skull->SetName("killSkull");
+    Skull->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/KillEffect.ui", Sprite::SpriteShader::DEFALT, false);
+}
+
+void UI_KillEffect::Start()
+{
+    //親子付け
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("killSkull"));
+}
+
+void UI_KillEffect::Update(float elapsedTime)
+{
+    for (int i = 0; i < 4; i++) {
+        if (StaticSendDataManager::Instance().GetKillID(i)) {
+            effectFLG = true;
+            StaticSendDataManager::Instance().GetKillID(i) = false;
+        }
+    }
+    EffectUpdat(elapsedTime);
+}
+
+void UI_KillEffect::EffectUpdat(float elapsedTime)
+{
+    std::shared_ptr<UiSystem> skull = GameObjectManager::Instance().Find("killSkull")->GetComponent<UiSystem>();
+    if (effectFLG) {
+        effectFLG = false;
+        skull->EasingPlay();
+    }
+    if (!skull->IsPlayEasing()) {
     }
 }

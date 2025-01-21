@@ -177,6 +177,8 @@ public:
         //ƒLƒ‹”
         int killCount = 0;
 
+        int bulletNum = 0;;
+
         //ƒNƒ‰ƒEƒ“
         //ŠŠÔ
         float crownTimer = 0;

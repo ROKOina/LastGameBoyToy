@@ -75,12 +75,14 @@ private:
 public:
     std::vector<SaveBuffer>& GetSaveBuffer(int playerID) { return saveBuffer[playerID]; }
     bool& GetDeathID(int id) { return deathID[id]; }
+    bool& GetKillID(int id) { return killID[id]; }
     std::vector<DirectX::XMFLOAT3>& GetDamagePos() { return damagePostPos; }
     int& GetTeamNum(int id) { return teamNum[id]; }
 
 private:
     std::vector<SaveBuffer> saveBuffer[5];
     bool deathID[4];    //ƒLƒ‹‚³‚ê‚½‘Šè‚ğ•Û‘¶
+    bool killID[4];    //ƒLƒ‹‚µ‚½‘Šè‚ğ•Û‘¶
     std::vector<DirectX::XMFLOAT3> damagePostPos = {};
     int teamNum[4] = { -1,-1,-1,-1 };    //[]playerID  0:Ô 1:Â -1:‚È‚µ 
 };

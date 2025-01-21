@@ -399,6 +399,17 @@ void PhotonLib::ImGui()
         }
     }
 
+    //弾
+    if (ImGui::TreeNode("bulletNum"))
+    {
+        for (auto& s : saveInputPhoton)
+        {
+            if (s.useFlg)
+                ImGui::InputInt(std::string(s.name).c_str(), &s.bulletNum);
+        }
+        ImGui::TreePop();
+    }
+
     //切る数
     if (ImGui::TreeNode("killcount"))
     {
@@ -1339,6 +1350,10 @@ void PhotonLib::GameRecv(NetData recvData)
             net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
         }
 
+        //弾数を合わせる
+        net1->GetComponent<CharacterCom>()->GetNetCharaData().SetBulletNum(recvData.gameData.bulletNum);
+        saveInputPhoton[myPlayerID].bulletNum = recvData.gameData.bulletNum;
+
         //キルをカウント
         if (recvData.gameData.deathID[myPlayerID])
         {
@@ -1350,6 +1365,9 @@ void PhotonLib::GameRecv(NetData recvData)
                 auto& myPlayer = GameObjectManager::Instance().Find("player");
                 if (myPlayer)
                     myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetKillID(recvData.playerId);
+
+                //キルしたIDを保存
+                StaticSendDataManager::Instance().GetKillID(recvData.playerId) = true;
             }
         }
 
@@ -1694,6 +1712,9 @@ void PhotonLib::sendGameData(void)
 
     //キャラIDを送る
     netD.gameData.charaID = myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();
+
+    //弾数送る
+    netD.gameData.bulletNum = myPlayer->GetComponent<CharacterCom>()->GetCurrentBulletNum();
 
     //自分の入力を送る
     //先頭20フレームの入力を送る

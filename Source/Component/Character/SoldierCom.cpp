@@ -89,7 +89,11 @@ void SoldierCom::UltSkill()
 //ÉäÉçÅ[Éh
 void SoldierCom::Reload()
 {
-    if (currentBulletNum < maxBulletNum)
+    bool isBulletNone = !(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
+        ? ((currentBulletNum > 0)) \
+        : ((netCharaData.GetBulletNum() > 0)));
+
+    if (isBulletNone)
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
     }
