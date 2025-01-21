@@ -158,27 +158,34 @@ void SceneTitle::Initialize()
     };
     SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
 
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Audio");
+    //    audioObj = audio->AddComponent<AudioCom>();
+    //    audioObj.lock()->RegisterSource(AUDIOID::SCENE_TITLE, "Title");
+    //    audioObj.lock()->RegisterSource(AUDIOID::CURSOR, "Cursor");
+    //    audioObj.lock()->RegisterSource(AUDIOID::ENTER, "Enter");
+
+    //    audioObj.lock()->Play("Title", true, 0.0f);
+    //    audioObj.lock()->FeedStart("Title", 0.5f, 0.1f);
+    //}
+
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Audio");
-        audioObj = audio->AddComponent<AudioCom>().get();
-        audioObj->RegisterSource(AUDIOID::SCENE_TITLE, "Title");
-        audioObj->RegisterSource(AUDIOID::CURSOR, "Cursor");
-        audioObj->RegisterSource(AUDIOID::ENTER, "Enter");
+        audioSource = audio->AddComponent<AudioSourceCom>();
+        audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::BGM));
+        audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::SE));
 
-        audioObj->Play("Title", true, 0.0f);
-        audioObj->FeedStart("Title", 0.5f, 0.1f);
+        audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
+        //audioSource->AudioPlay(static_cast<int>(AUDIOID::BGM), true);
+        //audioSource->FeedStart(static_cast<int>(AUDIOID::BGM), 0.5f, 0.1f);
     }
 
     {
         GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Audio");
-        audioSource = audio->AddComponent<AudioSourceCom>().get();
-        audioSource->AddAudio(static_cast<int>(AUDIOID::BGM));
-        audioSource->AddAudio(static_cast<int>(AUDIOID::SE));
-
-        //audioSource->AudioPlay(static_cast<int>(AUDIOID::BGM), true);
-        //audioSource->FeedStart(static_cast<int>(AUDIOID::BGM), 0.5f, 0.1f);
+        audio->SetName("Lisner");
+        audio->transform_->SetWorldPosition({ 100,0,10 });
     }
 
     //暗転からはじまるように
@@ -194,6 +201,9 @@ void SceneTitle::Finalize()
 
 void SceneTitle::Update(float elapsedTime)
 {
+    audioSource.lock()->GetListener().position = GameObjectManager::Instance().Find("Lisner")->transform_->GetWorldPosition();
+    
+
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     //UI更新
@@ -232,6 +242,19 @@ void SceneTitle::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
+
+    ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin("Lisner", nullptr, ImGuiWindowFlags_None))
+    {
+
+        if (ImGui::Button("LisnerUpdate")) {
+            audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
+        }
+    }
+    ImGui::End();
+
 }
 
 void SceneTitle::UIUpdate(float elapsedTime)
@@ -289,8 +312,8 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
-                    audioObj->FeedStart("Title", 0.0f, elapsedTime);
-                    audioObj->Play("Enter", false, 1.0f);
+                    audioObj.lock()->FeedStart("Title", 0.0f, elapsedTime);
+                    audioObj.lock()->Play("Enter", false, 1.0f);
 
                     //audioSource->FeedStart(static_cast<int>(AUDIOID::SE), 0.0f, elapsedTime);
                     //audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);
@@ -303,7 +326,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 }
             }
             //セレクト棒壱変更
-            if (sprite->GetHitSpriteEnter()) { audioObj->Stop("Cursor"); audioObj->Play("Cursor", false, 1.0f); }
+            if (sprite->GetHitSpriteEnter()) { audioObj.lock()->Stop("Cursor"); audioObj.lock()->Play("Cursor", false, 1.0f); }
             //if (sprite->GetHitSpriteEnter()) { audioSource->Stop(static_cast<int>(AUDIOID::SE)); audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);}
             selectB->SetEnabled(true);
             DirectX::XMFLOAT3 sP = selectB->transform_->GetWorldPosition();

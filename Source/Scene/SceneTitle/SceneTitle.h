@@ -41,6 +41,6 @@ private:
     //画面エフェクト実装
     void ScreenEffect(float elapsedTime);
 
-    AudioCom* audioObj;
-    AudioSourceCom* audioSource;
+    std::weak_ptr< AudioCom >audioObj;
+    std::weak_ptr < AudioSourceCom> audioSource;
 };

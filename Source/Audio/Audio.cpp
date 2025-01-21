@@ -3,6 +3,41 @@
 
 #pragma comment(lib, "xaudio2.lib")
 
+// Must match order of g_PRESET_NAMES
+XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAMS[30] =
+{
+    XAUDIO2FX_I3DL2_PRESET_FOREST,
+    XAUDIO2FX_I3DL2_PRESET_DEFAULT,
+    XAUDIO2FX_I3DL2_PRESET_GENERIC,
+    XAUDIO2FX_I3DL2_PRESET_PADDEDCELL,
+    XAUDIO2FX_I3DL2_PRESET_ROOM,
+    XAUDIO2FX_I3DL2_PRESET_BATHROOM,
+    XAUDIO2FX_I3DL2_PRESET_LIVINGROOM,
+    XAUDIO2FX_I3DL2_PRESET_STONEROOM,
+    XAUDIO2FX_I3DL2_PRESET_AUDITORIUM,
+    XAUDIO2FX_I3DL2_PRESET_CONCERTHALL,
+    XAUDIO2FX_I3DL2_PRESET_CAVE,
+    XAUDIO2FX_I3DL2_PRESET_ARENA,
+    XAUDIO2FX_I3DL2_PRESET_HANGAR,
+    XAUDIO2FX_I3DL2_PRESET_CARPETEDHALLWAY,
+    XAUDIO2FX_I3DL2_PRESET_HALLWAY,
+    XAUDIO2FX_I3DL2_PRESET_STONECORRIDOR,
+    XAUDIO2FX_I3DL2_PRESET_ALLEY,
+    XAUDIO2FX_I3DL2_PRESET_CITY,
+    XAUDIO2FX_I3DL2_PRESET_MOUNTAINS,
+    XAUDIO2FX_I3DL2_PRESET_QUARRY,
+    XAUDIO2FX_I3DL2_PRESET_PLAIN,
+    XAUDIO2FX_I3DL2_PRESET_PARKINGLOT,
+    XAUDIO2FX_I3DL2_PRESET_SEWERPIPE,
+    XAUDIO2FX_I3DL2_PRESET_UNDERWATER,
+    XAUDIO2FX_I3DL2_PRESET_SMALLROOM,
+    XAUDIO2FX_I3DL2_PRESET_MEDIUMROOM,
+    XAUDIO2FX_I3DL2_PRESET_LARGEROOM,
+    XAUDIO2FX_I3DL2_PRESET_MEDIUMHALL,
+    XAUDIO2FX_I3DL2_PRESET_LARGEHALL,
+    XAUDIO2FX_I3DL2_PRESET_PLATE,
+};
+
 // コンストラクタ
 Audio::Audio()
 {
@@ -32,13 +67,58 @@ Audio::Audio()
     }
 
     // スピーカーチャネルマスクの取得
-    DWORD speakerChannelMask = SPEAKER_STEREO;
+    speakerChannelMask = SPEAKER_STEREO;
     hr = masteringVoice_->GetChannelMask(&speakerChannelMask);
     if (FAILED(hr) || speakerChannelMask == 0)
     {
         speakerChannelMask = SPEAKER_STEREO;  // 取得失敗時にデフォルトを再設定
         throw std::runtime_error("Failed to retrieve speaker channel mask or invalid channel mask.");
     }
+
+    //サブミックス
+    DWORD dwChannelMask = 0;
+    UINT32 nSampleRate = 0;
+
+    XAUDIO2_VOICE_DETAILS details;
+    masteringVoice_->GetVoiceDetails(&details);
+
+    nSampleRate = details.InputSampleRate;
+    InputChannels = details.InputChannels;
+
+
+
+    FXMASTERINGLIMITER_PARAMETERS params = {};
+    params.Release = FXMASTERINGLIMITER_DEFAULT_RELEASE;
+    params.Loudness = FXMASTERINGLIMITER_DEFAULT_LOUDNESS;
+
+    hr = CreateFX(__uuidof(FXMasteringLimiter), &pVolumeLimiter, &params, sizeof(params));
+
+    XAUDIO2_EFFECT_DESCRIPTOR desc = {};
+    desc.InitialState = TRUE;
+    desc.OutputChannels = InputChannels;
+    desc.pEffect = pVolumeLimiter.Get();
+
+    XAUDIO2_EFFECT_CHAIN chain = { 1, &desc };
+    hr = masteringVoice_->SetEffectChain(&chain);
+
+
+
+    UINT32 rflags = 0;
+    hr = XAudio2CreateReverb(&pReverbEffect, rflags);
+
+    XAUDIO2_EFFECT_DESCRIPTOR effects[] = { { pReverbEffect.Get(), TRUE, 1 } };
+    XAUDIO2_EFFECT_CHAIN effectChain = { 1, effects };
+
+    hr = xaudio_->CreateSubmixVoice(&submixVoice_, 1,
+        nSampleRate, 0, 0,
+        nullptr, &effectChain);
+
+        // Set default FX params
+    XAUDIO2FX_REVERB_PARAMETERS native;
+    ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS[0], &native);
+    submixVoice_->SetEffectParameters(0, &native, sizeof(native));
+
+
 
     // X3DAudio 初期化
     hr = X3DAudioInitialize(speakerChannelMask, X3DAUDIO_SPEED_OF_SOUND, x3dAudioHandle_);
@@ -60,12 +140,21 @@ Audio::~Audio()
         masteringVoice_ = nullptr;
     }
 
+    // サブミックス破棄
+    if (submixVoice_ != nullptr)
+    {
+        submixVoice_->DestroyVoice();
+        submixVoice_ = nullptr;
+    }
+
     // XAudio終了化
     if (xaudio_ != nullptr)
     {
         xaudio_->Release();
         xaudio_ = nullptr;
     }
+
+    pReverbEffect.Reset();
 
     // COM終了化
     CoUninitialize();
@@ -136,7 +225,7 @@ void Audio::RegisterAudioSources()
 
 void Audio::RegisterAudioSourcesTest()
 {
-    audioResourcesTest[AUDIOID::BGM] = LoadAudioSource("Data/AudioData/TestAudio/BGM.wav");
+    audioResourcesTest[AUDIOID::BGM] = LoadAudioSource("Data/AudioData/TestAudio/heli.wav");
     RegisterAudioName(AUDIOID::BGM, "BGM");
 
     audioResourcesTest[AUDIOID::SE] = LoadAudioSource("Data/AudioData/TestAudio/SE.wav");
@@ -291,6 +380,114 @@ void Audio::RegisterAudioSourcesTest()
         audioResources[AUDIOID::TUTOLINES_25] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/025_L.wav");
         RegisterAudioName(AUDIOID::TUTOLINES_25, "25");
     }
+}
+
+//using namespace DirectX;
+//static const X3DAUDIO_CONE Listener_DirectionalCone = { X3DAUDIO_PI * 5.0f / 6.0f, X3DAUDIO_PI * 11.0f / 6.0f, 1.0f, 0.75f, 0.0f, 0.25f, 0.708f, 1.0f };
+//
+//static int frame3 = 3;
+void Audio::Test3DUpdate()
+{
+    //// Calculate listener orientation in x-z plane
+    //if (vListenerPos.x != listener.Position.x
+    //    || vListenerPos.z != listener.Position.z)
+    //{
+    //    const XMVECTOR v1 = XMLoadFloat3(&vListenerPos);
+    //    const XMVECTOR v2 = XMVectorSet(listener.Position.x, listener.Position.y, listener.Position.z, 0.f);
+
+    //    XMVECTOR vDelta = v1 - v2;
+
+    //    fListenerAngle = float(atan2(XMVectorGetX(vDelta), XMVectorGetZ(vDelta)));
+
+    //    vDelta = XMVectorSetY(vDelta, 0.f);
+    //    vDelta = XMVector3Normalize(vDelta);
+
+    //    XMFLOAT3 tmp;
+    //    XMStoreFloat3(&tmp, vDelta);
+
+    //    listener.OrientFront.x = tmp.x;
+    //    listener.OrientFront.y = 0.f;
+    //    listener.OrientFront.z = tmp.z;
+    //}
+
+    //if (fUseListenerCone)
+    //{
+    //    listener.pCone = (X3DAUDIO_CONE*)&Listener_DirectionalCone;
+    //}
+    //else
+    //{
+    //    listener.pCone = nullptr;
+    //}
+    //if (fUseInnerRadius)
+    //{
+    //    emitter.InnerRadius = 2.0f;
+    //    emitter.InnerRadiusAngle = X3DAUDIO_PI / 4.0f;
+    //}
+    //else
+    //{
+    //    emitter.InnerRadius = 0.0f;
+    //    emitter.InnerRadiusAngle = 0.0f;
+    //}
+
+    //XMVECTOR v1 = XMLoadFloat3(&vListenerPos);
+    //XMVECTOR v2 = XMVectorSet(listener.Position.x, listener.Position.y, listener.Position.z, 0);
+
+    //const XMVECTOR lVelocity = (v1 - v2) / 0.01666f;
+    //listener.Position.x = vListenerPos.x;
+    //listener.Position.y = vListenerPos.y;
+    //listener.Position.z = vListenerPos.z;
+
+    //XMFLOAT3 tmp;
+    //XMStoreFloat3(&tmp, lVelocity);
+    //listener.Velocity.x = tmp.x;
+    //listener.Velocity.y = tmp.y;
+    //listener.Velocity.z = tmp.z;
+
+    //v1 = XMLoadFloat3(&vEmitterPos);
+    //v2 = XMVectorSet(emitter.Position.x, emitter.Position.y, emitter.Position.z, 0.f);
+
+    //const XMVECTOR eVelocity = (v1 - v2) / 0.01666f;
+    //emitter.Position.x = vEmitterPos.x;
+    //emitter.Position.y = vEmitterPos.y;
+    //emitter.Position.z = vEmitterPos.z;
+
+    //XMStoreFloat3(&tmp, eVelocity);
+    //emitter.Velocity.x = tmp.x;
+    //emitter.Velocity.y = tmp.y;
+    //emitter.Velocity.z = tmp.z;
+
+
+    //DWORD dwCalcFlags = X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER
+    //    | X3DAUDIO_CALCULATE_LPF_DIRECT | X3DAUDIO_CALCULATE_LPF_REVERB
+    //    | X3DAUDIO_CALCULATE_REVERB;
+    //if (fUseRedirectToLFE)
+    //{
+    //    // On devices with an LFE channel, allow the mono source data
+    //    // to be routed to the LFE destination channel.
+    //    dwCalcFlags |= X3DAUDIO_CALCULATE_REDIRECT_TO_LFE;
+    //}
+
+    //const X3DAUDIO_HANDLE* x3dHandle = Audio::Instance().GetX3DAudioHandle();
+
+    //X3DAudioCalculate(*x3dHandle,
+    //    &listener,
+    //    &emitter,
+    //    X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER,
+    //    &dspSettings);
+
+    //// 計算結果を反映
+    //IXAudio2SourceVoice* voice = g_audioState.pSourceVoice;
+
+    //voice->SetOutputMatrix(Audio::Instance().GetMasterVoice(), 1, nC,
+    //    dspSettings.pMatrixCoefficients);
+
+    //voice->SetOutputMatrix(Audio::Instance().GetSubmixVoice(), 1, 1, &dspSettings.ReverbLevel);
+
+    //XAUDIO2_FILTER_PARAMETERS FilterParametersDirect = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * dspSettings.LPFDirectCoefficient), 1.0f }; // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
+    //voice->SetOutputFilterParameters(Audio::Instance().GetMasterVoice(), &FilterParametersDirect);
+    //XAUDIO2_FILTER_PARAMETERS FilterParametersReverb = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * dspSettings.LPFReverbCoefficient), 1.0f }; // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
+    //voice->SetOutputFilterParameters(Audio::Instance().GetSubmixVoice(), &FilterParametersReverb);
+
 }
 
 void Audio::RegisterAudioName(AUDIOID id, const std::string& name)

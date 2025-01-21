@@ -11,10 +11,11 @@
 struct Listener_
 {
     X3DAUDIO_LISTENER x3dListener = {};
-    DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
+    DirectX::XMFLOAT3 position = { 1.0f, 0.0f, 0.0f };
     DirectX::XMFLOAT3 velocity = { 0.0f, 0.0f, 0.0f };
     DirectX::XMFLOAT3 front = { 0.0f, 0.0f, 1.0f }; // 前方向
     DirectX::XMFLOAT3 top = { 0.0f, 1.0f, 0.0f };   // 上方向
+    X3DAUDIO_CONE cone;
 
     void Update()
     {
@@ -33,6 +34,9 @@ struct Listener_
         x3dListener.Velocity = { velocity.x, velocity.y, velocity.z };
         x3dListener.OrientFront = { front.x, front.y, front.z };
         x3dListener.OrientTop = { top.x, top.y, top.z };
+
+        cone = X3DAudioDefault_DirectionalCone;
+        x3dListener.pCone = &cone;
     }
 };
 
@@ -43,11 +47,14 @@ struct Emitter_
     DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
     DirectX::XMFLOAT3 velocity = { 0.0f, 0.0f, 0.0f };
 
+    FLOAT32 f = 1;
+    FLOAT32 mat[8] = { 0,0,0,0,0,0,0,0 };
+
     void Initialize(const WAVEFORMATEX& waveFormat)
     {
-        x3dEmitter.CurveDistanceScaler = 1.0f; // 距離減衰スケール
-        x3dEmitter.DopplerScaler = 1.0f;       // ドップラー効果スケール
-        x3dEmitter.ChannelCount = waveFormat.nChannels;
+        x3dEmitter.CurveDistanceScaler = 10.0f; // 距離減衰スケール
+        x3dEmitter.DopplerScaler = 10.0f;       // ドップラー効果スケール
+        x3dEmitter.ChannelCount = 8;
         x3dEmitter.Position = { position.x, position.y, position.z };
         x3dEmitter.Velocity = { velocity.x, velocity.y, velocity.z };
     }
@@ -56,6 +63,9 @@ struct Emitter_
     {
         x3dEmitter.Position = { position.x, position.y, position.z };
         x3dEmitter.Velocity = { velocity.x, velocity.y, velocity.z };
+
+        x3dEmitter.ChannelRadius = 1;
+        x3dEmitter.pChannelAzimuths = &f;
     }
 };
 
@@ -65,7 +75,7 @@ public:
     AudioSourceCom() = default;
     ~AudioSourceCom() override { StopAll(); }
 
-    void Start() override {}
+    void Start() override;
     void Update(float elapsedTime) override;
 
     const char* GetName() const override { return "Audio"; }
@@ -98,7 +108,7 @@ public:
     // 3Dオーディオの更新
     void Update3DAudio();
 
-    Listener_ GetListener() { return listener_; }
+    Listener_& GetListener() { return listener_; }
     Emitter_ GetEmitter_() { return emitter_; }
 private:
     struct FeedState {
@@ -120,5 +130,20 @@ private:
     Emitter_ emitter_;    // エミッター情報
 
     bool isPlaying = false;
+
+
+    X3DAUDIO_DSP_SETTINGS dspSettings;
+    X3DAUDIO_LISTENER listener;
+    X3DAUDIO_EMITTER emitter;
+    X3DAUDIO_CONE emitterCone;
+
+    DirectX::XMFLOAT3 vListenerPos;
+    DirectX::XMFLOAT3 vEmitterPos;
+    float fListenerAngle;
+    bool  fUseListenerCone;
+    bool  fUseInnerRadius;
+    bool  fUseRedirectToLFE;
+
+    FLOAT32 matrixCoefficients[8];
 };
 

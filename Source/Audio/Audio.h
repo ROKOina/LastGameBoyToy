@@ -1,6 +1,7 @@
 #pragma once
 
 #include <xaudio2.h>
+#include <xaudio2fx.h>
 #include <cassert>
 #include <map>
 #include <string>
@@ -8,6 +9,8 @@
 #include "Audio/AudioSource.h"
 #include "Audio/AudioResource.h"
 #include <X3DAudio.h>
+#include <wrl/client.h>
+#include <xapofx.h>
 
 enum class AUDIOID
 {
@@ -103,18 +106,28 @@ public:
 
     void RegisterAudioSourcesTest();
 
+    void Test3DUpdate();
+
     // IDと名前の登録関数
     void RegisterAudioName(AUDIOID id, const std::string& name);
     std::string GetAudioName(AUDIOID id) const;
 
     IXAudio2* GetXAudio() const { return xaudio_; }
     const X3DAUDIO_HANDLE* GetX3DAudioHandle() const { return &x3dAudioHandle_; }
+    IXAudio2MasteringVoice* GetMasterVoice() { return masteringVoice_; }
+    IXAudio2SubmixVoice* GetSubmixVoice() { return submixVoice_; }
+    unsigned long GetChannelMask() { return speakerChannelMask; }
+    float GetInputChannel() { return InputChannels; }
 
 private:
     static inline std::unique_ptr<Audio> instance;
 
     IXAudio2* xaudio_ = nullptr;
     IXAudio2MasteringVoice* masteringVoice_ = nullptr;
+
+    Microsoft::WRL::ComPtr<IUnknown> pVolumeLimiter;
+    Microsoft::WRL::ComPtr<IUnknown> pReverbEffect;
+    IXAudio2SubmixVoice* submixVoice_ = nullptr;
 
     // 3Dオーディオ関連
     X3DAUDIO_HANDLE x3dAudioHandle_;
@@ -123,4 +136,21 @@ private:
 
     std::map<AUDIOID, std::shared_ptr<AudioResource>> audioResourcesTest;
     std::map<AUDIOID, std::string> audioNames;  // IDと名前の紐付け
+
+    unsigned long speakerChannelMask;
+    float InputChannels;
+
+    X3DAUDIO_DSP_SETTINGS dspSettings;
+    X3DAUDIO_LISTENER listener;
+    X3DAUDIO_EMITTER emitter;
+    X3DAUDIO_CONE emitterCone;
+
+    DirectX::XMFLOAT3 vListenerPos;
+    DirectX::XMFLOAT3 vEmitterPos;
+    float fListenerAngle;
+    bool  fUseListenerCone;
+    bool  fUseInnerRadius;
+    bool  fUseRedirectToLFE;
+
+    FLOAT32 matrixCoefficients[8];
 };
