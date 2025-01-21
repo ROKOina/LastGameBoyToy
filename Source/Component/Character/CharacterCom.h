@@ -293,6 +293,7 @@ protected:
     bool boostflag = false;
     float dashGauge = 10;
     bool attackInputSave = false;   //先行入力
+    NetCharaData netCharaData = {};  //ネット関連
 
 private:
 
@@ -344,6 +345,4 @@ private:
     bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
 
     bool startCountDown = false; //ゲーム開始前カウントダウン
-
-    NetCharaData netCharaData = {};  //ネット関連
 };
