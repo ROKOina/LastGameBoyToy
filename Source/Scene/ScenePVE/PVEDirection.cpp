@@ -81,6 +81,7 @@ void PVEDirection::CharaSlect(float elapsedTime)
         GameObjectManager::Instance().Find("Reactar1")->SetEnabled(false);
         GameObjectManager::Instance().Find("Reactar2")->SetEnabled(false);
         GameObjectManager::Instance().Find("Reactar3")->SetEnabled(false);
+        //GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
         //GameObjectManager::Instance().Find("cameraPostPlayer")->SetEnabled(false);
         //GameObjectManager::Instance().Find("armChild")->SetEnabled(false);
        
@@ -103,6 +104,7 @@ void PVEDirection::CharaSlect(float elapsedTime)
             GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
             deleyFlag = true;
             GameObjectManager::Instance().Find("player")->SetEnabled(false);
+           
         }
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
@@ -284,6 +286,7 @@ void PVEDirection::DirectionFOne(float elapsedTime)
 {
     if (!flag)
     {
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
         //暗転
@@ -355,6 +358,8 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
 
     if (!flag)
     {
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
+
         //最初にイベントカメラへ変更
         GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
         //暗転

@@ -2,10 +2,22 @@
 
 #include <wrl.h>
 #include <d3d11.h>
+#include <stdlib.h>
+#include <filesystem>
+#include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
+#include <map>
+#include "Graphics/Graphics.h"
+#include "SystemStruct\Misc.h"
+#include "SystemStruct\Logger.h"
+#include <stb_image.h>
 
 // テクスチャ
 //DDSTextureを読み込むための処理
 HRESULT LoadTextureFromFile(ID3D11Device* device, const char* filename, ID3D11ShaderResourceView** shader_resource_view, D3D11_TEXTURE2D_DESC* texture2d_desc);
+
+//HDRTexture読み込み
+HRESULT LoadHDRTexture(ID3D11Device* device, const std::wstring& filename, Microsoft::WRL::ComPtr<ID3D11Resource>& resource, ID3D11ShaderResourceView** shader_resource_view);
 
 //解放処理
 void ReleaseAllTextures();

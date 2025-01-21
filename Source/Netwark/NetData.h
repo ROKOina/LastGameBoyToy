@@ -152,6 +152,7 @@ struct NetData
 
         //ゲームモード
         DEATHMATCH,
+        CROWN,
     };
     int dataKind = {};
     bool isMasterClient = false;
@@ -163,6 +164,7 @@ struct NetData
     struct GameData //0
     {
         int startTime = {};
+        int countTime = {};
 
         std::vector<SaveBuffer> saveInputBuf = {};
 
@@ -213,6 +215,13 @@ struct NetData
     {
         int killCount = {};
     }deathMatchData;
+    //王冠
+    struct CrownData   //4
+    {
+        float crownTimer = {};
+        DirectX::XMFLOAT3 lastPos = {}; //王冠を落とした時の位置
+        bool haveCrown = false; //所持しているか
+    }crownData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
@@ -225,6 +234,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::GAME)
     {
         out << h.gameData.startTime << " ";
+        out << h.gameData.countTime << " ";
         out << h.gameData.damageData << " ";
         out << h.gameData.healData << " ";
         out << h.gameData.stanData << " ";
@@ -266,6 +276,12 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     {
         out << h.deathMatchData.killCount << " ";
     }
+    if (h.dataKind == NetData::DATA_KIND::CROWN)
+    {
+        out << h.crownData.crownTimer << " ";
+        out << h.crownData.lastPos << " ";
+        out << h.crownData.haveCrown << " ";
+    }
 
     return out;
 }
@@ -280,6 +296,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::GAME)
     {
         in >> h.gameData.startTime;
+        in >> h.gameData.countTime;
         in >> h.gameData.damageData;
         in >> h.gameData.healData;
         in >> h.gameData.stanData;
@@ -321,6 +338,12 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::DEATHMATCH)
     {
         in >> h.deathMatchData.killCount;
+    }
+    if (h.dataKind == NetData::DATA_KIND::CROWN)
+    {
+        in >> h.crownData.crownTimer;
+        in >> h.crownData.lastPos;
+        in >> h.crownData.haveCrown;
     }
 
     return in;

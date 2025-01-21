@@ -23,7 +23,6 @@
 #include "Component\Stage\StageEditorCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\Particle\GPUParticle.h"
-#include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
@@ -149,15 +148,6 @@ void SceneTitle::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    // スカイボックスの設定
-    std::array<const char*, 4> filepath = {
-      "Data\\Texture\\DayInTheClouds4k.DDS",
-      "Data\\Texture\\diffuse_iem.dds",
-      "Data\\Texture\\specular_pmrem.dds",
-      "Data\\Texture\\lut_ggx.DDS"
-    };
-    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
-
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Audio");
@@ -187,9 +177,6 @@ void SceneTitle::Update(float elapsedTime)
 
     //UI更新
     UIUpdate(elapsedTime);
-
-    //画面エフェクト更新
-    ScreenEffect(elapsedTime);
 
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
@@ -302,24 +289,4 @@ void SceneTitle::UIUpdate(float elapsedTime)
     }
     //棒消す
     if (SceneManager::Instance().GetTransitionFlag())selectB->SetEnabled(false);
-}
-
-//画面エフェクト実装
-void SceneTitle::ScreenEffect(float elapsedTime)
-{
-    auto& posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
-
-    // hue の更新
-    static float direction = 1.0f;
-    float hue = posteffect->GetPostData().hue + direction * elapsedTime;
-
-    // 方向の切り替え
-    if (hue >= 1.0f || hue <= -1.0f)
-    {
-        direction *= -1.0f; // 増減を反転
-        hue = std::clamp(hue, -1.0f, 1.0f); // hue を範囲内に調整
-    }
-
-    // 更新した hue を適用
-    posteffect->SetParameter(hue, 9.0f, { PostEffect::PostEffectParameter::Hue });
 }

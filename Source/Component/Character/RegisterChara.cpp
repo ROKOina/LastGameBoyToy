@@ -101,7 +101,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->GetNetCharaData().SetCharaID(int(CHARA_LIST::INAZAWA));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
-    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 5.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 5.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
@@ -214,7 +214,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
 
@@ -295,7 +295,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
     std::shared_ptr<FarahCom> c = obj->AddComponent<FarahCom>();
     c->GetNetCharaData().SetCharaID(int(CHARA_LIST::FARAH));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
-    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 6.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
@@ -373,7 +373,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
 
@@ -473,7 +473,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
 
@@ -506,7 +506,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<SoldierCom> c = obj->AddComponent<SoldierCom>();
     c->GetNetCharaData().SetCharaID(int(CHARA_LIST::SOLIDER));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
-    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 6.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
@@ -612,7 +612,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
 

@@ -40,6 +40,7 @@ TrainingManager::TrainingManager()
 }
 TrainingManager::~TrainingManager()
 {
+
 }
 TrainingSystem::TrainingSystem()
 {
@@ -64,7 +65,15 @@ void TrainingManager::TrainingManagerStart()
     TrainingSystem::Instance().TrainingSystemStart();
     TutorialSystem::Instance().TutorialSystemStart();
 
-    // INAZAWA
+    charaPicks = std::make_shared<CharaPicks>();
+
+    InitializeBack();
+
+    // キャラピックUI生成
+    charaPicks->CreateCharaPicksUiObject();
+    charaPicks->SetViewCharaPicks(false);
+
+    // ポーズ画面設定
     {
         // タイトルへ
         {
@@ -97,16 +106,22 @@ void TrainingManager::TrainingManagerStart()
 
 void TrainingManager::TrainingManagerUpdate(float elapsedTime)
 {
-    
-    if (tutorialFlag)
+    if (!charaSelectFlag)
     {
-        //チュートリアル
-        TutorialSystem::Instance().TutorialSystemUpdate(elapsedTime);
+        if (tutorialFlag)
+        {
+            //チュートリアル
+            TutorialSystem::Instance().TutorialSystemUpdate(elapsedTime);
+        }
+        else
+        {
+            //トレーニング
+            TrainingSystem::Instance().TrainingSystemUpdate(elapsedTime);
+        }
     }
     else
     {
-        //トレーニング
-        TrainingSystem::Instance().TrainingSystemUpdate(elapsedTime);
+        CharaSelectUpdate(elapsedTime);
     }
 
     Setting();
@@ -116,6 +131,11 @@ void TrainingManager::TrainingManagerClear()
 {
     TutorialSystem::Instance().TutorialSystemClear();
     TrainingSystem::Instance().TrainingSystemClear();
+    tutorialUIFlag = false;
+    charaSelectFlag = true;
+    flag = false;
+    flag1 = false;
+
 }
 
 void TrainingManager::ChangeTutorialFlag()
@@ -125,6 +145,7 @@ void TrainingManager::ChangeTutorialFlag()
     TrainingSystem::Instance().TrainingObjUnhide();
     
     tutorialFlag = true;
+    tutorialUIFlag = true;
 }
 
 void TrainingManager::ChangeTrainigFlag()
@@ -234,6 +255,67 @@ void TrainingManager::Setting()
     {
         traing->GetComponent<Sprite>()->spc.color = Color;
     }
+}
+
+void TrainingManager::CharaSelectUpdate(float elapsedTime)
+{
+    if (!flag)
+    {
+        CharaSelectUnHindOBJ();
+        charaPicks->SetViewCharaPicks(true);
+        flag = true;
+    }
+
+    charaPicks->CharaPicksUpdate(elapsedTime);
+
+    if (charaPicks->IsDecisionFlg())
+    {
+        if (!flag1)
+        {
+            RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()));
+            GameObjectManager::Instance().Find(charName[charaPicks->GetSelectedCharacterId()].c_str())->SetEnabled(false);
+            charaPicks->SetViewCharaPicks(false);
+            GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
+            flag1 = true;
+            GameObjectManager::Instance().Find("player")->SetEnabled(false);
+        }
+
+        GameObjectManager::Instance().Find("scarecrow1")->SetEnabled(true);
+        GameObjectManager::Instance().Find("scarecrow2")->SetEnabled(true);
+        GameObjectManager::Instance().Find("scarecrow3")->SetEnabled(true);
+        GameObjectManager::Instance().Find("scarecrow4")->SetEnabled(true);
+        GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(true);
+
+        GameObjectManager::Instance().Find("player")->SetEnabled(true);
+        GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+        charaSelectFlag = false;
+        //最初にイベントカメラへ変更
+        GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
+    }
+}
+
+void TrainingManager::CharaSelectUnHindOBJ()
+{
+    GameObjectManager::Instance().Find("scarecrow1")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow2")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow3")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow4")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
+    GameObjectManager::Instance().Find("cameraPostPlayer")->SetEnabled(false);
+    GameObjectManager::Instance().Find("armChild")->SetEnabled(false);
+
+    GameObjectManager::Instance().Find("player")->SetEnabled(false);
+    GameObjectManager::Instance().Find("stage")->SetEnabled(false);
+
+}
+
+void TrainingManager::InitializeBack()
+{
+    //背景
+    std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
+    lobbyBackParent->SetName("lobbyBackParent");
+    tempRemoveObj.emplace_back(lobbyBackParent);
+
 }
 
 void TrainingManager::OnGUI()
@@ -992,6 +1074,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
     {
         audioObj->Play(moveSubTitle[moveSubTitleIndex].Lines, false, 1.0f);
         linesFlag = true;
+        TrainingManager::Instance().SetTutorilUIFlag(false);
     }
 
     InputVec = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetLeftStick();

@@ -1,6 +1,7 @@
 #pragma once
 #include "Component/System/Component.h"
 #include "Component\Audio\AudioCom.h"
+#include <PvPUi/CharaPicks.h>
 
 
 
@@ -28,19 +29,46 @@ public:
     void ChangeTrainigFlag();
 
 
+    bool GetTutoriaFlag() { return tutorialFlag; }
+    bool GetCharaFlag() { return charaSelectFlag; }
+    bool GetTutorilUIFlag() { return tutorialUIFlag; }
+
+    void SetTutorilUIFlag(bool flag) { tutorialUIFlag = flag; }
     //void LightManager();
 
     void Changeblackout();
     void Changelightchange();
 
     void Setting();
+
+
+    ///キャラ設定画面関連///
+    void CharaSelectUpdate(float elapsedTime);
+
+    void CharaSelectUnHindOBJ();
+    
+    //背景初期化
+    void InitializeBack();
+
 private:
+
+    std::shared_ptr<CharaPicks>   charaPicks;  //PVPのキャラ選択をここでも使用
+
+    std::string charName[4] = { "Kanizo-Player","FaraicPlayer","SantorattoPlayer","Matya-Player" };
+    std::vector<std::weak_ptr<GameObject>> tempRemoveObj;   //画面切り替え時に削除するオブジェクト
 
     //最初はトレーニングモード
     bool tutorialFlag = false;
 
-    bool lightFlag = false;
+    bool tutorialUIFlag = false;
 
+
+    bool charaSelectFlag = true;
+
+    bool flag = false;
+    bool flag1 = false;
+
+    bool lightFlag = false;
 };
 
 //トレーニングモード

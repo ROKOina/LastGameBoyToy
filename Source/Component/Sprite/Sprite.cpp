@@ -175,23 +175,33 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     {
     case SpriteShader::DEFALT:
         PSPath = { "Shader\\SpritePS.cso" };
+        VSPath = { "Shader\\SpriteVS.cso" };
         break;
     case SpriteShader::BLUR:
         PSPath = { "Shader\\SpriteBlurPS.cso" };
+        VSPath = { "Shader\\SpriteVS.cso" };
         break;
     case SpriteShader::CHROMATICABERRATION:
         PSPath = { "Shader\\SpriteChromaticAberrationPS.cso" };
+        VSPath = { "Shader\\SpriteVS.cso" };
         break;
     case SpriteShader::DISSOLVE:
         PSPath = { "Shader\\SpriteDissolvePS.cso" };
+        VSPath = { "Shader\\SpriteVS.cso" };
         LoadTextureFromFile(device, "Data\\Texture\\DissolveNoise.png", noiseshaderresourceview_.GetAddressOf(), &dissolveTexture2ddesc_);
         LoadTextureFromFile(device, "Data\\Texture\\Ramp.png", rampshaderresourceview_.GetAddressOf(), &rampTexture2ddesc_);
         break;
     case SpriteShader::GLITCH:
         PSPath = { "Shader\\GlitchPS.cso" };
+        VSPath = { "Shader\\SpriteVS.cso" };
         break;
     case SpriteShader::HOLO:
         PSPath = { "Shader\\HoloGlennPS.cso" };
+        VSPath = { "Shader\\SpriteVS.cso" };
+        break;
+    case SpriteShader::ELECTRO:
+        PSPath = { "Shader\\SpritePS.cso" };
+        VSPath = { "Shader\\ElectroVS.cso" };
         break;
     default:
         assert(!"シェーダーがありません");
@@ -206,7 +216,7 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
             { "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
             { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         };
-        CreateVsFromCso(device, "Shader\\SpriteVS.cso", vertexShader_.GetAddressOf(), inputLayout_.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
+        CreateVsFromCso(device, VSPath, vertexShader_.GetAddressOf(), inputLayout_.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
     }
 
     // ピクセルシェーダー
@@ -218,6 +228,7 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
     if (filename)
     {
         Deserialize(filename);
+        filepath = filename;
         LoadTextureFromFile(device, spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
     }
 
@@ -544,6 +555,14 @@ void Sprite::OnGUI()
         spc.texSize.y = texture2ddesc_.Height;
     }
 
+    // ファイルパスを表示
+    char filename[256];
+    ::strncpy_s(filename, sizeof(filename), filepath.c_str(), sizeof(filename));
+    if (ImGui::InputText((char*)u8"ファイルパス", filename, sizeof(filename), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        filepath = filename;
+    }
+
     // テクスチャの選択
     ImGui::Text("Texture Selection");
     char textureFile[256];
@@ -654,6 +673,9 @@ void Sprite::OnGUI()
         ImGui::DragFloat((char*)u8"クリップ時間", &constants.cliptime, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"ディゾルブ量", &constants.edgethreshold, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat((char*)u8"縁オフセット", &constants.edgeoffset, 0.1f, 0.0f, 1.0f);
+        ImGui::DragFloat((char*)u8"アニメーション速度", &constants.framerate, 0.1f, 0.0f, 60.0f);
+        ImGui::InputInt((char*)u8"スプライトの列数", &constants.columns);
+        ImGui::InputInt((char*)u8"スプライトの行数", &constants.rows);
         ImGui::Checkbox((char*)u8"発光フラグ", reinterpret_cast<bool*>(&constants.onflag));
         ImGui::TreePop();
     }
@@ -764,6 +786,7 @@ void Sprite::LoadDeserialize()
     if (result == DialogResult::OK)
     {
         Deserialize(filename);
+        filepath = filename;
     }
 }
 

@@ -1,5 +1,4 @@
 #include "SpawnCom.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Animation/AnimationCom.h"
 #include <cstdlib>
 #include <cmath>
@@ -503,7 +502,11 @@ void SpawnCom::HitObject()
                     {
                         if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                         {
-                            int id = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+                            int id = -1;
+                            if (parent.lock())
+                            {
+                                id = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+                            }
                             status->AddDamagePoint(-15, id);
                         }
                     }

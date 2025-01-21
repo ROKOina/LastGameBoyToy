@@ -31,8 +31,10 @@
 #include "Component\Sprite\Sprite.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Component\UI\Font.h"
+#include "Component\UI\UiEasingEnabledRemove.h"
 #include "Math/easing.h"
 #include "Component\GameSystem\RespawnCom.h"
+#include "Component\System\CrownCom.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
@@ -41,6 +43,39 @@
 
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
+
+// UTF-8 (std::string) → UTF-16 (std::wstring) 変換
+std::wstring UTF8ToWString2(const std::string& str) {
+    std::wstring result;
+    size_t i = 0;
+    while (i < str.size()) {
+        unsigned char c = str[i];
+        if (c <= 0x7F) {
+            result.push_back(c);
+            ++i;
+        }
+        else if ((c & 0xE0) == 0xC0) {
+            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+            result.push_back(wc);
+            i += 2;
+        }
+        else if ((c & 0xF0) == 0xE0) {
+            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+            result.push_back(wc);
+            i += 3;
+        }
+        else if ((c & 0xF8) == 0xF0) {
+            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+            result.push_back(wc);
+            i += 4;
+        }
+        else {
+            // 不正なUTF-8データを無視する
+            ++i;
+        }
+    }
+    return result;
+}
 
 void ScenePVP::Initialize()
 {
@@ -58,6 +93,20 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
         obj->AddComponent<Light>("Data/SerializeData/LightData/pvp.light");
+    }
+
+    //ダメージ
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("DamageCircles");
+
+        for (int i = 0; i < 4; ++i)
+        {
+            std::shared_ptr<GameObject> damageC = obj->AddChildObject();
+            damageC->SetName(("DamageCircle" + std::to_string(i)).c_str());
+            damageC->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/damageCircle.ui", Sprite::SpriteShader::DEFALT, false);
+            damageC->SetEnabled(false);
+        }
     }
 
     //ロビー選択から始まる
@@ -239,10 +288,19 @@ void ScenePVP::InitializePVP()
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
 
         //ネットIDによって位置分け
-        int id = photonNet->GetPhotonLib()->GetMyPlayerID();
-        int teamId = photonNet->GetPhotonLib()->GetTeamID(id);
-        id = (id % 2) - teamId;
-        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[id]);
+
+        //自分のID
+        int myPlayerID = 0;
+        myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
+
+        //自分のチーム
+        int teamIndex = -1;
+        teamIndex = photonNet->GetPhotonLib()->GetTeamID(myPlayerID);
+
+        //どの出現位置なのか
+        int spawnIndex = 0;
+
+        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[GetPlayerTeamIndex(myPlayerID)]);
     }
 
     //イベント用カメラ
@@ -263,6 +321,58 @@ void ScenePVP::InitializePVP()
     //UI
     std::shared_ptr<GameObject> gameModeUI = GameObjectManager::Instance().Create();
     gameModeUI->SetName("gameModeUI");
+
+    //カウントダウンUI
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("countTime");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 900,560 };
+        font->scale = 4.5f;
+        font->color = { 0,0.2f,0.7f,1 };
+    }
+    //ゲーム開始
+    {
+        //ゲームモード
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameMode");
+            obj->AddComponent<UiSystem>(("Data/SerializeData/UIData/PVPScene/GameMode" + std::to_string(int(pvpGameSystem->GetGameMode())) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        }
+        //説明
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameModeExp");
+            obj->AddComponent<UiSystem>(("Data/SerializeData/UIData/PVPScene/GameModeExp" + std::to_string(int(pvpGameSystem->GetGameMode())) + ".ui").c_str(), Sprite::SpriteShader::DEFALT, false);
+        }
+        //ゲーム開始
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameStart");
+            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
+            obj->SetEnabled(false);
+            obj->AddComponent<UiEasingEnabledRemoveCom>();
+        }
+        //ゲームモード横のエフェクト
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameModeSideEff");
+            {
+                std::shared_ptr<GameObject> effLeft = obj->AddChildObject();
+                effLeft->SetName("GameModeLeftEff");
+                auto& ui = effLeft->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameModeEffLeft.ui", Sprite::SpriteShader::DEFALT, false);
+                ui->constants.rows = 6;
+                ui->constants.framerate = 10;
+            }
+            {
+                std::shared_ptr<GameObject> effLeft = obj->AddChildObject();
+                effLeft->SetName("GameModeRightEff");
+                auto& ui = effLeft->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameModeEffRight.ui", Sprite::SpriteShader::DEFALT, false);
+                ui->constants.rows = 6;
+                ui->constants.framerate = 10;
+            }
+        }
+    }
 
     switch (pvpGameSystem->GetGameMode())
     {
@@ -290,6 +400,46 @@ void ScenePVP::InitializePVP()
         font->position = { 829,23 };
         font->scale = 1.0f;
         font->color = { 1,0,0,1 };
+    }
+    break;
+    case PVPGameSystem::GAME_MODE::Crown:
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("time");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 900,0 };
+        font->scale = 1.5f;
+        font->color = { 1,1,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("crownCountAlly");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1091,23 };
+        font->scale = 1.0f;
+        font->color = { 0,0,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("crownCountEnemy");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 829,23 };
+        font->scale = 1.0f;
+        font->color = { 1,0,0,1 };
+    }
+    //王冠オブジェクト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("crown");
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        obj->transform_->SetScale({ 0.5f, 0.5f, 0.5f });
+        obj->transform_->SetWorldPosition({ 3.4f, 20, 8.1f });
+        auto& move = obj->AddComponent<MovementCom>();
+        auto& col = obj->AddComponent<SphereColliderCom>();
+        col->SetMyTag(COLLIDER_TAG::Crown);
+        col->SetJudgeTag(COLLIDER_TAG::Player);
+        obj->AddComponent<CrownCom>();
     }
     break;
     }
@@ -390,6 +540,51 @@ void ScenePVP::Update(float elapsedTime)
     GameSystemUpdate(elapsedTime);
     pvpGameSystem->update(elapsedTime);
 
+    //ダメージ表記UI
+    auto& damages = StaticSendDataManager::Instance().GetDamagePos();
+    auto& d = GameObjectManager::Instance().Find("DamageCircles");
+    for (auto& dm : d->GetChildren())
+    {
+        auto& dmUI = dm.lock()->GetComponent<UiSystem>();
+        if (!dmUI->IsPlayEasing())
+            dm.lock()->SetEnabled(false);
+    }
+    for (auto& damPos : damages)
+    {
+        for (auto& dm : d->GetChildren())
+        {
+            auto& dmUI = dm.lock()->GetComponent<UiSystem>();
+            if (dmUI->IsPlayEasing())continue;
+            //位置で回転する
+            auto& player = GameObjectManager::Instance().Find("player");
+            if (player)
+            {
+                DirectX::XMFLOAT3 pos = player->transform_->GetWorldPosition();
+                DirectX::XMFLOAT3 posF = player->transform_->GetWorldFront();
+                pos.y = 0;
+                damPos.y = 0;
+                posF.y = 0;
+                DirectX::XMFLOAT3 posP = Mathf::Normalize(damPos - pos);
+                posF = Mathf::Normalize(posF);
+                float angle = 0;
+                if (Mathf::Cross(posP, posF).y < 0) //ひだりがわ
+                    angle = 180.0f * (Mathf::Dot(posP, posF) * 0.5f * -1.0f + 0.5f);
+                else
+                    angle = 180 + 180.0f * (1.0f - (Mathf::Dot(posP, posF) * 0.5f * -1.0f + 0.5f));
+                dmUI->spc.angle = angle;
+                dmUI->spc.easingangle = angle;
+            }
+
+            //UIイージング設定
+            dm.lock()->SetEnabled(true);
+            dmUI->spc.scale = { 0.5f,0.5f };
+            dmUI->spc.color = { 1,0,0,0.7f };
+            dmUI->EasingPlay();
+            break;
+        }
+    }
+    damages.clear();
+
     //終わり
     if (pvpGameSystem->IsGameEnd())
     {
@@ -398,8 +593,8 @@ void ScenePVP::Update(float elapsedTime)
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
         //仮遷移
-       // if (!SceneManager::Instance().GetTransitionFlag())
-       //     SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+        if (!SceneManager::Instance().GetTransitionFlag())
+            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
     }
 
     //画面切り替え処理
@@ -507,6 +702,38 @@ void ScenePVP::Render(float elapsedTime)
     EventCameraManager::Instance().EventCameraImGui();
 }
 
+int ScenePVP::GetPlayerTeamIndex(int playerID)
+{
+    //自分のチーム
+    int teamIndex = -1;
+    teamIndex = StaticSendDataManager::Instance().GetTeamNum(playerID);
+    teamIndex == 0 ? teamIndex = 1 : teamIndex = 0;
+
+    //どの出現位置なのか
+    int spawnIndex = 0;
+
+    //同じチームのプレイヤーを探す
+    for (int i = 0; i < 4; ++i)
+    {
+        int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
+        if (teamIndex == teamFlag && playerID != i)
+        {
+            if (i > playerID)
+            {
+                spawnIndex = 0;
+            }
+            else if (i < playerID)
+            {
+                spawnIndex = 1;
+            }
+
+            break;
+        }
+    }
+
+    return spawnIndex + (teamIndex * 2);
+}
+
 //オブジェクト生成関数
 void ScenePVP::NewObject()
 {
@@ -545,6 +772,91 @@ void ScenePVP::NewObject()
 void ScenePVP::GameSystemUpdate(float elapsedTime)
 {
     auto net = photonNet->GetPhotonLib();
+
+    //カウントダウン時処理
+    if (isCountDown)
+    {
+        //カウントダウン時はタイマーをリセット
+        net->ResetNowTime();
+
+        float countTimerTemp = countTimer - net->GetCountNowTime();
+        auto& gameModeUI = GameObjectManager::Instance().Find("gameModeUI");
+        if (gameModeUI) {
+            //タイマー更新
+            auto& countT = gameModeUI->GetChildFind("countTime");
+            if (countT) {
+                auto& time = gameModeUI->GetChildFind("countTime")->GetComponent<Font>();
+                time->str = UTF8ToWString2(std::to_string(int(countTimerTemp) + 1));
+            }
+            //カウントダウン終了前にゲームモード説明イージング
+            if (countTimerTemp < 0.6f)
+            {
+                auto& mode = gameModeUI->GetChildFind("GameMode");
+                if (mode) {
+                    auto& spr = mode->GetComponent<UiSystem>();
+                    if (!spr->IsPlayEasing())spr->EasingPlay();
+                }
+                auto& modeE = gameModeUI->GetChildFind("GameModeExp");
+                if (modeE) {
+                    auto& spr = modeE->GetComponent<UiSystem>();
+                    if (!spr->IsPlayEasing())spr->EasingPlay();
+                }
+                auto& sideEff = gameModeUI->GetChildFind("GameModeSideEff");
+                if (sideEff) {
+                    auto& sprL = sideEff->GetChildFind("GameModeLeftEff")->GetComponent<UiSystem>();
+                    if (!sprL->IsPlayEasing())sprL->EasingPlay();
+                    auto& sprR = sideEff->GetChildFind("GameModeRightEff")->GetComponent<UiSystem>();
+                    if (!sprR->IsPlayEasing())sprR->EasingPlay();
+                }
+            }
+        }
+
+        //キャラの動きを止める
+        for (auto& s : net->GetSaveInput())
+        {
+            if (!s.useFlg)continue;
+
+            std::string name = "netPlayer" + std::to_string(s.photonId);
+            GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+            if (!net1)continue;
+            net1->GetComponent<CharacterCom>()->SetStartCountDown(true);
+        }
+        auto& p = GameObjectManager::Instance().Find("player");
+        if (p)
+            p->GetComponent<CharacterCom>()->SetStartCountDown(true);
+
+        //カウントダウン終了処理
+        if (countTimerTemp < 0)
+        {
+            isCountDown = false;
+            auto& countT = gameModeUI->GetChildFind("countTime");
+            countT->SetEnabled(false);
+            auto& mode = gameModeUI->GetChildFind("GameMode");
+            mode->SetEnabled(false);
+            auto& modeE = gameModeUI->GetChildFind("GameModeExp");
+            modeE->SetEnabled(false);
+            auto& sideEff = gameModeUI->GetChildFind("GameModeSideEff");
+            sideEff->SetEnabled(false);
+            //キャラの動きを再開
+            for (auto& s : net->GetSaveInput())
+            {
+                if (!s.useFlg)continue;
+
+                std::string name = "netPlayer" + std::to_string(s.photonId);
+                GameObj net1 = GameObjectManager::Instance().Find(name.c_str());
+                if (!net1)continue;
+                net1->GetComponent<CharacterCom>()->SetStartCountDown(false);
+            }
+            auto& p = GameObjectManager::Instance().Find("player");
+            if (p)
+                p->GetComponent<CharacterCom>()->SetStartCountDown(false);
+
+            auto& start = gameModeUI->GetChildFind("GameStart");
+            start->SetEnabled(true);
+            start->GetComponent<UiSystem>()->EasingPlay();
+        }
+    }
+
     //各ゲームモード必要情報更新
     switch (pvpGameSystem->GetGameMode())
     {
@@ -557,45 +869,23 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     }
     break;
     case PVPGameSystem::GAME_MODE::Crown:
+    {
+        //王冠所持時間をネットに送信
+        auto& crown = GameObjectManager::Instance().Find("crown")->GetComponent<CrownCom>();
+        if (net->GetMyPlayerID() >= 0)
+            net->SetCrownTimer(net->GetMyPlayerID(), crown->GetHaveTimer());
 
-        break;
+        //ゲームシステムに送信
+        auto& DM = pvpGameSystem->GetCrownData();
+        DM.teamData[PVPGameSystem::TEAM_KIND::RED_GROUP].crownTime = net->GetCrownTimerCount(PVPGameSystem::TEAM_KIND::RED_GROUP);
+        DM.teamData[PVPGameSystem::TEAM_KIND::BLUE_GROUP].crownTime = net->GetCrownTimerCount(PVPGameSystem::TEAM_KIND::BLUE_GROUP);
+        DM.nowTime = net->GetNowTime();
+    }
+    break;
     case PVPGameSystem::GAME_MODE::Button:
 
         break;
     }
-}
-
-// UTF-8 (std::string) → UTF-16 (std::wstring) 変換
-std::wstring UTF8ToWString2(const std::string& str) {
-    std::wstring result;
-    size_t i = 0;
-    while (i < str.size()) {
-        unsigned char c = str[i];
-        if (c <= 0x7F) {
-            result.push_back(c);
-            ++i;
-        }
-        else if ((c & 0xE0) == 0xC0) {
-            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
-            result.push_back(wc);
-            i += 2;
-        }
-        else if ((c & 0xF0) == 0xE0) {
-            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
-            result.push_back(wc);
-            i += 3;
-        }
-        else if ((c & 0xF8) == 0xF0) {
-            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
-            result.push_back(wc);
-            i += 4;
-        }
-        else {
-            // 不正なUTF-8データを無視する
-            ++i;
-        }
-    }
-    return result;
 }
 
 void ScenePVP::TransitionUpdate(float elapsedTime)
@@ -1073,17 +1363,38 @@ void ScenePVP::GameUpdate(float elapsedTime)
 
     //使用キャラUI更新
     int charaID[4] = { -1,-1,-1,-1 };   //前２個は味方
+    int PhotonID[4] = { -1,-1,-1,-1 };  //前２個は味方
     for (auto& s : saveI)
     {
         if (!s.useFlg)continue;
         if (netData.GetTeamID() == s.teamID)
-            if (charaID[0] < 0)charaID[0] = s.charaID;
-            else charaID[1] = s.charaID;
+        {
+            if (charaID[0] < 0)
+            {
+                charaID[0] = s.charaID;
+                PhotonID[0] = s.photonId;
+            }
+            else
+            {
+                charaID[1] = s.charaID;
+                PhotonID[1] = s.photonId;
+            }
+        }
         else
-            if (charaID[2] < 0)charaID[2] = s.charaID;
-            else charaID[3] = s.charaID;
+        {
+            if (charaID[2] < 0)
+            {
+                charaID[2] = s.charaID;
+                PhotonID[2] = s.photonId;
+            }
+            else
+            {
+                charaID[3] = s.charaID;
+                PhotonID[3] = s.photonId;
+            }
+        }
     }
-    PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID);
+    PlayerUIManager::Instance().NetUseCharaUIUpdate(charaID, PhotonID);
 
     //ゲームモードUI更新
     switch (pvpGameSystem->GetGameMode())
@@ -1107,6 +1418,28 @@ void ScenePVP::GameUpdate(float elapsedTime)
         {
             killA->str = UTF8ToWString2(std::to_string(des.teamData[1].killCount));
             killE->str = UTF8ToWString2(std::to_string(des.teamData[0].killCount));
+        }
+    }
+    break;
+    case PVPGameSystem::GAME_MODE::Crown:
+    {
+        auto& gameModeUI = GameObjectManager::Instance().Find("gameModeUI");
+        auto& time = gameModeUI->GetChildFind("time")->GetComponent<Font>();
+        auto& crownA = gameModeUI->GetChildFind("crownCountAlly")->GetComponent<Font>();
+        auto& crownE = gameModeUI->GetChildFind("crownCountEnemy")->GetComponent<Font>();
+        auto& cro = pvpGameSystem->GetCrownData();
+        time->str = UTF8ToWString2(std::to_string(int(cro.endTime - cro.nowTime)));
+
+        //チームによって変える
+        if (netData.GetTeamID() == 0)
+        {
+            crownA->str = UTF8ToWString2(std::to_string(int(cro.teamData[0].crownTime)));
+            crownE->str = UTF8ToWString2(std::to_string(int(cro.teamData[1].crownTime)));
+        }
+        else
+        {
+            crownA->str = UTF8ToWString2(std::to_string(int(cro.teamData[1].crownTime)));
+            crownE->str = UTF8ToWString2(std::to_string(int(cro.teamData[0].crownTime)));
         }
     }
     break;

@@ -45,12 +45,10 @@ void PVPGameSystem::DeathmatchUpdate()
 			victoryTeam = TEAM_KIND(i);	//勝利チーム
 			return;
 		}
-
 	}
 	//タイムアップ
 	if (deathMatchData.nowTime >= deathMatchData.endTime)
 	{
-
 		isEndGame = true;	//ゲーム終了
 		//勝利チーム
 		if (deathMatchData.teamData[0].killCount == deathMatchData.teamData[1].killCount)
@@ -71,6 +69,35 @@ void PVPGameSystem::DeathmatchUpdate()
 
 void PVPGameSystem::CrownUpdate()
 {
+	//クラウン所持時間
+	for (int i = 0; i < 2; ++i)
+	{
+		if (crownData.teamData[i].crownTime > crownData.haveWinTime)
+		{
+			isEndGame = true;	//ゲーム終了
+			victoryTeam = TEAM_KIND(i);	//勝利チーム
+			return;
+		}
+	}
+
+	//タイムアップ
+	if (crownData.nowTime >= crownData.endTime)
+	{
+		isEndGame = true;	//ゲーム終了
+		//勝利チーム
+		if (crownData.teamData[0].crownTime == crownData.teamData[1].crownTime)
+		{
+			victoryTeam = TEAM_KIND::DRAW;
+		}
+		else if (crownData.teamData[0].crownTime > crownData.teamData[1].crownTime)
+		{
+			victoryTeam = TEAM_KIND::RED_GROUP;
+		}
+		else
+		{
+			victoryTeam = TEAM_KIND::BLUE_GROUP;
+		}
+	}
 }
 
 void PVPGameSystem::ButtonUpdate()

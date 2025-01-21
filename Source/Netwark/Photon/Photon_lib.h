@@ -78,6 +78,8 @@ public:
 
     //キル数取得
     int GetKillCount(int team);
+    //クラウン所持時間取得
+    float GetCrownTimerCount(int team);
 
     int GetMyPhotonID();
     int GetMyPlayerID();
@@ -111,6 +113,9 @@ public:
 
     //今の試合時間
     float GetNowTime();
+    float GetCountNowTime();
+    //試合時間リセット
+    void ResetNowTime();
 
     //参加人数
     float GetJoinNum();
@@ -135,6 +140,9 @@ public:
     std::vector<std::wstring> GetRoomNames();
 
     int GetMasterPlayerID() { return masterPlayerID; }
+
+    //クラウン所持時間取得
+    void SetCrownTimer(int playerID, float timer);
 
     //接続開始
     void StartConnect() { connectFlg = true; }
@@ -164,8 +172,14 @@ public:
         //情報が更新されたか
         bool isInputUpdate = false;
 
+        //ゲームモード変数
+        //デスマッチ
         //キル数
         int killCount = 0;
+
+        //クラウン
+        //所持時間
+        float crownTimer = 0;
 
         //次の入力情報を格納
         struct NextInput
@@ -241,6 +255,7 @@ private:
     //ゲームモード情報送信
     void sendGameModeData(void);
     void sendDeathMatchData(void);
+    void sendCrownData(void);
 
     // events, triggered by certain operations of all players in the same room
     //入室時に入る
@@ -252,6 +267,7 @@ private:
     void JoinRecv(NetData recvData);    //入室受信
     void LobbyRecv(NetData recvData);    //ロビー受信
     void DeathMatchRecv(NetData recvData);    //デスマッチ受信
+    void CrownRecv(NetData recvData);    //クラウン受信
 
     // receive and print out debug out here
     virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);
@@ -295,6 +311,7 @@ private:
 
     //タイマースタート時間
     int startTime = 0;
+    int countTime = 0;  //カウントダウンタイマー
 
     //キャラ選択画面か
     bool isCharaSelect = false;
@@ -331,6 +348,21 @@ private:
         float deathCountTimer = -1;   //重複阻止
     };
     SaveDeath saveDeath[4];
+
+    //クラウン
+    struct SaveCrown
+    {
+        int haveID = -1;
+
+        //落とされた時
+        bool isCrownFall[4] = { false,false,false,false };  //落下したか
+        float fallTimer[4] = { 0,0,0,0 };   //一度通らせるため
+        DirectX::XMFLOAT3 crownFallPos = {};
+
+        //自分が落とした時
+        int slowFrame = 0;  //何フレーム間送るか
+        DirectX::XMFLOAT3 myCrownFallPos = {}; 
+    }saveCrown;
 
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ

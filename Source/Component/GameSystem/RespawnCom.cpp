@@ -7,6 +7,7 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Animation\AnimationCom.h"
+#include "Netwark\Photon\StaticSendDataManager.h"
 
 void RespawnCom::Update(float elapsedTime)
 {
@@ -34,15 +35,29 @@ void RespawnCom::Update(float elapsedTime)
             {
                 //位置移動
                 int spawnIndex = 0;
-                int teamIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
-                spawnIndex %= 2;
-
+                int teamIndex = -1;
                 teamIndex = charaCom->GetNetCharaData().GetTeamID();
 
-                if (spawnIndex < 0) { spawnIndex = 0; }
-                if (teamIndex < 0) { teamIndex = 0; }
-                player->transform_->SetWorldPosition(respawnPoses[spawnIndex + teamIndex]);
+                for (int i = 0; i < 4; ++i)
+                {
+                    int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
+                    if (teamIndex == teamFlag && spawnIndex != i)
+                    {
+                        if (i > spawnIndex)
+                        {
+                            spawnIndex = 0;
+                        }
+                        else
+                        {
+                            spawnIndex = 1;
+                        }
+
+                        break;
+                    }
+                }
+
+                player->transform_->SetWorldPosition(respawnPoses[spawnIndex + (teamIndex * 2)]);
 
                 //パラメータ回復
                 CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();

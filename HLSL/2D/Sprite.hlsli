@@ -17,5 +17,8 @@ cbuffer SpriteConstants : register(b0)
     float edgethreshold;
     float edgeoffset;
     int onflag;
-    float padding;
+    float framerate;
+    int columns;
+    int rows;
+    float2 padding;
 };
