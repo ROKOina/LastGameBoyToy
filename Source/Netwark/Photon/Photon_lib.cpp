@@ -1350,6 +1350,9 @@ void PhotonLib::GameRecv(NetData recvData)
                 auto& myPlayer = GameObjectManager::Instance().Find("player");
                 if (myPlayer)
                     myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetKillID(recvData.playerId);
+
+                //ƒLƒ‹‚µ‚½ID‚ð•Û‘¶
+                StaticSendDataManager::Instance().GetKillID(recvData.playerId) = true;
             }
         }
 

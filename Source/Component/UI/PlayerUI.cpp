@@ -8,6 +8,7 @@
 #include "Component\UI\UiFlag.h"
 #include "Component\UI\Font.h"
 #include "Scene\ScenePVP\ScenePVP.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
@@ -753,6 +754,7 @@ void PlayerUIManager::Register()
     //Hitエフェクト
     CreateHitEffect();
 
+    CreateKillEffect();
     ////////////////////////////////
 
     //キャラ固有のUI
@@ -1209,6 +1211,7 @@ void PlayerUIManager::CreateGunIcon()
     }
 }
 
+//ヒットエフェクト
 void PlayerUIManager::CreateHitEffect()
 {
     bool* isHit = player.lock()->GetComponent<CharacterCom>()->GetIsHitAttack();
@@ -1220,6 +1223,18 @@ void PlayerUIManager::CreateHitEffect()
         hit->SetName("HitEffect");
 
         hit->AddComponent<UiFlag>("Data/SerializeData/UIData/Player/HitEffect.ui", Sprite::SpriteShader::DEFALT, false, isHit);
+    }
+}
+
+void PlayerUIManager::CreateKillEffect() 
+{
+    //Boost
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hit = canvas->AddChildObject();
+        hit->SetName("KillEffect");
+
+        hit->AddComponent<UI_KillEffect>();
     }
 }
 
@@ -1536,5 +1551,43 @@ void UI_DeathComp::Update(float elapsedTime)
         sprite->spc.scale = { 0.3f,0.3f };
         sprite->spc.color = { 1,1,1,1 };
         charaicon->spc.color = { 1,1,1,1 };
+    }
+}
+
+UI_KillEffect::UI_KillEffect()
+{
+    std::shared_ptr<GameObject> Skull = GameObjectManager::Instance().Create();
+    Skull->SetName("killSkull");
+    Skull->AddComponent<UiSystem>(nullptr,Sprite::SpriteShader::DEFALT,false);
+}
+
+void UI_KillEffect::Start()
+{
+   //親子付け
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("killSkull"));
+}
+
+void UI_KillEffect::Update(float elapsedTime)
+{
+   
+   for (int i = 0; i < 4; i++) {
+       if (StaticSendDataManager::Instance().GetKillID(i)) {
+           effectFLG = true;
+           StaticSendDataManager::Instance().GetKillID(i) = false;
+       }
+   }
+   EffectUpdat(elapsedTime);
+}
+
+void UI_KillEffect::EffectUpdat(float elapsedTime)
+{
+    std::shared_ptr<UiSystem> skull = GameObjectManager::Instance().Find("killSkull")->GetComponent<UiSystem>();
+    if (effectFLG) {
+        skull->spc.color = { 1,1,1,1 };
+        skull->EasingPlay();
+    }
+    if (!skull->IsPlayEasing()) {
+        skull->spc.color = { 1,1,1,0 };
+        effectFLG = false;
     }
 }
