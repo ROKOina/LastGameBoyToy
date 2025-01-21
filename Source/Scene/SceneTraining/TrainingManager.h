@@ -97,6 +97,8 @@ public:
     void TrainingObjUnhide();
     void TrainingObjDisplay();
 
+    //射撃中の初期化
+    void ShootingIni();
 
 private:
     //射撃の開始処理と終了処理
@@ -104,6 +106,7 @@ private:
 
     //射撃のロジック？
     void ShootingSystem(float elapsdTime);
+
 
     //射撃時の案山子スポーン 
     void ShootingSpawnCrow();
@@ -119,6 +122,7 @@ private:
     int     shootingScore = 0;                     //射撃のスコア
     int     scarecrowMaxTotal = 30;                //射撃時の最大案山子スポーン数
     int     scarecrowCount = 0;                    //射撃時の案山子スポーン
+    int     scarecrowAlive = 0;
           
     float   scarecrowLifeTime = 1.0f;              //スポーンしてからの生存時間
     float   scarecrowLifeTimer = 0.0f;             //生存時間タイマー
