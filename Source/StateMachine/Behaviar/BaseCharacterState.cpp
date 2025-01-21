@@ -276,6 +276,7 @@ void BaseCharacter_DeathState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
+    charaCom.lock()->SetCurrentBulletNum(charaCom.lock()->GetMaxBulletNum());
 
     RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
     if (respawn)

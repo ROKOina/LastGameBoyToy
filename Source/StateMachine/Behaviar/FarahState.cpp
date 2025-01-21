@@ -23,7 +23,10 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         charaCom.lock()->HandleArmAnimation();
 
         //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
-        charaCom.lock()->AddCurrentBulletNum(-1);
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaCom.lock()->AddCurrentBulletNum(-1);
+        }
 
         //UŒ‚ˆ—
         charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
