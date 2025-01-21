@@ -1367,20 +1367,20 @@ void ScenePVP::GameUpdate(float elapsedTime)
     for (auto& s : saveI)
     {
         if (!s.useFlg)continue;
-        if (netData.GetTeamID() == s.teamID)
+        if (netData.GetTeamID() == s.teamID)//どっちのチームか調べる
         {
-            if (charaID[0] < 0)
+            if (charaID[0] < 0)//チーム1人目の使用キャラと使ってるプレイヤーを調べる
             {
                 charaID[0] = s.charaID;
                 PhotonID[0] = s.photonId;
             }
-            else
+            else//二人目
             {
                 charaID[1] = s.charaID;
                 PhotonID[1] = s.photonId;
             }
         }
-        else
+        else  //敵
         {
             if (charaID[2] < 0)
             {

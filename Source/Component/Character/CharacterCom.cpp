@@ -365,6 +365,12 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         //’eØ‚ê‚È‚çŽ©“®“I‚ÉƒŠƒ[ƒh
         currentBulletNum > 0 ?
             MainAttackDown() : Reload();
+
+        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+        {
+            netCharaData.GetBulletNum() > 0 ?
+                MainAttackDown() : Reload();
+        }
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {

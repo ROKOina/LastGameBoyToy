@@ -73,7 +73,10 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         charaCom.lock()->HandleArmAnimation();
 
         //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
-        charaCom.lock()->AddCurrentBulletNum(-1);
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaCom.lock()->AddCurrentBulletNum(-1);
+        }
 
         //UŒ‚ˆ—
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower / maxAttackPower, maxDamage * attackPower);

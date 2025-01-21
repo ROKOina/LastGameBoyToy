@@ -55,7 +55,10 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
         charaCom.lock()->HandleArmAnimation();
 
         //弾減らさないとリロードしない
-        charaCom.lock()->AddCurrentBulletNum(-1);
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaCom.lock()->AddCurrentBulletNum(-1);
+        }
 
         //射撃間隔タイマー起動
         charaCom.lock()->ResetShootTimer();
