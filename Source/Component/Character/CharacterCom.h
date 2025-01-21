@@ -9,6 +9,11 @@
 #include "Prop/NetCharaData.h"
 #include <array>
 
+#define JUDGE_NONEBULLET() \
+    (std::strcmp(GetGameObject()->GetName(), "player") == 0 \
+        ? ((currentBulletNum > 0)) \
+        : ((netCharaData.bulletNum > 0)))
+
 //プレイヤー用キー入力補助クラス
 class CharacterInput
 {

@@ -15,11 +15,6 @@
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
 
-#define JUDGE_NONEBULLET() \
-    (std::strcmp(GetGameObject()->GetName(), "player") == 0 \
-        ? ((currentBulletNum > 0)) \
-        : ((netCharaData.bulletNum > 0)))
-
 void CharacterCom::Update(float elapsedTime)
 {
     auto& ss = SceneManager::Instance().GetSettingScreen();
