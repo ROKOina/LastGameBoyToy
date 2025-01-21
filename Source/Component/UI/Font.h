@@ -65,7 +65,7 @@ public:
 	void Start() override {};
 
 	// 更新処理
-	void Update(float elapsedTime) override {};
+	void Update(float elapsedTime) override;
 	void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
 	void OnGUI()override;
@@ -112,4 +112,6 @@ public:
 	DirectX::XMFLOAT4				color = { 1,1,1,1 };
     std::wstring			        str;
 	wchar_t*						stri = nullptr;
+	DirectX::XMFLOAT2               parentPosOffset = {}; //親とどれだけ離れるか
+	float							parentScaleOffset = {}; //親とどれだけ離れるか
 };

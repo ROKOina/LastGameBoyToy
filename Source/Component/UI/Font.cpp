@@ -8,6 +8,7 @@
 #include <string>
 #include <codecvt>
 #include<windows.h>
+#include "Math\Mathf.h"
 
 // UTF-16 (std::wstring) ¨ UTF-8 (std::string) •ÏŠ·
 std::string WStringToUTF8(const std::wstring& wstr) {
@@ -337,6 +338,20 @@ Font::Font( const char* filename, int maxSpriteCount)
 	}
 }
 
+void Font::Update(float elapsedTime)
+{
+	for (auto& child : GetGameObject()->GetChildren())
+	{
+		Font* font = child.lock()->GetComponent<Font>().get();
+		if (font != nullptr)
+		{
+			font->str = str;
+			font->position = position + font->parentPosOffset;
+			font->scale = scale + font->parentScaleOffset;
+		}
+	}
+}
+
 void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
 	Graphics& Graphics = Graphics::Instance();
@@ -535,5 +550,6 @@ void Font::OnGUI()
 	}
 
 	ImGui::DragFloat2("Position", &position.x);
+	ImGui::DragFloat2("ParentOffset", &parentPosOffset.x);
 	ImGui::DragFloat("Scale", &scale);
 }

@@ -118,28 +118,44 @@ void SceneResult::Render(float elapsedTime)
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }
 
-//#define void MAKE_SHADOW_UI
+#define MAKE_FONT_SHADOW(parentFont, offsetX,offsetY) \
+        GameObj fontObj = parentFont->GetGameObject()->AddChildObject();\
+        std::string name = parentFont->GetName();\
+        fontObj->SetName(name.c_str());\
+        name += "_shadow";\
+        parentFont->GetGameObject()->SetName(name.c_str()); \
+        Font* fontCom = fontObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024).get();\
+        fontCom->str = parentFont->str; \
+        fontCom->parentPosOffset = { -offsetX, -offsetY }; \
+        fontCom->scale = parentFont->scale; \
+        fontCom->color = { 1,1,1,1 }; \
+        parentFont->color = { 0,0,0,1 };
 
 void SceneResult::MakeResultUI(GameObj canvas)
 {
     for (int i = 0; i < 4; ++i)
     {
-        std::shared_ptr<GameObject> obj = canvas->AddChildObject();
-        std::string name = std::to_string(i) + "st_Player_shadow";
-        obj->SetName(name.c_str());
-        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->str = L"000";
-        font->position = { 450.0f + 5,300.0f + (150 * i) + 2 };
-        font->scale = 1.5f;
-        font->color = { 0,0,0,1 };
+        //キル数
+        std::shared_ptr<GameObject> killNumObj = canvas->AddChildObject();
+        std::string killNum = std::to_string(i) + "st_Player";
+        killNumObj->SetName(killNum.c_str());
+        std::shared_ptr<Font> killNumFont = killNumObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        killNumFont->str = L"000";
+        killNumFont->position = DirectX::XMFLOAT2{ 450.0f,300.0f + (150 * i) };
+        killNumFont->scale = 1.5f;
 
-        std::shared_ptr<GameObject> obj1 = canvas->AddChildObject();
-        std::string name1 = std::to_string(i) + "st_Player";
-        obj1->SetName(name1.c_str());
-        std::shared_ptr<Font> font1 = obj1->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font1->str = L"000";
-        font1->position = { 450.0f,300.0f + (150 * i)};
-        font1->scale = 1.5f;
-        font1->color = { 1,1,1,1 };
+        { MAKE_FONT_SHADOW(killNumFont, 3, 2); }
+        resultUI[i] = killNumObj;
+
+        //「キル」文字
+        std::shared_ptr<GameObject> killStrObj = canvas->AddChildObject();
+        std::string killStr = std::to_string(i) + "st_Player_kill";
+        killStrObj->SetName(killStr.c_str());
+        std::shared_ptr<Font> killStrFont = killStrObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        killStrFont->str = L"Kill";
+        killStrFont->position = DirectX::XMFLOAT2{ 650.0f,3250.0f + (150 * i) };
+        killStrFont->scale = 0.9f;
+
+        { MAKE_FONT_SHADOW(killStrFont, 3, 2); }
     }
 }
