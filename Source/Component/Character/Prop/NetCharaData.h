@@ -22,6 +22,9 @@ public:
     void SetKillID(int id) { killID = id; }
     int GetKillID() { return killID; }
 
+    void SetBulletNum(int num) { bulletNum = num; }
+    int GetBulletNum() { return bulletNum; }
+
 private:
     int teamID = 0;   //自分のチーム
     int netPlayerID = 0;//どのクライアントがこのキャラを担当するか
@@ -29,4 +32,5 @@ private:
     bool myChara = false;
 
     int killID = -1;    //キルした相手保存
+    int bulletNum = 0;    //球数
 };

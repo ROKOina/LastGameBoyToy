@@ -143,7 +143,7 @@ void TrainingManager::ChangeTutorialFlag()
     GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -0.115f,0.0f,3.489f });
     GameObjectManager::Instance().Find("player")->transform_->SetEulerRotation({0.0f,180.119f,0.0f});
     TrainingSystem::Instance().TrainingObjUnhide();
-    
+    TrainingSystem::Instance().ShootingIni();
     tutorialFlag = true;
     tutorialUIFlag = true;
 }
@@ -570,7 +570,12 @@ void TrainingSystem::TrainingSystemUpdate(float elapsedTime)
 //クリア処理
 void TrainingSystem::TrainingSystemClear()
 {
-
+    GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
+    shootingStartFlag = false;
+    scarecrowSpawnIntervalTimer = 0.0f;
+    scarecrowLifeTimer = 0.0f;
+    scarecrowCount = 0;
+    shootingScore = 0;
 }
 
 
@@ -578,38 +583,43 @@ void TrainingSystem::TrainingSystemClear()
 //射撃時の案山子スポーン
 void TrainingSystem::ShootingSpawnCrow()
 {
-    //射撃時の倒す案山子
+    if (GameObjectManager::Instance().Find("scarecrow") == nullptr)
     {
-        DirectX::XMFLOAT3 randomPos;
-        randomPos.x = Mathf::RandomRange(-23.737f, 19.528f);
-        randomPos.y = 0.0f;
-        randomPos.z = Mathf::RandomRange(-65.607f, -46.164f);
+        //射撃時の倒す案山子
+        {
+            DirectX::XMFLOAT3 randomPos;
+            randomPos.x = Mathf::RandomRange(-23.737f, 19.528f);
+            randomPos.y = 0.0f;
+            randomPos.z = Mathf::RandomRange(-65.607f, -46.164f);
 
-        auto& scarecrow5 = GameObjectManager::Instance().Create();
-        scarecrow5->SetName("scarecrow");
-        std::shared_ptr<RendererCom> r = scarecrow5->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
-        r->SetOutlineColor({ 1,0,0 });
-        r->SetOutlineIntensity(10.0f);
-        scarecrow5->transform_->SetWorldPosition(randomPos);
-        scarecrow5->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
-        scarecrow5->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
-        std::shared_ptr<SphereColliderCom> collider = scarecrow5->AddComponent<SphereColliderCom>();
-        collider->SetMyTag(COLLIDER_TAG::Enemy);
-        scarecrow5->AddComponent<AnimationCom>();
-        scarecrow5->AddComponent<MovementCom>();
+            auto& scarecrow5 = GameObjectManager::Instance().Create();
+            scarecrow5->SetName("scarecrow");
+            std::shared_ptr<RendererCom> r = scarecrow5->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
+            r->SetOutlineColor({ 1,0,0 });
+            r->SetOutlineIntensity(10.0f);
+            scarecrow5->transform_->SetWorldPosition(randomPos);
+            scarecrow5->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
+            scarecrow5->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
+            std::shared_ptr<SphereColliderCom> collider = scarecrow5->AddComponent<SphereColliderCom>();
+            collider->SetMyTag(COLLIDER_TAG::Enemy);
+            scarecrow5->AddComponent<AnimationCom>();
+            scarecrow5->AddComponent<MovementCom>();
 
-        auto& scareCom = scarecrow5->AddComponent<ScarecrowCom>();
-        scareCom->SetCrowMode(0);
+            auto& scareCom = scarecrow5->AddComponent<ScarecrowCom>();
+            scareCom->SetCrowMode(0);
 
-        auto& charaStatusCom = scarecrow5->AddComponent<CharaStatusCom>();
-        charaStatusCom->SetInvincibleTime(0.1f);
-        charaStatusCom->SetHitPoint(1);
-        charaStatusCom->SetMaxHitPoint(1);
-        scarecrow5->AddComponent<AudioCom>();
-        std::shared_ptr<PushBackCom>pushBack = scarecrow5->AddComponent<PushBackCom>();
-        pushBack->SetRadius(1.5f);
-        pushBack->SetWeight(600.0f);
+            auto& charaStatusCom = scarecrow5->AddComponent<CharaStatusCom>();
+            charaStatusCom->SetInvincibleTime(0.1f);
+            charaStatusCom->SetHitPoint(1);
+            charaStatusCom->SetMaxHitPoint(1);
+            scarecrow5->AddComponent<AudioCom>();
+            std::shared_ptr<PushBackCom>pushBack = scarecrow5->AddComponent<PushBackCom>();
+            pushBack->SetRadius(1.5f);
+            pushBack->SetWeight(600.0f);
+
+
+        }
     }
 }
 
@@ -670,6 +680,8 @@ void TrainingSystem::ShootingStartEndSystem()
         GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->SetEnabled(false);
 
         shootingStartFlag = false;
+        scarecrowSpawnIntervalTimer = 0.0f;
+        scarecrowLifeTimer = 0.0f;
         scarecrowCount = 0;
         shootingScore = 0;
     }
@@ -687,29 +699,28 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         {
             //案山子破棄
             GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
-
+           
             //案山子スポーン
-            ShootingSpawnCrow();
+            ShootingSpawnCrow();      ///sssassssssss
 
             //初期化
             scarecrowLifeTimer = 0.0f;
             scarecrowCount += 1;
         }
     }
-    //倒してリスポーン
 
-    if (!shootingIntervalFlag&& GameObjectManager::Instance().Find("scarecrow")->GetComponent<CharaStatusCom>()->IsDeath())
-    {
-        //案山子破棄
-        GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
-
-        //初期化
+    //倒してリスポーン 
+    auto scarecrow = GameObjectManager::Instance().Find("scarecrow");
+    if (!shootingIntervalFlag && scarecrow && scarecrow->GetComponent<CharaStatusCom>()->IsDeath())
+    { 
+        //案山子破棄 
+         GameObjectManager::Instance().Remove(scarecrow);
+         //初期化 
         shootingIntervalFlag = true;
-        scarecrowLifeTimer = 0.0f;
+        scarecrowLifeTimer = 0.0f; 
         shootingScore += 1;
         scarecrowCount += 1;
     }
-
 
     //次の案山子スポーンまでの信号待ち
     if (shootingIntervalFlag)
@@ -718,7 +729,7 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         if (scarecrowSpawnIntervalTime < scarecrowSpawnIntervalTimer)
         {
             //案山子スポーン
-            ShootingSpawnCrow();
+            ShootingSpawnCrow();      //sssssss
 
             //初期化
             scarecrowSpawnIntervalTimer = 0.0f;
@@ -726,10 +737,32 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         }
     }
 
+
     GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->str = std::to_wstring(shootingScore);
     GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->str = std::to_wstring(scarecrowMaxTotal - scarecrowCount);
 
 
+}
+
+void TrainingSystem::ShootingIni()
+{
+    //案山子破棄
+    GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
+
+    GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
+    GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->ReSpawn(1);
+    GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
+    GameObjectManager::Instance().Find("trainingScoreF")->GetComponent<Font>()->SetEnabled(false);
+    GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->SetEnabled(false);
+    GameObjectManager::Instance().Find("trainingRestF")->GetComponent<Font>()->SetEnabled(false);
+    GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->SetEnabled(false);
+
+    shootingStartFlag = false;
+    scarecrowSpawnIntervalTimer = 0.0f;
+    scarecrowLifeTimer = 0.0f;
+
+    scarecrowCount = 0;
+    shootingScore = 0;
 }
 
 //アイテムスポーンシステム
@@ -756,6 +789,11 @@ void TrainingSystem::TrainingObjUnhide()
     GameObjectManager::Instance().Find("scarecrow4")->SetEnabled(false);
     GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
 
+    GameObjectManager::Instance().Find("allyBack")->SetEnabled(false);
+    GameObjectManager::Instance().Find("enemyBack")->SetEnabled(false);
+
+    
+
     if (GameObjectManager::Instance().Find("ULTSKILLMAXITEM") != nullptr)
     {
         GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->SetEnabled(false);
@@ -771,6 +809,10 @@ void TrainingSystem::TrainingObjDisplay()
     GameObjectManager::Instance().Find("scarecrow4")->SetEnabled(true);
     GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(true);
     GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->ReSpawn(1);
+
+    GameObjectManager::Instance().Find("allyBack")->SetEnabled(true);
+    GameObjectManager::Instance().Find("enemyBack")->SetEnabled(true);
+
 
     if (GameObjectManager::Instance().Find("ULTSKILLMAXITEM") != nullptr)
     {
@@ -1025,6 +1067,7 @@ void TutorialSystem::BlackOutManager(float elapsedTime)
     if (!flag)
     {
         TrainingManager::Instance().Changeblackout();
+        TutorialRightFlag = true;
         flag = true;
     }
 
@@ -1060,6 +1103,7 @@ void TutorialSystem::LightChangeManger(float elapsedTime)
     {
         NextTutorial(TutorialID::MOVE);
         GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+        TutorialRightFlag = false;
         upFlag = true;
         flag = false;
     }

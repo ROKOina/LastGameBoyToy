@@ -115,7 +115,9 @@ void FarahCom::UltSkill()
 //リロード（弾減らす処理は各自のキャラでする
 void FarahCom::Reload()
 {
-    if (currentBulletNum < maxBulletNum)
+    if (!(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
+        ? ((currentBulletNum > 0)) \
+        : ((netCharaData.GetBulletNum() > 0))))
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
     }

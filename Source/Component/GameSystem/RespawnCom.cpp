@@ -1,4 +1,5 @@
 #include "RespawnCom.h"
+#include "Scene\ScenePVP\ScenePVP.h"
 #include "Component\System\TransformCom.h"
 #include "Component\Character\CharacterCom.h"
 #include "Component\MoveSystem\MovementCom.h"
@@ -36,28 +37,7 @@ void RespawnCom::Update(float elapsedTime)
                 //位置移動
                 int spawnIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
-                int teamIndex = -1;
-                teamIndex = charaCom->GetNetCharaData().GetTeamID();
-
-                for (int i = 0; i < 4; ++i)
-                {
-                    int teamFlag = StaticSendDataManager::Instance().GetTeamNum(i);
-                    if (teamIndex == teamFlag && spawnIndex != i)
-                    {
-                        if (i > spawnIndex)
-                        {
-                            spawnIndex = 0;
-                        }
-                        else
-                        {
-                            spawnIndex = 1;
-                        }
-
-                        break;
-                    }
-                }
-
-                player->transform_->SetWorldPosition(respawnPoses[spawnIndex + (teamIndex * 2)]);
+                player->transform_->SetWorldPosition(respawnPoses[ScenePVP::GetPlayerTeamIndex(spawnIndex)]);
 
                 //パラメータ回復
                 CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
@@ -98,7 +78,9 @@ void RespawnCom::Update(float elapsedTime)
     //リスポーン終了したオブジェクトをコンテナから出す
     for (RespawnData* removeObj : endDatas)
     {
-        respawnDatas.erase(std::remove(respawnDatas.begin(), respawnDatas.end(), removeObj), respawnDatas.end());
+        auto& it = std::remove(respawnDatas.begin(), respawnDatas.end(), removeObj);
+        delete respawnDatas[respawnDatas.size() - 1];
+        respawnDatas.erase(it, respawnDatas.end());
     }
     endDatas.clear();
 }

@@ -19,7 +19,7 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
 }
 
 // e‚Ìæ’[ˆÊ’u‚ðŽæ“¾
-bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos,DirectX::XMFLOAT3& dir, unsigned int gamePad) const
+bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos, DirectX::XMFLOAT3& dir, unsigned int gamePad) const
 {
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
@@ -141,7 +141,10 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         charaComponent->ReleaseHaveBullet();
 
         //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
-        charaComponent->AddCurrentBulletNum(-1);
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaComponent->AddCurrentBulletNum(-1);
+        }
 
         //‰Šú‰»
         charaComponent->ResetShootTimer();
