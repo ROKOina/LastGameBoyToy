@@ -15,6 +15,11 @@
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
 
+#define JUDGE_NONEBULLET() \
+    (std::strcmp(GetGameObject()->GetName(), "player") == 0 \
+        ? ((currentBulletNum > 0)) \
+        : ((netCharaData.bulletNum > 0)))
+
 void CharacterCom::Update(float elapsedTime)
 {
     auto& ss = SceneManager::Instance().GetSettingScreen();
@@ -120,7 +125,7 @@ void CharacterCom::Update(float elapsedTime)
                 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
             {
                 //弾切れならリロード
-                if (currentBulletNum > 0)
+                if (JUDGE_NONEBULLET())
                 {
                     MainAttackDown();
                 }
@@ -133,13 +138,13 @@ void CharacterCom::Update(float elapsedTime)
                 }
 
                 //ネットを介した処理
-                if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
-                {
-                    if (netCharaData.GetBulletNum() > 0)
-                    {
-                        MainAttackDown();
-                    }
-                }
+                //if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+                //{
+                //    if (netCharaData.GetBulletNum() > 0)
+                //    {
+                //        MainAttackDown();
+                //    }
+                //}
             }
             attackInputSave = false;
         }
@@ -324,7 +329,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //弾切れなら自動的にリロード
-        if (currentBulletNum > 0 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+        if (JUDGE_NONEBULLET() && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
         {
             MainAttackDown();
         }
@@ -337,13 +342,13 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //ネットを介した処理
-        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
-        {
-            if (netCharaData.GetBulletNum() > 0 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
-            {
-                MainAttackDown();
-            }
-        }
+        //if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+        //{
+        //    if (netCharaData.GetBulletNum() > 0 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+        //    {
+        //        MainAttackDown();
+        //    }
+        //}
     }
     else if (CharacterInput::MainAttackButton & GetButton()
         && GamePad::BTN_A & GetButton())
@@ -363,14 +368,14 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //弾切れなら自動的にリロード
-        currentBulletNum > 0 ?
+        JUDGE_NONEBULLET() ?
             MainAttackDown() : Reload();
 
-        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
-        {
-            netCharaData.GetBulletNum() > 0 ?
-                MainAttackDown() : Reload();
-        }
+        //if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+        //{
+        //    netCharaData.GetBulletNum() > 0 ?
+        //        MainAttackDown() : Reload();
+        //}
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
