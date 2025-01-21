@@ -1558,7 +1558,7 @@ UI_KillEffect::UI_KillEffect()
 {
     std::shared_ptr<GameObject> Skull = GameObjectManager::Instance().Create();
     Skull->SetName("killSkull");
-    Skull->AddComponent<UiSystem>(nullptr,Sprite::SpriteShader::DEFALT,false);
+    Skull->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/KillEffect.ui",Sprite::SpriteShader::DEFALT,false);
 }
 
 void UI_KillEffect::Start()
@@ -1583,11 +1583,12 @@ void UI_KillEffect::EffectUpdat(float elapsedTime)
 {
     std::shared_ptr<UiSystem> skull = GameObjectManager::Instance().Find("killSkull")->GetComponent<UiSystem>();
     if (effectFLG) {
+        effectFLG = false;
         skull->spc.color = { 1,1,1,1 };
         skull->EasingPlay();
     }
     if (!skull->IsPlayEasing()) {
+        //effectFLG = false;
         skull->spc.color = { 1,1,1,0 };
-        effectFLG = false;
     }
 }
