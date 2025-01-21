@@ -167,6 +167,8 @@ public:
 
     void TutorialFlagClear();
 
+
+
 public:
     //ˆÃ“]
     void BlackOutManager(float elapsedTime);
@@ -189,6 +191,9 @@ public:
     void EndBlackTutorialManager(float elapsedTime);
 
     void EndTutorialManager(float elapsedTime);
+
+    bool GetTutorialRightFlag() { return TutorialRightFlag;}
+    void SetTutorialRightFlag(bool flag) { TutorialRightFlag = flag; }
 
     void OnGui();
 private:
@@ -225,7 +230,7 @@ private:
     bool moveWFlag = false;
     bool moveSFlag = false;
     bool moveJumpFlag = false;
-
+    bool TutorialRightFlag = false;
 
     DirectX::XMFLOAT2 InputVec = { 0,0 };
 

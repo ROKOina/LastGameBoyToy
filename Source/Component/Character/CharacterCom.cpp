@@ -14,6 +14,7 @@
 #include "Component\Renderer\RendererCom.h"
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
+#include  "Scene/SceneTraining/TrainingManager.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -24,7 +25,7 @@ void CharacterCom::Update(float elapsedTime)
         {
             //ê›íËâÊñ ÇäJÇ≠(ESC)
             GamePad& gamePad = Input::Instance().GetGamePad();
-            if (GamePad::ESC & gamePad.GetButtonDown())
+            if (GamePad::ESC & gamePad.GetButtonDown()&&!TutorialSystem::Instance().GetTutorialRightFlag())
             {
                 if (isViewSetting)
                 {
