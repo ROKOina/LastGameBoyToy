@@ -35,6 +35,7 @@
 #include "Math/easing.h"
 #include "Component\GameSystem\RespawnCom.h"
 #include "Component\System\CrownCom.h"
+#include "Component\System\pingCom.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
@@ -107,6 +108,20 @@ void ScenePVP::Initialize()
             damageC->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/damageCircle.ui", Sprite::SpriteShader::DEFALT, false);
             damageC->SetEnabled(false);
         }
+    }
+
+    //ピン
+    for (int i = 0; i < 4; ++i)
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName(("ping" + std::to_string(i)).c_str());
+
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        
+        obj->AddComponent<PingCom>();
+
+        obj->SetEnabled(false);
     }
 
     //ロビー選択から始まる
@@ -623,6 +638,9 @@ void ScenePVP::Update(float elapsedTime)
     }
     damages.clear();
 
+    //ピン
+    PingUpdate(elapsedTime);
+
     //終わり
     if (pvpGameSystem->IsGameEnd())
     {
@@ -925,6 +943,40 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     }
 }
 
+void ScenePVP::PingUpdate(float elapsedTime)
+{
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (GamePad::NAKA_BUTTON & gamePad.GetButtonDown())
+    {
+        auto& player = GameObjectManager::Instance().Find("player");
+        if (!player)return;
+        auto& camera = player->GetChildFind("cameraPostPlayer");
+        if (!camera)return;
+
+        DirectX::XMFLOAT3 start = camera->transform_->GetWorldPosition();
+        DirectX::XMFLOAT3 end = start + camera->transform_->GetWorldFront() * 1000;
+
+        PxRaycastBuffer buffer;
+        if (PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
+        {
+            DirectX::XMFLOAT3 pinPos;
+
+            // レイキャストが当たった位置と法線を保存
+            pinPos.x = buffer.block.position.x;
+            pinPos.y = buffer.block.position.y;
+            pinPos.z = buffer.block.position.z;
+
+            int myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
+            auto& ping = GameObjectManager::Instance().Find(("ping" + std::to_string(myPlayerID)).c_str());
+            if (ping)
+            {
+                ping->GetComponent<PingCom>()->SetPing(pinPos);
+                StaticSendDataManager::Instance().SendNetPing(pinPos);
+            }
+        }
+    }
+}
+
 void ScenePVP::TransitionUpdate(float elapsedTime)
 {
     switch (lobbyState)
@@ -1138,6 +1190,7 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
             if (ui->GetHitSprite())
             {
                 GamePad& gamePad = Input::Instance().GetGamePad();
+                //if (GamePad::NAKA_BUTTON & gamePad.GetButtonDown())
                 if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
                 {
                     auto& lobbyStr = fP->GetChildFind(("lobbySelectFont" + std::to_string(2)).c_str());  //文字

@@ -52,6 +52,9 @@ private:
     //ゲームシステム更新
     void GameSystemUpdate(float elapsedTime);
 
+    //ピン
+    void PingUpdate(float elapsedTime);
+
     //画面に応じた更新処理
     void TransitionUpdate(float elapsedTime);
 

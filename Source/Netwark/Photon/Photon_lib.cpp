@@ -20,6 +20,7 @@
 #include "PVPGameSystem/PVPGameSystem.h"
 
 #include "StaticSendDataManager.h"
+#include "Component\System\pingCom.h"
 
 #include "imgui.h"
 
@@ -1461,6 +1462,13 @@ void PhotonLib::GameRecv(NetData recvData)
         }
     }
 
+    //ピング
+    if (recvData.gameData.pingFlg)
+    {
+        auto& ping = GameObjectManager::Instance().Find(("ping" + std::to_string(recvData.playerId)).c_str());
+        ping->GetComponent<PingCom>()->SetPing(recvData.gameData.pingPos);
+    }
+
     if (recvData.playerId >= 0)
     {
         //保存情報
@@ -1714,6 +1722,9 @@ void PhotonLib::sendGameData(void)
     {
         netD.gameData.isKillCount[d] = saveDeath[d].killCon;
     }
+
+    //ピング
+    netD.gameData.pingFlg = StaticSendDataManager::Instance().GetNetPing(netD.gameData.pingPos);
 
     //キャラIDを送る
     netD.gameData.charaID = myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();
