@@ -773,7 +773,7 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     auto net = photonNet->GetPhotonLib();
 
     //カウントダウン時処理
-    if (isCountDown)
+    if (isCountDown&& isGame)
     {
         //カウントダウン時はタイマーをリセット
         net->ResetNowTime();
