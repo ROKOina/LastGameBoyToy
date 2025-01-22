@@ -1358,7 +1358,7 @@ void PhotonLib::GameRecv(NetData recvData)
         {
             if (saveDeath[myPlayerID].deathCountTimer <= 0)
             {
-                saveDeath[myPlayerID].deathCountTimer = 5;
+                saveDeath[myPlayerID].deathCountTimer = 2;
                 saveDeath[myPlayerID].killCon = true;
                 saveInputPhoton[myPlayerID].killCount++;
                 auto& myPlayer = GameObjectManager::Instance().Find("player");

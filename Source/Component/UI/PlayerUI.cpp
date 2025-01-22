@@ -1448,7 +1448,7 @@ void PlayerUIManager::CreateKillLog()
     {
         std::shared_ptr<GameObject> enemyBack = killLogCanvas->AddChildObject();
         enemyBack->SetName(("enemyKillLog" + std::to_string(i)).c_str());
-        enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
+        enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBackEnemy.ui", Sprite::SpriteShader::DEFALT, false);
         enemyBack->SetEnabled(false);
         //ˆêl–Ú
         {
