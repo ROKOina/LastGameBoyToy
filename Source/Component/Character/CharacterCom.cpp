@@ -37,6 +37,11 @@ void CharacterCom::Update(float elapsedTime)
                     ss->SetViewSetting(true);
                 }
             }
+            //Ž€‚ñ‚¾‚çƒIƒvƒVƒ‡ƒ“‰æ–Ê•Â‚¶‚é
+            if (GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
+            {
+                ss->SetViewSetting(false);
+            }
         }
     }
 
