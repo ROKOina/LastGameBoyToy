@@ -90,13 +90,32 @@ bool InputTextWString(const char* label, std::wstring& wstr, size_t max_length =
     return edited;
 }
 
-Font::Font(const char* filename, int maxSpriteCount)
+Font::Font(const char* filename, int maxSpriteCount, FontShader shader)
 {
     //Fontの作り方はPVPシーンにイニシャライズに参考例置いときます
     HRESULT hr = S_OK;
 
     ID3D11Device* device = Graphics::Instance().GetDevice();
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+    //ファイル名
+    const char* PSPath = nullptr;
+    const char* VSPath = nullptr;
+
+    //シェーダのパス設定
+    switch (shader)
+    {
+    case FontShader::DEFALT:
+        PSPath = { "Shader\\Font_PS.cso" };
+        VSPath = { "Shader\\Font_VS.cso" };
+        break;
+    case FontShader::COOL:
+        PSPath = { "Shader\\FontCool_PS.cso" };
+        VSPath = { "Shader\\Font_VS.cso" };
+        break;
+    default:
+        assert(!"シェーダーがありません");
+    }
 
     // 頂点シェーダー
     {
@@ -110,12 +129,12 @@ Font::Font(const char* filename, int maxSpriteCount)
             { "MASK",     0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
             { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
             };
-            CreateVsFromCso(device, "Shader\\Font_VS.cso", vertexShader.GetAddressOf(), inputLayout.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
+            CreateVsFromCso(device, VSPath, vertexShader.GetAddressOf(), inputLayout.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
         }
     }
     // ピクセルシェーダー
     {
-        CreatePsFromCso(device, "Shader\\Font_PS.cso", pixelShader.GetAddressOf());
+        CreatePsFromCso(device, PSPath, pixelShader.GetAddressOf());
     }
 
     // 頂点バッファ
@@ -368,7 +387,7 @@ void Font::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& pr
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_ON_ZW_ON), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
 
-    stri = L"いとうさいこう";
+    stri = L"いとうさいこう!!!";
     // 頂点編集開始
     D3D11_MAPPED_SUBRESOURCE mapped_subresource;
     dc->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_subresource);
