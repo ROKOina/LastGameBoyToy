@@ -30,7 +30,7 @@ void Solder_MainAttackState::Enter()
     DirectX::XMFLOAT3 end = start + front * 100;
 
     //エフェクト再生
-    //owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
+    owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
 
     //レイキャスト有効化
     ray->SetStart(start);
@@ -66,7 +66,21 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
         //腕アニメーション再生
         charaCom.lock()->HandleArmAnimation();
 
-        //レイキャストOFF
+        //レイ設定
+        ray = rayobj->GetComponent<RayColliderCom>();
+        DirectX::XMFLOAT3 start = rayobj->transform_->GetWorldPosition();
+
+        //カメラ取得
+        auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
+        DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
+        DirectX::XMFLOAT3 end = start + front * 100;
+
+        //エフェクト再生
+        owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
+
+        //レイキャスト有効化
+        ray->SetStart(start);
+        ray->SetEnd(end);
         ray->SetEnabled(true);
 
         //弾減らさないとリロードしない
