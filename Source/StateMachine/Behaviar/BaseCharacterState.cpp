@@ -425,17 +425,6 @@ void Ult_Attack_State::Enter()
     DirectX::XMFLOAT3 front = owner->GetFpsCameraDir();
     DirectX::XMFLOAT3 end = start + front * 100;
 
-    //エフェクト
-    //auto& arm = owner->GetGameObject()->GetChildFind("armChild");
-    //DirectX::XMFLOAT3 gunPos = {};
-    //if (arm)
-    //{
-    //    const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-    //    const auto& node = model->FindNode("gun2");
-
-    //    gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
-    //}
-
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
         auto& camera = owner->GetGameObject()->GetChildFind("cameraPostPlayer");
