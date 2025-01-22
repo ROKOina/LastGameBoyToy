@@ -311,6 +311,44 @@ void ScenePVP::InitializePVP()
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
+    //ステージのエフェクト関係
+    {
+        std::shared_ptr<GameObject> stageEffect = GameObjectManager::Instance().Create();
+        stageEffect->SetName("StageEffetc");
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect1 = stageEffect->AddChildObject();
+            jeteffect1->SetName("Jet1");
+            jeteffect1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet.gpuparticle", 1000);
+            jeteffect1->transform_->SetWorldPosition({ 14.696f,10.043f,-2.208f });
+        }
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect2 = stageEffect->AddChildObject();
+            jeteffect2->SetName("Jet2");
+            jeteffect2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet.gpuparticle", 1000);
+            jeteffect2->transform_->SetWorldPosition({ -5.260f,9.686f,-2.317f });
+        }
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect3 = stageEffect->AddChildObject();
+            jeteffect3->SetName("Jet3");
+            jeteffect3->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet_1.gpuparticle", 1000);
+            jeteffect3->transform_->SetWorldPosition({ 15.187f,9.727f,17.154f });
+        }
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect4 = stageEffect->AddChildObject();
+            jeteffect4->SetName("Jet4");
+            jeteffect4->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet_1.gpuparticle", 1000);
+            jeteffect4->transform_->SetWorldPosition({ -4.663f,9.966f,17.040f });
+        }
+    }
+
     //snowparticle
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
