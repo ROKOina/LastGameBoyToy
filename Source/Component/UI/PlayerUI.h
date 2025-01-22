@@ -438,7 +438,8 @@ public:
     void CreateKillEffect();
 
     //キルログ
-    void KillLog();
+    void KillLogUpdate(float elapsedTime);
+    void CreateKillLog();   //オブジェ生成
 
     //全員の使用キャラUI
     void CreateNetUseCharaUI();
@@ -464,4 +465,24 @@ private:
     bool isEndFLG = false;
 
     bool allyHp = false;    //味方HP表示済み
+
+    float  kilogTimer[4] = {};
+
+    //要素がキルキャラID
+    struct DeathData
+    {
+        int charaID;
+        bool isEnemy;   //ですしたキャラは敵か
+
+        //動き
+        struct MoveData
+        {
+            bool startFlg = false;
+            int id = 0;
+
+            float timer = 0;
+            int underNum = 0;   //追加できた数
+        }moveData;
+    };
+    std::map<int, DeathData> saveCharaKilog;
 };
