@@ -221,7 +221,9 @@ private:
     bool upFlag = false;
     bool downFlag = false;
     bool jumpFlag = false;
+    bool dashFlag = false;
     bool gunFlag = false;
+    bool reloadFlga = false;
     bool skillFlag = false;
     bool ultFlag = false;
 
@@ -248,8 +250,8 @@ private:
         const char* Lines;
     };
 
-    SubTitle moveSubTitle[12];
-    SubTitle gunSubTitle[4];
+    SubTitle moveSubTitle[15];
+    SubTitle gunSubTitle[7];
     SubTitle skillSubTitle[4];
     SubTitle ultSubTitle[5];
 
