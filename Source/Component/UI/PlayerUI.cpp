@@ -1267,7 +1267,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 //一回だけ通るように
                 if (kilogTimer[deathPID] > 0)continue;  //待機時間はcontinue
 
-                kilogTimer[deathPID] = 3;
+                kilogTimer[deathPID] = 5;
 
                 //ここでキルログを出す
                 int killChara = -1;
