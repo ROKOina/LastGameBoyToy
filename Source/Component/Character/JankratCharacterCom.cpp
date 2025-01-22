@@ -69,18 +69,6 @@ void JankratCharacterCom::SubSkill()
     }
 }
 
-void JankratCharacterCom::Reload()
-{
-    bool isBulletNone = !(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
-        ? ((currentBulletNum > 0)) \
-        : ((netCharaData.GetBulletNum() > 0)));
-
-    if (isBulletNone)
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
-}
-
 //ult
 void JankratCharacterCom::UltSkill()
 {

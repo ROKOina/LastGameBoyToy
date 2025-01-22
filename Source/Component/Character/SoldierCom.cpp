@@ -86,19 +86,6 @@ void SoldierCom::UltSkill()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 
-//ƒŠƒ[ƒh
-void SoldierCom::Reload()
-{
-    bool isBulletNone = !(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
-        ? ((currentBulletNum > 0)) \
-        : ((netCharaData.GetBulletNum() > 0)));
-
-    if (isBulletNone)
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
-}
-
 // GUI
 void SoldierCom::OnGUI()
 {

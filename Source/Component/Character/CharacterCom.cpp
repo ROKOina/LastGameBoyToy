@@ -261,6 +261,16 @@ void CharacterCom::OnGUI()
     }
 }
 
+void CharacterCom::Reload()
+{
+    if ((std::strcmp(GetGameObject()->GetName(), "player") == 0 \
+        ? ((currentBulletNum < maxBulletNum)) \
+        : ((netCharaData.GetBulletNum() < maxBulletNum))))
+    {
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
+    }
+}
+
 //ダッシュ
 void CharacterCom::DashFewSub(float elapsedTime)
 {
@@ -371,12 +381,6 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         //弾切れなら自動的にリロード
         JUDGE_NONEBULLET() ?
             MainAttackDown() : Reload();
-
-        //if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
-        //{
-        //    netCharaData.GetBulletNum() > 0 ?
-        //        MainAttackDown() : Reload();
-        //}
     }
     else if (CharacterInput::MainAttackButton & GetButton())
     {
@@ -397,12 +401,6 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SubAttackPushing();
     }
 
-    //if (CharacterInput::MainSkillButton_E & GetButtonDown()
-    //    && IsSkillCoolMax(SkillCoolID::Q))
-    //{
-    //    skillCools[SkillCoolID::Q].timer = 0;
-    //    MainSkill();
-    //}
     if (CharacterInput::MainSkillButton_E & GetButtonDown()
         && IsSkillCoolMax(SkillCoolID::E))
     {

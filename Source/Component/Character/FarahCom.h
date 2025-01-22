@@ -48,9 +48,6 @@ public:
     // ULT
     void UltSkill() override;
 
-    //リロード（弾減らす処理は各自のキャラでする
-    void Reload()override;
-
 private:
 
     // 銃の打つ間隔とマズルフラッシュ
