@@ -756,8 +756,10 @@ void PlayerUIManager::Register()
 
     CreateKillEffect();
 
-    //キルログ
-    KillLog();
+    ////キルログ
+    //KillLog();
+    CreateKillLog();
+
     ////////////////////////////////
 
     //キャラ固有のUI
@@ -780,6 +782,9 @@ void PlayerUIManager::Register()
 
 void PlayerUIManager::UIUpdate(float elapsedTime)
 {
+    //キルログ
+    KillLogUpdate(elapsedTime);
+
     if (!bookingRegister) return;
 
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
@@ -1242,66 +1247,225 @@ void PlayerUIManager::CreateKillEffect()
 }
 
 //キルログ
-void PlayerUIManager::KillLog()
+void PlayerUIManager::KillLogUpdate(float elapsedTime)
 {
-    //for (int i = 0; i < 4; i++)
-    //{
-    //    effectFLGTimer[i] -= elapsedTime;
-    //    if (effectFLGTimer[i] > 0)continue;
+    //タイマー更新
+    for (int deathPID = 0; deathPID < 4; deathPID++)
+    {
+        kilogTimer[deathPID] -= elapsedTime;
+    }
 
-    //    auto& player = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>();
-    //    auto& killflg = StaticSendDataManager::Instance().GetKillID(player->GetNetCharaData().GetNetPlayerID(), i);
+    //キルした側
+    for (int killPID = 0; killPID < 4; killPID++)
+    {
+        //デスした側
+        for (int deathPID = 0; deathPID < 4; deathPID++)
+        {
+            auto& killflg = StaticSendDataManager::Instance().GetKillID(killPID, deathPID);
+            if (killflg)  //キルが発生しているなら
+            {
+                //一回だけ通るように
+                if (kilogTimer[deathPID] > 0)continue;  //待機時間はcontinue
 
-    //    if (killflg)
-    //    {
-    //        effectFLG = true;
+                kilogTimer[deathPID] = 3;
 
-    //        killflg = false;
-    //        effectFLGTimer[i] = 3;
-    //    }
-    //}
+                //ここでキルログを出す
+                int killChara = -1;
+                DeathData  d;
+                //チームを見る
+                for (auto& chara : GameObjectManager::Instance().GetCharaObject())
+                {
+                    if (!chara.lock())continue;
+                    auto& charaCom = chara.lock()->GetComponent<CharacterCom>();
+                    
+                    if (!charaCom)continue;
 
-    //std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-    ////味方
-    //{
-    //    std::shared_ptr<GameObject> allyBack = canvas->AddChildObject();
-    //    allyBack->SetName("KilllogAlly");
-    //    allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
-    //    //一人目
-    //    {
-    //        std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
-    //        ally01->SetName("Ally1");
-    //        ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
-    //    }
-    //    //二人目
-    //    {
-    //        std::shared_ptr<GameObject> ally02 = allyBack->AddChildObject();
-    //        ally02->SetName("Ally2");
-    //        ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
-    //    }
-    //}
+                    //キル側
+                    if (charaCom->GetNetCharaData().GetNetPlayerID() == killPID)
+                    {
+                        killChara = charaCom->GetNetCharaData().GetCharaID();
+                    }
 
-    ////敵
-    //{
-    //    std::shared_ptr<GameObject> enemyBack = canvas->AddChildObject();
-    //    enemyBack->SetName("KillLogEnemy");
-    //    enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBackEnemy.ui", Sprite::SpriteShader::DEFALT, false);
-    //    //一人目
-    //    {
-    //        std::shared_ptr<GameObject> enemy01 = enemyBack->AddChildObject();
-    //        enemy01->SetName("Enemy1");
-    //        enemy01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
-    //    }
-    //    //二人目
-    //    {
-    //        std::shared_ptr<GameObject> enemy02 = enemyBack->AddChildObject();
-    //        enemy02->SetName("Enemy2");
-    //        enemy02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
-    //    }
-    //}
+                    //デス側
+                    if (charaCom->GetNetCharaData().GetNetPlayerID() == deathPID)
+                    {
+                        //チームを比べる
+                        auto& p = GameObjectManager::Instance().Find("player");
+                        int pT = p->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+                        int nT = charaCom->GetNetCharaData().GetTeamID();
+                        d.isEnemy = (pT != nT);
+
+                        d.charaID = charaCom->GetNetCharaData().GetCharaID();
+
+                        //使用UIを決める
+                        int uiID = 0;
+                        for (auto& log : saveCharaKilog)
+                        {
+                            //後から追加される数を増やす
+                            log.second.moveData.underNum++;
+                            if (log.second.isEnemy != d.isEnemy)continue;   //同じチームが流れている場合は入る
+
+                            if (log.second.moveData.id == 0)
+                                uiID = 1;
+                        }
+                        if (uiID == 1)d.moveData.id = 0;
+                        else d.moveData.id = 1;
+                    }
+                }
+
+                //キルが起きたので一旦保存
+                saveCharaKilog[killChara] = d;
+            }
+            killflg = false;
+        }
+    }
+
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("killLogCanvas");
+   
+    //削除用変数
+    std::vector<int> removeID;
+
+    //演出用変数
+    static const float stopY = 300; //停止位置
+    static const float stopX = 3000; //停止位置
+    static const float stopA = 0.6f; //停止透明色
+    static const float removeTime = 3; //消去時間
+
+    //敵味方、関係なく表示する
+    auto& kilogView = [&](std::string parentObjName, std::pair<const int, DeathData>& data)
+        {
+            auto& moveData = data.second.moveData;
+
+            auto& parant = canvas->GetChildFind((parentObjName + std::to_string(moveData.id)).c_str());
+            auto& c01 = parant->GetChildFind("charaView01");
+            auto& c02 = parant->GetChildFind("charaView02");
+
+            auto& Pspr = parant->GetComponent<UiSystem>();
+            auto& c1spr = c01->GetComponent<UiSystem>();
+            auto& c2spr = c02->GetComponent<UiSystem>();
+
+            //起動時
+            if (!moveData.startFlg)
+            {
+                moveData.startFlg = true;
+                parant->SetEnabled(true);
+                //初期位置
+                parant->transform_->SetWorldPosition({ 1760,500,0 });
+                c01->transform_->SetLocalPosition({80,0,0});
+                c02->transform_->SetLocalPosition({380,0,0});
+
+                //いーじんぐ初期か
+                Pspr->spc.color.w = 0;
+                c1spr->spc.color.w = 0;
+                c2spr->spc.color.w = 0;
+
+                //キャラIDを見て画像ずらす
+                c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.first;
+                c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.second.charaID;
+            }
+
+            //動き
+            moveData.timer += elapsedTime;
+
+            //入場演出
+            static const float inSlideTime = 0.5f;
+            if (moveData.timer <= inSlideTime)
+            {
+                //位置
+                DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
+                pos.y = Mathf::Lerp(pos.y, stopY, moveData.timer / inSlideTime);
+                parant->transform_->SetWorldPosition(pos);             
+                
+                //色
+                Pspr->spc.color.w = Mathf::Lerp(Pspr->spc.color.w, stopA, moveData.timer / inSlideTime);
+                c1spr->spc.color.w = Mathf::Lerp(c1spr->spc.color.w, 1, moveData.timer / inSlideTime);
+                c2spr->spc.color.w = Mathf::Lerp(c2spr->spc.color.w, 1, moveData.timer / inSlideTime);
+            }
+
+            //追加された時に上にスライド
+            {
+                DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
+                pos.y = Mathf::Lerp(pos.y, stopY - moveData.underNum * 100, 0.1f);
+                parant->transform_->SetWorldPosition(pos);
+            }
+
+            //退出演出
+            static const float outSlideTime = 0.5f;
+            if (moveData.timer >= removeTime- outSlideTime)
+            {
+                float t = moveData.timer - (removeTime - outSlideTime);
+                DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
+                pos.x = Mathf::Lerp(pos.x, stopX, t / outSlideTime);
+                parant->transform_->SetWorldPosition(pos);
+            }
+
+            //削除申請
+            if (moveData.timer > removeTime)
+                removeID.emplace_back(data.first);
+        };
+
+
+    for (auto& log : saveCharaKilog)
+    {
+        if (log.second.isEnemy)  //チームが敵を倒した場合
+            kilogView("allyKillLog", log);
+        else
+            kilogView("enemyKillLog", log);
+    }
+
+    for (auto& id : removeID)
+        saveCharaKilog.erase(id);
 }
 
-//TODO ITOKUN RAMUCHI
+void PlayerUIManager::CreateKillLog()
+{
+    std::shared_ptr<GameObject> killLogCanvas = GameObjectManager::Instance().Create();
+    killLogCanvas->SetName("killLogCanvas");
+
+    //味方用
+    for (int i = 0; i < 2; ++i)
+    {
+        std::shared_ptr<GameObject> allyBack = killLogCanvas->AddChildObject();
+        allyBack->SetName(("allyKillLog" + std::to_string(i)).c_str());
+        allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
+        allyBack->SetEnabled(false);
+        //一人目
+        {
+            std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
+            ally01->SetName("charaView01");
+            ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //二人目
+        {
+            std::shared_ptr<GameObject> ally02 = allyBack->AddChildObject();
+            ally02->SetName("charaView02");
+            ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+    }
+
+    //敵用
+    for (int i = 0; i < 2; ++i)
+    {
+        std::shared_ptr<GameObject> enemyBack = killLogCanvas->AddChildObject();
+        enemyBack->SetName(("enemyKillLog" + std::to_string(i)).c_str());
+        enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
+        enemyBack->SetEnabled(false);
+        //一人目
+        {
+            std::shared_ptr<GameObject> ally01 = enemyBack->AddChildObject();
+            ally01->SetName("charaView01");
+            ally01->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //二人目
+        {
+            std::shared_ptr<GameObject> ally02 = enemyBack->AddChildObject();
+            ally02->SetName("charaView02");
+            ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+    }
+
+}
+
 void PlayerUIManager::CreateNetUseCharaUI()
 {
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
