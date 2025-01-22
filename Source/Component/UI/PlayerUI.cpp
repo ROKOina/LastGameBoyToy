@@ -1329,7 +1329,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
     static const float stopY = 300; //停止位置
     static const float stopX = 3000; //停止位置
     static const float stopA = 0.6f; //停止透明色
-    static const float removeTime = 3; //消去時間
+    static const float removeTime = 5; //消去時間
 
     //敵味方、関係なく表示する
     auto& kilogView = [&](std::string parentObjName, std::pair<const int, DeathData>& data)
@@ -1374,7 +1374,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 //位置
                 DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
                 pos.y = Mathf::Lerp(pos.y, stopY, moveData.timer / inSlideTime);
-                parant->transform_->SetWorldPosition(pos);             
+                parant->transform_->SetWorldPosition(pos);
                 
                 //色
                 Pspr->spc.color.w = Mathf::Lerp(Pspr->spc.color.w, stopA, moveData.timer / inSlideTime);
@@ -1401,7 +1401,10 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
             //削除申請
             if (moveData.timer > removeTime)
+            {
+                parant->SetEnabled(false);
                 removeID.emplace_back(data.first);
+            }
         };
 
 
