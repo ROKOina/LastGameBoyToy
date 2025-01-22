@@ -121,7 +121,9 @@ void ScenePVP::Initialize()
         
         obj->AddComponent<PingCom>();
 
-        obj->SetEnabled(false);
+        obj->AddComponent<GPUParticle>(nullptr, 100);
+
+        //obj->SetEnabled(false);
     }
 
     //ロビー選択から始まる
