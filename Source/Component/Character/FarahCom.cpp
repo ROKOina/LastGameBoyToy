@@ -122,17 +122,6 @@ void FarahCom::UltSkill()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
 }
 
-//リロード（弾減らす処理は各自のキャラでする
-void FarahCom::Reload()
-{
-    if (!(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
-        ? ((currentBulletNum > 0)) \
-        : ((netCharaData.GetBulletNum() > 0))))
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
-}
-
 // 銃の発射間隔とマズルフラッシュ
 void FarahCom::ShotSecond()
 {
