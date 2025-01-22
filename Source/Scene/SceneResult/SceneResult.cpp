@@ -9,7 +9,7 @@
 
 void SceneResult::Initialize()
 {
-    #pragma region 描画の基本系
+#pragma region 描画の基本系
 
     //ポストエフェクト
     {
@@ -147,7 +147,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         std::shared_ptr<GameObject> killNumObj = canvas->AddChildObject();
         std::string killNum = std::to_string(i) + "st_Player";
         killNumObj->SetName(killNum.c_str());
-        std::shared_ptr<Font> killNumFont = killNumObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        std::shared_ptr<Font> killNumFont = killNumObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::COOL);
         killNumFont->str = L"000";
         killNumFont->position = DirectX::XMFLOAT2{ 450.0f,300.0f + (150 * i) };
         killNumFont->scale = 1.5f;
@@ -159,7 +159,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         std::shared_ptr<GameObject> killStrObj = canvas->AddChildObject();
         std::string killStr = std::to_string(i) + "st_Player_kill";
         killStrObj->SetName(killStr.c_str());
-        std::shared_ptr<Font> killStrFont = killStrObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        std::shared_ptr<Font> killStrFont = killStrObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::COOL);
         killStrFont->str = L"Kill";
         killStrFont->position = DirectX::XMFLOAT2{ 650.0f,325.0f + (150 * i) };
         killStrFont->scale = 0.9f;
