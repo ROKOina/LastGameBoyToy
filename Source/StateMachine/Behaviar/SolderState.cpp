@@ -46,6 +46,12 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButton())
     {
         ray->SetEnabled(false);
+
+        //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaCom.lock()->AddCurrentBulletNum(-1);
+        }
     }
 
     //ŠÔ‚ğŒo‰ß‚³‚¹‚Ä‘Å‚ÂŠÔ‚ğ’²®
