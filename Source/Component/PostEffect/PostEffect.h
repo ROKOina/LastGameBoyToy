@@ -45,8 +45,6 @@ public:
         BlurStrength,
         BlurRadius,
         BlurDecay,
-        Sepia,
-        Nega,
         MAX
     };
 
@@ -92,9 +90,7 @@ private:
         float blurstrength = {};
         float blurradius = { 1.0f };
         float blurdecay = { 0.999f };
-        float sepiastrength = { 0.0f };
-        float negapogistrength = { 0.0f };
-        DirectX::XMFLOAT3 padding = {};
+        float ditancesan = { 1034.0f };
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 
@@ -120,7 +116,7 @@ public:
 
 private:
     enum class offscreen { offscreen, posteffect, tonemap, cascadeshadow, fxaa, depthCopy, max };
-    enum class pixelshader { deferred, colorGrading, cascadeshadow, fxaa, tonemap, charapick, max };
+    enum class pixelshader { deferred, colorGrading, cascadeshadow, fxaa, tonemap, max };
     std::unique_ptr<FrameBuffer> m_offScreenBuffer[static_cast<int>(offscreen::max)];
     Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelshaders[static_cast<int>(pixelshader::max)];
 
