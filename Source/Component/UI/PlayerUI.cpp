@@ -1284,14 +1284,22 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                     if (charaCom->GetNetCharaData().GetNetPlayerID() == killPID)
                     {
                         killChara = charaCom->GetNetCharaData().GetCharaID();
+
+                        //自分の場合
+                        if (std::strcmp(chara.lock()->GetName(), "player"))
+                            d.myID = 0;
                     }
 
                     //デス側
                     if (charaCom->GetNetCharaData().GetNetPlayerID() == deathPID)
                     {
+                        //自分の場合
+                        if (std::strcmp(chara.lock()->GetName(), "player"))
+                            d.myID = 1;
                         //チームを比べる
-                        auto& p = GameObjectManager::Instance().Find("player");
-                        int pT = p->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+                        auto& player = GameObjectManager::Instance().Find("player");
+                        auto& charaC = player->GetComponent<CharacterCom>();
+                        int pT = charaC->GetNetCharaData().GetTeamID();
                         int nT = charaCom->GetNetCharaData().GetTeamID();
                         d.isEnemy = (pT != nT);
 
@@ -1358,6 +1366,10 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 Pspr->spc.color.w = 0;
                 c1spr->spc.color.w = 0;
                 c2spr->spc.color.w = 0;
+                if (data.second.myID == 0) //キルが自分
+                    c1spr->spc.color = { 1,0,0,0 };
+                if (data.second.myID == 1) //デスが自分
+                    c2spr->spc.color = { 1,0,0,0 };
 
                 //キャラIDを見て画像ずらす
                 c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.first;
