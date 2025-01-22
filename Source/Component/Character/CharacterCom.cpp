@@ -25,7 +25,7 @@ void CharacterCom::Update(float elapsedTime)
         {
             //設定画面を開く(ESC)
             GamePad& gamePad = Input::Instance().GetGamePad();
-            if (GamePad::ESC & gamePad.GetButtonDown()&&!TutorialSystem::Instance().GetTutorialRightFlag())
+            if (GamePad::ESC & gamePad.GetButtonDown() && !TutorialSystem::Instance().GetTutorialRightFlag())
             {
                 if (isViewSetting)
                 {
@@ -137,15 +137,6 @@ void CharacterCom::Update(float elapsedTime)
                         Reload();
                     }
                 }
-
-                //ネットを介した処理
-                //if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
-                //{
-                //    if (netCharaData.GetBulletNum() > 0)
-                //    {
-                //        MainAttackDown();
-                //    }
-                //}
             }
             attackInputSave = false;
         }
@@ -351,21 +342,21 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
                 Reload();
             }
         }
-
-        //ネットを介した処理
-        //if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
-        //{
-        //    if (netCharaData.GetBulletNum() > 0 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
-        //    {
-        //        MainAttackDown();
-        //    }
-        //}
     }
-    else if (CharacterInput::MainAttackButton & GetButton()
-        && GamePad::BTN_A & GetButton())
+    else if (CharacterInput::MainAttackButton & GetButton() && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
-        if (!isUseUlt)
+        //弾切れなら自動的にリロード
+        if (JUDGE_NONEBULLET() && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+        {
             MainAttackPushing();
+        }
+        else
+        {
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+            {
+                Reload();
+            }
+        }
     }
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
@@ -389,21 +380,28 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 #endif // DEBUG_
 
-    if (CharacterInput::SubAttackButton & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::RightClick))
+    if (CharacterInput::SubAttackButton & GetButtonDown() && IsSkillCoolMax(SkillCoolID::RightClick))
     {
+        //メイン攻撃時はリターン
+        if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
         skillCools[SkillCoolID::RightClick].timer = 0;
         skillCools[SkillCoolID::RightClick].useskill = true;
         SubAttackDown();
     }
     else if (CharacterInput::SubAttackButton & GetButton())
     {
+        //メイン攻撃時はリターン
+        if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
         SubAttackPushing();
     }
 
-    if (CharacterInput::MainSkillButton_E & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::E))
+    if (CharacterInput::MainSkillButton_E & GetButtonDown() && IsSkillCoolMax(SkillCoolID::E))
     {
+        //メイン攻撃時はリターン
+        if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
         skillCools[SkillCoolID::E].timer = 0;
         skillCools[SkillCoolID::E].useskill = true;
         SubSkill();

@@ -40,6 +40,7 @@
 
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
+#include "../SceneResult/SceneResult.h"
 
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
@@ -632,7 +633,21 @@ void ScenePVP::Update(float elapsedTime)
         }
         //仮遷移
         if (!SceneManager::Instance().GetTransitionFlag())
-            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+        {
+            SceneResult* result = new SceneResult;
+
+            //ここでリザルトに送るデータを作る
+            for (int i = 0; i < 4; i++)
+            {
+                SceneResult::ResultData data;
+                data.charaID;
+                data.playerName = std::to_string(i) + "_player";
+
+                result->resultDatas[i] = data;
+            }
+
+            SceneManager::Instance().ChangeSceneDelay(result, 2);
+        }
     }
 
     //画面切り替え処理

@@ -6,6 +6,7 @@
 #include "Component/System/TransformCom.h"
 #include "Component/Animation/AnimationCom.h"
 #include "Component\Character\SoldierCom.h"
+#include <Component\Collsion\ColliderCom.h>
 
 //ソルジャー
 class Solder_BaseState : public State<CharacterCom>
@@ -29,10 +30,14 @@ public:
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     void Exit() override;
+    void ImGui() override;
     virtual const char* GetName() const override { return "MainAttack"; }
 
 private:
-    std::weak_ptr<GameObject>rayobj;
+    std::shared_ptr<GameObject>rayobj;
+    std::shared_ptr<RayColliderCom>ray;
+    float shottimer = 0.0f;
+    bool rayenabled = true;
 };
 
 //Eスキル
@@ -72,4 +77,7 @@ public:
     void Exit() override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "UltAttack"; }
+
+private:
+    std::weak_ptr<GameObject>rayobj;
 };

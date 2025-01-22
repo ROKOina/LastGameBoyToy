@@ -60,6 +60,9 @@ void SoldierCom::Update(float elapsedTime)
 // 右クリック単発押し処理
 void SoldierCom::SubAttackDown()
 {
+    //メイン攻撃時はリターン
+    if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
     if (!UseUlt())
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
@@ -69,6 +72,9 @@ void SoldierCom::SubAttackDown()
 // Eスキル
 void SoldierCom::SubSkill()
 {
+    //メイン攻撃時はリターン
+    if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
     if (!UseUlt())
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
@@ -90,7 +96,6 @@ void SoldierCom::MainAttackDown()
 
     //アタック
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
-    attackInputSave = false;
 }
 
 // ULT

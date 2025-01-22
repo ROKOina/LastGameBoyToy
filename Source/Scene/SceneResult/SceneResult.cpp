@@ -90,6 +90,14 @@ void SceneResult::Initialize()
     ConstantBufferInitialize();
 }
 
+void SceneResult::Finalize()
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        //resultUI
+    }
+}
+
 void SceneResult::Update(float elapsedTime)
 {
     GameObjectManager::Instance().Update(elapsedTime);
@@ -120,7 +128,7 @@ void SceneResult::Render(float elapsedTime)
 
 #define MAKE_FONT_SHADOW(parentFont, offsetX,offsetY) \
         GameObj fontObj = parentFont->GetGameObject()->AddChildObject();\
-        std::string name = parentFont->GetName();\
+        std::string name = parentFont->GetGameObject()->GetName();\
         fontObj->SetName(name.c_str());\
         name += "_shadow";\
         parentFont->GetGameObject()->SetName(name.c_str()); \
@@ -153,7 +161,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         killStrObj->SetName(killStr.c_str());
         std::shared_ptr<Font> killStrFont = killStrObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
         killStrFont->str = L"Kill";
-        killStrFont->position = DirectX::XMFLOAT2{ 650.0f,3250.0f + (150 * i) };
+        killStrFont->position = DirectX::XMFLOAT2{ 650.0f,325.0f + (150 * i) };
         killStrFont->scale = 0.9f;
 
         { MAKE_FONT_SHADOW(killStrFont, 3, 2); }

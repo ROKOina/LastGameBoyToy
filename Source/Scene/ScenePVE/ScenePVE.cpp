@@ -31,6 +31,7 @@
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
+#include "Component\GameSystem\RespawnCom.h"
 
 ScenePVE::~ScenePVE()
 {
@@ -110,6 +111,11 @@ void ScenePVE::Initialize()
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,-1,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj, true);
+
+        //リスポーン用
+        GameObj respawnObj = GameObjectManager::Instance().Create();
+        respawnObj->SetName("respawn");
+        RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
     }
 
     //snowparticle
