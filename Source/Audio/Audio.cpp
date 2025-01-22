@@ -126,6 +126,12 @@ void Audio::RegisterAudioSources()
     audioResources[AUDIOID::TUTOLINES_23] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/023_L.wav");
     audioResources[AUDIOID::TUTOLINES_24] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/024_L.wav");
     audioResources[AUDIOID::TUTOLINES_25] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/025_L.wav");
+    audioResources[AUDIOID::TUTOLINES_26] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/026_L.wav");
+    audioResources[AUDIOID::TUTOLINES_27] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/027_L.wav");
+    audioResources[AUDIOID::TUTOLINES_28] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/028_L.wav");
+    audioResources[AUDIOID::TUTOLINES_29] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/029_L.wav");
+    audioResources[AUDIOID::TUTOLINES_30] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/030_L.wav");
+    audioResources[AUDIOID::TUTOLINES_31] = LoadAudioSource("Data/AudioData/SE/Tutorial/TutorialLines/031_L.wav");
 }
 
 void Audio::RegisterAudioSources(AUDIOID id, const char* filename)

@@ -869,6 +869,12 @@ void TutorialSystem::TutorialSystemStart()
         audioObj->RegisterSource(AUDIOID::TUTOLINES_23, "23");
         audioObj->RegisterSource(AUDIOID::TUTOLINES_24, "24");
         audioObj->RegisterSource(AUDIOID::TUTOLINES_25, "25");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_26, "26");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_27, "27");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_28, "28");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_29, "29");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_30, "30");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_31, "31");
 
         
     }
@@ -930,55 +936,86 @@ void TutorialSystem::TutorialSystemStart()
     moveSubTitle[10].pos = { 834.0f,80.0f };
     moveSubTitle[10].UIID = 10;
 
-    moveSubTitle[11].str = L"次は銃の説明なのだ";
+    moveSubTitle[11].str = L"次はダッシュなのだ";
     moveSubTitle[11].Lines = "12";
     moveSubTitle[11].pos = { 715.0f,80.0f };
     moveSubTitle[11].UIID = 11;
+
+    moveSubTitle[12].str = L"キーボードのShiftキーでダッシュなのだ";
+    moveSubTitle[12].Lines = "13";
+    moveSubTitle[12].pos = { 539.0f,80.0f };
+    moveSubTitle[12].UIID = 12;
+
+    moveSubTitle[13].str = L"よくできたのだ";
+    moveSubTitle[13].Lines = "14";
+    moveSubTitle[13].pos = { 806.0f,80.0f };
+    moveSubTitle[13].UIID = 13;
+
+
+    moveSubTitle[14].str = L"次は銃の説明なのだ";
+    moveSubTitle[14].Lines = "15";
+    moveSubTitle[14].pos = { 715.0f,80.0f };
+    moveSubTitle[14].UIID = 14;
 
 
 #pragma endregion
 #pragma region 銃セリフ
 
     gunSubTitle[0].str = L"銃の基本説明を教えるのだ";
-    gunSubTitle[0].Lines = "13";
+    gunSubTitle[0].Lines = "16";
     gunSubTitle[0].pos = {674.0f,80.0f};
     gunSubTitle[0].UIID = 0;
 
     gunSubTitle[1].str = L"マウスの左クリックで、発射なのだ";
-    gunSubTitle[1].Lines = "14";
+    gunSubTitle[1].Lines = "17";
     gunSubTitle[1].pos = { 571.0f,80.0f };
     gunSubTitle[1].UIID=1;
 
     gunSubTitle[2].str = L"よくできたのだ";
-    gunSubTitle[2].Lines = "15";
+    gunSubTitle[2].Lines = "18";
     gunSubTitle[2].pos = { 765.0f,80.0f };
     gunSubTitle[2].UIID =2;
 
-    gunSubTitle[3].str = L"次はスキルの説明なのだ";
-    gunSubTitle[3].Lines = "16";
-    gunSubTitle[3].pos = { 693.0f,80.0f};
-    gunSubTitle[3].UIID=3;
+    gunSubTitle[3].str = L"次はリロードなのだ";
+    gunSubTitle[3].Lines = "19";
+    gunSubTitle[3].pos = { 715.0f,80.0f };
+    gunSubTitle[3].UIID = 3;
+
+    gunSubTitle[4].str = L"キーボードのRキーで、リロードなのだ";
+    gunSubTitle[4].Lines = "20";
+    gunSubTitle[4].pos = { 539.0f,80.0f };
+    gunSubTitle[4].UIID = 4;
+
+    gunSubTitle[5].str = L"すばらしいのだ";
+    gunSubTitle[5].Lines = "21";
+    gunSubTitle[5].pos = { 809.0f,80.0f };
+    gunSubTitle[5].UIID = 5;
+
+    gunSubTitle[6].str = L"次はスキルの説明なのだ";
+    gunSubTitle[6].Lines = "22";
+    gunSubTitle[6].pos = { 693.0f,80.0f};
+    gunSubTitle[6].UIID=6;
 
 #pragma endregion
 #pragma region スキルセリフ
 
     skillSubTitle[0].str = L"スキルの基本操作を教えるのだ";
-    skillSubTitle[0].Lines = "17";
+    skillSubTitle[0].Lines = "23";
     skillSubTitle[0].pos = { 624.0f,80.0f };
     skillSubTitle[0].UIID = 0;
 
     skillSubTitle[1].str = L"キーボードのEキーで発動なのだ";
-    skillSubTitle[1].Lines = "18";
+    skillSubTitle[1].Lines = "24";
     skillSubTitle[1].pos = { 621.0f,80.0f };
     skillSubTitle[1].UIID =1;
 
     skillSubTitle[2].str = L"素晴らしいのだ";
-    skillSubTitle[2].Lines = "19";
+    skillSubTitle[2].Lines = "25";
     skillSubTitle[2].pos = { 780.0f,80.0f };
     skillSubTitle[2].UIID = 2;
 
     skillSubTitle[3].str = L"次はウルトの説明なのだ";
-    skillSubTitle[3].Lines = "20";
+    skillSubTitle[3].Lines = "26";
     skillSubTitle[3].pos = { 714.0f,80.0f };
     skillSubTitle[3].UIID=3;
 
@@ -986,27 +1023,27 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region ウルトセリフ
 
     ultSubTitle[0].str = L"ウルトの基本操作を教えるのだ";
-    ultSubTitle[0].Lines = "21";
+    ultSubTitle[0].Lines = "27";
     ultSubTitle[0].pos = { 628.0f,80.0f};
     ultSubTitle[0].UIID = 0;
 
     ultSubTitle[1].str = L"キーボードのRキーで発動なのだ";
-    ultSubTitle[1].Lines = "22";
+    ultSubTitle[1].Lines = "28";
     ultSubTitle[1].pos = { 628.0f,80.0f};
     ultSubTitle[1].UIID = 1;
 
     ultSubTitle[2].str = L"天才なのだ";
-    ultSubTitle[2].Lines = "23";
+    ultSubTitle[2].Lines = "29";
     ultSubTitle[2].pos = { 827.0f,80.0f};
     ultSubTitle[2].UIID = 2;
 
     ultSubTitle[3].str = L"これでチュートリアルは終わりなのだ";
-    ultSubTitle[3].Lines = "24";
+    ultSubTitle[3].Lines = "30";
     ultSubTitle[3].pos = { 543.0f,80.0f};
     ultSubTitle[3].UIID = 3;
 
     ultSubTitle[4].str = L"Les’t enjoyなのだ";
-    ultSubTitle[4].Lines = "25";
+    ultSubTitle[4].Lines = "31";
     ultSubTitle[4].pos = { 742.0f,80.0f};
     ultSubTitle[4].UIID=5;
 
@@ -1123,7 +1160,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
     InputVec = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetLeftStick();
 
-    if (moveSubTitleIndex != 3 && moveSubTitleIndex != 6 && moveSubTitleIndex != 9)
+    if (moveSubTitleIndex != 3 && moveSubTitleIndex != 6 && moveSubTitleIndex != 9&&moveSubTitleIndex!=12)
     {
         if (upFlag)
         {
@@ -1135,7 +1172,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
                 if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
                 {
-                    if (moveSubTitleIndex == 11)
+                    if (moveSubTitleIndex == 14)
                     {
                         moveInspectionFlag = true;
                         upFlag = false;
@@ -1293,6 +1330,43 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
             }
         }
     }
+    else if (moveSubTitleIndex == 12)
+    {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
+
+        if (CharacterInput::LeftShiftButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonDown())
+        {
+            dashFlag = true;
+        }
+
+        if (dashFlag)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    moveSubTitleIndex += 1;
+                    linesFlag = false;
+                }
+
+            }
+        }
+    }
 
 
     if (moveInspectionFlag)
@@ -1314,7 +1388,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
     }
 
 
-    if (gunSubTitleIndex != 1)
+    if (gunSubTitleIndex != 1&&gunSubTitleIndex!=4)
     {
         if (upFlag)
         {
@@ -1326,7 +1400,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 
                 if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
                 {
-                    if (gunSubTitleIndex == 3)
+                    if (gunSubTitleIndex == 6)
                     {
                         gunInspectionFlag = true;
                         upFlag = false;
@@ -1395,7 +1469,46 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 
            
     }
+    else if (gunSubTitleIndex == 4)
+    {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
 
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
+        //攻撃終了処理＆攻撃処理
+        if (CharacterInput::Reload & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
+        {
+            reloadFlga = true;
+        }
+
+        if (reloadFlga)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    gunSubTitleIndex += 1;
+                    linesFlag = false;
+
+                }
+
+            }
+        }
+
+
+    }
 
 
     if (gunInspectionFlag)
@@ -1679,7 +1792,9 @@ void TutorialSystem::TutorialFlagClear()
     upFlag = false;
     downFlag = false;
     jumpFlag = false;
+    dashFlag = false;
     gunFlag = false;
+    reloadFlga = false;
     skillFlag = false;
     ultFlag = false;
 
