@@ -1132,6 +1132,7 @@ void GameObjectManager::FontRender(const DirectX::XMFLOAT4X4& view, const Direct
 
     for (std::weak_ptr<Font>& font : fontobject)
     {
+        if (font.expired() != 0) continue;
         if (!font.lock()->GetGameObject()->GetEnabled())continue;
         if (!font.lock()->GetEnabled())continue;
 

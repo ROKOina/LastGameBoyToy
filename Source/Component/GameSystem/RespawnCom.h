@@ -23,6 +23,9 @@ public:
     //ñºëOê›íË
     const char* GetName() const override { return "Respawn"; }
 
+    void Respawn_GoTitle(float elapsedTime);
+    void Respawn_GamePVP(float elapsedTime);
+
     std::vector<DirectX::XMFLOAT3>& GetRespawnPoses() { return respawnPoses; }
     void AddRespawnPoses(DirectX::XMFLOAT3 pos) { respawnPoses.emplace_back(pos); }
     PVPGameSystem::GAME_MODE GetGameMode() { return gameMode; }
@@ -39,7 +42,7 @@ public:
     void SetIsRespawn(bool flag) { isRespawn = flag; }
 
 private:
-    PVPGameSystem::GAME_MODE gameMode;
+    PVPGameSystem::GAME_MODE gameMode = PVPGameSystem::GAME_MODE::None;
 
     std::vector<DirectX::XMFLOAT3> respawnPoses = {};
     float playerDeathHeight = -50;
