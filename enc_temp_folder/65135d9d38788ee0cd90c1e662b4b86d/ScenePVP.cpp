@@ -636,7 +636,7 @@ void ScenePVP::Update(float elapsedTime)
         {
             SceneResult* result = new SceneResult;
 
-            //ここでリザルトに送るデータを作る
+            //
             for (int i = 0; i < 4; i++)
             {
                 SceneResult::ResultData data;

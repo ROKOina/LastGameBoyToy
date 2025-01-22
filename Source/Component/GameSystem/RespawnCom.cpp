@@ -21,6 +21,39 @@ void RespawnCom::Update(float elapsedTime)
         status->AddDamagePoint(-200, -1);
     }
 
+    switch (gameMode)
+    {
+    case PVPGameSystem::GAME_MODE::Deathmatch:
+    case PVPGameSystem::GAME_MODE::Crown:
+    case PVPGameSystem::GAME_MODE::Button:
+        Respawn_GamePVP(elapsedTime);
+        break;
+    default:
+        Respawn_GoTitle(elapsedTime);
+        break;
+    }
+}
+
+void RespawnCom::Respawn_GoTitle(float elapsedTime)
+{
+    for (RespawnData* respawnData : respawnDatas)
+    {
+        respawnData->respawnTime += elapsedTime;
+
+        //死亡演出が終了したらリスポーン
+        if (respawnData->respawnTime >= 2.5f)
+        {
+            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 0.0f);
+            delete respawnData;
+            respawnDatas.clear();
+        }
+    }
+}
+
+void RespawnCom::Respawn_GamePVP(float elapsedTime)
+{
+    GameObj player = GameObjectManager::Instance().Find("player");
+
     //リスポーン処理
     for (RespawnData* respawnData : respawnDatas)
     {
@@ -70,7 +103,7 @@ void RespawnCom::Update(float elapsedTime)
             auto& attackStateMachine = charaCom->GetAttackStateMachine();
             moveStateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
             attackStateMachine.ChangeState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-  
+
             endDatas.emplace_back(respawnData);
         }
     }

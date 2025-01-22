@@ -90,14 +90,6 @@ void SceneResult::Initialize()
     ConstantBufferInitialize();
 }
 
-void SceneResult::Finalize()
-{
-    for (int i = 0; i < 4; ++i)
-    {
-        //resultUI
-    }
-}
-
 void SceneResult::Update(float elapsedTime)
 {
     GameObjectManager::Instance().Update(elapsedTime);
@@ -157,7 +149,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
 
         //uƒLƒ‹v•¶Žš
         std::shared_ptr<GameObject> killStrObj = canvas->AddChildObject();
-        std::string killStr = std::to_string(i) + "st_Player_kill";
+        std::string killStr = resultDatas[i].playerName;//std::to_string(i) + "st_Player_kill";
         killStrObj->SetName(killStr.c_str());
         std::shared_ptr<Font> killStrFont = killStrObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
         killStrFont->str = L"Kill";

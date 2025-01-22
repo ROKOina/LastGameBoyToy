@@ -12,7 +12,7 @@ public:
     void Initialize()override;
 
     // I—¹‰»
-    void Finalize()override;
+    void Finalize()override {};
 
     // XVˆ—
     void Update(float elapsedTime)override;
