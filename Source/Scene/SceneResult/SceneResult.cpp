@@ -168,6 +168,6 @@ void SceneResult::MakeResultUI(GameObj canvas)
 
         //ƒtƒŒ[ƒ€
         GameObj frameUiObj = GameObjectManager::Instance().Create();
-        frameUiObj->AddComponent<Sprite>("Data/Texture/");
+        //frameUiObj->AddComponent<Sprite>("Data/Texture/");
     }
 }

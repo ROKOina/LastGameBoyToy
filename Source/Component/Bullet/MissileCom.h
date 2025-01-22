@@ -10,7 +10,7 @@
 class MissileCom : public Component
 {
 public:
-    MissileCom(){};
+    MissileCom() {};
     MissileCom(float soundTime) { soundLen = soundTime; };
     ~MissileCom() override {};
 

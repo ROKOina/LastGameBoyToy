@@ -33,7 +33,6 @@ public:
     //更新処理
     void Update(float elapsedTime);
 
-
 public:
     //コリジョンレイヤー
     enum class CollisionLayer
@@ -74,9 +73,9 @@ public:
     };
 
     bool SphereCast_PhysX(
-        const DirectX::XMFLOAT3& pos, 
-        const DirectX::XMFLOAT3& dir, 
-        float radius, float dist, 
+        const DirectX::XMFLOAT3& pos,
+        const DirectX::XMFLOAT3& dir,
+        float radius, float dist,
         PxSweepBuffer& hit);
 
     bool RayCast_PhysX(
@@ -92,13 +91,12 @@ public:
         const float maxDistance,
         PxRaycastBuffer& hitBuffer, PhysXLib::CollisionLayer layer);
 
-
     //オブジェクトの塊を分解してColliderを作る（スタティック専用・主にステージで使う）
     void GenerateComplexCollider(ModelResource* model, std::string filepath, std::string key, float worldScale, CollisionLayer layer, std::vector<PxRigidActor*>& vec);
 
     //当たり判定作成
     physx::PxRigidActor* GenerateCollider(RigidData& data);
-    
+
     //判定の形状生成
     physx::PxShape* MakeShape(RigidData& data);
     physx::PxShape* Make_TriangleShape(RigidData& data);

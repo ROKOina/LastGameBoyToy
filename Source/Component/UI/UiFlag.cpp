@@ -30,7 +30,6 @@ void UiFlag::Update(float elapsedTime)
                 spc.scale.y -= 0.05f;
             }
         }
-
     }
     //親クラスのアップデートをよぶ
     this->UiSystem::Update(elapsedTime);
@@ -38,7 +37,6 @@ void UiFlag::Update(float elapsedTime)
 
 void UiFlag::OnGUI()
 {
-
     ImGui::Checkbox("Flag", *&flag);
     this->UiSystem::OnGUI();
 }

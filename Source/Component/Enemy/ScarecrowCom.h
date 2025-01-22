@@ -32,7 +32,7 @@ public:
     enum class ScareCrowState
     {
         IDLE,
-       
+
         RANDOMIDLE,
 
         MOVE,
@@ -53,5 +53,4 @@ private:
     //案山子のモード
     //0=棒立ち　1＝ランダム移動　
     int scareCrowMode = 1;
-
 };

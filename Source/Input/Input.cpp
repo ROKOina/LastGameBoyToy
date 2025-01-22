@@ -4,14 +4,14 @@ Input* Input::instance_ = nullptr;
 
 // コンストラクタ
 Input::Input(HWND hWnd)
-	: mouse_(hWnd)
+    : mouse_(hWnd)
 {
-	instance_ = this;
+    instance_ = this;
 }
 
 // 更新処理
 void Input::Update()
 {
-	gamePad_.Update();
-	mouse_.Update();
+    gamePad_.Update();
+    mouse_.Update();
 }

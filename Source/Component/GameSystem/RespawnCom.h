@@ -17,7 +17,7 @@ public:
     //‰Šúİ’è
     void Start()override {};
     //XVˆ—
-    void Update(float elapsedTime)override ;
+    void Update(float elapsedTime)override;
     //IMGUI
     void OnGUI()override {};
     //–¼‘Oİ’è
@@ -31,9 +31,9 @@ public:
     PVPGameSystem::GAME_MODE GetGameMode() { return gameMode; }
     void SetGameMode(PVPGameSystem::GAME_MODE mode) { gameMode = mode; }
 
-    void AddRespawnData(std::shared_ptr<GameObject> obj) 
-    { 
-        RespawnData* res = new RespawnData; 
+    void AddRespawnData(std::shared_ptr<GameObject> obj)
+    {
+        RespawnData* res = new RespawnData;
         res->gameObj = obj.get();
         respawnDatas.emplace_back(res);
     }

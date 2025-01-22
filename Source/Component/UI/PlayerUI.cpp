@@ -41,14 +41,12 @@ void UI_Skill::Update(float elapsedTime)
 
 UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion) :UiSystem(filename, spriteshader, collsion)
 {
-
 }
 
 void UI_HPEffect::Start()
 {
     this->UiSystem::Start();
 }
-
 
 void UI_HPEffect::Update(float elapsedTime)
 {
@@ -1293,7 +1291,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 {
                     if (!chara.lock())continue;
                     auto& charaCom = chara.lock()->GetComponent<CharacterCom>();
-                    
+
                     if (!charaCom)continue;
 
                     //キル側
@@ -1337,7 +1335,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
     }
 
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("killLogCanvas");
-   
+
     //削除用変数
     std::vector<int> removeID;
 
@@ -1367,8 +1365,8 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 parant->SetEnabled(true);
                 //初期位置
                 parant->transform_->SetWorldPosition({ 1760,500,0 });
-                c01->transform_->SetLocalPosition({80,0,0});
-                c02->transform_->SetLocalPosition({380,0,0});
+                c01->transform_->SetLocalPosition({ 80,0,0 });
+                c02->transform_->SetLocalPosition({ 380,0,0 });
 
                 //いーじんぐ初期か
                 Pspr->spc.color.w = 0;
@@ -1390,8 +1388,8 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 //位置
                 DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
                 pos.y = Mathf::Lerp(pos.y, stopY, moveData.timer / inSlideTime);
-                parant->transform_->SetWorldPosition(pos);             
-                
+                parant->transform_->SetWorldPosition(pos);
+
                 //色
                 Pspr->spc.color.w = Mathf::Lerp(Pspr->spc.color.w, stopA, moveData.timer / inSlideTime);
                 c1spr->spc.color.w = Mathf::Lerp(c1spr->spc.color.w, 1, moveData.timer / inSlideTime);
@@ -1407,7 +1405,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
             //退出演出
             static const float outSlideTime = 0.5f;
-            if (moveData.timer >= removeTime- outSlideTime)
+            if (moveData.timer >= removeTime - outSlideTime)
             {
                 float t = moveData.timer - (removeTime - outSlideTime);
                 DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
@@ -1419,7 +1417,6 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
             if (moveData.timer > removeTime)
                 removeID.emplace_back(data.first);
         };
-
 
     for (auto& log : saveCharaKilog)
     {
@@ -1479,7 +1476,6 @@ void PlayerUIManager::CreateKillLog()
             ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
         }
     }
-
 }
 
 void PlayerUIManager::CreateNetUseCharaUI()

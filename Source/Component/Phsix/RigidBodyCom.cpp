@@ -11,12 +11,11 @@ RigidBodyCom::RigidBodyCom(bool isStatic, PhysXLib::ShapeType type)
 
 RigidBodyCom::~RigidBodyCom()
 {
-    if(rigidActor) rigidActor->release();
+    if (rigidActor) rigidActor->release();
 }
 
 void RigidBodyCom::Start()
 {
-
 }
 
 void RigidBodyCom::Update(float elapsedTime)
@@ -78,7 +77,6 @@ void RigidBodyCom::SetMass(float value)
     {
         // 質量を設定
         if (!data.isStatic) {
-
             //Dynamicにキャストし設定
             PxRigidDynamic* dynamicActor = rigidActor->is<PxRigidDynamic>();
             PxRigidBodyExt::setMassAndUpdateInertia(*dynamicActor, data.mass);
@@ -108,19 +106,19 @@ void RigidBodyCom::SetMaterial(float f, float r)
 void RigidBodyCom::SetFriction(float value)
 {
     data.friction = value;
-    if(rigidActor)SetMaterial(data.friction, data.restitution);
+    if (rigidActor)SetMaterial(data.friction, data.restitution);
 }
 
 void RigidBodyCom::SetRestitution(float value)
 {
     data.restitution = value;
-    if(rigidActor)SetMaterial(data.friction, data.restitution);
+    if (rigidActor)SetMaterial(data.friction, data.restitution);
 }
 
 void RigidBodyCom::SetUseGravity(bool flag)
 {
     data.useGravity = flag;
-    if(rigidActor)rigidActor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, flag);
+    if (rigidActor)rigidActor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, flag);
 }
 
 void RigidBodyCom::SetRigidFlag(physx::PxRigidBodyFlag::Enum rigidFlag, bool flag)
@@ -155,7 +153,7 @@ void RigidBodyCom::SetUp()
 
     //トランスフォーム
     data.pos = GetGameObject()->transform_->GetWorldPosition();
-    data.rotate = GetGameObject()->transform_->GetRotation();  
+    data.rotate = GetGameObject()->transform_->GetRotation();
 
     DirectX::XMFLOAT3 scaleV = GetGameObject().get()->transform_->GetScale();
     data.scale.x = scaleV.x * rigidScale;
@@ -164,8 +162,8 @@ void RigidBodyCom::SetUp()
 
     //モデル
     !useResourcePath.empty()
-    ? data.model = ResourceManager::Instance().GetModelResource(useResourcePath.c_str())
-    : data.model = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource_shared();
+        ? data.model = ResourceManager::Instance().GetModelResource(useResourcePath.c_str())
+        : data.model = GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource_shared();
 
     rigidActor = PhysXLib::Instance().GenerateCollider(data);
 }

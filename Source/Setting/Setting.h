@@ -40,7 +40,8 @@ private:
     {
         valueLimit(std::shared_ptr<GameObject> obj, ValueID id, float min = 0, float max = 100)
             :obj(obj), id(id), minValue(min), maxValue(max)
-        {}
+        {
+        }
 
         std::weak_ptr<GameObject> obj;
         ValueID id;
