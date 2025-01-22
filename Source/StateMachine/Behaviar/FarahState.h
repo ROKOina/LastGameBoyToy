@@ -57,7 +57,4 @@ public:
     void Exit() override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "UltAttack"; }
-
-private:
-    float time = 0.0f;
 };
