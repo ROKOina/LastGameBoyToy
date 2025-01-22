@@ -1383,6 +1383,8 @@ void PhotonLib::GameRecv(NetData recvData)
             {
                 //デスを確認
                 saveDeath[myD].onDeath = false;
+                //キルしたIDを保存
+                StaticSendDataManager::Instance().GetKillID(myD, recvData.playerId) = true;
             }
         }
     }
