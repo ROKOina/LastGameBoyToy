@@ -230,6 +230,14 @@ public:
     void SetMaxBulletNum(int num) { maxBulletNum = num; }
     void SetMaxBullet() { currentBulletNum = maxBulletNum; }
 
+    //ウルトの経過時間
+    float& GetUltTimer() { return ulttimer; }
+    float* GetUltTimerPointer(float t) { return &ulttimer; }
+    void SetUltTimer(float ult) { this->ulttimer = ult; }
+
+    //マックス時間を取得
+    float& GetMaxUltTime() { return maxulttime; }
+
     //腕アニメーション再生
     void HandleArmAnimation();
 
@@ -341,6 +349,10 @@ private:
 
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;
+
+    //伊藤君が使うウルト発動時間(今はファラとソルジャー専用)
+    float ulttimer = 0.0f;
+    float maxulttime = 8.0f;
 
     //野村追加
     float stickAngle = 0.0f;
