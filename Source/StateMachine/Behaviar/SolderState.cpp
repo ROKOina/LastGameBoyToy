@@ -39,6 +39,12 @@ void Solder_MainAttackState::Enter()
 
     //腕アニメーション再生
     charaCom.lock()->HandleArmAnimation();
+
+    //弾減らさないとリロードしない
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        charaCom.lock()->AddCurrentBulletNum(-1);
+    }
 }
 void Solder_MainAttackState::Execute(const float& elapsedTime)
 {
@@ -46,12 +52,6 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
     if (CharacterInput::MainAttackButton & owner->GetButton())
     {
         ray->SetEnabled(false);
-
-        //弾減らさないとリロードしない
-        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
-        {
-            charaCom.lock()->AddCurrentBulletNum(-1);
-        }
     }
 
     //時間を経過させて打つ時間を調整
