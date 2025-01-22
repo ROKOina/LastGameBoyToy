@@ -1265,64 +1265,65 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
             if (killflg)  //キルが発生しているなら
             {
                 //一回だけ通るように
-                if (kilogTimer[deathPID] > 0)continue;  //待機時間はcontinue
-
-                kilogTimer[deathPID] = 5;
-
-                //ここでキルログを出す
-                int killChara = -1;
-                DeathData  d;
-                //チームを見る
-                for (auto& chara : GameObjectManager::Instance().GetCharaObject())
+                if (kilogTimer[deathPID] < 0)
                 {
-                    if (!chara.lock())continue;
-                    auto& charaCom = chara.lock()->GetComponent<CharacterCom>();
-                    
-                    if (!charaCom)continue;
+                    kilogTimer[deathPID] = 3;
 
-                    //キル側
-                    if (charaCom->GetNetCharaData().GetNetPlayerID() == killPID)
+                    //ここでキルログを出す
+                    int killChara = -1;
+                    DeathData  d;
+                    //チームを見る
+                    for (auto& chara : GameObjectManager::Instance().GetCharaObject())
                     {
-                        killChara = charaCom->GetNetCharaData().GetCharaID();
+                        if (!chara.lock())continue;
+                        auto& charaCom = chara.lock()->GetComponent<CharacterCom>();
 
-                        //自分の場合
-                        if (std::strcmp(chara.lock()->GetName(), "player"))
-                            d.myID = 0;
-                    }
+                        if (!charaCom)continue;
 
-                    //デス側
-                    if (charaCom->GetNetCharaData().GetNetPlayerID() == deathPID)
-                    {
-                        //自分の場合
-                        if (std::strcmp(chara.lock()->GetName(), "player"))
-                            d.myID = 1;
-                        //チームを比べる
-                        auto& player = GameObjectManager::Instance().Find("player");
-                        auto& charaC = player->GetComponent<CharacterCom>();
-                        int pT = charaC->GetNetCharaData().GetTeamID();
-                        int nT = charaCom->GetNetCharaData().GetTeamID();
-                        d.isEnemy = (pT != nT);
-
-                        d.charaID = charaCom->GetNetCharaData().GetCharaID();
-
-                        //使用UIを決める
-                        int uiID = 0;
-                        for (auto& log : saveCharaKilog)
+                        //キル側
+                        if (charaCom->GetNetCharaData().GetNetPlayerID() == killPID)
                         {
-                            //後から追加される数を増やす
-                            log.second.moveData.underNum++;
-                            if (log.second.isEnemy != d.isEnemy)continue;   //同じチームが流れている場合は入る
+                            killChara = charaCom->GetNetCharaData().GetCharaID();
 
-                            if (log.second.moveData.id == 0)
-                                uiID = 1;
+                            //自分の場合
+                            if (std::strcmp(chara.lock()->GetName(), "player") == 0)
+                                d.myID = 0;
                         }
-                        if (uiID == 1)d.moveData.id = 0;
-                        else d.moveData.id = 1;
-                    }
-                }
 
-                //キルが起きたので一旦保存
-                saveCharaKilog[killChara] = d;
+                        //デス側
+                        if (charaCom->GetNetCharaData().GetNetPlayerID() == deathPID)
+                        {
+                            //自分の場合
+                            if (std::strcmp(chara.lock()->GetName(), "player") == 0)
+                                d.myID = 1;
+                            //チームを比べる
+                            auto& player = GameObjectManager::Instance().Find("player");
+                            auto& charaC = player->GetComponent<CharacterCom>();
+                            int pT = charaC->GetNetCharaData().GetTeamID();
+                            int nT = charaCom->GetNetCharaData().GetTeamID();
+                            d.isEnemy = (pT != nT);
+
+                            d.charaID = charaCom->GetNetCharaData().GetCharaID();
+
+                            //使用UIを決める
+                            int uiID = 0;
+                            for (auto& log : saveCharaKilog)
+                            {
+                                //後から追加される数を増やす
+                                log.second.moveData.underNum++;
+                                if (log.second.isEnemy != d.isEnemy)continue;   //同じチームが流れている場合は入る
+
+                                if (log.second.moveData.id == 0)
+                                    uiID = 1;
+                            }
+                            if (uiID == 1)d.moveData.id = 0;
+                            else d.moveData.id = 1;
+                        }
+                    }
+
+                    //キルが起きたので一旦保存
+                    saveCharaKilog[killChara] = d;
+                }
             }
             killflg = false;
         }
@@ -1763,7 +1764,6 @@ void UI_KillEffect::Update(float elapsedTime)
                 effectFLGTimer = 3;
             }
 
-            killflg = false;
         }
     }
     EffectUpdat(elapsedTime);
