@@ -28,6 +28,25 @@ private:
     DirectX::XMFLOAT2 maxPos = {};
 };
 
+class UI_HPEffect : public UiSystem
+{
+    //コンポーネントオーバーライド
+public:
+    UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion);
+    ~UI_HPEffect() {}
+
+    // 名前取得
+    const char* GetName() const override { return "Ui_Hpeffect"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+private:
+};
+
 class UI_BoosGauge : public Component
 {
     //コンポーネントオーバーライド

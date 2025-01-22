@@ -39,6 +39,22 @@ void UI_Skill::Update(float elapsedTime)
     this->UiSystem::Update(elapsedTime);
 }
 
+UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion) :UiSystem(filename, spriteshader, collsion)
+{
+
+}
+
+void UI_HPEffect::Start()
+{
+    this->UiSystem::Start();
+}
+
+
+void UI_HPEffect::Update(float elapsedTime)
+{
+    this->UiSystem::Update(elapsedTime);
+}
+
 UI_BoosGauge::UI_BoosGauge()
 {
     //ゲージのマスク
