@@ -58,10 +58,10 @@ void UI_HPEffect::Start()
 void UI_HPEffect::Update(float elapsedTime)
 {
     valueRate = *character.lock()->GetComponent<CharaStatusCom>()->GetHitPoint() / maxHp;
-    DirectX::XMFLOAT3 localPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetLocalPosition();
-    DirectX::XMFLOAT3 worldPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetWorldPosition();
-    this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({ (float)(memoryId * divideTexSize), localPositiom.y ,localPositiom.z});
-    spc.easingposition = { worldPositiom.x,worldPositiom.y };
+    DirectX::XMFLOAT3 localPosition = this->GetGameObject()->GetComponent<TransformCom>()->GetLocalPosition();
+    DirectX::XMFLOAT3 worldPosition = this->GetGameObject()->GetComponent<TransformCom>()->GetWorldPosition();
+    this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({(float)(memoryId * divideTexSize), localPosition.y ,localPosition.z});
+    spc.easingposition = { worldPosition.x,worldPosition.y };
     if (!isDebug)
     {
 
@@ -695,25 +695,26 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
     float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
     float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
     std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
-
-    //前フレームのHpと現在のHpが違うなら
-    if (*Hp != oldHp) {
-        displayFLG = true;
-        timer = 0.0f;
-        oldHp = *Hp;
-        gauge->spc.color = { 1,1,1,1 };
-    }
-
-    if (displayFLG) {
-        timer += elapsedTime;
-        if (time < timer) {
-            displayFLG = false;
-            timer = 0.0f;
-        }
-    }
-    else {
-        gauge->spc.color = { 0,0,0,0 };
-    }
+  //
+  ////前フレームのHpと現在のHpが違うなら
+  //if (*Hp != oldHp) {
+  //    displayFLG = true;
+  //    timer = 0.0f;
+  //    oldHp = *Hp;
+  //    gauge->spc.color = { 1,1,1,1 };
+  //}
+  //
+  //if (displayFLG) {
+  //    timer += elapsedTime;
+  //    if (time < timer) {
+  //        displayFLG = false;
+  //        timer = 0.0f;
+  //    }
+  //}
+  //else {
+  //    gauge->spc.color = { 0,0,0,0 };
+  //}
+    gauge->spc.color = { 1,1,1,1 };
 }
 
 void UI_EnemyHp::Register(std::weak_ptr<GameObject> obj)
@@ -740,7 +741,7 @@ void UI_EnemyHp::Register(std::weak_ptr<GameObject> obj)
             std::string name = "HpEffect_" + std::to_string(i);
             hpEffect->SetName(name.c_str());
             int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
-            std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>(nullptr, Sprite::SpriteShader::DEFALT, true, gaugeTexSize, obj, i);
+            std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/EnemyHpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, obj, i);
         }
     }
 }
