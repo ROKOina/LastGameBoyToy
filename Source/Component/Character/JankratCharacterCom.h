@@ -24,6 +24,7 @@ public:
     void UltSkill() override;
 
 private:
+
     //Á‹‚³‚ê‚Ä‚¢‚é’e‚â’n—‹‚ğè•ú‚·
     void EraseHaveObjects();
 
