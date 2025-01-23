@@ -702,7 +702,7 @@ void Sprite::OnGUI()
         ImGui::DragFloat((char*)u8"イージング回転", &spc.easingangle);
         ImGui::DragFloat2((char*)u8"中心位置", &spc.pivot.x);
         ImGui::DragFloat2((char*)u8"テクスチャサイズ", &spc.texSize.x);
-        ImGui::DragFloat((char*)u8"再生速度", &spc.timescale, 0.1f, 0.0f, 5.0f);
+        ImGui::DragFloat((char*)u8"再生速度", &spc.timescale, 0.1f, 0.0f, 15.0f);
         DirectX::XMFLOAT2 mouse = { (float)(Input::Instance().GetMouse().GetPositionX()),(float)(Input::Instance().GetMouse().GetPositionY()) };
         ImGui::DragFloat2((char*)u8"マウス位置", &mouse.x);
         ImGui::DragFloat2((char*)u8"当たり判定中心位置", &collisionPivot.x);
