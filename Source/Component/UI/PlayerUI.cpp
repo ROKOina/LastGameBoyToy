@@ -39,7 +39,7 @@ void UI_Skill::Update(float elapsedTime)
     this->UiSystem::Update(elapsedTime);
 }
 
-UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion,int gaugeTexSize, std::weak_ptr<GameObject> obj,int num) :UiSystem(filename, spriteshader, collsion)
+UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion, int gaugeTexSize, std::weak_ptr<GameObject> obj, int num) :UiSystem(filename, spriteshader, collsion)
 {
     this->gaugeTexSize = gaugeTexSize;
     //ゲージ本体のテクスチャサイズを10で割った数字を保持
@@ -60,32 +60,30 @@ void UI_HPEffect::Update(float elapsedTime)
     valueRate = *character.lock()->GetComponent<CharaStatusCom>()->GetHitPoint() / maxHp;
     DirectX::XMFLOAT3 localPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetLocalPosition();
     DirectX::XMFLOAT3 worldPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetWorldPosition();
-    this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({ (float)(memoryId * divideTexSize), localPositiom.y ,localPositiom.z});
+    this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({ (float)(memoryId * divideTexSize), localPositiom.y ,localPositiom.z });
     spc.easingposition = { worldPositiom.x,worldPositiom.y };
 
-//現在のHPからメモリの場所を特定
- int memoryCount = valueRate * 10;
-if (memoryId == memoryCount&& !onceFLG) {
-    easingFLG = true;
-    onceFLG = true;
-}
+    //現在のHPからメモリの場所を特定
+    int memoryCount = valueRate * 10;
+    if (memoryId == memoryCount && !onceFLG) {
+        easingFLG = true;
+        onceFLG = true;
+    }
 
+    if (easingFLG) {
+        spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
+        EasingPlay();
+        easingFLG = false;
+    }
+    if (!IsPlayEasing()) {
+        spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
+    }
 
- if(easingFLG) {
-     spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
-     EasingPlay();
-     easingFLG = false;
- }
- if(!IsPlayEasing()) {
-     spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
- }
+    if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
+        onceFLG = false;
+    }
 
- if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
-     onceFLG = false;
-     
- }
-    
-     this->UiSystem::Update(elapsedTime);
+    this->UiSystem::Update(elapsedTime);
 }
 
 void UI_HPEffect::OnGUI()
@@ -1159,7 +1157,10 @@ void PlayerUIManager::CreateHpUI()
         std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
         std::shared_ptr<GameObject> electro = hpFrame->AddChildObject();
         electro->SetName("electro");
-        electro->AddComponent<Sprite>("Data/SerializeData/UIData/Player/electro.ui", Sprite::SpriteShader::ELECTRO, false);
+        std::shared_ptr<Sprite>e = electro->AddComponent<Sprite>("Data/SerializeData/UIData/Player/electro.ui", Sprite::SpriteShader::DEFALT, false);
+        e->SetColumns(6);
+        e->SetRows(2);
+        e->SetFrameRate(20.2f);
     }
 
     //HpGauge
@@ -1176,14 +1177,13 @@ void PlayerUIManager::CreateHpUI()
     //HPエフェクト
     {
         for (int i = 0; i < 9; i++) {
-
-         std::shared_ptr<GameObject> hpgauge= GameObjectManager::Instance().Find("HpGauge");
-         std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
-         std::string name = "HpEffect_" + i;
-         hpEffect->SetName(name.c_str());
-         int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
-         std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize,player,i);
-       }
+            std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("HpGauge");
+            std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
+            std::string name = "HpEffect_" + i;
+            hpEffect->SetName(name.c_str());
+            int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
+            std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, player, i);
+        }
     }
 }
 
