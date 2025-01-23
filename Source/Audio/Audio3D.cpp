@@ -477,12 +477,12 @@ HRESULT UpdateAudio(float fElapsedTime)
             voice->SetOutputMatrix(g_audioState.pMasteringVoice, INPUTCHANNELS, g_audioState.nChannels,
                 g_audioState.matrixCoefficients);
 
-            //voice->SetOutputMatrix(g_audioState.pSubmixVoice, 1, 1, &g_audioState.dspSettings.ReverbLevel);
+            voice->SetOutputMatrix(g_audioState.pSubmixVoice, 1, 1, &g_audioState.dspSettings.ReverbLevel);
 
-            //XAUDIO2_FILTER_PARAMETERS FilterParametersDirect = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * g_audioState.dspSettings.LPFDirectCoefficient), 1.0f }; // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
-            //voice->SetOutputFilterParameters(g_audioState.pMasteringVoice, &FilterParametersDirect);
-            //XAUDIO2_FILTER_PARAMETERS FilterParametersReverb = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * g_audioState.dspSettings.LPFReverbCoefficient), 1.0f }; // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
-            //voice->SetOutputFilterParameters(g_audioState.pSubmixVoice, &FilterParametersReverb);
+            XAUDIO2_FILTER_PARAMETERS FilterParametersDirect = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * g_audioState.dspSettings.LPFDirectCoefficient), 1.0f }; // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
+            voice->SetOutputFilterParameters(g_audioState.pMasteringVoice, &FilterParametersDirect);
+            XAUDIO2_FILTER_PARAMETERS FilterParametersReverb = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * g_audioState.dspSettings.LPFReverbCoefficient), 1.0f }; // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
+            voice->SetOutputFilterParameters(g_audioState.pSubmixVoice, &FilterParametersReverb);
         }
     }
 
@@ -580,6 +580,7 @@ VOID CleanupAudio()
 
 void AudioSource3D::SetAudio()
 {
+    //resource_ = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
     resource_ = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
 
     if (resource_ != nullptr)
@@ -610,11 +611,12 @@ void AudioSource3D::SetAudio()
         const XAUDIO2_VOICE_SENDS sendList = { 2, sendDescriptors };
 
         // create the source voice
-        g_audioState.pXAudio2->CreateSourceVoice(&au3D.sourceVoice_, pwfx, 0,
+        HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&au3D.sourceVoice_, pwfx, 0,
             2.0f, nullptr, &sendList);
-
-        HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+        //HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
+        //_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 
 }
