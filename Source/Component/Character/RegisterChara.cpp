@@ -46,7 +46,7 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     //キャラが登録された時にHP表示用のコンポーネントを用意する
     if (obj->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Enemy) {
         obj->AddComponent<UI_EnemyHp>();
-        obj->GetComponent<UI_EnemyHp>()->Register();
+        obj->GetComponent<UI_EnemyHp>()->Register(obj);
     }
 
     //自キャラの場合

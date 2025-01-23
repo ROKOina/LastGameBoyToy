@@ -55,6 +55,8 @@ private:
 
     bool easingFLG = false;
     bool onceFLG = false;
+
+    bool isDebug = false;
 }; 
 
 class UI_BoosGauge : public Component
@@ -235,7 +237,7 @@ public:
     void GaugeUpdate(float elapsedTime);
 
     //“o˜^
-    void Register();
+    void Register(std::weak_ptr<GameObject> obj);
 
     void OnGUI()override {};
 private:

@@ -62,35 +62,41 @@ void UI_HPEffect::Update(float elapsedTime)
     DirectX::XMFLOAT3 worldPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetWorldPosition();
     this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({ (float)(memoryId * divideTexSize), localPositiom.y ,localPositiom.z});
     spc.easingposition = { worldPositiom.x,worldPositiom.y };
+    if (!isDebug)
+    {
 
-//現在のHPからメモリの場所を特定
- int memoryCount = valueRate * 10;
-if (memoryId == memoryCount&& !onceFLG) {
-    easingFLG = true;
-    onceFLG = true;
-}
+        //現在のHPからメモリの場所を特定
+        int memoryCount = valueRate * 10;
+        if (memoryId == memoryCount && !onceFLG) {
+            easingFLG = true;
+            onceFLG = true;
+        }
 
 
- if(easingFLG) {
-     spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
-     EasingPlay();
-     easingFLG = false;
- }
- if(!IsPlayEasing()) {
-     spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
- }
+        if (easingFLG) {
+            spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
+            EasingPlay();
+            easingFLG = false;
+        }
+        if (!IsPlayEasing()) {
+            spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
+        }
 
- if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
-     onceFLG = false;
-     
- }
-    
+        if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
+            onceFLG = false;
+
+        }
+    }
+    else {
+        spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
+    }
      this->UiSystem::Update(elapsedTime);
 }
 
 void UI_HPEffect::OnGUI()
 {
     ImGui::InputInt("divideTexSize", &divideTexSize);
+    ImGui::Checkbox("Debug", &isDebug);
     this->UiSystem::OnGUI();
 }
 
@@ -710,7 +716,7 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
     }
 }
 
-void UI_EnemyHp::Register()
+void UI_EnemyHp::Register(std::weak_ptr<GameObject> obj)
 {
     enemyHp = this->GetGameObject()->AddChildObject();
     enemyHp->SetName("enemyHp");
@@ -724,6 +730,19 @@ void UI_EnemyHp::Register()
     gauge->originalTexSize = { 200,100 };
     gauge->SetVariableValue(Hp);
     gauge->SetMaxValue(MaxHp);
+
+    //HPエフェクト
+    {
+        for (int i = 0; i < 9; i++) {
+
+            std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("enemyHp");
+            std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
+            std::string name = "HpEffect_" + std::to_string(i);
+            hpEffect->SetName(name.c_str());
+            int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
+            std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>(nullptr, Sprite::SpriteShader::DEFALT, true, gaugeTexSize, obj, i);
+        }
+    }
 }
 
 UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
@@ -1179,7 +1198,7 @@ void PlayerUIManager::CreateHpUI()
 
          std::shared_ptr<GameObject> hpgauge= GameObjectManager::Instance().Find("HpGauge");
          std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
-         std::string name = "HpEffect_" + i;
+         std::string name = "HpEffect_" + std::to_string(i);
          hpEffect->SetName(name.c_str());
          int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
          std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize,player,i);
