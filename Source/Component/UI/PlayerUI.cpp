@@ -800,12 +800,7 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
          displayFLG = false;
          timer = 0.0f;
      }
-     if (timer <= 0.1) {
-         gauge->spc.color = { 1,1,0,1 };
-     }
-     else {
-         gauge->spc.color = { 1,0,0,1 };
-     }
+      gauge->spc.color = { 1,0,0,1 }; 
  }
  else {
      gauge->GetGameObject()->SetEnabled(false);
@@ -829,18 +824,6 @@ void UI_EnemyHp::Register(std::weak_ptr<GameObject> obj)
     gauge->SetVariableValue(Hp);
     gauge->SetMaxValue(MaxHp);
 
-    //HPエフェクト
-    {
-        for (int i = 0; i < 9; i++) {
-
-            std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("enemyHp");
-            std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
-            std::string name = "HpEffect_" + std::to_string(i);
-            hpEffect->SetName(name.c_str());
-            int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
-            std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/EnemyHpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, obj, i);
-        }
-    }
 }
 
 UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
