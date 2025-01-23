@@ -278,6 +278,9 @@ void PVEDirection::DirectionFOne(float elapsedTime)
     if (!flag)
     {
         GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
+        GameObjectManager::Instance().Find("allyBack")->SetEnabled(false);
+        GameObjectManager::Instance().Find("enemyBack")->SetEnabled(false);
+
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
         //ˆÃ“]
@@ -373,6 +376,7 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
 
     if (eventBoss->GetComponent<CharaStatusCom>()->IsDeath())
     {
+            GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
         //ˆÃ“]
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
