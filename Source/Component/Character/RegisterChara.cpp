@@ -622,6 +622,13 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
         }
+
+        //ビームエフェクト
+        {
+            std::shared_ptr<GameObject>beem = cameraPost->AddChildObject();
+            beem->SetName("Beem");
+            beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beem.gpuparticle", 2000);
+        }
     }
 
     //着火
