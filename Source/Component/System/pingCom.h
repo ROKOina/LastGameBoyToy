@@ -142,7 +142,7 @@ public:
         GetGameObject()->GetComponent<GPUParticle>()->SetEnabled(false);
 
         //ƒLƒƒƒ‰‚Ì‘I‘ğŠÖ”‚ğŒÄ‚Ô
-        std::string Nname = "netPlayer" + photonID;
+        std::string Nname = "netPlayer" + std::to_string(photonID);
         GameObj netPlayer = GameObjectManager::Instance().Find(Nname.c_str());
 
         if (netPlayer)
