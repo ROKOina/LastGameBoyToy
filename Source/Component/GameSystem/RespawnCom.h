@@ -30,7 +30,7 @@ public:
 
     void AddRespawnData(std::shared_ptr<GameObject> obj) 
     { 
-        RespawnData* res = new RespawnData; 
+        RespawnData* res = new RespawnData;
         res->gameObj = obj.get();
         respawnDatas.emplace_back(res);
     }
