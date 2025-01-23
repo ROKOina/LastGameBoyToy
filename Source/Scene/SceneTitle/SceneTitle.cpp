@@ -27,8 +27,10 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
-#include "Component\Audio\AudioCom.h"
+//#include "Component\Audio\AudioCom.h"
 #include "Scene\SceneTraining\SceneTraining.h"
+
+#include "Audio/Audio3D.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -36,6 +38,9 @@ SceneTitle::~SceneTitle()
 
 void SceneTitle::Initialize()
 {
+    InitAudio();
+    PrepareAudio();
+
     //ポストエフェクト
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -170,22 +175,22 @@ void SceneTitle::Initialize()
     //    audioObj.lock()->FeedStart("Title", 0.5f, 0.1f);
     //}
 
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Audio");
-        audioSource = audio->AddComponent<AudioSourceCom>();
-        audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::BGM));
-        audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::SE));
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Audio");
+    //    audioSource = audio->AddComponent<AudioSourceCom>();
+    //    audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::BGM));
+    //    audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::SE));
 
-        audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
-        //audioSource->AudioPlay(static_cast<int>(AUDIOID::BGM), true);
-        //audioSource->FeedStart(static_cast<int>(AUDIOID::BGM), 0.5f, 0.1f);
-    }
+    //    audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
+    //    //audioSource->AudioPlay(static_cast<int>(AUDIOID::BGM), true);
+    //    //audioSource->FeedStart(static_cast<int>(AUDIOID::BGM), 0.5f, 0.1f);
+    //}
 
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Lisner");
-        audio->transform_->SetWorldPosition({ 100,0,10 });
+        audio->transform_->SetWorldPosition({ 5,0,0 });
     }
 
     //暗転からはじまるように
@@ -200,10 +205,10 @@ void SceneTitle::Finalize()
 }
 
 void SceneTitle::Update(float elapsedTime)
-{
-    audioSource.lock()->GetListener().position = GameObjectManager::Instance().Find("Lisner")->transform_->GetWorldPosition();
-    
+{    
+    UpdateAudio(elapsedTime);
 
+    g_audioState.vListenerPos = GameObjectManager::Instance().Find("Lisner")->transform_->GetWorldPosition();
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     //UI更新
