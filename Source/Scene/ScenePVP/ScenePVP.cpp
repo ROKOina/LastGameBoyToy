@@ -116,14 +116,17 @@ void ScenePVP::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName(("ping" + std::to_string(i)).c_str());
 
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
-        
         obj->AddComponent<PingCom>();
 
-        obj->AddComponent<GPUParticle>(nullptr, 100);
+        auto& ray = obj->AddComponent<RayColliderCom>();
+        ray->SetMyTag(COLLIDER_TAG::pin);
+        ray->SetJudgeTag(COLLIDER_TAG::pinCharacter);
 
-        //obj->SetEnabled(false);
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/pingEff01.gpuparticle", 500);
+
+        auto& spr=obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/targetCharacter.ui", Sprite::SpriteShader::DEFALT, false);
+
+        obj->SetEnabled(false);
     }
 
     //ロビー選択から始まる
@@ -950,31 +953,11 @@ void ScenePVP::PingUpdate(float elapsedTime)
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (GamePad::NAKA_BUTTON & gamePad.GetButtonDown())
     {
-        auto& player = GameObjectManager::Instance().Find("player");
-        if (!player)return;
-        auto& camera = player->GetChildFind("cameraPostPlayer");
-        if (!camera)return;
-
-        DirectX::XMFLOAT3 start = camera->transform_->GetWorldPosition();
-        DirectX::XMFLOAT3 end = start + camera->transform_->GetWorldFront() * 1000;
-
-        PxRaycastBuffer buffer;
-        if (PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
+        int myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
+        auto& ping = GameObjectManager::Instance().Find(("ping" + std::to_string(myPlayerID)).c_str());
+        if (ping)
         {
-            DirectX::XMFLOAT3 pinPos;
-
-            // レイキャストが当たった位置と法線を保存
-            pinPos.x = buffer.block.position.x;
-            pinPos.y = buffer.block.position.y;
-            pinPos.z = buffer.block.position.z;
-
-            int myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
-            auto& ping = GameObjectManager::Instance().Find(("ping" + std::to_string(myPlayerID)).c_str());
-            if (ping)
-            {
-                ping->GetComponent<PingCom>()->SetPing(pinPos);
-                StaticSendDataManager::Instance().SendNetPing(pinPos);
-            }
+            ping->GetComponent<PingCom>()->SetPing();
         }
     }
 }

@@ -134,6 +134,7 @@ void PhotonLib::update(float elapsedTime)
         }
         int myPlayerID = GetMyPlayerID();
         myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(myPlayerID);
+        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPhotonID(GetMyPhotonID());
         myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetMyChara(true);
     }
 
@@ -1348,6 +1349,7 @@ void PhotonLib::GameRecv(NetData recvData)
 
             RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
             net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPhotonID(recvData.photonId);
         }
 
         //弾数を合わせる
@@ -1462,15 +1464,24 @@ void PhotonLib::GameRecv(NetData recvData)
         }
     }
 
-    //ピング
-    if (recvData.gameData.pingFlg)
-    {
-        auto& ping = GameObjectManager::Instance().Find(("ping" + std::to_string(recvData.playerId)).c_str());
-        ping->GetComponent<PingCom>()->SetPing(recvData.gameData.pingPos);
-    }
 
     if (recvData.playerId >= 0)
     {
+        //ピング
+        if (saveInputPhoton[recvData.playerId].teamID == saveInputPhoton[myPlayerID].teamID)
+        {
+            if (recvData.gameData.pingFlg)
+            {
+                auto& ping = GameObjectManager::Instance().Find(("ping" + std::to_string(recvData.playerId)).c_str());
+                if (ping) {
+                    if (recvData.gameData.isPosPin)
+                        ping->GetComponent<PingCom>()->SetPosPing(recvData.gameData.pingPos);
+                    else
+                        ping->GetComponent<PingCom>()->SetTargetPing(recvData.gameData.pinPhotonID);
+                }
+            }
+        }
+
         //保存情報
             //入力
         DirectX::XMFLOAT3 nowPos = {};
@@ -1724,7 +1735,14 @@ void PhotonLib::sendGameData(void)
     }
 
     //ピング
-    netD.gameData.pingFlg = StaticSendDataManager::Instance().GetNetPing(netD.gameData.pingPos);
+    StaticSendDataManager::PinSendData pinData;
+    netD.gameData.pingFlg = StaticSendDataManager::Instance().GetNetPing(pinData);
+    if (netD.gameData.pingFlg)
+    {
+        netD.gameData.isPosPin = pinData.isPos;
+        netD.gameData.pingPos = pinData.pinPos;
+        netD.gameData.pinPhotonID = pinData.photonid;
+    }
 
     //キャラIDを送る
     netD.gameData.charaID = myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().GetCharaID();

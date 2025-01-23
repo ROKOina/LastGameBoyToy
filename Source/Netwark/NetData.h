@@ -183,7 +183,9 @@ struct NetData
         int bulletNum = {};
 
         bool pingFlg = false;
+        bool isPosPin = false;
         DirectX::XMFLOAT3 pingPos = {};
+        int pinPhotonID = {};
 
         std::array<bool, 4> deathID = {};    //キルされたらIDをtrueに
         std::array<bool, 4> isKillCount = {};   //キル数カウントしたらtrueに
@@ -254,7 +256,9 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         out << h.gameData.teamID << " ";
         out << h.gameData.bulletNum << " ";
         out << h.gameData.pingFlg << " ";
+        out << h.gameData.isPosPin << " ";
         out << h.gameData.pingPos << " ";
+        out << h.gameData.pinPhotonID << " ";
         out << h.gameData.deathID << " ";
         out << h.gameData.isKillCount << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
@@ -319,7 +323,9 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
         in >> h.gameData.teamID;
         in >> h.gameData.bulletNum;
         in >> h.gameData.pingFlg;
+        in >> h.gameData.isPosPin;
         in >> h.gameData.pingPos;
+        in >> h.gameData.pinPhotonID;
         in >> h.gameData.deathID;
         in >> h.gameData.isKillCount;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
