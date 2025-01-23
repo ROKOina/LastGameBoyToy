@@ -194,6 +194,9 @@ void ScenePVP::InitializeLobbySelect()
         //削除予定リストに追加
         tempRemoveObj.emplace_back(obj);
     }
+
+    //名前入力から始まる
+    fontState = 10;
 }
 
 void ScenePVP::InitializeLobby()
@@ -1000,6 +1003,57 @@ void ScenePVP::TransitionUpdate(float elapsedTime)
     }
 }
 
+void ScenePVP::FontInput(GameObj& fontObj)
+{
+    auto& font = fontObj->GetComponent<Font>();
+    //一文字削除
+    static bool BSflg = false;  //連続対処
+    bool BSOneFlg = false;
+    if (GetKeyState(8) & 0x8000)
+    {
+        BSOneFlg = true;
+        if (!BSflg)
+        {
+            if (font->str.length() > 0)
+                font->str.erase(font->str.end() - 1);
+        }
+    }
+    BSflg = BSOneFlg;
+
+    //文字入力
+    static bool inputFlg[26];  //連続対処
+    for (int i = 65; i < 91; ++i)
+    {
+        bool oneIn = false;
+        if (GetKeyState(i) & 0x8000)
+        {
+            oneIn = true;
+            if (!inputFlg[91 - i])
+            {
+                char a = char(i);
+                font->str.push_back(static_cast<wchar_t>(a));
+            }
+        }
+        inputFlg[91 - i] = oneIn;
+    }
+    //文字入力
+    static bool numFlg[10];  //連続対処
+    for (int i = 48; i < 58; ++i)
+    {
+        bool oneIn = false;
+        if (GetKeyState(i) & 0x8000)
+        {
+            oneIn = true;
+            if (!numFlg[58 - i])
+            {
+                char a = char(i);
+                font->str.push_back(static_cast<wchar_t>(a));
+            }
+        }
+        numFlg[58 - i] = oneIn;
+    }
+}
+
 void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
 {
     //font当たり背景セット
@@ -1090,6 +1144,20 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
 
                         break;
                     }
+                    else if (f.id == 14)    //名前決定
+                    {
+                        auto& nameStr = fP->GetChildFind(("lobbySelectFont" + std::to_string(16)).c_str());  //文字
+                        auto& nameF = nameStr->GetComponent<Font>();
+
+                        if (nameF->str.length() > 0)
+                        {
+                            auto net = photonNet->GetPhotonLib();
+                            net->SetNetName(nameF->str);
+                            fontState = 0;
+                        }
+
+                        break;
+                    }
                     //ヒット情報リセット
                     for (auto& f : lobbySelectFont)
                     {
@@ -1113,53 +1181,16 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
 
             if (f.id == 2)  //入力用
             {
-                auto& font = fontObj->GetComponent<Font>();
-                //一文字削除
-                static bool BSflg = false;  //連続対処
-                bool BSOneFlg = false;
-                if (GetKeyState(8) & 0x8000)
-                {
-                    BSOneFlg = true;
-                    if (!BSflg)
-                    {
-                        if (font->str.length() > 0)
-                            font->str.erase(font->str.end() - 1);
-                    }
-                }
-                BSflg = BSOneFlg;
+                FontInput(fontObj);
+            }
+        }
+        if (fontState == 10)
+        {
+            gage->SetEnabled(true);
 
-                //文字入力
-                static bool inputFlg[26];  //連続対処
-                for (int i = 65; i < 91; ++i)
-                {
-                    bool oneIn = false;
-                    if (GetKeyState(i) & 0x8000)
-                    {
-                        oneIn = true;
-                        if (!inputFlg[91 - i])
-                        {
-                            char a = char(i);
-                            font->str.push_back(static_cast<wchar_t>(a));
-                        }
-                    }
-                    inputFlg[91 - i] = oneIn;
-                }
-                //文字入力
-                static bool numFlg[10];  //連続対処
-                for (int i = 48; i < 58; ++i)
-                {
-                    bool oneIn = false;
-                    if (GetKeyState(i) & 0x8000)
-                    {
-                        oneIn = true;
-                        if (!numFlg[58 - i])
-                        {
-                            char a = char(i);
-                            font->str.push_back(static_cast<wchar_t>(a));
-                        }
-                    }
-                    numFlg[58 - i] = oneIn;
-                }
+            if (f.id == 16)  //入力用
+            {
+                FontInput(fontObj);
             }
         }
     }
