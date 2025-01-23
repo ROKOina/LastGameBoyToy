@@ -39,9 +39,15 @@ void UI_Skill::Update(float elapsedTime)
     this->UiSystem::Update(elapsedTime);
 }
 
-UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion) :UiSystem(filename, spriteshader, collsion)
+UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion,int gaugeTexSize, std::weak_ptr<GameObject> obj,int num) :UiSystem(filename, spriteshader, collsion)
 {
-
+    this->gaugeTexSize = gaugeTexSize;
+    //ゲージ本体のテクスチャサイズを10で割った数字を保持
+    divideTexSize = gaugeTexSize / 10;
+    character = obj;
+    maxHp = character.lock()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
+    memoryId = num;
+    spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
 }
 
 void UI_HPEffect::Start()
@@ -52,7 +58,41 @@ void UI_HPEffect::Start()
 
 void UI_HPEffect::Update(float elapsedTime)
 {
-    this->UiSystem::Update(elapsedTime);
+    valueRate = *character.lock()->GetComponent<CharaStatusCom>()->GetHitPoint() / maxHp;
+    DirectX::XMFLOAT3 localPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetLocalPosition();
+    DirectX::XMFLOAT3 worldPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetWorldPosition();
+    this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({ (float)(memoryId * divideTexSize), localPositiom.y ,localPositiom.z});
+    spc.easingposition = { worldPositiom.x,worldPositiom.y };
+
+//現在のHPからメモリの場所を特定
+ int memoryCount = valueRate * 10;
+if (memoryId == memoryCount&& !onceFLG) {
+    easingFLG = true;
+    onceFLG = true;
+}
+
+
+ if(easingFLG) {
+     spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
+     EasingPlay();
+     easingFLG = false;
+ }
+ if(!IsPlayEasing()) {
+     spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
+ }
+
+ if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
+     onceFLG = false;
+     
+ }
+    
+     this->UiSystem::Update(elapsedTime);
+}
+
+void UI_HPEffect::OnGUI()
+{
+    ImGui::InputInt("divideTexSize", &divideTexSize);
+    this->UiSystem::OnGUI();
 }
 
 UI_BoosGauge::UI_BoosGauge()
@@ -1124,6 +1164,19 @@ void PlayerUIManager::CreateHpUI()
         gauge->SetMaxValue(GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
         float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
         gauge->SetVariableValue(i);
+    }
+
+    //HPエフェクト
+    {
+        for (int i = 0; i < 9; i++) {
+
+         std::shared_ptr<GameObject> hpgauge= GameObjectManager::Instance().Find("HpGauge");
+         std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
+         std::string name = "HpEffect_" + i;
+         hpEffect->SetName(name.c_str());
+         int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
+         std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize,player,i);
+       }
     }
 }
 
