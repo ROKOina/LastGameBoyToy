@@ -48,14 +48,14 @@ public:
         if (chara.lock())
         {
             //キャラの選択関数を呼ぶ
-            std::string name = "netPlayer" + std::to_string(chara.lock()->GetNetCharaData().GetNetPhotonID());
-            GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
+            std::string Nname = "netPlayer" + std::to_string(chara.lock()->GetNetCharaData().GetNetPhotonID());
+            GameObj netPlayer = GameObjectManager::Instance().Find(Nname.c_str());
 
             if (netPlayer)
             {
                 //ターゲットUI設定
                 auto& ui = GetGameObject()->GetComponent<UiSystem>();
-                ui->spc.objectname = name;
+                ui->spc.objectname = Nname;
                 ui->SetEnabled(true);
 
                 //ネットに送る
@@ -142,14 +142,14 @@ public:
         GetGameObject()->GetComponent<GPUParticle>()->SetEnabled(false);
 
         //キャラの選択関数を呼ぶ
-        std::string name = "netPlayer" + photonID;
-        GameObj netPlayer = GameObjectManager::Instance().Find(name.c_str());
+        std::string Nname = "netPlayer" + photonID;
+        GameObj netPlayer = GameObjectManager::Instance().Find(Nname.c_str());
 
         if (netPlayer)
         {
             //ターゲットUI設定
             auto& ui = GetGameObject()->GetComponent<UiSystem>();
-            ui->spc.objectname = name;
+            ui->spc.objectname = Nname;
             ui->SetEnabled(true);
         }
         time = 3;
