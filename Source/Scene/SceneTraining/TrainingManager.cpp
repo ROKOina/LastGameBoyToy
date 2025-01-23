@@ -898,7 +898,7 @@ void TutorialSystem::TutorialSystemStart()
     moveSubTitle[11].pos = { 715.0f,80.0f };
     moveSubTitle[11].UIID = 11;
 
-    moveSubTitle[12].str = L"キーボードのShiftキーでダッシュなのだ";
+    moveSubTitle[12].str = L"移動しながらShiftキーでダッシュなのだ";
     moveSubTitle[12].Lines = "13";
     moveSubTitle[12].pos = { 539.0f,80.0f };
     moveSubTitle[12].UIID = 12;
@@ -982,7 +982,7 @@ void TutorialSystem::TutorialSystemStart()
     ultSubTitle[0].pos = { 628.0f,80.0f };
     ultSubTitle[0].UIID = 0;
 
-    ultSubTitle[1].str = L"キーボードのRキーで発動なのだ";
+    ultSubTitle[1].str = L"キーボードのQキーで発動なのだ";
     ultSubTitle[1].Lines = "28";
     ultSubTitle[1].pos = { 628.0f,80.0f };
     ultSubTitle[1].UIID = 1;
