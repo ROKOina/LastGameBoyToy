@@ -59,6 +59,28 @@ private:
     bool isDebug = false;
 }; 
 
+
+class UI_PlayerHpUI :public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_PlayerHpUI();
+    ~UI_PlayerHpUI() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_PlayerHp"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+private:
+    float* hp;
+    std::weak_ptr<GameObject> player;
+};
+
 class UI_BoosGauge : public Component
 {
     //コンポーネントオーバーライド
@@ -246,7 +268,7 @@ private:
 
     float oldHp = 0.0f;
     float timer = 0.0f;
-    const float time = 1.0f;
+    const float time = 0.5f;
 
     std::shared_ptr<GameObject> enemyHp;
 };
