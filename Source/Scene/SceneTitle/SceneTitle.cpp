@@ -192,6 +192,11 @@ void SceneTitle::Initialize()
         audio->SetName("Lisner");
         audio->transform_->SetWorldPosition({ 5,0,0 });
     }
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Emitter");
+        audio->transform_->SetWorldPosition({ 5,0,0 });
+    }
 
     //à√ì]Ç©ÇÁÇÕÇ∂Ç‹ÇÈÇÊÇ§Ç…
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
@@ -209,6 +214,7 @@ void SceneTitle::Update(float elapsedTime)
     UpdateAudio(elapsedTime);
 
     g_audioState.vListenerPos = GameObjectManager::Instance().Find("Lisner")->transform_->GetWorldPosition();
+    g_audioState.vEmitterPos = GameObjectManager::Instance().Find("Emitter")->transform_->GetWorldPosition();
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     //UIçXêV
