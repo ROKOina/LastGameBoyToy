@@ -791,7 +791,7 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
      displayFLG = true;
      timer = 0.0f;
      oldHp = *Hp;
-     gauge->spc.color = { 1,1,1,1 };
+     gauge->GetGameObject()->SetEnabled(true);
  }
  
  if (displayFLG) {
@@ -800,15 +800,22 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
          displayFLG = false;
          timer = 0.0f;
      }
+     if (timer <= 0.1) {
+         gauge->spc.color = { 1,1,0,1 };
+     }
+     else {
+         gauge->spc.color = { 1,0,0,1 };
+     }
  }
  else {
-     gauge->spc.color = { 0,0,0,0 };
+     gauge->GetGameObject()->SetEnabled(false);
  }
-    gauge->spc.color = { 1,1,1,1 };
+
 }
 
 void UI_EnemyHp::Register(std::weak_ptr<GameObject> obj)
 {
+    hp = obj.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
     enemyHp = this->GetGameObject()->AddChildObject();
     enemyHp->SetName("enemyHp");
     enemyHp->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/EnemyHp.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);

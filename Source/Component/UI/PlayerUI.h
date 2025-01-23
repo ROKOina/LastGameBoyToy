@@ -271,6 +271,8 @@ private:
     const float time = 0.5f;
 
     std::shared_ptr<GameObject> enemyHp;
+   
+    float* hp;
 };
 
 class UI_GameJudge : public Component
