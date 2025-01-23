@@ -4,6 +4,8 @@
 #include "Math\easing.h"
 #include "Math\Mathf.h"
 
+using namespace DirectX;
+
 void AudioSourceCom::Update(float elapsedTime)
 {
     for (auto& [id, feedState] : feedStates_)
@@ -17,38 +19,115 @@ void AudioSourceCom::Update(float elapsedTime)
             }
         }
     }
+
+    // 3Dオーディオの更新
+    if (!t)
+        Update3DAudio(elapsedTime);
+    t = (!t);
 }
 
 // 3Dオーディオの更新
-void AudioSourceCom::Update3DAudio()
+void AudioSourceCom::Update3DAudio(float elapsedTime)
 {
-    // リスナーとエミッターを更新
-    listener_.Update();
-    emitter_.Update();
+    if (audio->GetListener().position.x != audio->GetListener().x3dListener.Position.x
+        || audio->GetListener().position.z != audio->GetListener().x3dListener.Position.z)
+    {
+        const XMVECTOR v1 = XMLoadFloat3(&audio->GetListener().position);
+        const XMVECTOR v2 = XMVectorSet(audio->GetListener().x3dListener.Position.x, audio->GetListener().x3dListener.Position.y, audio->GetListener().x3dListener.Position.z, 0.f);
 
-    // X3DAudioの計算
-    X3DAUDIO_DSP_SETTINGS dspSettings = {};
-    dspSettings.SrcChannelCount = emitter_.x3dEmitter.ChannelCount;
-    dspSettings.DstChannelCount = 2; // ステレオ出力
+        XMVECTOR vDelta = v1 - v2;
 
-    // 必要なマトリックスのメモリ確保
-    std::vector<FLOAT32> matrix(dspSettings.SrcChannelCount * dspSettings.DstChannelCount);
-    dspSettings.pMatrixCoefficients = matrix.data();
+        audio->GetListener().listenerAngle = float(atan2(XMVectorGetX(vDelta), XMVectorGetZ(vDelta)));
 
-    const X3DAUDIO_HANDLE* x3dHandle = Audio::Instance().GetX3DAudioHandle();
+        vDelta = XMVectorSetY(vDelta, 0.f);
+        vDelta = XMVector3Normalize(vDelta);
 
-    X3DAudioCalculate(*x3dHandle,
-        &listener_.x3dListener,
-        &emitter_.x3dEmitter,
-        X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER,
-        &dspSettings);
+        XMFLOAT3 tmp;
+        XMStoreFloat3(&tmp, vDelta);
+
+        audio->GetListener().x3dListener.OrientFront.x = tmp.x;
+        audio->GetListener().x3dListener.OrientFront.y = 0.f;
+        audio->GetListener().x3dListener.OrientFront.z = tmp.z;
+    }
+
+    if (audio->GetListener().useListenerCone)
+    {
+        X3DAUDIO_CONE a = audio->GetListener().Listener_DirectionalCone;
+        audio->GetListener().pCone = std::make_shared<X3DAUDIO_CONE>(a);
+    }
+    else
+    {
+        audio->GetListener().x3dListener.pCone = nullptr;
+    }
+    if (audio->GetUseInnerRadius())
+    {
+        audio->GetEmitter().x3dEmitter.InnerRadius = 2.0f;
+        audio->GetEmitter().x3dEmitter.InnerRadiusAngle = X3DAUDIO_PI / 4.0f;
+    }
+    else
+    {
+        audio->GetEmitter().x3dEmitter.InnerRadius = 0.0f;
+        audio->GetEmitter().x3dEmitter.InnerRadiusAngle = 0.0f;
+    }
+
+    if (elapsedTime > 0)
+    {
+        XMVECTOR v1 = XMLoadFloat3(&audio->GetListener().position);
+        XMVECTOR v2 = XMVectorSet(audio->GetListener().x3dListener.Position.x, audio->GetListener().x3dListener.Position.y, audio->GetListener().x3dListener.Position.z, 0);
+
+        const XMVECTOR lVelocity = (v1 - v2) / elapsedTime;
+        audio->GetListener().x3dListener.Position.x = audio->GetListener().position.x;
+        audio->GetListener().x3dListener.Position.y = audio->GetListener().position.y;
+        audio->GetListener().x3dListener.Position.z = audio->GetListener().position.z;
+
+        XMFLOAT3 tmp;
+        XMStoreFloat3(&tmp, lVelocity);
+        audio->GetListener().x3dListener.Velocity.x = tmp.x;
+        audio->GetListener().x3dListener.Velocity.y = tmp.y;
+        audio->GetListener().x3dListener.Velocity.z = tmp.z;
+
+        v1 = XMLoadFloat3(&audio->GetEmitter().position);
+        v2 = XMVectorSet(audio->GetEmitter().x3dEmitter.Position.x, audio->GetEmitter().x3dEmitter.Position.y, audio->GetEmitter().x3dEmitter.Position.z, 0.f);
+
+        const XMVECTOR eVelocity = (v1 - v2) / elapsedTime;
+        audio->GetEmitter().x3dEmitter.Position.x = audio->GetEmitter().position.x;
+        audio->GetEmitter().x3dEmitter.Position.y = audio->GetEmitter().position.y;
+        audio->GetEmitter().x3dEmitter.Position.z = audio->GetEmitter().position.z;
+
+        XMStoreFloat3(&tmp, eVelocity);
+        audio->GetEmitter().x3dEmitter.Velocity.x = tmp.x;
+        audio->GetEmitter().x3dEmitter.Velocity.y = tmp.y;
+        audio->GetEmitter().x3dEmitter.Velocity.z = tmp.z;
+
+    }
+
+    DWORD dwCalcFlags = X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER
+        | X3DAUDIO_CALCULATE_LPF_DIRECT | X3DAUDIO_CALCULATE_LPF_REVERB
+        | X3DAUDIO_CALCULATE_REVERB;
+    if (audio->GetUseRedirectToLFE())
+    {
+        // On devices with an LFE channel, allow the mono source data
+        // to be routed to the LFE destination channel.
+        dwCalcFlags |= X3DAUDIO_CALCULATE_REDIRECT_TO_LFE;
+    }
+
+    // 3Dオーディオの更新
+    X3DAudioCalculate(*audio->GetX3DAudioHandle(), &audio->GetListener().x3dListener, &audio->GetEmitter().x3dEmitter, dwCalcFlags, audio->GetDspSettings().get());
 
     // 計算結果を反映
     for (auto& [id, voice] : sourceVoices_)
     {
-        voice->SetFrequencyRatio(dspSettings.DopplerFactor);
-        voice->SetOutputMatrix(nullptr, dspSettings.SrcChannelCount, dspSettings.DstChannelCount, dspSettings.pMatrixCoefficients);
-        voice->SetVolume(volumeControls_[id] * dspSettings.EmitterToListenerDistance);
+        voice->SetFrequencyRatio(audio->GetDspSettings()->DopplerFactor);
+        voice->SetOutputMatrix(audio->GetMasteringVoice(), INPUTCHANNELS, audio->GetNChannels(), audio->GetMatrixCoefficients());
+        voice->SetOutputMatrix(audio->GetSubmixVoice(), 1, 1, &audio->GetDspSettings()->ReverbLevel);
+
+        // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
+        XAUDIO2_FILTER_PARAMETERS FilterParametersDirect = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * audio->GetDspSettings()->LPFDirectCoefficient), 1.0f }; 
+        voice->SetOutputFilterParameters(audio->GetMasteringVoice(), &FilterParametersDirect);
+
+        // see XAudio2CutoffFrequencyToRadians() in XAudio2.h for more information on the formula used here
+        XAUDIO2_FILTER_PARAMETERS FilterParametersReverb = { LowPassFilter, 2.0f * sinf(X3DAUDIO_PI / 6.0f * audio->GetDspSettings()->LPFReverbCoefficient), 1.0f }; 
+        voice->SetOutputFilterParameters(audio->GetSubmixVoice(), &FilterParametersReverb);
     }
 }
 
@@ -204,8 +283,6 @@ void AudioSourceCom::EmitterPlay(int id)
     sourceVoice->FlushSourceBuffers();
     sourceVoice->SubmitSourceBuffer(&buffer);
 
-    // 3Dオーディオの更新
-    Update3DAudio();
 
     // 再生開始
     HRESULT hr = sourceVoice->Start();
@@ -242,9 +319,6 @@ void AudioSourceCom::EmitterPlay(int id, bool loop, float volume)
     sourceVoice->Stop();
     sourceVoice->FlushSourceBuffers();
     sourceVoice->SubmitSourceBuffer(&buffer);
-
-    // 3Dオーディオの更新
-    Update3DAudio();
 
     // 再生開始
     HRESULT hr = sourceVoice->Start();

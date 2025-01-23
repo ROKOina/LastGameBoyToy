@@ -3,6 +3,41 @@
 
 #pragma comment(lib, "xaudio2.lib")
 
+XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAM[NUM_PRESETS] =
+{
+    XAUDIO2FX_I3DL2_PRESET_FOREST,
+    XAUDIO2FX_I3DL2_PRESET_DEFAULT,
+    XAUDIO2FX_I3DL2_PRESET_GENERIC,
+    XAUDIO2FX_I3DL2_PRESET_PADDEDCELL,
+    XAUDIO2FX_I3DL2_PRESET_ROOM,
+    XAUDIO2FX_I3DL2_PRESET_BATHROOM,
+    XAUDIO2FX_I3DL2_PRESET_LIVINGROOM,
+    XAUDIO2FX_I3DL2_PRESET_STONEROOM,
+    XAUDIO2FX_I3DL2_PRESET_AUDITORIUM,
+    XAUDIO2FX_I3DL2_PRESET_CONCERTHALL,
+    XAUDIO2FX_I3DL2_PRESET_CAVE,
+    XAUDIO2FX_I3DL2_PRESET_ARENA,
+    XAUDIO2FX_I3DL2_PRESET_HANGAR,
+    XAUDIO2FX_I3DL2_PRESET_CARPETEDHALLWAY,
+    XAUDIO2FX_I3DL2_PRESET_HALLWAY,
+    XAUDIO2FX_I3DL2_PRESET_STONECORRIDOR,
+    XAUDIO2FX_I3DL2_PRESET_ALLEY,
+    XAUDIO2FX_I3DL2_PRESET_CITY,
+    XAUDIO2FX_I3DL2_PRESET_MOUNTAINS,
+    XAUDIO2FX_I3DL2_PRESET_QUARRY,
+    XAUDIO2FX_I3DL2_PRESET_PLAIN,
+    XAUDIO2FX_I3DL2_PRESET_PARKINGLOT,
+    XAUDIO2FX_I3DL2_PRESET_SEWERPIPE,
+    XAUDIO2FX_I3DL2_PRESET_UNDERWATER,
+    XAUDIO2FX_I3DL2_PRESET_SMALLROOM,
+    XAUDIO2FX_I3DL2_PRESET_MEDIUMROOM,
+    XAUDIO2FX_I3DL2_PRESET_LARGEROOM,
+    XAUDIO2FX_I3DL2_PRESET_MEDIUMHALL,
+    XAUDIO2FX_I3DL2_PRESET_LARGEHALL,
+    XAUDIO2FX_I3DL2_PRESET_PLATE,
+};
+
+
 // コンストラクタ
 Audio::Audio()
 {
@@ -32,17 +67,101 @@ Audio::Audio()
     }
 
     // スピーカーチャネルマスクの取得
-    DWORD speakerChannelMask = SPEAKER_STEREO;
-    hr = masteringVoice_->GetChannelMask(&speakerChannelMask);
-    if (FAILED(hr) || speakerChannelMask == 0)
+    DWORD dwChannelMask = 0;
+    UINT32  sampleRate = 0;
+    XAUDIO2_VOICE_DETAILS details;
+
+    masteringVoice_->GetVoiceDetails(&details);
+
+    hr = masteringVoice_->GetChannelMask(&dwChannelMask);
+    if (FAILED(hr))
     {
-        speakerChannelMask = SPEAKER_STEREO;  // 取得失敗時にデフォルトを再設定
         throw std::runtime_error("Failed to retrieve speaker channel mask or invalid channel mask.");
     }
 
+    sampleRate = details.InputSampleRate;
+    nChannels = details.InputChannels;
+    channelMask = dwChannelMask;
+
+    UINT32 rflags = 0;
+    if (FAILED(hr = XAudio2CreateReverb(&reverbEffect, rflags)))
+    {
+        xaudio_->Release();
+    }
+
+    // 反響と複数のマスターボリュームを設定する
+    {
+        XAUDIO2_EFFECT_DESCRIPTOR effects[] = { {reverbEffect.Get(), TRUE, 1 } };
+        XAUDIO2_EFFECT_CHAIN effectChain = { 1, effects };
+
+        if (FAILED(hr = xaudio_->CreateSubmixVoice(&submixVoice, 1, sampleRate, 0, 0, nullptr, &effectChain)))
+        {
+            xaudio_->Release();
+            reverbEffect.Reset();
+        }
+
+        // Set default FX params
+        XAUDIO2FX_REVERB_PARAMETERS native;
+        ReverbConvertI3DL2ToNative(&g_PRESET_PARAM[9], &native);
+        submixVoice->SetEffectParameters(0, &native, sizeof(native));
+    }
+
     // X3DAudio 初期化
-    hr = X3DAudioInitialize(speakerChannelMask, X3DAUDIO_SPEED_OF_SOUND, x3dAudioHandle_);
+    constexpr float SPEEDOFSOUND = X3DAUDIO_SPEED_OF_SOUND;
+
+    hr = X3DAudioInitialize(dwChannelMask, SPEEDOFSOUND, x3dAudioHandle_);
     _ASSERT_EXPR(SUCCEEDED(hr), "Failed to initialize X3DAudio.");
+
+    listener_.listenerAngle = 0;
+    listener_.useListenerCone = true;
+    useInnerRadius = true;
+    useRedirectToLFE = ((dwChannelMask & SPEAKER_LOW_FREQUENCY) != 0);
+
+    // リスナー初期化
+    {
+        listener_.x3dListener.Position = listener_.position;
+        listener_.x3dListener.OrientTop = listener_.top;
+        listener_.x3dListener.OrientFront = listener_.front;
+
+        listener_.x3dListener.pCone = (X3DAUDIO_CONE*)&listener_.Listener_DirectionalCone;
+    }
+
+    // エミッター初期化
+    {
+        emitter_.x3dEmitter.pCone = &emitter_.emitterCone;
+        emitter_.x3dEmitter.pCone->InnerAngle = 0.0f;
+        emitter_.x3dEmitter.pCone->OuterAngle = 0.0f;
+        emitter_.x3dEmitter.pCone->InnerVolume = 0.0f;
+        emitter_.x3dEmitter.pCone->OuterVolume = 1.0f;
+        emitter_.x3dEmitter.pCone->InnerLPF = 0.0f;
+        emitter_.x3dEmitter.pCone->OuterLPF = 1.0f;
+        emitter_.x3dEmitter.pCone->InnerReverb = 0.0f;
+        emitter_.x3dEmitter.pCone->OuterReverb = 1.0f;
+
+        emitter_.x3dEmitter.Position = emitter_.position;
+        emitter_.x3dEmitter.OrientTop = emitter_.top;
+        emitter_.x3dEmitter.OrientFront = emitter_.front;
+
+        emitter_.x3dEmitter.ChannelCount = INPUTCHANNELS;
+        emitter_.x3dEmitter.ChannelRadius = 1.0f;
+
+        emitter_.x3dEmitter.InnerRadius = 2.0f;
+        emitter_.x3dEmitter.InnerRadiusAngle = X3DAUDIO_PI / 4.0f;
+
+        emitter_.x3dEmitter.pVolumeCurve = (X3DAUDIO_DISTANCE_CURVE*)&X3DAudioDefault_LinearCurve;
+        emitter_.x3dEmitter.pLFECurve = (X3DAUDIO_DISTANCE_CURVE*)&emitter_.Emitter_LFE_Curve;
+        emitter_.x3dEmitter.pLPFDirectCurve = nullptr; // use default curve
+        emitter_.x3dEmitter.pLPFReverbCurve = nullptr; // use default curve
+        emitter_.x3dEmitter.pReverbCurve = (X3DAUDIO_DISTANCE_CURVE*)&emitter_.Emitter_Reverb_Curve;
+        emitter_.x3dEmitter.CurveDistanceScaler = 14.0f;
+        emitter_.x3dEmitter.DopplerScaler = 1.0f;
+    }
+
+    dspSettings = std::make_shared<X3DAUDIO_DSP_SETTINGS>();
+
+    dspSettings->SrcChannelCount = INPUTCHANNELS;
+    dspSettings->DstChannelCount = nChannels;
+    dspSettings->pMatrixCoefficients = matrixCoefficients;
 
     // BGMとSEを一括登録
     RegisterAudioSources();
