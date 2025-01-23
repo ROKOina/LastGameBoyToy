@@ -1,7 +1,6 @@
 #pragma once
 #include "Component/System/Component.h"
 
-
 class UltSkillMaxItem :public Component
 {
 public:
@@ -21,7 +20,6 @@ public:
     //名前設定
     const char* GetName() const override { return "ULTSKILLMAX"; }
 
-
 public:
 
     //アイテムを拾った時の処理
@@ -31,5 +29,4 @@ public:
     void TransformItem(float elapsedTime);
 
     float timer = 0.0f;
-  
 };

@@ -189,16 +189,3 @@ void InazawaCharacterCom::UltSkill()
     //ステートを初期化
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
-
-//リロード（弾減らす処理は各自のキャラでする
-void InazawaCharacterCom::Reload()
-{
-    bool isBulletNone = !(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
-        ? ((currentBulletNum > 0)) \
-        : ((netCharaData.GetBulletNum() > 0)));
-
-    if (isBulletNone)
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
-}

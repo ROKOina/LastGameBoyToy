@@ -34,13 +34,11 @@
 #include "Setting/Setting.h"
 #include "Scene\SceneTitle\SceneTitle.h"
 
-
 TrainingManager::TrainingManager()
 {
 }
 TrainingManager::~TrainingManager()
 {
-
 }
 TrainingSystem::TrainingSystem()
 {
@@ -54,7 +52,6 @@ TutorialSystem::TutorialSystem()
 TutorialSystem::~TutorialSystem()
 {
 }
-
 
 #pragma region トレーニング統括
 void TrainingManager::TrainingManagerStart()
@@ -77,9 +74,9 @@ void TrainingManager::TrainingManagerStart()
     {
         // タイトルへ
         {
-            auto& name  = obj->AddChildObject();
+            auto& name = obj->AddChildObject();
             name->SetName("title");
-            auto& spr=name->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTitle.ui", Sprite::SpriteShader::DEFALT, true);
+            auto& spr = name->AddComponent<Sprite>("Data/SerializeData/UIData/setting/trainingGotoTitle.ui", Sprite::SpriteShader::DEFALT, true);
             spr->SetOrderinLayer(100);
             name->SetEnabled(false);
         }
@@ -135,13 +132,12 @@ void TrainingManager::TrainingManagerClear()
     charaSelectFlag = true;
     flag = false;
     flag1 = false;
-
 }
 
 void TrainingManager::ChangeTutorialFlag()
 {
     GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition({ -0.115f,0.0f,3.489f });
-    GameObjectManager::Instance().Find("player")->transform_->SetEulerRotation({0.0f,180.119f,0.0f});
+    GameObjectManager::Instance().Find("player")->transform_->SetEulerRotation({ 0.0f,180.119f,0.0f });
     TrainingSystem::Instance().TrainingObjUnhide();
     TrainingSystem::Instance().ShootingIni();
     tutorialFlag = true;
@@ -150,7 +146,6 @@ void TrainingManager::ChangeTutorialFlag()
 
 void TrainingManager::ChangeTrainigFlag()
 {
-   
     TutorialSystem::Instance().TutorialFlagClear();
     tutorialFlag = false;
 }
@@ -160,7 +155,6 @@ void TrainingManager::Changeblackout()
     //暗転
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
-    
 }
 
 void TrainingManager::Changelightchange()
@@ -172,7 +166,6 @@ void TrainingManager::Changelightchange()
 
 void TrainingManager::Setting()
 {
-
     auto& tuto = GameObjectManager::Instance().Find("tuto");
     auto& title = GameObjectManager::Instance().Find("title");
     auto& traing = GameObjectManager::Instance().Find("training");
@@ -200,12 +193,10 @@ void TrainingManager::Setting()
         tuto->SetEnabled(false);
         title->SetEnabled(false);
         traing->SetEnabled(false);
-        
     }
 
-
     //チュートリアルへ
-    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting()&&tuto->GetComponent<Sprite>()->GetHitSprite()&&!tutorialFlag)
+    if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && tuto->GetComponent<Sprite>()->GetHitSprite() && !tutorialFlag)
     {
         tuto->GetComponent<Sprite>()->spc.color = selectColor;
 
@@ -213,7 +204,6 @@ void TrainingManager::Setting()
         {
             TrainingManager::Instance().ChangeTutorialFlag();
             SceneManager::Instance().GetSettingScreen()->SetViewSetting(false);
-           
         }
     }
     else
@@ -221,11 +211,10 @@ void TrainingManager::Setting()
         tuto->GetComponent<Sprite>()->spc.color = Color;
     }
 
-
     //タイトルへ
     if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && title->GetComponent<Sprite>()->GetHitSprite())
     {
-        title->GetComponent<Sprite>()->spc.color= selectColor;
+        title->GetComponent<Sprite>()->spc.color = selectColor;
 
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
         {
@@ -237,7 +226,6 @@ void TrainingManager::Setting()
     {
         title->GetComponent<Sprite>()->spc.color = Color;
     }
-
 
     //トレーニングモードへ
     if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && traing->GetComponent<Sprite>()->GetHitSprite())
@@ -306,7 +294,6 @@ void TrainingManager::CharaSelectUnHindOBJ()
 
     GameObjectManager::Instance().Find("player")->SetEnabled(false);
     GameObjectManager::Instance().Find("stage")->SetEnabled(false);
-
 }
 
 void TrainingManager::InitializeBack()
@@ -315,7 +302,6 @@ void TrainingManager::InitializeBack()
     std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
     lobbyBackParent->SetName("lobbyBackParent");
     tempRemoveObj.emplace_back(lobbyBackParent);
-
 }
 
 void TrainingManager::OnGUI()
@@ -324,10 +310,6 @@ void TrainingManager::OnGUI()
 }
 
 #pragma endregion
-
-
-
-
 
 #pragma region トレーニングモード
 void TrainingSystem::TrainingSystemStart()
@@ -379,8 +361,6 @@ void TrainingSystem::TrainingSystemStart()
         font->color.w = 1.0f;
         font->SetEnabled(false);
     }
-
-
 
     //棒立ち案山子君
     {
@@ -437,7 +417,6 @@ void TrainingSystem::TrainingSystemStart()
             std::shared_ptr<PushBackCom>pushBack = scarecrow2->AddComponent<PushBackCom>();
             pushBack->SetRadius(1.5f);
             pushBack->SetWeight(600.0f);
-
         }
     }
 
@@ -504,7 +483,7 @@ void TrainingSystem::TrainingSystemStart()
         r->LoadModel("Data/Model/Boss/boss_ver2.mdl");
         r->SetOutlineColor({ 1,0,0 });
         r->SetOutlineIntensity(10.0f);
-        scarecrow5->transform_->SetWorldPosition({-2.656f, 0.0f, -46.567f});
+        scarecrow5->transform_->SetWorldPosition({ -2.656f, 0.0f, -46.567f });
         scarecrow5->transform_->SetScale({ 0.12f, 0.12f, 0.12f });
         scarecrow5->AddComponent<NodeCollsionCom>("Data/Model/Boss/boss.nodecollsion");
         std::shared_ptr<SphereColliderCom> collider = scarecrow5->AddComponent<SphereColliderCom>();
@@ -524,7 +503,7 @@ void TrainingSystem::TrainingSystemStart()
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
     }
-    
+
     //ULTのアイテム
     {
         auto& scarecrow1 = GameObjectManager::Instance().Create();
@@ -547,9 +526,7 @@ void TrainingSystem::TrainingSystemStart()
         scarecrow1->AddComponent<AnimationCom>();
         scarecrow1->AddComponent<UltSkillMaxItem>();
         scarecrow1->AddComponent<AudioCom>();
-
     }
-
 }
 
 //更新処理
@@ -577,8 +554,6 @@ void TrainingSystem::TrainingSystemClear()
     scarecrowCount = 0;
     shootingScore = 0;
 }
-
-
 
 //射撃時の案山子スポーン
 void TrainingSystem::ShootingSpawnCrow()
@@ -617,8 +592,6 @@ void TrainingSystem::ShootingSpawnCrow()
             std::shared_ptr<PushBackCom>pushBack = scarecrow5->AddComponent<PushBackCom>();
             pushBack->SetRadius(1.5f);
             pushBack->SetWeight(600.0f);
-
-
         }
     }
 }
@@ -637,7 +610,7 @@ void TrainingSystem::SpawnItem()
         scarecrow1->transform_->SetWorldPosition({ 0.0f,1.0f,-2.0f });
         scarecrow1->transform_->SetEulerRotation({ 0.0f,0.0f,30.0f });
         scarecrow1->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
-        
+
         std::shared_ptr<SphereColliderCom> collider = scarecrow1->AddComponent<SphereColliderCom>();
         collider->SetMyTag(COLLIDER_TAG::Enemy);
         collider->SetJudgeTag(COLLIDER_TAG::Player);
@@ -648,7 +621,6 @@ void TrainingSystem::SpawnItem()
         scarecrow1->AddComponent<AnimationCom>();
         scarecrow1->AddComponent<UltSkillMaxItem>();
         scarecrow1->AddComponent<AudioCom>();
-
     }
 }
 
@@ -656,7 +628,7 @@ void TrainingSystem::SpawnItem()
 void TrainingSystem::ShootingStartEndSystem()
 {
     //開始処理
-    if (GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->IsDeath()&&!shootingStartFlag)
+    if (GameObjectManager::Instance().Find("scarecrow5")->GetComponent<CharaStatusCom>()->IsDeath() && !shootingStartFlag)
     {
         shootingStartFlag = true;
         GameObjectManager::Instance().Find("scarecrow5")->SetEnabled(false);
@@ -665,7 +637,6 @@ void TrainingSystem::ShootingStartEndSystem()
         GameObjectManager::Instance().Find("trainingRestF")->GetComponent<Font>()->SetEnabled(true);
         GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->SetEnabled(true);
         ShootingSpawnCrow();
-        
     }
 
     //終了処理
@@ -690,7 +661,6 @@ void TrainingSystem::ShootingStartEndSystem()
 //射撃のロジック？
 void TrainingSystem::ShootingSystem(float elapsdTime)
 {
-
     //時間切れでリスポーン
     if (!shootingIntervalFlag)
     {
@@ -699,7 +669,7 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         {
             //案山子破棄
             GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("scarecrow"));
-           
+
             //案山子スポーン
             ShootingSpawnCrow();      ///sssassssssss
 
@@ -709,15 +679,15 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         }
     }
 
-    //倒してリスポーン 
+    //倒してリスポーン
     auto scarecrow = GameObjectManager::Instance().Find("scarecrow");
     if (!shootingIntervalFlag && scarecrow && scarecrow->GetComponent<CharaStatusCom>()->IsDeath())
-    { 
-        //案山子破棄 
-         GameObjectManager::Instance().Remove(scarecrow);
-         //初期化 
+    {
+        //案山子破棄
+        GameObjectManager::Instance().Remove(scarecrow);
+        //初期化
         shootingIntervalFlag = true;
-        scarecrowLifeTimer = 0.0f; 
+        scarecrowLifeTimer = 0.0f;
         shootingScore += 1;
         scarecrowCount += 1;
     }
@@ -737,11 +707,8 @@ void TrainingSystem::ShootingSystem(float elapsdTime)
         }
     }
 
-
     GameObjectManager::Instance().Find("trainingScoreI")->GetComponent<Font>()->str = std::to_wstring(shootingScore);
     GameObjectManager::Instance().Find("trainingRestI")->GetComponent<Font>()->str = std::to_wstring(scarecrowMaxTotal - scarecrowCount);
-
-
 }
 
 void TrainingSystem::ShootingIni()
@@ -792,14 +759,11 @@ void TrainingSystem::TrainingObjUnhide()
     GameObjectManager::Instance().Find("allyBack")->SetEnabled(false);
     GameObjectManager::Instance().Find("enemyBack")->SetEnabled(false);
 
-    
-
     if (GameObjectManager::Instance().Find("ULTSKILLMAXITEM") != nullptr)
     {
         GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->SetEnabled(false);
     }
 }
-
 
 void TrainingSystem::TrainingObjDisplay()
 {
@@ -813,17 +777,12 @@ void TrainingSystem::TrainingObjDisplay()
     GameObjectManager::Instance().Find("allyBack")->SetEnabled(true);
     GameObjectManager::Instance().Find("enemyBack")->SetEnabled(true);
 
-
     if (GameObjectManager::Instance().Find("ULTSKILLMAXITEM") != nullptr)
     {
         GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->SetEnabled(true);
     }
 }
 #pragma endregion
-
-
-
-
 
 #pragma region チュートリアルモード
 void TutorialSystem::TutorialSystemStart()
@@ -869,20 +828,24 @@ void TutorialSystem::TutorialSystemStart()
         audioObj->RegisterSource(AUDIOID::TUTOLINES_23, "23");
         audioObj->RegisterSource(AUDIOID::TUTOLINES_24, "24");
         audioObj->RegisterSource(AUDIOID::TUTOLINES_25, "25");
-
-        
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_26, "26");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_27, "27");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_28, "28");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_29, "29");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_30, "30");
+        audioObj->RegisterSource(AUDIOID::TUTOLINES_31, "31");
     }
 
 #pragma region 移動
 
-    moveSubTitle[0].str= L"ようこそ　チュートリアルへ";
+    moveSubTitle[0].str = L"ようこそ　チュートリアルへ";
     moveSubTitle[0].Lines = "01";
-    moveSubTitle[0].pos = {650.0f,80.0f};
+    moveSubTitle[0].pos = { 650.0f,80.0f };
     moveSubTitle[0].UIID = 0;
 
     moveSubTitle[1].str = L"今から基本的な操作方法を教えるのだ";
     moveSubTitle[1].Lines = "02";
-    moveSubTitle[1].pos = {553.0f,80.0f};
+    moveSubTitle[1].pos = { 553.0f,80.0f };
     moveSubTitle[1].UIID = 1;
 
     moveSubTitle[2].str = L"まずは、移動からなのだ";
@@ -930,88 +893,116 @@ void TutorialSystem::TutorialSystemStart()
     moveSubTitle[10].pos = { 834.0f,80.0f };
     moveSubTitle[10].UIID = 10;
 
-    moveSubTitle[11].str = L"次は銃の説明なのだ";
+    moveSubTitle[11].str = L"次はダッシュなのだ";
     moveSubTitle[11].Lines = "12";
     moveSubTitle[11].pos = { 715.0f,80.0f };
     moveSubTitle[11].UIID = 11;
 
+    moveSubTitle[12].str = L"キーボードのShiftキーでダッシュなのだ";
+    moveSubTitle[12].Lines = "13";
+    moveSubTitle[12].pos = { 539.0f,80.0f };
+    moveSubTitle[12].UIID = 12;
+
+    moveSubTitle[13].str = L"よくできたのだ";
+    moveSubTitle[13].Lines = "14";
+    moveSubTitle[13].pos = { 806.0f,80.0f };
+    moveSubTitle[13].UIID = 13;
+
+    moveSubTitle[14].str = L"次は銃の説明なのだ";
+    moveSubTitle[14].Lines = "15";
+    moveSubTitle[14].pos = { 715.0f,80.0f };
+    moveSubTitle[14].UIID = 14;
 
 #pragma endregion
 #pragma region 銃セリフ
 
     gunSubTitle[0].str = L"銃の基本説明を教えるのだ";
-    gunSubTitle[0].Lines = "13";
-    gunSubTitle[0].pos = {674.0f,80.0f};
+    gunSubTitle[0].Lines = "16";
+    gunSubTitle[0].pos = { 674.0f,80.0f };
     gunSubTitle[0].UIID = 0;
 
     gunSubTitle[1].str = L"マウスの左クリックで、発射なのだ";
-    gunSubTitle[1].Lines = "14";
+    gunSubTitle[1].Lines = "17";
     gunSubTitle[1].pos = { 571.0f,80.0f };
-    gunSubTitle[1].UIID=1;
+    gunSubTitle[1].UIID = 1;
 
     gunSubTitle[2].str = L"よくできたのだ";
-    gunSubTitle[2].Lines = "15";
+    gunSubTitle[2].Lines = "18";
     gunSubTitle[2].pos = { 765.0f,80.0f };
-    gunSubTitle[2].UIID =2;
+    gunSubTitle[2].UIID = 2;
 
-    gunSubTitle[3].str = L"次はスキルの説明なのだ";
-    gunSubTitle[3].Lines = "16";
-    gunSubTitle[3].pos = { 693.0f,80.0f};
-    gunSubTitle[3].UIID=3;
+    gunSubTitle[3].str = L"次はリロードなのだ";
+    gunSubTitle[3].Lines = "19";
+    gunSubTitle[3].pos = { 715.0f,80.0f };
+    gunSubTitle[3].UIID = 3;
+
+    gunSubTitle[4].str = L"キーボードのRキーで、リロードなのだ";
+    gunSubTitle[4].Lines = "20";
+    gunSubTitle[4].pos = { 539.0f,80.0f };
+    gunSubTitle[4].UIID = 4;
+
+    gunSubTitle[5].str = L"すばらしいのだ";
+    gunSubTitle[5].Lines = "21";
+    gunSubTitle[5].pos = { 809.0f,80.0f };
+    gunSubTitle[5].UIID = 5;
+
+    gunSubTitle[6].str = L"次はスキルの説明なのだ";
+    gunSubTitle[6].Lines = "22";
+    gunSubTitle[6].pos = { 693.0f,80.0f };
+    gunSubTitle[6].UIID = 6;
 
 #pragma endregion
 #pragma region スキルセリフ
 
     skillSubTitle[0].str = L"スキルの基本操作を教えるのだ";
-    skillSubTitle[0].Lines = "17";
+    skillSubTitle[0].Lines = "23";
     skillSubTitle[0].pos = { 624.0f,80.0f };
     skillSubTitle[0].UIID = 0;
 
     skillSubTitle[1].str = L"キーボードのEキーで発動なのだ";
-    skillSubTitle[1].Lines = "18";
+    skillSubTitle[1].Lines = "24";
     skillSubTitle[1].pos = { 621.0f,80.0f };
-    skillSubTitle[1].UIID =1;
+    skillSubTitle[1].UIID = 1;
 
     skillSubTitle[2].str = L"素晴らしいのだ";
-    skillSubTitle[2].Lines = "19";
+    skillSubTitle[2].Lines = "25";
     skillSubTitle[2].pos = { 780.0f,80.0f };
     skillSubTitle[2].UIID = 2;
 
     skillSubTitle[3].str = L"次はウルトの説明なのだ";
-    skillSubTitle[3].Lines = "20";
+    skillSubTitle[3].Lines = "26";
     skillSubTitle[3].pos = { 714.0f,80.0f };
-    skillSubTitle[3].UIID=3;
+    skillSubTitle[3].UIID = 3;
 
 #pragma endregion
 #pragma region ウルトセリフ
 
     ultSubTitle[0].str = L"ウルトの基本操作を教えるのだ";
-    ultSubTitle[0].Lines = "21";
-    ultSubTitle[0].pos = { 628.0f,80.0f};
+    ultSubTitle[0].Lines = "27";
+    ultSubTitle[0].pos = { 628.0f,80.0f };
     ultSubTitle[0].UIID = 0;
 
     ultSubTitle[1].str = L"キーボードのRキーで発動なのだ";
-    ultSubTitle[1].Lines = "22";
-    ultSubTitle[1].pos = { 628.0f,80.0f};
+    ultSubTitle[1].Lines = "28";
+    ultSubTitle[1].pos = { 628.0f,80.0f };
     ultSubTitle[1].UIID = 1;
 
     ultSubTitle[2].str = L"天才なのだ";
-    ultSubTitle[2].Lines = "23";
-    ultSubTitle[2].pos = { 827.0f,80.0f};
+    ultSubTitle[2].Lines = "29";
+    ultSubTitle[2].pos = { 827.0f,80.0f };
     ultSubTitle[2].UIID = 2;
 
     ultSubTitle[3].str = L"これでチュートリアルは終わりなのだ";
-    ultSubTitle[3].Lines = "24";
-    ultSubTitle[3].pos = { 543.0f,80.0f};
+    ultSubTitle[3].Lines = "30";
+    ultSubTitle[3].pos = { 543.0f,80.0f };
     ultSubTitle[3].UIID = 3;
 
     ultSubTitle[4].str = L"Les’t enjoyなのだ";
-    ultSubTitle[4].Lines = "25";
-    ultSubTitle[4].pos = { 742.0f,80.0f};
-    ultSubTitle[4].UIID=5;
+    ultSubTitle[4].Lines = "31";
+    ultSubTitle[4].pos = { 742.0f,80.0f };
+    ultSubTitle[4].UIID = 5;
 
 #pragma endregion
-
 }
 
 void TutorialSystem::TutorialSystemUpdate(float elapsedTime)
@@ -1021,7 +1012,6 @@ void TutorialSystem::TutorialSystemUpdate(float elapsedTime)
 
 void TutorialSystem::TutorialSystemClear()
 {
-
 }
 
 void TutorialSystem::TutorialManagerSystem(float elapsedTime)
@@ -1060,7 +1050,6 @@ void TutorialSystem::NextTutorial(TutorialID id)
     tutorialID = id;
 }
 
-
 //暗転
 void TutorialSystem::BlackOutManager(float elapsedTime)
 {
@@ -1076,7 +1065,7 @@ void TutorialSystem::BlackOutManager(float elapsedTime)
         blackTimer += elapsedTime;
     }
 
-    if (blackTime<blackTimer)
+    if (blackTime < blackTimer)
     {
         NextTutorial(TutorialID::LIGHT);
         blackTimer = 0.0f;
@@ -1093,13 +1082,13 @@ void TutorialSystem::LightChangeManger(float elapsedTime)
         GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->SetEnabled(true);
         flag = true;
     }
-    
+
     if (flag)
     {
         GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
     }
 
-    if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w<1.0f)
+    if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 1.0f)
     {
         NextTutorial(TutorialID::MOVE);
         GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
@@ -1107,13 +1096,11 @@ void TutorialSystem::LightChangeManger(float elapsedTime)
         upFlag = true;
         flag = false;
     }
-
 }
 
 //移動のロジック
 void TutorialSystem::MoveTutorialManager(float elapsedTime)
 {
-    
     if (!linesFlag)
     {
         audioObj->Play(moveSubTitle[moveSubTitleIndex].Lines, false, 1.0f);
@@ -1123,7 +1110,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
     InputVec = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetLeftStick();
 
-    if (moveSubTitleIndex != 3 && moveSubTitleIndex != 6 && moveSubTitleIndex != 9)
+    if (moveSubTitleIndex != 3 && moveSubTitleIndex != 6 && moveSubTitleIndex != 9 && moveSubTitleIndex != 12)
     {
         if (upFlag)
         {
@@ -1135,7 +1122,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
                 if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
                 {
-                    if (moveSubTitleIndex == 11)
+                    if (moveSubTitleIndex == 14)
                     {
                         moveInspectionFlag = true;
                         upFlag = false;
@@ -1163,11 +1150,9 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                 upFlag = true;
             }
         }
-
-
     }
     //横移動
-    else if(moveSubTitleIndex==3)
+    else if (moveSubTitleIndex == 3)
     {
         if (InputVec.x == 1.0f)
         {
@@ -1178,8 +1163,6 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
         {
             moveAFlag = true;
         }
-
-
 
         if (downFlag)
         {
@@ -1206,10 +1189,8 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                     moveSubTitleIndex += 1;
                     linesFlag = false;
                 }
-
             }
         }
-
     }
     //縦移動
     else if (moveSubTitleIndex == 6)
@@ -1236,8 +1217,6 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
             moveSFlag = true;
         }
 
-
-
         if (moveWFlag && moveSFlag)
         {
             if (upFlag)
@@ -1251,7 +1230,6 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                     moveSubTitleIndex += 1;
                     linesFlag = false;
                 }
-
             }
         }
     }
@@ -1269,7 +1247,6 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                 upFlag = true;
             }
         }
-
 
         if (CharacterInput::JumpButton_SPACE & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonDown())
         {
@@ -1289,11 +1266,44 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
                     moveSubTitleIndex += 1;
                     linesFlag = false;
                 }
-
             }
         }
     }
+    else if (moveSubTitleIndex == 12)
+    {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
 
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
+            }
+        }
+
+        if (CharacterInput::LeftShiftButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonDown())
+        {
+            dashFlag = true;
+        }
+
+        if (dashFlag)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    moveSubTitleIndex += 1;
+                    linesFlag = false;
+                }
+            }
+        }
+    }
 
     if (moveInspectionFlag)
     {
@@ -1306,15 +1316,13 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
 void TutorialSystem::GunTutorialManager(float elapsedTime)
 {
-
     if (!linesFlag)
     {
         audioObj->Play(gunSubTitle[gunSubTitleIndex].Lines, false, 1.0f);
         linesFlag = true;
     }
 
-
-    if (gunSubTitleIndex != 1)
+    if (gunSubTitleIndex != 1 && gunSubTitleIndex != 4)
     {
         if (upFlag)
         {
@@ -1326,7 +1334,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 
                 if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
                 {
-                    if (gunSubTitleIndex == 3)
+                    if (gunSubTitleIndex == 6)
                     {
                         gunInspectionFlag = true;
                         upFlag = false;
@@ -1355,7 +1363,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
             }
         }
     }
-    else if (gunSubTitleIndex==1)
+    else if (gunSubTitleIndex == 1)
     {
         if (downFlag)
         {
@@ -1387,16 +1395,46 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
                     downFlag = true;
                     gunSubTitleIndex += 1;
                     linesFlag = false;
-
                 }
+            }
+        }
+    }
+    else if (gunSubTitleIndex == 4)
+    {
+        if (downFlag)
+        {
+            GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
 
+            if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
+                downFlag = false;
+                upFlag = true;
             }
         }
 
-           
+        //攻撃終了処理＆攻撃処理
+        if (CharacterInput::Reload & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
+        {
+            reloadFlga = true;
+        }
+
+        if (reloadFlga)
+        {
+            if (upFlag)
+            {
+                GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w -= elapsedTime;
+
+                if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
+                {
+                    upFlag = false;
+                    downFlag = true;
+                    gunSubTitleIndex += 1;
+                    linesFlag = false;
+                }
+            }
+        }
     }
-
-
 
     if (gunInspectionFlag)
     {
@@ -1405,12 +1443,10 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = gunSubTitle[gunSubTitleIndex].str;
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = gunSubTitle[gunSubTitleIndex].pos;
-
 }
 
 void TutorialSystem::SkillTutorialManager(float elapsedTime)
 {
-
     if (!linesFlag)
     {
         audioObj->Play(skillSubTitle[skillSubTitleIndex].Lines, false, 1.0f);
@@ -1435,7 +1471,6 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
                         upFlag = false;
                         downFlag = true;
                         linesFlag = false;
-
                     }
                     else
                     {
@@ -1443,7 +1478,6 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
                         upFlag = false;
                         downFlag = true;
                         linesFlag = false;
-
                     }
                 }
             }
@@ -1492,16 +1526,10 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
                     downFlag = true;
                     skillSubTitleIndex += 1;
                     linesFlag = false;
-
                 }
-
             }
         }
-          
     }
-
-
-
 
     if (skillInspectionFlag)
     {
@@ -1510,18 +1538,15 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = skillSubTitle[skillSubTitleIndex].str;
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = skillSubTitle[skillSubTitleIndex].pos;
-
 }
 
 void TutorialSystem::UltTutorialManager(float elapsedTime)
 {
-
     if (!linesFlag)
     {
         audioObj->Play(ultSubTitle[ultSubTitleIndex].Lines, false, 1.0f);
         linesFlag = true;
     }
-
 
     if (ultSubTitleIndex != 1)
     {
@@ -1566,7 +1591,6 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
     }
     else if (ultSubTitleIndex == 1)
     {
-
         if (downFlag)
         {
             GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
@@ -1583,7 +1607,6 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
         if (CharacterInput::UltimetButton & GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetButtonUp())
         {
             ultFlag = true;
-           
         }
 
         if (ultFlag)
@@ -1599,11 +1622,8 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
                     ultSubTitleIndex += 1;
                     linesFlag = false;
                 }
-
             }
         }
-
-        
     }
 
     if (ultInspectionFlag)
@@ -1613,8 +1633,6 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
 
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->str = ultSubTitle[ultSubTitleIndex].str;
     GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->position = ultSubTitle[ultSubTitleIndex].pos;
-
-
 }
 
 void TutorialSystem::EndBlackTutorialManager(float elapsedTime)
@@ -1679,7 +1697,9 @@ void TutorialSystem::TutorialFlagClear()
     upFlag = false;
     downFlag = false;
     jumpFlag = false;
+    dashFlag = false;
     gunFlag = false;
+    reloadFlga = false;
     skillFlag = false;
     ultFlag = false;
 
@@ -1688,7 +1708,6 @@ void TutorialSystem::TutorialFlagClear()
     moveWFlag = false;
     moveSFlag = false;
     moveJumpFlag = false;
-
 
     // moveSubTitle のリセット
     for (auto& subtitle : moveSubTitle)
@@ -1713,11 +1732,7 @@ void TutorialSystem::TutorialFlagClear()
     {
         subtitle.subtitleTimer = 0.0f;
     }
-
-
 }
-
-
 
 void TutorialSystem::OnGui()
 {
@@ -1729,11 +1744,9 @@ void TutorialSystem::OnGui()
         ImGui::DragInt("skillIndex", &skillSubTitleIndex);
         ImGui::DragFloat2("float", &skillSubTitle[skillSubTitleIndex].pos.x, 0.1);
         ImGui::DragInt("ultIndex", &ultSubTitleIndex);
-
     }
     ImGui::End();
 #endif
 }
 
 #pragma endregion
-

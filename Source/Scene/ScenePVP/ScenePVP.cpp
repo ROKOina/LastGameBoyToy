@@ -41,6 +41,7 @@
 
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
+#include "../SceneResult/SceneResult.h"
 
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
@@ -490,7 +491,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("crown");
         std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->LoadModel("Data/Model/Crawn/crawn.mdl");
         obj->transform_->SetScale({ 0.5f, 0.5f, 0.5f });
         obj->transform_->SetWorldPosition({ 3.4f, 20, 8.1f });
         auto& move = obj->AddComponent<MovementCom>();
@@ -655,7 +656,21 @@ void ScenePVP::Update(float elapsedTime)
         }
         //仮遷移
         if (!SceneManager::Instance().GetTransitionFlag())
-            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+        {
+            SceneResult* result = new SceneResult;
+
+            //ここでリザルトに送るデータを作る
+            for (int i = 0; i < 4; i++)
+            {
+                SceneResult::ResultData data;
+                data.charaID;
+                data.playerName = std::to_string(i) + "_player";
+
+                result->resultDatas[i] = data;
+            }
+
+            SceneManager::Instance().ChangeSceneDelay(result, 2);
+        }
     }
 
     //画面切り替え処理
@@ -834,7 +849,7 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     auto net = photonNet->GetPhotonLib();
 
     //カウントダウン時処理
-    if (isCountDown&& isGame)
+    if (isCountDown && isGame)
     {
         //カウントダウン時はタイマーをリセット
         net->ResetNowTime();

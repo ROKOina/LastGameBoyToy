@@ -358,6 +358,20 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
         au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
     }
 
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Jump.gpuparticle", 500);
+        p->SetLoop(false);
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Jump.gpuparticle", 500);
+        p->SetLoop(false);
+    }
+
     //ネットでは見える化
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
@@ -681,6 +695,13 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             particleobj->SetName("muzzleflash");
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
+        }
+
+        //ビームエフェクト
+        {
+            std::shared_ptr<GameObject>beem = cameraPost->AddChildObject();
+            beem->SetName("Beem");
+            beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beem.gpuparticle", 2000);
         }
     }
 

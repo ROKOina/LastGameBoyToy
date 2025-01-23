@@ -49,7 +49,6 @@ protected:
 
     bool isDebug = false;           //デバッグ用フラグ
 
-
 public:
     DirectX::XMFLOAT2 originalTexSize = {};    //元のテクスチャサイズ
     //変更する値を決めるenum

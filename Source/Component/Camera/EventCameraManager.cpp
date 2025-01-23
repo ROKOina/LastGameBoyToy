@@ -103,7 +103,6 @@ void EventCameraManager::SaveEventCameraBuff::serialize(Archive& archive, int ve
             CEREAL_NVP(isFocusLocal)
         );
     }
-
 }
 
 //シリアライズ

@@ -120,7 +120,6 @@ public:
 private:
 };
 
-
 class BaseCharacter_ReloadState : public BaseCharacter_BaseState
 {
 public:

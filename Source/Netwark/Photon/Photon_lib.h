@@ -345,8 +345,8 @@ private:
     //デス保存
     struct SaveDeath
     {
-        bool onDeath=false;   //キルされた時にtrue
-        bool killCon=false;    //キル確認用
+        bool onDeath = false;   //キルされた時にtrue
+        bool killCon = false;    //キル確認用
         float deathCountTimer = -1;   //重複阻止
     };
     SaveDeath saveDeath[4];
@@ -363,7 +363,7 @@ private:
 
         //自分が落とした時
         int slowFrame = 0;  //何フレーム間送るか
-        DirectX::XMFLOAT3 myCrownFallPos = {}; 
+        DirectX::XMFLOAT3 myCrownFallPos = {};
     }saveCrown;
 
     //仮機能

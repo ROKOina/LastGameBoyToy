@@ -40,16 +40,6 @@ bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos,
     }
     else
     {
-        //RendererCom* render = owner->GetGameObject()->GetComponent<RendererCom>().get();
-        //const auto& gunNode = render->GetModel()->FindNode("gun2");
-
-        //outGunPos =
-        //{
-        //    gunNode->worldTransform._41,
-        //    gunNode->worldTransform._42,
-        //    gunNode->worldTransform._43
-        //};
-
         //ネットの銃口
         auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(owner->GetNetCharaData().GetNetPlayerID());
         for (auto& b : saveB)
@@ -83,11 +73,7 @@ void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
     jankratBullet->SetAddGravity(addGravity);
     jankratBullet->SetExplosionTime(explosiontime);
 
-    // 銃の先端位置とカメラ方向を使用して弾丸を発射
-    //DirectX::XMFLOAT3 gunPos = {}, fireDir;
-    //if (GetGunTipPosition(gunPos, fireDir, CharacterInput::MainAttackButton | CharacterInput::UltimetButton))
-    //{
-        // 発射方向を計算
+    // 発射方向を計算
     DirectX::XMFLOAT3  fireDir;
 
     fireDir = Mathf::Normalize({
@@ -99,7 +85,6 @@ void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
     // 弾丸の初期位置と初速度を設定
     bullet->transform_->SetWorldPosition(POS);
     rigid->AddForce(fireDir * force);
-    //}
 }
 
 #pragma region 通常弾

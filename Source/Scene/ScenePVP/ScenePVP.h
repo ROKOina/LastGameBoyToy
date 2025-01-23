@@ -8,7 +8,6 @@
 // 前方宣言
 class CharaPicks;
 
-
 //リザルトシーン
 class ScenePVP :public Scene
 {
@@ -85,8 +84,9 @@ private:
 
     struct LobbySelectFont
     {
-        LobbySelectFont(int id, std::wstring str, DirectX::XMFLOAT2 pos, float scale, bool col, int state, DirectX::XMFLOAT4 color = {1,1,1,1})
-            :id(id), str(str), pos(pos), scale(scale), collision(col), state(state),color(color) {}
+        LobbySelectFont(int id, std::wstring str, DirectX::XMFLOAT2 pos, float scale, bool col, int state, DirectX::XMFLOAT4 color = { 1,1,1,1 })
+            :id(id), str(str), pos(pos), scale(scale), collision(col), state(state), color(color) {
+        }
         int id;
         std::wstring str;
         DirectX::XMFLOAT2 pos;
@@ -145,5 +145,4 @@ private:
     //ゲーム開始時UI表示用変数
     bool isCountDown = true;    //カウントダウン中か
     float countTimer = 10;   //秒数
-
 };

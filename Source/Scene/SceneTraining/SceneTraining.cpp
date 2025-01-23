@@ -42,7 +42,6 @@ void SceneTraining::Initialize()
         obj->AddComponent<PostEffect>();
     }
 
-
     //ライト
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -56,7 +55,6 @@ void SceneTraining::Initialize()
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-        
     }
 
     //ステージ
@@ -79,7 +77,7 @@ void SceneTraining::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,1,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj,true);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj, true);
     }
 
     //snowparticle
@@ -97,8 +95,6 @@ void SceneTraining::Initialize()
     //ネット大事
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
-
-   
 }
 
 void SceneTraining::Finalize()

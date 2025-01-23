@@ -131,7 +131,7 @@ public:
     virtual void UltSkill() {};
 
     //リロード（弾減らす処理は各自のキャラでする@
-    virtual void Reload() {};
+    virtual void Reload();
 
     //LeftShift (固定ダッシュ)
     void DashFewSub(float elapsedTime);

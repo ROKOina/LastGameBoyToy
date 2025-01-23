@@ -4,7 +4,7 @@
 // v1.22 - flip button; cosmetic fixes
 // v1.21 - oops :)
 // v1.20 - add iq's interpolation code
-// v1.10 - easing and colors        
+// v1.10 - easing and colors
 // v1.00 - jari komppa's original
 
 #pragma once
@@ -543,7 +543,6 @@ namespace ImGui
             }
         } while (kill);
 
-
         RenderFrame(bb.Min, bb.Max, GetColorU32(ImGuiCol_FrameBg, 1), true, style.FrameRounding);
 
         float ht = bb.Max.y - bb.Min.y;
@@ -746,7 +745,6 @@ namespace ImGui
 
         return modified;
     }
-
 
     int CurveEditor(const char* label
         , float* values
@@ -1100,7 +1098,6 @@ namespace ImGui
                     points[3] = p;
                     changed_idx = point_idx + 1;
                 }
-
             }
             else
             {
@@ -1153,7 +1150,6 @@ namespace ImGui
                     };
 
                 qsort(values, points_count + 1, sizeof(ImVec2) * 3, compare);
-
             }
             else
             {
@@ -1228,7 +1224,6 @@ namespace ImGui
 
                 window->DrawList->AddLine(p, q, GetColorU32(ImGuiCol_PlotHistogram));
             }
-
         }
 
         if (hovered_point) *hovered_point = hovered_idx;
@@ -1238,7 +1233,7 @@ namespace ImGui
         EndChildFrame();
         RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
 
-            // curve selector
+        // curve selector
         static const char* items[] = {
             "Custom",
 
@@ -1307,7 +1302,6 @@ namespace ImGui
                 *isSelectable = true;
             }
 
-
             ImGui::EndPopup();
         }
 
@@ -1359,5 +1353,4 @@ namespace ImGui
             size->y = ImMax(1.0f, GetIO().MouseDelta.y + size->y);
         }
     }
-
 };

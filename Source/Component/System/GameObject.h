@@ -220,8 +220,6 @@ private:
     //デカール描画
     void DecalRender();
 
-
-
     //トレイル描画
     void TrailRender();
 
@@ -294,7 +292,6 @@ private:
 
     //キャラObject保存
     std::vector<std::weak_ptr<GameObject>> characterobject;
-
 
     //video描画
     std::vector<std::weak_ptr<Video>>videoobject;

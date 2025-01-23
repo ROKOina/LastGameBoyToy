@@ -9,7 +9,7 @@
 
 void SceneResult::Initialize()
 {
-    #pragma region 描画の基本系
+#pragma region 描画の基本系
 
     //ポストエフェクト
     {
@@ -90,6 +90,14 @@ void SceneResult::Initialize()
     ConstantBufferInitialize();
 }
 
+void SceneResult::Finalize()
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        resultUI[i].reset();
+    }
+}
+
 void SceneResult::Update(float elapsedTime)
 {
     GameObjectManager::Instance().Update(elapsedTime);
@@ -120,7 +128,7 @@ void SceneResult::Render(float elapsedTime)
 
 #define MAKE_FONT_SHADOW(parentFont, offsetX,offsetY) \
         GameObj fontObj = parentFont->GetGameObject()->AddChildObject();\
-        std::string name = parentFont->GetName();\
+        std::string name = parentFont->GetGameObject()->GetName();\
         fontObj->SetName(name.c_str());\
         name += "_shadow";\
         parentFont->GetGameObject()->SetName(name.c_str()); \
@@ -140,10 +148,10 @@ void SceneResult::MakeResultUI(GameObj canvas)
         std::string killNum = std::to_string(i) + "st_Player";
         killNumObj->SetName(killNum.c_str());
         std::shared_ptr<Font> killNumFont = killNumObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        killNumFont->str = L"000";
+        killNumFont->str = std::to_wstring(resultDatas[i].killNum);
         killNumFont->position = DirectX::XMFLOAT2{ 450.0f,300.0f + (150 * i) };
         killNumFont->scale = 1.5f;
-
+        //フォントの影生成
         { MAKE_FONT_SHADOW(killNumFont, 3, 2); }
         resultUI[i] = killNumObj;
 
@@ -151,11 +159,15 @@ void SceneResult::MakeResultUI(GameObj canvas)
         std::shared_ptr<GameObject> killStrObj = canvas->AddChildObject();
         std::string killStr = std::to_string(i) + "st_Player_kill";
         killStrObj->SetName(killStr.c_str());
-        std::shared_ptr<Font> killStrFont = killStrObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        std::shared_ptr<Font> killStrFont = killStrObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::COOL);
         killStrFont->str = L"Kill";
-        killStrFont->position = DirectX::XMFLOAT2{ 650.0f,3250.0f + (150 * i) };
-        killStrFont->scale = 0.9f;
-
+        killStrFont->position = DirectX::XMFLOAT2{ 620.0f,325.0f + (150 * i) };
+        killStrFont->scale = 0.87f;
+        //フォントの影生成
         { MAKE_FONT_SHADOW(killStrFont, 3, 2); }
+
+        //フレーム
+        GameObj frameUiObj = GameObjectManager::Instance().Create();
+        //frameUiObj->AddComponent<Sprite>("Data/Texture/");
     }
 }

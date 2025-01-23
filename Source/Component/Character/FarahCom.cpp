@@ -9,6 +9,7 @@
 #include "Component\Bullet\BulletCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
+#include "Graphics\Model\Model.h"
 
 // 定数
 constexpr float JUMP_FORCE = 12.62f;
@@ -47,6 +48,7 @@ void FarahCom::Update(float elapsedTime)
     ShotSecond();
     CharacterCom::Update(elapsedTime);
     GroundBomber(elapsedTime);
+    EffectONOFF();
 
     //死亡したらウルトの時間を0にする
     if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::DEATH)
@@ -56,6 +58,19 @@ void FarahCom::Update(float elapsedTime)
 
         //時間初期化
         SetUltTimer(0.0f);
+    }
+
+    //足にエフェクトを付与
+    {
+        //ブーストエフェクト1、２
+        {
+            const auto& footpos = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNode("R_foot2");
+            GetGameObject()->GetChildFind("Boost1")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
+        }
+        {
+            const auto& footpos = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNode("L_foot2");
+            GetGameObject()->GetChildFind("Boost2")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
+        }
     }
 }
 
@@ -120,17 +135,6 @@ void FarahCom::UltSkill()
 {
     //ステートをウルトに変更
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
-}
-
-//リロード（弾減らす処理は各自のキャラでする
-void FarahCom::Reload()
-{
-    if (!(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
-        ? ((currentBulletNum > 0)) \
-        : ((netCharaData.GetBulletNum() > 0))))
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
 }
 
 // 銃の発射間隔とマズルフラッシュ
@@ -276,6 +280,28 @@ void FarahCom::RemoveBullet(const std::shared_ptr<GameObject>& obj)
 void FarahCom::ClearAllBullets()
 {
     bullets.clear();
+}
+
+//エフェクトのループをどうするかのクラス
+void FarahCom::EffectONOFF()
+{
+    auto& boost1 = GetGameObject()->GetChildFind("Boost1")->GetComponent<GPUParticle>();
+    auto& boost2 = GetGameObject()->GetChildFind("Boost2")->GetComponent<GPUParticle>();
+    auto& move = GetGameObject()->GetComponent<MovementCom>();
+
+    //着地時off
+    if (move->OnGround())
+    {
+        boost1->SetLoop(false);
+        boost2->SetLoop(false);
+    }
+
+    //空中ならoff
+    if (!move->OnGround())
+    {
+        boost1->SetLoop(true);
+        boost2->SetLoop(true);
+    }
 }
 
 // 弾丸生成

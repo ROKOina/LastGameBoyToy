@@ -461,7 +461,7 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
 
     int playerTeam = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
     int myTeam = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
-    if (playerTeam== myTeam)
+    if (playerTeam == myTeam)
     {
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     }

@@ -17,19 +17,22 @@ public:
     //èâä˙ê›íË
     void Start()override {};
     //çXêVèàóù
-    void Update(float elapsedTime)override ;
+    void Update(float elapsedTime)override;
     //IMGUI
     void OnGUI()override {};
     //ñºëOê›íË
     const char* GetName() const override { return "Respawn"; }
+
+    void Respawn_GoTitle(float elapsedTime);
+    void Respawn_GamePVP(float elapsedTime);
 
     std::vector<DirectX::XMFLOAT3>& GetRespawnPoses() { return respawnPoses; }
     void AddRespawnPoses(DirectX::XMFLOAT3 pos) { respawnPoses.emplace_back(pos); }
     PVPGameSystem::GAME_MODE GetGameMode() { return gameMode; }
     void SetGameMode(PVPGameSystem::GAME_MODE mode) { gameMode = mode; }
 
-    void AddRespawnData(std::shared_ptr<GameObject> obj) 
-    { 
+    void AddRespawnData(std::shared_ptr<GameObject> obj)
+    {
         RespawnData* res = new RespawnData;
         res->gameObj = obj.get();
         respawnDatas.emplace_back(res);
@@ -39,7 +42,7 @@ public:
     void SetIsRespawn(bool flag) { isRespawn = flag; }
 
 private:
-    PVPGameSystem::GAME_MODE gameMode;
+    PVPGameSystem::GAME_MODE gameMode = PVPGameSystem::GAME_MODE::None;
 
     std::vector<DirectX::XMFLOAT3> respawnPoses = {};
     float playerDeathHeight = -50;

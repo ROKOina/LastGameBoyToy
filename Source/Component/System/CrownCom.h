@@ -10,7 +10,8 @@ class CrownCom : public Component
 public:
     //myObjにキャラクターコンポーネントを入れる
     CrownCom()
-    {}
+    {
+    }
     ~CrownCom() override {}
 
     // 名前取得

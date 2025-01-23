@@ -12,7 +12,7 @@ public:
     void Initialize()override;
 
     // 終了化
-    void Finalize()override {};
+    void Finalize()override;
 
     // 更新処理
     void Update(float elapsedTime)override;
@@ -35,6 +35,8 @@ public:
         //必要な分足していく
         int charaID = -1;
         int playerID = -1;
+
+        bool isWin = false;
 
         std::string playerName;
     };
