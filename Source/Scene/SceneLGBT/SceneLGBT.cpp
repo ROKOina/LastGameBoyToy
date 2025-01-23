@@ -72,7 +72,7 @@ void SceneLGBT::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("skipfont");
-        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::COOL);
         font->position = { 687.0f,940.0f };
         font->str = L"スペースキーでスキップ";
         font->scale = 1.0f;

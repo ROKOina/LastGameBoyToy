@@ -11,7 +11,7 @@ class RayCollisionCom;
 class RayCastManager
 {
 private:
-    RayCastManager() { }
+    RayCastManager() {}
     ~RayCastManager() {}
 
 public:

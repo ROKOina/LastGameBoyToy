@@ -10,7 +10,6 @@
 
 class ScarecrowCom;
 
-
 //トレーニングルームの案山子
 
 class Scarecrow_BaseState :public State<ScarecrowCom>
@@ -20,18 +19,16 @@ public:
     Scarecrow_BaseState(ScarecrowCom* owner);
 
     void RandomMove(float moveSpeed);
-  
 
     DirectX::XMFLOAT3 randomPos = { 0,0,0 };
     DirectX::XMFLOAT3 VEC = { 0,0,0 };
-    
+
     float limitRightX = -28.0f;
     float limitLeftX = -10.0f;
     float moveSpeed = 2.0f;
 
-    
     bool reSpawn = false;
-  
+
 protected:
     std::weak_ptr<ScarecrowCom> scarecrowCom;
     std::weak_ptr<MovementCom> moveCom;
@@ -39,13 +36,7 @@ protected:
     std::weak_ptr<AnimationCom> animationCom;
     std::weak_ptr<AudioCom> audioCom;
     std::weak_ptr<CharaStatusCom>characterstatas;
-
-
-
-
-    
 };
-
 
 //待機
 class Scarecrow_IdleState :public Scarecrow_BaseState
@@ -63,7 +54,7 @@ public:
 class Scarecrow_RandomIdleState :public Scarecrow_BaseState
 {
 public:
-    Scarecrow_RandomIdleState(ScarecrowCom*owner):Scarecrow_BaseState(owner){}
+    Scarecrow_RandomIdleState(ScarecrowCom* owner) :Scarecrow_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
@@ -73,23 +64,20 @@ public:
 private:
     float randomIdleTime = 0;
     float randomIdleTimer = 0;
-
 };
 
 //移動
 class Scarecrow_MoveState :public Scarecrow_BaseState
 {
 public:
-    Scarecrow_MoveState(ScarecrowCom* owner):Scarecrow_BaseState(owner) {}
+    Scarecrow_MoveState(ScarecrowCom* owner) :Scarecrow_BaseState(owner) {}
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
     //void Exit()override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "Move"; }
-
 };
-
 
 //死亡
 class Scarecrow_DeathState :public Scarecrow_BaseState
@@ -106,4 +94,3 @@ private:
     float reSpawnTime = 1.0f;
     float reSpawnTimer = 0.0f;
 };
-

@@ -40,6 +40,7 @@
 
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
+#include "../SceneResult/SceneResult.h"
 
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
@@ -309,6 +310,44 @@ void ScenePVP::InitializePVP()
         eventCamera->SetName("eventcamera");
         eventCamera->AddComponent<EventCameraCom>();
         eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
+
+    //ステージのエフェクト関係
+    {
+        std::shared_ptr<GameObject> stageEffect = GameObjectManager::Instance().Create();
+        stageEffect->SetName("StageEffetc");
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect1 = stageEffect->AddChildObject();
+            jeteffect1->SetName("Jet1");
+            jeteffect1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet.gpuparticle", 1000);
+            jeteffect1->transform_->SetWorldPosition({ 14.696f,10.043f,-2.208f });
+        }
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect2 = stageEffect->AddChildObject();
+            jeteffect2->SetName("Jet2");
+            jeteffect2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet.gpuparticle", 1000);
+            jeteffect2->transform_->SetWorldPosition({ -5.260f,9.686f,-2.317f });
+        }
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect3 = stageEffect->AddChildObject();
+            jeteffect3->SetName("Jet3");
+            jeteffect3->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet_1.gpuparticle", 1000);
+            jeteffect3->transform_->SetWorldPosition({ 15.187f,9.727f,17.154f });
+        }
+
+        //jet機のエフェクト
+        {
+            std::shared_ptr<GameObject> jeteffect4 = stageEffect->AddChildObject();
+            jeteffect4->SetName("Jet4");
+            jeteffect4->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet_1.gpuparticle", 1000);
+            jeteffect4->transform_->SetWorldPosition({ -4.663f,9.966f,17.040f });
+        }
     }
 
     //snowparticle
@@ -594,7 +633,21 @@ void ScenePVP::Update(float elapsedTime)
         }
         //仮遷移
         if (!SceneManager::Instance().GetTransitionFlag())
-            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 2);
+        {
+            SceneResult* result = new SceneResult;
+
+            //ここでリザルトに送るデータを作る
+            for (int i = 0; i < 4; i++)
+            {
+                SceneResult::ResultData data;
+                data.charaID;
+                data.playerName = std::to_string(i) + "_player";
+
+                result->resultDatas[i] = data;
+            }
+
+            SceneManager::Instance().ChangeSceneDelay(result, 2);
+        }
     }
 
     //画面切り替え処理
@@ -773,7 +826,7 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     auto net = photonNet->GetPhotonLib();
 
     //カウントダウン時処理
-    if (isCountDown)
+    if (isCountDown && isGame)
     {
         //カウントダウン時はタイマーをリセット
         net->ResetNowTime();

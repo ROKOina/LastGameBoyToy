@@ -289,7 +289,6 @@ void Boss_SA1::Execute(const float& elapsedTime)
         audioCom.lock()->Play("PUNCH", false, 10.0f);
     }
 
-
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())
     {

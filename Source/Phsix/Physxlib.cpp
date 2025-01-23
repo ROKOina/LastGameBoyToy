@@ -146,8 +146,8 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepat
     {
         //形状の種類を記憶した親ノードを取得
         if (node.name == "Triangle") { triangleIndex = nodeCount; }
-        if (node.name == "Convex"){ convexIndex = nodeCount; }
-        if (node.name == "Box"){ boxIndex = nodeCount; }
+        if (node.name == "Convex") { convexIndex = nodeCount; }
+        if (node.name == "Box") { boxIndex = nodeCount; }
         nodeCount++;
 
         //形状によってビットを立てる
@@ -159,7 +159,7 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepat
         //ビットが立っていた場合Modelの形を取得する
         if (shapeType != ShapeType::None)
         {
-            #pragma region モデルリソース取得
+#pragma region モデルリソース取得
 
             // 区切り文字 "(" の位置を検索
             size_t delimiterPos = node.name.find(key);
@@ -182,7 +182,7 @@ void PhysXLib::GenerateComplexCollider(ModelResource* model, std::string filepat
             {
                 m = ResourceManager::Instance().LoadModelResource(path.c_str());	//ロードする
             }
-            #pragma endregion
+#pragma endregion
 
             RigidData data;
             data.isStatic = true;
@@ -215,7 +215,6 @@ physx::PxRigidActor* PhysXLib::GenerateCollider(RigidData& data)
         rigidObj = gPhysics->createRigidStatic(physx::PxTransform(physx::PxIdentity));
     }
     else {
-
         //動的オブジェクトは質量設定
         physx::PxRigidDynamic* dynamic;
         dynamic = gPhysics->createRigidDynamic(physx::PxTransform(physx::PxIdentity));
@@ -280,7 +279,7 @@ physx::PxShape* PhysXLib::Make_TriangleShape(RigidData& data)
     //例外処理
     if (!data.model) assert(!"TriangleShape生成時にModelResourceが決められていない");
 
-    #pragma region Shape生成
+#pragma region Shape生成
     //
     std::vector<PxVec3> vertices;
     std::vector<PxU32> indices;
@@ -317,13 +316,11 @@ physx::PxShape* PhysXLib::Make_TriangleShape(RigidData& data)
     physx::PxTolerancesScale tolerances_scale;
     PxCookingParams cooking_params(tolerances_scale);
 
-
     cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH;
     cooking_params.meshPreprocessParams |= PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE;
 
     physx::PxTriangleMesh* triangle_mesh = nullptr;
     physx::PxDefaultMemoryOutputStream write_buffer;
-
 
     if (!PxCookTriangleMesh(cooking_params, meshDesc, write_buffer)) {
         assert(0 && "PxCookTriangleMesh failed.");
@@ -334,7 +331,7 @@ physx::PxShape* PhysXLib::Make_TriangleShape(RigidData& data)
 
     physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
     triangle_mesh = gPhysics->createTriangleMesh(read_buffer);
-    #pragma endregion
+#pragma endregion
 
     //当たり判定とモデルのスケールを合わせる
     DirectX::XMFLOAT3 sV = data.scale;
@@ -351,7 +348,7 @@ physx::PxShape* PhysXLib::Make_ConvexShape(RigidData& data)
 {
     if (!data.model) assert(!"ConvexShape生成時使うModelResourceが決められていない");
 
-    #pragma region メッシュデータの作成
+#pragma region メッシュデータの作成
 
     std::vector<PxVec3> vertices;
     for (auto& mesh : data.model->GetMeshes())
@@ -380,7 +377,6 @@ physx::PxShape* PhysXLib::Make_ConvexShape(RigidData& data)
     physx::PxConvexMesh* triangle_mesh = nullptr;
     physx::PxDefaultMemoryOutputStream write_buffer;
 
-
     if (!PxCookConvexMesh(cooking_params, meshDesc, write_buffer)) {
         assert(0 && "PxCookConvexMesh failed.");
     }
@@ -391,7 +387,7 @@ physx::PxShape* PhysXLib::Make_ConvexShape(RigidData& data)
     physx::PxDefaultMemoryInputData read_buffer(write_buffer.getData(), write_buffer.getSize());
     triangle_mesh = gPhysics->createConvexMesh(read_buffer);
 
-    #pragma endregion
+#pragma endregion
 
     //形状のサイズ
     DirectX::XMFLOAT3 sV = data.scale;

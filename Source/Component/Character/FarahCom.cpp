@@ -47,6 +47,16 @@ void FarahCom::Update(float elapsedTime)
     ShotSecond();
     CharacterCom::Update(elapsedTime);
     GroundBomber(elapsedTime);
+
+    //死亡したらウルトの時間を0にする
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::DEATH)
+    {
+        //エフェクトも停止
+        GetGameObject()->GetChildFind("UltObject")->GetComponent<GPUParticle>()->SetLoop(false);
+
+        //時間初期化
+        SetUltTimer(0.0f);
+    }
 }
 
 // GUI
@@ -110,17 +120,6 @@ void FarahCom::UltSkill()
 {
     //ステートをウルトに変更
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
-}
-
-//リロード（弾減らす処理は各自のキャラでする
-void FarahCom::Reload()
-{
-    if (!(std::strcmp(GetGameObject()->GetName(), "player") == 0 \
-        ? ((currentBulletNum > 0)) \
-        : ((netCharaData.GetBulletNum() > 0))))
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
 }
 
 // 銃の発射間隔とマズルフラッシュ

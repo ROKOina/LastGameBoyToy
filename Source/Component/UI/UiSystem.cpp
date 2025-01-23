@@ -29,7 +29,7 @@ void UiSystem::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4
 
 void UiSystem::OnGUI()
 {
-    ImGui::Checkbox("Debug",&isDebug);
+    ImGui::Checkbox("Debug", &isDebug);
 
     ImGui::DragFloat("FadeTimer", &fadeTimer);
 

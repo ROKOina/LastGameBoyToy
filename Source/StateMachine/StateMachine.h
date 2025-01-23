@@ -85,7 +85,7 @@ public:
         currentState->Enter();
     }
 
-      bool CurrentStateImGui(Enum index)
+    bool CurrentStateImGui(Enum index)
     {
         if (stateList.count(index) != 0)
         {
@@ -107,7 +107,6 @@ public:
         }
         return nullptr;
     }
-
 
     StatePtr GetState(Enum e)
     {

@@ -22,12 +22,11 @@ void CrownCom::OnGUI()
     ImGui::DragFloat("haveTimer", &haveTimer);
 
     ImGui::DragFloat("secondGetTimer", &secondGetTimer);
-
 }
 
 bool CrownCom::HaveCrown()
 {
-    if(!haveObj.lock())
+    if (!haveObj.lock())
         return false;
 
     if (std::strcmp(haveObj.lock()->GetName(), "player") == 0)

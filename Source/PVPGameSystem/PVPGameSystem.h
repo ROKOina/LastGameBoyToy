@@ -23,7 +23,6 @@ public:
         Button,
     };
 
-
     //デスマッチ勝敗必要情報
     struct DeathMatchData   //ゲーム
     {
@@ -85,7 +84,6 @@ private:
     void DeathmatchUpdate();
     void CrownUpdate();
     void ButtonUpdate();
-
 
 private:
     //ネットから取得する

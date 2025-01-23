@@ -412,7 +412,8 @@ public:
     void OnGUI()override {};
 
 private:
-  bool  effectFLG;
+    bool  effectFLG;
+    float  effectFLGTimer = 0;
 };
 
 //PlayerUIのマネージャー
@@ -465,6 +466,10 @@ public:
     //キルエフェクト
     void CreateKillEffect();
 
+    //キルログ
+    void KillLogUpdate(float elapsedTime);
+    void CreateKillLog();   //オブジェ生成
+
     //全員の使用キャラUI
     void CreateNetUseCharaUI();
     //使用キャラ更新
@@ -474,9 +479,6 @@ public:
     void CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer);
     bool GetAllyHp() { return allyHp; }
     void ResetAllyHp() { allyHp = false; }
-
-    //死亡時のネットを挟んだアイコン表示
-    //void NetDeathIcon(int chara[4], std::weak_ptr<GameObject>owner/*std::weak_ptr<GameObject>netPlayer, std::weak_ptr<GameObject>owner*/);
 
     //勝敗表示UI
     void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
@@ -492,4 +494,24 @@ private:
     bool isEndFLG = false;
 
     bool allyHp = false;    //味方HP表示済み
+
+    float  kilogTimer[4] = {};
+
+    //要素がキルキャラID
+    struct DeathData
+    {
+        int charaID;
+        bool isEnemy;   //ですしたキャラは敵か
+
+        //動き
+        struct MoveData
+        {
+            bool startFlg = false;
+            int id = 0;
+
+            float timer = 0;
+            int underNum = 0;   //追加できた数
+        }moveData;
+    };
+    std::map<int, DeathData> saveCharaKilog;
 };

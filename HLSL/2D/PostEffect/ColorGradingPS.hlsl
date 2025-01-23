@@ -163,24 +163,62 @@ float3 radialblur(float2 texcoord)
     return color;
 }
 
-//セピア
-float3 sepia(float3 currentcolor)
+//レンズフレアとグローライトのエフェクト
+float3 lens_flare(float2 uv, float2 pos)
 {
-    float3x3 sepiaVals = float3x3
-    (
-        0.393, 0.769, 0.189, // Red
-        0.349, 0.686, 0.168, // Green
-        0.272, 0.534, 0.131 // Blue
-    );
+    const float glory_light_intensity = 1.5;
+    const float lens_flare_intensity = 3.0;
 
-    float3 sepiaResult = mul(currentcolor.rgb, sepiaVals);
-    return saturate(sepiaResult); // 結果をクランプ
+    float2 main = uv - pos;
+    float2 uvd = uv * (length(uv));
+
+    float ang = atan2(main.x, main.y);
+    float dist = length(main);
+    dist = pow(dist, .1);
+    float n = noise(float2(ang * 16.0, dist * 32.0));
+
+    float f0 = 1.0 / (length(uv - pos) * 16.0 + 1.0);
+    f0 = f0 + f0 * (sin(noise(sin(ang * 2. + pos.x) * 4.0 - cos(ang * 3. + pos.y)) * 16.) * .1 + dist * .1 + .8);
+
+    float f1 = max(0.01 - pow(length(uv + 1.2 * pos), 1.9), .0) * 7.0;
+
+    float f2 = max(1.0 / (1.0 + 32.0 * pow(length(uvd + 0.8 * pos), 2.0)), .0) * 0.25;
+    float f22 = max(1.0 / (1.0 + 32.0 * pow(length(uvd + 0.85 * pos), 2.0)), .0) * 0.23;
+    float f23 = max(1.0 / (1.0 + 32.0 * pow(length(uvd + 0.9 * pos), 2.0)), .0) * 0.21;
+
+    float2 uvx = lerp(uv, uvd, -0.5);
+
+    float f4 = max(0.01 - pow(length(uvx + 0.4 * pos), 2.4), .0) * 6.0;
+    float f42 = max(0.01 - pow(length(uvx + 0.45 * pos), 2.4), .0) * 5.0;
+    float f43 = max(0.01 - pow(length(uvx + 0.5 * pos), 2.4), .0) * 3.0;
+
+    uvx = lerp(uv, uvd, -.4);
+
+    float f5 = max(0.01 - pow(length(uvx + 0.2 * pos), 5.5), .0) * 2.0;
+    float f52 = max(0.01 - pow(length(uvx + 0.4 * pos), 5.5), .0) * 2.0;
+    float f53 = max(0.01 - pow(length(uvx + 0.6 * pos), 5.5), .0) * 2.0;
+
+    uvx = lerp(uv, uvd, -0.5);
+
+    float f6 = max(0.01 - pow(length(uvx - 0.3 * pos), 1.6), .0) * 6.0;
+    float f62 = max(0.01 - pow(length(uvx - 0.325 * pos), 1.6), .0) * 3.0;
+    float f63 = max(0.01 - pow(length(uvx - 0.35 * pos), 1.6), .0) * 5.0;
+
+    float3 c = 0;
+
+    c.r += f2 + f4 + f5 + f6;
+    c.g += f22 + f42 + f52 + f62;
+    c.b += f23 + f43 + f53 + f63;
+    c = max(0, c * 1.3 - (length(uvd) * .05));
+
+    return f0 * glory_light_intensity + c * lens_flare_intensity;
 }
 
-//ネガポジ反転
-float3 NegaPogi(float3 currentscale)
+//色に対して修正を行い、修正された色を返します
+float3 cc(float3 color, float factor, float factor2) // color modifier
 {
-    return 1 - currentscale;
+    float w = color.x + color.y + color.z;
+    return lerp(color, w * factor, w * factor2);
 }
 
 float4 main(VS_OUT pin) : SV_TARGET
@@ -190,6 +228,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     uint mip_level = 0, number_of_samples;
     texturemaps.GetDimensions(mip_level, dimensions.x, dimensions.y, number_of_samples);
 
+    //テクスチャマップの幅と高さの比率
     const float aspect = (float) dimensions.y / dimensions.x;
 
     // 深度マップからピクセルの深度情報をサンプリング
@@ -209,6 +248,27 @@ float4 main(VS_OUT pin) : SV_TARGET
     // シーンのテクスチャマップをサンプリング
     float4 sampled_color = texturemaps.Sample(sampler_states[POINT], pin.texcoord.xy);
 
+    //レンズフレアとグローライトのエフェクト
+    float4 ndc_sun_position = mul(float4(-normalize(directionalLight.direction.xyz) * distance_to_sun, 1), viewProjection);
+    ndc_sun_position /= ndc_sun_position.w;
+    if (saturate(ndc_sun_position.z) == ndc_sun_position.z)
+    {
+        float4 occluder;
+        occluder.xy = ndc_sun_position.xy;
+        occluder.z = depth_map.Sample(sampler_states[BLACK_BORDER_LINEAR], float2(ndc_sun_position.x * 0.5 + 0.5, 0.5 - ndc_sun_position.y * 0.5)).x;
+        occluder = mul(float4(occluder.xyz, 1), inverseprojection);
+        occluder /= occluder.w;
+        float occluded_factor = step(250.0, occluder.z);
+
+        const float2 aspect_correct = float2(1.0 / aspect, 1.0);
+
+        float sun_highlight_factor = max(0, dot(normalize(mul(world_position - float4(cameraposition, 1.0f), view)).xyz, float3(0, 0, 1)));
+        float3 lens_flare_color = float3(1.4, 1.2, 1.0) * lens_flare(ndc_position.xy * aspect_correct, ndc_sun_position.xy * aspect_correct);
+        lens_flare_color -= noise(ndc_position.xy * 256) * .015;
+        lens_flare_color = cc(lens_flare_color, .5, .1);
+        sampled_color.rgb += max(0.0, lens_flare_color) * occluded_factor * directionalLight.color.rgb * 0.5;
+    }
+
     // 明るさとコントラストの調整
     sampled_color.rgb = brightness_contrast(sampled_color.rgb, brightness, contrast);
 
@@ -223,12 +283,6 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     // ビネット効果の適用
     sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
-
-    // セピア効果の適用
-    sampled_color.rgb = lerp(sampled_color.rgb, sepia(sampled_color.rgb), sepiastrength);
-
-    //ネガポジ反転
-    sampled_color.rgb = lerp(sampled_color.rgb, NegaPogi(sampled_color.rgb), negapogistrength);
 
     // 最終的な色を返す
     return sampled_color;
