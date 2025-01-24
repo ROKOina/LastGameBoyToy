@@ -1820,41 +1820,10 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
         playerName->SetName("AllyPlayerName");
         std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->scale = 0.6f;
+        font->scale = 0.5f;
         font->color = { 1,1,1,1.0f };
         font->str = UTF8ToWString3(netPlayer.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GeNetName());  //L付けてね
-        font->position = { 176.0f,948.0f };
-    }
-
-    ////currenthp
-    //{
-    //    std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
-    //    std::shared_ptr<GameObject> hpnum = hpFrame->AddChildObject();
-    //    hpnum->SetName("AllyHpNum");
-    //    std::shared_ptr<UI_HpNum>hn = hpnum->AddComponent<UI_HpNum>();
-    //}
-
-    //hpslashu
-    {
-        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
-        std::shared_ptr<GameObject> hps = hpFrame->AddChildObject();
-        hps->SetName("Allyslashu");
-        hps->AddComponent<Sprite>("Data/SerializeData/UIData/Player/slashu.ui", Sprite::SpriteShader::DEFALT, false);
-    }
-
-    //maxhp
-    {
-        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
-        std::shared_ptr<GameObject> hpnum = hpFrame->AddChildObject();
-        auto& playerchara = netPlayer.lock()->GetComponent<CharaStatusCom>();
-        hpnum->SetName("AllyMaxHp");
-        float maxhp = playerchara->GetMaxHitpoint();  //最大HP
-        std::wstring numstr = std::to_wstring(static_cast<int>(maxhp));
-        std::shared_ptr<Font> font = hpnum->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->scale = 0.75f;
-        font->color = { 1,1,1,0.5f };
-        font->str = numstr;  //L付けてね
-        font->position = { 252.0f,814.0f };
+        font->position = { 139.0f,763.0f };
     }
 
     //electro
@@ -1862,7 +1831,7 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
         std::shared_ptr<GameObject> electro = hpFrame->AddChildObject();
         electro->SetName("Allyelectro");
-        std::shared_ptr<Sprite>e = electro->AddComponent<Sprite>("Data/SerializeData/UIData/Player/electro.ui", Sprite::SpriteShader::DEFALT, false);
+        std::shared_ptr<Sprite>e = electro->AddComponent<Sprite>("Data/SerializeData/UIData/Player/Allyelectro.ui", Sprite::SpriteShader::DEFALT, false);
         e->SetColumns(6);
         e->SetRows(2);
         e->SetFrameRate(20.2f);
@@ -1870,15 +1839,15 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
 
     //HPエフェクト
     {
-        //for (int i = 0; i < 9; i++)
-        //{
-        //    std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("HpGauge");
-        //    std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
-        //    std::string name = "HpEffect_" + i;
-        //    hpEffect->SetName(name.c_str());
-        //    int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
-        //    std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, player, i);
-        //}
+        for (int i = 0; i < 9; i++)
+        {
+            std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("AllyHpGauge");
+            std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
+            std::string name = "HpEffect_" + i;
+            hpEffect->SetName(name.c_str());
+            int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
+            std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, player, i);
+        }
     }
 }
 
