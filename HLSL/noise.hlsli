@@ -1,5 +1,7 @@
 // GLSL Noise Algorithms
 // https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+#define NUM_NOISE_OCTAVES 5
+
 float random(float n)
 {
     return frac(sin(n) * 43758.5453123);
@@ -19,7 +21,7 @@ float noise(float2 p)
     float2 ip = floor(p);
     float2 u = frac(p);
     u = u * u * (3.0 - 2.0 * u);
-	
+
     float res = lerp(
 		lerp(random(ip), random(ip + float2(1.0, 0.0)), u.x),
 		lerp(random(ip + float2(0.0, 1.0)), random(ip + float2(1.0, 1.0)), u.x), u.y);
@@ -221,6 +223,20 @@ float snoise(float3 v)
     return 105.0 * dot(m * m, float4(dot(p0, x0), dot(p1, x1),
         dot(p2, x2), dot(p3, x3)));
 }
+float fbm(float3 x)
+{
+    float v = 0.0;
+    float a = 0.5;
+    float3 shift = 100;
+    for (int i = 0; i < NUM_NOISE_OCTAVES; ++i)
+    {
+        v += a * noise(x);
+        x = x * 2.0 + shift;
+        a *= 0.5;
+    }
+    return v;
+}
+
 #if 0
 // A single iteration of Bob Jenkins' One-At-A-Time hashing algorithm.
 uint hash(uint x)
