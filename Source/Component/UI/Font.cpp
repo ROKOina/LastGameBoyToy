@@ -369,7 +369,7 @@ void Font::Update(float elapsedTime)
         }
         else
         {
-            position = DirectX::XMFLOAT2(parent->transform_->GetWorldPosition().x,parent->transform_->GetWorldPosition().y) + parentPosOffset;
+            position = DirectX::XMFLOAT2(parent->transform_->GetWorldPosition().x, parent->transform_->GetWorldPosition().y) + parentPosOffset;
         }
     }
 }
