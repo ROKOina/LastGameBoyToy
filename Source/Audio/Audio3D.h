@@ -32,12 +32,6 @@
     static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_Reverb_CurvePoints[3] = { 0.0f, 0.5f, 0.75f, 1.0f, 1.0f, 0.0f };
     static const X3DAUDIO_DISTANCE_CURVE       Emitter_Reverb_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_Reverb_CurvePoints[0], 3 };
 
-    // External functions
-    HRESULT InitAudio();
-    HRESULT SetReverb(int nReverb);
-    VOID PauseAudio(bool resume);
-    VOID CleanupAudio();
-
 enum AUDIOIDTEST
 {
     BGM,
@@ -46,96 +40,6 @@ enum AUDIOIDTEST
 
    MAX_
 };
-
-enum AUDIOID2D
-{
-    BGM2D,
-    SE2D,
-
-    MAX2D
-};
-
-// オーディオソース
-class AudioSource3D : public Component
-{
-public:
-    AudioSource3D() {    
-        // オーディオの初期化
-        InitAudio();
-        // オーディオ登録情報
-        RegisterAudio();
-    };
-    ~AudioSource3D() override;
-
-    void Start() override;
-    void Update(float elapsedTime) override;
-
-    const char* GetName() const override { return "Audio"; }
-    void OnGUI() override {}
-
-    void UpdateAudio3d(float elapsedTime);
-
-    // オーディオ呼び出し関数
-    void SetAudio(AUDIOIDTEST id, bool flg = false);
-
-    // 再生
-    void AudioPlay();
-
-    void SetListenerPos(DirectX::XMFLOAT3 pos) { listenerPos = pos; }
-    void SetEmitterPos(DirectX::XMFLOAT3 pos) { emitterPos = pos; }
-
-private:
-    // オーディオ登録
-    void RegisterAudio();
-
-public:
-    IXAudio2SourceVoice* sourceVoice_ = nullptr;
-    std::shared_ptr<AudioResource>	resource_;
-
-private:
-    std::map<AUDIOIDTEST, std::shared_ptr<AudioResource>> audioResources;
-
-    DirectX::XMFLOAT3 listenerPos;
-    DirectX::XMFLOAT3 emitterPos;
-
-    bool audioChangeFlg = false;
-};
-
-class AudioSource2D : public Component
-{
-public:
-    AudioSource2D();
-    ~AudioSource2D() override;
-
-    void Start() override {};
-    void Update(float elapsedTime) override {};
-
-    const char* GetName() const override { return "Audio2D"; }
-    void OnGUI() override {}
-
-    // オーディオ呼び出し関数
-    void SetAudio2D(AUDIOID2D id);
-
-    // 再生
-    void Audio2DPlay();
-    void Audio2DPlay(float volume, bool loop = false);
-private:
-    // オーディオ登録
-    void RegisterAudio2D();
-
-public:
-    IXAudio2SourceVoice* sourceVoice_ = nullptr;
-    std::shared_ptr<AudioResource>	resource_;
-
-private:
-    Microsoft::WRL::ComPtr<IXAudio2> xaudio;
-    IXAudio2MasteringVoice* masteringVoice = nullptr;
-
-    std::map<AUDIOID2D, std::shared_ptr<AudioResource>> audioResources;
-
-    bool audioChangeFlg = false;
-};
-
 struct AUDIO_STATE
 {
     bool bInitialized;
@@ -173,5 +77,90 @@ struct AUDIO_STATE
 
 };
 
-// Global variables
-extern AUDIO_STATE  g_audioState;
+enum AUDIOID2D
+{
+    BGM2D,
+    SE2D,
+
+    MAX2D
+};
+
+// オーディオソース
+class AudioSource3D : public Component
+{
+public:
+    AudioSource3D();
+    ~AudioSource3D() override;
+
+    void Start() override;
+    void Update(float elapsedTime) override;
+
+    const char* GetName() const override { return "Audio"; }
+    void OnGUI() override {}
+
+    void UpdateAudio3d(float elapsedTime);
+
+    // オーディオ呼び出し関数
+    void SetAudio(AUDIOIDTEST id);
+
+    // 再生
+    void AudioPlay();
+
+    void SetListenerPos(DirectX::XMFLOAT3 pos) { listenerPos = pos; }
+    void SetEmitterPos(DirectX::XMFLOAT3 pos) { emitterPos = pos; }
+
+private:
+    // オーディオ登録
+    void RegisterAudio();
+
+public:
+    IXAudio2SourceVoice* sourceVoice_ = nullptr;
+    std::shared_ptr<AudioResource>	resource_;
+
+private:
+    std::map<AUDIOIDTEST, std::shared_ptr<AudioResource>> audioResources;
+
+    DirectX::XMFLOAT3 listenerPos;
+    DirectX::XMFLOAT3 emitterPos;
+
+    AUDIO_STATE  g_audioState;
+};
+
+class AudioSource2D : public Component
+{
+public:
+    AudioSource2D();
+    ~AudioSource2D() override;
+
+    void Start() override {};
+    void Update(float elapsedTime) override {};
+
+    const char* GetName() const override { return "Audio2D"; }
+    void OnGUI() override {}
+
+    // オーディオ呼び出し関数
+    void SetAudio2D(AUDIOID2D id);
+
+    // 再生
+    void Audio2DPlay();
+    void Audio2DPlay(float volume, bool loop = false);
+private:
+    // オーディオ登録
+    void RegisterAudio2D();
+
+public:
+    IXAudio2SourceVoice* sourceVoice_ = nullptr;
+    std::shared_ptr<AudioResource>	resource_;
+
+private:
+    Microsoft::WRL::ComPtr<IXAudio2> xaudio;
+    IXAudio2MasteringVoice* masteringVoice = nullptr;
+
+    std::map<AUDIOID2D, std::shared_ptr<AudioResource>> audioResources;
+
+    bool audioChangeFlg = false;
+};
+
+
+//// Global variables
+//extern AUDIO_STATE  g_audioState;

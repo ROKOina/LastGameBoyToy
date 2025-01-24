@@ -26,7 +26,7 @@ SceneManager::SceneManager()
 
 SceneManager::~SceneManager()
 {
-    CleanupAudio();
+    //CleanupAudio();
 }
 
 //XVˆ—

@@ -8,9 +8,6 @@
 
 using namespace DirectX;
 
-// Global variables
-AUDIO_STATE g_audioState;
-
 // リバーブ効果
 XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAMS02[NUM_PRESETS] =
 {
@@ -47,8 +44,7 @@ XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAMS02[NUM_PRESETS] =
 };
 
 
-// Initialize the audio by creating the XAudio2 device, mastering voice, etc.
-HRESULT InitAudio()
+AudioSource3D::AudioSource3D()
 {
     // Clear struct
     g_audioState = {};
@@ -56,7 +52,8 @@ HRESULT InitAudio()
     // Initialize XAudio2
     HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     if (FAILED(hr))
-        return hr;
+    {
+    }
 
 
     UINT32 flags = 0;
@@ -65,7 +62,8 @@ HRESULT InitAudio()
 #endif
     hr = XAudio2Create(&g_audioState.pXAudio2, flags);
     if (FAILED(hr))
-        return hr;
+    {
+    }
 
 #if !defined(USING_XAUDIO2_7_DIRECTX) && defined(_DEBUG)
     // To see the trace output, you need to view ETW logs for this application:
@@ -83,7 +81,6 @@ HRESULT InitAudio()
     if (FAILED(hr = g_audioState.pXAudio2->CreateMasteringVoice(&g_audioState.pMasteringVoice)))
     {
         g_audioState.pXAudio2.Reset();
-        return hr;
     }
 
     // Check device details to make sure it's within our sample supported parameters
@@ -96,13 +93,11 @@ HRESULT InitAudio()
     if (details.InputChannels > OUTPUTCHANNELS)
     {
         g_audioState.pXAudio2.Reset();
-        return E_FAIL;
     }
 
     if (FAILED(hr = g_audioState.pMasteringVoice->GetChannelMask(&dwChannelMask)))
     {
         g_audioState.pXAudio2.Reset();
-        return E_FAIL;
     }
 
     nSampleRate = details.InputSampleRate;
@@ -117,7 +112,6 @@ HRESULT InitAudio()
     if (FAILED(hr = XAudio2CreateReverb(&g_audioState.pReverbEffect, rflags)))
     {
         g_audioState.pXAudio2.Reset();
-        return hr;
     }
 
     // Create a submix voice
@@ -134,7 +128,6 @@ HRESULT InitAudio()
     {
         g_audioState.pXAudio2.Reset();
         g_audioState.pReverbEffect.Reset();
-        return hr;
     }
 
     // Set default FX params
@@ -244,43 +237,22 @@ HRESULT InitAudio()
     //音源ロード
     //SetAudio(AUDIOIDTEST::SE);
 
-    return S_OK;
+
+    // オーディオ登録情報
+    RegisterAudio();
 }
 
-// Set reverb effect
-HRESULT SetReverb(int nReverb)
+AudioSource3D::~AudioSource3D()
 {
-    if (!g_audioState.bInitialized)
-        return S_FALSE;
-
-    if (nReverb < 0 || nReverb >= NUM_PRESETS)
-        return E_FAIL;
-
-    if (g_audioState.pSubmixVoice)
+    if (sourceVoice_)
     {
-        XAUDIO2FX_REVERB_PARAMETERS native;
-        ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS02[nReverb], &native);
-        g_audioState.pSubmixVoice->SetEffectParameters(0, &native, sizeof(native));
+        sourceVoice_->DestroyVoice();
+        sourceVoice_ = nullptr;
     }
 
-    return S_OK;
-}
+    resource_.reset();
+    audioResources.clear();
 
-// Pause audio playback
-VOID PauseAudio(bool resume)
-{
-    if (!g_audioState.bInitialized)
-        return;
-
-    if (resume)
-        g_audioState.pXAudio2->StartEngine();
-    else
-        g_audioState.pXAudio2->StopEngine();
-}
-
-// Releases XAudio2
-VOID CleanupAudio()
-{
     if (!g_audioState.bInitialized)
         return;
     if (g_audioState.pSubmixVoice)
@@ -314,18 +286,6 @@ VOID CleanupAudio()
     g_audioState.bInitialized = false;
 }
 
-AudioSource3D::~AudioSource3D()
-{
-    if (sourceVoice_)
-    {
-        sourceVoice_->DestroyVoice();
-        sourceVoice_ = nullptr;
-    }
-
-    resource_.reset();
-    audioResources.clear();
-}
-
 void AudioSource3D::Start()
 {
 }
@@ -333,7 +293,8 @@ void AudioSource3D::Start()
 void AudioSource3D::Update(float elapsedTime)
 {
     g_audioState.vListenerPos = GameObjectManager::Instance().Find("Lisner")->transform_->GetWorldPosition();
-    g_audioState.vEmitterPos = GameObjectManager::Instance().Find("Emitter")->transform_->GetWorldPosition();
+    g_audioState.vEmitterPos = GetGameObject()->transform_->GetWorldPosition();
+    //g_audioState.vEmitterPos = GameObjectManager::Instance().Find("Emitter")->transform_->GetWorldPosition();
 
     //g_audioState.vListenerPos = listenerPos;
     //g_audioState.vEmitterPos = emitterPos;
@@ -351,8 +312,6 @@ void AudioSource3D::RegisterAudio()
 
 void AudioSource3D::UpdateAudio3d(float elapsedTime)
 {
-    if (!audioChangeFlg) return;
-
     {
         // Calculate listener orientation in x-z plane
         if (g_audioState.vListenerPos.x != g_audioState.listener.Position.x
@@ -456,10 +415,9 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
     }
 }
 
-void AudioSource3D::SetAudio(AUDIOIDTEST id, bool flg)
+void AudioSource3D::SetAudio(AUDIOIDTEST id)
 {
     resource_ = audioResources[id];
-    audioChangeFlg = flg;
 
     if (resource_ != nullptr)
     {
@@ -475,35 +433,23 @@ void AudioSource3D::SetAudio(AUDIOIDTEST id, bool flg)
         const uint8_t* sampleData = resource_->GetAudioData();
         uint32_t waveSize = resource_->GetAudioBytes();
 
-        // チェンジ
-        if (!flg)
-        {
-            // 2Dオーディオ
-            HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
-            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-        }
-        else
-        {
-            // 3Dオーディオ
-            // Play the wave using a source voice that sends to both the submix and mastering voices
-            XAUDIO2_SEND_DESCRIPTOR sendDescriptors[2];
-            sendDescriptors[0].Flags = XAUDIO2_SEND_USEFILTER; // LPF direct-path
-            sendDescriptors[0].pOutputVoice = g_audioState.pMasteringVoice;
-            sendDescriptors[1].Flags = XAUDIO2_SEND_USEFILTER; // LPF reverb-path -- omit for better performance at the cost of less realistic occlusion
-            sendDescriptors[1].pOutputVoice = g_audioState.pSubmixVoice;
-            const XAUDIO2_VOICE_SENDS sendList = { 2, sendDescriptors };
+        // 3Dオーディオ
+        // Play the wave using a source voice that sends to both the submix and mastering voices
+        XAUDIO2_SEND_DESCRIPTOR sendDescriptors[2];
+        sendDescriptors[0].Flags = XAUDIO2_SEND_USEFILTER; // LPF direct-path
+        sendDescriptors[0].pOutputVoice = g_audioState.pMasteringVoice;
+        sendDescriptors[1].Flags = XAUDIO2_SEND_USEFILTER; // LPF reverb-path -- omit for better performance at the cost of less realistic occlusion
+        sendDescriptors[1].pOutputVoice = g_audioState.pSubmixVoice;
+        const XAUDIO2_VOICE_SENDS sendList = { 2, sendDescriptors };
 
-            // create the source voice
-            HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, pwfx, 0, 2.0f, nullptr, &sendList);
-            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-        }
+        // create the source voice
+        HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, pwfx, 0, 2.0f, nullptr, &sendList);
+        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 }
 
 void AudioSource3D::AudioPlay()
 {
-    if (!g_audioState.bInitialized) return;
-
     // Submit the wave sample data using an XAUDIO2_BUFFER structure
     XAUDIO2_BUFFER buffer = {};
 
@@ -571,7 +517,7 @@ void AudioSource2D::SetAudio2D(AUDIOID2D id)
 {
     resource_ = audioResources[id];
 
-    if (resource_ != nullptr) return;
+    if (resource_ == nullptr) return;
 
     if (sourceVoice_)
     {
@@ -591,8 +537,6 @@ void AudioSource2D::SetAudio2D(AUDIOID2D id)
 
 void AudioSource2D::Audio2DPlay()
 {
-    if (!g_audioState.bInitialized) return;
-
     XAUDIO2_BUFFER buffer = {};
     buffer.AudioBytes = resource_->GetAudioBytes();
     buffer.pAudioData = resource_->GetAudioData();
@@ -605,8 +549,6 @@ void AudioSource2D::Audio2DPlay()
 
 void AudioSource2D::Audio2DPlay(float volume, bool loop)
 {
-    if (!g_audioState.bInitialized) return;
-
     XAUDIO2_BUFFER buffer = {};
     buffer.AudioBytes = resource_->GetAudioBytes();
     buffer.pAudioData = resource_->GetAudioData();
