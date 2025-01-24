@@ -199,15 +199,15 @@ void SceneTitle::Initialize()
         audioSource3d1.lock()->SetAudio(AUDIOIDTEST::SE);
         audioSource3d1.lock()->AudioPlay();
     }
-    //{
-    //    GameObj audio = GameObjectManager::Instance().Create();
-    //    audio->SetName("Emitter1");
-    //    audio->AddComponent<AudioSource3D>();
-    //    audio->transform_->SetWorldPosition({ 5,0,0 });
-    //    audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
-    //    audio->GetComponent<AudioSource3D>()->SetAudio(AUDIOIDTEST::TEST);
-    //    audio->GetComponent<AudioSource3D>()->AudioPlay();
-    //}
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Emitter1");
+        audio->AddComponent<AudioSource3D>();
+        audio->transform_->SetWorldPosition({ 5,0,0 });
+        audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
+        audio->GetComponent<AudioSource3D>()->SetAudio(AUDIOIDTEST::TEST);
+        audio->GetComponent<AudioSource3D>()->AudioPlay();
+    }
 
     //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
