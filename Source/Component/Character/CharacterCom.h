@@ -277,6 +277,7 @@ protected:
     bool useMoveFlag = true;//falseにするとmoveStateを使わない
     float jumpPower = 3.0f;
 
+    bool stanEnd = false;   //スタン終了時判別用
     bool isStan = false;
     float stanTimer = 0;
 

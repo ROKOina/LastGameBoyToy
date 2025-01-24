@@ -186,6 +186,8 @@ void InazawaCharacterCom::UltSkill()
         GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
     }
 
+    SetMaxBullet();
+
     //ステートを初期化
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 }
