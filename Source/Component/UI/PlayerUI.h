@@ -283,15 +283,19 @@ public:
     ~UI_GameJudge() {}
 
     // 名前取得
-    const char* GetName() const override { return "UI_BoostGauge"; }
+    const char* GetName() const override { return "UI_GameJudge"; }
 
     // 開始処理
     void Start() override;
 
     // 更新処理
     void Update(float elapsedTime) override;
+
+    void OnGUI()override;
 private:
     std::vector<std::weak_ptr<GameObject>> circles;
+    int state = 0;
+    float fadeTimr = 0.0f;
 };
 
 class UI_UltNum : public Component

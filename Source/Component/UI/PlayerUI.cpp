@@ -831,12 +831,28 @@ void UI_EnemyHp::Register(std::weak_ptr<GameObject> obj)
 
 UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
 {
-    std::shared_ptr<GameObject> tunder = GameObjectManager::Instance().Create();
-    tunder->SetName("Tunder");
-    tunder->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+
+    std::shared_ptr<GameObject> fade = GameObjectManager::Instance().Create();
+    fade->SetName("Fade");
+    fade->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/Fade.ui", Sprite::SpriteShader::DEFALT, false);
+
+
+    std::shared_ptr<GameObject> leftTrunder = GameObjectManager::Instance().Create();
+    leftTrunder->SetName("LeftTrunder");
+    leftTrunder->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/LeftTunder.ui", Sprite::SpriteShader::DEFALT, false);
+    leftTrunder->SetEnabled(false);
+
+    std::shared_ptr<GameObject> rightTrunder = GameObjectManager::Instance().Create();
+    rightTrunder->SetName("RightTrunder");
+    rightTrunder->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/RightTunder.ui", Sprite::SpriteShader::DEFALT, false);
+    rightTrunder->SetEnabled(false);
+
     std::shared_ptr<GameObject> font = GameObjectManager::Instance().Create();
     font->SetName("Font");
-    font->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    font->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/Font.ui", Sprite::SpriteShader::DEFALT, false);
+    font->SetEnabled(false);
+    font->GetComponent<UiSystem>()->spc.scale = { 0,0 };
+
     for (int i = 0; i <= 3; i++)
     {
         std::shared_ptr<GameObject> circle = GameObjectManager::Instance().Create();
@@ -849,28 +865,89 @@ UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
 
     //勝敗に応じてロードするテクスチャ変更
     if (victryTeam == player.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID()) {
-        tunder->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Thunder.png");
         font->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Victory.png");
+        
+        leftTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        leftTrunder->GetComponent<UiSystem>()->SetRows(2);
+        leftTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        leftTrunder->GetComponent<UiSystem>()->spc.color = { 1.000f, 0.933f, 0.000f, 1.000f};
+       
+
+
+        rightTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        rightTrunder->GetComponent<UiSystem>()->SetRows(2);
+        rightTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        rightTrunder->GetComponent<UiSystem>()->spc.color = { 1.000f, 0.933f, 0.000f, 1.000f };
     }
     else {
-        tunder->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/DefeatTunder.png");
         font->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Defeat.png");
+ 
+        leftTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        leftTrunder->GetComponent<UiSystem>()->SetRows(2);
+        leftTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        leftTrunder->GetComponent<UiSystem>()->spc.color = { 1,0,0,1 };
+
+        rightTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        rightTrunder->GetComponent<UiSystem>()->SetRows(2);
+        rightTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        rightTrunder->GetComponent<UiSystem>()->spc.color = { 1,0,0,1 };
     }
 }
 
 void UI_GameJudge::Start()
 {
-    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Tunder"));
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Fade"));
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("LeftTrunder"));
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("RightTrunder"));
     this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Font"));
     for (auto& circle : circles)
     {
         this->GetGameObject()->AddChildObject(circle.lock());
     }
 }
+void UI_GameJudge::OnGUI() {
+    ImGui::DragInt("state", &state);
+}
 
 void UI_GameJudge::Update(float elaspedTime)
 {
+  std::shared_ptr<GameObject> fade =  GameObjectManager::Instance().Find("Fade");
+  std::shared_ptr<UiSystem> fadeCom = fade->GetComponent<UiSystem>();
 
+  std::shared_ptr<GameObject> leftTrunder =  GameObjectManager::Instance().Find("LeftTrunder");
+  std::shared_ptr<UiSystem> leftTrunderCom = leftTrunder->GetComponent<UiSystem>();
+
+  std::shared_ptr<GameObject> rightTrunder =  GameObjectManager::Instance().Find("RightTrunder");
+  std::shared_ptr<UiSystem> rightTrunderCom = rightTrunder->GetComponent<UiSystem>();
+
+  std::shared_ptr<GameObject> font =  GameObjectManager::Instance().Find("Font");
+  std::shared_ptr<UiSystem> fontCom = font->GetComponent<UiSystem>();
+
+   
+  switch (state)
+  {
+  case 0:
+      fadeTimr += 0.1f;
+      fadeCom->spc.color = { 0,0,0,fadeTimr };
+      if (fadeTimr >= 1.0f) {
+          state++;
+      }
+      break;
+  case 1:
+      font->SetEnabled(true);
+      fontCom->spc.scale = { fontCom->spc.scale.x + 0.01f, fontCom->spc.scale.y + 0.01f, };
+      if (fontCom->spc.scale.x >= 1.0f) {
+          state++;
+      }
+      break;
+
+  case 2:
+      leftTrunder->SetEnabled(true);
+      rightTrunder->SetEnabled(true);
+      break;
+  default:
+      break;
+  }
 }
 
 void PlayerUIManager::Register()

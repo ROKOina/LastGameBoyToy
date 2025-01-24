@@ -657,6 +657,7 @@ void ScenePVP::Update(float elapsedTime)
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
+
         //‰¼‘JˆÚ
        //if (!SceneManager::Instance().GetTransitionFlag())
        //{
