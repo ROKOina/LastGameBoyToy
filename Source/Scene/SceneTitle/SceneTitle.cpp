@@ -227,18 +227,6 @@ void SceneTitle::Render(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
 
-    ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-
-    //if (ImGui::Begin("Lisner", nullptr, ImGuiWindowFlags_None))
-    //{
-
-    //    if (ImGui::Button("LisnerUpdate")) {
-    //        audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
-    //    }
-    //}
-    //ImGui::End();
-
 }
 
 void SceneTitle::UIUpdate(float elapsedTime)

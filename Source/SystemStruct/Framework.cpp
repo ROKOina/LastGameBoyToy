@@ -100,9 +100,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     // ƒV[ƒ“•`‰æˆ—
     SceneManager::Instance().Render(elapsedTime);
-    TimeManager::Instance().ImGui();
 
 #ifdef _DEBUG
+    TimeManager::Instance().ImGui();
     //IMGUI•`‰æ
     IMGUI_CTRL_DISPLAY();
 #endif
