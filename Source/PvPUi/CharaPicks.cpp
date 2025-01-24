@@ -389,7 +389,7 @@ void CharaPicks::AddCharacterUI(std::shared_ptr<GameObject> parent, const char* 
     obj->transform_->SetWorldPosition({ -0.191f, 0.018f, 1.802f });
     obj->transform_->SetScale({ 0.2f, 0.2f, 0.2f });
     obj->transform_->SetEulerRotation({ 0.0f, 209.99f, 0.0f });
-    auto& r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+    auto& r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
     r->LoadModel(modelPath);
     auto& anim = obj->AddComponent<AnimationCom>();
     anim->PlayAnimation(5, true);

@@ -18,6 +18,9 @@ public:
     //更新処理
     void Update(const float& elapsedTime);
 
+    //imgui
+    void ImGui();
+
     //セッター
     void SetTimeEffect(const float& scale, const float& time)
     {
