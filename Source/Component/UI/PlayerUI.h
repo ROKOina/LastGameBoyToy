@@ -502,6 +502,8 @@ private:
     {
         int charaID;
         bool isEnemy;   //ですしたキャラは敵か
+        //自分がいる場合
+        int myID = -1;  //-1:なし　0:キル　1:デス
 
         //動き
         struct MoveData

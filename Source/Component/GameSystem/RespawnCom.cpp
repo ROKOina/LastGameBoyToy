@@ -112,7 +112,14 @@ void RespawnCom::Respawn_GamePVP(float elapsedTime)
     for (RespawnData* removeObj : endDatas)
     {
         auto& it = std::remove(respawnDatas.begin(), respawnDatas.end(), removeObj);
-        delete respawnDatas[respawnDatas.size() - 1];
+        for (int i = 0; i < respawnDatas.size(); ++i)
+        {
+            if (std::strcmp(respawnDatas[i]->gameObj->GetName(), removeObj->gameObj->GetName()) == 0)
+            {
+                delete respawnDatas[i];
+                break;
+            }
+        }
         respawnDatas.erase(it, respawnDatas.end());
     }
     endDatas.clear();
