@@ -537,18 +537,18 @@ void UI_E_SkillCount::Start()
 void UI_E_SkillCount::Update(float elapsedTime)
 {
     //ごめん消しましたby上野
-    //if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
-    //    UpdateCore(elapsedTime);
-    //    UpdateGauge(elapsedTime);
-    //}
-    //else {
-    //    for (int                                                                               i = 0; i < num; i++) {
-    //        coresUi.at(i).coreFrameUi->spc.color.w                                             = 0.0f;
-    //        coresUi.at(i).coreUi->spc.color.w                                                  = 0.0f;
-    //    }
-    //    gaugeUi->spc.color.w                                                                   = 0.0f;
-    //    gaugeFrameUi->spc.color.w                                                              = 0.0f;
-    //}
+    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
+        UpdateCore(elapsedTime);
+        UpdateGauge(elapsedTime);
+    }
+    else {
+        for (int                                                                               i = 0; i < num; i++) {
+            coresUi.at(i).coreFrameUi->spc.color.w                                             = 0.0f;
+            coresUi.at(i).coreUi->spc.color.w                                                  = 0.0f;
+        }
+        gaugeUi->spc.color.w                                                                   = 0.0f;
+        gaugeFrameUi->spc.color.w                                                              = 0.0f;
+    }
 }
 
 void UI_E_SkillCount::UpdateGauge(float elapsedTime)
@@ -1210,6 +1210,24 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
 
     break;
     }
+
+
+    //個別キャラUI
+    if (player.lock()->GetComponent<InazawaCharacterCom>())
+    {
+        //Eskillコア
+        std::shared_ptr<GameObject> EcoreUI = canvas->AddChildObject();
+        EcoreUI->SetName("EskillCoreManager");
+        //int arrowNum = player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->maxArrowCount;
+        EcoreUI->AddComponent<UI_E_SkillCount>(8);
+        //ultコア
+        std::shared_ptr<GameObject> ultCoreUI = canvas->AddChildObject();
+        ultCoreUI->SetName("EskillCoreManager");
+        int ultCount = player.lock()->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
+        ultCoreUI->AddComponent<UI_Ult_Count>(ultCount);
+    }
+
+
 }
 
 void PlayerUIManager::CreateReticleUI()
