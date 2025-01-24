@@ -16,13 +16,18 @@ public:
 
     // XVˆ—
     void Update(float elapsedTime) override {
-        if (!GetGameObject()->GetComponent<UiSystem>()->IsPlayEasing())
-        {
+        timerUI -= elapsedTime;
+        if (timerUI < 0)
             GetGameObject()->SetEnabled(false);
-        }
     }
 
     void OnGUI()override {}
 
+    void SetRemoveTimer(float time) {
+        timerUI = time;
+        GetGameObject()->SetEnabled(true);
+    }
+
 private:
+    float timerUI = 0;
 };

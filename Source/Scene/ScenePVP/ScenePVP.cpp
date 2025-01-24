@@ -419,7 +419,24 @@ void ScenePVP::InitializePVP()
         {
             std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
             obj->SetName("GameStart");
-            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
+            auto& spr=obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
+            spr->SetOrderinLayer(100);
+            obj->SetEnabled(false);
+            obj->AddComponent<UiEasingEnabledRemoveCom>();
+        }
+        //ゲーム開始Back1
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameStartBack1");
+            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStartB1.ui", Sprite::SpriteShader::DEFALT, false);
+            obj->SetEnabled(false);
+            obj->AddComponent<UiEasingEnabledRemoveCom>();
+        }
+        //ゲーム開始Back2
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameStartBack2");
+            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStartB2.ui", Sprite::SpriteShader::DEFALT, false);
             obj->SetEnabled(false);
             obj->AddComponent<UiEasingEnabledRemoveCom>();
         }
@@ -680,7 +697,7 @@ void ScenePVP::Update(float elapsedTime)
                 result->resultDatas[i] = data;
             }
 
-            SceneManager::Instance().ChangeSceneDelay(result, 2);
+            //SceneManager::Instance().ChangeSceneDelay(result, 2);
         }
     }
 
@@ -933,13 +950,17 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
                 if (!net1)continue;
                 net1->GetComponent<CharacterCom>()->SetStartCountDown(false);
             }
-            auto& p = GameObjectManager::Instance().Find("player");
             if (p)
                 p->GetComponent<CharacterCom>()->SetStartCountDown(false);
 
             auto& start = gameModeUI->GetChildFind("GameStart");
-            start->SetEnabled(true);
-            start->GetComponent<UiSystem>()->EasingPlay();
+            start->GetComponent<UiEasingEnabledRemoveCom>()->SetRemoveTimer(2);
+            auto& startB1 = gameModeUI->GetChildFind("GameStartBack1");
+            startB1->GetComponent<UiSystem>()->EasingPlay();
+            startB1->GetComponent<UiEasingEnabledRemoveCom>()->SetRemoveTimer(2);
+            auto& startB2 = gameModeUI->GetChildFind("GameStartBack2");
+            startB2->GetComponent<UiSystem>()->EasingPlay();
+            startB2->GetComponent<UiEasingEnabledRemoveCom>()->SetRemoveTimer(2);
         }
     }
 
