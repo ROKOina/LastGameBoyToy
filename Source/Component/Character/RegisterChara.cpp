@@ -273,6 +273,26 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             }
         }
     }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
+    }
 }
 
 //ファラ
@@ -398,6 +418,26 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
             cpuparticle->SetActive(false);
         }
     }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
+    }
 }
 
 void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
@@ -468,6 +508,18 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         smokeeffct->SetActive(false);
     }
 
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/santrat_body.gpuparticle", 1000);
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/santrat_body.gpuparticle", 1000);
+    }
+
     //自分かネットのプレイヤーで
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -497,6 +549,26 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
         }
+    }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
 }
 
@@ -552,6 +624,20 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/solder_ult_aura.gpuparticle", 2000);
         auto& spawn = ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
         spawn->SetParentObjectKun(obj);
+    }
+
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/matya_body.gpuparticle", 2000);
+        boost1->transform_->SetWorldPosition({ 1.180f,10.533f,-1.194f });
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/matya_body.gpuparticle", 2000);
+        boost2->transform_->SetWorldPosition({ -0.105f, 10.505f, -1.080f });
     }
 
     //ヒットスキャン
@@ -650,5 +736,25 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         std::shared_ptr<GameObject> beem = obj->AddChildObject();
         beem->SetName("beem_fire");
         beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_mainattack_fire.gpuparticle", 300);
+    }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
 }

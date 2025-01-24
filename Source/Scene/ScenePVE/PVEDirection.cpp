@@ -435,6 +435,7 @@ void PVEDirection::DirectionCTwo(float elaspdTime)
 
     if (!EventCameraManager::Instance().GetIsPlayEvent())
     {
+        GameObjectManager::Instance().Find("BOSS")->SetEnabled(false);
         directionNumber += 1;
         flag = false;
     }
@@ -451,6 +452,7 @@ void PVEDirection::DirectionCThi(float elapsedTime)
         GameObjectManager::Instance().Find("arm")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("head")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("shoulder")->GetComponent<MovementCom>()->SetGravity(0.98f);
+        
         flag = true;
     }
 

@@ -1383,56 +1383,65 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
             if (killflg)  //キルが発生しているなら
             {
                 //一回だけ通るように
-                if (kilogTimer[deathPID] > 0)continue;  //待機時間はcontinue
-
-                kilogTimer[deathPID] = 5;
-
-                //ここでキルログを出す
-                int killChara = -1;
-                DeathData  d;
-                //チームを見る
-                for (auto& chara : GameObjectManager::Instance().GetCharaObject())
+                if (kilogTimer[deathPID] < 0)
                 {
-                    if (!chara.lock())continue;
-                    auto& charaCom = chara.lock()->GetComponent<CharacterCom>();
+                    kilogTimer[deathPID] = 3;
 
-                    if (!charaCom)continue;
-
-                    //キル側
-                    if (charaCom->GetNetCharaData().GetNetPlayerID() == killPID)
+                    //ここでキルログを出す
+                    int killChara = -1;
+                    DeathData  d;
+                    //チームを見る
+                    for (auto& chara : GameObjectManager::Instance().GetCharaObject())
                     {
-                        killChara = charaCom->GetNetCharaData().GetCharaID();
-                    }
+                        if (!chara.lock())continue;
+                        auto& charaCom = chara.lock()->GetComponent<CharacterCom>();
 
-                    //デス側
-                    if (charaCom->GetNetCharaData().GetNetPlayerID() == deathPID)
-                    {
-                        //チームを比べる
-                        auto& p = GameObjectManager::Instance().Find("player");
-                        int pT = p->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
-                        int nT = charaCom->GetNetCharaData().GetTeamID();
-                        d.isEnemy = (pT != nT);
+                        if (!charaCom)continue;
 
-                        d.charaID = charaCom->GetNetCharaData().GetCharaID();
-
-                        //使用UIを決める
-                        int uiID = 0;
-                        for (auto& log : saveCharaKilog)
+                        //キル側
+                        if (charaCom->GetNetCharaData().GetNetPlayerID() == killPID)
                         {
-                            //後から追加される数を増やす
-                            log.second.moveData.underNum++;
-                            if (log.second.isEnemy != d.isEnemy)continue;   //同じチームが流れている場合は入る
+                            killChara = charaCom->GetNetCharaData().GetCharaID();
 
-                            if (log.second.moveData.id == 0)
-                                uiID = 1;
+                            //自分の場合
+                            if (std::strcmp(chara.lock()->GetName(), "player") == 0)
+                                d.myID = 0;
                         }
-                        if (uiID == 1)d.moveData.id = 0;
-                        else d.moveData.id = 1;
-                    }
-                }
 
-                //キルが起きたので一旦保存
-                saveCharaKilog[killChara] = d;
+                        //デス側
+                        if (charaCom->GetNetCharaData().GetNetPlayerID() == deathPID)
+                        {
+                            //自分の場合
+                            if (std::strcmp(chara.lock()->GetName(), "player") == 0)
+                                d.myID = 1;
+                            //チームを比べる
+                            auto& player = GameObjectManager::Instance().Find("player");
+                            auto& charaC = player->GetComponent<CharacterCom>();
+                            int pT = charaC->GetNetCharaData().GetTeamID();
+                            int nT = charaCom->GetNetCharaData().GetTeamID();
+                            d.isEnemy = (pT != nT);
+
+                            d.charaID = charaCom->GetNetCharaData().GetCharaID();
+
+                            //使用UIを決める
+                            int uiID = 0;
+                            for (auto& log : saveCharaKilog)
+                            {
+                                //後から追加される数を増やす
+                                log.second.moveData.underNum++;
+                                if (log.second.isEnemy != d.isEnemy)continue;   //同じチームが流れている場合は入る
+
+                                if (log.second.moveData.id == 0)
+                                    uiID = 1;
+                            }
+                            if (uiID == 1)d.moveData.id = 0;
+                            else d.moveData.id = 1;
+                        }
+                    }
+
+                    //キルが起きたので一旦保存
+                    saveCharaKilog[killChara] = d;
+                }
             }
             killflg = false;
         }
@@ -1447,7 +1456,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
     static const float stopY = 300; //停止位置
     static const float stopX = 3000; //停止位置
     static const float stopA = 0.6f; //停止透明色
-    static const float removeTime = 3; //消去時間
+    static const float removeTime = 5; //消去時間
 
     //敵味方、関係なく表示する
     auto& kilogView = [&](std::string parentObjName, std::pair<const int, DeathData>& data)
@@ -1476,6 +1485,10 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 Pspr->spc.color.w = 0;
                 c1spr->spc.color.w = 0;
                 c2spr->spc.color.w = 0;
+                if (data.second.myID == 0) //キルが自分
+                    c1spr->spc.color = { 1,0,0,0 };
+                if (data.second.myID == 1) //デスが自分
+                    c2spr->spc.color = { 1,0,0,0 };
 
                 //キャラIDを見て画像ずらす
                 c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.first;
@@ -1493,7 +1506,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
                 pos.y = Mathf::Lerp(pos.y, stopY, moveData.timer / inSlideTime);
                 parant->transform_->SetWorldPosition(pos);
-
+                
                 //色
                 Pspr->spc.color.w = Mathf::Lerp(Pspr->spc.color.w, stopA, moveData.timer / inSlideTime);
                 c1spr->spc.color.w = Mathf::Lerp(c1spr->spc.color.w, 1, moveData.timer / inSlideTime);
@@ -1519,7 +1532,10 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
             //削除申請
             if (moveData.timer > removeTime)
+            {
+                parant->SetEnabled(false);
                 removeID.emplace_back(data.first);
+            }
         };
 
     for (auto& log : saveCharaKilog)
@@ -1864,7 +1880,6 @@ void UI_KillEffect::Update(float elapsedTime)
                 effectFLGTimer = 3;
             }
 
-            killflg = false;
         }
     }
     EffectUpdat(elapsedTime);

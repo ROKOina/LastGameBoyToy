@@ -35,6 +35,7 @@
 #include "Math/easing.h"
 #include "Component\GameSystem\RespawnCom.h"
 #include "Component\System\CrownCom.h"
+#include "Component\System\pingCom.h"
 
 #include "Component/Renderer/InstanceRendererCom.h"
 
@@ -110,6 +111,25 @@ void ScenePVP::Initialize()
         }
     }
 
+    //ピン
+    for (int i = 0; i < 4; ++i)
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName(("ping" + std::to_string(i)).c_str());
+
+        obj->AddComponent<PingCom>();
+
+        auto& ray = obj->AddComponent<RayColliderCom>();
+        ray->SetMyTag(COLLIDER_TAG::pin);
+        ray->SetJudgeTag(COLLIDER_TAG::pinCharacter);
+
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/pingEff01.gpuparticle", 500);
+
+        auto& spr=obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/targetCharacter.ui", Sprite::SpriteShader::DEFALT, false);
+
+        obj->SetEnabled(false);
+    }
+
     //ロビー選択から始まる
     //InitializePVP();
     InitializeLobbySelect();
@@ -174,6 +194,9 @@ void ScenePVP::InitializeLobbySelect()
         //削除予定リストに追加
         tempRemoveObj.emplace_back(obj);
     }
+
+    //名前入力から始まる
+    fontState = 10;
 }
 
 void ScenePVP::InitializeLobby()
@@ -624,6 +647,9 @@ void ScenePVP::Update(float elapsedTime)
     }
     damages.clear();
 
+    //ピン
+    PingUpdate(elapsedTime);
+
     //終わり
     if (pvpGameSystem->IsGameEnd())
     {
@@ -940,6 +966,20 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     }
 }
 
+void ScenePVP::PingUpdate(float elapsedTime)
+{
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (GamePad::NAKA_BUTTON & gamePad.GetButtonDown())
+    {
+        int myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
+        auto& ping = GameObjectManager::Instance().Find(("ping" + std::to_string(myPlayerID)).c_str());
+        if (ping)
+        {
+            ping->GetComponent<PingCom>()->SetPing();
+        }
+    }
+}
+
 void ScenePVP::TransitionUpdate(float elapsedTime)
 {
     switch (lobbyState)
@@ -960,6 +1000,57 @@ void ScenePVP::TransitionUpdate(float elapsedTime)
         GameUpdate(elapsedTime);
 
         break;
+    }
+}
+
+void ScenePVP::FontInput(GameObj& fontObj)
+{
+    auto& font = fontObj->GetComponent<Font>();
+    //一文字削除
+    static bool BSflg = false;  //連続対処
+    bool BSOneFlg = false;
+    if (GetKeyState(8) & 0x8000)
+    {
+        BSOneFlg = true;
+        if (!BSflg)
+        {
+            if (font->str.length() > 0)
+                font->str.erase(font->str.end() - 1);
+        }
+    }
+    BSflg = BSOneFlg;
+
+    //文字入力
+    static bool inputFlg[26];  //連続対処
+    for (int i = 65; i < 91; ++i)
+    {
+        bool oneIn = false;
+        if (GetKeyState(i) & 0x8000)
+        {
+            oneIn = true;
+            if (!inputFlg[91 - i])
+            {
+                char a = char(i);
+                font->str.push_back(static_cast<wchar_t>(a));
+            }
+        }
+        inputFlg[91 - i] = oneIn;
+    }
+    //文字入力
+    static bool numFlg[10];  //連続対処
+    for (int i = 48; i < 58; ++i)
+    {
+        bool oneIn = false;
+        if (GetKeyState(i) & 0x8000)
+        {
+            oneIn = true;
+            if (!numFlg[58 - i])
+            {
+                char a = char(i);
+                font->str.push_back(static_cast<wchar_t>(a));
+            }
+        }
+        numFlg[58 - i] = oneIn;
     }
 }
 
@@ -1053,6 +1144,20 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
 
                         break;
                     }
+                    else if (f.id == 14)    //名前決定
+                    {
+                        auto& nameStr = fP->GetChildFind(("lobbySelectFont" + std::to_string(16)).c_str());  //文字
+                        auto& nameF = nameStr->GetComponent<Font>();
+
+                        if (nameF->str.length() > 0)
+                        {
+                            auto net = photonNet->GetPhotonLib();
+                            net->SetNetName(nameF->str);
+                            fontState = 0;
+                        }
+
+                        break;
+                    }
                     //ヒット情報リセット
                     for (auto& f : lobbySelectFont)
                     {
@@ -1076,53 +1181,16 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
 
             if (f.id == 2)  //入力用
             {
-                auto& font = fontObj->GetComponent<Font>();
-                //一文字削除
-                static bool BSflg = false;  //連続対処
-                bool BSOneFlg = false;
-                if (GetKeyState(8) & 0x8000)
-                {
-                    BSOneFlg = true;
-                    if (!BSflg)
-                    {
-                        if (font->str.length() > 0)
-                            font->str.erase(font->str.end() - 1);
-                    }
-                }
-                BSflg = BSOneFlg;
+                FontInput(fontObj);
+            }
+        }
+        if (fontState == 10)
+        {
+            gage->SetEnabled(true);
 
-                //文字入力
-                static bool inputFlg[26];  //連続対処
-                for (int i = 65; i < 91; ++i)
-                {
-                    bool oneIn = false;
-                    if (GetKeyState(i) & 0x8000)
-                    {
-                        oneIn = true;
-                        if (!inputFlg[91 - i])
-                        {
-                            char a = char(i);
-                            font->str.push_back(static_cast<wchar_t>(a));
-                        }
-                    }
-                    inputFlg[91 - i] = oneIn;
-                }
-                //文字入力
-                static bool numFlg[10];  //連続対処
-                for (int i = 48; i < 58; ++i)
-                {
-                    bool oneIn = false;
-                    if (GetKeyState(i) & 0x8000)
-                    {
-                        oneIn = true;
-                        if (!numFlg[58 - i])
-                        {
-                            char a = char(i);
-                            font->str.push_back(static_cast<wchar_t>(a));
-                        }
-                    }
-                    numFlg[58 - i] = oneIn;
-                }
+            if (f.id == 16)  //入力用
+            {
+                FontInput(fontObj);
             }
         }
     }
@@ -1153,6 +1221,7 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
             if (ui->GetHitSprite())
             {
                 GamePad& gamePad = Input::Instance().GetGamePad();
+                //if (GamePad::NAKA_BUTTON & gamePad.GetButtonDown())
                 if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
                 {
                     auto& lobbyStr = fP->GetChildFind(("lobbySelectFont" + std::to_string(2)).c_str());  //文字

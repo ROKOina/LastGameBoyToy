@@ -79,10 +79,36 @@ public:
     std::vector<DirectX::XMFLOAT3>& GetDamagePos() { return damagePostPos; }
     int& GetTeamNum(int id) { return teamNum[id]; }
 
+    //ピン関係
+    struct PinSendData
+    {
+        bool isPos = false;
+        //位置
+        DirectX::XMFLOAT3 pinPos = {};
+
+        //ターゲットデータ
+        int photonid;
+    };
+    void SendNetPing(PinSendData data) {
+        pinNum = 3;
+        pinSend = data;
+    }
+    bool GetNetPing(PinSendData& data) {
+        if (pinNum < 0)return false;
+
+        data = pinSend;
+        pinNum--;
+        return true;
+    }
+
 private:
     std::vector<SaveBuffer> saveBuffer[5];
     bool deathID[4] = {};    //キルされた相手を保存
     bool killlog[4][4] = {};    //[キルID][デスID]
     std::vector<DirectX::XMFLOAT3> damagePostPos = {};
     int teamNum[4] = { -1,-1,-1,-1 };    //[]playerID  0:赤 1:青 -1:なし
+
+    //ピン関係
+    int pinNum = -1;
+    PinSendData pinSend;
 };

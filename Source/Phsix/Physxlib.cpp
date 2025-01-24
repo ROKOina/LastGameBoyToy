@@ -258,7 +258,6 @@ physx::PxShape* PhysXLib::MakeShape(RigidData& data)
     case PhysXLib::ShapeType::Sphere:
         return Make_SphereShape(data);
         break;
-
     case PhysXLib::ShapeType::Cupsule:
         break;
     case PhysXLib::ShapeType::Sylnder:

@@ -11,6 +11,9 @@ public:
     void SetNetPlayerID(int id) { netPlayerID = id; }
     int GetNetPlayerID() { return netPlayerID; }
 
+    void SetNetPhotonID(int id) { netPhotonID = id; }
+    int GetNetPhotonID() { return netPhotonID; }
+
     void SetTeamID(int id) { teamID = id; }
     int GetTeamID() { return teamID; }
 
@@ -28,6 +31,7 @@ public:
 private:
     int teamID = 0;   //自分のチーム
     int netPlayerID = 0;//どのクライアントがこのキャラを担当するか
+    int netPhotonID = 0;
     int charaID;    //キャラクター識別用
     bool myChara = false;
 

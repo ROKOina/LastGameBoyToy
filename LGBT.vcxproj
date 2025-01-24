@@ -125,6 +125,7 @@
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
     <ClInclude Include="Source\Component\System\CrownCom.h" />
+    <ClInclude Include="Source\Component\System\pingCom.h" />
     <ClInclude Include="Source\Component\UI\UiEasingEnabledRemove.h" />
     <ClInclude Include="Source\Graphics\Video.h" />
     <ClInclude Include="Source\PvPUi\CharaPicks.h" />

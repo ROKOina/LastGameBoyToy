@@ -4,6 +4,7 @@
 #include "Component\SkillObj\JankratMineCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Renderer\RendererCom.h"
 
 JankratCharacterCom::~JankratCharacterCom()
 {
@@ -44,6 +45,19 @@ void JankratCharacterCom::Update(float elapsedTime)
 
     //後処理
     EraseHaveObjects();
+
+    //足にエフェクトを付与
+    {
+        //ブーストエフェクト1、２
+        {
+            const auto& footpos = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNode("R_foot2");
+            GetGameObject()->GetChildFind("Boost1")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
+        }
+        {
+            const auto& footpos = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNode("L_foot2");
+            GetGameObject()->GetChildFind("Boost2")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
+        }
+    }
 }
 
 void JankratCharacterCom::MainAttackDown()

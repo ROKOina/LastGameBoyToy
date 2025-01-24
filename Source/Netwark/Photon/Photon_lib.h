@@ -86,6 +86,8 @@ public:
 
     void SetRoomName(std::wstring wstr) { roomName = WStringToString(wstr); }
 
+    void SetNetName(std::wstring wstr) { netName = WStringToString(wstr); }
+
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
 

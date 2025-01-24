@@ -51,8 +51,13 @@ private:
     //ゲームシステム更新
     void GameSystemUpdate(float elapsedTime);
 
+    //ピン
+    void PingUpdate(float elapsedTime);
+
     //画面に応じた更新処理
     void TransitionUpdate(float elapsedTime);
+
+    void FontInput(GameObj& fontObj);
 
     //ロビー選択時
     void LobbySelectFontUpdate(float elapsedTime);  //fontUpdate
@@ -110,6 +115,11 @@ private:
         LobbySelectFont(12,L"入室",{1203,624},1.5f,true,2),
 
         LobbySelectFont(13,L"部屋参加",{76,54},2,false,2),
+
+        LobbySelectFont(14,L"決定",{1203,624},1.5f,true,10),
+        LobbySelectFont(15,L"名前",{465,223},1,false,10),
+        LobbySelectFont(16,L"",{784,223},1,false,10),   //ロビー名打ち込み用
+        LobbySelectFont(17,L"名前入力",{76,54},2,false,10),
 
         //ロビー名用
         LobbySelectFont(20,L"",{536,218},1.0f,true,2),
