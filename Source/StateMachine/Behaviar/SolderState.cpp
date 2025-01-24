@@ -31,11 +31,6 @@ void Solder_MainAttackState::Enter()
     DirectX::XMFLOAT3 end = start + front * 100;
 
     //エフェクト再生
-    //auto& beem = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("Beem");
-    //beem->transform_->SetWorldPosition(start);
-    //beem->GetComponent<GPUParticle>()->Play();
-
-    //エフェクト再生
     owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
 
     //レイキャスト有効化
@@ -82,11 +77,6 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
         DirectX::XMFLOAT3 end = start + front * 100;
 
         //エフェクト再生
-        //auto& beem = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("Beem");
-        //beem->transform_->SetWorldPosition(start);
-        //beem->GetComponent<GPUParticle>()->Play();
-
-        //エフェクト再生
         owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
 
         //レイキャスト有効化
@@ -130,10 +120,6 @@ void Solder_MainAttackState::ImGui()
 #pragma region ult攻撃
 void Solder_UltState::Enter()
 {
-    //レイキャストのリセット
-    //rayobj = owner->GetGameObject()->GetChildFind("mainattack");
-    //rayobj.reset();
-
     //ウルトオブジェクトを更新
     auto& ultobj = owner->GetGameObject()->GetChildFind("UltObject");
     ultobj->GetComponent<GPUParticle>()->SetLoop(true);

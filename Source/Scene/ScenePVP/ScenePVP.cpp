@@ -130,6 +130,14 @@ void ScenePVP::Initialize()
         obj->SetEnabled(false);
     }
 
+    //画像
+    {
+        std::shared_ptr<GameObject> stanSpr = GameObjectManager::Instance().Create();
+        stanSpr->SetName("stanSpr");
+        stanSpr->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/StanSpr.ui", Sprite::SpriteShader::DEFALT, false);
+        stanSpr->SetEnabled(false);
+    }
+
     //ロビー選択から始まる
     //InitializePVP();
     InitializeLobbySelect();
@@ -660,21 +668,21 @@ void ScenePVP::Update(float elapsedTime)
 
         //仮遷移
        //if (!SceneManager::Instance().GetTransitionFlag())
-       //{
-       //    SceneResult* result = new SceneResult;
-       //
-       //    //ここでリザルトに送るデータを作る
-       //    for (int i = 0; i < 4; i++)
-       //    {
-       //        SceneResult::ResultData data;
-       //        data.charaID;
-       //        data.playerName = std::to_string(i) + "_player";
-       //
-       //        result->resultDatas[i] = data;
-       //    }
-       //
-       //    SceneManager::Instance().ChangeSceneDelay(result, 2);
-       //}
+      {
+          SceneResult* result = new SceneResult;
+      
+          //ここでリザルトに送るデータを作る
+          for (int i = 0; i < 4; i++)
+          {
+              SceneResult::ResultData data;
+              data.charaID;
+              data.playerName = std::to_string(i) + "_player";
+      
+              result->resultDatas[i] = data;
+          }
+      
+          SceneManager::Instance().ChangeSceneDelay(result, 5);
+      }
     }
 
     //画面切り替え処理

@@ -485,6 +485,7 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
 
     //’e
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
+    bulletCom->SetCharaGameObj(parent);
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
@@ -614,6 +615,7 @@ GameObj BulletCreate::JankratUlt(std::shared_ptr<GameObject> parent, DirectX::XM
 
     //’e
     std::shared_ptr<JankratBulletCom> bulletCom = bullet->AddComponent<JankratBulletCom>();
+    bulletCom->SetCharaGameObj(parent);
 
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
