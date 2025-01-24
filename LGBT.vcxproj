@@ -127,6 +127,7 @@
     <ClInclude Include="Source\Component\System\CrownCom.h" />
     <ClInclude Include="Source\Component\System\pingCom.h" />
     <ClInclude Include="Source\Component\UI\UiEasingEnabledRemove.h" />
+    <ClInclude Include="Source\Component\UI\UiMove.h" />
     <ClInclude Include="Source\Graphics\Video.h" />
     <ClInclude Include="Source\PvPUi\CharaPicks.h" />
     <ClInclude Include="External\DirectXTex\DDS.h" />
@@ -261,7 +262,6 @@
     <ClInclude Include="Source\Scene\ScenePVE\PVEDirection.h" />
     <ClInclude Include="Source\Scene\ScenePVE\ScenePVE.h" />
     <ClInclude Include="Source\Scene\ScenePVP\ScenePVP.h" />
-    <ClInclude Include="Source\Scene\SceneReslut.h" />
     <ClInclude Include="Source\Scene\SceneResult\SceneResult.h" />
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
@@ -293,6 +293,7 @@
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
     <ClCompile Include="Source\Component\System\CrownCom.cpp" />
+    <ClCompile Include="Source\Component\UI\UiMove.cpp" />
     <ClCompile Include="Source\Graphics\Video.cpp" />
     <ClCompile Include="Source\PvPUi\CharaPicks.cpp" />
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />

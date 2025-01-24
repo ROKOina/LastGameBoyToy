@@ -32,7 +32,7 @@ class UI_HPEffect : public UiSystem
 {
     //コンポーネントオーバーライド
 public:
-    UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion,int gaugeTexSize,std::weak_ptr<GameObject> obj,int num);
+    UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion, int gaugeTexSize, std::weak_ptr<GameObject> obj, int num);
     ~UI_HPEffect() {}
 
     // 名前取得
@@ -55,7 +55,30 @@ private:
 
     bool easingFLG = false;
     bool onceFLG = false;
-}; 
+
+    bool isDebug = false;
+};
+
+class UI_PlayerHpUI :public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_PlayerHpUI();
+    ~UI_PlayerHpUI() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_PlayerHp"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+private:
+    float* hp;
+    std::weak_ptr<GameObject> player;
+};
 
 class UI_BoosGauge : public Component
 {
@@ -235,7 +258,7 @@ public:
     void GaugeUpdate(float elapsedTime);
 
     //登録
-    void Register();
+    void Register(std::weak_ptr<GameObject> obj);
 
     void OnGUI()override {};
 private:
@@ -244,9 +267,11 @@ private:
 
     float oldHp = 0.0f;
     float timer = 0.0f;
-    const float time = 1.0f;
+    const float time = 0.5f;
 
     std::shared_ptr<GameObject> enemyHp;
+
+    float* hp;
 };
 
 class UI_GameJudge : public Component
@@ -257,15 +282,19 @@ public:
     ~UI_GameJudge() {}
 
     // 名前取得
-    const char* GetName() const override { return "UI_BoostGauge"; }
+    const char* GetName() const override { return "UI_GameJudge"; }
 
     // 開始処理
     void Start() override;
 
     // 更新処理
     void Update(float elapsedTime) override;
+
+    void OnGUI()override;
 private:
     std::vector<std::weak_ptr<GameObject>> circles;
+    int state = 0;
+    float fadeTimr = 0.0f;
 };
 
 class UI_UltNum : public Component
@@ -444,10 +473,8 @@ public:
 
     //ウルトUI
     void CreateUltUI();
-
     //HPUI
     void CreateHpUI();
-
     //ブーストUI
     void CreateBoostUI();
 

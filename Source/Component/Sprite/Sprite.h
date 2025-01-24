@@ -159,6 +159,9 @@ public:
     void SetOrderinLayer(int num) { orderinLayer = num; }
     int GetOrderinLayer() { return orderinLayer; }
 
+    void SetIsParentMove(bool flag) { isParentMove = flag; }
+    void SetParentPosOffset(DirectX::XMFLOAT3 pos) { parentPosOffset.x = pos.x; parentPosOffset.y = pos.y; }
+     
 private:
 
     //í∏ì_ç\ë¢ëÃ
@@ -205,4 +208,7 @@ private:
     int orderinLayer = 0;
 
     DirectX::XMFLOAT2 collisionPivot;
+
+    bool isParentMove = false;
+    DirectX::XMFLOAT3 parentPosOffset = {};
 };

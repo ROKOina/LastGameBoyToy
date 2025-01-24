@@ -113,8 +113,6 @@ void PVEDirection::CharaSlect(float elapsedTime)
             GameObjectManager::Instance().Find("Reactar1")->SetEnabled(true);
             GameObjectManager::Instance().Find("Reactar2")->SetEnabled(true);
             GameObjectManager::Instance().Find("Reactar3")->SetEnabled(true);
-            //GameObjectManager::Instance().Find("cameraPostPlayer")->SetEnabled(true);
-            //GameObjectManager::Instance().Find("armChild")->SetEnabled(true);
 
             CharaSelectFlag = true;
             flag = false;
@@ -452,7 +450,7 @@ void PVEDirection::DirectionCThi(float elapsedTime)
         GameObjectManager::Instance().Find("arm")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("head")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("shoulder")->GetComponent<MovementCom>()->SetGravity(0.98f);
-        
+
         flag = true;
     }
 

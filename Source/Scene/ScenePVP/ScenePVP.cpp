@@ -682,23 +682,24 @@ void ScenePVP::Update(float elapsedTime)
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
+
         //仮遷移
-        if (!SceneManager::Instance().GetTransitionFlag())
-        {
-            SceneResult* result = new SceneResult;
-
-            //ここでリザルトに送るデータを作る
-            for (int i = 0; i < 4; i++)
-            {
-                SceneResult::ResultData data;
-                data.charaID;
-                data.playerName = std::to_string(i) + "_player";
-
-                result->resultDatas[i] = data;
-            }
-
-            //SceneManager::Instance().ChangeSceneDelay(result, 2);
-        }
+       //if (!SceneManager::Instance().GetTransitionFlag())
+      {
+          SceneResult* result = new SceneResult;
+      
+          //ここでリザルトに送るデータを作る
+          for (int i = 0; i < 4; i++)
+          {
+              SceneResult::ResultData data;
+              data.charaID;
+              data.playerName = std::to_string(i) + "_player";
+      
+              result->resultDatas[i] = data;
+          }
+      
+          SceneManager::Instance().ChangeSceneDelay(result, 5);
+      }
     }
 
     //画面切り替え処理
