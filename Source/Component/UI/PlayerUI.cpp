@@ -1145,7 +1145,6 @@ void PlayerUIManager::CreateUltUI()
 
 void PlayerUIManager::CreateHpUI()
 {
-
     std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
     //HpFrame
     {
@@ -1226,10 +1225,10 @@ void PlayerUIManager::CreateHpUI()
         std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
         playerName->SetName("PlayerName");
         std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->scale = 0.75f;
-        font->color = { 1,1,1,1.0f };       
+        font->scale = 0.6f;
+        font->color = { 1,1,1,1.0f };
+        font->position = { 177.0f,942.0f };
         font->str = UTF8ToWString3(playerObj->GetComponent<CharacterCom>()->GetNetCharaData().GeNetName());  //L付けてね
-        font->position = { 252.0f,814.0f };
     }
 }
 
@@ -1273,7 +1272,6 @@ void PlayerUIManager::CreatePlayerIcon()
 void PlayerUIManager::CreateGunIcon()
 {
     //ロードするテクスチャを設定
-    //std::string name = "Data/Texture/PlayerUI/GunIcon/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + ".png";
     std::string name = "Data/Texture/PlayerUI/weapon_icon.png";
 
     {
@@ -1818,10 +1816,10 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
         playerName->SetName("PlayerName");
         std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->scale = 0.75f;
+        font->scale = 0.6f;
         font->color = { 1,1,1,1.0f };
         font->str = UTF8ToWString3(netPlayer.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GeNetName());  //L付けてね
-        font->position = { 252.0f,814.0f };
+        font->position = { 176.0f,948.0f };
     }
 }
 

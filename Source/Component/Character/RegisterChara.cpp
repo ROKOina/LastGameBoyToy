@@ -276,11 +276,10 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
                 std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
                 stanEff->SetName("stanEff");
                 stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
-                auto& gpuP=stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
                 gpuP->SetLoop(false);
             }
         }
-
     }
 
     //敵の場合はピン用の当たりを設定
@@ -757,13 +756,6 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
                 auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
                 gpuP->SetLoop(false);
             }
-        }
-
-        //ビームエフェクト
-        {
-            std::shared_ptr<GameObject>beem = cameraPost->AddChildObject();
-            beem->SetName("Beem");
-            beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beem.gpuparticle", 2000);
         }
     }
 
