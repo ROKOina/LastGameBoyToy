@@ -77,6 +77,14 @@ struct AUDIO_STATE
 
 };
 
+enum AUDIOID2D
+{
+    BGM2D,
+    SE2D,
+
+    MAX2D
+};
+
 // オーディオソース
 class AudioSource3D : public Component
 {
@@ -114,7 +122,43 @@ private:
 
     DirectX::XMFLOAT3 listenerPos;
     DirectX::XMFLOAT3 emitterPos;
+
     AUDIO_STATE  g_audioState;
+};
+
+class AudioSource2D : public Component
+{
+public:
+    AudioSource2D();
+    ~AudioSource2D() override;
+
+    void Start() override {};
+    void Update(float elapsedTime) override {};
+
+    const char* GetName() const override { return "Audio2D"; }
+    void OnGUI() override {}
+
+    // オーディオ呼び出し関数
+    void SetAudio2D(AUDIOID2D id);
+
+    // 再生
+    void Audio2DPlay();
+    void Audio2DPlay(float volume, bool loop = false);
+private:
+    // オーディオ登録
+    void RegisterAudio2D();
+
+public:
+    IXAudio2SourceVoice* sourceVoice_ = nullptr;
+    std::shared_ptr<AudioResource>	resource_;
+
+private:
+    Microsoft::WRL::ComPtr<IXAudio2> xaudio;
+    IXAudio2MasteringVoice* masteringVoice = nullptr;
+
+    std::map<AUDIOID2D, std::shared_ptr<AudioResource>> audioResources;
+
+    bool audioChangeFlg = false;
 };
 
 

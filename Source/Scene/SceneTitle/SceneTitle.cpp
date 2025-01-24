@@ -171,17 +171,13 @@ void SceneTitle::Initialize()
     //    audioObj.lock()->FeedStart("Title", 0.5f, 0.1f);
     //}
 
-    //{
-    //    GameObj audio = GameObjectManager::Instance().Create();
-    //    audio->SetName("Audio");
-    //    audioSource = audio->AddComponent<AudioSourceCom>();
-    //    audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::BGM));
-    //    audioSource.lock()->AddAudio(static_cast<int>(AUDIOID::SE));
-
-    //    audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
-    //    //audioSource->AudioPlay(static_cast<int>(AUDIOID::BGM), true);
-    //    //audioSource->FeedStart(static_cast<int>(AUDIOID::BGM), 0.5f, 0.1f);
-    //}
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Audio");
+        auto& a2d = audio->AddComponent<AudioSource2D>();
+        a2d->SetAudio2D(AUDIOID2D::BGM2D);
+        a2d->Audio2DPlay();
+    }
 
     {
         GameObj audio = GameObjectManager::Instance().Create();

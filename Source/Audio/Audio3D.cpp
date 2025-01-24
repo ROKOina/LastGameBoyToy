@@ -417,7 +417,6 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
 
 void AudioSource3D::SetAudio(AUDIOIDTEST id)
 {
-    //resource_ = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
     resource_ = audioResources[id];
 
     if (resource_ != nullptr)
@@ -445,9 +444,6 @@ void AudioSource3D::SetAudio(AUDIOIDTEST id)
         // create the source voice
         HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, pwfx, 0, 2.0f, nullptr, &sendList);
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-        //HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
-        //_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 }
 
@@ -468,4 +464,105 @@ void AudioSource3D::AudioPlay()
     sourceVoice_->Start(0);
 
     g_audioState.nFrameToApply3DAudio = 0;
+}
+
+
+AudioSource2D::AudioSource2D()
+{
+    HRESULT hr;
+    // COMの初期化
+    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+    UINT32 createFlags = 0;
+#if defined(DEBUG) || defined(_DEBUG)
+    //createFlags |= XAUDIO2_DEBUG_ENGINE;
+#endif
+    // XAudio初期化
+    hr = XAudio2Create(&xaudio, createFlags);
+    // マスタリングボイス生成
+    hr = xaudio->CreateMasteringVoice(&masteringVoice);
+
+    // オーディオ登録情報
+    RegisterAudio2D();
+}
+
+AudioSource2D::~AudioSource2D()
+{
+    resource_.reset();
+
+    for (auto& pair : audioResources)
+    {
+        pair.second.reset();
+    }
+    audioResources.clear();
+
+    // マスタリングボイス破棄
+    if (masteringVoice != nullptr)
+    {
+        masteringVoice->DestroyVoice();
+        masteringVoice = nullptr;
+    }
+
+    // XAudio終了化
+    if (xaudio != nullptr)
+    {
+        xaudio->Release();
+        xaudio = nullptr;
+    }
+
+    // COM終了化
+    CoUninitialize();
+}
+
+void AudioSource2D::SetAudio2D(AUDIOID2D id)
+{
+    resource_ = audioResources[id];
+
+    if (resource_ == nullptr) return;
+
+    if (sourceVoice_)
+    {
+        sourceVoice_->Stop(0);
+        sourceVoice_->DestroyVoice();
+        sourceVoice_ = 0;
+    }
+
+    const WAVEFORMATEX* pwfx = &resource_->GetWaveFormat();
+    const uint8_t* sampleData = resource_->GetAudioData();
+    uint32_t waveSize = resource_->GetAudioBytes();
+
+    // 2Dオーディオ
+    HRESULT hr = xaudio->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+}
+
+void AudioSource2D::Audio2DPlay()
+{
+    XAUDIO2_BUFFER buffer = {};
+    buffer.AudioBytes = resource_->GetAudioBytes();
+    buffer.pAudioData = resource_->GetAudioData();
+    buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+    sourceVoice_->SubmitSourceBuffer(&buffer);
+    sourceVoice_->Start(0);
+}
+
+void AudioSource2D::Audio2DPlay(float volume, bool loop)
+{
+    XAUDIO2_BUFFER buffer = {};
+    buffer.AudioBytes = resource_->GetAudioBytes();
+    buffer.pAudioData = resource_->GetAudioData();
+    buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+    sourceVoice_->SubmitSourceBuffer(&buffer);
+    sourceVoice_->Start();
+    sourceVoice_->SetVolume(volume * 0.1f);
+}
+
+void AudioSource2D::RegisterAudio2D()
+{
+    audioResources[AUDIOID2D::BGM2D] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
+    audioResources[AUDIOID2D::SE2D] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
 }
