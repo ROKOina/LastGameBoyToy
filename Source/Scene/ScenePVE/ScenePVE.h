@@ -29,6 +29,12 @@ public:
 
     //–¼‘Oæ“¾
     std::string GetName() const override { return "ScenePVE"; };
+
+private:
+
+    //ƒ{ƒX‚Ì—‰º‘Îô
+    void BossCountermeasure();
+
 private:
     GameObj audioObj;
     std::unique_ptr<BasicsApplication> photonNet;
@@ -36,4 +42,6 @@ private:
     bool battleClymax = false;
 
     bool flag = false;
+
+    DirectX::XMFLOAT3 SpawnPos = { 0,8.0f,0 };
 };
