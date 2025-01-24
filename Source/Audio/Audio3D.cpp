@@ -351,6 +351,8 @@ void AudioSource3D::RegisterAudio()
 
 void AudioSource3D::UpdateAudio3d(float elapsedTime)
 {
+    if (!audioChangeFlg) return;
+
     {
         // Calculate listener orientation in x-z plane
         if (g_audioState.vListenerPos.x != g_audioState.listener.Position.x
@@ -454,10 +456,10 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
     }
 }
 
-void AudioSource3D::SetAudio(AUDIOIDTEST id)
+void AudioSource3D::SetAudio(AUDIOIDTEST id, bool flg)
 {
-    //resource_ = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
     resource_ = audioResources[id];
+    audioChangeFlg = flg;
 
     if (resource_ != nullptr)
     {
@@ -473,20 +475,28 @@ void AudioSource3D::SetAudio(AUDIOIDTEST id)
         const uint8_t* sampleData = resource_->GetAudioData();
         uint32_t waveSize = resource_->GetAudioBytes();
 
-        // Play the wave using a source voice that sends to both the submix and mastering voices
-        XAUDIO2_SEND_DESCRIPTOR sendDescriptors[2];
-        sendDescriptors[0].Flags = XAUDIO2_SEND_USEFILTER; // LPF direct-path
-        sendDescriptors[0].pOutputVoice = g_audioState.pMasteringVoice;
-        sendDescriptors[1].Flags = XAUDIO2_SEND_USEFILTER; // LPF reverb-path -- omit for better performance at the cost of less realistic occlusion
-        sendDescriptors[1].pOutputVoice = g_audioState.pSubmixVoice;
-        const XAUDIO2_VOICE_SENDS sendList = { 2, sendDescriptors };
+        // チェンジ
+        if (!flg)
+        {
+            // 2Dオーディオ
+            HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
+            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        }
+        else
+        {
+            // 3Dオーディオ
+            // Play the wave using a source voice that sends to both the submix and mastering voices
+            XAUDIO2_SEND_DESCRIPTOR sendDescriptors[2];
+            sendDescriptors[0].Flags = XAUDIO2_SEND_USEFILTER; // LPF direct-path
+            sendDescriptors[0].pOutputVoice = g_audioState.pMasteringVoice;
+            sendDescriptors[1].Flags = XAUDIO2_SEND_USEFILTER; // LPF reverb-path -- omit for better performance at the cost of less realistic occlusion
+            sendDescriptors[1].pOutputVoice = g_audioState.pSubmixVoice;
+            const XAUDIO2_VOICE_SENDS sendList = { 2, sendDescriptors };
 
-        // create the source voice
-        HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, pwfx, 0, 2.0f, nullptr, &sendList);
-        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-        //HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
-        //_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+            // create the source voice
+            HRESULT hr = g_audioState.pXAudio2->CreateSourceVoice(&sourceVoice_, pwfx, 0, 2.0f, nullptr, &sendList);
+            _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        }
     }
 }
 
@@ -507,4 +517,109 @@ void AudioSource3D::AudioPlay()
     sourceVoice_->Start(0);
 
     g_audioState.nFrameToApply3DAudio = 0;
+}
+
+
+AudioSource2D::AudioSource2D()
+{
+    HRESULT hr;
+    // COMの初期化
+    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+    UINT32 createFlags = 0;
+#if defined(DEBUG) || defined(_DEBUG)
+    //createFlags |= XAUDIO2_DEBUG_ENGINE;
+#endif
+    // XAudio初期化
+    hr = XAudio2Create(&xaudio, createFlags);
+    // マスタリングボイス生成
+    hr = xaudio->CreateMasteringVoice(&masteringVoice);
+
+    // オーディオ登録情報
+    RegisterAudio2D();
+}
+
+AudioSource2D::~AudioSource2D()
+{
+    resource_.reset();
+
+    for (auto& pair : audioResources)
+    {
+        pair.second.reset();
+    }
+    audioResources.clear();
+
+    // マスタリングボイス破棄
+    if (masteringVoice != nullptr)
+    {
+        masteringVoice->DestroyVoice();
+        masteringVoice = nullptr;
+    }
+
+    // XAudio終了化
+    if (xaudio != nullptr)
+    {
+        xaudio->Release();
+        xaudio = nullptr;
+    }
+
+    // COM終了化
+    CoUninitialize();
+}
+
+void AudioSource2D::SetAudio2D(AUDIOID2D id)
+{
+    resource_ = audioResources[id];
+
+    if (resource_ != nullptr) return;
+
+    if (sourceVoice_)
+    {
+        sourceVoice_->Stop(0);
+        sourceVoice_->DestroyVoice();
+        sourceVoice_ = 0;
+    }
+
+    const WAVEFORMATEX* pwfx = &resource_->GetWaveFormat();
+    const uint8_t* sampleData = resource_->GetAudioData();
+    uint32_t waveSize = resource_->GetAudioBytes();
+
+    // 2Dオーディオ
+    HRESULT hr = xaudio->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
+    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+}
+
+void AudioSource2D::Audio2DPlay()
+{
+    if (!g_audioState.bInitialized) return;
+
+    XAUDIO2_BUFFER buffer = {};
+    buffer.AudioBytes = resource_->GetAudioBytes();
+    buffer.pAudioData = resource_->GetAudioData();
+    buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+    sourceVoice_->SubmitSourceBuffer(&buffer);
+    sourceVoice_->Start(0);
+}
+
+void AudioSource2D::Audio2DPlay(float volume, bool loop)
+{
+    if (!g_audioState.bInitialized) return;
+
+    XAUDIO2_BUFFER buffer = {};
+    buffer.AudioBytes = resource_->GetAudioBytes();
+    buffer.pAudioData = resource_->GetAudioData();
+    buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+    sourceVoice_->SubmitSourceBuffer(&buffer);
+    sourceVoice_->Start();
+    sourceVoice_->SetVolume(volume * 0.1f);
+}
+
+void AudioSource2D::RegisterAudio2D()
+{
+    audioResources[AUDIOID2D::BGM2D] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
+    audioResources[AUDIOID2D::SE2D] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
 }
