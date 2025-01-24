@@ -526,6 +526,18 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         smokeeffct->SetActive(false);
     }
 
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/santrat_body.gpuparticle", 1000);
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/santrat_body.gpuparticle", 1000);
+    }
+
     //自分かネットのプレイヤーで
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -639,6 +651,20 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/solder_ult_aura.gpuparticle", 2000);
         auto& spawn = ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
         spawn->SetParentObjectKun(obj);
+    }
+
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/matya_body.gpuparticle", 2000);
+        boost1->transform_->SetWorldPosition({ 1.180f,10.533f,-1.194f });
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/matya_body.gpuparticle", 2000);
+        boost2->transform_->SetWorldPosition({ -0.105f, 10.505f, -1.080f });
     }
 
     //ヒットスキャン

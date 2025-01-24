@@ -1185,6 +1185,18 @@ void PlayerUIManager::CreateHpUI()
             std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, player, i);
         }
     }
+
+    //自身の名前
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
+        playerName->SetName("PlayerName");
+        std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->scale = 0.75f;
+        font->color = { 1,1,1,1.0f };
+        //font->str = ;  //L付けてね
+        font->position = { 252.0f,814.0f };
+    }
 }
 
 void PlayerUIManager::CreateBoostUI()
@@ -1458,7 +1470,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
                 pos.y = Mathf::Lerp(pos.y, stopY, moveData.timer / inSlideTime);
                 parant->transform_->SetWorldPosition(pos);
-                
+
                 //色
                 Pspr->spc.color.w = Mathf::Lerp(Pspr->spc.color.w, stopA, moveData.timer / inSlideTime);
                 c1spr->spc.color.w = Mathf::Lerp(c1spr->spc.color.w, 1, moveData.timer / inSlideTime);
@@ -1765,6 +1777,18 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         std::shared_ptr<UiSystem>iconUi = icon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/AllyIcon.ui", Sprite::SpriteShader::DEFALT, false);
         iconUi->LoadTexture(name);
     }
+
+    //味方のネットの名前
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
+        std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
+        playerName->SetName("PlayerName");
+        std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->scale = 0.75f;
+        font->color = { 1,1,1,1.0f };
+        //font->str = netPlayer.lock()->;  //L付けてね
+        font->position = { 252.0f,814.0f };
+    }
 }
 
 void PlayerUIManager::CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam)
@@ -1796,7 +1820,15 @@ void UI_SkillComp::Update(float elapsedTime)
 {
     std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
     auto& playerchara = player->GetComponent<CharacterCom>();
-    GetGameObject()->GetComponent<UiSystem>()->SetEnabled(playerchara->IsSkillJustCooled(skill, 0.5f));
+    GetGameObject()->GetComponent<UiSystem>()->SetEnabled(playerchara->IsSkillJustCooled(skill, 0.2f));
+
+    //コマ数初期化
+    if (!playerchara->GetCoolFlag(skill))
+    {
+        auto& s = GetGameObject()->GetComponent<Sprite>();
+        s->SetColumns(10);
+        s->SetRows(1);
+    }
 }
 
 void UI_DeathComp::Update(float elapsedTime)
@@ -1853,7 +1885,6 @@ void UI_KillEffect::Update(float elapsedTime)
                 effectFLG = true;
                 effectFLGTimer = 3;
             }
-
         }
     }
     EffectUpdat(elapsedTime);

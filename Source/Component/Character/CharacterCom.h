@@ -202,6 +202,7 @@ public:
     void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
     bool IsSkillJustCooled(SkillCoolID id, float limittime);
+    bool GetCoolFlag(SkillCoolID id) { return skillCools[id].coolflag; }
 
     //ネット関連変数ゲッター
     NetCharaData& GetNetCharaData() { return netCharaData; }
