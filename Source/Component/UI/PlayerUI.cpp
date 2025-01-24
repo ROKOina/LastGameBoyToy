@@ -1416,6 +1416,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
             auto& parant = canvas->GetChildFind((parentObjName + std::to_string(moveData.id)).c_str());
             auto& c01 = parant->GetChildFind("charaView01");
             auto& c02 = parant->GetChildFind("charaView02");
+            auto& bow = parant->GetChildFind("Bow");
 
             auto& Pspr = parant->GetComponent<UiSystem>();
             auto& c1spr = c01->GetComponent<UiSystem>();
@@ -1430,6 +1431,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 parant->transform_->SetWorldPosition({ 1760,500,0 });
                 c01->transform_->SetLocalPosition({ 80,0,0 });
                 c02->transform_->SetLocalPosition({ 380,0,0 });
+                bow->transform_->SetLocalPosition({ 0,0,0 });
 
                 //‚¢[‚¶‚ñ‚®‰Šú‚©
                 Pspr->spc.color.w = 0;
@@ -1524,6 +1526,12 @@ void PlayerUIManager::CreateKillLog()
             ally02->SetName("charaView02");
             ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
         }
+        //–îˆó
+        {
+            std::shared_ptr<GameObject> allyBow = allyBack->AddChildObject();
+            allyBow->SetName("Bow");
+            allyBow->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/logBow.ui", Sprite::SpriteShader::DEFALT, false);
+        }
     }
 
     //“G—p
@@ -1544,6 +1552,12 @@ void PlayerUIManager::CreateKillLog()
             std::shared_ptr<GameObject> ally02 = enemyBack->AddChildObject();
             ally02->SetName("charaView02");
             ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //–îˆó
+        {
+            std::shared_ptr<GameObject> enemyBow = enemyBack->AddChildObject();
+            enemyBow->SetName("Bow");
+            enemyBow->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/logBow.ui", Sprite::SpriteShader::DEFALT, false);
         }
     }
 }
