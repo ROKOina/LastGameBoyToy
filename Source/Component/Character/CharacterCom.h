@@ -202,6 +202,7 @@ public:
     void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
     bool IsSkillJustCooled(SkillCoolID id, float limittime);
+    bool GetCoolFlag(SkillCoolID id) { return skillCools[id].coolflag; }
 
     //ネット関連変数ゲッター
     NetCharaData& GetNetCharaData() { return netCharaData; }
@@ -277,6 +278,7 @@ protected:
     bool useMoveFlag = true;//falseにするとmoveStateを使わない
     float jumpPower = 3.0f;
 
+    bool stanEnd = false;   //スタン終了時判別用
     bool isStan = false;
     float stanTimer = 0;
 

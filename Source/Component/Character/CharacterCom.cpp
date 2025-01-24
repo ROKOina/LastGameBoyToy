@@ -596,7 +596,36 @@ void CharacterCom::StanUpdate(float elapsedTime)
     {
         isStan = true;
         stanTimer -= elapsedTime;
+
+        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+        {
+            //エフェクト開始
+            auto& stanObj = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild")->GetChildFind("stanEff");
+            auto& GP = stanObj->GetComponent<GPUParticle>();
+            GP->SetLoop(true);
+
+            //画像
+            GameObjectManager::Instance().Find("stanSpr")->SetEnabled(true);
+        }
     }
+
+    //スタン終了時
+    if (stanEnd) {
+        if (!isStan) {
+            if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+            {
+                //エフェクト終了
+                auto& stanObj = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild")->GetChildFind("stanEff");
+                auto& GP = stanObj->GetComponent<GPUParticle>();
+
+                GP->SetLoop(false);
+
+                //画像
+                GameObjectManager::Instance().Find("stanSpr")->SetEnabled(false);
+            }
+        }
+    }
+    stanEnd = isStan;
 
     if (!isStan && !startCountDown)return;
 

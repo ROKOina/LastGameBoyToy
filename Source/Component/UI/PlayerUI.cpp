@@ -1185,6 +1185,18 @@ void PlayerUIManager::CreateHpUI()
             std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, player, i);
         }
     }
+
+    //自身の名前
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
+        playerName->SetName("PlayerName");
+        std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->scale = 0.75f;
+        font->color = { 1,1,1,1.0f };
+        //font->str = ;  //L付けてね
+        font->position = { 252.0f,814.0f };
+    }
 }
 
 void PlayerUIManager::CreateBoostUI()
@@ -1416,6 +1428,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
             auto& parant = canvas->GetChildFind((parentObjName + std::to_string(moveData.id)).c_str());
             auto& c01 = parant->GetChildFind("charaView01");
             auto& c02 = parant->GetChildFind("charaView02");
+            auto& bow = parant->GetChildFind("Bow");
 
             auto& Pspr = parant->GetComponent<UiSystem>();
             auto& c1spr = c01->GetComponent<UiSystem>();
@@ -1430,6 +1443,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 parant->transform_->SetWorldPosition({ 1760,500,0 });
                 c01->transform_->SetLocalPosition({ 80,0,0 });
                 c02->transform_->SetLocalPosition({ 380,0,0 });
+                bow->transform_->SetLocalPosition({ 0,0,0 });
 
                 //いーじんぐ初期か
                 Pspr->spc.color.w = 0;
@@ -1456,7 +1470,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 DirectX::XMFLOAT3 pos = parant->transform_->GetWorldPosition();
                 pos.y = Mathf::Lerp(pos.y, stopY, moveData.timer / inSlideTime);
                 parant->transform_->SetWorldPosition(pos);
-                
+
                 //色
                 Pspr->spc.color.w = Mathf::Lerp(Pspr->spc.color.w, stopA, moveData.timer / inSlideTime);
                 c1spr->spc.color.w = Mathf::Lerp(c1spr->spc.color.w, 1, moveData.timer / inSlideTime);
@@ -1497,7 +1511,17 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
     }
 
     for (auto& id : removeID)
+    {
+        GameObj parent;
+        if (saveCharaKilog[id].isEnemy)
+            parent = canvas->GetChildFind(("allyKillLog" + std::to_string(saveCharaKilog[id].moveData.id)).c_str());
+        else
+            parent = canvas->GetChildFind(("enemyKillLog" + std::to_string(saveCharaKilog[id].moveData.id)).c_str());
+
+        parent->SetEnabled(false);
+
         saveCharaKilog.erase(id);
+    }
 }
 
 void PlayerUIManager::CreateKillLog()
@@ -1524,6 +1548,12 @@ void PlayerUIManager::CreateKillLog()
             ally02->SetName("charaView02");
             ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
         }
+        //矢印
+        {
+            std::shared_ptr<GameObject> allyBow = allyBack->AddChildObject();
+            allyBow->SetName("Bow");
+            allyBow->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/logBow.ui", Sprite::SpriteShader::DEFALT, false);
+        }
     }
 
     //敵用
@@ -1544,6 +1574,12 @@ void PlayerUIManager::CreateKillLog()
             std::shared_ptr<GameObject> ally02 = enemyBack->AddChildObject();
             ally02->SetName("charaView02");
             ally02->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaList.ui", Sprite::SpriteShader::DEFALT, false);
+        }
+        //矢印
+        {
+            std::shared_ptr<GameObject> enemyBow = enemyBack->AddChildObject();
+            enemyBow->SetName("Bow");
+            enemyBow->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/logBow.ui", Sprite::SpriteShader::DEFALT, false);
         }
     }
 }
@@ -1741,6 +1777,18 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         std::shared_ptr<UiSystem>iconUi = icon->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/AllyIcon.ui", Sprite::SpriteShader::DEFALT, false);
         iconUi->LoadTexture(name);
     }
+
+    //味方のネットの名前
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
+        std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
+        playerName->SetName("PlayerName");
+        std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->scale = 0.75f;
+        font->color = { 1,1,1,1.0f };
+        //font->str = netPlayer.lock()->;  //L付けてね
+        font->position = { 252.0f,814.0f };
+    }
 }
 
 void PlayerUIManager::CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam)
@@ -1772,7 +1820,15 @@ void UI_SkillComp::Update(float elapsedTime)
 {
     std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
     auto& playerchara = player->GetComponent<CharacterCom>();
-    GetGameObject()->GetComponent<UiSystem>()->SetEnabled(playerchara->IsSkillJustCooled(skill, 0.5f));
+    GetGameObject()->GetComponent<UiSystem>()->SetEnabled(playerchara->IsSkillJustCooled(skill, 0.2f));
+
+    //コマ数初期化
+    if (!playerchara->GetCoolFlag(skill))
+    {
+        auto& s = GetGameObject()->GetComponent<Sprite>();
+        s->SetColumns(10);
+        s->SetRows(1);
+    }
 }
 
 void UI_DeathComp::Update(float elapsedTime)
@@ -1829,7 +1885,6 @@ void UI_KillEffect::Update(float elapsedTime)
                 effectFLG = true;
                 effectFLGTimer = 3;
             }
-
         }
     }
     EffectUpdat(elapsedTime);

@@ -271,7 +271,16 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
                 std::shared_ptr<GPUParticle> eff = attackUltSide2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltSide.gpuparticle", 5);
                 eff->SetLoop(false);
             }
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP=stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
+
     }
 
     //敵の場合はピン用の当たりを設定
@@ -416,6 +425,15 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
             particleobj->SetName("muzzleflash");
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
+
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
     }
 
@@ -548,6 +566,15 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             particleobj->SetName("muzzleflash");
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
+
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
     }
 
@@ -721,6 +748,15 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             particleobj->SetName("muzzleflash");
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
+
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
 
         //ビームエフェクト

@@ -118,6 +118,8 @@ void InazawaCharacter_AttackState::ImGui()
 
 void InazawaCharacter_ESkillState::Enter()
 {
+    charaCom.lock()->SetMaxBullet();
+
     arrowCount = 8;
     skillTimer = skillTime;
     intervalTimer = 0.0f;

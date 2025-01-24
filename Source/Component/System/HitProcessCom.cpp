@@ -39,12 +39,14 @@ void HitProcessCom::Update(float elapsedTime)
             isHitNonChara = true;
             nonCharaObj = hit.gameObject;
 
-            //–³“GŽžŠÔ‚ÌŠÔ‚Íƒqƒbƒg‚ð—^‚¦‚È‚¢
-            if (!stats->IsInvincible())
-                chara->SetIsHitAttack(true);
+            ////–³“GŽžŠÔ‚ÌŠÔ‚Íƒqƒbƒg‚ð—^‚¦‚È‚¢
+            //if (!stats->IsInvincible())
+            //    chara->SetIsHitAttack(true);
 
             //ƒ_ƒ[ƒW‚ð—^‚¦‚é
             stats->AddDamagePoint(-value, -1);
+
+            chara->SetIsHitAttack(true);
 
             continue;
         }

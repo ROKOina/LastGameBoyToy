@@ -130,6 +130,14 @@ void ScenePVP::Initialize()
         obj->SetEnabled(false);
     }
 
+    //画像
+    {
+        std::shared_ptr<GameObject> stanSpr = GameObjectManager::Instance().Create();
+        stanSpr->SetName("stanSpr");
+        stanSpr->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/StanSpr.ui", Sprite::SpriteShader::DEFALT, false);
+        stanSpr->SetEnabled(false);
+    }
+
     //ロビー選択から始まる
     //InitializePVP();
     InitializeLobbySelect();
