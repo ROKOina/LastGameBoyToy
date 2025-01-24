@@ -255,6 +255,12 @@ void Sprite::Update(float elapsedTime)
     spc.position.x = GetGameObject()->transform_->GetWorldPosition().x;
     spc.position.y = GetGameObject()->transform_->GetWorldPosition().y;
 
+    if (isParentMove)
+    {
+        GameObj parent = GetGameObject()->GetParent();
+        GetGameObject()->transform_->SetWorldPosition(parent->transform_->GetWorldPosition() + parentPosOffset);
+    }
+
     //// 子どもがいれば
     //if (!GetGameObject()->GetChildren().empty())
     //{
@@ -621,6 +627,8 @@ void Sprite::OnGUI()
     {
         StopEasing();
     }
+
+    ImGui::DragFloat3("ParentPos", &parentPosOffset.x);
 
     // イージング設定
     ImGui::Text("Easing Settings");

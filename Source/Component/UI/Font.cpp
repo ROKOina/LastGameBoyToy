@@ -9,6 +9,7 @@
 #include <codecvt>
 #include<windows.h>
 #include "Math\Mathf.h"
+#include "Component\System\TransformCom.h"
 
 // UTF-16 (std::wstring) ¨ UTF-8 (std::string) •ÏŠ·
 std::string WStringToUTF8(const std::wstring& wstr) {
@@ -336,14 +337,20 @@ Font::Font(const char* filename, int maxSpriteCount)
 
 void Font::Update(float elapsedTime)
 {
-    for (auto& child : GetGameObject()->GetChildren())
+    if (isParentMove == false) return;
+
+    GameObj parent = GetGameObject()->GetParent();
+    if (parent != nullptr)
     {
-        Font* font = child.lock()->GetComponent<Font>().get();
+        Font* font = parent->GetComponent<Font>().get();
         if (font != nullptr)
         {
-            font->str = str;
-            font->position = position + font->parentPosOffset;
-            font->scale = scale + font->parentScaleOffset;
+            position = font->position + parentPosOffset;
+            scale = font->scale + parentScaleOffset;
+        }
+        else
+        {
+            position = DirectX::XMFLOAT2(parent->transform_->GetWorldPosition().x,parent->transform_->GetWorldPosition().y) + parentPosOffset;
         }
     }
 }

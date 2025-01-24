@@ -114,4 +114,6 @@ public:
 	wchar_t*						stri = nullptr;
 	DirectX::XMFLOAT2               parentPosOffset = {}; //親とどれだけ離れるか
 	float							parentScaleOffset = {}; //親とどれだけ離れるか
+
+	bool							isParentMove = false;//親子関係で動くかどうか
 };
