@@ -10,6 +10,39 @@
 #include "Scene\ScenePVP\ScenePVP.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 
+// UTF-8 (std::string) → UTF-16 (std::wstring) 変換
+std::wstring UTF8ToWString3(const std::string& str) {
+    std::wstring result;
+    size_t i = 0;
+    while (i < str.size()) {
+        unsigned char c = str[i];
+        if (c <= 0x7F) {
+            result.push_back(c);
+            ++i;
+        }
+        else if ((c & 0xE0) == 0xC0) {
+            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+            result.push_back(wc);
+            i += 2;
+        }
+        else if ((c & 0xF0) == 0xE0) {
+            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+            result.push_back(wc);
+            i += 3;
+        }
+        else if ((c & 0xF8) == 0xF0) {
+            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+            result.push_back(wc);
+            i += 4;
+        }
+        else {
+            // 不正なUTF-8データを無視する
+            ++i;
+        }
+    }
+    return result;
+}
+
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
     changePosValue = min - max;
@@ -1112,6 +1145,8 @@ void PlayerUIManager::CreateUltUI()
 
 void PlayerUIManager::CreateHpUI()
 {
+
+    std::shared_ptr<GameObject> playerObj = GameObjectManager::Instance().Find("player");
     //HpFrame
     {
         std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
@@ -1140,8 +1175,7 @@ void PlayerUIManager::CreateHpUI()
     {
         std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
         std::shared_ptr<GameObject> hpnum = hpFrame->AddChildObject();
-        std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
-        auto& playerchara = player->GetComponent<CharaStatusCom>();
+        auto& playerchara = playerObj->GetComponent<CharaStatusCom>();
         hpnum->SetName("MaxHp");
         float maxhp = playerchara->GetMaxHitpoint();  //最大HP
         std::wstring numstr = std::to_wstring(static_cast<int>(maxhp));
@@ -1169,8 +1203,8 @@ void PlayerUIManager::CreateHpUI()
         std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
         hpGauge->SetName("HpGauge");
         std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
-        gauge->SetMaxValue(GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
-        float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
+        gauge->SetMaxValue(playerObj->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
+        float* i = playerObj->GetComponent<CharaStatusCom>()->GetHitPoint();
         gauge->SetVariableValue(i);
     }
 
@@ -1193,8 +1227,8 @@ void PlayerUIManager::CreateHpUI()
         playerName->SetName("PlayerName");
         std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
         font->scale = 0.75f;
-        font->color = { 1,1,1,1.0f };
-        //font->str = ;  //L付けてね
+        font->color = { 1,1,1,1.0f };       
+        font->str = UTF8ToWString3(playerObj->GetComponent<CharacterCom>()->GetNetCharaData().GeNetName());  //L付けてね
         font->position = { 252.0f,814.0f };
     }
 }
@@ -1786,7 +1820,7 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
         font->scale = 0.75f;
         font->color = { 1,1,1,1.0f };
-        //font->str = netPlayer.lock()->;  //L付けてね
+        font->str = UTF8ToWString3(netPlayer.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GeNetName());  //L付けてね
         font->position = { 252.0f,814.0f };
     }
 }

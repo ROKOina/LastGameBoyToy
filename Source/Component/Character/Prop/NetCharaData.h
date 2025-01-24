@@ -28,6 +28,9 @@ public:
     void SetBulletNum(int num) { bulletNum = num; }
     int GetBulletNum() { return bulletNum; }
 
+    void SetNetName(std::string name) { netName = name; }
+    std::string GeNetName() { return netName; }
+
 private:
     int teamID = 0;   //自分のチーム
     int netPlayerID = 0;//どのクライアントがこのキャラを担当するか
@@ -37,4 +40,6 @@ private:
 
     int killID = -1;    //キルした相手保存
     int bulletNum = 0;    //球数
+
+    std::string netName;
 };

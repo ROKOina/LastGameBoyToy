@@ -133,9 +133,11 @@ void PhotonLib::update(float elapsedTime)
             break;
         }
         int myPlayerID = GetMyPlayerID();
-        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(myPlayerID);
-        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPhotonID(GetMyPhotonID());
-        myPlayer->GetComponent<CharacterCom>()->GetNetCharaData().SetMyChara(true);
+        auto& chara = myPlayer->GetComponent<CharacterCom>();
+        chara->GetNetCharaData().SetNetPlayerID(myPlayerID);
+        chara->GetNetCharaData().SetNetPhotonID(GetMyPhotonID());
+        chara->GetNetCharaData().SetNetName(netName);
+        chara->GetNetCharaData().SetMyChara(true);
     }
 
     switch (mState)
@@ -1348,8 +1350,10 @@ void PhotonLib::GameRecv(NetData recvData)
                     team = true;
 
             RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(recvData.gameData.charaID), net1, team);
-            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPlayerID(recvData.playerId);
-            net1->GetComponent<CharacterCom>()->GetNetCharaData().SetNetPhotonID(recvData.photonId);
+            auto& chara = net1->GetComponent<CharacterCom>();
+            chara->GetNetCharaData().SetNetPlayerID(recvData.playerId);
+            chara->GetNetCharaData().SetNetPhotonID(recvData.photonId);
+            chara->GetNetCharaData().SetNetName(recvData.name);
         }
 
         //’e”‚ğ‡‚í‚¹‚é
