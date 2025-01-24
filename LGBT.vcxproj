@@ -123,7 +123,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\Audio\Audio3D.h" />
-    <ClInclude Include="Source\Component\Audio\AudioSourceCom.h" />
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
     <ClInclude Include="Source\Graphics\Video.h" />
@@ -291,7 +290,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Audio\Audio3D.cpp" />
-    <ClCompile Include="Source\Component\Audio\AudioSourceCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
     <ClCompile Include="Source\Graphics\Video.cpp" />

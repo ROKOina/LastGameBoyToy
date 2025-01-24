@@ -30,7 +30,6 @@
 //#include "Component\Audio\AudioCom.h"
 #include "Scene\SceneTraining\SceneTraining.h"
 
-#include "Audio/Audio3D.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -38,9 +37,6 @@ SceneTitle::~SceneTitle()
 
 void SceneTitle::Initialize()
 {
-    InitAudio();
-    PrepareAudio();
-
     //ポストエフェクト
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -190,13 +186,28 @@ void SceneTitle::Initialize()
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Lisner");
+        audioSource3d = audio->AddComponent<AudioSource3D>();
         audio->transform_->SetWorldPosition({ 5,0,0 });
+        audioSource3d.lock()->SetListenerPos(audio->transform_->GetWorldPosition());
     }
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Emitter");
+        audioSource3d1 = audio->AddComponent<AudioSource3D>();
         audio->transform_->SetWorldPosition({ 5,0,0 });
+        audioSource3d1.lock()->SetEmitterPos(audio->transform_->GetWorldPosition());
+        audioSource3d1.lock()->SetAudio(AUDIOIDTEST::SE);
+        audioSource3d1.lock()->AudioPlay();
     }
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Emitter1");
+    //    audio->AddComponent<AudioSource3D>();
+    //    audio->transform_->SetWorldPosition({ 5,0,0 });
+    //    audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
+    //    audio->GetComponent<AudioSource3D>()->SetAudio(AUDIOIDTEST::TEST);
+    //    audio->GetComponent<AudioSource3D>()->AudioPlay();
+    //}
 
     //暗転からはじまるように
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
@@ -210,11 +221,7 @@ void SceneTitle::Finalize()
 }
 
 void SceneTitle::Update(float elapsedTime)
-{    
-    UpdateAudio(elapsedTime);
-
-    g_audioState.vListenerPos = GameObjectManager::Instance().Find("Lisner")->transform_->GetWorldPosition();
-    g_audioState.vEmitterPos = GameObjectManager::Instance().Find("Emitter")->transform_->GetWorldPosition();
+{
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     //UI更新
@@ -257,14 +264,14 @@ void SceneTitle::Render(float elapsedTime)
     ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-    if (ImGui::Begin("Lisner", nullptr, ImGuiWindowFlags_None))
-    {
+    //if (ImGui::Begin("Lisner", nullptr, ImGuiWindowFlags_None))
+    //{
 
-        if (ImGui::Button("LisnerUpdate")) {
-            audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
-        }
-    }
-    ImGui::End();
+    //    if (ImGui::Button("LisnerUpdate")) {
+    //        audioSource.lock()->EmitterPlay(static_cast<int>(AUDIOID::BGM));
+    //    }
+    //}
+    //ImGui::End();
 
 }
 

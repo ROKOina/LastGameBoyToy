@@ -9,7 +9,7 @@
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 #include "Component\Audio\AudioCom.h"
-#include "Component/Audio/AudioSourceCom.h"
+#include "Audio/Audio3D.h"
 
 //タイトルシーン
 class SceneTitle :public Scene
@@ -42,5 +42,6 @@ private:
     void ScreenEffect(float elapsedTime);
 
     std::weak_ptr< AudioCom >audioObj;
-    std::weak_ptr < AudioSourceCom> audioSource;
+    std::weak_ptr < AudioSource3D> audioSource3d;
+    std::weak_ptr < AudioSource3D> audioSource3d1;
 };

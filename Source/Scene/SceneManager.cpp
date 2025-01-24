@@ -16,6 +16,7 @@
 #include "SceneUeno\SceneUeno.h"
 
 #include "Setting/Setting.h"
+#include "Audio/Audio3D.h"
 
 SceneManager::SceneManager()
 {
@@ -25,6 +26,7 @@ SceneManager::SceneManager()
 
 SceneManager::~SceneManager()
 {
+    CleanupAudio();
 }
 
 //XVˆ—
