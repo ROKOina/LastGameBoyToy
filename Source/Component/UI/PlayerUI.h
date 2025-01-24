@@ -3,6 +3,7 @@
 #include "Component\UI\UiGauge.h"
 #include "Component\Character\RegisterChara.h"
 #include "Component\Character\CharacterCom.h"
+#include "PVPGameSystem\PVPGameSystem.h"
 #include <map>
 
 class UI_Skill : public UiSystem
@@ -27,6 +28,57 @@ private:
     DirectX::XMFLOAT2 maxPos = {};
 };
 
+class UI_HPEffect : public UiSystem
+{
+    //コンポーネントオーバーライド
+public:
+    UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion, int gaugeTexSize, std::weak_ptr<GameObject> obj, int num);
+    ~UI_HPEffect() {}
+
+    // 名前取得
+    const char* GetName() const override { return "Ui_Hpeffect"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    void OnGUI()override;
+
+private:
+    int divideTexSize = 0; //分割した時のTexSize
+    int gaugeTexSize = 0;  //ゲージ本体のテクスチャサイズ
+    float maxHp;
+    int memoryId; //何番目のメモリなのか
+    std::weak_ptr<GameObject> character;
+
+    bool easingFLG = false;
+    bool onceFLG = false;
+
+    bool isDebug = false;
+};
+
+class UI_PlayerHpUI :public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_PlayerHpUI();
+    ~UI_PlayerHpUI() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_PlayerHp"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+private:
+    float* hp;
+    std::weak_ptr<GameObject> player;
+};
 
 class UI_BoosGauge : public Component
 {
@@ -195,7 +247,7 @@ public:
 
     // 名前取得
     const char* GetName() const override { return "UI_EnemyHp"; }
-    
+
     // 開始処理
     void Start() override {};
 
@@ -206,18 +258,43 @@ public:
     void GaugeUpdate(float elapsedTime);
 
     //登録
-    void Register();
+    void Register(std::weak_ptr<GameObject> obj);
 
     void OnGUI()override {};
 private:
     bool enemyFLG = false;
     bool displayFLG = false;
 
-    float oldHp= 0.0f;
+    float oldHp = 0.0f;
     float timer = 0.0f;
-    const float time = 5.0f;
+    const float time = 0.5f;
 
     std::shared_ptr<GameObject> enemyHp;
+
+    float* hp;
+};
+
+class UI_GameJudge : public Component
+{
+    //コンポーネントオーバーライド
+public:
+    UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam);
+    ~UI_GameJudge() {}
+
+    // 名前取得
+    const char* GetName() const override { return "UI_GameJudge"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    void OnGUI()override;
+private:
+    std::vector<std::weak_ptr<GameObject>> circles;
+    int state = 0;
+    float fadeTimr = 0.0f;
 };
 
 class UI_UltNum : public Component
@@ -238,7 +315,134 @@ public:
     void OnGUI()override {};
 
 private:
+};
 
+class UI_SkillNum : public Component
+{
+public:
+    UI_SkillNum(CharacterCom::SkillCoolID skillid, const char* objnamekunn, const char* name, DirectX::XMFLOAT2 pos);
+    ~UI_SkillNum() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_SkillNum"; }
+
+    // 開始処理
+    void Start() override {};
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //gui
+    void OnGUI()override {};
+
+private:
+    CharacterCom::SkillCoolID skill = CharacterCom::SkillCoolID::E;
+    const char* objname = {};
+};
+
+class UI_HpNum : public Component
+{
+public:
+    UI_HpNum();
+    ~UI_HpNum() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_HpNum"; }
+
+    // 開始処理
+    void Start() override {};
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //gui
+    void OnGUI()override {};
+};
+
+class UI_BulletNum : public Component
+{
+public:
+    UI_BulletNum();
+    ~UI_BulletNum() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_BulletNum"; }
+
+    // 開始処理
+    void Start() override {};
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //gui
+    void OnGUI()override {};
+};
+
+class UI_SkillComp :public Component
+{
+public:
+    UI_SkillComp(CharacterCom::SkillCoolID skillid);
+    ~UI_SkillComp() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_SkillComp"; }
+
+    // 開始処理
+    void Start() override {};
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //gui
+    void OnGUI()override {};
+
+private:
+    CharacterCom::SkillCoolID skill = CharacterCom::SkillCoolID::E;
+};
+
+class UI_DeathComp :public Component
+{
+public:
+    UI_DeathComp() {};
+    ~UI_DeathComp() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_DeathComp"; }
+
+    // 開始処理
+    void Start() override {};
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //gui
+    void OnGUI()override {};
+};
+
+class UI_KillEffect : public Component
+{
+public:
+    UI_KillEffect();
+    ~UI_KillEffect() {};
+
+    // 名前取得
+    const char* GetName() const override { return "KillEffect"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //エフェクトの更新
+    void EffectUpdat(float elapsedTime);
+
+    //gui
+    void OnGUI()override {};
+
+private:
+    bool  effectFLG;
+    float  effectFLGTimer = 0;
 };
 
 //PlayerUIのマネージャー
@@ -257,23 +461,20 @@ public:
         return instance;
     }
 
-
     void Register();
 
     void UIUpdate(float elapsedTime);
 
     //スキルUI
-    void CreateSkillUI(USE_SKILL use_skill,int count);
+    void CreateSkillUI(USE_SKILL use_skill, int count);
 
     //レティクルUI
     void CreateReticleUI();
 
     //ウルトUI
     void CreateUltUI();
-
     //HPUI
     void CreateHpUI();
-
     //ブーストUI
     void CreateBoostUI();
 
@@ -283,25 +484,63 @@ public:
     //キャラアイコン
     void CreatePlayerIcon();
 
-    //ヒットエフェクト  
+    //銃のアイコンとか
+    void CreateGunIcon();
+
+    //ヒットエフェクト
     void CreateHitEffect();
+
+    //キルエフェクト
+    void CreateKillEffect();
+
+    //キルログ
+    void KillLogUpdate(float elapsedTime);
+    void CreateKillLog();   //オブジェ生成
 
     //全員の使用キャラUI
     void CreateNetUseCharaUI();
     //使用キャラ更新
-    void NetUseCharaUIUpdate(int chara[4]);
+    void NetUseCharaUIUpdate(int chara[4], int photonid[4]);
 
     //味方HPUI
     void CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer);
     bool GetAllyHp() { return allyHp; }
     void ResetAllyHp() { allyHp = false; }
 
+    //勝敗表示UI
+    void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
+    bool GetIsEndFLG() { return isEndFLG; }
+
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
-  
+
 private:
     bool bookingRegister = false;
-    
+
     std::weak_ptr<GameObject> player;
 
+    bool isEndFLG = false;
+
     bool allyHp = false;    //味方HP表示済み
+
+    float  kilogTimer[4] = {};
+
+    //要素がキルキャラID
+    struct DeathData
+    {
+        int charaID;
+        bool isEnemy;   //ですしたキャラは敵か
+        //自分がいる場合
+        int myID = -1;  //-1:なし　0:キル　1:デス
+
+        //動き
+        struct MoveData
+        {
+            bool startFlg = false;
+            int id = 0;
+
+            float timer = 0;
+            int underNum = 0;   //追加できた数
+        }moveData;
+    };
+    std::map<int, DeathData> saveCharaKilog;
 };

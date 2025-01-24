@@ -23,7 +23,10 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         charaCom.lock()->HandleArmAnimation();
 
         //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
-        charaCom.lock()->AddCurrentBulletNum(-1);
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaCom.lock()->AddCurrentBulletNum(-1);
+        }
 
         //UŒ‚ˆ—
         charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
@@ -48,7 +51,7 @@ void Farah_UltState::Enter()
 }
 void Farah_UltState::Execute(const float& elapsedTime)
 {
-    time += elapsedTime;
+    owner->GetUltTimer() += elapsedTime;
 
     //UŒ‚I—¹ˆ—•UŒ‚ˆ—
     if (CharacterInput::MainAttackButton & owner->GetButtonUp())
@@ -60,7 +63,7 @@ void Farah_UltState::Execute(const float& elapsedTime)
         charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 40.0f));
     }
 
-    if (time > 8.0f)
+    if (owner->GetUltTimer() > owner->GetMaxUltTime())
     {
         owner->GetGameObject()->GetChildFind("UltObject")->GetComponent<GPUParticle>()->SetLoop(false);
 
@@ -70,12 +73,12 @@ void Farah_UltState::Execute(const float& elapsedTime)
 }
 void Farah_UltState::Exit()
 {
-    //”­ŽËŠÔŠu‚ð’Z‚­‚·‚éŒ³‚É–ß‚·
-    charaCom.lock()->SetCurrentBulletNum(5);
-    charaCom.lock()->SetMaxBulletNum(5);
+    //’e”‚ðŒ³‚É–ß‚·
+    charaCom.lock()->SetCurrentBulletNum(10);
+    charaCom.lock()->SetMaxBulletNum(10);
 
     //ŽžŠÔ‰Šú‰»
-    time = 0.0f;
+    owner->SetUltTimer(0.0f);
 
     //ultI—¹
     charaCom.lock()->FinishUlt();

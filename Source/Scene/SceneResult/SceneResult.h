@@ -1,16 +1,16 @@
 #pragma once
-
-#include "Scene/Scene.h"
-#include "Component\Sprite\Sprite.h"
-#include "Audio\AudioSource.h"
-#include "Audio\Audio.h"
-
+#include "Scene\Scene.h"
 #include "Component\System\GameObject.h"
-#include "Component/Collsion/NodeCollsionCom.h"
-#include "Netwark/Photon/BasicsApplication.h"
 
-//リザルトシーン
-class SceneResult :public Scene
+struct ResultUI
+{
+public:
+    GameObj canvasObj;
+
+    void UiSlide(float x, float y, float speed);
+};
+
+class SceneResult : public Scene
 {
 public:
     SceneResult() {};
@@ -32,5 +32,28 @@ public:
     std::string GetName() const override { return "SceneResult"; };
 
 private:
-    void UIUpdate(float elapsedTime);
+    void MakeResultUI(GameObj canvas);
+    void MakeResultModel();
+
+public:
+    struct ResultData
+    {
+        int killNum = 0;
+        int deathNum = 0;
+
+        //必要な分足していく
+        int charaID = -1;
+        int playerID = -1;
+
+        bool isWin = false;
+
+        std::string playerName;
+    };
+    ResultData resultDatas[4];
+    GameObj resultUI[4];
+    GameObj resultModel[2];
 };
+
+
+
+

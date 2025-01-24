@@ -20,7 +20,6 @@ std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* fi
                         subset.material = &model->GetMaterialsEdit().at(subset.materialIndex);
                     }
                 }
-
             }
         }
     }

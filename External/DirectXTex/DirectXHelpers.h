@@ -51,7 +51,6 @@
 //  CD3D11_COUNTER_DESC
 //
 
-
 namespace DirectX
 {
     class IEffect;
@@ -61,7 +60,7 @@ namespace DirectX
     {
     public:
         MapGuard(_In_ ID3D11DeviceContext* context,
-            _In_ ID3D11Resource *resource,
+            _In_ ID3D11Resource* resource,
             _In_ unsigned int subresource,
             _In_ D3D11_MAP mapType,
             _In_ unsigned int mapFlags) noexcept(false)
@@ -104,11 +103,10 @@ namespace DirectX
         }
 
     private:
-        ID3D11DeviceContext*    mContext;
-        ID3D11Resource*         mResource;
+        ID3D11DeviceContext* mContext;
+        ID3D11Resource* mResource;
         unsigned int            mSubresource;
     };
-
 
     // Helper sets a D3D resource name string (used by PIX and debug layer leak reporting).
     template<UINT TNameLength>

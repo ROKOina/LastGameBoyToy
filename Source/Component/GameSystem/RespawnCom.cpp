@@ -1,4 +1,5 @@
 #include "RespawnCom.h"
+#include "Scene\ScenePVP\ScenePVP.h"
 #include "Component\System\TransformCom.h"
 #include "Component\Character\CharacterCom.h"
 #include "Component\MoveSystem\MovementCom.h"
@@ -7,6 +8,7 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Animation\AnimationCom.h"
+#include "Netwark\Photon\StaticSendDataManager.h"
 
 void RespawnCom::Update(float elapsedTime)
 {
@@ -16,8 +18,41 @@ void RespawnCom::Update(float elapsedTime)
     if (!fallEvent && player->transform_->GetWorldPosition().y < playerDeathHeight)
     {
         CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-        status->AddDamagePoint(-200);
+        status->AddDamagePoint(-200, -1);
     }
+
+    switch (gameMode)
+    {
+    case PVPGameSystem::GAME_MODE::Deathmatch:
+    case PVPGameSystem::GAME_MODE::Crown:
+    case PVPGameSystem::GAME_MODE::Button:
+        Respawn_GamePVP(elapsedTime);
+        break;
+    default:
+        Respawn_GoTitle(elapsedTime);
+        break;
+    }
+}
+
+void RespawnCom::Respawn_GoTitle(float elapsedTime)
+{
+    for (RespawnData* respawnData : respawnDatas)
+    {
+        respawnData->respawnTime += elapsedTime;
+
+        //死亡演出が終了したらリスポーン
+        if (respawnData->respawnTime >= 2.5f)
+        {
+            SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 0.0f);
+            delete respawnData;
+            respawnDatas.clear();
+        }
+    }
+}
+
+void RespawnCom::Respawn_GamePVP(float elapsedTime)
+{
+    GameObj player = GameObjectManager::Instance().Find("player");
 
     //リスポーン処理
     for (RespawnData* respawnData : respawnDatas)
@@ -35,8 +70,11 @@ void RespawnCom::Update(float elapsedTime)
                 //位置移動
                 int spawnIndex = 0;
                 spawnIndex = charaCom->GetNetCharaData().GetNetPlayerID();
-                if (spawnIndex < 0) { spawnIndex = 0; }
-                player->transform_->SetWorldPosition(respawnPoses[spawnIndex]);
+                player->transform_->SetWorldPosition(respawnPoses[ScenePVP::GetPlayerTeamIndex(spawnIndex)]);
+
+                //パラメータ回復
+                CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
+                status->ReSpawn(status->GetMaxHitpoint());
 
                 //プレイヤー隠す
                 player->GetComponent<RendererCom>()->SetDissolveThreshold(1);
@@ -48,8 +86,8 @@ void RespawnCom::Update(float elapsedTime)
             }
 
             //パラメータ回復
-            CharaStatusCom* status = player->GetComponent<CharaStatusCom>().get();
-            status->ReSpawn(status->GetMaxHitpoint());
+            CharaStatusCom* status = respawnData->gameObj->GetComponent<CharaStatusCom>().get();
+            status->SetIsDeath(false);
 
             //アニメーションを死亡から待機へ
             AnimationCom* animaCom = player->GetComponent<AnimationCom>().get();
@@ -65,7 +103,7 @@ void RespawnCom::Update(float elapsedTime)
             auto& attackStateMachine = charaCom->GetAttackStateMachine();
             moveStateMachine.ChangeState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
             attackStateMachine.ChangeState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
-  
+
             endDatas.emplace_back(respawnData);
         }
     }
@@ -73,12 +111,16 @@ void RespawnCom::Update(float elapsedTime)
     //リスポーン終了したオブジェクトをコンテナから出す
     for (RespawnData* removeObj : endDatas)
     {
-        std::vector<RespawnData*>::iterator it = std::find(respawnDatas.begin(), respawnDatas.end(), removeObj);
-        if (it != respawnDatas.end())
+        auto& it = std::remove(respawnDatas.begin(), respawnDatas.end(), removeObj);
+        for (int i = 0; i < respawnDatas.size(); ++i)
         {
-            delete respawnDatas[respawnDatas.size() - 1];
-            respawnDatas.erase(it);
+            if (std::strcmp(respawnDatas[i]->gameObj->GetName(), removeObj->gameObj->GetName()) == 0)
+            {
+                delete respawnDatas[i];
+                break;
+            }
         }
+        respawnDatas.erase(it, respawnDatas.end());
     }
     endDatas.clear();
 }

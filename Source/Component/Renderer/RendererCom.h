@@ -94,6 +94,9 @@ public:
     void SetDissolveEdgeColor(const DirectX::XMFLOAT3& color) { p.dissolveEdgeColor = color; }
     void SetAlpha(float a) { p.alpha = a; }
 
+    //テクスチャを縮小
+    void SetTextureScroll(const DirectX::XMFLOAT2& t) { texturescroll = t; }
+
 private:
     void ModelInitialize(const char* filename);
 
@@ -131,6 +134,7 @@ private:
     bool						hiddenProperty = false;
     std::string					modelFilePath;
     std::string					filePathDriveToModel = "";
+    DirectX::XMFLOAT2 texturescroll = { 1.0f,1.0f };
 
     //モデル読み込みをスレッド化
     std::future<void> future;

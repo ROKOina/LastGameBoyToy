@@ -27,9 +27,6 @@ public:
     // ULT
     void UltSkill() override;
 
-    //リロード（弾減らす処理は各自のキャラでする
-    void Reload()override;
-
     // GUI
     void OnGUI() override;
 

@@ -40,7 +40,7 @@ void PVEDirection::Setting()
     DirectX::XMFLOAT4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
     GamePad& gamePad = Input::Instance().GetGamePad();
     //UI表示
-    
+
     if (SceneManager::Instance().GetSettingScreen()->IsViewSetting())
     {
         GameObjectManager::Instance().Find("title")->SetEnabled(true);
@@ -50,7 +50,6 @@ void PVEDirection::Setting()
         GameObjectManager::Instance().Find("title")->SetEnabled(false);
     }
 
-
     //タイトルへ
     if (SceneManager::Instance().GetSettingScreen()->IsViewSetting() && GameObjectManager::Instance().Find("title")->GetComponent<Sprite>()->GetHitSprite())
     {
@@ -59,7 +58,6 @@ void PVEDirection::Setting()
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
         {
             SceneManager::Instance().ChangeScene(new SceneTitle);
-           
         }
     }
     else
@@ -67,7 +65,6 @@ void PVEDirection::Setting()
         GameObjectManager::Instance().Find("title")->GetComponent<Sprite>()->spc.color = Color;
     }
 }
-
 
 void PVEDirection::CharaSlect(float elapsedTime)
 {
@@ -77,8 +74,13 @@ void PVEDirection::CharaSlect(float elapsedTime)
         GameObjectManager::Instance().Find("stage")->SetEnabled(false);
         GameObjectManager::Instance().Find("player")->SetEnabled(false);
         GameObjectManager::Instance().Find("Gate0")->SetEnabled(false);
-       
-       
+        GameObjectManager::Instance().Find("Reactar0")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Reactar1")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Reactar2")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Reactar3")->SetEnabled(false);
+        //GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
+        //GameObjectManager::Instance().Find("cameraPostPlayer")->SetEnabled(false);
+        //GameObjectManager::Instance().Find("armChild")->SetEnabled(false);
 
         charaPicks->SetViewCharaPicks(true);
         flag = true;
@@ -89,16 +91,33 @@ void PVEDirection::CharaSlect(float elapsedTime)
 
     if (charaPicks->IsDecisionFlg())
     {
-        RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()));
-        GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
-        GameObjectManager::Instance().Find("stage")->SetEnabled(true);
-        GameObjectManager::Instance().Find("player")->SetEnabled(true);
-        GameObjectManager::Instance().Find("Gate0")->SetEnabled(true);
-        GameObjectManager::Instance().Find(charName[charaPicks->GetSelectedCharacterId()].c_str())->SetEnabled(false);
-        charaPicks->SetViewCharaPicks(false);
-        CharaSelectFlag = true;
-        flag = false;
-        directionNumber += 1;
+        if (!deleyFlag)
+        {
+            RegisterChara::Instance().ChangeChara("player", RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()));
+            GameObjectManager::Instance().Find(charName[charaPicks->GetSelectedCharacterId()].c_str())->SetEnabled(false);
+            charaPicks->SetViewCharaPicks(false);
+            GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
+            deleyFlag = true;
+            GameObjectManager::Instance().Find("player")->SetEnabled(false);
+        }
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
+        deleyTimer += elapsedTime;
+        if (deleyTime < deleyTimer)
+        {
+            GameObjectManager::Instance().Find("BOSS")->SetEnabled(true);
+            GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+            GameObjectManager::Instance().Find("player")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Gate0")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar0")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar1")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar2")->SetEnabled(true);
+            GameObjectManager::Instance().Find("Reactar3")->SetEnabled(true);
+
+            CharaSelectFlag = true;
+            flag = false;
+            directionNumber += 1;
+        }
     }
 }
 
@@ -183,10 +202,8 @@ void PVEDirection::InitializeChara()
 
 void PVEDirection::DirectionStart()
 {
-
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("pveCanvas");
-
 
     // タイトルへ
     {
@@ -196,7 +213,6 @@ void PVEDirection::DirectionStart()
         spr->SetOrderinLayer(100);
         name->SetEnabled(false);
     }
-
 
     charaPicks = std::make_shared<CharaPicks>();
 
@@ -215,6 +231,8 @@ void PVEDirection::DirectionStart()
 void PVEDirection::DirectionEnd()
 {
     flag = false;
+    CharaSelectFlag = false;
+    deleyFlag = false;
 }
 
 //シーン演出統括
@@ -257,10 +275,16 @@ void PVEDirection::DirectionFOne(float elapsedTime)
 {
     if (!flag)
     {
-        
-
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
+        GameObjectManager::Instance().Find("allyBack")->SetEnabled(false);
+        GameObjectManager::Instance().Find("enemyBack")->SetEnabled(false);
+        GameObjectManager::Instance().Find("armChild")->SetEnabled(false);
+        GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetEnabled(false);
         GameObjectManager::Instance().Find("eventcamera")->GetComponent<CameraCom>()->ActiveCameraChange();
         EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/test.eventcamera");
+        //暗転
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(1.4f, 7.0f, parameters);
 
         //イベントシーン用の歩きステートへ遷移
         GameObject* eventBoss = GameObjectManager::Instance().Find("BOSS").get();
@@ -327,6 +351,9 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
 
     if (!flag)
     {
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
+        GameObjectManager::Instance().Find("armChild")->SetEnabled(true);
+
         //最初にイベントカメラへ変更
         GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
         //暗転
@@ -349,6 +376,7 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
 
     if (eventBoss->GetComponent<CharaStatusCom>()->IsDeath())
     {
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
         //暗転
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
@@ -405,6 +433,7 @@ void PVEDirection::DirectionCTwo(float elaspdTime)
 
     if (!EventCameraManager::Instance().GetIsPlayEvent())
     {
+        GameObjectManager::Instance().Find("BOSS")->SetEnabled(false);
         directionNumber += 1;
         flag = false;
     }
@@ -421,6 +450,7 @@ void PVEDirection::DirectionCThi(float elapsedTime)
         GameObjectManager::Instance().Find("arm")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("head")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("shoulder")->GetComponent<MovementCom>()->SetGravity(0.98f);
+
         flag = true;
     }
 

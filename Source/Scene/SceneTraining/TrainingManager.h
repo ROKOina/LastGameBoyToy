@@ -1,8 +1,7 @@
 #pragma once
 #include "Component/System/Component.h"
 #include "Component\Audio\AudioCom.h"
-
-
+#include <PvPUi/CharaPicks.h>
 
 //トレーニングの統括
 class TrainingManager
@@ -27,20 +26,44 @@ public:
     void ChangeTutorialFlag();
     void ChangeTrainigFlag();
 
+    bool GetTutoriaFlag() { return tutorialFlag; }
+    bool GetCharaFlag() { return charaSelectFlag; }
+    bool GetTutorilUIFlag() { return tutorialUIFlag; }
 
+    void SetTutorilUIFlag(bool flag) { tutorialUIFlag = flag; }
     //void LightManager();
 
     void Changeblackout();
     void Changelightchange();
 
     void Setting();
+
+    ///キャラ設定画面関連///
+    void CharaSelectUpdate(float elapsedTime);
+
+    void CharaSelectUnHindOBJ();
+
+    //背景初期化
+    void InitializeBack();
+
 private:
+
+    std::shared_ptr<CharaPicks>   charaPicks;  //PVPのキャラ選択をここでも使用
+
+    std::string charName[4] = { "Kanizo-Player","FaraicPlayer","SantorattoPlayer","Matya-Player" };
+    std::vector<std::weak_ptr<GameObject>> tempRemoveObj;   //画面切り替え時に削除するオブジェクト
 
     //最初はトレーニングモード
     bool tutorialFlag = false;
 
-    bool lightFlag = false;
+    bool tutorialUIFlag = false;
 
+    bool charaSelectFlag = true;
+
+    bool flag = false;
+    bool flag1 = false;
+
+    bool lightFlag = false;
 };
 
 //トレーニングモード
@@ -69,6 +92,8 @@ public:
     void TrainingObjUnhide();
     void TrainingObjDisplay();
 
+    //射撃中の初期化
+    void ShootingIni();
 
 private:
     //射撃の開始処理と終了処理
@@ -77,7 +102,7 @@ private:
     //射撃のロジック？
     void ShootingSystem(float elapsdTime);
 
-    //射撃時の案山子スポーン 
+    //射撃時の案山子スポーン
     void ShootingSpawnCrow();
 
     //アイテムのスポーン
@@ -86,15 +111,15 @@ private:
     //アイテムスポーンシステム
     void SpawnItemSystem(float elapsdTime);
 
-    
 private:
     int     shootingScore = 0;                     //射撃のスコア
     int     scarecrowMaxTotal = 30;                //射撃時の最大案山子スポーン数
     int     scarecrowCount = 0;                    //射撃時の案山子スポーン
-          
+    int     scarecrowAlive = 0;
+
     float   scarecrowLifeTime = 1.0f;              //スポーンしてからの生存時間
     float   scarecrowLifeTimer = 0.0f;             //生存時間タイマー
-    float   scarecrowSpawnIntervalTime  = 1.0f;    //案山子が倒されてからの次の案山子をスポーンの間隔
+    float   scarecrowSpawnIntervalTime = 1.0f;    //案山子が倒されてからの次の案山子をスポーンの間隔
     float   scarecrowSpawnIntervalTimer = 0.0f;    //↑のタイマー
     float   spawnItemIntervalTime = 2.0f;          //アイテムが取得されてからの次のアイテムをスポーンさせる間隔
     float   spawnItemIntervalTimer = 0.0f;         //↑のタイマー
@@ -125,7 +150,9 @@ public:
 public:
     //チュートリアルのID
     enum TutorialID
-    {BLACK, LIGHT, MOVE, GUN, SKILL, ULT, ENDBLACK, END };
+    {
+        BLACK, LIGHT, MOVE, GUN, SKILL, ULT, ENDBLACK, END
+    };
 public:
     //チュートリアル管理システム
     void TutorialManagerSystem(float elapsedTime);
@@ -140,7 +167,7 @@ public:
     void BlackOutManager(float elapsedTime);
 
     //明転
-   void LightChangeManger(float elapsedTime);
+    void LightChangeManger(float elapsedTime);
 
     //動きのチュートリアル管理
     void MoveTutorialManager(float elapsedTime);
@@ -158,11 +185,14 @@ public:
 
     void EndTutorialManager(float elapsedTime);
 
+    bool GetTutorialRightFlag() { return TutorialRightFlag; }
+    void SetTutorialRightFlag(bool flag) { TutorialRightFlag = flag; }
+
     void OnGui();
 private:
 
     int tutorialID = 0;
-    
+
     int  moveSubTitleIndex = 0;
     int  gunSubTitleIndex = 0;
     int  skillSubTitleIndex = 0;
@@ -184,7 +214,9 @@ private:
     bool upFlag = false;
     bool downFlag = false;
     bool jumpFlag = false;
+    bool dashFlag = false;
     bool gunFlag = false;
+    bool reloadFlga = false;
     bool skillFlag = false;
     bool ultFlag = false;
 
@@ -193,7 +225,7 @@ private:
     bool moveWFlag = false;
     bool moveSFlag = false;
     bool moveJumpFlag = false;
-
+    bool TutorialRightFlag = false;
 
     DirectX::XMFLOAT2 InputVec = { 0,0 };
 
@@ -203,7 +235,6 @@ private:
 
         float subtitleTimer = 0.0f;
         float subtitleTime = 1.0f;
-        
 
         DirectX::XMFLOAT2 pos = { 0,0 };
         std::wstring str;
@@ -211,12 +242,10 @@ private:
         const char* Lines;
     };
 
-    SubTitle moveSubTitle[12];
-    SubTitle gunSubTitle[4];
+    SubTitle moveSubTitle[15];
+    SubTitle gunSubTitle[7];
     SubTitle skillSubTitle[4];
     SubTitle ultSubTitle[5];
 
     AudioCom* audioObj;
-
-    
 };

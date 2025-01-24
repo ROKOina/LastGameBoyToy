@@ -52,7 +52,7 @@ void SceneNakanisi::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
-        obj->AddComponent<Light>(nullptr);
+        obj->AddComponent<Light>("Data/SerializeData/LightData/pvp.light");
     }
 
 #ifdef _DEBUG
@@ -92,19 +92,29 @@ void SceneNakanisi::Initialize()
     //    }
     //}
 
+    //Numberkun
+    //{
+    //    auto& obj = GameObjectManager::Instance().Create();
+    //    obj->SetName("Number");
+    //    std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::NUMBER, BLENDSTATE::ALPHA, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_NONE, false, false);
+    //    r->LoadModel("Data/Model/AbeStage/Plane.mdl");
+    //}
+
     //ステージ
     {
         auto& stageObj = GameObjectManager::Instance().Create();
         stageObj->SetName("stage");
         stageObj->transform_->SetWorldPosition({ 0.00f, 0.00f, 0.000f });
-        stageObj->transform_->SetScale({ 0.05f, 0.05f, 0.05f });
+
+        float size = 0.05f;
+        stageObj->transform_->SetScale({ size, size, size });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/AbeStage/TestStage.mdl");
+        r->LoadModel("Data/Model/AbeStage/AbeStage_light.mdl");
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "testStage.mdl", "__", 0.05);
+        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "AbeStage_light.mdl", "__", size);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage_Spawn.json");
 
@@ -128,7 +138,7 @@ void SceneNakanisi::Initialize()
 
         //スポーン位置を設定
         RespawnCom* spawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
-        obj->transform_->SetWorldPosition(spawn->GetRespawnPoses()[0]);
+        obj->transform_->SetWorldPosition({ 0,50,0 });
 
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::JANKRAT, obj, true);
     }

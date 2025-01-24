@@ -23,7 +23,6 @@
 #include "Component\Stage\StageEditorCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 #include "Component\Particle\GPUParticle.h"
-#include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
@@ -150,58 +149,32 @@ void SceneTitle::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    // スカイボックスの設定
-    std::array<const char*, 4> filepath = {
-      "Data\\Texture\\CosmicCoolCloudBottom.DDS",
-      "Data\\Texture\\diffuse_iem.dds",
-      "Data\\Texture\\specular_pmrem.dds",
-      "Data\\Texture\\lut_ggx.DDS"
-    };
-    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
-
-    //{
-    //    GameObj audio = GameObjectManager::Instance().Create();
-    //    audio->SetName("Audio");
-    //    audioObj = audio->AddComponent<AudioCom>();
-    //    audioObj.lock()->RegisterSource(AUDIOID::SCENE_TITLE, "Title");
-    //    audioObj.lock()->RegisterSource(AUDIOID::CURSOR, "Cursor");
-    //    audioObj.lock()->RegisterSource(AUDIOID::ENTER, "Enter");
-
-    //    audioObj.lock()->Play("Title", true, 0.0f);
-    //    audioObj.lock()->FeedStart("Title", 0.5f, 0.1f);
-    //}
-
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Audio");
         auto& a2d = audio->AddComponent<AudioSource2D>();
-        a2d->SetAudio2D(AUDIOID2D::BGM2D);
+        a2d->SetAudio2D(AUDIOID2D::BGM);
         a2d->Audio2DPlay();
     }
 
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Lisner");
-        audioSource3d = audio->AddComponent<AudioSource3D>();
-        audio->transform_->SetWorldPosition({ 5,0,0 });
-        audioSource3d.lock()->SetListenerPos(audio->transform_->GetWorldPosition());
     }
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Emitter");
-        audioSource3d1 = audio->AddComponent<AudioSource3D>();
+        audioSource3d1 = audio->AddComponent<AudioSource3D>(AUDIOID3D::TEST);
         audio->transform_->SetWorldPosition({ 5,0,0 });
         audioSource3d1.lock()->SetEmitterPos(audio->transform_->GetWorldPosition());
-        audioSource3d1.lock()->SetAudio(AUDIOIDTEST::SE);
         audioSource3d1.lock()->AudioPlay();
     }
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Emitter1");
-        audio->AddComponent<AudioSource3D>();
+        audio->AddComponent<AudioSource3D>(AUDIOID3D::TEST);
         audio->transform_->SetWorldPosition({ 5,0,0 });
         audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
-        audio->GetComponent<AudioSource3D>()->SetAudio(AUDIOIDTEST::TEST);
         audio->GetComponent<AudioSource3D>()->AudioPlay();
     }
 
@@ -222,9 +195,6 @@ void SceneTitle::Update(float elapsedTime)
 
     //UI更新
     UIUpdate(elapsedTime);
-
-    //画面エフェクト更新
-    ScreenEffect(elapsedTime);
 
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
@@ -353,24 +323,4 @@ void SceneTitle::UIUpdate(float elapsedTime)
     }
     //棒消す
     if (SceneManager::Instance().GetTransitionFlag())selectB->SetEnabled(false);
-}
-
-//画面エフェクト実装
-void SceneTitle::ScreenEffect(float elapsedTime)
-{
-    auto& posteffect = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
-
-    // hue の更新
-    static float direction = 1.0f;
-    float hue = posteffect->GetPostData().hue + direction * elapsedTime;
-
-    // 方向の切り替え
-    if (hue >= 1.0f || hue <= -1.0f)
-    {
-        direction *= -1.0f; // 増減を反転
-        hue = std::clamp(hue, -1.0f, 1.0f); // hue を範囲内に調整
-    }
-
-    // 更新した hue を適用
-    posteffect->SetParameter(hue, 9.0f, { PostEffect::PostEffectParameter::Hue });
 }

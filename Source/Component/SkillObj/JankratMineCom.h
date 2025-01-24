@@ -28,7 +28,6 @@ public:
     //起爆
     void Fire();
 
-
     //セッター・ゲッター
     void SetLifeTime(float time) { lifeTime = time; };
 

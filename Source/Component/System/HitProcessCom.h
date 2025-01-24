@@ -9,7 +9,8 @@ public:
     //myObjにキャラクターコンポーネントを入れる
     HitProcessCom(std::shared_ptr<GameObject> charaObj)
         : hitIntervalTimer(100), myObj(charaObj)
-    {}
+    {
+    }
     ~HitProcessCom() override {}
 
     // 名前取得
@@ -57,7 +58,7 @@ private:
 
     //ヒット間隔(レイキャスト用)
     float hitIntervalTime = 0.1f;
-    float hitIntervalTimer=100;
+    float hitIntervalTimer = 100;
 
     //与える数
     float value = 1.0f; //DAMAGE, HEAL, STAN

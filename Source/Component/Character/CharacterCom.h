@@ -9,6 +9,11 @@
 #include "Prop/NetCharaData.h"
 #include <array>
 
+#define JUDGE_NONEBULLET() \
+    (std::strcmp(GetGameObject()->GetName(), "player") == 0 \
+        ? ((currentBulletNum > 0)) \
+        : ((netCharaData.bulletNum > 0)))
+
 //プレイヤー用キー入力補助クラス
 class CharacterInput
 {
@@ -67,7 +72,8 @@ public:
         MAX,
     };
 
-    enum class CHARACTER_MOVE_ACTIONS {
+    enum class CHARACTER_MOVE_ACTIONS
+    {
         IDLE,
         MOVE,
         DASH,
@@ -80,8 +86,8 @@ public:
     };
 
     //攻撃やスキルを使った時の挙動
-    enum class CHARACTER_ATTACK_ACTIONS {
-        PANTCH,
+    enum class CHARACTER_ATTACK_ACTIONS
+    {
         RELOAD,
         MAIN_ATTACK,
         SUB_ATTACK,
@@ -125,7 +131,7 @@ public:
     virtual void UltSkill() {};
 
     //リロード（弾減らす処理は各自のキャラでする@
-    virtual void Reload() {};
+    virtual void Reload();
 
     //LeftShift (固定ダッシュ)
     void DashFewSub(float elapsedTime);
@@ -188,13 +194,15 @@ public:
     //スキルクールダウン系
     enum SkillCoolID
     {
-        Q, E, R, LeftShift, Space, LeftClick, MAX
+        Q, E, R, LeftShift, Space, RightClick, MAX
     };
     void SetSkillCoolTime(SkillCoolID id, float time) { skillCools[id].time = time; }
     float GetSkillCoolTime(SkillCoolID id) { return skillCools[id].time; }
     float* GetSkillCoolTimerPointer(SkillCoolID id) { return &skillCools[id].timer; }
     void ResetSkillCoolTimer(SkillCoolID id) { skillCools[id].timer = skillCools[id].time; }    //マックスの状態にする
     bool IsSkillCoolMax(SkillCoolID id) { return skillCools[id].timer >= skillCools[id].time; }
+    bool IsSkillJustCooled(SkillCoolID id, float limittime);
+    bool GetCoolFlag(SkillCoolID id) { return skillCools[id].coolflag; }
 
     //ネット関連変数ゲッター
     NetCharaData& GetNetCharaData() { return netCharaData; }
@@ -215,6 +223,7 @@ public:
 
     //残弾
     int GetCurrentBulletNum() { return currentBulletNum; }
+    int* GetCurrentBulletNumPointer() { return &currentBulletNum; }
     void SetCurrentBulletNum(int num) { currentBulletNum = num; }
     void AddCurrentBulletNum(int num) { currentBulletNum += num; }
 
@@ -222,8 +231,19 @@ public:
     void SetMaxBulletNum(int num) { maxBulletNum = num; }
     void SetMaxBullet() { currentBulletNum = maxBulletNum; }
 
+    //ウルトの経過時間
+    float& GetUltTimer() { return ulttimer; }
+    float* GetUltTimerPointer(float t) { return &ulttimer; }
+    void SetUltTimer(float ult) { this->ulttimer = ult; }
+
+    //マックス時間を取得
+    float& GetMaxUltTime() { return maxulttime; }
+
     //腕アニメーション再生
     void HandleArmAnimation();
+
+    //ゲーム開始前カウントダウン
+    void SetStartCountDown(bool flg) { startCountDown = flg; }
 
 private:
     //入力ステート更新
@@ -251,13 +271,14 @@ private:
     void UltUpdate(float elapsedTime);
 
 protected:
-    StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>   moveStateMachine;
-    StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine;
+    StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>   moveStateMachine = {};
+    StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS> attackStateMachine = {};
     GameObject* cameraObj = nullptr;    //自分のキャラの場合だけ入る
 
     bool useMoveFlag = true;//falseにするとmoveStateを使わない
     float jumpPower = 3.0f;
 
+    bool stanEnd = false;   //スタン終了時判別用
     bool isStan = false;
     float stanTimer = 0;
 
@@ -270,8 +291,12 @@ protected:
     //スキルクールダウン
     struct SkillCoolTime
     {
-        float time = 0;
-        float timer = 100;
+        float time = 0.0f;
+        float timer = 100.0f;
+        bool useskill = false;
+        bool coolflag = false;
+        float coolJustFrameCounter = 0.0f;        // スキルが溜まった直後のフレーム数カウント
+        float limitTime = 0.0f;
     };
     SkillCoolTime skillCools[SkillCoolID::MAX];
 
@@ -283,6 +308,7 @@ protected:
     bool boostflag = false;
     float dashGauge = 10;
     bool attackInputSave = false;   //先行入力
+    NetCharaData netCharaData = {};  //ネット関連
 
 private:
 
@@ -326,6 +352,10 @@ private:
     //ネットに送る用のカメラの向き
     DirectX::XMFLOAT3 fpsCameraDir;
 
+    //伊藤君が使うウルト発動時間(今はファラとソルジャー専用)
+    float ulttimer = 0.0f;
+    float maxulttime = 8.0f;
+
     //野村追加
     float stickAngle = 0.0f;
     float nowAngle = 0.0f;
@@ -333,5 +363,5 @@ private:
 
     bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
 
-    NetCharaData netCharaData;  //ネット関連
+    bool startCountDown = false; //ゲーム開始前カウントダウン
 };

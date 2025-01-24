@@ -44,7 +44,7 @@ XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAMS02[NUM_PRESETS] =
 };
 
 
-AudioSource3D::AudioSource3D()
+AudioSource3D::AudioSource3D(AUDIOID3D id)
 {
     // Clear struct
     g_audioState = {};
@@ -231,15 +231,8 @@ AudioSource3D::AudioSource3D()
     // Done
     g_audioState.bInitialized = true;
 
-    // オーディオ登録情報
-    //RegisterAudio();
-
     //音源ロード
-    //SetAudio(AUDIOIDTEST::SE);
-
-
-    // オーディオ登録情報
-    RegisterAudio();
+    SetAudio(id);
 }
 
 AudioSource3D::~AudioSource3D()
@@ -251,7 +244,6 @@ AudioSource3D::~AudioSource3D()
     }
 
     resource_.reset();
-    audioResources.clear();
 
     if (!g_audioState.bInitialized)
         return;
@@ -283,7 +275,7 @@ AudioSource3D::~AudioSource3D()
 
     CoUninitialize();
 
-    g_audioState.bInitialized = false;
+    g_audioState.bInitialized = false;    
 }
 
 void AudioSource3D::Start()
@@ -302,13 +294,6 @@ void AudioSource3D::Update(float elapsedTime)
     UpdateAudio3d(elapsedTime);
 }
 
-// オーディオ登録情報
-void AudioSource3D::RegisterAudio()
-{
-    audioResources[AUDIOIDTEST::BGM] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
-    audioResources[AUDIOIDTEST::SE] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
-    audioResources[AUDIOIDTEST::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
-}
 
 void AudioSource3D::UpdateAudio3d(float elapsedTime)
 {
@@ -415,9 +400,9 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
     }
 }
 
-void AudioSource3D::SetAudio(AUDIOIDTEST id)
+void AudioSource3D::SetAudio(AUDIOID3D id)
 {
-    resource_ = audioResources[id];
+    resource_ = AudioResourceMagaer::Instance().GetAudio3DResouce(id);
 
     if (resource_ != nullptr)
     {
@@ -480,20 +465,17 @@ AudioSource2D::AudioSource2D()
     hr = XAudio2Create(&xaudio, createFlags);
     // マスタリングボイス生成
     hr = xaudio->CreateMasteringVoice(&masteringVoice);
-
-    // オーディオ登録情報
-    RegisterAudio2D();
 }
 
 AudioSource2D::~AudioSource2D()
 {
     resource_.reset();
 
-    for (auto& pair : audioResources)
-    {
-        pair.second.reset();
-    }
-    audioResources.clear();
+    //for (auto& pair : audioResources)
+    //{
+    //    pair.second.reset();
+    //}
+    //audioResources.clear();
 
     // マスタリングボイス破棄
     if (masteringVoice != nullptr)
@@ -502,12 +484,15 @@ AudioSource2D::~AudioSource2D()
         masteringVoice = nullptr;
     }
 
-    // XAudio終了化
-    if (xaudio != nullptr)
-    {
-        xaudio->Release();
-        xaudio = nullptr;
-    }
+    //// XAudio終了化
+    //if (xaudio != nullptr)
+    //{
+    //    xaudio->Release();
+    //    xaudio = nullptr;
+    //}
+
+    xaudio->StopEngine();
+    xaudio.Reset();
 
     // COM終了化
     CoUninitialize();
@@ -515,7 +500,7 @@ AudioSource2D::~AudioSource2D()
 
 void AudioSource2D::SetAudio2D(AUDIOID2D id)
 {
-    resource_ = audioResources[id];
+    resource_ = AudioResourceMagaer::Instance().GetAudio2DResouce(id);
 
     if (resource_ == nullptr) return;
 
@@ -558,10 +543,4 @@ void AudioSource2D::Audio2DPlay(float volume, bool loop)
     sourceVoice_->SubmitSourceBuffer(&buffer);
     sourceVoice_->Start();
     sourceVoice_->SetVolume(volume * 0.1f);
-}
-
-void AudioSource2D::RegisterAudio2D()
-{
-    audioResources[AUDIOID2D::BGM2D] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
-    audioResources[AUDIOID2D::SE2D] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
 }

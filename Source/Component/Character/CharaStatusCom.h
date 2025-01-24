@@ -31,7 +31,7 @@ public:
     float GetVinetHp() { return vinetHp; }
 
     // HPの減少と増加
-    void AddDamagePoint(float value);
+    void AddDamagePoint(float value, int playerID); //IDがない場合は-1
     void AddHealPoint(float value) { hitPoint += value; }
     float GetFrameDamage() { return frameDamage; }
 
@@ -39,12 +39,17 @@ public:
     void SetInvincibleTime(float time) { invincibleTime = time; }
     bool IsInvincible() const { return currentInvincibleTime > 0.0f; }
 
+    //死亡フラグ
     bool IsDeath() { return isDeath; }
     void SetIsDeath(bool flag) { isDeath = flag; }
+
+    //死亡フラグが立った時1度だけtrueになるフラグ
+    bool IsDeathFrame() { return isDeathFrame; }
 
     //リスポーンさせる関数
     void ReSpawn(int HP);
 
+    int GetLastDamageID() { return lastDamageID; }
 
 private:
     float hitPoint = 100;
@@ -55,4 +60,9 @@ private:
     float frameDamage = 0.0f;           // このフレーム中に受けたダメージ
 
     bool isDeath = false;   //死亡フラグ
+    bool isDeathFrame = false; //死亡フラグが立った時一度だけ入るフラグ
+    bool wasDeath = false; // 前フレームの死亡状態
+
+    int lastDamageID = -1;  //最後に攻撃してきた相手
+    float lastDamageTimer = 0.0f;   //リセット時間
 };

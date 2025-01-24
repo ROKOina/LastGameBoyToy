@@ -125,6 +125,10 @@
     <ClInclude Include="Source\Audio\Audio3D.h" />
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
+    <ClInclude Include="Source\Component\System\CrownCom.h" />
+    <ClInclude Include="Source\Component\System\pingCom.h" />
+    <ClInclude Include="Source\Component\UI\UiEasingEnabledRemove.h" />
+    <ClInclude Include="Source\Component\UI\UiMove.h" />
     <ClInclude Include="Source\Graphics\Video.h" />
     <ClInclude Include="Source\PvPUi\CharaPicks.h" />
     <ClInclude Include="External\DirectXTex\DDS.h" />
@@ -254,7 +258,6 @@
     <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Scene\SceneLGBT\SceneLGBT.h" />
     <ClInclude Include="Source\Scene\SceneLoading\SceneLoading.h" />
-    <ClInclude Include="Source\Scene\SceneLobby\SceneLobby.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\Scene\SceneNakanisi\SceneNakanisi.h" />
     <ClInclude Include="Source\Scene\ScenePVE\PVEDirection.h" />
@@ -264,7 +267,6 @@
     <ClInclude Include="Source\Scene\SceneTitle\SceneTitle.h" />
     <ClInclude Include="Source\Scene\SceneTraining\SceneTraining.h" />
     <ClInclude Include="Source\Scene\SceneTraining\TrainingManager.h" />
-    <ClInclude Include="Source\Scene\SceneUeno\SceneUeno.h" />
     <ClInclude Include="Source\Setting\Setting.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BaseCharacterState.h" />
     <ClInclude Include="Source\StateMachine\Behaviar\BossState.h" />
@@ -292,6 +294,8 @@
     <ClCompile Include="Source\Audio\Audio3D.cpp" />
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
+    <ClCompile Include="Source\Component\System\CrownCom.cpp" />
+    <ClCompile Include="Source\Component\UI\UiMove.cpp" />
     <ClCompile Include="Source\Graphics\Video.cpp" />
     <ClCompile Include="Source\PvPUi\CharaPicks.cpp" />
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />
@@ -406,7 +410,6 @@
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneLGBT\SceneLGBT.cpp" />
     <ClCompile Include="Source\Scene\SceneLoading\SceneLoading.cpp" />
-    <ClCompile Include="Source\Scene\SceneLobby\SceneLobby.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Scene\SceneNakanisi\SceneNakanisi.cpp" />
     <ClCompile Include="Source\Scene\ScenePVE\PVEDirection.cpp" />
@@ -416,7 +419,6 @@
     <ClCompile Include="Source\Scene\SceneTitle\SceneTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\SceneTraining.cpp" />
     <ClCompile Include="Source\Scene\SceneTraining\TrainingManager.cpp" />
-    <ClCompile Include="Source\Scene\SceneUeno\SceneUeno.cpp" />
     <ClCompile Include="Source\Setting\Setting.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BaseCharacterState.cpp" />
     <ClCompile Include="Source\StateMachine\Behaviar\BossState.cpp" />
@@ -463,6 +465,14 @@
     <None Include="Shader\BloomExtract.cod" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="HLSL\2D\ElectroVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\2D\FontCool_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\2D\Font_PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -480,10 +490,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\2D\PostEffect\CascadeShadow.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\2D\PostEffect\CharaPickPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
@@ -590,6 +596,10 @@
     <FxCompile Include="HLSL\3D\GhostBlurVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\3D\HoloPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\3D\InstanceFakeDepthVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>

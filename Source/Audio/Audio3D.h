@@ -32,14 +32,6 @@
     static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_Reverb_CurvePoints[3] = { 0.0f, 0.5f, 0.75f, 1.0f, 1.0f, 0.0f };
     static const X3DAUDIO_DISTANCE_CURVE       Emitter_Reverb_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_Reverb_CurvePoints[0], 3 };
 
-enum AUDIOIDTEST
-{
-    BGM,
-    SE,
-    TEST,
-
-   MAX_
-};
 struct AUDIO_STATE
 {
     bool bInitialized;
@@ -77,31 +69,84 @@ struct AUDIO_STATE
 
 };
 
-enum AUDIOID2D
+enum AUDIOID3D
 {
-    BGM2D,
-    SE2D,
+    BGM,
+    SE,
+    TEST,
 
-    MAX2D
+   MAX_
+};
+enum class AUDIOID2D
+{
+    BGM,
+    SE,
+
+    MAX_
+};
+
+class AudioResourceMagaer
+{
+public:
+    AudioResourceMagaer() {
+        //2Dオーディオ登録
+        audio2DResources[AUDIOID2D::BGM] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
+        audio2DResources[AUDIOID2D::SE] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
+
+        //3Dオーディオ登録
+        audio3DResources[AUDIOID3D::BGM] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
+        audio3DResources[AUDIOID3D::SE] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
+        audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
+    };
+    ~AudioResourceMagaer() {};
+
+    // インスタンス取得
+    static AudioResourceMagaer& Instance()
+    {
+        static AudioResourceMagaer instance;
+        return instance;
+    }
+
+    //リソース検索
+    std::shared_ptr<AudioResource> GetAudio2DResouce(AUDIOID2D audioENUM)
+    {
+        auto& it = audio2DResources.find(audioENUM);
+        if (it != audio2DResources.end()) { // 見つかった
+            return it->second;
+        }
+        //見つからない
+        return nullptr;
+    }
+    std::shared_ptr<AudioResource> GetAudio3DResouce(AUDIOID3D audioENUM)
+    {
+        auto& it = audio3DResources.find(audioENUM);
+        if (it != audio3DResources.end()) { // 見つかった
+            return it->second;
+        }
+        //見つからない
+        return nullptr;
+    }
+private:
+    std::map<AUDIOID2D, std::shared_ptr<AudioResource>> audio2DResources;
+    std::map<AUDIOID3D, std::shared_ptr<AudioResource>> audio3DResources;
+
+
 };
 
 // オーディオソース
 class AudioSource3D : public Component
 {
 public:
-    AudioSource3D();
+    AudioSource3D(AUDIOID3D id);
     ~AudioSource3D() override;
 
     void Start() override;
     void Update(float elapsedTime) override;
 
-    const char* GetName() const override { return "Audio"; }
+    const char* GetName() const override { return "Audio3D"; }
     void OnGUI() override {}
 
     void UpdateAudio3d(float elapsedTime);
-
-    // オーディオ呼び出し関数
-    void SetAudio(AUDIOIDTEST id);
 
     // 再生
     void AudioPlay();
@@ -110,16 +155,16 @@ public:
     void SetEmitterPos(DirectX::XMFLOAT3 pos) { emitterPos = pos; }
 
 private:
-    // オーディオ登録
-    void RegisterAudio();
+    // オーディオ登録関数
+    void SetAudio(AUDIOID3D id);
+
+
 
 public:
     IXAudio2SourceVoice* sourceVoice_ = nullptr;
     std::shared_ptr<AudioResource>	resource_;
 
 private:
-    std::map<AUDIOIDTEST, std::shared_ptr<AudioResource>> audioResources;
-
     DirectX::XMFLOAT3 listenerPos;
     DirectX::XMFLOAT3 emitterPos;
 
@@ -144,9 +189,6 @@ public:
     // 再生
     void Audio2DPlay();
     void Audio2DPlay(float volume, bool loop = false);
-private:
-    // オーディオ登録
-    void RegisterAudio2D();
 
 public:
     IXAudio2SourceVoice* sourceVoice_ = nullptr;
@@ -155,8 +197,6 @@ public:
 private:
     Microsoft::WRL::ComPtr<IXAudio2> xaudio;
     IXAudio2MasteringVoice* masteringVoice = nullptr;
-
-    std::map<AUDIOID2D, std::shared_ptr<AudioResource>> audioResources;
 
     bool audioChangeFlg = false;
 };

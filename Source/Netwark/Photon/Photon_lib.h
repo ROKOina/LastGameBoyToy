@@ -56,7 +56,7 @@ private:
     bool connectNow = false;
 
     //部屋名
-    std::string roomName;
+    std::string roomName = {};
     //charaID
     std::string charaIDList[int(RegisterChara::CHARA_LIST::MAX)] =
     {
@@ -78,11 +78,15 @@ public:
 
     //キル数取得
     int GetKillCount(int team);
+    //クラウン所持時間取得
+    float GetCrownTimerCount(int team);
 
     int GetMyPhotonID();
     int GetMyPlayerID();
 
     void SetRoomName(std::wstring wstr) { roomName = WStringToString(wstr); }
+
+    void SetNetName(std::wstring wstr) { netName = WStringToString(wstr); }
 
     //マスタークライアントなのか
     bool GetIsMasterPlayer();
@@ -111,6 +115,9 @@ public:
 
     //今の試合時間
     float GetNowTime();
+    float GetCountNowTime();
+    //試合時間リセット
+    void ResetNowTime();
 
     //参加人数
     float GetJoinNum();
@@ -136,6 +143,9 @@ public:
 
     int GetMasterPlayerID() { return masterPlayerID; }
 
+    //クラウン所持時間取得
+    void SetCrownTimer(int playerID, float timer);
+
     //接続開始
     void StartConnect() { connectFlg = true; }
     bool GetConnectBegin() { return connectBegin; }
@@ -150,8 +160,8 @@ public:
         }
         bool useFlg = false;    //使用されているか
         std::string name = {};
-        int photonId;
-        int playerId;
+        int photonId = {};
+        int playerId = {};
         std::unique_ptr<RingBuffer<SaveBuffer>> inputBuf;
 
         ////自分のIDから見たディレイ
@@ -164,13 +174,21 @@ public:
         //情報が更新されたか
         bool isInputUpdate = false;
 
+        //ゲームモード変数
+        //デスマッチ
         //キル数
         int killCount = 0;
+
+        int bulletNum = 0;;
+
+        //クラウン
+        //所持時間
+        float crownTimer = 0;
 
         //次の入力情報を格納
         struct NextInput
         {
-            int oldFrame;
+            int oldFrame = {};
             unsigned int inputDown = 0;
             unsigned int input = 0;
             unsigned int inputUp = 0;
@@ -241,6 +259,7 @@ private:
     //ゲームモード情報送信
     void sendGameModeData(void);
     void sendDeathMatchData(void);
+    void sendCrownData(void);
 
     // events, triggered by certain operations of all players in the same room
     //入室時に入る
@@ -252,6 +271,7 @@ private:
     void JoinRecv(NetData recvData);    //入室受信
     void LobbyRecv(NetData recvData);    //ロビー受信
     void DeathMatchRecv(NetData recvData);    //デスマッチ受信
+    void CrownRecv(NetData recvData);    //クラウン受信
 
     // receive and print out debug out here
     virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);
@@ -284,9 +304,9 @@ private:
     //送信頻度（ms）
     int sendMs = 1000 / 60.0f * 5;
     //int sendMs = 35;
-    int oldMs;
+    int oldMs = {};
 
-    std::vector<SaveInput> saveInputPhoton;
+    std::vector<SaveInput> saveInputPhoton = {};
     //追加予約
     int addSavePhotonID[4] = { -1,-1,-1,-1 };   //要素がプレイヤーID、値がフォトンIDになる
 
@@ -295,6 +315,7 @@ private:
 
     //タイマースタート時間
     int startTime = 0;
+    int countTime = 0;  //カウントダウンタイマー
 
     //キャラ選択画面か
     bool isCharaSelect = false;
@@ -309,7 +330,7 @@ private:
         NetData::JoinData jData;
         std::string joinName;
     };
-    std::vector<JoinManager> joinManager;
+    std::vector<JoinManager> joinManager = {};
     bool joinPermission = false;    //入室許可
 
     //遅延フレーム
@@ -323,8 +344,32 @@ private:
     //マスタープレイヤーID保存
     int masterPlayerID = 0;
 
+    //デス保存
+    struct SaveDeath
+    {
+        bool onDeath = false;   //キルされた時にtrue
+        bool killCon = false;    //キル確認用
+        float deathCountTimer = -1;   //重複阻止
+    };
+    SaveDeath saveDeath[4];
+
+    //クラウン
+    struct SaveCrown
+    {
+        int haveID = -1;
+
+        //落とされた時
+        bool isCrownFall[4] = { false,false,false,false };  //落下したか
+        float fallTimer[4] = { 0,0,0,0 };   //一度通らせるため
+        DirectX::XMFLOAT3 crownFallPos = {};
+
+        //自分が落とした時
+        int slowFrame = 0;  //何フレーム間送るか
+        DirectX::XMFLOAT3 myCrownFallPos = {};
+    }saveCrown;
+
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ
-    std::string chat;   //チャット
-    std::vector<std::string> chatList;
+    std::string chat = {};   //チャット
+    std::vector<std::string> chatList = {};
 };

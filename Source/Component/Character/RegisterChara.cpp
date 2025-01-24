@@ -46,7 +46,7 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     //キャラが登録された時にHP表示用のコンポーネントを用意する
     if (obj->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Enemy) {
         obj->AddComponent<UI_EnemyHp>();
-        obj->GetComponent<UI_EnemyHp>()->Register();
+        obj->GetComponent<UI_EnemyHp>()->Register(obj);
     }
 
     //自キャラの場合
@@ -101,7 +101,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<InazawaCharacterCom> c = obj->AddComponent<InazawaCharacterCom>();
     c->GetNetCharaData().SetCharaID(int(CHARA_LIST::INAZAWA));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
-    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 5.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 5.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
@@ -214,7 +214,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             auto& anim = armChild->AddComponent<AnimationCom>();
 
@@ -271,7 +271,35 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
                 std::shared_ptr<GPUParticle> eff = attackUltSide2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/attackUltSide.gpuparticle", 5);
                 eff->SetLoop(false);
             }
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
+    }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
 }
 
@@ -295,7 +323,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
     std::shared_ptr<FarahCom> c = obj->AddComponent<FarahCom>();
     c->GetNetCharaData().SetCharaID(int(CHARA_LIST::FARAH));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
-    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 6.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
@@ -338,6 +366,20 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
         au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
     }
 
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Jump.gpuparticle", 500);
+        p->SetLoop(false);
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_Jump.gpuparticle", 500);
+        p->SetLoop(false);
+    }
+
     //ネットでは見える化
     if (std::strcmp(obj->GetName(), "player") != 0)
     {
@@ -373,7 +415,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
 
@@ -382,7 +424,36 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
             particleobj->SetName("muzzleflash");
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
+
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
+    }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
 }
 
@@ -400,6 +471,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
     charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
+    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 0.1f);
     charaCom->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //HPの初期設定
@@ -454,6 +526,18 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         smokeeffct->SetActive(false);
     }
 
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/santrat_body.gpuparticle", 1000);
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/santrat_body.gpuparticle", 1000);
+    }
+
     //自分かネットのプレイヤーで
     if (std::strcmp(obj->GetName(), "player") == 0)
     {
@@ -473,7 +557,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
 
@@ -482,7 +566,36 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             particleobj->SetName("muzzleflash");
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
+
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
+    }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
 }
 
@@ -506,7 +619,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<SoldierCom> c = obj->AddComponent<SoldierCom>();
     c->GetNetCharaData().SetCharaID(int(CHARA_LIST::SOLIDER));
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
-    c->SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 6.0f);
+    c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 6.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //ボックスコライダー
@@ -538,6 +651,20 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/solder_ult_aura.gpuparticle", 2000);
         auto& spawn = ultobject->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/soldier_ult.spawn");
         spawn->SetParentObjectKun(obj);
+    }
+
+    //ブーストエフェクト1、２
+    {
+        std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
+        boost1->SetName("Boost1");
+        std::shared_ptr<GPUParticle>p = boost1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/matya_body.gpuparticle", 2000);
+        boost1->transform_->SetWorldPosition({ 1.180f,10.533f,-1.194f });
+    }
+    {
+        std::shared_ptr<GameObject>boost2 = obj->AddChildObject();
+        boost2->SetName("Boost2");
+        std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/matya_body.gpuparticle", 2000);
+        boost2->transform_->SetWorldPosition({ -0.105f, 10.505f, -1.080f });
     }
 
     //ヒットスキャン
@@ -612,7 +739,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->SetName("armChild");
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
-            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+            std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
             r->LoadModel("Data/Model/player_arm/player_arm.mdl");
             armChild->AddComponent<AnimationCom>();
 
@@ -621,6 +748,15 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             particleobj->SetName("muzzleflash");
             std::shared_ptr<CPUParticle>cpuparticle = particleobj->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/player_muzzleflash.cpuparticle", 10);
             cpuparticle->SetActive(false);
+
+            //スタンエフェクト
+            {
+                std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
+                stanEff->SetName("stanEff");
+                stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                gpuP->SetLoop(false);
+            }
         }
     }
 
@@ -629,5 +765,25 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         std::shared_ptr<GameObject> beem = obj->AddChildObject();
         beem->SetName("beem_fire");
         beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/soldier_mainattack_fire.gpuparticle", 300);
+    }
+
+    //敵の場合はピン用の当たりを設定
+    if (std::strcmp(obj->GetName(), "player") != 0 && !myTeam)
+    {
+        std::shared_ptr<GameObject> pin = obj->AddChildObject();
+        pin->SetName("pinCol");
+
+        pin->transform_->SetLocalPosition({ 0,7,0 });
+
+        //ノードコリジョン用モデル
+        std::shared_ptr<RendererCom> r = pin->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
+        r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+        r->SetDissolveThreshold(1);
+
+        std::shared_ptr<SphereColliderCom> Sphere = pin->AddComponent<SphereColliderCom>();
+        Sphere->SetRadius(2.5f);
+        Sphere->SetMyTag(COLLIDER_TAG::pinCharacter);
+
+        pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
 }

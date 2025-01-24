@@ -5,6 +5,7 @@
 #include <Math\Collision.h>
 #include <functional>
 #include "Component\Renderer\RendererCom.h"
+#include "Component\Phsix\RigidBodyCom.h"
 
 using GenerateFunc = std::function<void(GameObj my)>;
 
@@ -22,7 +23,7 @@ public:
     void Update(float elapsedTime);
 
     // îjä¸èàóù
-    void OnDestroy() {}
+    void OnDestroy();
 
     // GUIï`âÊ
     void OnGUI();
@@ -58,6 +59,8 @@ private:
         TestNakanisi,
         TowerGimic,
         GateGimic,
+        SpawnGimic,
+        Plan,
         Max,
     };
 
@@ -65,6 +68,8 @@ private:
     static void TestNakanisi(GameObj& place);
     static void TowerGimic(GameObj& place);
     static void GateGimic(GameObj& place);
+    static void SpawnGimic(GameObj& place);
+    static void PlaneGimic(GameObj& place);
 
     GenerateFunc generateFunc[(int)GenerateFuncName::Max] =
     {
@@ -73,6 +78,8 @@ private:
         TestNakanisi,
         TowerGimic,
         GateGimic,
+        SpawnGimic,
+        PlaneGimic,
     };
 
 public:
@@ -108,4 +115,5 @@ private:
     std::list<GameObj> objList;
 
     float playerDeathHeight = -50;
+    std::vector<PxRigidActor*> rigidActors;
 };

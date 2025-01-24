@@ -53,7 +53,7 @@ public:
         int   lowerAnimeFourId = 0; ///歩きモーション用
         int   lowerAnimeFiveId = 0; ///歩きモーション用
         int   lowerAnimaSixId = 0;  ///歩きモーション用
-        int   lowerAnimaSevenId = 0;///歩きモーション用 
+        int   lowerAnimaSevenId = 0;///歩きモーション用
         int   lowerAnimaEightId = 0;///歩きモーション用
 
         bool  loop = false;         //ループ再生するかしないか
@@ -170,14 +170,14 @@ private:
     int                             currentUpperAnimation = -1;
     int                             currentLowerAnimation = -1;
     //上半身下半身のアニメーション番号
-    int                             upperAnimationIndex      = 0;
-    int                             lowerAnimationIndex      = 0;
-    int                             lowerAnimationTwoIndex   = 0;
+    int                             upperAnimationIndex = 0;
+    int                             lowerAnimationIndex = 0;
+    int                             lowerAnimationTwoIndex = 0;
     int                             lowerAnimationThreeIndex = 0;
-    int                             lowerAnimationFourIndex  = 0;
-    int                             lowerAnimetionFiveIndex  = 0; 
-    int                             lowerAnimationSixIndex   = 0;  
-    int                             lowerAnimationSevenIndex = 0; 
+    int                             lowerAnimationFourIndex = 0;
+    int                             lowerAnimetionFiveIndex = 0;
+    int                             lowerAnimationSixIndex = 0;
+    int                             lowerAnimationSevenIndex = 0;
     int                             lowerAnimationEightIndex = 0;
 
     //下半身のアニメーション制御の番号 0=normal 1=blendAnime 2=walkAnime

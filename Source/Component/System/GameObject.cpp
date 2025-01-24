@@ -220,7 +220,8 @@ void GameObjectManager::CreateNowTimeSaveComponent(std::shared_ptr<GameObject> o
 // 削除
 void GameObjectManager::Remove(std::shared_ptr<GameObject> obj)
 {
-    removeGameObject_.insert(obj);
+    if (obj)
+        removeGameObject_.insert(obj);
 }
 
 //即削除（危険出来れば使わない方がいいかも）
@@ -1131,6 +1132,7 @@ void GameObjectManager::FontRender(const DirectX::XMFLOAT4X4& view, const Direct
 
     for (std::weak_ptr<Font>& font : fontobject)
     {
+        if (font.expired() != 0) continue;
         if (!font.lock()->GetGameObject()->GetEnabled())continue;
         if (!font.lock()->GetEnabled())continue;
 

@@ -115,7 +115,7 @@ void BaseCharacter_IdleState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown() && moveCom.lock()->OnGround())
+    if (CharacterInput::JumpButton_SPACE & owner->GetButtonDown() && moveCom.lock()->OnGround())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
@@ -165,7 +165,7 @@ void BaseCharacter_MoveState::Execute(const float& elapsedTime)
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown() && moveCom.lock()->OnGround())
+    if (CharacterInput::JumpButton_SPACE & owner->GetButtonDown() && moveCom.lock()->OnGround())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
@@ -201,7 +201,7 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
         Hovering(elapsedTime);
     }
 
-    if (!animationCom.lock()->IsPlayAnimation())
+    if (!animationCom.lock()->IsPlayLowerAnimation())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
     }
@@ -248,19 +248,19 @@ void BaseCharacter_Landing::Execute(const float& elapsedTime)
     }
 
     //ジャンプ
-    if (GamePad::BTN_A & owner->GetButtonDown())
+    if (CharacterInput::JumpButton_SPACE & owner->GetButtonDown())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMP);
     }
 
     //アニメーションが終われば
-    if (!animationCom.lock()->IsPlayAnimation())
+    if (!animationCom.lock()->IsPlayLowerAnimation())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::IDLE);
     }
 
     //移動
-    if (owner->IsPushLeftStick() && !animationCom.lock()->IsPlayAnimation())
+    if (owner->IsPushLeftStick() && !animationCom.lock()->IsPlayLowerAnimation())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::MOVE);
     }
@@ -276,9 +276,13 @@ void BaseCharacter_DeathState::Enter()
 {
     animationCom.lock()->SetUpAnimationUpdate(AnimationCom::AnimationType::NormalAnimation);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Down"), false);
+    charaCom.lock()->SetCurrentBulletNum(charaCom.lock()->GetMaxBulletNum());
 
     RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
-    respawn->AddRespawnData(owner->GetGameObject());
+    if (respawn)
+    {
+        respawn->AddRespawnData(owner->GetGameObject());
+    }
 
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
@@ -420,17 +424,6 @@ void Ult_Attack_State::Enter()
 
     DirectX::XMFLOAT3 front = owner->GetFpsCameraDir();
     DirectX::XMFLOAT3 end = start + front * 100;
-
-    //エフェクト
-    //auto& arm = owner->GetGameObject()->GetChildFind("armChild");
-    //DirectX::XMFLOAT3 gunPos = {};
-    //if (arm)
-    //{
-    //    const auto& model = arm->GetComponent<RendererCom>()->GetModel();
-    //    const auto& node = model->FindNode("gun2");
-
-    //    gunPos = { node->worldTransform._41,node->worldTransform._42,node->worldTransform._43 };
-    //}
 
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
@@ -588,11 +581,11 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
         {
             if (owner->GetDashFlag())
             {
-                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Walk_Forward"), true);
             }
             else
             {
-                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Walk_Forward"), true);
+                animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Idle"), true);
             }
         }
 
@@ -606,14 +599,14 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
 
     case CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP:
         isPlayer ?
-            animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_middle"), false) :
-            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_middle"), false);
+            animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_middle"), true) :
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_middle"), true);
         break;
 
     case CharacterCom::CHARACTER_MOVE_ACTIONS::LANDING:
         isPlayer ?
             animCom->PlayAnimation(animCom->FindAnimation("FPS_Jump_end"), false) :
-            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_end"), false);        break;
+            animCom->PlayUpperBodyOnlyAnimation(animCom->FindAnimation("Jump_end"), false);
         break;
 
     default:

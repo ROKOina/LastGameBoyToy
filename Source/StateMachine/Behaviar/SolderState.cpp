@@ -1,9 +1,9 @@
 #include "SolderState.h"
-#include <Component\Collsion\ColliderCom.h>
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Bullet\BulletCom.h"
 #include "Component\System\SpawnCom.h"
+#include "Component\Renderer\TrailCom.h"
 
 //基底クラス
 Solder_BaseState::Solder_BaseState(CharacterCom* owner) : State(owner)
@@ -19,11 +19,11 @@ Solder_BaseState::Solder_BaseState(CharacterCom* owner) : State(owner)
 void Solder_MainAttackState::Enter()
 {
     rayobj = owner->GetGameObject()->GetChildFind("mainattack");
-    if (!rayobj.lock())return;
+    if (!rayobj)return;
 
     //レイ設定
-    auto& ray = rayobj.lock()->GetComponent<RayColliderCom>();
-    DirectX::XMFLOAT3 start = rayobj.lock()->transform_->GetWorldPosition();
+    ray = rayobj->GetComponent<RayColliderCom>();
+    DirectX::XMFLOAT3 start = rayobj->transform_->GetWorldPosition();
 
     //カメラ取得
     auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
@@ -37,39 +37,83 @@ void Solder_MainAttackState::Enter()
     ray->SetStart(start);
     ray->SetEnd(end);
     ray->SetEnabled(true);
+
+    //腕アニメーション再生
+    charaCom.lock()->HandleArmAnimation();
+
+    //弾減らさないとリロードしない
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        charaCom.lock()->AddCurrentBulletNum(-1);
+    }
 }
 void Solder_MainAttackState::Execute(const float& elapsedTime)
 {
-    auto& ray = rayobj.lock()->GetComponent<RayColliderCom>();
-
     //レイキャストOFF
     if (CharacterInput::MainAttackButton & owner->GetButton())
     {
         ray->SetEnabled(false);
     }
 
-    //攻撃終了処理＆攻撃処理
-    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
+    //時間を経過させて打つ時間を調整
+    if (CharacterInput::MainAttackButton & owner->GetButton())
+    {
+        shottimer += elapsedTime;
+    }
+
+    //ここで時間を0にする
+    if (shottimer > 0.4f)
     {
         //腕アニメーション再生
         charaCom.lock()->HandleArmAnimation();
 
+        //レイ設定
+        ray = rayobj->GetComponent<RayColliderCom>();
+        DirectX::XMFLOAT3 start = rayobj->transform_->GetWorldPosition();
+
+        //カメラ取得
+        auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
+        DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
+        DirectX::XMFLOAT3 end = start + front * 100;
+
+        //エフェクト再生
+        owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
+
+        //レイキャスト有効化
+        ray->SetStart(start);
+        ray->SetEnd(end);
+        ray->SetEnabled(true);
+
         //弾減らさないとリロードしない
-        charaCom.lock()->AddCurrentBulletNum(-1);
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaCom.lock()->AddCurrentBulletNum(-1);
+        }
 
-        //射撃間隔タイマー起動
-        charaCom.lock()->ResetShootTimer();
+        //時間を初期化
+        shottimer = 0.0f;
+    }
 
-        //レイキャストOFF
-        ray->SetEnabled(false);
-
+    //右クリックを上げたら時間は0に初期化する
+    if (CharacterInput::MainAttackButton & owner->GetButtonUp())
+    {
         //ステート変更
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }
 void Solder_MainAttackState::Exit()
 {
+    //レイキャストOFF
+    ray->SetEnabled(false);
+
+    //諸々初期化
+    shottimer = 0.0f;
     rayobj.reset();
+}
+void Solder_MainAttackState::ImGui()
+{
+    ImGui::DragFloat("shottimer", &shottimer);
+    ImGui::Checkbox("rayenabled", &rayenabled);
 }
 #pragma endregion
 
@@ -83,10 +127,10 @@ void Solder_UltState::Enter()
 }
 void Solder_UltState::Execute(const float& elapsedTime)
 {
-    time += elapsedTime;
+    owner->GetUltTimer() += elapsedTime;
 
     //時間になれば終了
-    if (time > 8.0f)
+    if (owner->GetUltTimer() > owner->GetMaxUltTime())
     {
         //ウルトオブジェクトを更新しない
         auto& ultobj = owner->GetGameObject()->GetChildFind("UltObject");
@@ -99,7 +143,9 @@ void Solder_UltState::Execute(const float& elapsedTime)
 }
 void Solder_UltState::Exit()
 {
-    time = 0.0f;
+    //時間初期化
+    owner->SetUltTimer(0.0f);
+
     //ult終了
     charaCom.lock()->FinishUlt();
 }

@@ -41,6 +41,8 @@ public:
     //名前取得
     std::string GetName() const override { return "ScenePVP"; };
 
+    static int GetPlayerTeamIndex(int playerID);
+
 private:
 
     //オブジェクト生成関数
@@ -49,8 +51,13 @@ private:
     //ゲームシステム更新
     void GameSystemUpdate(float elapsedTime);
 
+    //ピン
+    void PingUpdate(float elapsedTime);
+
     //画面に応じた更新処理
     void TransitionUpdate(float elapsedTime);
+
+    void FontInput(GameObj& fontObj);
 
     //ロビー選択時
     void LobbySelectFontUpdate(float elapsedTime);  //fontUpdate
@@ -64,7 +71,7 @@ private:
     void LobbyBackSprUpdate(float elapsedTime);
 private:
 
-    std::shared_ptr<CharaPicks>          charaPicks;
+    std::shared_ptr<CharaPicks>        charaPicks;
     std::unique_ptr<BasicsApplication> photonNet;
 
     bool isGame = false;
@@ -79,8 +86,9 @@ private:
 
     struct LobbySelectFont
     {
-        LobbySelectFont(int id, std::wstring str, DirectX::XMFLOAT2 pos, float scale, bool col, int state, DirectX::XMFLOAT4 color = {1,1,1,1})
-            :id(id), str(str), pos(pos), scale(scale), collision(col), state(state),color(color) {}
+        LobbySelectFont(int id, std::wstring str, DirectX::XMFLOAT2 pos, float scale, bool col, int state, DirectX::XMFLOAT4 color = { 1,1,1,1 })
+            :id(id), str(str), pos(pos), scale(scale), collision(col), state(state), color(color) {
+        }
         int id;
         std::wstring str;
         DirectX::XMFLOAT2 pos;
@@ -108,6 +116,11 @@ private:
 
         LobbySelectFont(13,L"部屋参加",{76,54},2,false,2),
 
+        LobbySelectFont(14,L"決定",{1203,624},1.5f,true,10),
+        LobbySelectFont(15,L"名前",{465,223},1,false,10),
+        LobbySelectFont(16,L"",{784,223},1,false,10),   //ロビー名打ち込み用
+        LobbySelectFont(17,L"名前入力",{76,54},2,false,10),
+
         //ロビー名用
         LobbySelectFont(20,L"",{536,218},1.0f,true,2),
         LobbySelectFont(21,L"",{536,218},1.0f,true,2),
@@ -124,7 +137,7 @@ private:
 
         LobbySelectFont(10,L"ゲームモード",{1260,52},1.5f,false,0),
         LobbySelectFont(11,L"チームデスマッチ",{1435,201},1,true,0),
-        LobbySelectFont(12,L"王冠",{1435,281},1,true,0),
+        LobbySelectFont(12,L"クラウンスティール",{1435,281},1,true,0),
 
         //ネット名用
         LobbySelectFont(20,L"",{536,218},1.0f,true,2),
@@ -135,4 +148,8 @@ private:
 
     int fontState = 0;
     int joinRoomCount = -1; //部屋参加時登録用
+
+    //ゲーム開始時UI表示用変数
+    bool isCountDown = true;    //カウントダウン中か
+    float countTimer = 10;   //秒数
 };

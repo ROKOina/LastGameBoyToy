@@ -163,7 +163,7 @@ void Boss_BaseState::AnimtionEventControl(const std::string& eventname, const st
     {
         for (const auto& hitobject : collision->OnHitGameObject())
         {
-            hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-20);
+            hitobject.gameObject.lock()->GetComponent<CharaStatusCom>()->AddDamagePoint(-20, -1);
         }
     }
 }
@@ -288,7 +288,6 @@ void Boss_SA1::Execute(const float& elapsedTime)
     {
         audioCom.lock()->Play("PUNCH", false, 10.0f);
     }
-
 
     //アニメーションが終われば
     if (!animationCom.lock()->IsPlayAnimation())

@@ -7,6 +7,7 @@
 #include "Component\Renderer\RendererCom.h"
 #include "Phsix\Physxlib.h"
 #include "Component\Renderer\DecalCom.h"
+#include <Component\System\SpawnCom.h>
 
 //初期化
 void SoldierCom::Start()
@@ -42,11 +43,26 @@ void SoldierCom::Update(float elapsedTime)
 
     //銃口にエフェクトを付ける
     SetMuzzleFlash();
+
+    //死亡したらウルトの時間を0にする
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::DEATH)
+    {
+        //ウルトオブジェクトを更新しない
+        auto& ultobj = GetGameObject()->GetChildFind("UltObject");
+        ultobj->GetComponent<GPUParticle>()->SetLoop(false);
+        ultobj->GetComponent<SpawnCom>()->SetOnTrigger(false);
+
+        //時間初期化
+        SetUltTimer(0.0f);
+    }
 }
 
 // 右クリック単発押し処理
 void SoldierCom::SubAttackDown()
 {
+    //メイン攻撃時はリターン
+    if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
     if (!UseUlt())
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_ATTACK);
@@ -56,6 +72,9 @@ void SoldierCom::SubAttackDown()
 // Eスキル
 void SoldierCom::SubSkill()
 {
+    //メイン攻撃時はリターン
+    if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
     if (!UseUlt())
     {
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::SUB_SKILL);
@@ -77,22 +96,12 @@ void SoldierCom::MainAttackDown()
 
     //アタック
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK);
-    attackInputSave = false;
 }
 
 // ULT
 void SoldierCom::UltSkill()
 {
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::ULT);
-}
-
-//リロード
-void SoldierCom::Reload()
-{
-    if (currentBulletNum < maxBulletNum)
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
 }
 
 // GUI

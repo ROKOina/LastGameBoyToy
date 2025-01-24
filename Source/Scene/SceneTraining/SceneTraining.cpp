@@ -42,20 +42,19 @@ void SceneTraining::Initialize()
         obj->AddComponent<PostEffect>();
     }
 
+    //ライト
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("directionallight");
+        obj->AddComponent<Light>(nullptr);
+    }
+
     //フリーカメラ
     {
         std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
         freeCamera->SetName("freecamera");
         freeCamera->AddComponent<FreeCameraCom>();
         freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-        
-    }
-
-    //ライト
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("directionallight");
-        obj->AddComponent<Light>(nullptr);
     }
 
     //ステージ
@@ -78,7 +77,7 @@ void SceneTraining::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("player");
         obj->transform_->SetWorldPosition({ 0,1,0 });
-        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj,true);
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST::INAZAWA, obj, true);
     }
 
     //snowparticle
@@ -96,9 +95,6 @@ void SceneTraining::Initialize()
     //ネット大事
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
-
-    //最初にイベントカメラへ変更
-    GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->ActiveCameraChange();
 }
 
 void SceneTraining::Finalize()
@@ -114,14 +110,27 @@ void SceneTraining::Update(float elapsedTime)
     GamePad& gamePad = Input::Instance().GetGamePad();
     photonNet->run(elapsedTime);
 
-    //UI生成
-    PlayerUIManager::Instance().UIUpdate(elapsedTime);
+    if (!TrainingManager::Instance().GetCharaFlag())
+    {
+        //UI生成
+        PlayerUIManager::Instance().UIUpdate(elapsedTime);
+    }
 
+    if (TrainingManager::Instance().GetTutoriaFlag())
+    {
+        if (!TrainingManager::Instance().GetTutorilUIFlag())
+        {
+            GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
+        }
+        else
+        {
+            GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
+        }
+    }
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
-    //Ui更新
-    PlayerUIManager::Instance().UIUpdate(elapsedTime);
+    //
     TrainingManager::Instance().TrainingManagerUpdate(elapsedTime);
 }
 

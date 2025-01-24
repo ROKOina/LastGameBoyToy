@@ -12,7 +12,6 @@
 #include "Effects.h"
 #include "PlatformHelpers.h"
 
-
 using namespace DirectX;
 
 _Use_decl_annotations_

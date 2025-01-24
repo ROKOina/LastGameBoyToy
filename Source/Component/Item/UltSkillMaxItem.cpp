@@ -5,7 +5,6 @@
 #include "Component/System/TransformCom.h"
 void UltSkillMaxItem::Start()
 {
-
 }
 
 void UltSkillMaxItem::Update(float elapsedTime)
@@ -17,14 +16,13 @@ void UltSkillMaxItem::Update(float elapsedTime)
 
 void UltSkillMaxItem::OnGUI()
 {
-
 }
 
 //ƒAƒCƒeƒ€‚ðE‚Á‚½Žž‚Ìˆ—
 void UltSkillMaxItem::OnItemPickup()
 {
     float ultGauge = *GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetUltGauge();
-    if (ultGauge!=GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetUltGaugeMax())
+    if (ultGauge != GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetUltGaugeMax())
     {
         for (auto& hit : GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->GetComponent<SphereColliderCom>()->OnHitGameObject())
         {
@@ -48,8 +46,8 @@ void UltSkillMaxItem::TransformItem(float elapsedTime)
     DirectX::XMFLOAT3 Pos = GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->GetWorldPosition();
     DirectX::XMFLOAT3 Eule = GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->GetEulerRotation();
 
-    Pos.y = 2.0f +0.2f*std::sin(timer);
-    Eule.y += 5*elapsedTime;
+    Pos.y = 2.0f + 0.2f * std::sin(timer);
+    Eule.y += 5 * elapsedTime;
 
     GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->SetEulerRotation(Eule);
     GameObjectManager::Instance().Find("ULTSKILLMAXITEM")->transform_->SetWorldPosition(Pos);

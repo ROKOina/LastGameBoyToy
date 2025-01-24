@@ -6,7 +6,6 @@
 #include "Input/Input.h"
 #include "Framework.h"
 #include "Scene\SceneManager.h"
-#include "Scene\SceneResult\SceneResult.h"
 #include "Scene/ScenePVE/ScenePVE.h"
 #include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\\SceneTitle\SceneTitle.h"
@@ -101,6 +100,7 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     // ƒV[ƒ“•`‰æˆ—
     SceneManager::Instance().Render(elapsedTime);
+    TimeManager::Instance().ImGui();
 
 #ifdef _DEBUG
     //IMGUI•`‰æ

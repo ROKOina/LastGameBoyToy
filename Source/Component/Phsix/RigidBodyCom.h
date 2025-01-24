@@ -39,7 +39,6 @@ public:
     // ÕŒ‚‚ğ‰Á‚¦‚é(isStatic‚ªfalse‚Ìê‡‚Ì‚İ,SetUpŠÖ”I‚í‚Á‚½‚çg‚¦‚é
     void AddForce(DirectX::XMFLOAT3 force);
 
-
     //¿—Êİ’è(isStatic‚ªfalse‚Ìê‡‚Ì‚İ
     void SetMass(float value);
     //–€C—Íİ’è

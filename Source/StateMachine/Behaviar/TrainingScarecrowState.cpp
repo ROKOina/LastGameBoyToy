@@ -7,12 +7,11 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "Scene/SceneTraining/TrainingManager.h"
 
-
 //基底コンストラクタ
 Scarecrow_BaseState::Scarecrow_BaseState(ScarecrowCom* owner) :State(owner)
 {
-    scarecrowCom=owner->GetGameObject()->GetComponent<ScarecrowCom>();
-    moveCom=owner->GetGameObject()->GetComponent<MovementCom>();
+    scarecrowCom = owner->GetGameObject()->GetComponent<ScarecrowCom>();
+    moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
     audioCom = owner->GetGameObject()->GetComponent<AudioCom>();
@@ -26,7 +25,6 @@ void Scarecrow_BaseState::RandomMove(float moveSpeed)
     randomPos.x = Mathf::RandomRange(-28.0f, -10.0f);
     randomPos.y = 0.0f;
     randomPos.z = 0.0f;
-
 
     DirectX::XMVECTOR Vec = DirectX::XMLoadFloat3(&randomPos);
     DirectX::XMVECTOR Vec1 = DirectX::XMLoadFloat3(&transCom.lock()->GetWorldPosition());
@@ -57,7 +55,6 @@ void Scarecrow_IdleState::Execute(const float& elapsedTime)
     {
         scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::DEATH);
     }
-
 }
 #pragma endregion
 
@@ -87,7 +84,6 @@ void Scarecrow_MoveState::Enter()
 
 void Scarecrow_MoveState::Execute(const float& elapsedTime)
 {
-    
     DirectX::XMVECTOR Vec = DirectX::XMLoadFloat3(&randomPos);
     DirectX::XMFLOAT3 pos = transCom.lock()->GetWorldPosition();
     pos.y = 0.0;
@@ -96,19 +92,14 @@ void Scarecrow_MoveState::Execute(const float& elapsedTime)
 
     DirectX::XMVECTOR Vec2 = DirectX::XMVectorSubtract(Vec1, Vec);
 
-
-
     moveCom.lock()->AddForce(VEC * moveSpeed);
 
-    
+    float Distanc = DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec2));
 
-    float Distanc=DirectX::XMVectorGetX(DirectX::XMVector3Length(Vec2));
-
-    if (Distanc<0.1f)
+    if (Distanc < 0.1f)
     {
         scarecrowCom.lock()->GetStateMachine().ChangeState(ScarecrowCom::ScareCrowState::RANDOMIDLE);
     }
-
 
     //死亡
     if (characterstatas.lock()->IsDeath())
@@ -146,6 +137,3 @@ void Scarecrow_DeathState::Execute(const float& elapsedTime)
     }
 }
 #pragma endregion
-
-
-

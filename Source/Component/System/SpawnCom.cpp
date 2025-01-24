@@ -1,5 +1,4 @@
 #include "SpawnCom.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Animation/AnimationCom.h"
 #include <cstdlib>
 #include <cmath>
@@ -462,7 +461,7 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
 
     int playerTeam = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
     int myTeam = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
-    if (playerTeam== myTeam)
+    if (playerTeam == myTeam)
     {
         collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
     }
@@ -503,7 +502,12 @@ void SpawnCom::HitObject()
                     {
                         if (const auto& status = hitObj->GetComponent<CharaStatusCom>())
                         {
-                            status->AddDamagePoint(-15);
+                            int id = -1;
+                            if (parent.lock())
+                            {
+                                id = parent.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
+                            }
+                            status->AddDamagePoint(-15, id);
                         }
                     }
                 }

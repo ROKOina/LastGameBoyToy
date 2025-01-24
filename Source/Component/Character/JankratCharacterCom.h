@@ -23,10 +23,8 @@ public:
     //ult
     void UltSkill() override;
 
-    //リロード（弾減らす処理は各自のキャラでする
-    void Reload()override;
-
 private:
+
     //消去されている弾や地雷を手放す
     void EraseHaveObjects();
 

@@ -37,6 +37,11 @@ enum COLLIDER_TAG : uint64_t
     Impact = 1 << 15,
 
     UnderStand = 1 << 21,   //’†—§
+    Crown = 1 << 22,
+
+    //ƒsƒ“
+    pin = 1 << 25,
+    pinCharacter = 1 << 26,
 
     Wall = 1 << 30,
 };

@@ -20,6 +20,7 @@ public:
         CHROMATICABERRATION,
         GLITCH,
         HOLO,
+        ELECTRO,
         MAX
     };
 
@@ -127,7 +128,10 @@ public:
         float edgethreshold = 1.0f;
         float edgeoffset = 0.0f;
         int onflag = 1;
-        float padding = {};
+        float framerate = { 0.0f };
+        int columns = { 1 };
+        int rows = { 1 };
+        DirectX::XMFLOAT2 padding = {};
     };
     SaveConstantsParameter constants;
 
@@ -141,6 +145,13 @@ public:
     void SetClipTime(float cliptime) { constants.cliptime = cliptime; }
     float GetClipTime() { return constants.cliptime; }
 
+    //アニメーションの列数と行数
+    void SetColumns(int column) { constants.columns = column; }
+    void SetRows(int row) { constants.rows = row; }
+
+    //再生時間の係数(初期値が0なので自分で設定する)
+    void SetFrameRate(float frame) { constants.framerate = frame; }
+
     //数字用に追加
     DirectX::XMFLOAT2 numUVScroll = { 0,0 };
 
@@ -148,6 +159,9 @@ public:
     void SetOrderinLayer(int num) { orderinLayer = num; }
     int GetOrderinLayer() { return orderinLayer; }
 
+    void SetIsParentMove(bool flag) { isParentMove = flag; }
+    void SetParentPosOffset(DirectX::XMFLOAT3 pos) { parentPosOffset.x = pos.x; parentPosOffset.y = pos.y; }
+     
 private:
 
     //頂点構造体
@@ -187,8 +201,14 @@ private:
     bool hitEnter = false;
     bool ontriiger = false;
 
+    //シリアライズのファイルパス
+    std::string filepath = {};
+
     //数字が大きいほど前に来る
     int orderinLayer = 0;
 
     DirectX::XMFLOAT2 collisionPivot;
+
+    bool isParentMove = false;
+    DirectX::XMFLOAT3 parentPosOffset = {};
 };

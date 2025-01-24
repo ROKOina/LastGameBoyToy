@@ -9,8 +9,10 @@
 #include "Component/Character/RegisterChara.h"
 #include "Component/Renderer/RendererCom.h"
 #include <Component\Camera\FreeCameraCom.h>
-
 #include <Component\Stage\StageEditorCom.h>
+#include "Component\UI\Font.h"
+#include "Input\Input.h"
+#include "Graphics/SkyBoxManager/SkyBoxManager.h"
 
 //初期化
 void SceneLGBT::Initialize()
@@ -65,6 +67,26 @@ void SceneLGBT::Initialize()
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
     }
+
+    //skipフォント
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("skipfont");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::COOL);
+        font->position = { 687.0f,940.0f };
+        font->str = L"スペースキーでスキップ";
+        font->scale = 1.0f;
+        font->color.w = 1.0f;
+    }
+
+    // スカイボックスの設定
+    std::array<const char*, 4> filepath = {
+      "Data\\Texture\\DayInTheClouds4k.hdr",
+      "Data\\Texture\\diffuse_iem.dds",
+      "Data\\Texture\\specular_pmrem.dds",
+      "Data\\Texture\\lut_ggx.DDS"
+    };
+    SkyBoxManager::Instance().LoadSkyBoxTextures(filepath);
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -122,5 +144,12 @@ void SceneLGBT::SceneTransition(float elapsedTime)
         {
             SceneManager::Instance().ChangeScene(new SceneTitle);
         }
+    }
+
+    //スペースキーを押したらスキップ
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    {
+        SceneManager::Instance().ChangeScene(new SceneTitle);
     }
 }

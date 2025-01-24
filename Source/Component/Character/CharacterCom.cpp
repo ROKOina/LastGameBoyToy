@@ -14,7 +14,7 @@
 #include "Component\Renderer\RendererCom.h"
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
-
+#include  "Scene/SceneTraining/TrainingManager.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -23,9 +23,9 @@ void CharacterCom::Update(float elapsedTime)
     if (netCharaData.myChara)
     {
         {
-            //設定画面を開く(P)
+            //設定画面を開く(ESC)
             GamePad& gamePad = Input::Instance().GetGamePad();
-            if (GamePad::BTN_P & gamePad.GetButtonDown())
+            if (GamePad::ESC & gamePad.GetButtonDown() && !TutorialSystem::Instance().GetTutorialRightFlag())
             {
                 if (isViewSetting)
                 {
@@ -36,6 +36,11 @@ void CharacterCom::Update(float elapsedTime)
                 {
                     ss->SetViewSetting(true);
                 }
+            }
+            //死んだらオプション画面閉じる
+            if (GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
+            {
+                ss->SetViewSetting(false);
             }
         }
     }
@@ -118,15 +123,19 @@ void CharacterCom::Update(float elapsedTime)
         {
             //スキル発動中はリターン
             if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::SUB_SKILL
-            &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+                && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
             {
                 //弾切れならリロード
-                if (currentBulletNum > 0) {
+                if (JUDGE_NONEBULLET())
+                {
                     MainAttackDown();
                 }
-                else {
+                else
+                {
                     if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+                    {
                         Reload();
+                    }
                 }
             }
             attackInputSave = false;
@@ -206,6 +215,8 @@ void CharacterCom::OnGUI()
         ImGui::DragFloat3("fpsCameraDir", &fpsCameraDir.x);
         ImGui::InputInt("netID", &netCharaData.netPlayerID);
 
+        ImGui::InputInt("killID", &netCharaData.killID);
+
         ImGui::TreePop();
     }
 
@@ -215,23 +226,39 @@ void CharacterCom::OnGUI()
         ImGui::DragFloat("shootTimer", &shootTimer);
         ImGui::DragFloat("QTime", &skillCools[SkillCoolID::Q].time);
         ImGui::DragFloat("QTimer", &skillCools[SkillCoolID::Q].timer);
+        ImGui::Checkbox("QFlag", &skillCools[SkillCoolID::Q].useskill);
         ImGui::Separator();
         ImGui::DragFloat("ETime", &skillCools[SkillCoolID::E].time);
         ImGui::DragFloat("ETimer", &skillCools[SkillCoolID::E].timer);
+        ImGui::Checkbox("EFlag", &skillCools[SkillCoolID::E].useskill);
         ImGui::Separator();
         ImGui::DragFloat("LSTime", &skillCools[SkillCoolID::LeftShift].time);
         ImGui::DragFloat("LSTimer", &skillCools[SkillCoolID::LeftShift].timer);
+        ImGui::Checkbox("LSFlag", &skillCools[SkillCoolID::LeftShift].useskill);
         ImGui::Separator();
         ImGui::DragFloat("SpaceTime", &skillCools[SkillCoolID::Space].time);
         ImGui::DragFloat("SpaceTimer", &skillCools[SkillCoolID::Space].timer);
+        ImGui::Checkbox("SpaceFlag", &skillCools[SkillCoolID::Space].useskill);
         ImGui::Separator();
-        ImGui::DragFloat("LeftClickTime", &skillCools[SkillCoolID::LeftClick].time);
-        ImGui::DragFloat("LeftClickTimer", &skillCools[SkillCoolID::LeftClick].timer);
+        ImGui::DragFloat("RightClickTime", &skillCools[SkillCoolID::RightClick].time);
+        ImGui::DragFloat("RightClickTimer", &skillCools[SkillCoolID::RightClick].timer);
+        ImGui::Checkbox("RightClickFlag", &skillCools[SkillCoolID::RightClick].useskill);
         ImGui::Separator();
         ImGui::DragFloat("RTime", &skillCools[SkillCoolID::R].time);
         ImGui::DragFloat("RTimer", &skillCools[SkillCoolID::R].timer);
+        ImGui::Checkbox("RFlag", &skillCools[SkillCoolID::R].useskill);
 
         ImGui::TreePop();
+    }
+}
+
+void CharacterCom::Reload()
+{
+    if ((std::strcmp(GetGameObject()->GetName(), "player") == 0 \
+        ? ((currentBulletNum < maxBulletNum)) \
+        : ((netCharaData.GetBulletNum() < maxBulletNum))))
+    {
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
     }
 }
 
@@ -251,6 +278,12 @@ void CharacterCom::DashFewSub(float elapsedTime)
         //速度を普通に
         dashSpeed = dashSpeedNormal;
     }
+}
+
+bool CharacterCom::IsSkillJustCooled(SkillCoolID id, float limittime)
+{
+    skillCools[id].limitTime = limittime;             //比較時間
+    return skillCools[id].coolflag;
 }
 
 //腕アニメーション再生
@@ -298,7 +331,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //弾切れなら自動的にリロード
-        if (currentBulletNum > 0 && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+        if (JUDGE_NONEBULLET() && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
         {
             MainAttackDown();
         }
@@ -310,16 +343,25 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
             }
         }
     }
-    else if (CharacterInput::MainAttackButton & GetButton()
-        && GamePad::BTN_A & GetButton())
+    else if (CharacterInput::MainAttackButton & GetButton() && GamePad::BTN_LEFT_SHOULDER & GetButton())
     {
-        if (!isUseUlt)
+        //弾切れなら自動的にリロード
+        if (JUDGE_NONEBULLET() && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+        {
             MainAttackPushing();
+        }
+        else
+        {
+            if (attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
+            {
+                Reload();
+            }
+        }
     }
 #else
     //デバッグ中は2つのボタン同時押しで攻撃（画面見づらくなるの防止用
-    if (CharacterInput::MainAttackButton & GetButtonDown() 
-    &&  attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD))
+    if (CharacterInput::MainAttackButton & GetButtonDown()
+        && attackStateMachine.GetCurrentState() != CHARACTER_ATTACK_ACTIONS::RELOAD)
     {
         if (shootTimer < shootTime)
         {
@@ -328,7 +370,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         }
 
         //弾切れなら自動的にリロード
-        currentBulletNum > 0 ?
+        JUDGE_NONEBULLET() ?
             MainAttackDown() : Reload();
     }
     else if (CharacterInput::MainAttackButton & GetButton())
@@ -338,33 +380,37 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 #endif // DEBUG_
 
-    if (CharacterInput::SubAttackButton & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::LeftClick))
+    if (CharacterInput::SubAttackButton & GetButtonDown() && IsSkillCoolMax(SkillCoolID::RightClick))
     {
-        skillCools[SkillCoolID::LeftClick].timer = 0;
+        //メイン攻撃時はリターン
+        if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
+        skillCools[SkillCoolID::RightClick].timer = 0;
+        skillCools[SkillCoolID::RightClick].useskill = true;
         SubAttackDown();
     }
     else if (CharacterInput::SubAttackButton & GetButton())
     {
+        //メイン攻撃時はリターン
+        if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
         SubAttackPushing();
     }
 
-    //if (CharacterInput::MainSkillButton_E & GetButtonDown()
-    //    && IsSkillCoolMax(SkillCoolID::Q))
-    //{
-    //    skillCools[SkillCoolID::Q].timer = 0;
-    //    MainSkill();
-    //}
-    if (CharacterInput::MainSkillButton_E & GetButtonDown()
-        && IsSkillCoolMax(SkillCoolID::E))
+    if (CharacterInput::MainSkillButton_E & GetButtonDown() && IsSkillCoolMax(SkillCoolID::E))
     {
+        //メイン攻撃時はリターン
+        if (attackStateMachine.GetCurrentState() == CHARACTER_ATTACK_ACTIONS::MAIN_ATTACK)return;
+
         skillCools[SkillCoolID::E].timer = 0;
+        skillCools[SkillCoolID::E].useskill = true;
         SubSkill();
     }
 
     if (CharacterInput::JumpButton_SPACE & GetButtonDown())
     {
         skillCools[SkillCoolID::Space].timer = 0;
+        skillCools[SkillCoolID::Space].useskill = true;
         SpaceSkill();
     }
 
@@ -500,6 +546,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
             if (dashGauge <= 0)
             {
                 skillCools[SkillCoolID::LeftShift].timer = 0;
+                skillCools[SkillCoolID::LeftShift].useskill = true;
                 posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
             }
         }
@@ -549,9 +596,38 @@ void CharacterCom::StanUpdate(float elapsedTime)
     {
         isStan = true;
         stanTimer -= elapsedTime;
+
+        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+        {
+            //エフェクト開始
+            auto& stanObj = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild")->GetChildFind("stanEff");
+            auto& GP = stanObj->GetComponent<GPUParticle>();
+            GP->SetLoop(true);
+
+            //画像
+            GameObjectManager::Instance().Find("stanSpr")->SetEnabled(true);
+        }
     }
 
-    if (!isStan)return;
+    //スタン終了時
+    if (stanEnd) {
+        if (!isStan) {
+            if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+            {
+                //エフェクト終了
+                auto& stanObj = GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("armChild")->GetChildFind("stanEff");
+                auto& GP = stanObj->GetComponent<GPUParticle>();
+
+                GP->SetLoop(false);
+
+                //画像
+                GameObjectManager::Instance().Find("stanSpr")->SetEnabled(false);
+            }
+        }
+    }
+    stanEnd = isStan;
+
+    if (!isStan && !startCountDown)return;
 
     //スタン中なら
 
@@ -567,7 +643,27 @@ void CharacterCom::CoolUpdate(float elapsedTime)
 {
     for (int i = 0; i < SkillCoolID::MAX; ++i)
     {
+        // スキルタイマーを更新
         skillCools[i].timer += elapsedTime;
+
+        if (skillCools[i].useskill && skillCools[i].time <= skillCools[i].timer)
+        {
+            skillCools[i].useskill = false;
+            skillCools[i].coolflag = true;
+        }
+
+        //trueになれば時間を更新
+        if (skillCools[i].coolflag)
+        {
+            skillCools[i].coolJustFrameCounter += elapsedTime;
+        }
+
+        //比較してcoolJustFrameCounterが超えればfalseにする
+        if (skillCools[i].coolJustFrameCounter > skillCools[i].limitTime)
+        {
+            skillCools[i].coolflag = false;
+            skillCools[i].coolJustFrameCounter = 0.0f;
+        }
     }
 }
 
@@ -583,6 +679,22 @@ void CharacterCom::UltUpdate(float elapsedTime)
     else
     {
         isMaxUlt = false; // max未到達ならfalseに戻す
+    }
+
+    // UIのON/OFF
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+    if (canvas != nullptr)
+    {
+        auto& UltUI = canvas->GetChildFind("UltFrame");
+        if (UltUI != nullptr)
+        {
+            if (std::string(GetGameObject()->GetName()) == "player")
+            {
+                UltUI->GetChildFind("UltThunder_IN")->SetEnabled(isMaxUlt);
+                UltUI->GetChildFind("UltThunder_Right")->SetEnabled(isMaxUlt);
+                UltUI->GetChildFind("UltThunder_Left")->SetEnabled(isMaxUlt);
+            }
+        }
     }
 
     // 状態を記録

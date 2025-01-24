@@ -11,6 +11,7 @@ public:
         RED_GROUP,
         BLUE_GROUP,
         DRAW,
+        Max,
     };
 
     enum class GAME_MODE
@@ -22,17 +23,16 @@ public:
         Button,
     };
 
-
     //デスマッチ勝敗必要情報
     struct DeathMatchData   //ゲーム
     {
-        int victoryCount = 10;  //勝ちキル数
+        int victoryCount = 5;  //勝ちキル数
         float endTime = 10000; //終了時間(秒)
 
         float nowTime = 0;
         struct DeathMatchTeamData   //チームごと
         {
-            int killCount;
+            int killCount = 0;
         };
         DeathMatchTeamData teamData[2];
     };
@@ -40,8 +40,14 @@ public:
     //王冠勝敗必要情報
     struct CrownData   //ゲーム
     {
+        float endTime = 10000; //終了時間(秒)
+
+        float nowTime = 0;
+
+        float haveWinTime = 120;
         struct CrownTeamData   //チームごと
         {
+            float crownTime = 0;
         };
         CrownTeamData teamData[2];
     };
@@ -71,12 +77,13 @@ public:
     //勝利チーム
     TEAM_KIND GetVictoryTeam() { return victoryTeam; }
 
+    void OnGUI();
+
 private:
     //各ゲームモード更新
     void DeathmatchUpdate();
     void CrownUpdate();
     void ButtonUpdate();
-
 
 private:
     //ネットから取得する

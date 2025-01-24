@@ -19,7 +19,7 @@ JankratCharacter_BaseState::JankratCharacter_BaseState(CharacterCom* owner) : St
 }
 
 // e‚Ìæ’[ˆÊ’u‚ðŽæ“¾
-bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos,DirectX::XMFLOAT3& dir, unsigned int gamePad) const
+bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos, DirectX::XMFLOAT3& dir, unsigned int gamePad) const
 {
     if (std::string(owner->GetGameObject()->GetName()) == "player")
     {
@@ -40,16 +40,6 @@ bool JankratCharacter_BaseState::GetGunTipPosition(DirectX::XMFLOAT3& outGunPos,
     }
     else
     {
-        //RendererCom* render = owner->GetGameObject()->GetComponent<RendererCom>().get();
-        //const auto& gunNode = render->GetModel()->FindNode("gun2");
-
-        //outGunPos =
-        //{
-        //    gunNode->worldTransform._41,
-        //    gunNode->worldTransform._42,
-        //    gunNode->worldTransform._43
-        //};
-
         //ƒlƒbƒg‚ÌeŒû
         auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(owner->GetNetCharaData().GetNetPlayerID());
         for (auto& b : saveB)
@@ -76,18 +66,14 @@ void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
     // ’eŠÛ‚Ì•¨—ƒvƒƒpƒeƒBÝ’è
     rigid->SetMass(mass);
     rigid->SetRestitution(restitution);
-    rigid->SetRigidFlag(physx::PxRigidBodyFlag::eENABLE_CCD, true);
+    rigid->SetRigidFlag(physx::PxRigidBodyFlag::PxRigidBodyFlag::eENABLE_SPECULATIVE_CCD, true);
 
     // ’eŠÛ‚ÌŽõ–½‚Æd—ÍÝ’è
     jankratBullet->SetLifeTime(bulletLifeTimer);
     jankratBullet->SetAddGravity(addGravity);
     jankratBullet->SetExplosionTime(explosiontime);
 
-    // e‚Ìæ’[ˆÊ’u‚ÆƒJƒƒ‰•ûŒü‚ðŽg—p‚µ‚Ä’eŠÛ‚ð”­ŽË
-    //DirectX::XMFLOAT3 gunPos = {}, fireDir;
-    //if (GetGunTipPosition(gunPos, fireDir, CharacterInput::MainAttackButton | CharacterInput::UltimetButton))
-    //{
-        // ”­ŽË•ûŒü‚ðŒvŽZ
+    // ”­ŽË•ûŒü‚ðŒvŽZ
     DirectX::XMFLOAT3  fireDir;
 
     fireDir = Mathf::Normalize({
@@ -99,7 +85,6 @@ void JankratCharacter_BaseState::FireBullet(const GameObj& bullet)
     // ’eŠÛ‚Ì‰ŠúˆÊ’u‚Æ‰‘¬“x‚ðÝ’è
     bullet->transform_->SetWorldPosition(POS);
     rigid->AddForce(fireDir * force);
-    //}
 }
 
 #pragma region ’Êí’e
@@ -141,7 +126,10 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         charaComponent->ReleaseHaveBullet();
 
         //’eŒ¸‚ç‚³‚È‚¢‚ÆƒŠƒ[ƒh‚µ‚È‚¢
-        charaComponent->AddCurrentBulletNum(-1);
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            charaComponent->AddCurrentBulletNum(-1);
+        }
 
         //‰Šú‰»
         charaComponent->ResetShootTimer();
@@ -173,7 +161,7 @@ void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
     if (GetGunTipPosition(gunPos, dir, CharacterInput::MainSkillButton_E))
     {
         // ’eŠÛ‚ðì¬‚µƒZƒbƒg
-        charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, dir, 100.0f, 20, charaCom.lock()->GetNetCharaData().GetCharaID()));
+        charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, dir, 100.0f, 50, charaCom.lock()->GetNetCharaData().GetCharaID()));
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
 }

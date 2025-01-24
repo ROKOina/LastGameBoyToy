@@ -42,7 +42,6 @@ private:
 
     void CharaSlect(float elapsedTime);
 
-
     void DirectionFOne(float elapsedTime);
     void DirectionFTwo(float elapsedTime);
     void DirectionFEnd(float elapsedTIme);
@@ -60,13 +59,15 @@ private:
     std::weak_ptr<AnimationCom> animationCom;
     std::shared_ptr<CharaPicks>   charaPicks;  //PVPのキャラ選択をここでも使用
     std::vector<std::weak_ptr<GameObject>> tempRemoveObj;   //画面切り替え時に削除するオブジェクト
-    std::string charName[4] = { "Kanizo-Player","FaraicPlayer","SantorattoPlayer","Matya-Player"};
+    std::string charName[4] = { "Kanizo-Player","FaraicPlayer","SantorattoPlayer","Matya-Player" };
 
     int directionNumber = 0;
 
     float deleyTimer = 0;
     float deleyTime = 2.0f;
-    bool flag = false; 
+    bool flag = false;
+
+    bool deleyFlag = false;
 
     bool CharaSelectFlag = false;
 };

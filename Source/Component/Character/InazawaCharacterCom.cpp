@@ -133,6 +133,9 @@ void InazawaCharacterCom::MainAttackDown()
             FinishUlt();
         }
 
+        //腕アニメーション再生
+        HandleArmAnimation();
+
         return;
     }
 
@@ -163,16 +166,16 @@ void InazawaCharacterCom::SubSkill()
 
 void InazawaCharacterCom::UltSkill()
 {
-   //int counter = *GetRCounter();
-   //if (counter >= 0 && counter <= 4)
-   //{
-   //    std::string coreName = "core" + std::to_string(4 - counter);
-   //    const auto& sprite = GameObjectManager::Instance().Find(coreName.c_str())->GetComponent<Sprite>();
-   //    if (sprite)
-   //    {
-   //        sprite->EasingPlay();
-   //    }
-   //}
+    //int counter = *GetRCounter();
+    //if (counter >= 0 && counter <= 4)
+    //{
+    //    std::string coreName = "core" + std::to_string(4 - counter);
+    //    const auto& sprite = GameObjectManager::Instance().Find(coreName.c_str())->GetComponent<Sprite>();
+    //    if (sprite)
+    //    {
+    //        sprite->EasingPlay();
+    //    }
+    //}
 
     attackUltCounter = 0;
 
@@ -183,15 +186,8 @@ void InazawaCharacterCom::UltSkill()
         GameObjectManager::Instance().Find("attackUltSide2")->GetComponent<GPUParticle>()->SetLoop(true);
     }
 
+    SetMaxBullet();
+
     //ステートを初期化
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
-}
-
-//リロード（弾減らす処理は各自のキャラでする
-void InazawaCharacterCom::Reload()
-{
-    if (currentBulletNum < maxBulletNum)
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
-    }
 }

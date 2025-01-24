@@ -4,6 +4,7 @@
 #include "Component\SkillObj\JankratMineCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Particle\CPUParticle.h"
+#include "Component\Renderer\RendererCom.h"
 
 JankratCharacterCom::~JankratCharacterCom()
 {
@@ -44,6 +45,23 @@ void JankratCharacterCom::Update(float elapsedTime)
 
     //後処理
     EraseHaveObjects();
+
+    //足にエフェクトを付与
+    {
+        //ブーストエフェクト1、２
+        {
+            const auto& footpos = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNode("R_foot2");
+            GetGameObject()->GetChildFind("Boost1")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
+        }
+        {
+            const auto& footpos = GetGameObject()->GetComponent<RendererCom>()->GetModel()->FindNode("L_foot2");
+            GetGameObject()->GetChildFind("Boost2")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
+        }
+    }
+    if (haveMine.size() > 0)
+        ResetSkillCoolTimer(SkillCoolID::RightClick);
+    else
+        *GetSkillCoolTimerPointer(SkillCoolID::RightClick) = 0;
 }
 
 void JankratCharacterCom::MainAttackDown()
@@ -64,16 +82,8 @@ void JankratCharacterCom::SubSkill()
     {
         //地雷設置
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
-        //SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 0.1f);
-        //ResetSkillCoolTimer(SkillCoolID::LeftClick);
-    }
-}
-
-void JankratCharacterCom::Reload()
-{
-    if (currentBulletNum < maxBulletNum)
-    {
-        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::RELOAD);
+        //SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 0.1f);
+        //ResetSkillCoolTimer(SkillCoolID::RightClick);
     }
 }
 

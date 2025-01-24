@@ -5,15 +5,13 @@
 #include "Component\Character\CharacterCom.h"
 #include "Graphics/Graphics.h"
 #include "Input\Input.h"
-#include "SceneLobby\SceneLobby.h"
 #include "ScenePVE/ScenePVE.h"
 #include "ScenePVP/ScenePVP.h"
 #include "SceneTitle/SceneTitle.h"
-#include "SceneResult/SceneResult.h"
 #include "SceneTraining/SceneTraining.h"
 #include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\SceneNakanisi\SceneNakanisi.h"
-#include "SceneUeno\SceneUeno.h"
+#include "Scene\SceneResult\SceneResult.h"
 
 #include "Setting/Setting.h"
 #include "Audio/Audio3D.h"
@@ -134,10 +132,8 @@ void SceneManager::ImGui()
                 "ScenePVE",
                 "ScenePVP",
                 "SceneTraining",
-                "SceneLobby",
-                "SceneResult",
                 "SceneNakanisi",
-                "SceneUeno",
+                "SceneResult"
             };
             int scene_id = 0;
             int last_index = sizeof(scene_names) / sizeof(const char*);
@@ -155,10 +151,8 @@ void SceneManager::ImGui()
                     new ScenePVE,
                     new ScenePVP,
                     new SceneTraining,
-                    new SceneLobby,
-                    new SceneResult,
                     new SceneNakanisi,
-                    new SceneUeno,
+                    new SceneResult,
                 };
                 ChangeScene((scenes[scene_id]));
                 for (int i = 0; i < _countof(scenes); i++)

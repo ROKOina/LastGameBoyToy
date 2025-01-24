@@ -48,7 +48,7 @@ namespace
         _Out_ size_t& theight,
         _Out_ size_t& tdepth,
         _Out_ size_t& skipMip,
-        _Out_writes_(mipCount*arraySize) D3D11_SUBRESOURCE_DATA* initData) noexcept
+        _Out_writes_(mipCount* arraySize) D3D11_SUBRESOURCE_DATA* initData) noexcept
     {
         if (!bitData || !initData)
         {
@@ -102,7 +102,7 @@ namespace
                     ++skipMip;
                 }
 
-                if (pSrcBits + (NumBytes*d) > pEndBits)
+                if (pSrcBits + (NumBytes * d) > pEndBits)
                 {
                     return HRESULT_FROM_WIN32(ERROR_HANDLE_EOF);
                 }
@@ -146,7 +146,7 @@ namespace
         _In_ unsigned int miscFlags,
         _In_ bool forceSRGB,
         _In_ bool isCubeMap,
-        _In_reads_opt_(mipCount*arraySize) const D3D11_SUBRESOURCE_DATA* initData,
+        _In_reads_opt_(mipCount* arraySize) const D3D11_SUBRESOURCE_DATA* initData,
         _Outptr_opt_ ID3D11Resource** texture,
         _Outptr_opt_ ID3D11ShaderResourceView** textureView) noexcept
     {
@@ -687,7 +687,7 @@ namespace
                 {
                 case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
                 {
-                    ID3D11Texture1D *temp = nullptr;
+                    ID3D11Texture1D* temp = nullptr;
                     CD3D11_TEXTURE1D_DESC stagingDesc(format, width, arraySize, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ);
                     hr = d3dDevice->CreateTexture1D(&stagingDesc, initData.get(), &temp);
                     if (SUCCEEDED(hr))
@@ -697,7 +697,7 @@ namespace
 
                 case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
                 {
-                    ID3D11Texture2D *temp = nullptr;
+                    ID3D11Texture2D* temp = nullptr;
                     CD3D11_TEXTURE2D_DESC stagingDesc(format, width, height, arraySize, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ, 1, 0, isCubeMap ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0);
                     hr = d3dDevice->CreateTexture2D(&stagingDesc, initData.get(), &temp);
                     if (SUCCEEDED(hr))
@@ -707,7 +707,7 @@ namespace
 
                 case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
                 {
-                    ID3D11Texture3D *temp = nullptr;
+                    ID3D11Texture3D* temp = nullptr;
                     CD3D11_TEXTURE3D_DESC stagingDesc(format, width, height, depth, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ);
                     hr = d3dDevice->CreateTexture3D(&stagingDesc, initData.get(), &temp);
                     if (SUCCEEDED(hr))
@@ -728,7 +728,7 @@ namespace
                     while (d3dDeviceX->IsFencePending(copyFence)) { SwitchToThread(); }
                     pStaging->Release();
                 }
-#else 
+#else
                 if (arraySize > 1)
                 {
                     const uint8_t* pSrcBits = bitData;
@@ -923,7 +923,6 @@ namespace
     }
 } // anonymous namespace
 
-
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
 HRESULT DirectX::CreateDDSTextureFromMemory(
@@ -949,16 +948,16 @@ HRESULT DirectX::CreateDDSTextureFromMemory(
     ID3D11DeviceX* d3dDevice,
     ID3D11DeviceContextX* d3dContext,
 #else
-HRESULT DirectX::CreateDDSTextureFromMemory(
-    ID3D11Device* d3dDevice,
-    ID3D11DeviceContext* d3dContext,
+    HRESULT DirectX::CreateDDSTextureFromMemory(
+        ID3D11Device* d3dDevice,
+        ID3D11DeviceContext* d3dContext,
 #endif
-    const uint8_t* ddsData,
-    size_t ddsDataSize,
-    ID3D11Resource** texture,
-    ID3D11ShaderResourceView** textureView,
-    size_t maxsize,
-    DDS_ALPHA_MODE* alphaMode) noexcept
+        const uint8_t* ddsData,
+        size_t ddsDataSize,
+        ID3D11Resource** texture,
+        ID3D11ShaderResourceView** textureView,
+        size_t maxsize,
+        DDS_ALPHA_MODE* alphaMode) noexcept
 {
     return CreateDDSTextureFromMemoryEx(d3dDevice, d3dContext,
         ddsData, ddsDataSize,
@@ -1022,9 +1021,9 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx(
     }
 
     hr = CreateTextureFromDDS(d3dDevice, nullptr,
-    #if defined(_XBOX_ONE) && defined(_TITLE)
+#if defined(_XBOX_ONE) && defined(_TITLE)
         nullptr, nullptr,
-    #endif
+#endif
         header, bitData, bitSize,
         maxsize,
         usage, bindFlags, cpuAccessFlags, miscFlags,
@@ -1055,21 +1054,21 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx(
     ID3D11DeviceX* d3dDevice,
     ID3D11DeviceContextX* d3dContext,
 #else
-HRESULT DirectX::CreateDDSTextureFromMemoryEx(
-    ID3D11Device* d3dDevice,
-    ID3D11DeviceContext* d3dContext,
+    HRESULT DirectX::CreateDDSTextureFromMemoryEx(
+        ID3D11Device* d3dDevice,
+        ID3D11DeviceContext* d3dContext,
 #endif
-    const uint8_t* ddsData,
-    size_t ddsDataSize,
-    size_t maxsize,
-    D3D11_USAGE usage,
-    unsigned int bindFlags,
-    unsigned int cpuAccessFlags,
-    unsigned int miscFlags,
-    bool forceSRGB,
-    ID3D11Resource** texture,
-    ID3D11ShaderResourceView** textureView,
-    DDS_ALPHA_MODE* alphaMode) noexcept
+        const uint8_t* ddsData,
+        size_t ddsDataSize,
+        size_t maxsize,
+        D3D11_USAGE usage,
+        unsigned int bindFlags,
+        unsigned int cpuAccessFlags,
+        unsigned int miscFlags,
+        bool forceSRGB,
+        ID3D11Resource** texture,
+        ID3D11ShaderResourceView** textureView,
+        DDS_ALPHA_MODE* alphaMode) noexcept
 {
     if (texture)
     {
@@ -1110,9 +1109,9 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx(
     }
 
     hr = CreateTextureFromDDS(d3dDevice, d3dContext,
-        #if defined(_XBOX_ONE) && defined(_TITLE)
-            d3dDevice, d3dContext,
-        #endif
+#if defined(_XBOX_ONE) && defined(_TITLE)
+        d3dDevice, d3dContext,
+#endif
         header, bitData, bitSize,
         maxsize,
         usage, bindFlags, cpuAccessFlags, miscFlags,
@@ -1161,15 +1160,15 @@ HRESULT DirectX::CreateDDSTextureFromFile(
     ID3D11DeviceX* d3dDevice,
     ID3D11DeviceContextX* d3dContext,
 #else
-HRESULT DirectX::CreateDDSTextureFromFile(
-    ID3D11Device* d3dDevice,
-    ID3D11DeviceContext* d3dContext,
+    HRESULT DirectX::CreateDDSTextureFromFile(
+        ID3D11Device* d3dDevice,
+        ID3D11DeviceContext* d3dContext,
 #endif
-    const wchar_t* fileName,
-    ID3D11Resource** texture,
-    ID3D11ShaderResourceView** textureView,
-    size_t maxsize,
-    DDS_ALPHA_MODE* alphaMode) noexcept
+        const wchar_t* fileName,
+        ID3D11Resource** texture,
+        ID3D11ShaderResourceView** textureView,
+        size_t maxsize,
+        DDS_ALPHA_MODE* alphaMode) noexcept
 {
     return CreateDDSTextureFromFileEx(d3dDevice, d3dContext,
         fileName,
@@ -1233,9 +1232,9 @@ HRESULT DirectX::CreateDDSTextureFromFileEx(
     }
 
     hr = CreateTextureFromDDS(d3dDevice, nullptr,
-    #if defined(_XBOX_ONE) && defined(_TITLE)
+#if defined(_XBOX_ONE) && defined(_TITLE)
         nullptr, nullptr,
-    #endif
+#endif
         header, bitData, bitSize,
         maxsize,
         usage, bindFlags, cpuAccessFlags, miscFlags,
@@ -1259,20 +1258,20 @@ HRESULT DirectX::CreateDDSTextureFromFileEx(
     ID3D11DeviceX* d3dDevice,
     ID3D11DeviceContextX* d3dContext,
 #else
-HRESULT DirectX::CreateDDSTextureFromFileEx(
-    ID3D11Device* d3dDevice,
-    ID3D11DeviceContext* d3dContext,
+    HRESULT DirectX::CreateDDSTextureFromFileEx(
+        ID3D11Device* d3dDevice,
+        ID3D11DeviceContext* d3dContext,
 #endif
-    const wchar_t* fileName,
-    size_t maxsize,
-    D3D11_USAGE usage,
-    unsigned int bindFlags,
-    unsigned int cpuAccessFlags,
-    unsigned int miscFlags,
-    bool forceSRGB,
-    ID3D11Resource** texture,
-    ID3D11ShaderResourceView** textureView,
-    DDS_ALPHA_MODE* alphaMode) noexcept
+        const wchar_t* fileName,
+        size_t maxsize,
+        D3D11_USAGE usage,
+        unsigned int bindFlags,
+        unsigned int cpuAccessFlags,
+        unsigned int miscFlags,
+        bool forceSRGB,
+        ID3D11Resource** texture,
+        ID3D11ShaderResourceView** textureView,
+        DDS_ALPHA_MODE* alphaMode) noexcept
 {
     if (texture)
     {
@@ -1314,9 +1313,9 @@ HRESULT DirectX::CreateDDSTextureFromFileEx(
     }
 
     hr = CreateTextureFromDDS(d3dDevice, d3dContext,
-    #if defined(_XBOX_ONE) && defined(_TITLE)
+#if defined(_XBOX_ONE) && defined(_TITLE)
         d3dDevice, d3dContext,
-    #endif
+#endif
         header, bitData, bitSize,
         maxsize,
         usage, bindFlags, cpuAccessFlags, miscFlags,
