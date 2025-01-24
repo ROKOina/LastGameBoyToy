@@ -2,6 +2,14 @@
 #include "Scene\Scene.h"
 #include "Component\System\GameObject.h"
 
+struct ResultUI
+{
+public:
+    GameObj canvasObj;
+
+    void UiSlide(float x, float y, float speed);
+};
+
 class SceneResult : public Scene
 {
 public:
@@ -25,6 +33,7 @@ public:
 
 private:
     void MakeResultUI(GameObj canvas);
+    void MakeResultModel();
 
 public:
     struct ResultData
@@ -42,4 +51,9 @@ public:
     };
     ResultData resultDatas[4];
     GameObj resultUI[4];
+    GameObj resultModel[2];
 };
+
+
+
+
