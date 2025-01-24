@@ -1499,7 +1499,17 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
     }
 
     for (auto& id : removeID)
+    {
+        GameObj parent;
+        if (saveCharaKilog[id].isEnemy)
+            parent = canvas->GetChildFind(("allyKillLog" + std::to_string(saveCharaKilog[id].moveData.id)).c_str());
+        else
+            parent = canvas->GetChildFind(("enemyKillLog" + std::to_string(saveCharaKilog[id].moveData.id)).c_str());
+
+        parent->SetEnabled(false);
+
         saveCharaKilog.erase(id);
+    }
 }
 
 void PlayerUIManager::CreateKillLog()
