@@ -126,6 +126,9 @@ void UI_PlayerHpUI::Update(float elapsedTime)
         }
 
     }
+    else {
+      
+    }
     
 }
 
