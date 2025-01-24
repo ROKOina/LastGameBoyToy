@@ -14,6 +14,7 @@ Texture2D EmissiveHoloMap : register(t5);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
+
     // UVç¿ïW
     float2 uv = pin.texcoord.xy;
 

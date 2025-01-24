@@ -3,6 +3,7 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Bullet\BulletCom.h"
 #include "Component\System\SpawnCom.h"
+#include "Component\Renderer\TrailCom.h"
 
 //基底クラス
 Solder_BaseState::Solder_BaseState(CharacterCom* owner) : State(owner)
@@ -28,6 +29,11 @@ void Solder_MainAttackState::Enter()
     auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
     DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
     DirectX::XMFLOAT3 end = start + front * 100;
+
+    //エフェクト再生
+    auto& beem = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("Beem");
+    beem->transform_->SetWorldPosition(start);
+    beem->GetComponent<GPUParticle>()->Play();
 
     //エフェクト再生
     owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
@@ -74,6 +80,11 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
         auto& camera = GameObjectManager::Instance().Find("cameraPostPlayer");
         DirectX::XMFLOAT3 front = camera->transform_->GetWorldFront();
         DirectX::XMFLOAT3 end = start + front * 100;
+
+        //エフェクト再生
+        auto& beem = owner->GetGameObject()->GetChildFind("cameraPostPlayer")->GetChildFind("Beem");
+        beem->transform_->SetWorldPosition(start);
+        beem->GetComponent<GPUParticle>()->Play();
 
         //エフェクト再生
         owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();

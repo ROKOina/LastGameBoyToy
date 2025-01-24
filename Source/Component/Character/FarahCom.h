@@ -77,6 +77,9 @@ private:
     // 全弾削除
     void ClearAllBullets();
 
+    //エフェクトのループをどうするかのクラス
+    void EffectONOFF();
+
 public:
 
     // ゲージ減少速度設定
