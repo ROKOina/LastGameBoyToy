@@ -32,7 +32,7 @@ class UI_HPEffect : public UiSystem
 {
     //コンポーネントオーバーライド
 public:
-    UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion,int gaugeTexSize,std::weak_ptr<GameObject> obj,int num);
+    UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion, int gaugeTexSize, std::weak_ptr<GameObject> obj, int num);
     ~UI_HPEffect() {}
 
     // 名前取得
@@ -57,8 +57,7 @@ private:
     bool onceFLG = false;
 
     bool isDebug = false;
-}; 
-
+};
 
 class UI_PlayerHpUI :public Component
 {
@@ -271,7 +270,7 @@ private:
     const float time = 0.5f;
 
     std::shared_ptr<GameObject> enemyHp;
-   
+
     float* hp;
 };
 
@@ -474,10 +473,8 @@ public:
 
     //ウルトUI
     void CreateUltUI();
-
     //HPUI
     void CreateHpUI();
-
     //ブーストUI
     void CreateBoostUI();
 
