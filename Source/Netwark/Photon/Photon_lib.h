@@ -178,6 +178,7 @@ public:
         //デスマッチ
         //キル数
         int killCount = 0;
+        int deathCount = 0;
 
         int bulletNum = 0;;
 
