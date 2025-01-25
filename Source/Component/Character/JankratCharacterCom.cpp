@@ -58,6 +58,10 @@ void JankratCharacterCom::Update(float elapsedTime)
             GetGameObject()->GetChildFind("Boost2")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
         }
     }
+    if (haveMine.size() > 0)
+        ResetSkillCoolTimer(SkillCoolID::RightClick);
+    else
+        *GetSkillCoolTimerPointer(SkillCoolID::RightClick) = 0;
 }
 
 void JankratCharacterCom::MainAttackDown()
@@ -78,8 +82,8 @@ void JankratCharacterCom::SubSkill()
     {
         //ínóãê›íu
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
-        //SetSkillCoolTime(CharacterCom::SkillCoolID::LeftClick, 0.1f);
-        //ResetSkillCoolTimer(SkillCoolID::LeftClick);
+        //SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 0.1f);
+        //ResetSkillCoolTimer(SkillCoolID::RightClick);
     }
 }
 
