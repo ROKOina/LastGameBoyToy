@@ -101,12 +101,36 @@ public:
         return true;
     }
 
+    void SendMyDeath() { isMyDeath = true; }
+    bool GetMyDeath() { 
+        //送信したらリセット
+        bool d = isMyDeath;
+        isMyDeath = false;
+        return d;
+    }
+
+
+    void ResetData()
+    {
+        for (auto& s : saveBuffer)
+            s.clear();
+        for (int i = 0; i < 4; ++i) {
+            teamNum[i] = -1;
+            deathID[i] = false;
+
+            for (int ii = 0; ii < 4; ++ii) {
+                killlog[i][ii] = false;
+            }
+        }
+        isMyDeath = false;
+    }
 private:
     std::vector<SaveBuffer> saveBuffer[5];
     bool deathID[4] = {};    //キルされた相手を保存
     bool killlog[4][4] = {};    //[キルID][デスID]
     std::vector<DirectX::XMFLOAT3> damagePostPos = {};
     int teamNum[4] = { -1,-1,-1,-1 };    //[]playerID  0:赤 1:青 -1:なし
+    bool isMyDeath = false;   //デスした時にtrueに
 
     //ピン関係
     int pinNum = -1;

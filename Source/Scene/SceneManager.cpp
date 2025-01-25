@@ -107,6 +107,7 @@ void SceneManager::ChangeScene(Scene* scene)
 
 void SceneManager::ChangeSceneDelay(Scene* scene, float time)
 {
+    if (transitionFlag)return;
     transitionFlag = true;
     transitionScene_ = scene;
     transitionTime = time;

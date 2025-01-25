@@ -42,6 +42,7 @@
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
 #include "../SceneResult/SceneResult.h"
+#include "../SceneResult/DeliveryResultData.h"
 
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
@@ -677,6 +678,7 @@ void ScenePVP::Update(float elapsedTime)
     //ピン
     PingUpdate(elapsedTime);
 
+    auto net = photonNet->GetPhotonLib();
     //終わり
     if (pvpGameSystem->IsGameEnd())
     {
@@ -686,26 +688,64 @@ void ScenePVP::Update(float elapsedTime)
         }
 
         //仮遷移
-       //if (!SceneManager::Instance().GetTransitionFlag())
+       if (!SceneManager::Instance().GetTransitionFlag())
         {
-            SceneResult* result = new SceneResult;
+            //SceneResult* result = new SceneResult;
 
-            //ここでリザルトに送るデータを作る
-            for (int i = 0; i < 4; i++)
+            int Pid = net->GetMyPlayerID();
+            if (Pid >= 0)
             {
-                SceneResult::ResultData data;
-                data.charaID;
-                data.playerName = std::to_string(i) + "_player";
+                int myTeamID = net->GetSaveInput()[Pid].teamID;
 
-                result->resultDatas[i] = data;
+                DelivertResultData::Instance().ResetResultData();
+                bool teamMyJudge = false;   //０～１に味方を設置するため
+                bool teamEnemyJudge = false;  //２～３に敵を設置するため
+                //ここでリザルトに送るデータを作る
+                for (int i = 0; i < 4; i++)
+                {
+                    auto& netI = net->GetSaveInput()[i];
+                    if (!netI.useFlg)continue;
+                    DelivertResultData::ResultData data;
+                    data.charaID = netI.charaID;
+                    data.playerName = netI.name + "_player";
+                    data.killNum = netI.killCount;
+                    data.deathNum = netI.deathCount;
+
+                    data.isWin = (netI.teamID == (int)pvpGameSystem->GetVictoryTeam());
+                    data.myTeam = (myTeamID == netI.teamID);
+                    data.playerID = i;
+
+                    //result->resultDatas[i] = data;
+                    if (data.myTeam)
+                    {
+                        if (!teamMyJudge)
+                        {
+                            teamMyJudge = true;
+                            DelivertResultData::Instance().GetResultData(0) = data;
+                        }
+                        else DelivertResultData::Instance().GetResultData(1) = data;
+                    }
+                    else
+                    {
+                        if (!teamEnemyJudge)
+                        {
+                            teamEnemyJudge = true;
+                            DelivertResultData::Instance().GetResultData(2) = data;
+                        }
+                        else DelivertResultData::Instance().GetResultData(3) = data;
+                    }
+
+                    //勝敗を送る
+                    if (i == Pid)
+                        DelivertResultData::Instance().SetIsMyWin(data.isWin);
+                }
             }
 
-            SceneManager::Instance().ChangeSceneDelay(result, 5);
+            SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
         }
     }
 
     //画面切り替え処理
-    auto net = photonNet->GetPhotonLib();
     bool lobbyOneFlg = false;   //一回だけ初期化するように(ロビーに)
     if (!isLobby) //一回だけ入る
     {

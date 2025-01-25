@@ -10,7 +10,11 @@ void CharaStatusCom::Update(float elapsedTime)
     }
 
     // isDeathFrame の処理
-    isDeathFrame = (isDeath && !wasDeath);
+    if ((isDeath && !wasDeath))
+    {
+        isDeathFrame = true;
+        StaticSendDataManager::Instance().SendMyDeath();    //ネットにデスを送信
+    }
 
     // 現在の isDeath 状態を記録
     wasDeath = isDeath;

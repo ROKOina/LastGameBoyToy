@@ -8,6 +8,7 @@
 #include "Component\UI\Font.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Input\Input.h"
+#include "DeliveryResultData.h"
 #include <Component\UI\PlayerUI.h>
 #include <Component\Animation\AnimationCom.h>
 
@@ -46,6 +47,12 @@ void SceneResult::Initialize()
     }
 
 #pragma endregion
+
+    //データ受け渡し
+    for (int i = 0; i < 4; ++i) {
+        resultDatas[i] = DelivertResultData::Instance().GetResultData(i);
+    }
+    isMyWin = DelivertResultData::Instance().GetIsMyWin();
 
     auto& obj = GameObjectManager::Instance().Create();
     obj->SetName("Canvas");
@@ -95,6 +102,8 @@ void SceneResult::Update(float elapsedTime)
                 resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
                 std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
                 resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+                std::string icon = std::to_string(i) + "st_PlayerIcon";
+                resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
             }
 
             //勝敗君
@@ -111,6 +120,8 @@ void SceneResult::Update(float elapsedTime)
                 resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->StopEasing();
                 std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
                 resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->StopEasing();
+                std::string icon = std::to_string(i) + "st_PlayerIcon";
+                resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->StopEasing();
             }
 
             //勝敗君
@@ -168,6 +179,9 @@ void SceneResult::MakeResultUI(GameObj canvas)
         Sprite* frameUiSprite = frameUiObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_flame.ui", Sprite::SpriteShader::DEFALT, false).get();
         frameUiSprite->SetIsParentMove(true);
         frameUiSprite->SetEasingPosition({ 400.0f,395.0f + (160 * i) + uiOffset });
+        //敵チームは少し色を変える
+        if (i >= 2)
+            frameUiSprite->spc.easingcolor = { 1,45.0f / 255.0f,45.0f / 255.0f,1 };
 
         // キル数
         GameObj killNumObj = uiCanvas->AddChildObject();
@@ -176,6 +190,10 @@ void SceneResult::MakeResultUI(GameObj canvas)
         Sprite* killNumSpr = killNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Kill_number.ui", Sprite::SpriteShader::DEFALT, false).get();
         killNumSpr->SetIsParentMove(true);
         killNumSpr->SetEasingPosition({ 650.0f,395.0f + (160 * i) + uiOffset });
+        //キル数分スクロール
+        float kill = float(resultDatas[i].killNum) * 0.1f;
+        killNumSpr->numUVScroll.x = kill;
+
 
         // デス数
         GameObj deathNumObj = uiCanvas->AddChildObject();
@@ -184,20 +202,43 @@ void SceneResult::MakeResultUI(GameObj canvas)
         Sprite* deathNumSpr = deathNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Death_number.ui", Sprite::SpriteShader::DEFALT, false).get();
         deathNumSpr->SetIsParentMove(true);
         deathNumSpr->SetEasingPosition({ 766.0f,395.0f + (160 * i) + uiOffset });
+        //デス数分スクロール
+        float death = float(resultDatas[i].deathNum) * 0.1f;
+        deathNumSpr->numUVScroll.x = death;
 
         // キャラアイコン
-        //GameObj IconObj = uiCanvas->AddChildObject();
-        //std::string IconName = std::to_string(i) + "st_PlayerIcon";
-        //IconObj->SetName(IconName.c_str());
-        //UiSystem* IconSprite = IconObj->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false).get();
-        //IconSprite->SetIsParentMove(true);
+        GameObj IconObj = uiCanvas->AddChildObject();
+        std::string IconName = std::to_string(i) + "st_PlayerIcon";
+        IconObj->SetName(IconName.c_str());
+
+        UiSystem* IconSprite = IconObj->AddComponent<UiSystem>("Data/SerializeData/UIData/resultScene/Result_CharaIcon.ui", Sprite::SpriteShader::DEFALT, false).get();
+        IconSprite->SetIsParentMove(true);
+        IconSprite->SetEasingPosition({ 93.0f,380.0f + (160 * i) + uiOffset });
+
+        switch (resultDatas[i].charaID)
+        {
+        case 0:
+            IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/InazawaCharacter.png");
+            break;
+        case 1:
+            IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/FarahCom.png");
+            break;
+        case 2:
+            IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/JankratCharacter.png");
+            break;
+        case 3:
+            IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/SoldierCom.png");
+            break;
+        }
+
+
     }
 
     // 勝敗表示
     GameObj judgeObj = canvas->AddChildObject();
     judgeObj->SetName("Judge");
     Sprite* judgeSpr = nullptr;
-    resultDatas[0].isWin ?
+    isMyWin ?
         judgeSpr = judgeObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Judge_victory.ui", Sprite::SpriteShader::DEFALT, false).get() :
         judgeSpr = judgeObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Judge_defeat.ui", Sprite::SpriteShader::DEFALT, false).get();
 }
@@ -205,6 +246,18 @@ void SceneResult::MakeResultUI(GameObj canvas)
 //ここでModel関係を作成
 void SceneResult::MakeResultModel()
 {
+    int winCharaID[2] = { 0,0 };
+    int c = 0;
+    for (int i = 0; i < 4; ++i)
+    {
+        if (resultDatas[i].isWin)
+        {
+            winCharaID[c] = resultDatas[i].charaID;
+            c++;
+            if (c > 1)break;
+        }
+    }
+
     for (int i = 0; i < 2; ++i)
     {
         // 勝利したキャラを出す
@@ -217,7 +270,23 @@ void SceneResult::MakeResultModel()
         std::string charaName = "winChara" + std::to_string(i + 1);
         winChara->SetName(charaName.c_str());
         auto& winCharaRender = winChara->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        winCharaRender->LoadModel("Data/Model/player_True/player1.mdl");
+
+        switch (winCharaID[i])
+        {
+        case 0:
+            winCharaRender->LoadModel("Data/Model/player_True/player1.mdl");
+            break;
+        case 1:
+            winCharaRender->LoadModel("Data/Model/player_True/player2.mdl");
+            break;
+        case 2:
+            winCharaRender->LoadModel("Data/Model/player_True/player3.mdl");
+            break;
+        case 3:
+            winCharaRender->LoadModel("Data/Model/player_True/player4.mdl");
+            break;
+        }
+
         std::shared_ptr<AnimationCom>anim = winChara->AddComponent<AnimationCom>();
         anim->PlayAnimation(5, true);
 
