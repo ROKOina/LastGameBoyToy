@@ -20,7 +20,7 @@ public:
     void Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection) {};
 
     // GUI•`‰æ
-    void OnGUI() override {};
+    void OnGUI() override;
 
 public:
     struct SlideData
@@ -55,8 +55,9 @@ public:
     void SetTargetValue(SlideType type, DirectX::XMFLOAT3 value) { slideDatas[(int)type].target = value; }
     float GetSlideTimer(SlideType type) { return slideDatas[(int)type].slideTimer; }
     float GetSlideTime(SlideType type) { return slideDatas[(int)type].slideTime; }
+
     //“®‚«‚Ìis“xæ“¾
-    float GetSlideProgress(SlideType type); 
+    float GetSlideProgress(SlideType type);
 
 private:
     SlideData slideDatas[(int)SlideType::Max];

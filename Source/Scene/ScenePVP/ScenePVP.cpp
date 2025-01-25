@@ -125,7 +125,7 @@ void ScenePVP::Initialize()
 
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/pingEff01.gpuparticle", 500);
 
-        auto& spr=obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/targetCharacter.ui", Sprite::SpriteShader::DEFALT, false);
+        auto& spr = obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/targetCharacter.ui", Sprite::SpriteShader::DEFALT, false);
 
         obj->SetEnabled(false);
     }
@@ -139,7 +139,6 @@ void ScenePVP::Initialize()
     }
 
     //ロビー選択から始まる
-    //InitializePVP();
     InitializeLobbySelect();
 
     charaPicks = std::make_shared<CharaPicks>();
@@ -419,7 +418,7 @@ void ScenePVP::InitializePVP()
         {
             std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
             obj->SetName("GameStart");
-            auto& spr=obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
+            auto& spr = obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
             spr->SetOrderinLayer(100);
             obj->SetEnabled(false);
             obj->AddComponent<UiEasingEnabledRemoveCom>();
@@ -685,21 +684,21 @@ void ScenePVP::Update(float elapsedTime)
 
         //仮遷移
        //if (!SceneManager::Instance().GetTransitionFlag())
-      {
-          SceneResult* result = new SceneResult;
-      
-          //ここでリザルトに送るデータを作る
-          for (int i = 0; i < 4; i++)
-          {
-              SceneResult::ResultData data;
-              data.charaID;
-              data.playerName = std::to_string(i) + "_player";
-      
-              result->resultDatas[i] = data;
-          }
-      
-          SceneManager::Instance().ChangeSceneDelay(result, 5);
-      }
+        {
+            SceneResult* result = new SceneResult;
+
+            //ここでリザルトに送るデータを作る
+            for (int i = 0; i < 4; i++)
+            {
+                SceneResult::ResultData data;
+                data.charaID;
+                data.playerName = std::to_string(i) + "_player";
+
+                result->resultDatas[i] = data;
+            }
+
+            SceneManager::Instance().ChangeSceneDelay(result, 5);
+        }
     }
 
     //画面切り替え処理
@@ -1478,6 +1477,13 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
     {
         //ゲームスタート
         charaPicks->SetViewCharaPicks(false);
+
+        //暗転からはじまるように
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+        auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+        post->SetExposureZero();    //暗転
+        post->SetParameter(1.4f, 1.0f, parameters); //明転
+
         net->PlayGameStart();
     }
 

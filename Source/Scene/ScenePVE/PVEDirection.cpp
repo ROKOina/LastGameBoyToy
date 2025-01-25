@@ -127,6 +127,12 @@ void PVEDirection::InitializeBack()
     std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
     lobbyBackParent->SetName("lobbyBackParent");
     tempRemoveObj.emplace_back(lobbyBackParent);
+
+    //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
+    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+    auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+    post->SetExposureZero();    //ˆÃ“]
+    post->SetParameter(1.4f, 1.0f, parameters); //–¾“]
 }
 
 void PVEDirection::InitializeChara()

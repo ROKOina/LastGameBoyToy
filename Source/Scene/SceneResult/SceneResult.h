@@ -2,17 +2,10 @@
 #include "Scene\Scene.h"
 #include "Component\System\GameObject.h"
 
-struct ResultUI
-{
-public:
-    GameObj canvasObj;
-
-    void UiSlide(float x, float y, float speed);
-};
-
 class SceneResult : public Scene
 {
 public:
+
     SceneResult() {};
     ~SceneResult()override {};
 
@@ -32,10 +25,14 @@ public:
     std::string GetName() const override { return "SceneResult"; };
 
 private:
+
+    //UIやモデルを生成する関数
     void MakeResultUI(GameObj canvas);
     void MakeResultModel();
 
 public:
+
+    //この構造体の中身が多分ネットの情報を入れるんだと思うby上野
     struct ResultData
     {
         int killNum = 0;
