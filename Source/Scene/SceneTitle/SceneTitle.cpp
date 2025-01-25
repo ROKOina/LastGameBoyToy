@@ -160,26 +160,27 @@ void SceneTitle::Initialize()
 
     Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
 
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Lisner");
-    }
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Emitter");
-        audioSource3d1 = audio->AddComponent<AudioSource3D>(AUDIOID3D::SE);
-        audio->transform_->SetWorldPosition({ -15,0,0 });
-        audioSource3d1.lock()->SetEmitterPos(audio->transform_->GetWorldPosition());
-        audioSource3d1.lock()->AudioPlay();
-    }
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Emitter1");
-        audio->AddComponent<AudioSource3D>(AUDIOID3D::SE);
-        audio->transform_->SetWorldPosition({ 15,0,0 });
-        audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
-        audio->GetComponent<AudioSource3D>()->AudioPlay();
-    }
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Lisner");
+    //}
+
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Emitter");
+    //    audioSource3d1 = audio->AddComponent<AudioSource3D>(AUDIOID3D::SE);
+    //    audio->transform_->SetWorldPosition({ -15,0,0 });
+    //    audioSource3d1.lock()->SetEmitterPos(audio->transform_->GetWorldPosition());
+    //    audioSource3d1.lock()->AudioPlay();
+    //}
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Emitter1");
+    //    audio->AddComponent<AudioSource3D>(AUDIOID3D::SE);
+    //    audio->transform_->SetWorldPosition({ 15,0,0 });
+    //    audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
+    //    audio->GetComponent<AudioSource3D>()->AudioPlay();
+    //}
 
     //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
@@ -306,7 +307,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
             if (sprite->GetHitSpriteEnter())
             {
                 Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR); 
-                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, false, 1.0f);
+                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
             }
             //{ audioObj.lock()->Stop("Cursor"); audioObj.lock()->Play("Cursor", false, 1.0f); }
             //if (sprite->GetHitSpriteEnter()) { audioSource->Stop(static_cast<int>(AUDIOID::SE)); audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);}

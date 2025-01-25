@@ -575,7 +575,7 @@ void CharacterCom::Vinetto(float elapsedTime)
             posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
 
             //音
-            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_DAMAGE, false, 10);
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_DAMAGE, 10.0f, false);
         }
         else
         {

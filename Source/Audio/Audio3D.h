@@ -269,17 +269,6 @@ private:
 
     }
 
-    ////リソース検索
-    //std::shared_ptr<AudioResource> GetAudio2DResouce(AUDIOID2D audioENUM)
-    //{
-    //    auto& it = audio2DResources.find(audioENUM);
-    //    if (it != audio2DResources.end()) { // 見つかった
-    //        return it->second;
-    //    }
-    //    //見つからない
-    //    return nullptr;
-    //}
-
         //2D音源構造体
     struct AudioResource2DStr
     {
@@ -299,10 +288,6 @@ private:
                 sourceVoice_ = 0;
             }
 
-            //const WAVEFORMATEX* pwfx = &resource2D->GetWaveFormat();
-            //const uint8_t* sampleData = resource2D->GetAudioData();
-            //uint32_t waveSize = resource2D->GetAudioBytes();
-
             HRESULT hr = x2d->CreateSourceVoice(&sourceVoice_, &resource2D->GetWaveFormat());
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
@@ -311,6 +296,18 @@ private:
         std::shared_ptr<AudioResource> resource2D;
         IXAudio2SourceVoice* sourceVoice_ = nullptr;
     };
+
+    //リソース検索
+    AudioResource2DStr& GetAudio2DResouce(AUDIOID2D audioENUM)
+    {
+        auto& it = audio2DResources.find(audioENUM);
+        if (it != audio2DResources.end()) { // 見つかった
+            return it->second;
+        }
+        //見つからない
+        AudioResource2DStr ar2d;
+        return ar2d;
+    }
 
     //変数
     std::map<AUDIOID2D, AudioResource2DStr> audio2DResources;

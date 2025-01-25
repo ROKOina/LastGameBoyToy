@@ -70,7 +70,7 @@ void InazawaCharacterCom::Update(float elapsedTime)
 
                     //‰¹
                      Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_ATTACKULTBOOM);
-                     Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_ATTACKULTBOOM, false, 10);
+                     Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_ATTACKULTBOOM, 10.0f, false);
                 }
                 objHitFlag = true;
             }

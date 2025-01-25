@@ -248,7 +248,7 @@ void ScenePVE::Initialize()
 
     //オーディオ
     {
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME1, true, 0.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME1, 0.0f, true);
         Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME1, 0.6f, 0.01f);
     }
 
@@ -298,7 +298,7 @@ void ScenePVE::Update(float elapsedTime)
         {
             Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME1, 0.0f, elapsedTime);
 
-            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME2, true, 0.0f);
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME2, 0.0f, true);
             Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME2, 1.0f, elapsedTime / 2);
 
             battleClymax = true;

@@ -9,8 +9,6 @@
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Audio/Audio3D.h"
-//Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_CHARGE, false, 10);
-//Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_CHARGE);
 
 InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -34,7 +32,7 @@ void InazawaCharacter_AttackState::Enter()
         charge->GetComponent<GPUParticle>()->SetLoop(true);
 
         //音
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_CHARGE, false, 10);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_CHARGE, 10.0f, false);
     }
 }
 
@@ -85,7 +83,7 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
 
         //音
         Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_CHARGE);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, false, 10);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, 10.0f, false);
 
         //射撃間隔タイマー起動
         owner->GetGameObject()->GetComponent<InazawaCharacterCom>()->ResetShootTimer();
@@ -159,7 +157,7 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
 
         //音
         Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_SHOOT);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, false, 10);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, 10.0f, false);
     }
 }
 
