@@ -517,14 +517,17 @@ void ScenePVP::InitializePVP()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("crown");
-        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        std::shared_ptr<RendererCom> r = obj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_NONE, true, false);
         r->LoadModel("Data/Model/Crawn/crawn.mdl");
-        obj->transform_->SetScale({ 0.5f, 0.5f, 0.5f });
+        r->SetOutlineIntensity(10.0f);
+        r->SetOutlineColor({ 0.899f, 1.000f, 0.000f });
+        obj->transform_->SetScale({ 0.3f, 0.3f, 0.3f });
         obj->transform_->SetWorldPosition({ 3.4f, 20, 8.1f });
         auto& move = obj->AddComponent<MovementCom>();
         auto& col = obj->AddComponent<SphereColliderCom>();
         col->SetMyTag(COLLIDER_TAG::Crown);
         col->SetJudgeTag(COLLIDER_TAG::Player);
+        col->SetRadius(1.3f);
         obj->AddComponent<CrownCom>();
     }
     break;

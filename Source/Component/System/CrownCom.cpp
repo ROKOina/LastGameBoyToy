@@ -87,7 +87,7 @@ void CrownCom::IsCrownHaveUpdate(float elapsedTime)
     //ˆÊ’u
     DirectX::XMFLOAT3 pos = haveObj.lock()->transform_->GetWorldPosition();
     lastPos = pos;  //ŠŽ’†‚ÌˆÊ’u‚ð•Û‘¶
-    pos.y += 1.5f;
+    pos.y += 4.5f;
     GetGameObject()->transform_->SetWorldPosition(pos);
 }
 
