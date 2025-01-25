@@ -493,6 +493,9 @@ public:
     //キルエフェクト
     void CreateKillEffect();
 
+    //ファラの固有UI
+    void FarahSkillAndUltUI();
+
     //キルログ
     void KillLogUpdate(float elapsedTime);
     void CreateKillLog();   //オブジェ生成

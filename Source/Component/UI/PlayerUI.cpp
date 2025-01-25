@@ -9,6 +9,7 @@
 #include "Component\UI\Font.h"
 #include "Scene\ScenePVP\ScenePVP.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
+#include "Graphics\Graphics.h"
 
 // UTF-8 (std::string) → UTF-16 (std::wstring) 変換
 std::wstring UTF8ToWString3(const std::string& str) {
@@ -1022,12 +1023,17 @@ void PlayerUIManager::Register()
         break;
 
     case (int)RegisterChara::CHARA_LIST::FARAH:
+
+        FarahSkillAndUltUI();
+
         break;
 
     case (int)RegisterChara::CHARA_LIST::JANKRAT:
+
         break;
 
     case (int)RegisterChara::CHARA_LIST::SOLIDER:
+
         break;
     }
 }
@@ -1217,7 +1223,6 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         //Eskillコア
         std::shared_ptr<GameObject> EcoreUI = canvas->AddChildObject();
         EcoreUI->SetName("EskillCoreManager");
-        //int arrowNum = player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->maxArrowCount;
         EcoreUI->AddComponent<UI_E_SkillCount>(8);
         //ultコア
         std::shared_ptr<GameObject> ultCoreUI = canvas->AddChildObject();
@@ -1478,6 +1483,74 @@ void PlayerUIManager::CreateKillEffect()
         hit->SetName("KillEffect");
 
         hit->AddComponent<UI_KillEffect>();
+    }
+}
+
+//ファラの固有UI
+void PlayerUIManager::FarahSkillAndUltUI()
+{
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+
+    //矢印生成
+    {
+        std::shared_ptr<GameObject>farahui = canvas->AddChildObject();
+        farahui->SetName("farah_ui");
+        farahui->SetEnabled(false);
+
+        // 矢印ごとに配置する位置を管理
+        std::vector<std::pair<float, float>> placedPositions;
+        float minDistance = 300.0f; // 矢印間の最低距離を設定
+
+        for (int i = 0; i < 10; i++)
+        {
+            std::shared_ptr<GameObject>arrow = farahui->AddChildObject();
+
+            // 矢印の名前を列挙ごとに不同にする
+            std::string arrowName = "arrow_" + std::to_string(i + 1);
+            arrow->SetName(arrowName.c_str());
+
+            //コンポーネント付与
+            std::shared_ptr<Sprite>arrawsprite = arrow->AddComponent<Sprite>("Data/SerializeData/UIData/Player/farah_ult.ui", Sprite::SpriteShader::DEFALT, false);
+            arrawsprite->SetColumns(10);
+            arrawsprite->SetFrameRate(19.3f + static_cast<float>(i));
+
+            // 位置を全部バラバラにする
+            float width = Graphics::Instance().GetScreenWidth();
+            float height = Graphics::Instance().GetScreenHeight();
+
+            // 画面の中央を避ける円の半径
+            float avoidRadius = (std::min)(width, height) * 0.3f;
+
+            float xOffset = static_cast<float>(rand() % static_cast<int>(width));
+            float yOffset = static_cast<float>(rand() % static_cast<int>(height));
+
+            // 中央を避ける条件
+            float dx = xOffset - width * 0.5f;
+            float dy = yOffset - height * 0.5f;
+
+            // 他の矢印との間隔もチェック
+            bool isFarEnough = true;
+            for (const auto& pos : placedPositions)
+            {
+                float distX = xOffset - pos.first;
+                float distY = yOffset - pos.second;
+                if (std::sqrt(distX * distX + distY * distY) < minDistance)
+                {
+                    isFarEnough = false;
+                    break;
+                }
+            }
+
+            if (std::sqrt(dx * dx + dy * dy) > avoidRadius && isFarEnough)
+            {
+                placedPositions.emplace_back(xOffset, yOffset);
+            }
+
+            xOffset = std::clamp(xOffset, 0.0f, width);
+            yOffset = std::clamp(yOffset, 0.0f, height);
+
+            arrawsprite->spc.position = { xOffset, yOffset };
+        }
     }
 }
 
