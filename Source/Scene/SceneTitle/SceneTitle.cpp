@@ -26,13 +26,14 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
-//#include "Component\Audio\AudioCom.h"
 #include "Scene\SceneTraining\SceneTraining.h"
 
 
 SceneTitle::~SceneTitle()
 {
 }
+
+AUDIOID2D titleAudioID = AUDIOID2D::BGM;
 
 void SceneTitle::Initialize()
 {
@@ -149,13 +150,15 @@ void SceneTitle::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Audio");
-        auto& a2d = audio->AddComponent<AudioSource2D>();
-        a2d->SetAudio2D(AUDIOID2D::BGM);
-        a2d->Audio2DPlay();
-    }
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Audio");
+    //    auto& a2d = audio->AddComponent<AudioSource2D>();
+    //    a2d->SetAudio2D(AUDIOID2D::BGM);
+    //    a2d->Audio2DPlay();
+    //}
+
+    Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
 
     {
         GameObj audio = GameObjectManager::Instance().Create();
@@ -164,16 +167,16 @@ void SceneTitle::Initialize()
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Emitter");
-        audioSource3d1 = audio->AddComponent<AudioSource3D>(AUDIOID3D::TEST);
-        audio->transform_->SetWorldPosition({ 5,0,0 });
+        audioSource3d1 = audio->AddComponent<AudioSource3D>(AUDIOID3D::SE);
+        audio->transform_->SetWorldPosition({ -15,0,0 });
         audioSource3d1.lock()->SetEmitterPos(audio->transform_->GetWorldPosition());
         audioSource3d1.lock()->AudioPlay();
     }
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Emitter1");
-        audio->AddComponent<AudioSource3D>(AUDIOID3D::TEST);
-        audio->transform_->SetWorldPosition({ 5,0,0 });
+        audio->AddComponent<AudioSource3D>(AUDIOID3D::SE);
+        audio->transform_->SetWorldPosition({ 15,0,0 });
         audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
         audio->GetComponent<AudioSource3D>()->AudioPlay();
     }
@@ -284,8 +287,10 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
-                    audioObj.lock()->FeedStart("Title", 0.0f, elapsedTime);
-                    audioObj.lock()->Play("Enter", false, 1.0f);
+                    //BGM消す
+                    Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
+                    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
+                    
 
                     //audioSource->FeedStart(static_cast<int>(AUDIOID::SE), 0.0f, elapsedTime);
                     //audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);
@@ -298,7 +303,12 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 }
             }
             //セレクト棒壱変更
-            if (sprite->GetHitSpriteEnter()) { audioObj.lock()->Stop("Cursor"); audioObj.lock()->Play("Cursor", false, 1.0f); }
+            if (sprite->GetHitSpriteEnter())
+            {
+                Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR); 
+                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, false, 1.0f);
+            }
+            //{ audioObj.lock()->Stop("Cursor"); audioObj.lock()->Play("Cursor", false, 1.0f); }
             //if (sprite->GetHitSpriteEnter()) { audioSource->Stop(static_cast<int>(AUDIOID::SE)); audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);}
             selectB->SetEnabled(true);
             DirectX::XMFLOAT3 sP = selectB->transform_->GetWorldPosition();

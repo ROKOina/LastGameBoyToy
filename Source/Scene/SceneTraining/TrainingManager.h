@@ -1,7 +1,7 @@
 #pragma once
 #include "Component/System/Component.h"
-#include "Component\Audio\AudioCom.h"
 #include <PvPUi/CharaPicks.h>
+#include "Audio/Audio3D.h"
 
 //トレーニングの統括
 class TrainingManager
@@ -239,13 +239,12 @@ private:
         DirectX::XMFLOAT2 pos = { 0,0 };
         std::wstring str;
 
-        const char* Lines;
+        AUDIOID2D Lines;
+        //const char* Lines;
     };
 
     SubTitle moveSubTitle[15];
     SubTitle gunSubTitle[7];
     SubTitle skillSubTitle[4];
     SubTitle ultSubTitle[5];
-
-    AudioCom* audioObj;
 };

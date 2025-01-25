@@ -17,7 +17,6 @@
 #include "Component\System\SpawnCom.h"
 #include "Component\Renderer\TrailCom.h"
 #include "Component\Particle\GPUParticle.h"
-#include "Component\Audio\AudioCom.h"
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Character\Prop\SetNodeWorldPosCom.h>
 #include "Component\UI\PlayerUI.h"
@@ -126,16 +125,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         smokeeffct->SetActive(false);
     }
 
-    //SE
-    {
-        auto& au = obj->AddComponent<AudioCom>();
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
-        au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
-        au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
-        au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
-        au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
-    }
 
     //ウルト関係Obj追加
     {
@@ -355,17 +344,6 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
         ultobject->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/farah_UltSkill.gpuparticle", 2000);
     }
 
-    //SE
-    {
-        auto& au = obj->AddComponent<AudioCom>();
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
-        au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
-        au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
-        au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
-        au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
-    }
-
     //ブーストエフェクト1、２
     {
         std::shared_ptr<GameObject>boost1 = obj->AddChildObject();
@@ -479,13 +457,6 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
 
-    auto& au = obj->AddComponent<AudioCom>();
-    au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
-    au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
-    au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
-    au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
-    au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
-    au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
@@ -691,17 +662,6 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
 
         //キャラクターに登録
         obj->GetComponent<SoldierCom>()->SetAttackRayObj(ultAttckChild);
-    }
-
-    //SE
-    {
-        auto& au = obj->AddComponent<AudioCom>();
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTBOOM, "P_ATTACK_ULT_BOOM");
-        au->RegisterSource(AUDIOID::PLAYER_ATTACKULTSHOOT, "P_ATTACKULTSHOOT");
-        au->RegisterSource(AUDIOID::PLAYER_CHARGE, "P_CHARGE");
-        au->RegisterSource(AUDIOID::PLAYER_DAMAGE, "P_DAMAGE");
-        au->RegisterSource(AUDIOID::PLAYER_DASH, "P_DASH");
-        au->RegisterSource(AUDIOID::PLAYER_SHOOT, "P_SHOOT");
     }
 
     //ネットでは見える化

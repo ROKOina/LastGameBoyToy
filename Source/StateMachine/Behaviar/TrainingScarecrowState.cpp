@@ -14,7 +14,6 @@ Scarecrow_BaseState::Scarecrow_BaseState(ScarecrowCom* owner) :State(owner)
     moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
-    audioCom = owner->GetGameObject()->GetComponent<AudioCom>();
     characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
 }
 

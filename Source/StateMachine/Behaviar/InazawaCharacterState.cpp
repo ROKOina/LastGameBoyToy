@@ -8,7 +8,9 @@
 #include "Component\Bullet\BulletCom.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Particle\GPUParticle.h"
-#include "Component\Audio\AudioCom.h"
+#include "Audio/Audio3D.h"
+//Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_CHARGE, false, 10);
+//Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_CHARGE);
 
 InazawaCharacter_BaseState::InazawaCharacter_BaseState(CharacterCom* owner) : State(owner)
 {
@@ -32,7 +34,7 @@ void InazawaCharacter_AttackState::Enter()
         charge->GetComponent<GPUParticle>()->SetLoop(true);
 
         //音
-        owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_CHARGE", false, 10);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_CHARGE, false, 10);
     }
 }
 
@@ -82,8 +84,8 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower / maxAttackPower, maxDamage * attackPower);
 
         //音
-        owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_CHARGE");
-        owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_SHOOT", false, 10);
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_CHARGE);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, false, 10);
 
         //射撃間隔タイマー起動
         owner->GetGameObject()->GetComponent<InazawaCharacterCom>()->ResetShootTimer();
@@ -156,8 +158,8 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
         isShot = true;
 
         //音
-        owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_SHOOT");
-        owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_SHOOT", false, 10);
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_SHOOT);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, false, 10);
     }
 }
 

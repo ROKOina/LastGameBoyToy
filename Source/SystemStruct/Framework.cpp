@@ -32,9 +32,6 @@ Framework::Framework(HWND hWnd)
     //指定したシーンを選択
     SceneManager::Instance().ChangeScene(new SceneLGBT);
 
-    // オーディオ初期化
-    Audio::Initialize();
-
 #ifdef _DEBUG
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());

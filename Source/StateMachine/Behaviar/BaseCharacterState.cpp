@@ -9,9 +9,9 @@
 #include "Component\Camera\CameraCom.h"
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene/SceneTitle/SceneTitle.h"
-#include "Component\Audio\AudioCom.h"
 #include "Component\GameSystem\RespawnCom.h"
 #include "Component\Character\CharaStatusCom.h"
+#include "Audio/Audio3D.h"
 
 //Šî’êŒN
 BaseCharacter_BaseState::BaseCharacter_BaseState(CharacterCom* owner) : State(owner)
@@ -440,8 +440,8 @@ void Ult_Attack_State::Enter()
     }
 
     //‰¹
-    owner->GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACKULTSHOOT");
-    owner->GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACKULTSHOOT", false, 10);
+    Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_ATTACKULTSHOOT);
+    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_ATTACKULTSHOOT, false, 10);
 
     ray->SetStart(start);
     ray->SetEnd(end);

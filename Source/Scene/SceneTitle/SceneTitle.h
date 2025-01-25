@@ -2,13 +2,10 @@
 
 #include "Scene/Scene.h"
 #include "Component\Sprite\Sprite.h"
-#include "Audio\AudioSource.h"
-#include "Audio\Audio.h"
 
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
-#include "Component\Audio\AudioCom.h"
 #include "Audio/Audio3D.h"
 
 //タイトルシーン
@@ -41,7 +38,6 @@ private:
     //画面エフェクト実装
     void ScreenEffect(float elapsedTime);
 
-    std::weak_ptr< AudioCom >audioObj;
     std::weak_ptr < AudioSource3D> audioSource3d;
     std::weak_ptr < AudioSource3D> audioSource3d1;
 };

@@ -153,12 +153,9 @@
     <ClInclude Include="External\imgui\imstb_rectpack.h" />
     <ClInclude Include="External\imgui\imstb_textedit.h" />
     <ClInclude Include="External\imgui\imstb_truetype.h" />
-    <ClInclude Include="Source\Audio\Audio.h" />
     <ClInclude Include="Source\Audio\AudioResource.h" />
-    <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\Component\Animation\AimIKCom.h" />
     <ClInclude Include="Source\Component\Animation\AnimationCom.h" />
-    <ClInclude Include="Source\Component\Audio\AudioCom.h" />
     <ClInclude Include="Source\Component\Bullet\BulletCom.h" />
     <ClInclude Include="Source\Component\Bullet\KnockBackCom.h" />
     <ClInclude Include="Source\Component\Bullet\JankratBulletCom.h" />
@@ -316,12 +313,9 @@
     <ClCompile Include="External\imgui\imgui_ja_gryph_ranges.cpp" />
     <ClCompile Include="External\imgui\imgui_tables.cpp" />
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Source\Audio\Audio.cpp" />
     <ClCompile Include="Source\Audio\AudioResource.cpp" />
-    <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\Component\Animation\AimIKCom.cpp" />
     <ClCompile Include="Source\Component\Animation\AnimationCom.cpp" />
-    <ClCompile Include="Source\Component\Audio\AudioCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\BulletCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\JankratBulletCom.cpp" />
     <ClCompile Include="Source\Component\Bullet\KnockBackCom.cpp" />

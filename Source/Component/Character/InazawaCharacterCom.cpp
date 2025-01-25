@@ -10,9 +10,9 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Character\RemoveTimerCom.h"
-#include "Component\Audio\AudioCom.h"
 #include "Phsix\Physxlib.h"
 #include "Component\Renderer\DecalCom.h"
+#include "Audio/Audio3D.h"
 
 void InazawaCharacterCom::Start()
 {
@@ -69,8 +69,8 @@ void InazawaCharacterCom::Update(float elapsedTime)
                     }
 
                     //‰¹
-                    GetGameObject()->GetComponent<AudioCom>()->Stop("P_ATTACK_ULT_BOOM");
-                    GetGameObject()->GetComponent<AudioCom>()->Play("P_ATTACK_ULT_BOOM", false, 10);
+                     Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_ATTACKULTBOOM);
+                     Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_ATTACKULTBOOM, false, 10);
                 }
                 objHitFlag = true;
             }

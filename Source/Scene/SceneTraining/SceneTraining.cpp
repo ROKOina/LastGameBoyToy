@@ -28,7 +28,6 @@
 #include "Component\Camera\FPSCameraCom.h"
 #include "Component\Particle\GPUParticle.h"
 #include <Component/Character/CharaStatusCom.h>
-#include <Component/Audio/AudioCom.h>
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
 #include <Component/UI/PlayerUI.h>
