@@ -550,24 +550,22 @@ void AudioSource3D::AudioPlay()
 
 void Audio2DMagaer::Audio2DPlay(AUDIOID2D id, float volume, bool loop)
 {
-    //Audio2DStop(id);
-    auto& source = GetAudio2DResouce(id);
+    Audio2DStop(id);
     XAUDIO2_BUFFER buffer = {0};
-    buffer.AudioBytes = source.resource2D->GetAudioBytes();
-    buffer.pAudioData = source.resource2D->GetAudioData();
+    buffer.AudioBytes = audio2DResources[id].resource2D->GetAudioBytes();
+    buffer.pAudioData = audio2DResources[id].resource2D->GetAudioData();
     buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
     buffer.Flags = XAUDIO2_END_OF_STREAM;
 
-    source.sourceVoice_->SubmitSourceBuffer(&buffer);
-    source.sourceVoice_->Start();
-    source.sourceVoice_->SetVolume(volume * 0.1f);
+    audio2DResources[id].sourceVoice_->SubmitSourceBuffer(&buffer);
+    audio2DResources[id].sourceVoice_->Start();
+    audio2DResources[id].sourceVoice_->SetVolume(volume * 0.1f);
 }
 
 void Audio2DMagaer::Audio2DStop(AUDIOID2D id)
 {
-    auto& source = GetAudio2DResouce(id);
-    if (!source.sourceVoice_)return;
+    if (!audio2DResources[id].sourceVoice_)return;
 
-    source.sourceVoice_->FlushSourceBuffers();
-    source.sourceVoice_->Stop(0);
+    audio2DResources[id].sourceVoice_->FlushSourceBuffers();
+    audio2DResources[id].sourceVoice_->Stop(0);
 }
