@@ -53,7 +53,3 @@ public:
     GameObj resultUI[4];
     GameObj resultModel[2];
 };
-
-
-
-

@@ -12,7 +12,7 @@
 
 void SceneResult::Initialize()
 {
-    #pragma region 描画の基本系
+#pragma region 描画の基本系
 
     //ポストエフェクト
     {
@@ -40,7 +40,7 @@ void SceneResult::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
-        obj->AddComponent<Light>("Data/SerializeData/LightData/title.light");
+        obj->AddComponent<Light>("Data/SerializeData/LightData/result.light");
     }
 
 #pragma endregion
@@ -85,8 +85,11 @@ void SceneResult::Update(float elapsedTime)
             resultUI[i]->GetComponent<UiMove>()->SlideAllReset();
         }
 
-        modelMove->SlideStart(UiMove::SlideType::Pos,true, 2.0f);
-        modelMove->SlideStart(UiMove::SlideType::Rote,true, 2.0f);
+        //勝ち負けのイージング処理
+        GameObjectManager::Instance().Find("Canvas")->GetChildFind("Judge")->GetComponent<Sprite>()->EasingPlay();
+
+        modelMove->SlideStart(UiMove::SlideType::Pos, true, 2.0f);
+        modelMove->SlideStart(UiMove::SlideType::Rote, true, 2.0f);
     }
 
     //モデルのラープが半分になると敗者チームのUIを出す
@@ -137,61 +140,52 @@ void SceneResult::Render(float elapsedTime)
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
 }
 
-#define MAKE_FONT_SHADOW(parentFont, offsetX,offsetY) \
-        GameObj fontObj = parentFont->GetGameObject()->AddChildObject();\
-        std::string name = parentFont->GetGameObject()->GetName();\
-        fontObj->SetName(name.c_str());\
-        name += "_shadow";\
-        parentFont->GetGameObject()->SetName(name.c_str()); \
-        Font* fontCom = fontObj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024).get();\
-        fontCom->str = parentFont->str; \
-        fontCom->parentPosOffset = { -offsetX, -offsetY }; \
-        fontCom->scale = parentFont->scale; \
-        fontCom->color = { 0,0,0,1 }; \
-        fontCom->isParentMove = true; \
-        parentFont->color = { 1,1,1,1 };
-
 void SceneResult::MakeResultUI(GameObj canvas)
 {
-    
-
     for (int i = 0; i < 4; ++i)
     {
         float uiOffset = 0;
         if (i >= 2) uiOffset = 60;
 
-        GameObj uiCanvas = GameObjectManager::Instance().Create();
-        uiCanvas->transform_->SetWorldPosition({ -400.0f,395.0f + (160 * i) + uiOffset,0.0f });
+        // 子オブジェクト (UI Canvas) を生成し名前を付ける
+        GameObj uiCanvas = canvas->AddChildObject();
+        std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
+        uiCanvas->SetName(canvasName.c_str());
+        uiCanvas->transform_->SetWorldPosition({ -400.0f, 395.0f + (160 * i) + uiOffset, 0.0f });
+
+        // UiMove コンポーネントを設定
         UiMove* uiMove = uiCanvas->AddComponent<UiMove>().get();
         DirectX::XMFLOAT3 uiMovePos = uiCanvas->transform_->GetWorldPosition();
-        uiMove->SetOriginValue(UiMove::SlideType::Pos,uiMovePos);
-        uiMove->SetTargetValue(UiMove::SlideType::Pos,{ 480.0f, uiMovePos.y, uiMovePos.z });
+        uiMove->SetOriginValue(UiMove::SlideType::Pos, uiMovePos);
+        uiMove->SetTargetValue(UiMove::SlideType::Pos, { 410.0f, uiMovePos.y, uiMovePos.z });
         resultUI[i] = uiCanvas;
 
-        //フレーム
+        // フレーム
         GameObj frameUiObj = uiCanvas->AddChildObject();
+        frameUiObj->SetName((canvasName + "_Frame").c_str());
         Sprite* frameUiSprite = frameUiObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_flame.ui", Sprite::SpriteShader::DEFALT, false).get();
         frameUiSprite->SetIsParentMove(true);
 
-        //キル数
-        std::shared_ptr<GameObject> killNumObj = uiCanvas->AddChildObject();
-        std::string killNum = std::to_string(i) + "st_PlayerKillNum";
-        killNumObj->SetName(killNum.c_str());
+        // キル数
+        GameObj killNumObj = uiCanvas->AddChildObject();
+        std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
+        killNumObj->SetName(killNumName.c_str());
         Sprite* killNumSpr = killNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_number.ui", Sprite::SpriteShader::DEFALT, false).get();
         killNumSpr->SetIsParentMove(true);
-        killNumSpr->SetParentPosOffset({ 305,-10,0 });
+        killNumSpr->SetParentPosOffset({ 305, -10, 0 });
 
-        //デス数
-        std::shared_ptr<GameObject> deathNumObj = uiCanvas->AddChildObject();
-        std::string deathNum = std::to_string(i) + "st_PlayerDeathNum";
-        deathNumObj->SetName(killNum.c_str());
+        // デス数
+        GameObj deathNumObj = uiCanvas->AddChildObject();
+        std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
+        deathNumObj->SetName(deathNumName.c_str());
         Sprite* deathNumSpr = deathNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_number.ui", Sprite::SpriteShader::DEFALT, false).get();
         deathNumSpr->SetIsParentMove(true);
-        deathNumSpr->SetParentPosOffset({ 435,-10,0 });
+        deathNumSpr->SetParentPosOffset({ 435, -10, 0 });
     }
 
-    //勝敗表示
-    GameObj judgeObj = GameObjectManager::Instance().Create();
+    // 勝敗表示
+    GameObj judgeObj = canvas->AddChildObject();
+    judgeObj->SetName("Judge");
     Sprite* judgeSpr = nullptr;
     resultDatas[0].isWin ?
         judgeSpr = judgeObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Judge_victory.ui", Sprite::SpriteShader::DEFALT, false).get() :
@@ -204,13 +198,14 @@ void SceneResult::MakeResultModel()
     GameObj winChara = GameObjectManager::Instance().Create();
     winChara->transform_->SetWorldPosition({ 1.0f,1.9f,-5.1f });
     winChara->transform_->SetScale({ 0.13f,0.13f,0.13f });
+    winChara->SetName("winChara");
     auto& winCharaRender = winChara->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
     winCharaRender->LoadModel("Data/Model/player_True/player1.mdl");
     UiMove* winCharaMove = winChara->AddComponent<UiMove>().get();
-    winCharaMove->SetOriginValue(UiMove::SlideType::Pos,{ 1.0f,-4.0f,-5.1f });
-    winCharaMove->SetTargetValue(UiMove::SlideType::Pos,{ 1.0f,-1.9f,-5.1f });
-    winCharaMove->SetOriginValue(UiMove::SlideType::Rote,{ 0.0f,0.0f,0.0f });
-    winCharaMove->SetTargetValue(UiMove::SlideType::Rote,{ 0.0f,560.0f,0.0f });
+    winCharaMove->SetOriginValue(UiMove::SlideType::Pos, { 1.0f,-4.0f,-5.1f });
+    winCharaMove->SetTargetValue(UiMove::SlideType::Pos, { 1.0f,-1.9f,-5.1f });
+    winCharaMove->SetOriginValue(UiMove::SlideType::Rote, { 0.0f,0.0f,0.0f });
+    winCharaMove->SetTargetValue(UiMove::SlideType::Rote, { 0.0f,560.0f,0.0f });
 
     resultModel[0] = winChara;
 }
