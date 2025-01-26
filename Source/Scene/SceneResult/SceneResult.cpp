@@ -15,6 +15,7 @@
 #include "Component\MoveSystem\EasingMoveCom.h"
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
+#include "Scene\SceneTitle\SceneTitle.h"
 
 //コンストラクタ
 void SceneResult::Initialize()
@@ -82,13 +83,20 @@ void SceneResult::Initialize()
 //終了処理
 void SceneResult::Finalize()
 {
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < std::size(resultUI); ++i)
     {
-        resultUI[i].reset();
+        if (resultUI[i])
+        {
+            resultUI[i].reset();
+        }
     }
-    for (int i = 0; i < 2; ++i)
+
+    for (int i = 0; i < std::size(resultModel); ++i)
     {
-        resultModel->reset();
+        if (resultModel[i])
+        {
+            resultModel[i].reset();
+        }
     }
 }
 
@@ -430,5 +438,12 @@ void SceneResult::EventCamera(float elapsedTime)
 
         //勝敗君
         canvas->GetChildFind("Judge")->GetComponent<Sprite>()->EasingPlay();
+    }
+
+    //チェンジシーン
+    GamePad& gamepad = Input::Instance().GetGamePad();
+    if (GamePad::BTN_P & gamepad.GetButtonDown())
+    {
+        SceneManager::Instance().ChangeScene(new SceneTitle);
     }
 }

@@ -74,9 +74,14 @@ void FarahCom::Update(float elapsedTime)
     }
 
     //ult‚Ìui‚ÌON,OFF
-    if (GameObjectManager::Instance().Find("Canvas") != nullptr)
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+    if (canvas)
     {
-        GameObjectManager::Instance().Find("Canvas")->GetChildFind("farah_ui")->SetEnabled(UseUlt());
+        auto& farahUI = canvas->GetChildFind("farah_ui");
+        if (farahUI)
+        {
+            farahUI->SetEnabled(UseUlt());
+        }
     }
 }
 

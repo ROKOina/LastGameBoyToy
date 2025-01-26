@@ -140,7 +140,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         smokeeffct->SetActive(false);
     }
 
-
     //ウルト関係Obj追加
     {
         //アタック系ウルト
@@ -471,7 +470,6 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
-
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
