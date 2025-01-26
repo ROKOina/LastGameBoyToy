@@ -298,7 +298,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         f->position = { 154.0f, 365.0f + (160 * i) };
         f->str = stringconvert(resultDatas[i].playerName);
         f->scale = { 0.9f };
-        f->color = { 1,1,1,fontalpha };
+        f->color = { 1,1,1,1.0f };
     }
 
     // 勝敗表示
@@ -486,10 +486,13 @@ void SceneResult::EventCamera(float elapsedTime)
         canvas->GetChildFind("Judge")->GetComponent<Sprite>()->EasingPlay();
     }
 
-    //フォントのalphaを徐々に上げる
-    if (limittimer >= 2.5f)
+    // フォントの alpha 値を徐々に上げる処理
+    if (limittimer >= 2.3f)
     {
-        fontalpha += elapsedTime / 3;
+        // 経過時間に応じて alpha を増加
+        fontalpha += elapsedTime / 2;
+
+        // alpha 値を最大 1.0 に制限
         fontalpha = (std::min)(fontalpha, 1.0f);
     }
 
