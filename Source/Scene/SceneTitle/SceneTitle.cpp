@@ -28,7 +28,6 @@
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTraining\SceneTraining.h"
 
-
 SceneTitle::~SceneTitle()
 {
 }
@@ -163,7 +162,7 @@ void SceneTitle::Initialize()
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Lisner");
-         audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+        audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
     }
 
     {
@@ -196,8 +195,6 @@ void SceneTitle::Finalize()
 
 void SceneTitle::Update(float elapsedTime)
 {
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
     //UI更新
     UIUpdate(elapsedTime);
 
@@ -231,7 +228,6 @@ void SceneTitle::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
-
 }
 
 void SceneTitle::UIUpdate(float elapsedTime)
@@ -292,7 +288,6 @@ void SceneTitle::UIUpdate(float elapsedTime)
                     //BGM消す
                     Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
                     Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
-                    
 
                     //audioSource->FeedStart(static_cast<int>(AUDIOID::SE), 0.0f, elapsedTime);
                     //audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);
@@ -307,7 +302,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
             //セレクト棒壱変更
             if (sprite->GetHitSpriteEnter())
             {
-                Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR); 
+                Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
                 Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
             }
             //{ audioObj.lock()->Stop("Cursor"); audioObj.lock()->Play("Cursor", false, 1.0f); }

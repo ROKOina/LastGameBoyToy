@@ -119,15 +119,14 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     pushBack->SetWeight(1);
 
     //音
-    if (std::strcmp(obj->GetName(), "player") != 0)
-    {   //足音
-        GameObj audio = obj->AddChildObject();
-        audio->SetName("footEmitter");
-        auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
-        au->SetEmitterPos(audio->transform_->GetWorldPosition());
-        au->AudioPlay();
-    }
-
+    //if (std::strcmp(obj->GetName(), "player") != 0)
+    //{   //足音
+    //    std::shared_ptr<GameObject> audio = obj->AddChildObject();
+    //    audio->SetName("footEmitter");
+    //    auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+    //    au->SetEmitterPos(audio->transform_->GetWorldPosition());
+    //    au->AudioPlay();
+    //}
 
     //煙のエフェクト
     {
@@ -136,7 +135,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         std::shared_ptr<CPUParticle> smokeeffct = smoke->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/smoke.cpuparticle", 100);
         smokeeffct->SetActive(false);
     }
-
 
     //ウルト関係Obj追加
     {
@@ -468,7 +466,6 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     status->SetMaxHitPoint(200);
     status->SetHitPoint(status->GetMaxHitpoint());
     status->SetInvincibleTime(0.3f);
-
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
