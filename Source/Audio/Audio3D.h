@@ -376,6 +376,8 @@ public:
     // Ä¶
     void AudioPlay();
 
+    void SetVolume(float volume) { volume = this->volume; }
+
     void SetListenerPos(DirectX::XMFLOAT3 pos) { listenerPos = pos; }
     void SetEmitterPos(DirectX::XMFLOAT3 pos) { emitterPos = pos; }
 

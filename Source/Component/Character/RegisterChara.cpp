@@ -127,6 +127,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             GameObj audio = obj->AddChildObject();
             audio->SetName("footEmitter");
             auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+            au->SetVolume(10);
             au->AudioPlay();
         }
     }
@@ -338,6 +339,20 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
+    //‰¹
+    std::string n = obj->GetName();
+    int na = n.find("load");
+    if (std::strcmp(obj->GetName(), "player") != 0) {
+        if (na < 0) {
+            //‘«‰¹
+            GameObj audio = obj->AddChildObject();
+            audio->SetName("footEmitter");
+            auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+            au->SetVolume(10);
+            au->AudioPlay();
+        }
+    }
+
     //‰Ÿ‚µo‚µˆ—
     auto& pushBack = obj->AddComponent<PushBackCom>();
     pushBack->SetRadius(0.5f);
@@ -480,6 +495,20 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
 
+    //‰¹
+    std::string n = obj->GetName();
+    int na = n.find("load");
+    if (std::strcmp(obj->GetName(), "player") != 0) {
+        if (na < 0) {
+            //‘«‰¹
+            GameObj audio = obj->AddChildObject();
+            audio->SetName("footEmitter");
+            auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+            au->SetVolume(10);
+            au->AudioPlay();
+        }
+    }
+
     //‰Ÿ‚µo‚µˆ—
     auto& pushBack = obj->AddComponent<PushBackCom>();
     pushBack->SetRadius(0.5f);
@@ -614,6 +643,20 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         box->SetMyTag(COLLIDER_TAG::Player);
     else
         box->SetMyTag(COLLIDER_TAG::Enemy);
+
+    //‰¹
+    std::string n = obj->GetName();
+    int na = n.find("load");
+    if (std::strcmp(obj->GetName(), "player") != 0) {
+        if (na < 0) {
+            //‘«‰¹
+            GameObj audio = obj->AddChildObject();
+            audio->SetName("footEmitter");
+            auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+            au->SetVolume(10);
+            au->AudioPlay();
+        }
+    }
 
     //‰Ÿ‚µo‚µˆ—
     auto& pushBack = obj->AddComponent<PushBackCom>();
