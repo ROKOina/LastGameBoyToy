@@ -51,4 +51,5 @@ private:
 
     float timer = 1.0f;
     float limittimer = 0.0f;
+    float fontalpha = 0.0f;
 };

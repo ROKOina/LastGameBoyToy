@@ -23,7 +23,7 @@ public:
         bool isWin = false;
         bool myTeam = false;
 
-        std::string playerName;
+        std::string playerName = {};
     };
 
     void ResetResultData() {

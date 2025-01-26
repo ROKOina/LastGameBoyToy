@@ -16,6 +16,41 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTitle\SceneTitle.h"
+#include <string>
+#include <windows.h>
+
+std::wstring stringconvert(const std::string& str)
+{
+    std::wstring result;
+    size_t i = 0;
+    while (i < str.size()) {
+        unsigned char c = str[i];
+        if (c <= 0x7F) {
+            result.push_back(c);
+            ++i;
+        }
+        else if ((c & 0xE0) == 0xC0) {
+            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+            result.push_back(wc);
+            i += 2;
+        }
+        else if ((c & 0xF0) == 0xE0) {
+            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+            result.push_back(wc);
+            i += 3;
+        }
+        else if ((c & 0xF8) == 0xF0) {
+            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+            result.push_back(wc);
+            i += 4;
+        }
+        else {
+            // 不正なUTF-8データを無視する
+            ++i;
+        }
+    }
+    return result;
+}
 
 //コンストラクタ
 void SceneResult::Initialize()
@@ -253,6 +288,17 @@ void SceneResult::MakeResultUI(GameObj canvas)
             IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/SoldierCom.png");
             break;
         }
+
+        //キャラの名前
+        GameObj charaname = uiCanvas->AddChildObject();
+        deathNumObj->SetName(deathNumName.c_str());
+        std::string name = "charaname" + std::to_string(i + 1);
+        charaname->SetName(name.c_str());
+        std::shared_ptr<Font>f = charaname->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        f->position = { 154.0f, 365.0f + (160 * i) };
+        f->str = stringconvert(resultDatas[i].playerName);
+        f->scale = { 0.9f };
+        f->color = { 1,1,1,fontalpha };
     }
 
     // 勝敗表示
@@ -438,6 +484,13 @@ void SceneResult::EventCamera(float elapsedTime)
 
         //勝敗君
         canvas->GetChildFind("Judge")->GetComponent<Sprite>()->EasingPlay();
+    }
+
+    //フォントのalphaを徐々に上げる
+    if (limittimer >= 2.5f)
+    {
+        fontalpha += elapsedTime / 3;
+        fontalpha = (std::min)(fontalpha, 1.0f);
     }
 
     //チェンジシーン
