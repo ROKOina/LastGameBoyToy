@@ -1675,18 +1675,12 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
                 //いーじんぐ初期か
                 Pspr->spc.color.w = 0;
-                c1spr->spc.color.w = 0;
-                c2spr->spc.color.w = 0;
+                c1spr->spc.color = { 1,1,1,0 };
+                c2spr->spc.color = { 1,1,1,0 };
                 if (data.second.myID == 0) //キルが自分
-                {
                     c1spr->spc.color = { 1,0,0,0 };
-                    c2spr->spc.color = { 1,1,1,0 };
-                }
                 if (data.second.myID == 1) //デスが自分
-                {
-                    c1spr->spc.color = { 1,1,1,0 };
                     c2spr->spc.color = { 1,0,0,0 };
-                }
 
                 //キャラIDを見て画像ずらす
                 c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.first;
@@ -1760,6 +1754,8 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
 void PlayerUIManager::CreateKillLog()
 {
+    saveCharaKilog.clear();
+
     std::shared_ptr<GameObject> killLogCanvas = GameObjectManager::Instance().Create();
     killLogCanvas->SetName("killLogCanvas");
 
