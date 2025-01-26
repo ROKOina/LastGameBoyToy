@@ -159,9 +159,13 @@ public:
     void SetOrderinLayer(int num) { orderinLayer = num; }
     int GetOrderinLayer() { return orderinLayer; }
 
+    //親子関係？
     void SetIsParentMove(bool flag) { isParentMove = flag; }
     void SetParentPosOffset(DirectX::XMFLOAT3 pos) { parentPosOffset.x = pos.x; parentPosOffset.y = pos.y; }
-     
+
+    //イージング位置を動的変更
+    void SetEasingPosition(DirectX::XMFLOAT2 easingpos) { spc.easingposition = easingpos; }
+
 private:
 
     //頂点構造体

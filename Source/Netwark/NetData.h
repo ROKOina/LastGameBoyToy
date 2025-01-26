@@ -187,6 +187,9 @@ struct NetData
         DirectX::XMFLOAT3 pingPos = {};
         int pinPhotonID = {};
 
+        int killCount = {};
+        int deathCount = {};
+
         std::array<bool, 4> deathID = {};    //キルされたらIDをtrueに
         std::array<bool, 4> isKillCount = {};   //キル数カウントしたらtrueに
     }gameData;
@@ -220,7 +223,6 @@ struct NetData
     //デスマッチ
     struct DeathMatchData   //3
     {
-        int killCount = {};
     }deathMatchData;
     //王冠
     struct CrownData   //4
@@ -261,6 +263,8 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         out << h.gameData.pinPhotonID << " ";
         out << h.gameData.deathID << " ";
         out << h.gameData.isKillCount << " ";
+        out << h.gameData.killCount << " ";
+        out << h.gameData.deathCount << " ";
         VectorSaveBufferOut(out, h.gameData.saveInputBuf);
     }
 
@@ -286,7 +290,6 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     out << h.gameMode << " ";
     if (h.dataKind == NetData::DATA_KIND::DEATHMATCH)
     {
-        out << h.deathMatchData.killCount << " ";
     }
     if (h.dataKind == NetData::DATA_KIND::CROWN)
     {
@@ -328,6 +331,8 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
         in >> h.gameData.pinPhotonID;
         in >> h.gameData.deathID;
         in >> h.gameData.isKillCount;
+        in >> h.gameData.killCount;
+        in >> h.gameData.deathCount;
         VectorSaveBufferIn(in, h.gameData.saveInputBuf);
     }
 
@@ -354,7 +359,6 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     in >> h.gameMode;
     if (h.dataKind == NetData::DATA_KIND::DEATHMATCH)
     {
-        in >> h.deathMatchData.killCount;
     }
     if (h.dataKind == NetData::DATA_KIND::CROWN)
     {

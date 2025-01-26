@@ -281,6 +281,8 @@ void ScenePVE::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
+    BossCountermeasure();
+
     if (PVEDirection::Instance().GetCharaSelect())
     {
         //UI生成
@@ -332,4 +334,17 @@ void ScenePVE::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
+}
+
+
+void ScenePVE::BossCountermeasure()
+{
+    //BOSSのY座標
+    float posY = GameObjectManager::Instance().Find("BOSS")->transform_->GetWorldPosition().y;
+
+    //一定距離落下したら中央に戻す
+    if (posY < -50.0f)
+    {
+        GameObjectManager::Instance().Find("BOSS")->transform_->SetWorldPosition(SpawnPos);
+    }
 }

@@ -1,18 +1,12 @@
 #pragma once
 #include "Scene\Scene.h"
 #include "Component\System\GameObject.h"
-
-struct ResultUI
-{
-public:
-    GameObj canvasObj;
-
-    void UiSlide(float x, float y, float speed);
-};
+#include "DeliveryResultData.h"
 
 class SceneResult : public Scene
 {
 public:
+
     SceneResult() {};
     ~SceneResult()override {};
 
@@ -32,28 +26,30 @@ public:
     std::string GetName() const override { return "SceneResult"; };
 
 private:
+
+    //UIやモデルを生成する関数
     void MakeResultUI(GameObj canvas);
     void MakeResultModel();
 
 public:
-    struct ResultData
-    {
-        int killNum = 0;
-        int deathNum = 0;
 
-        //必要な分足していく
-        int charaID = -1;
-        int playerID = -1;
+    //この構造体の中身が多分ネットの情報を入れるんだと思うby上野
+    //DelivertResultData.h 構造体だけ移した　by稲澤
+    //struct ResultData
+    //{
+    //    int killNum = 0;
+    //    int deathNum = 0;
 
-        bool isWin = false;
+    //    //必要な分足していく
+    //    int charaID = -1;
+    //    int playerID = -1;
 
-        std::string playerName;
-    };
-    ResultData resultDatas[4];
+    //    bool isWin = false;
+
+    //    std::string playerName;
+    //};
+    DelivertResultData::ResultData resultDatas[4];
+    bool isMyWin = false;
     GameObj resultUI[4];
     GameObj resultModel[2];
 };
-
-
-
-

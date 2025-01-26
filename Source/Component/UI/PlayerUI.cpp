@@ -542,12 +542,12 @@ void UI_E_SkillCount::Update(float elapsedTime)
         UpdateGauge(elapsedTime);
     }
     else {
-        for (int                                                                               i = 0; i < num; i++) {
-            coresUi.at(i).coreFrameUi->spc.color.w                                             = 0.0f;
-            coresUi.at(i).coreUi->spc.color.w                                                  = 0.0f;
+        for (int i = 0; i < num; i++) {
+            coresUi.at(i).coreFrameUi->spc.color.w = 0.0f;
+            coresUi.at(i).coreUi->spc.color.w = 0.0f;
         }
-        gaugeUi->spc.color.w                                                                   = 0.0f;
-        gaugeFrameUi->spc.color.w                                                              = 0.0f;
+        gaugeUi->spc.color.w = 0.0f;
+        gaugeFrameUi->spc.color.w = 0.0f;
     }
 }
 
@@ -1211,7 +1211,6 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
     break;
     }
 
-
     //ŒÂ•ÊƒLƒƒƒ‰UI
     if (player.lock()->GetComponent<InazawaCharacterCom>())
     {
@@ -1226,8 +1225,6 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
         int ultCount = player.lock()->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
         ultCoreUI->AddComponent<UI_Ult_Count>(ultCount);
     }
-
-
 }
 
 void PlayerUIManager::CreateReticleUI()

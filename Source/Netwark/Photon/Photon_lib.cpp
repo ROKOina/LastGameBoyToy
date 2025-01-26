@@ -44,6 +44,8 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 #	pragma warning(pop)
 #endif
 {
+    StaticSendDataManager::Instance().ResetData();
+
     //デバッグ出力レベル
     mLoadBalancingClient.setDebugOutputLevel(DEBUG_RELEASE(ExitGames::Common::DebugLevel::INFO, ExitGames::Common::DebugLevel::WARNINGS)); // that instance of LoadBalancingClient and its implementation details
     mLogger.setListener(*this);
@@ -67,6 +69,7 @@ PhotonLib::PhotonLib(UIListener* uiListener)
 void PhotonLib::update(float elapsedTime)
 {
     auto& myPlayer = GameObjectManager::Instance().Find("player");
+    int myPlayerID = GetMyPlayerID();
 
     if (myPlayer)
     {
@@ -132,7 +135,6 @@ void PhotonLib::update(float elapsedTime)
 
             break;
         }
-        int myPlayerID = GetMyPlayerID();
         auto& chara = myPlayer->GetComponent<CharacterCom>();
         chara->GetNetCharaData().SetNetPlayerID(myPlayerID);
         chara->GetNetCharaData().SetNetPhotonID(GetMyPhotonID());
@@ -158,7 +160,7 @@ void PhotonLib::update(float elapsedTime)
         break;
     case PhotonState::JOINED:
         //マスタープレイヤーID保存
-        if (GetIsMasterPlayer())masterPlayerID = GetMyPlayerID();
+        if (GetIsMasterPlayer())masterPlayerID = myPlayerID;
         //情報送信
         if (GetServerTime() - oldMs > sendMs)
         {
@@ -264,6 +266,12 @@ void PhotonLib::update(float elapsedTime)
         if (deathFlag)
             saveDeath[d].onDeath = deathFlag;
         deathFlag = false;
+    }
+    //死亡時送る
+    if (StaticSendDataManager::Instance().GetMyDeath())
+    {
+        //死亡時入る
+        saveInputPhoton[myPlayerID].deathCount++;
     }
 
     //クラウン
@@ -419,6 +427,15 @@ void PhotonLib::ImGui()
         for (auto& s : saveInputPhoton)
         {
             ImGui::InputInt(std::string(s.name).c_str(), &s.killCount);
+        }
+        ImGui::TreePop();
+    }
+    //.desu数
+    if (ImGui::TreeNode("deathcount"))
+    {
+        for (auto& s : saveInputPhoton)
+        {
+            ImGui::InputInt(std::string(s.name).c_str(), &s.deathCount);
         }
         ImGui::TreePop();
     }
@@ -1394,6 +1411,11 @@ void PhotonLib::GameRecv(NetData recvData)
                 StaticSendDataManager::Instance().GetKillID(myD, myPlayerID) = true;
             }
         }
+
+        if (recvData.playerId >= 0) {
+            saveInputPhoton[recvData.playerId].killCount = recvData.gameData.killCount;
+            saveInputPhoton[recvData.playerId].deathCount = recvData.gameData.deathCount;
+        }
     }
 
     if (recvData.playerId >= 0)
@@ -1627,8 +1649,6 @@ void PhotonLib::LobbyRecv(NetData recvData)
 
 void PhotonLib::DeathMatchRecv(NetData recvData)
 {
-    if (recvData.playerId >= 0)
-        saveInputPhoton[recvData.playerId].killCount = recvData.deathMatchData.killCount;
 }
 
 void PhotonLib::CrownRecv(NetData recvData)
@@ -1736,6 +1756,12 @@ void PhotonLib::sendGameData(void)
     for (int d = 0; d < 4; ++d)
     {
         netD.gameData.isKillCount[d] = saveDeath[d].killCon;
+    }
+
+    //切る数送信
+    if (myPlayerID >= 0) {
+        netD.gameData.killCount = saveInputPhoton[myPlayerID].killCount;
+        netD.gameData.deathCount = saveInputPhoton[myPlayerID].deathCount;
     }
 
     //ピング
@@ -1961,9 +1987,6 @@ void PhotonLib::sendDeathMatchData(void)
     //種別をデスマッチに
     netD.dataKind = NetData::DATA_KIND::DEATHMATCH;
 
-    //切る数取得
-    if (myPlayerID >= 0)
-        netD.deathMatchData.killCount = saveInputPhoton[myPlayerID].killCount;
     //for (auto& s : saveInputPhoton)
     //{
     //    if (s.playerId == myPlayerID)
