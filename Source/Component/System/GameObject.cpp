@@ -870,6 +870,7 @@ void GameObjectManager::RenderDeferred()
     int drawCount = 0;
     for (std::weak_ptr<RendererCom>& renderObj : renderSortObject_)
     {
+        if (!renderObj.lock())continue;
         // デファードレンダリングのモデルのみ描画する
         if (drawCount == deferredCount)return;
         drawCount++;

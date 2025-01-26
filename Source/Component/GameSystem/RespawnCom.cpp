@@ -44,7 +44,6 @@ void RespawnCom::Respawn_GoTitle(float elapsedTime)
         if (respawnData->respawnTime >= 2.5f)
         {
             SceneManager::Instance().ChangeSceneDelay(new SceneTitle, 0.0f);
-            delete respawnData;
             respawnDatas.clear();
         }
     }
@@ -52,6 +51,8 @@ void RespawnCom::Respawn_GoTitle(float elapsedTime)
 
 void RespawnCom::Respawn_GamePVP(float elapsedTime)
 {
+    endDatas.clear();
+
     GameObj player = GameObjectManager::Instance().Find("player");
 
     //リスポーン処理
@@ -111,16 +112,12 @@ void RespawnCom::Respawn_GamePVP(float elapsedTime)
     //リスポーン終了したオブジェクトをコンテナから出す
     for (RespawnData* removeObj : endDatas)
     {
-        auto& it = std::remove(respawnDatas.begin(), respawnDatas.end(), removeObj);
-        for (int i = 0; i < respawnDatas.size(); ++i)
+        auto it = std::find(respawnDatas.begin(), respawnDatas.end(), removeObj);
+        if (it != respawnDatas.end())
         {
-            if (std::strcmp(respawnDatas[i]->gameObj->GetName(), removeObj->gameObj->GetName()) == 0)
-            {
-                delete respawnDatas[i];
-                break;
-            }
+            delete* it;  // メモリを解放
+            respawnDatas.erase(it);  // コンテナから削除
         }
-        respawnDatas.erase(it, respawnDatas.end());
     }
     endDatas.clear();
 }
