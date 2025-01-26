@@ -85,7 +85,7 @@ void SceneResult::Finalize()
 {
     for (int i = 0; i < std::size(resultUI); ++i)
     {
-        if (resultUI[i])
+        if (resultUI[i].lock())
         {
             resultUI[i].reset();
         }
@@ -93,7 +93,7 @@ void SceneResult::Finalize()
 
     for (int i = 0; i < std::size(resultModel); ++i)
     {
-        if (resultModel[i])
+        if (resultModel[i].lock())
         {
             resultModel[i].reset();
         }
@@ -113,13 +113,13 @@ void SceneResult::Update(float elapsedTime)
             for (int i = 0; i < 4; ++i)
             {
                 std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-                resultUI[i]->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
                 std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-                resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
                 std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-                resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
                 std::string icon = std::to_string(i) + "st_PlayerIcon";
-                resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
             }
 
             //勝敗君
@@ -131,13 +131,13 @@ void SceneResult::Update(float elapsedTime)
             for (int i = 0; i < 4; ++i)
             {
                 std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-                resultUI[i]->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->StopEasing();
                 std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-                resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->StopEasing();
                 std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-                resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->StopEasing();
                 std::string icon = std::to_string(i) + "st_PlayerIcon";
-                resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->StopEasing();
             }
 
             //勝敗君
@@ -192,7 +192,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         if (i >= 2) uiOffset = 60;
 
         // 子オブジェクト (UI Canvas) を生成し名前を付ける
-        GameObj uiCanvas = canvas->AddChildObject();
+        std::shared_ptr<GameObject> uiCanvas = canvas->AddChildObject();
         std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
         uiCanvas->SetName(canvasName.c_str());
         uiCanvas->transform_->SetWorldPosition({ -400.0f, 395.0f + (160 * i) + uiOffset, 0.0f });
@@ -352,10 +352,10 @@ void SceneResult::MakeResultModel()
     }
 
     //値を代入
-    if (resultModel[0] && resultModel[1])
+    if (resultModel[0].lock() && resultModel[1].lock())
     {
-        resultModel[0]->transform_->SetWorldPosition({ 31.532f, -6.528f, 43.868f });
-        resultModel[1]->transform_->SetWorldPosition({ -35.722f, -7.606f, -14.812f });
+        resultModel[0].lock()->transform_->SetWorldPosition({ 31.532f, -6.528f, 43.868f });
+        resultModel[1].lock()->transform_->SetWorldPosition({ -35.722f, -7.606f, -14.812f });
     }
 
     //王冠
@@ -427,13 +427,13 @@ void SceneResult::EventCamera(float elapsedTime)
         for (int i = 0; i < 4; ++i)
         {
             std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-            resultUI[i]->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
             std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-            resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
             std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-            resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
             std::string icon = std::to_string(i) + "st_PlayerIcon";
-            resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
         }
 
         //勝敗君
