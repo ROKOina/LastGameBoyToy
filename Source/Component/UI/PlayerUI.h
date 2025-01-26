@@ -513,6 +513,7 @@ public:
     //èüîsï\é¶UI
     void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
     bool GetIsEndFLG() { return isEndFLG; }
+    void ResetEndFLG() { isEndFLG = false; }
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
 
