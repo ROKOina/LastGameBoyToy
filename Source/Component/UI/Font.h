@@ -54,14 +54,14 @@ public:
         bool						ascii;					// アスキー文字
     };
 
-    //シェーダ設定
+public:
+
     enum class FontShader
     {
         DEFALT,
         COOL,
     };
 
-public:
     Font(const char* filename, int maxSpriteCount, FontShader shader = FontShader::DEFALT);
     ~Font() {}
 
@@ -121,4 +121,6 @@ public:
     wchar_t* stri = nullptr;
     DirectX::XMFLOAT2               parentPosOffset = {}; //親とどれだけ離れるか
     float							parentScaleOffset = {}; //親とどれだけ離れるか
+
+    bool							isParentMove = false;//親子関係で動くかどうか
 };

@@ -113,8 +113,6 @@ void PVEDirection::CharaSlect(float elapsedTime)
             GameObjectManager::Instance().Find("Reactar1")->SetEnabled(true);
             GameObjectManager::Instance().Find("Reactar2")->SetEnabled(true);
             GameObjectManager::Instance().Find("Reactar3")->SetEnabled(true);
-            //GameObjectManager::Instance().Find("cameraPostPlayer")->SetEnabled(true);
-            //GameObjectManager::Instance().Find("armChild")->SetEnabled(true);
 
             CharaSelectFlag = true;
             flag = false;
@@ -129,6 +127,12 @@ void PVEDirection::InitializeBack()
     std::shared_ptr<GameObject> lobbyBackParent = GameObjectManager::Instance().Create();
     lobbyBackParent->SetName("lobbyBackParent");
     tempRemoveObj.emplace_back(lobbyBackParent);
+
+    //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
+    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+    auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+    post->SetExposureZero();    //ˆÃ“]
+    post->SetParameter(1.4f, 1.0f, parameters); //–¾“]
 }
 
 void PVEDirection::InitializeChara()
@@ -452,7 +456,7 @@ void PVEDirection::DirectionCThi(float elapsedTime)
         GameObjectManager::Instance().Find("arm")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("head")->GetComponent<MovementCom>()->SetGravity(0.98f);
         GameObjectManager::Instance().Find("shoulder")->GetComponent<MovementCom>()->SetGravity(0.98f);
-        
+
         flag = true;
     }
 

@@ -46,7 +46,7 @@ void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject
     //キャラが登録された時にHP表示用のコンポーネントを用意する
     if (obj->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Enemy) {
         obj->AddComponent<UI_EnemyHp>();
-        obj->GetComponent<UI_EnemyHp>()->Register();
+        obj->GetComponent<UI_EnemyHp>()->Register(obj);
     }
 
     //自キャラの場合
@@ -276,11 +276,10 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
                 std::shared_ptr<GameObject> stanEff = armChild->AddChildObject();
                 stanEff->SetName("stanEff");
                 stanEff->transform_->SetLocalPosition({ -3.1f,12.94f,1.69f });
-                auto& gpuP=stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
+                auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
                 gpuP->SetLoop(false);
             }
         }
-
     }
 
     //敵の場合はピン用の当たりを設定
@@ -472,6 +471,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
     charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
+    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 0.1f);
     charaCom->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
     //HPの初期設定
@@ -757,13 +757,6 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
                 auto& gpuP = stanEff->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stanDamageEff.gpuparticle", 250);
                 gpuP->SetLoop(false);
             }
-        }
-
-        //ビームエフェクト
-        {
-            std::shared_ptr<GameObject>beem = cameraPost->AddChildObject();
-            beem->SetName("Beem");
-            beem->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/beem.gpuparticle", 2000);
         }
     }
 

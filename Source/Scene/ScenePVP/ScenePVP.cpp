@@ -42,6 +42,7 @@
 #include "Netwark/Photon/Photon_lib.h"
 #include "../SceneTitle/SceneTitle.h"
 #include "../SceneResult/SceneResult.h"
+#include "../SceneResult/DeliveryResultData.h"
 
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
@@ -125,7 +126,7 @@ void ScenePVP::Initialize()
 
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/pingEff01.gpuparticle", 500);
 
-        auto& spr=obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/targetCharacter.ui", Sprite::SpriteShader::DEFALT, false);
+        auto& spr = obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/targetCharacter.ui", Sprite::SpriteShader::DEFALT, false);
 
         obj->SetEnabled(false);
     }
@@ -139,7 +140,6 @@ void ScenePVP::Initialize()
     }
 
     //ロビー選択から始まる
-    //InitializePVP();
     InitializeLobbySelect();
 
     charaPicks = std::make_shared<CharaPicks>();
@@ -419,7 +419,24 @@ void ScenePVP::InitializePVP()
         {
             std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
             obj->SetName("GameStart");
-            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
+            auto& spr = obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStart.ui", Sprite::SpriteShader::DEFALT, false);
+            spr->SetOrderinLayer(100);
+            obj->SetEnabled(false);
+            obj->AddComponent<UiEasingEnabledRemoveCom>();
+        }
+        //ゲーム開始Back1
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameStartBack1");
+            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStartB1.ui", Sprite::SpriteShader::DEFALT, false);
+            obj->SetEnabled(false);
+            obj->AddComponent<UiEasingEnabledRemoveCom>();
+        }
+        //ゲーム開始Back2
+        {
+            std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+            obj->SetName("GameStartBack2");
+            obj->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/GameStartB2.ui", Sprite::SpriteShader::DEFALT, false);
             obj->SetEnabled(false);
             obj->AddComponent<UiEasingEnabledRemoveCom>();
         }
@@ -658,6 +675,7 @@ void ScenePVP::Update(float elapsedTime)
     //ピン
     PingUpdate(elapsedTime);
 
+    auto net = photonNet->GetPhotonLib();
     //終わり
     if (pvpGameSystem->IsGameEnd())
     {
@@ -665,27 +683,66 @@ void ScenePVP::Update(float elapsedTime)
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
         }
+
         //仮遷移
-        if (!SceneManager::Instance().GetTransitionFlag())
+       if (!SceneManager::Instance().GetTransitionFlag())
         {
-            SceneResult* result = new SceneResult;
+            //SceneResult* result = new SceneResult;
 
-            //ここでリザルトに送るデータを作る
-            for (int i = 0; i < 4; i++)
+            int Pid = net->GetMyPlayerID();
+            if (Pid >= 0)
             {
-                SceneResult::ResultData data;
-                data.charaID;
-                data.playerName = std::to_string(i) + "_player";
+                int myTeamID = net->GetSaveInput()[Pid].teamID;
 
-                result->resultDatas[i] = data;
+                DelivertResultData::Instance().ResetResultData();
+                bool teamMyJudge = false;   //０～１に味方を設置するため
+                bool teamEnemyJudge = false;  //２～３に敵を設置するため
+                //ここでリザルトに送るデータを作る
+                for (int i = 0; i < 4; i++)
+                {
+                    auto& netI = net->GetSaveInput()[i];
+                    if (!netI.useFlg)continue;
+                    DelivertResultData::ResultData data;
+                    data.charaID = netI.charaID;
+                    data.playerName = netI.name + "_player";
+                    data.killNum = netI.killCount;
+                    data.deathNum = netI.deathCount;
+
+                    data.isWin = (netI.teamID == (int)pvpGameSystem->GetVictoryTeam());
+                    data.myTeam = (myTeamID == netI.teamID);
+                    data.playerID = i;
+
+                    //result->resultDatas[i] = data;
+                    if (data.myTeam)
+                    {
+                        if (!teamMyJudge)
+                        {
+                            teamMyJudge = true;
+                            DelivertResultData::Instance().GetResultData(0) = data;
+                        }
+                        else DelivertResultData::Instance().GetResultData(1) = data;
+                    }
+                    else
+                    {
+                        if (!teamEnemyJudge)
+                        {
+                            teamEnemyJudge = true;
+                            DelivertResultData::Instance().GetResultData(2) = data;
+                        }
+                        else DelivertResultData::Instance().GetResultData(3) = data;
+                    }
+
+                    //勝敗を送る
+                    if (i == Pid)
+                        DelivertResultData::Instance().SetIsMyWin(data.isWin);
+                }
             }
 
-            SceneManager::Instance().ChangeSceneDelay(result, 2);
+            SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
         }
     }
 
     //画面切り替え処理
-    auto net = photonNet->GetPhotonLib();
     bool lobbyOneFlg = false;   //一回だけ初期化するように(ロビーに)
     if (!isLobby) //一回だけ入る
     {
@@ -933,13 +990,17 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
                 if (!net1)continue;
                 net1->GetComponent<CharacterCom>()->SetStartCountDown(false);
             }
-            auto& p = GameObjectManager::Instance().Find("player");
             if (p)
                 p->GetComponent<CharacterCom>()->SetStartCountDown(false);
 
             auto& start = gameModeUI->GetChildFind("GameStart");
-            start->SetEnabled(true);
-            start->GetComponent<UiSystem>()->EasingPlay();
+            start->GetComponent<UiEasingEnabledRemoveCom>()->SetRemoveTimer(2);
+            auto& startB1 = gameModeUI->GetChildFind("GameStartBack1");
+            startB1->GetComponent<UiSystem>()->EasingPlay();
+            startB1->GetComponent<UiEasingEnabledRemoveCom>()->SetRemoveTimer(2);
+            auto& startB2 = gameModeUI->GetChildFind("GameStartBack2");
+            startB2->GetComponent<UiSystem>()->EasingPlay();
+            startB2->GetComponent<UiEasingEnabledRemoveCom>()->SetRemoveTimer(2);
         }
     }
 
@@ -1456,6 +1517,13 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
     {
         //ゲームスタート
         charaPicks->SetViewCharaPicks(false);
+
+        //暗転からはじまるように
+        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+        auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+        post->SetExposureZero();    //暗転
+        post->SetParameter(1.4f, 1.0f, parameters); //明転
+
         net->PlayGameStart();
     }
 

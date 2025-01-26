@@ -10,6 +10,39 @@
 #include "Scene\ScenePVP\ScenePVP.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 
+// UTF-8 (std::string) → UTF-16 (std::wstring) 変換
+std::wstring UTF8ToWString3(const std::string& str) {
+    std::wstring result;
+    size_t i = 0;
+    while (i < str.size()) {
+        unsigned char c = str[i];
+        if (c <= 0x7F) {
+            result.push_back(c);
+            ++i;
+        }
+        else if ((c & 0xE0) == 0xC0) {
+            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+            result.push_back(wc);
+            i += 2;
+        }
+        else if ((c & 0xF0) == 0xE0) {
+            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+            result.push_back(wc);
+            i += 3;
+        }
+        else if ((c & 0xF8) == 0xF0) {
+            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+            result.push_back(wc);
+            i += 4;
+        }
+        else {
+            // 不正なUTF-8データを無視する
+            ++i;
+        }
+    }
+    return result;
+}
+
 UI_Skill::UI_Skill(const char* filename, SpriteShader spriteshader, bool collsion, float min, float max) :UiSystem(filename, spriteshader, collsion)
 {
     changePosValue = min - max;
@@ -39,6 +72,92 @@ void UI_Skill::Update(float elapsedTime)
     this->UiSystem::Update(elapsedTime);
 }
 
+UI_PlayerHpUI::UI_PlayerHpUI()
+{
+    player = GameObjectManager::Instance().Find("player");
+    //HpFrame
+    {
+        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
+        std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
+        hpFrame->SetName("HpFrame");
+        hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpFrame.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+
+    //currenthp
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> hpnum = hpFrame->AddChildObject();
+        hpnum->SetName("HpNum");
+        std::shared_ptr<UI_HpNum>hn = hpnum->AddComponent<UI_HpNum>();
+    }
+
+    //hpslashu
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> hps = hpFrame->AddChildObject();
+        hps->SetName("slashu");
+        hps->AddComponent<Sprite>("Data/SerializeData/UIData/Player/slashu.ui", Sprite::SpriteShader::DEFALT, false);
+    }
+
+    //maxhp
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> hpnum = hpFrame->AddChildObject();
+        auto& playerchara = player.lock()->GetComponent<CharaStatusCom>();
+        hpnum->SetName("MaxHp");
+        float maxhp = playerchara->GetMaxHitpoint();  //最大HP
+        std::wstring numstr = std::to_wstring(static_cast<int>(maxhp));
+        std::shared_ptr<Font> font = hpnum->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->scale = 0.75f;
+        font->color = { 1,1,1,0.5f };
+        font->str = numstr;  //L付けてね
+        font->position = { 252.0f,860.0f };
+    }
+
+    //electro
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> electro = hpFrame->AddChildObject();
+        electro->SetName("electro");
+        std::shared_ptr<Sprite>e = electro->AddComponent<Sprite>("Data/SerializeData/UIData/Player/electro.ui", Sprite::SpriteShader::DEFALT, false);
+        e->SetColumns(6);
+        e->SetRows(2);
+        e->SetFrameRate(20.2f);
+    }
+
+    //HpGauge
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
+        std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
+        hpGauge->SetName("HpGauge");
+        std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
+        gauge->SetMaxValue(player.lock()->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
+        hp = player.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
+        gauge->SetVariableValue(hp);
+    }
+}
+
+void UI_PlayerHpUI::Start()
+{
+}
+
+void UI_PlayerHpUI::Update(float elapsedTime)
+{
+    std::shared_ptr<UiGauge> gauge = GameObjectManager::Instance().Find("HpGauge")->GetComponent<UiGauge>();
+    std::shared_ptr<Sprite> electro = GameObjectManager::Instance().Find("electro")->GetComponent<Sprite>();
+    if (*hp <= 100) {
+        gauge->spc.color = { 0.96f,0.945f,0.242f,1 };
+        electro->spc.color = { 0.96f,0.945f,0.242f,1 };
+
+        if (*hp <= 50) {
+            gauge->spc.color = { 0.876f, 0.090f, 0.090f, 1.000f };
+            electro->spc.color = { 0.827f, 0.105f, 0.105f, 1.000f };
+        }
+    }
+    else {
+    }
+}
+
 UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool collsion, int gaugeTexSize, std::weak_ptr<GameObject> obj, int num) :UiSystem(filename, spriteshader, collsion)
 {
     this->gaugeTexSize = gaugeTexSize;
@@ -58,37 +177,42 @@ void UI_HPEffect::Start()
 void UI_HPEffect::Update(float elapsedTime)
 {
     valueRate = *character.lock()->GetComponent<CharaStatusCom>()->GetHitPoint() / maxHp;
-    DirectX::XMFLOAT3 localPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetLocalPosition();
-    DirectX::XMFLOAT3 worldPositiom = this->GetGameObject()->GetComponent<TransformCom>()->GetWorldPosition();
-    this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({ (float)(memoryId * divideTexSize), localPositiom.y ,localPositiom.z });
-    spc.easingposition = { worldPositiom.x,worldPositiom.y };
+    DirectX::XMFLOAT3 localPosition = this->GetGameObject()->GetComponent<TransformCom>()->GetLocalPosition();
+    DirectX::XMFLOAT3 worldPosition = this->GetGameObject()->GetComponent<TransformCom>()->GetWorldPosition();
+    this->GetGameObject()->GetComponent<TransformCom>()->SetLocalPosition({ (float)(memoryId * divideTexSize), localPosition.y ,localPosition.z });
+    spc.easingposition = { worldPosition.x,worldPosition.y };
+    if (!isDebug)
+    {
+        //現在のHPからメモリの場所を特定
+        int memoryCount = valueRate * 10;
+        if (memoryId == memoryCount && !onceFLG) {
+            easingFLG = true;
+            onceFLG = true;
+        }
 
-    //現在のHPからメモリの場所を特定
-    int memoryCount = valueRate * 10;
-    if (memoryId == memoryCount && !onceFLG) {
-        easingFLG = true;
-        onceFLG = true;
+        if (easingFLG) {
+            spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
+            EasingPlay();
+            easingFLG = false;
+        }
+        if (!IsPlayEasing()) {
+            spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
+        }
+
+        if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
+            onceFLG = false;
+        }
     }
-
-    if (easingFLG) {
+    else {
         spc.color = { spc.color.x,spc.color.y,spc.color.z,1 };
-        EasingPlay();
-        easingFLG = false;
     }
-    if (!IsPlayEasing()) {
-        spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
-    }
-
-    if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
-        onceFLG = false;
-    }
-
     this->UiSystem::Update(elapsedTime);
 }
 
 void UI_HPEffect::OnGUI()
 {
     ImGui::InputInt("divideTexSize", &divideTexSize);
+    ImGui::Checkbox("Debug", &isDebug);
     this->UiSystem::OnGUI();
 }
 
@@ -413,18 +537,18 @@ void UI_E_SkillCount::Start()
 void UI_E_SkillCount::Update(float elapsedTime)
 {
     //ごめん消しましたby上野
-    //if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
-    //    UpdateCore(elapsedTime);
-    //    UpdateGauge(elapsedTime);
-    //}
-    //else {
-    //    for (int                                                                               i = 0; i < num; i++) {
-    //        coresUi.at(i).coreFrameUi->spc.color.w                                             = 0.0f;
-    //        coresUi.at(i).coreUi->spc.color.w                                                  = 0.0f;
-    //    }
-    //    gaugeUi->spc.color.w                                                                   = 0.0f;
-    //    gaugeFrameUi->spc.color.w                                                              = 0.0f;
-    //}
+    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::SUB_SKILL) {
+        UpdateCore(elapsedTime);
+        UpdateGauge(elapsedTime);
+    }
+    else {
+        for (int i = 0; i < num; i++) {
+            coresUi.at(i).coreFrameUi->spc.color.w = 0.0f;
+            coresUi.at(i).coreUi->spc.color.w = 0.0f;
+        }
+        gaugeUi->spc.color.w = 0.0f;
+        gaugeFrameUi->spc.color.w = 0.0f;
+    }
 }
 
 void UI_E_SkillCount::UpdateGauge(float elapsedTime)
@@ -610,7 +734,7 @@ UI_HpNum::UI_HpNum()
     font->str = L"";  //L付けてね
     font->scale = 0.75f;
     font->color = { 1,1,1,1.0f };
-    font->position = { 174.0f,817.0f };
+    font->position = { 176.0f,860.0f };
 }
 
 void UI_HpNum::Update(float elapsedTime)
@@ -687,13 +811,13 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
     float* Hp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetHitPoint();
     float MaxHp = this->GetGameObject()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
     std::shared_ptr<UiGauge> gauge = enemyHp->GetComponent<UiGauge>();
-
-    //前フレームのHpと現在のHpが違うなら
+    //
+   //前フレームのHpと現在のHpが違うなら
     if (*Hp != oldHp) {
         displayFLG = true;
         timer = 0.0f;
         oldHp = *Hp;
-        gauge->spc.color = { 1,1,1,1 };
+        gauge->GetGameObject()->SetEnabled(true);
     }
 
     if (displayFLG) {
@@ -702,14 +826,16 @@ void UI_EnemyHp::GaugeUpdate(float elapsedTime)
             displayFLG = false;
             timer = 0.0f;
         }
+        gauge->spc.color = { 1,0,0,1 };
     }
     else {
-        gauge->spc.color = { 0,0,0,0 };
+        gauge->GetGameObject()->SetEnabled(false);
     }
 }
 
-void UI_EnemyHp::Register()
+void UI_EnemyHp::Register(std::weak_ptr<GameObject> obj)
 {
+    hp = obj.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
     enemyHp = this->GetGameObject()->AddChildObject();
     enemyHp->SetName("enemyHp");
     enemyHp->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/EnemyHp.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);
@@ -726,12 +852,26 @@ void UI_EnemyHp::Register()
 
 UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
 {
-    std::shared_ptr<GameObject> tunder = GameObjectManager::Instance().Create();
-    tunder->SetName("Tunder");
-    tunder->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    std::shared_ptr<GameObject> fade = GameObjectManager::Instance().Create();
+    fade->SetName("Fade");
+    fade->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/Fade.ui", Sprite::SpriteShader::DEFALT, false);
+
+    std::shared_ptr<GameObject> leftTrunder = GameObjectManager::Instance().Create();
+    leftTrunder->SetName("LeftTrunder");
+    leftTrunder->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/LeftTunder.ui", Sprite::SpriteShader::DEFALT, false);
+    leftTrunder->SetEnabled(false);
+
+    std::shared_ptr<GameObject> rightTrunder = GameObjectManager::Instance().Create();
+    rightTrunder->SetName("RightTrunder");
+    rightTrunder->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/RightTunder.ui", Sprite::SpriteShader::DEFALT, false);
+    rightTrunder->SetEnabled(false);
+
     std::shared_ptr<GameObject> font = GameObjectManager::Instance().Create();
     font->SetName("Font");
-    font->AddComponent<UiSystem>(nullptr, Sprite::SpriteShader::DEFALT, false);
+    font->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/GameJudge/Font.ui", Sprite::SpriteShader::DEFALT, false);
+    font->SetEnabled(false);
+    font->GetComponent<UiSystem>()->spc.scale = { 0,0 };
+
     for (int i = 0; i <= 3; i++)
     {
         std::shared_ptr<GameObject> circle = GameObjectManager::Instance().Create();
@@ -744,27 +884,86 @@ UI_GameJudge::UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam)
 
     //勝敗に応じてロードするテクスチャ変更
     if (victryTeam == player.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID()) {
-        tunder->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Thunder.png");
         font->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Victory.png");
+
+        leftTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        leftTrunder->GetComponent<UiSystem>()->SetRows(2);
+        leftTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        leftTrunder->GetComponent<UiSystem>()->spc.color = { 1.000f, 0.933f, 0.000f, 1.000f };
+
+        rightTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        rightTrunder->GetComponent<UiSystem>()->SetRows(2);
+        rightTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        rightTrunder->GetComponent<UiSystem>()->spc.color = { 1.000f, 0.933f, 0.000f, 1.000f };
     }
     else {
-        tunder->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/DefeatTunder.png");
         font->GetComponent<UiSystem>()->LoadTexture("Data/Texture/PlayerUI/Defeat.png");
+
+        leftTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        leftTrunder->GetComponent<UiSystem>()->SetRows(2);
+        leftTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        leftTrunder->GetComponent<UiSystem>()->spc.color = { 1,0,0,1 };
+
+        rightTrunder->GetComponent<UiSystem>()->SetColumns(5);
+        rightTrunder->GetComponent<UiSystem>()->SetRows(2);
+        rightTrunder->GetComponent<UiSystem>()->SetFrameRate(10.0f);
+        rightTrunder->GetComponent<UiSystem>()->spc.color = { 1,0,0,1 };
     }
 }
 
 void UI_GameJudge::Start()
 {
-    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Tunder"));
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Fade"));
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("LeftTrunder"));
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("RightTrunder"));
     this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("Font"));
     for (auto& circle : circles)
     {
         this->GetGameObject()->AddChildObject(circle.lock());
     }
 }
+void UI_GameJudge::OnGUI() {
+    ImGui::DragInt("state", &state);
+}
 
 void UI_GameJudge::Update(float elaspedTime)
 {
+    std::shared_ptr<GameObject> fade = GameObjectManager::Instance().Find("Fade");
+    std::shared_ptr<UiSystem> fadeCom = fade->GetComponent<UiSystem>();
+
+    std::shared_ptr<GameObject> leftTrunder = GameObjectManager::Instance().Find("LeftTrunder");
+    std::shared_ptr<UiSystem> leftTrunderCom = leftTrunder->GetComponent<UiSystem>();
+
+    std::shared_ptr<GameObject> rightTrunder = GameObjectManager::Instance().Find("RightTrunder");
+    std::shared_ptr<UiSystem> rightTrunderCom = rightTrunder->GetComponent<UiSystem>();
+
+    std::shared_ptr<GameObject> font = GameObjectManager::Instance().Find("Font");
+    std::shared_ptr<UiSystem> fontCom = font->GetComponent<UiSystem>();
+
+    switch (state)
+    {
+    case 0:
+        fadeTimr += 0.1f;
+        fadeCom->spc.color = { 0,0,0,fadeTimr };
+        if (fadeTimr >= 1.0f) {
+            state++;
+        }
+        break;
+    case 1:
+        font->SetEnabled(true);
+        fontCom->spc.scale = { fontCom->spc.scale.x + 0.01f, fontCom->spc.scale.y + 0.01f, };
+        if (fontCom->spc.scale.x >= 1.0f) {
+            state++;
+        }
+        break;
+
+    case 2:
+        leftTrunder->SetEnabled(true);
+        rightTrunder->SetEnabled(true);
+        break;
+    default:
+        break;
+    }
 }
 
 void PlayerUIManager::Register()
@@ -787,11 +986,11 @@ void PlayerUIManager::Register()
 
     //レティクル
     CreateReticleUI();
+
     //ULT
     CreateUltUI();
     //Hp
     CreateHpUI();
-
     //ブースト
     CreateBoostUI();
 
@@ -807,10 +1006,10 @@ void PlayerUIManager::Register()
     //Hitエフェクト
     CreateHitEffect();
 
+    //キル時のエフェクト
     CreateKillEffect();
 
-    ////キルログ
-    //KillLog();
+    //キルログ
     CreateKillLog();
 
     ////////////////////////////////
@@ -1011,6 +1210,21 @@ void PlayerUIManager::CreateSkillUI(USE_SKILL use_skill, int count)
 
     break;
     }
+
+    //個別キャラUI
+    if (player.lock()->GetComponent<InazawaCharacterCom>())
+    {
+        //Eskillコア
+        std::shared_ptr<GameObject> EcoreUI = canvas->AddChildObject();
+        EcoreUI->SetName("EskillCoreManager");
+        //int arrowNum = player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetState<InazawaCharacter_ESkillState>()->maxArrowCount;
+        EcoreUI->AddComponent<UI_E_SkillCount>(8);
+        //ultコア
+        std::shared_ptr<GameObject> ultCoreUI = canvas->AddChildObject();
+        ultCoreUI->SetName("EskillCoreManager");
+        int ultCount = player.lock()->GetComponent<InazawaCharacterCom>()->GetRMaxCount();
+        ultCoreUI->AddComponent<UI_Ult_Count>(ultCount);
+    }
 }
 
 void PlayerUIManager::CreateReticleUI()
@@ -1109,77 +1323,19 @@ void PlayerUIManager::CreateUltUI()
         ultthunder->SetEnabled(false);
     }
 }
-
 void PlayerUIManager::CreateHpUI()
 {
-    //HpFrame
-    {
-        std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
-        std::shared_ptr<GameObject> hpFrame = canvas->AddChildObject();
-        hpFrame->SetName("HpFrame");
-        hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/HpFrame.ui", Sprite::SpriteShader::DEFALT, false);
-    }
+    std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("Canvas");
 
-    //currenthp
-    {
-        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
-        std::shared_ptr<GameObject> hpnum = hpFrame->AddChildObject();
-        hpnum->SetName("HpNum");
-        std::shared_ptr<UI_HpNum>hn = hpnum->AddComponent<UI_HpNum>();
-    }
-
-    //hpslashu
-    {
-        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
-        std::shared_ptr<GameObject> hps = hpFrame->AddChildObject();
-        hps->SetName("slashu");
-        hps->AddComponent<Sprite>("Data/SerializeData/UIData/Player/slashu.ui", Sprite::SpriteShader::DEFALT, false);
-    }
-
-    //maxhp
-    {
-        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
-        std::shared_ptr<GameObject> hpnum = hpFrame->AddChildObject();
-        std::shared_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
-        auto& playerchara = player->GetComponent<CharaStatusCom>();
-        hpnum->SetName("MaxHp");
-        float maxhp = playerchara->GetMaxHitpoint();  //最大HP
-        std::wstring numstr = std::to_wstring(static_cast<int>(maxhp));
-        std::shared_ptr<Font> font = hpnum->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->scale = 0.75f;
-        font->color = { 1,1,1,0.5f };
-        font->str = numstr;  //L付けてね
-        font->position = { 252.0f,814.0f };
-    }
-
-    //electro
-    {
-        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
-        std::shared_ptr<GameObject> electro = hpFrame->AddChildObject();
-        electro->SetName("electro");
-        std::shared_ptr<Sprite>e = electro->AddComponent<Sprite>("Data/SerializeData/UIData/Player/electro.ui", Sprite::SpriteShader::DEFALT, false);
-        e->SetColumns(6);
-        e->SetRows(2);
-        e->SetFrameRate(20.2f);
-    }
-
-    //HpGauge
-    {
-        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("HpFrame");
-        std::shared_ptr<GameObject> hpGauge = hpFrame->AddChildObject();
-        hpGauge->SetName("HpGauge");
-        std::shared_ptr<UiGauge>gauge = hpGauge->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/HpGauge.ui", Sprite::SpriteShader::DEFALT, true, UiSystem::X_ONLY_ADD);
-        gauge->SetMaxValue(GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
-        float* i = GameObjectManager::Instance().Find("player")->GetComponent<CharaStatusCom>()->GetHitPoint();
-        gauge->SetVariableValue(i);
-    }
-
+    std::shared_ptr<GameObject> Hp = GameObjectManager::Instance().Create();
+    Hp->SetName("HpUI");
+    Hp->AddComponent<UI_PlayerHpUI>();
     //HPエフェクト
     {
         for (int i = 0; i < 9; i++) {
             std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("HpGauge");
             std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
-            std::string name = "HpEffect_" + i;
+            std::string name = "HpEffect_" + std::to_string(i);
             hpEffect->SetName(name.c_str());
             int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
             std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, player, i);
@@ -1192,13 +1348,12 @@ void PlayerUIManager::CreateHpUI()
         std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
         playerName->SetName("PlayerName");
         std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->scale = 0.75f;
+        font->scale = 0.6f;
         font->color = { 1,1,1,1.0f };
-        //font->str = ;  //L付けてね
-        font->position = { 252.0f,814.0f };
+        font->position = { 177.0f,987.0f };
+        font->str = UTF8ToWString3(GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetNetCharaData().GeNetName());  //L付けてね
     }
 }
-
 void PlayerUIManager::CreateBoostUI()
 {
     //Boost
@@ -1223,6 +1378,7 @@ void PlayerUIManager::CreatePlayerIcon()
     fire->SetColumns(5);
     fire->SetRows(4);
     fire->SetFrameRate(20.0f);
+    fire->SetEnabled(false);
 
     std::shared_ptr<GameObject> charaicon = char_fire->AddChildObject();
     charaicon->SetName("CharaIcon");
@@ -1239,7 +1395,6 @@ void PlayerUIManager::CreatePlayerIcon()
 void PlayerUIManager::CreateGunIcon()
 {
     //ロードするテクスチャを設定
-    //std::string name = "Data/Texture/PlayerUI/GunIcon/" + (std::string)player.lock()->GetComponent<CharacterCom>()->GetName() + ".png";
     std::string name = "Data/Texture/PlayerUI/weapon_icon.png";
 
     {
@@ -1750,6 +1905,7 @@ void PlayerUIManager::NetUseCharaUIUpdate(int chara[4], int photonid[4])
 void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
 {
     allyHp = true;
+
     //ロードするテクスチャを設定(アイコンができてから)
     std::string name = "Data/Texture/PlayerUI/CharaIcon/" + (std::string)netPlayer.lock()->GetComponent<CharacterCom>()->GetName() + ".png";
 
@@ -1760,6 +1916,7 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         hpFrame->SetName("AllyHpFrame");
         hpFrame->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/AllyHpFrame.ui", Sprite::SpriteShader::DEFALT, false);
     }
+
     //HpGauge
     {
         std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
@@ -1770,6 +1927,7 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
         float* i = netPlayer.lock()->GetComponent<CharaStatusCom>()->GetHitPoint();
         gauge->SetVariableValue(i);
     }
+
     //Icon
     {
         std::shared_ptr<GameObject> icon = GameObjectManager::Instance().Find("AllyHpFrame")->AddChildObject();
@@ -1782,12 +1940,36 @@ void PlayerUIManager::CreateNetTeamUI(std::weak_ptr<GameObject> netPlayer)
     {
         std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
         std::shared_ptr<GameObject> playerName = hpFrame->AddChildObject();
-        playerName->SetName("PlayerName");
+        playerName->SetName("AllyPlayerName");
         std::shared_ptr<Font> font = playerName->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        font->scale = 0.75f;
+        font->scale = 0.5f;
         font->color = { 1,1,1,1.0f };
-        //font->str = netPlayer.lock()->;  //L付けてね
-        font->position = { 252.0f,814.0f };
+        font->str = UTF8ToWString3(netPlayer.lock()->GetComponent<CharacterCom>()->GetNetCharaData().GeNetName());  //L付けてね
+        font->position = { 139.0f,763.0f };
+    }
+
+    //electro
+    {
+        std::shared_ptr<GameObject> hpFrame = GameObjectManager::Instance().Find("AllyHpFrame");
+        std::shared_ptr<GameObject> electro = hpFrame->AddChildObject();
+        electro->SetName("Allyelectro");
+        std::shared_ptr<Sprite>e = electro->AddComponent<Sprite>("Data/SerializeData/UIData/Player/Allyelectro.ui", Sprite::SpriteShader::DEFALT, false);
+        e->SetColumns(6);
+        e->SetRows(2);
+        e->SetFrameRate(20.2f);
+    }
+
+    //HPエフェクト
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("AllyHpGauge");
+            std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
+            std::string name = "HpEffect_" + i;
+            hpEffect->SetName(name.c_str());
+            int gaugeTexSize = hpgauge->GetComponent<UiGauge>()->originalTexSize.x;
+            std::shared_ptr<UI_HPEffect>gauge = hpEffect->AddComponent<UI_HPEffect>("Data/SerializeData/UIData/Player/HpEffect.ui", Sprite::SpriteShader::DEFALT, true, gaugeTexSize, player, i);
+        }
     }
 }
 

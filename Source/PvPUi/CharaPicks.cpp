@@ -8,6 +8,7 @@
 #include <Component\Camera\FreeCameraCom.h>
 #include "Component\Renderer\VideoCom.h"
 #include "SystemStruct\TimeManager.h"
+#include "Component\PostEffect\PostEffect.h"
 
 CharaPicks::CharaPicks()
 {
@@ -87,6 +88,12 @@ void CharaPicks::CreateCharaPicksUiObject()
         auto& timeLimit = charaPicksCanvas->AddChildObject();
         timeLimit->SetName("TimeLimit");
     }
+
+    //暗転からはじまるように
+    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+    auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
+    post->SetExposureZero();    //暗転
+    post->SetParameter(1.4f, 1.0f, parameters); //明転
 }
 
 // キャラピック更新処理
