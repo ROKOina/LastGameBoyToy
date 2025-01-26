@@ -24,6 +24,8 @@ public:
     // 終了時のコールバック関数
     std::function<void()> onFinishCallback = nullptr;
 
+    void SetPlay(bool value) { play = value; }
+
 private:
 
     //イージング停止

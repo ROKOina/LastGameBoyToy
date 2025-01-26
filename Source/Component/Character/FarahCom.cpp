@@ -72,6 +72,12 @@ void FarahCom::Update(float elapsedTime)
             GetGameObject()->GetChildFind("Boost2")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
         }
     }
+
+    //ult‚Ìui‚ÌON,OFF
+    if (GameObjectManager::Instance().Find("Canvas") != nullptr)
+    {
+        GameObjectManager::Instance().Find("Canvas")->GetChildFind("farah_ui")->SetEnabled(UseUlt());
+    }
 }
 
 // GUI

@@ -11,6 +11,10 @@
 #include "DeliveryResultData.h"
 #include <Component\UI\PlayerUI.h>
 #include <Component\Animation\AnimationCom.h>
+#include "Component\Particle\GPUParticle.h"
+#include "Component\MoveSystem\EasingMoveCom.h"
+#include <Component\Camera\EventCameraCom.h>
+#include <Component\Camera\EventCameraManager.h>
 
 //コンストラクタ
 void SceneResult::Initialize()
@@ -24,21 +28,6 @@ void SceneResult::Initialize()
         std::shared_ptr<PostEffect>posteffect = obj->AddComponent<PostEffect>();
     }
 
-    //フリーカメラ
-    {
-        std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
-        freeCamera->SetName("freecamera");
-        freeCamera->transform_->SetWorldPosition({ 0.275f, -1.563f, -7.571f });
-        freeCamera->transform_->SetEulerRotation({ -12.959,359.176f,0.0f });
-        std::shared_ptr<FreeCameraCom> camera = freeCamera->AddComponent<FreeCameraCom>();
-        camera->SetFocusPos({ 0.363f,-1.042f,-5.307f });
-        camera->SetFocus({ 0.372f,-1.192f,-5.967f });
-        camera->SetEye({ 0.4f,-1.644f,-7.916f });
-        camera->SetDistance(3.026f);
-        camera->SetUpdate(false);
-    }
-    GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
-
     //ライト
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -46,10 +35,20 @@ void SceneResult::Initialize()
         obj->AddComponent<Light>("Data/SerializeData/LightData/result.light");
     }
 
+    //フリーカメラ
+    {
+        std::shared_ptr<GameObject> freeCamera = GameObjectManager::Instance().Create();
+        freeCamera->SetName("freecamera");
+        freeCamera->AddComponent<FreeCameraCom>();
+        freeCamera->transform_->SetWorldPosition({ 0, 5, -10 });
+    }
+    GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
+
 #pragma endregion
 
     //データ受け渡し
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i)
+    {
         resultDatas[i] = DelivertResultData::Instance().GetResultData(i);
     }
     isMyWin = DelivertResultData::Instance().GetIsMyWin();
@@ -60,6 +59,15 @@ void SceneResult::Initialize()
     //オブジェクト設定
     MakeResultUI(obj);
     MakeResultModel();
+
+    //イベント用カメラ
+    {
+        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
+        eventCamera->SetName("eventcamera");
+        std::shared_ptr<EventCameraCom>e = eventCamera->AddComponent<EventCameraCom>();
+        e->ActiveCameraChange();
+        EventCameraManager::Instance().PlayEventCamera("Data/SerializeData/EventCamera/result_firstcamera.eventcamera");
+    }
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -129,9 +137,15 @@ void SceneResult::Update(float elapsedTime)
         }
     }
 
+    //イベントカメラ用
+    EventCameraManager::Instance().EventUpdate(elapsedTime);
+
+    //イベントカメラ
+    EventCamera(elapsedTime);
+
     //行列更新や更新処理
-    GameObjectManager::Instance().Update(elapsedTime);
     GameObjectManager::Instance().UpdateTransform();
+    GameObjectManager::Instance().Update(elapsedTime);
 }
 
 //描画処理
@@ -155,6 +169,9 @@ void SceneResult::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
+
+    //イベントカメラ用
+    EventCameraManager::Instance().EventCameraImGui();
 }
 
 //UI関係をここで生成
@@ -180,8 +197,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         frameUiSprite->SetIsParentMove(true);
         frameUiSprite->SetEasingPosition({ 400.0f,395.0f + (160 * i) + uiOffset });
         //敵チームは少し色を変える
-        if (i >= 2)
-            frameUiSprite->spc.easingcolor = { 1,45.0f / 255.0f,45.0f / 255.0f,1 };
+        if (i >= 2)frameUiSprite->spc.easingcolor = { 1,45.0f / 255.0f,45.0f / 255.0f,1 };
 
         // キル数
         GameObj killNumObj = uiCanvas->AddChildObject();
@@ -193,7 +209,6 @@ void SceneResult::MakeResultUI(GameObj canvas)
         //キル数分スクロール
         float kill = float(resultDatas[i].killNum) * 0.1f;
         killNumSpr->numUVScroll.x = kill;
-
 
         // デス数
         GameObj deathNumObj = uiCanvas->AddChildObject();
@@ -217,21 +232,19 @@ void SceneResult::MakeResultUI(GameObj canvas)
 
         switch (resultDatas[i].charaID)
         {
-        case 0:
+        case Chara::INAZO:
             IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/InazawaCharacter.png");
             break;
-        case 1:
+        case Chara::FARAHC:
             IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/FarahCom.png");
             break;
-        case 2:
+        case Chara::SANTORAT:
             IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/JankratCharacter.png");
             break;
-        case 3:
+        case Chara::MATHYA:
             IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/SoldierCom.png");
             break;
         }
-
-
     }
 
     // 勝敗表示
@@ -246,6 +259,46 @@ void SceneResult::MakeResultUI(GameObj canvas)
 //ここでModel関係を作成
 void SceneResult::MakeResultModel()
 {
+    //親ステージ
+    GameObj ResultStage = GameObjectManager::Instance().Create();
+    ResultStage->SetName("ResultStage");
+    ResultStage->transform_->SetScale({ 0.005f,0.005f,0.005f });
+    auto& stage = ResultStage->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+    stage->LoadModel("Data/Model/AbeStage/ResultStage.mdl");
+
+    //エフェクト
+    {
+        GameObj BoostParent = ResultStage->AddChildObject();
+        BoostParent->SetName("BoostParent");
+
+        //ブーストが四つあるからそれに付随して付ける
+        for (int i = 0; i < 4; ++i)
+        {
+            GameObj boosteffect = BoostParent->AddChildObject();
+            std::string effectname = "boosteffect" + std::to_string(i + 1);
+            boosteffect->SetName(effectname.c_str());
+            boosteffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/result_boost.gpuparticle", 1000);
+
+            //初期値をこのように制御する
+            if (i == 0)
+            {
+                boosteffect->transform_->SetWorldPosition({ 134.347f,-62.699f,101.556f });
+            }
+            if (i == 1)
+            {
+                boosteffect->transform_->SetWorldPosition({ -132.713f,-63.360f,102.403f });
+            }
+            if (i == 2)
+            {
+                boosteffect->transform_->SetWorldPosition({ 132.212f,-62.527f,-102.284f });
+            }
+            if (i == 3)
+            {
+                boosteffect->transform_->SetWorldPosition({ -133.341f,-62.337f,-102.013f });
+            }
+        }
+    }
+
     int winCharaID[2] = { 0,0 };
     int c = 0;
     for (int i = 0; i < 4; ++i)
@@ -261,28 +314,24 @@ void SceneResult::MakeResultModel()
     for (int i = 0; i < 2; ++i)
     {
         // 勝利したキャラを出す
-        GameObj winChara = GameObjectManager::Instance().Create();
-
-        // キャラの位置をずらす
-        float offsetX = static_cast<float>(i) * 1.5f; // X方向に1.5ずつずらす
-        winChara->transform_->SetWorldPosition({ 1.0f + offsetX, 1.9f, 0.0f });
-        winChara->transform_->SetScale({ 0.13f, 0.13f, 0.13f });
+        GameObj winChara = ResultStage->AddChildObject();
+        winChara->transform_->SetScale({ 7.0f, 7.0f, 7.0f });
         std::string charaName = "winChara" + std::to_string(i + 1);
         winChara->SetName(charaName.c_str());
         auto& winCharaRender = winChara->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
 
         switch (winCharaID[i])
         {
-        case 0:
+        case Chara::INAZO:
             winCharaRender->LoadModel("Data/Model/player_True/player1.mdl");
             break;
-        case 1:
+        case Chara::FARAHC:
             winCharaRender->LoadModel("Data/Model/player_True/player2.mdl");
             break;
-        case 2:
+        case Chara::SANTORAT:
             winCharaRender->LoadModel("Data/Model/player_True/player3.mdl");
             break;
-        case 3:
+        case Chara::MATHYA:
             winCharaRender->LoadModel("Data/Model/player_True/player4.mdl");
             break;
         }
@@ -292,5 +341,94 @@ void SceneResult::MakeResultModel()
 
         // 結果モデルに格納
         resultModel[i] = winChara;
+    }
+
+    //値を代入
+    if (resultModel[0] && resultModel[1])
+    {
+        resultModel[0]->transform_->SetWorldPosition({ 31.532f, -6.528f, 43.868f });
+        resultModel[1]->transform_->SetWorldPosition({ -35.722f, -7.606f, -14.812f });
+    }
+
+    //王冠
+    {
+        GameObj crawn1 = ResultStage->AddChildObject();
+        crawn1->SetName("crawn1");
+        crawn1->transform_->SetScale({ 1.7f,1.7f ,1.7f });
+        crawn1->transform_->SetWorldPosition({ 34.960f,95.590f ,42.450f });
+        crawn1->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/crawn.easingmove");
+        auto& crawn1render = crawn1->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_NONE, true, false);
+        crawn1render->LoadModel("Data/Model/Crawn/crawn.mdl");
+        crawn1render->SetDissolveThreshold(1.0f);
+        crawn1render->SetOutlineIntensity(10.0f);
+        crawn1render->SetOutlineColor({ 0.899f, 1.000f, 0.000f });
+
+        GameObj crawn2 = ResultStage->AddChildObject();
+        crawn2->SetName("crawn2");
+        crawn2->transform_->SetScale({ 1.7f,1.7f ,1.7f });
+        crawn2->transform_->SetWorldPosition({ -32.329f,94.703f ,-15.492f });
+        crawn2->AddComponent<EasingMoveCom>("Data/SerializeData/3DEasingData/crawn.easingmove");
+        auto& crawn2render = crawn2->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_NONE, true, false);
+        crawn2render->LoadModel("Data/Model/Crawn/crawn.mdl");
+        crawn2render->SetDissolveThreshold(1.0f);
+        crawn2render->SetOutlineIntensity(10.0f);
+        crawn2render->SetOutlineColor({ 0.899f, 1.000f, 0.000f });
+    }
+
+    //王冠エフェクト１
+    {
+        GameObj crawneffect1 = GameObjectManager::Instance().Create();
+        crawneffect1->SetName("crawneffect1");
+        crawneffect1->transform_->SetWorldPosition({ 0.173f,0.536f,0.208f });
+        crawneffect1->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/result_crawneffect.gpuparticle", 700);
+        crawneffect1->SetEnabled(false);
+    }
+
+    //王冠エフェクト2
+    {
+        GameObj crawneffect2 = GameObjectManager::Instance().Create();
+        crawneffect2->SetName("crawneffect2");
+        crawneffect2->transform_->SetWorldPosition({ -0.162f,0.537f,-0.079f });
+        crawneffect2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/result_crawneffect.gpuparticle", 700);
+        crawneffect2->SetEnabled(false);
+    }
+}
+
+//イベントカメラの更新更新処理
+void SceneResult::EventCamera(float elapsedTime)
+{
+    auto& stage = GameObjectManager::Instance().Find("ResultStage");
+
+    if (!EventCameraManager::Instance().GetIsPlayEvent())
+    {
+        timer -= elapsedTime / 3;
+        stage->GetChildFind("crawn1")->GetComponent<RendererCom>()->SetDissolveThreshold(timer);
+        stage->GetChildFind("crawn2")->GetComponent<RendererCom>()->SetDissolveThreshold(timer);
+        GameObjectManager::Instance().Find("crawneffect1")->SetEnabled(true);
+        GameObjectManager::Instance().Find("crawneffect2")->SetEnabled(true);
+
+        //経過時間
+        limittimer += elapsedTime;
+    }
+
+    //イージング
+    if (limittimer >= 2.0f && limittimer <= 2.1f)
+    {
+        auto& canvas = GameObjectManager::Instance().Find("Canvas");
+        //リザルトのUI君
+        for (int i = 0; i < 4; ++i)
+        {
+            std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
+            resultUI[i]->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
+            std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
+            resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+            std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
+            resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+            std::string icon = std::to_string(i) + "st_PlayerIcon";
+            resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
+        }
+
+        //勝敗君
+        canvas->GetChildFind("Judge")->GetComponent<Sprite>()->EasingPlay();
     }
 }
