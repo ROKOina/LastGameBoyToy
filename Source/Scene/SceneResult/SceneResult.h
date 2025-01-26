@@ -31,25 +31,24 @@ private:
     void MakeResultUI(GameObj canvas);
     void MakeResultModel();
 
-public:
+    //イベントカメラの更新更新処理
+    void EventCamera(float elapsedTime);
 
-    //この構造体の中身が多分ネットの情報を入れるんだと思うby上野
-    //DelivertResultData.h 構造体だけ移した　by稲澤
-    //struct ResultData
-    //{
-    //    int killNum = 0;
-    //    int deathNum = 0;
+private:
 
-    //    //必要な分足していく
-    //    int charaID = -1;
-    //    int playerID = -1;
+    enum Chara
+    {
+        INAZO = 0,
+        FARAHC = 1,
+        SANTORAT = 2,
+        MATHYA = 3
+    };
 
-    //    bool isWin = false;
-
-    //    std::string playerName;
-    //};
     DelivertResultData::ResultData resultDatas[4];
     bool isMyWin = false;
     GameObj resultUI[4];
     GameObj resultModel[2];
+
+    float timer = 1.0f;
+    float limittimer = 0.0f;
 };

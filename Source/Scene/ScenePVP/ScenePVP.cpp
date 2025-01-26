@@ -688,7 +688,7 @@ void ScenePVP::Update(float elapsedTime)
         }
 
         //‰¼‘JˆÚ
-       if (!SceneManager::Instance().GetTransitionFlag())
+        if (!SceneManager::Instance().GetTransitionFlag())
         {
             //SceneResult* result = new SceneResult;
 

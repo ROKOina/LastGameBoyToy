@@ -62,6 +62,9 @@ public:
     bool GetIsPlayEvent() { return isEventPlay; }
     float GetEventEndTime() { return saveEventCameraBuff.ECTra[saveEventCameraBuff.ECTra.size() - 1].frame; }
 
+    //現在の時間を取得
+    float GetTimer() { return timer; }
+
 private:
     //フォーカスポジションから見たカメラポジションを返す
     DirectX::XMFLOAT3 FocusFromCameraPos();
