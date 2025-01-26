@@ -42,6 +42,11 @@ void CharacterCom::Update(float elapsedTime)
             {
                 ss->SetViewSetting(false);
             }
+            //‘JˆÚŽn‚Ü‚Á‚½‚ç•Â‚¶‚é
+            if (SceneManager::Instance().GetTransitionFlag())
+            {
+                ss->SetViewSetting(false);
+            }
         }
     }
 
