@@ -1,17 +1,14 @@
 #include "MissileCom.h"
-#include "Component\Audio\AudioCom.h"
 #include "Component\System\TransformCom.h"
+#include "Audio/Audio3D.h"
 
 void MissileCom::Start()
 {
-    AudioCom* audio = GetGameObject()->GetComponent<AudioCom>().get();
-    audio->RegisterSource(AUDIOID::BOSS_BULLET, "FIRE");
 }
 
 void MissileCom::Update(float elapsedTime)
 {
     GameObj player = GameObjectManager::Instance().Find("player");
-    AudioCom* audio = GetGameObject()->GetComponent<AudioCom>().get();
 
     if (!playFlag)
     {
@@ -19,8 +16,8 @@ void MissileCom::Update(float elapsedTime)
         float len = Mathf::Length(player->transform_->GetWorldPosition() - GetGameObject()->transform_->GetWorldPosition());
         if (len < soundLen)
         {
-            audio->Play("FIRE", false, 3.0f);
-            audio->FeedStart("FIRE", 10.0f, 0.2f);
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_BULLET, 3.0f, false);
+            Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::BOSS_BULLET, 10.0f, 0.2f);
             playFlag = true;
         }
     }

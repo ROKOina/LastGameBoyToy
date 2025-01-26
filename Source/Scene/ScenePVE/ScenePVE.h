@@ -2,8 +2,6 @@
 
 #include "Scene/Scene.h"
 #include "Component\Sprite\Sprite.h"
-#include "Audio\AudioSource.h"
-#include "Audio\Audio.h"
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
@@ -29,11 +27,18 @@ public:
 
     //ñºëOéÊìæ
     std::string GetName() const override { return "ScenePVE"; };
+
 private:
-    GameObj audioObj;
+
+    //É{ÉXÇÃóéâ∫ëŒçÙ
+    void BossCountermeasure();
+
+private:
     std::unique_ptr<BasicsApplication> photonNet;
 
     bool battleClymax = false;
 
     bool flag = false;
+
+    DirectX::XMFLOAT3 SpawnPos = { 0,8.0f,0 };
 };

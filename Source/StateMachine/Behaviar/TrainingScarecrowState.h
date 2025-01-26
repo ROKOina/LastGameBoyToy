@@ -5,7 +5,6 @@
 #include "Component/System/TransformCom.h"
 #include "Component/Animation/AnimationCom.h"
 #include "Component\Character\InazawaCharacterCom.h"
-#include <Component/Audio/AudioCom.h>
 #include <Component/Character/CharaStatusCom.h>
 
 class ScarecrowCom;
@@ -34,7 +33,6 @@ protected:
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
-    std::weak_ptr<AudioCom> audioCom;
     std::weak_ptr<CharaStatusCom>characterstatas;
 };
 

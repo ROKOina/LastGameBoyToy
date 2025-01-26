@@ -32,9 +32,6 @@ Framework::Framework(HWND hWnd)
     //指定したシーンを選択
     SceneManager::Instance().ChangeScene(new SceneLGBT);
 
-    // オーディオ初期化
-    Audio::Initialize();
-
 #ifdef _DEBUG
     //IMGUI初期化
     IMGUI_CTRL_INITIALIZE(hWnd_, graphics_.GetDevice(), graphics_.GetDeviceContext());
@@ -100,9 +97,9 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 
     // シーン描画処理
     SceneManager::Instance().Render(elapsedTime);
-    TimeManager::Instance().ImGui();
 
 #ifdef _DEBUG
+    TimeManager::Instance().ImGui();
     //IMGUI描画
     IMGUI_CTRL_DISPLAY();
 #endif

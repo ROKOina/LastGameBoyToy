@@ -5,7 +5,6 @@
 #include "Component/Animation/AnimationCom.h"
 #include "Component/Character/CharaStatusCom.h"
 #include "Component\Particle\CPUParticle.h"
-#include "Component\Audio\AudioCom.h"
 #include <random>
 
 class BossCom;
@@ -41,7 +40,6 @@ protected:
     std::weak_ptr<MovementCom> moveCom;
     std::weak_ptr<TransformCom> transCom;
     std::weak_ptr<AnimationCom> animationCom;
-    std::weak_ptr<AudioCom> audioCom;
     std::weak_ptr<CharaStatusCom>characterstatas;
 
 private:

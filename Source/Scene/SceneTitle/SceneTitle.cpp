@@ -26,12 +26,14 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
-#include "Component\Audio\AudioCom.h"
 #include "Scene\SceneTraining\SceneTraining.h"
+
 
 SceneTitle::~SceneTitle()
 {
 }
+
+AUDIOID2D titleAudioID = AUDIOID2D::BGM;
 
 void SceneTitle::Initialize()
 {
@@ -148,16 +150,37 @@ void SceneTitle::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
+    //{
+    //    GameObj audio = GameObjectManager::Instance().Create();
+    //    audio->SetName("Audio");
+    //    auto& a2d = audio->AddComponent<AudioSource2D>();
+    //    a2d->SetAudio2D(AUDIOID2D::BGM);
+    //    a2d->Audio2DPlay();
+    //}
+
+    Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
+
     {
         GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Audio");
-        audioObj = audio->AddComponent<AudioCom>().get();
-        audioObj->RegisterSource(AUDIOID::SCENE_TITLE, "Title");
-        audioObj->RegisterSource(AUDIOID::CURSOR, "Cursor");
-        audioObj->RegisterSource(AUDIOID::ENTER, "Enter");
+        audio->SetName("Lisner");
+         audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+    }
 
-        audioObj->Play("Title", true, 0.0f);
-        audioObj->FeedStart("Title", 0.5f, 0.1f);
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Emitter");
+        audioSource3d1 = audio->AddComponent<AudioSource3D>(AUDIOID3D::SE);
+        audio->transform_->SetWorldPosition({ -15,0,0 });
+        audioSource3d1.lock()->SetEmitterPos(audio->transform_->GetWorldPosition());
+        audioSource3d1.lock()->AudioPlay();
+    }
+    {
+        GameObj audio = GameObjectManager::Instance().Create();
+        audio->SetName("Emitter1");
+        audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+        audio->transform_->SetWorldPosition({ 15,0,0 });
+        audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
+        audio->GetComponent<AudioSource3D>()->AudioPlay();
     }
 
     //暗転からはじまるように
@@ -208,6 +231,7 @@ void SceneTitle::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
+
 }
 
 void SceneTitle::UIUpdate(float elapsedTime)
@@ -265,9 +289,13 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
                 if (!SceneManager::Instance().GetTransitionFlag())
                 {
-                    audioObj->FeedStart("Title", 0.0f, elapsedTime);
-                    audioObj->Play("Enter", false, 1.0f);
+                    //BGM消す
+                    Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
+                    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
+                    
 
+                    //audioSource->FeedStart(static_cast<int>(AUDIOID::SE), 0.0f, elapsedTime);
+                    //audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);
                     //暗転
                     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
                     GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
@@ -277,7 +305,13 @@ void SceneTitle::UIUpdate(float elapsedTime)
                 }
             }
             //セレクト棒壱変更
-            if (sprite->GetHitSpriteEnter()) { audioObj->Stop("Cursor"); audioObj->Play("Cursor", false, 1.0f); }
+            if (sprite->GetHitSpriteEnter())
+            {
+                Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR); 
+                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
+            }
+            //{ audioObj.lock()->Stop("Cursor"); audioObj.lock()->Play("Cursor", false, 1.0f); }
+            //if (sprite->GetHitSpriteEnter()) { audioSource->Stop(static_cast<int>(AUDIOID::SE)); audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);}
             selectB->SetEnabled(true);
             DirectX::XMFLOAT3 sP = selectB->transform_->GetWorldPosition();
             sP.y = s.y;

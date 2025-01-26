@@ -6,6 +6,8 @@
 #include "Component\System\SpawnCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Camera\CameraCom.h"
+#include "Audio/Audio3D.h"
+
 
 //基底コンストラクタ
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
@@ -15,7 +17,6 @@ Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
     moveCom = owner->GetGameObject()->GetComponent<MovementCom>();
     transCom = owner->GetGameObject()->GetComponent<TransformCom>();
     animationCom = owner->GetGameObject()->GetComponent<AnimationCom>();
-    audioCom = owner->GetGameObject()->GetComponent<AudioCom>();
     characterstatas = owner->GetGameObject()->GetComponent<CharaStatusCom>();
 
     // 乱数エンジンのシードを設定
@@ -251,8 +252,8 @@ void Boss_MoveState::Execute(const float& elapsedTime)
     //足音
     if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
     {
-        audioCom.lock()->Stop("WALK");
-        audioCom.lock()->Play("WALK", false, 7.0f);
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::BOSS_WALK);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_WALK, 7.0f, false);
     }
 
     //距離判定
@@ -286,7 +287,7 @@ void Boss_SA1::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
     {
-        audioCom.lock()->Play("PUNCH", false, 10.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_PUNCH, 10.0f, false);
     }
 
     //アニメーションが終われば
@@ -315,7 +316,7 @@ void Boss_SA2::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
     {
-        audioCom.lock()->Play("PUNCH", false, 10.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_PUNCH, 10.0f, false);
     }
 
     //アニメーションが終われば
@@ -379,8 +380,8 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
 
     if (animationCom.lock()->IsEventCalling("SOUND"))
     {
-        audioCom.lock()->Stop("LARIAT");
-        audioCom.lock()->Play("LARIAT", false, 10.0f);
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::BOSS_LARIAT);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_LARIAT, 10.0f, false);
     }
 
     //ラリアット持続時間
@@ -463,7 +464,8 @@ void Boss_UpShotStart::Execute(const float& elapsedTime)
 #pragma region 打ち上げチャージ
 void Boss_UpShotCharge::Enter()
 {
-    audioCom.lock()->Play("CHARGE", false, 10.0f);
+    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_CHARGE, 10.0f, false);
+
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_up_shot_charge"), true, false, 0.1f);
 }
 void Boss_UpShotCharge::Execute(const float& elapsedTime)
@@ -507,7 +509,7 @@ void Boss_UpShotLoop::Execute(const float& elapsedTime)
     }
 
     //モーションに合わせてSE再生
-    if (animationCom.lock()->IsEventCalling("SHOT")) { audioCom.lock()->Play("SHOT", false, 10.0f); }
+    if (animationCom.lock()->IsEventCalling("SHOT")) { Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_SHOT, 10.0f, false); }
 
     time += elapsedTime;
     if (time > 4.0f)
@@ -583,7 +585,7 @@ void Boss_ShotStart::Execute(const float& elapsedTime)
 #pragma region チャージ
 void Boss_ShotCharge::Enter()
 {
-    audioCom.lock()->Play("CHARGE", false, 10.0f);
+    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_CHARGE, 10.0f, false);
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_shot_charge_loop"), true, false, 0.1f);
 }
 void Boss_ShotCharge::Execute(const float& elapsedTime)
@@ -627,7 +629,7 @@ void Boss_Shot::Execute(const float& elapsedTime)
 
     if (animationCom.lock()->IsEventCalling("SHOT"))
     {
-        audioCom.lock()->Play("POWERSHOT", false, 10.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_POWERSHOT, 10.0f, false);
     }
 
     //アニメーションが終われば
@@ -660,7 +662,7 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     //飛ぶ
     if (animationCom.lock()->IsEventCalling("JUMPINIT"))
     {
-        audioCom.lock()->Play("JUMP_ATTACK_START", false, 5.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_JUMPATTACK_START, 5.0f, false);
     }
     if (animationCom.lock()->IsEventCalling("JUMPTIME"))
     {
@@ -703,7 +705,8 @@ void Boss_JumpAttackStart::Exit()
 #pragma region ジャンプ攻撃終わり
 void Boss_JumpAttackEnd::Enter()
 {
-    audioCom.lock()->Play("JUMP_ATTACK_END", false, 10.0f);
+    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_JUMPATTACK_END, 10.0f, false);
+
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_jump_attack_end"), false, false, 0.1f);
 
     //カメラシェイク
@@ -726,7 +729,7 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     if (moveCom.lock()->JustLanded())
     {
         //カメラシェイク
-        audioCom.lock()->Play("JUMP_ATTACK_GROUND", false, 10.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_JUMPATTACK_GROUND, 10.0f, false);
         GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.5f);
     }
 
@@ -759,7 +762,7 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
 
     if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
     {
-        audioCom.lock()->Play("WALK", false, 10.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_WALK, 10.0f, false);
     }
 
     //左右の煙

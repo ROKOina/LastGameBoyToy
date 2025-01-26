@@ -2,7 +2,6 @@
 #define _WINSOCKAPI_  // windows.hを定義した際に、winsock.hを自動的にインクルードしない
 #include <windows.h>
 #include "HighResolutionTimer.h"
-#include "Audio/Audio.h"
 #include "Graphics/Graphics.h"
 #include "Input/input.h"
 
@@ -37,7 +36,6 @@ public:
 private:
     const HWND				hWnd_;
     HighResolutionTimer		timer_;
-    Audio					audio_;
     Graphics				graphics_;
     Input					input_;
 

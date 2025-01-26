@@ -386,7 +386,6 @@ void TrainingSystem::TrainingSystemStart()
             charaStatusCom->SetInvincibleTime(0.1f);
             charaStatusCom->SetHitPoint(100);
             charaStatusCom->SetMaxHitPoint(100);
-            scarecrow1->AddComponent<AudioCom>();
             std::shared_ptr<PushBackCom>pushBack = scarecrow1->AddComponent<PushBackCom>();
             pushBack->SetRadius(1.5f);
             pushBack->SetWeight(600.0f);
@@ -413,7 +412,6 @@ void TrainingSystem::TrainingSystemStart()
             charaStatusCom->SetInvincibleTime(0.1f);
             charaStatusCom->SetHitPoint(100);
             charaStatusCom->SetMaxHitPoint(100);
-            scarecrow2->AddComponent<AudioCom>();
             std::shared_ptr<PushBackCom>pushBack = scarecrow2->AddComponent<PushBackCom>();
             pushBack->SetRadius(1.5f);
             pushBack->SetWeight(600.0f);
@@ -442,7 +440,6 @@ void TrainingSystem::TrainingSystemStart()
             charaStatusCom->SetInvincibleTime(0.1f);
             charaStatusCom->SetHitPoint(100);
             charaStatusCom->SetMaxHitPoint(100);
-            scarecrow3->AddComponent<AudioCom>();
             std::shared_ptr<PushBackCom>pushBack = scarecrow3->AddComponent<PushBackCom>();
             pushBack->SetRadius(1.5f);
             pushBack->SetWeight(600.0f);
@@ -468,7 +465,6 @@ void TrainingSystem::TrainingSystemStart()
             charaStatusCom->SetInvincibleTime(0.1f);
             charaStatusCom->SetHitPoint(100);
             charaStatusCom->SetMaxHitPoint(100);
-            scarecrow4->AddComponent<AudioCom>();
             std::shared_ptr<PushBackCom>pushBack = scarecrow4->AddComponent<PushBackCom>();
             pushBack->SetRadius(1.5f);
             pushBack->SetWeight(600.0f);
@@ -498,7 +494,6 @@ void TrainingSystem::TrainingSystemStart()
         charaStatusCom->SetInvincibleTime(0.1f);
         charaStatusCom->SetHitPoint(1);
         charaStatusCom->SetMaxHitPoint(1);
-        scarecrow5->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = scarecrow5->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
@@ -525,7 +520,6 @@ void TrainingSystem::TrainingSystemStart()
         scarecrow1->AddComponent<NodeCollsionCom>(nullptr);
         scarecrow1->AddComponent<AnimationCom>();
         scarecrow1->AddComponent<UltSkillMaxItem>();
-        scarecrow1->AddComponent<AudioCom>();
     }
 }
 
@@ -588,7 +582,6 @@ void TrainingSystem::ShootingSpawnCrow()
             charaStatusCom->SetInvincibleTime(0.1f);
             charaStatusCom->SetHitPoint(1);
             charaStatusCom->SetMaxHitPoint(1);
-            scarecrow5->AddComponent<AudioCom>();
             std::shared_ptr<PushBackCom>pushBack = scarecrow5->AddComponent<PushBackCom>();
             pushBack->SetRadius(1.5f);
             pushBack->SetWeight(600.0f);
@@ -620,7 +613,6 @@ void TrainingSystem::SpawnItem()
         scarecrow1->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/UltSkillMaxItem.nodecollsion");
         scarecrow1->AddComponent<AnimationCom>();
         scarecrow1->AddComponent<UltSkillMaxItem>();
-        scarecrow1->AddComponent<AudioCom>();
     }
 }
 
@@ -799,117 +791,80 @@ void TutorialSystem::TutorialSystemStart()
         font->SetEnabled(false);
     }
 
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Audio");
-        audioObj = audio->AddComponent<AudioCom>().get();
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_01, "01");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_02, "02");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_03, "03");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_04, "04");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_05, "05");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_06, "06");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_07, "07");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_08, "08");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_09, "09");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_10, "10");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_11, "11");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_12, "12");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_13, "13");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_14, "14");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_15, "15");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_16, "16");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_17, "17");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_18, "18");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_19, "19");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_20, "20");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_21, "21");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_22, "22");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_23, "23");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_24, "24");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_25, "25");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_26, "26");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_27, "27");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_28, "28");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_29, "29");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_30, "30");
-        audioObj->RegisterSource(AUDIOID::TUTOLINES_31, "31");
-    }
-
 #pragma region 移動
 
     moveSubTitle[0].str = L"ようこそ　チュートリアルへ";
-    moveSubTitle[0].Lines = "01";
+    moveSubTitle[0].Lines = AUDIOID2D::TUTOLINES_01;
     moveSubTitle[0].pos = { 650.0f,80.0f };
     moveSubTitle[0].UIID = 0;
 
     moveSubTitle[1].str = L"今から基本的な操作方法を教えるのだ";
-    moveSubTitle[1].Lines = "02";
+    moveSubTitle[1].Lines = AUDIOID2D::TUTOLINES_02;
     moveSubTitle[1].pos = { 553.0f,80.0f };
     moveSubTitle[1].UIID = 1;
 
     moveSubTitle[2].str = L"まずは、移動からなのだ";
-    moveSubTitle[2].Lines = "03";
+    moveSubTitle[2].Lines = AUDIOID2D::TUTOLINES_03;
     moveSubTitle[2].pos = { 701.0f,80.0f };
     moveSubTitle[2].UIID = 2;
 
     moveSubTitle[3].str = L"キーボードのADキーで左右移動なのだ";
-    moveSubTitle[3].Lines = "04";
+    moveSubTitle[3].Lines = AUDIOID2D::TUTOLINES_04;
     moveSubTitle[3].pos = { 539.0f,80.0f };
     moveSubTitle[3].UIID = 3;
 
     moveSubTitle[4].str = L"よくできたのだ";
-    moveSubTitle[4].Lines = "05";
+    moveSubTitle[4].Lines = AUDIOID2D::TUTOLINES_05;
     moveSubTitle[4].pos = { 806.0f,80.0f };
     moveSubTitle[4].UIID = 4;
 
     moveSubTitle[5].str = L"次は縦移動なのだ";
-    moveSubTitle[5].Lines = "06";
+    moveSubTitle[5].Lines = AUDIOID2D::TUTOLINES_06;
     moveSubTitle[5].pos = { 777.0f,80.0f };
     moveSubTitle[5].UIID = 5;
 
     moveSubTitle[6].str = L"キーボードのWSキーで縦移動なのだ";
-    moveSubTitle[6].Lines = "07";
+    moveSubTitle[6].Lines = AUDIOID2D::TUTOLINES_07;
     moveSubTitle[6].pos = { 556.0f,80.0f };
     moveSubTitle[6].UIID = 6;
 
     moveSubTitle[7].str = L"素晴らしいのだ";
-    moveSubTitle[7].Lines = "08";
+    moveSubTitle[7].Lines = AUDIOID2D::TUTOLINES_08;
     moveSubTitle[7].pos = { 809.0f,80.0f };
     moveSubTitle[7].UIID = 7;
 
     moveSubTitle[8].str = L"次はジャンプなのだ";
-    moveSubTitle[8].Lines = "09";
+    moveSubTitle[8].Lines = AUDIOID2D::TUTOLINES_09;
     moveSubTitle[8].pos = { 740.0f,80.0f };
     moveSubTitle[8].UIID = 8;
 
     moveSubTitle[9].str = L"キーボードのスペースキーでジャンプなのだ";
-    moveSubTitle[9].Lines = "10";
+    moveSubTitle[9].Lines = AUDIOID2D::TUTOLINES_10;
     moveSubTitle[9].pos = { 493.0f,80.0f };
     moveSubTitle[9].UIID = 9;
 
     moveSubTitle[10].str = L"天才なのだ";
-    moveSubTitle[10].Lines = "11";
+    moveSubTitle[10].Lines = AUDIOID2D::TUTOLINES_11;
     moveSubTitle[10].pos = { 834.0f,80.0f };
     moveSubTitle[10].UIID = 10;
 
     moveSubTitle[11].str = L"次はダッシュなのだ";
-    moveSubTitle[11].Lines = "12";
+    moveSubTitle[11].Lines = AUDIOID2D::TUTOLINES_12;
     moveSubTitle[11].pos = { 715.0f,80.0f };
     moveSubTitle[11].UIID = 11;
 
     moveSubTitle[12].str = L"移動しながらShiftキーでダッシュなのだ";
-    moveSubTitle[12].Lines = "13";
+    moveSubTitle[12].Lines = AUDIOID2D::TUTOLINES_13;
     moveSubTitle[12].pos = { 539.0f,80.0f };
     moveSubTitle[12].UIID = 12;
 
     moveSubTitle[13].str = L"よくできたのだ";
-    moveSubTitle[13].Lines = "14";
+    moveSubTitle[13].Lines = AUDIOID2D::TUTOLINES_14;
     moveSubTitle[13].pos = { 806.0f,80.0f };
     moveSubTitle[13].UIID = 13;
 
     moveSubTitle[14].str = L"次は銃の説明なのだ";
-    moveSubTitle[14].Lines = "15";
+    moveSubTitle[14].Lines = AUDIOID2D::TUTOLINES_15;
     moveSubTitle[14].pos = { 715.0f,80.0f };
     moveSubTitle[14].UIID = 14;
 
@@ -917,37 +872,37 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region 銃セリフ
 
     gunSubTitle[0].str = L"銃の基本説明を教えるのだ";
-    gunSubTitle[0].Lines = "16";
+    gunSubTitle[0].Lines = AUDIOID2D::TUTOLINES_16;
     gunSubTitle[0].pos = { 674.0f,80.0f };
     gunSubTitle[0].UIID = 0;
 
     gunSubTitle[1].str = L"マウスの左クリックで、発射なのだ";
-    gunSubTitle[1].Lines = "17";
+    gunSubTitle[1].Lines = AUDIOID2D::TUTOLINES_17;
     gunSubTitle[1].pos = { 571.0f,80.0f };
     gunSubTitle[1].UIID = 1;
 
     gunSubTitle[2].str = L"よくできたのだ";
-    gunSubTitle[2].Lines = "18";
+    gunSubTitle[2].Lines = AUDIOID2D::TUTOLINES_18;
     gunSubTitle[2].pos = { 765.0f,80.0f };
     gunSubTitle[2].UIID = 2;
 
     gunSubTitle[3].str = L"次はリロードなのだ";
-    gunSubTitle[3].Lines = "19";
+    gunSubTitle[3].Lines = AUDIOID2D::TUTOLINES_19;
     gunSubTitle[3].pos = { 715.0f,80.0f };
     gunSubTitle[3].UIID = 3;
 
     gunSubTitle[4].str = L"キーボードのRキーで、リロードなのだ";
-    gunSubTitle[4].Lines = "20";
+    gunSubTitle[4].Lines = AUDIOID2D::TUTOLINES_20;
     gunSubTitle[4].pos = { 539.0f,80.0f };
     gunSubTitle[4].UIID = 4;
 
     gunSubTitle[5].str = L"すばらしいのだ";
-    gunSubTitle[5].Lines = "21";
+    gunSubTitle[5].Lines = AUDIOID2D::TUTOLINES_21;
     gunSubTitle[5].pos = { 809.0f,80.0f };
     gunSubTitle[5].UIID = 5;
 
     gunSubTitle[6].str = L"次はスキルの説明なのだ";
-    gunSubTitle[6].Lines = "22";
+    gunSubTitle[6].Lines = AUDIOID2D::TUTOLINES_22;
     gunSubTitle[6].pos = { 693.0f,80.0f };
     gunSubTitle[6].UIID = 6;
 
@@ -955,22 +910,22 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region スキルセリフ
 
     skillSubTitle[0].str = L"スキルの基本操作を教えるのだ";
-    skillSubTitle[0].Lines = "23";
+    skillSubTitle[0].Lines = AUDIOID2D::TUTOLINES_23;
     skillSubTitle[0].pos = { 624.0f,80.0f };
     skillSubTitle[0].UIID = 0;
 
     skillSubTitle[1].str = L"キーボードのEキーで発動なのだ";
-    skillSubTitle[1].Lines = "24";
+    skillSubTitle[1].Lines = AUDIOID2D::TUTOLINES_24;
     skillSubTitle[1].pos = { 621.0f,80.0f };
     skillSubTitle[1].UIID = 1;
 
     skillSubTitle[2].str = L"素晴らしいのだ";
-    skillSubTitle[2].Lines = "25";
+    skillSubTitle[2].Lines = AUDIOID2D::TUTOLINES_25;
     skillSubTitle[2].pos = { 780.0f,80.0f };
     skillSubTitle[2].UIID = 2;
 
     skillSubTitle[3].str = L"次はウルトの説明なのだ";
-    skillSubTitle[3].Lines = "26";
+    skillSubTitle[3].Lines = AUDIOID2D::TUTOLINES_26;
     skillSubTitle[3].pos = { 714.0f,80.0f };
     skillSubTitle[3].UIID = 3;
 
@@ -978,27 +933,27 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region ウルトセリフ
 
     ultSubTitle[0].str = L"ウルトの基本操作を教えるのだ";
-    ultSubTitle[0].Lines = "27";
+    ultSubTitle[0].Lines = AUDIOID2D::TUTOLINES_27;
     ultSubTitle[0].pos = { 628.0f,80.0f };
     ultSubTitle[0].UIID = 0;
 
     ultSubTitle[1].str = L"キーボードのQキーで発動なのだ";
-    ultSubTitle[1].Lines = "28";
+    ultSubTitle[1].Lines = AUDIOID2D::TUTOLINES_28;
     ultSubTitle[1].pos = { 628.0f,80.0f };
     ultSubTitle[1].UIID = 1;
 
     ultSubTitle[2].str = L"天才なのだ";
-    ultSubTitle[2].Lines = "29";
+    ultSubTitle[2].Lines = AUDIOID2D::TUTOLINES_29;
     ultSubTitle[2].pos = { 827.0f,80.0f };
     ultSubTitle[2].UIID = 2;
 
     ultSubTitle[3].str = L"これでチュートリアルは終わりなのだ";
-    ultSubTitle[3].Lines = "30";
+    ultSubTitle[3].Lines = AUDIOID2D::TUTOLINES_30;
     ultSubTitle[3].pos = { 543.0f,80.0f };
     ultSubTitle[3].UIID = 3;
 
     ultSubTitle[4].str = L"Les’t enjoyなのだ";
-    ultSubTitle[4].Lines = "31";
+    ultSubTitle[4].Lines = AUDIOID2D::TUTOLINES_31;
     ultSubTitle[4].pos = { 742.0f,80.0f };
     ultSubTitle[4].UIID = 5;
 
@@ -1103,7 +1058,8 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        audioObj->Play(moveSubTitle[moveSubTitleIndex].Lines, false, 1.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(moveSubTitle[moveSubTitleIndex].Lines, 1.0f, false);
+
         linesFlag = true;
         TrainingManager::Instance().SetTutorilUIFlag(false);
     }
@@ -1318,7 +1274,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        audioObj->Play(gunSubTitle[gunSubTitleIndex].Lines, false, 1.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(gunSubTitle[gunSubTitleIndex].Lines, 1.0f, false);
         linesFlag = true;
     }
 
@@ -1449,7 +1405,7 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        audioObj->Play(skillSubTitle[skillSubTitleIndex].Lines, false, 1.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(skillSubTitle[skillSubTitleIndex].Lines, 1.0f, false);
         linesFlag = true;
     }
 
@@ -1544,7 +1500,7 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        audioObj->Play(ultSubTitle[ultSubTitleIndex].Lines, false, 1.0f);
+        Audio2DMagaer::Instance().Audio2DPlay(ultSubTitle[ultSubTitleIndex].Lines, 1.0f, false);
         linesFlag = true;
     }
 

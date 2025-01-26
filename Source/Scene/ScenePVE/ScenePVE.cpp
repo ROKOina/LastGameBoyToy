@@ -26,12 +26,12 @@
 #include <Component/UI/PlayerUI.h>
 #include <Component/UI/UiFlag.h>
 #include <Component/UI/UiGauge.h>
-#include "Component\Audio\AudioCom.h"
 #include "Netwark/Photon/StdIO_UIListener.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component\GameSystem\RespawnCom.h"
+#include "Audio/Audio3D.h"
 
 ScenePVE::~ScenePVE()
 {
@@ -146,7 +146,6 @@ void ScenePVE::Initialize()
         charaStatusCom->SetMaxHitPoint(2000);
         boss->AddComponent<BossCom>();
         boss->AddComponent<AimIKCom>(nullptr, "Boss_spine_up");
-        boss->AddComponent<AudioCom>();
         std::shared_ptr<PushBackCom>pushBack = boss->AddComponent<PushBackCom>();
         pushBack->SetRadius(1.5f);
         pushBack->SetWeight(600.0f);
@@ -249,16 +248,8 @@ void ScenePVE::Initialize()
 
     //オーディオ
     {
-        audioObj = GameObjectManager::Instance().Create();
-        audioObj->SetName("audio");
-        AudioCom* audio = audioObj->AddComponent<AudioCom>().get();
-        audio->RegisterSource(AUDIOID::SCENE_GAME1, "BGM1");
-        audio->RegisterSource(AUDIOID::SCENE_GAME2, "BGM2");
-        audio->RegisterSource(AUDIOID::CURSOR, "Cursor");
-        audio->RegisterSource(AUDIOID::ENTER, "Enter");
-
-        audioObj->GetComponent<AudioCom>()->Play("BGM1", true, 0.0f);
-        audioObj->GetComponent<AudioCom>()->FeedStart("BGM1", 0.6f, 0.01f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME1, 0.0f, true);
+        Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME1, 0.6f, 0.01f);
     }
 
 #pragma region グラフィック系の設定
@@ -290,6 +281,8 @@ void ScenePVE::Update(float elapsedTime)
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
+    BossCountermeasure();
+
     if (PVEDirection::Instance().GetCharaSelect())
     {
         //UI生成
@@ -305,10 +298,10 @@ void ScenePVE::Update(float elapsedTime)
         GameObj boss = GameObjectManager::Instance().Find("BOSS");
         if (!battleClymax && boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)
         {
-            audioObj->GetComponent<AudioCom>()->FeedStart("BGM1", 0.0f, elapsedTime);
+            Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME1, 0.0f, elapsedTime);
 
-            audioObj->GetComponent<AudioCom>()->Play("BGM2", true, 0.0f);
-            audioObj->GetComponent<AudioCom>()->FeedStart("BGM2", 1.0f, elapsedTime / 2);
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME2, 0.0f, true);
+            Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME2, 1.0f, elapsedTime / 2);
 
             battleClymax = true;
         }
@@ -341,4 +334,17 @@ void ScenePVE::Render(float elapsedTime)
 
     //イベントカメラ用
     EventCameraManager::Instance().EventCameraImGui();
+}
+
+
+void ScenePVE::BossCountermeasure()
+{
+    //BOSSのY座標
+    float posY = GameObjectManager::Instance().Find("BOSS")->transform_->GetWorldPosition().y;
+
+    //一定距離落下したら中央に戻す
+    if (posY < -50.0f)
+    {
+        GameObjectManager::Instance().Find("BOSS")->transform_->SetWorldPosition(SpawnPos);
+    }
 }

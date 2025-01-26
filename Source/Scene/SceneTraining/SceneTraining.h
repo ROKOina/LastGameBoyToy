@@ -2,8 +2,6 @@
 
 #include "Scene/Scene.h"
 #include "Component\Sprite\Sprite.h"
-#include "Audio\AudioSource.h"
-#include "Audio\Audio.h"
 
 #include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"

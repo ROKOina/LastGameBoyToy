@@ -9,12 +9,12 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "RemoveTimerCom.h"
 #include "Setting/Setting.h"
-#include "Component\Audio\AudioCom.h"
 #include "Component\Sprite\Sprite.h"
 #include "Component\Renderer\RendererCom.h"
 #include <Component\Animation\AnimationCom.h>
 #include "Component\Stage\StageEditorCom.h"
 #include  "Scene/SceneTraining/TrainingManager.h"
+#include "Audio/Audio3D.h"
 
 void CharacterCom::Update(float elapsedTime)
 {
@@ -575,7 +575,7 @@ void CharacterCom::Vinetto(float elapsedTime)
             posteffect->SetParameter(0.99f, 130.0f, parameters); // 強いビネット効果を設定
 
             //音
-            GetGameObject()->GetComponent<AudioCom>()->Play("P_DAMAGE", false, 10);
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_DAMAGE, 10.0f, false);
         }
         else
         {
