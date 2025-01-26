@@ -13,7 +13,8 @@ void CharaStatusCom::Update(float elapsedTime)
     if ((isDeath && !wasDeath))
     {
         isDeathFrame = true;
-        StaticSendDataManager::Instance().SendMyDeath();    //ネットにデスを送信
+        if (std::strcmp(GetGameObject()->GetName(), "player") == 0)
+            StaticSendDataManager::Instance().SendMyDeath();    //ネットにデスを送信
     }
 
     // 現在の isDeath 状態を記録
