@@ -1,6 +1,7 @@
 #include "Audio3D.h"
 #include "Component\System\GameObject.h"
 #include "Component/System/TransformCom.h"
+#include <imgui.h>
 
 //Audio2DMagaer* Audio2DMagaer::instance_ = nullptr;
 
@@ -285,7 +286,15 @@ void AudioSource3D::Start()
 
 void AudioSource3D::Update(float elapsedTime)
 {
-    g_audioState.vListenerPos = GameObjectManager::Instance().Find("Lisner")->transform_->GetWorldPosition();
+    DirectX::XMFLOAT3 pos = { 0,0,0 };
+    auto& player = GameObjectManager::Instance().Find("player");
+    if (player)
+    {
+        pos = player->transform_->GetWorldPosition();
+    }
+
+    g_audioState.vListenerPos = pos;
+
     g_audioState.vEmitterPos = GetGameObject()->transform_->GetWorldPosition();
     //g_audioState.vEmitterPos = GameObjectManager::Instance().Find("Emitter")->transform_->GetWorldPosition();
 
@@ -295,30 +304,27 @@ void AudioSource3D::Update(float elapsedTime)
     UpdateAudio3d(elapsedTime);
 }
 
+void AudioSource3D::OnGUI()
+{
+    if (ImGui::DragFloat("volume", &volume))
+        sourceVoice_->SetVolume(volume);
+}
+
 void AudioSource3D::UpdateAudio3d(float elapsedTime)
 {
     {
-        // Calculate listener orientation in x-z plane
-        if (g_audioState.vListenerPos.x != g_audioState.listener.Position.x
-            || g_audioState.vListenerPos.z != g_audioState.listener.Position.z)
+        //•ûŒü‚ðŽw’è
+        DirectX::XMFLOAT3 front = { 0,0,1 };
+        auto& player = GameObjectManager::Instance().Find("player");
+        if (player)
         {
-            const XMVECTOR v1 = XMLoadFloat3(&g_audioState.vListenerPos);
-            const XMVECTOR v2 = XMVectorSet(g_audioState.listener.Position.x, g_audioState.listener.Position.y, g_audioState.listener.Position.z, 0.f);
-
-            XMVECTOR vDelta = v1 - v2;
-
-            g_audioState.fListenerAngle = float(atan2(XMVectorGetX(vDelta), XMVectorGetZ(vDelta)));
-
-            vDelta = XMVectorSetY(vDelta, 0.f);
-            vDelta = XMVector3Normalize(vDelta);
-
-            XMFLOAT3 tmp;
-            XMStoreFloat3(&tmp, vDelta);
-
-            g_audioState.listener.OrientFront.x = tmp.x;
-            g_audioState.listener.OrientFront.y = 0.f;
-            g_audioState.listener.OrientFront.z = tmp.z;
+            auto& camera = player->GetChildFind("cameraPostPlayer");
+            if (camera)
+                front = camera->transform_->GetWorldFront();
         }
+        g_audioState.listener.OrientFront.x = front.x;
+        g_audioState.listener.OrientFront.y = front.y;
+        g_audioState.listener.OrientFront.z = front.z;
 
         if (g_audioState.fUseListenerCone)
         {
@@ -446,6 +452,7 @@ void AudioSource3D::AudioPlay()
     sourceVoice_->SubmitSourceBuffer(&buffer);
 
     sourceVoice_->Start(0);
+    //sourceVoice_->SetVolume(10);
 
     g_audioState.nFrameToApply3DAudio = 0;
 }

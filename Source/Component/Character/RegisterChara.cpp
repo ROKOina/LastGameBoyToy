@@ -21,6 +21,7 @@
 #include <Component\Character\Prop\SetNodeWorldPosCom.h>
 #include "Component\UI\PlayerUI.h"
 #include "Component\Character\SoldierCom.h"
+#include "Audio/Audio3D.h"
 
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj, bool myTeam)
 {
@@ -116,6 +117,17 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     auto& pushBack = obj->AddComponent<PushBackCom>();
     pushBack->SetRadius(0.5f);
     pushBack->SetWeight(1);
+
+    //音
+    if (std::strcmp(obj->GetName(), "player") != 0)
+    {   //足音
+        GameObj audio = obj->AddChildObject();
+        audio->SetName("footEmitter");
+        auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+        au->SetEmitterPos(audio->transform_->GetWorldPosition());
+        au->AudioPlay();
+    }
+
 
     //煙のエフェクト
     {

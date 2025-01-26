@@ -70,14 +70,6 @@ struct AUDIO_STATE
 
 };
 
-enum AUDIOID3D
-{
-    BGM,
-    SE,
-    TEST,
-
-   MAX_
-};
 enum class AUDIOID2D
 {
     BGM,
@@ -316,6 +308,15 @@ private:
 
 };
 
+enum AUDIOID3D
+{
+    BGM,
+    SE,
+    TEST,
+    PLAYER_WAKL,
+
+    MAX_
+};
 class Audio3DResourceMagaer
 {
 public:
@@ -348,7 +349,11 @@ private:
         audio3DResources[AUDIOID3D::BGM] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
         audio3DResources[AUDIOID3D::SE] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
         audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
+        audio3DResources[AUDIOID3D::PLAYER_WAKL] = std::make_shared<AudioResource>("Data/AudioData/SE/player/player_walk.wav");
+
     }
+
+
 
     std::map<AUDIOID3D, std::shared_ptr<AudioResource>> audio3DResources;
 };
@@ -364,7 +369,7 @@ public:
     void Update(float elapsedTime) override;
 
     const char* GetName() const override { return "Audio3D"; }
-    void OnGUI() override {}
+    void OnGUI() override;
 
     void UpdateAudio3d(float elapsedTime);
 
@@ -387,6 +392,8 @@ public:
 private:
     DirectX::XMFLOAT3 listenerPos;
     DirectX::XMFLOAT3 emitterPos;
+
+    float volume = 1;
 
     AUDIO_STATE  g_audioState;
 };
