@@ -295,7 +295,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         std::string name = "charaname" + std::to_string(i + 1);
         charaname->SetName(name.c_str());
         std::shared_ptr<Font>f = charaname->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
-        f->position = { 154.0f, 365.0f + (160 * i) };
+        f->position = { 154.0f, 365.0f + (160 * i) + uiOffset };
         f->str = stringconvert(resultDatas[i].playerName);
         f->scale = { 0.9f };
         f->color = { 1,1,1,1.0f };
