@@ -160,6 +160,7 @@ void ScenePVP::Initialize()
 
     //UI‰Šú‰»
     PlayerUIManager::Instance().ResetAllyHp();
+    PlayerUIManager::Instance().ResetEndFLG();
 }
 
 void ScenePVP::InitializeLobbySelect()
