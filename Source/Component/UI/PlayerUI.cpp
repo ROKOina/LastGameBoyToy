@@ -1678,9 +1678,15 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 c1spr->spc.color.w = 0;
                 c2spr->spc.color.w = 0;
                 if (data.second.myID == 0) //キルが自分
+                {
                     c1spr->spc.color = { 1,0,0,0 };
+                    c2spr->spc.color = { 1,1,1,0 };
+                }
                 if (data.second.myID == 1) //デスが自分
+                {
+                    c1spr->spc.color = { 1,1,1,0 };
                     c2spr->spc.color = { 1,0,0,0 };
+                }
 
                 //キャラIDを見て画像ずらす
                 c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.first;
