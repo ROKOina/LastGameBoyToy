@@ -40,7 +40,7 @@ void SceneLGBT::Initialize()
     for (int i = 0; i< int(RegisterChara::CHARA_LIST::MAX); ++i)
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName(std::string("p" + std::to_string(i)).c_str());
+        obj->SetName(std::string("loadP" + std::to_string(i)).c_str());
         obj->transform_->SetWorldPosition({ 100,0,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(i), obj, true);
         {

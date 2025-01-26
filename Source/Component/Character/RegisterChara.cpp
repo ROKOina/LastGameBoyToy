@@ -119,13 +119,15 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     pushBack->SetWeight(1);
 
     //‰¹
-    if (std::strcmp(obj->GetName(), "player") != 0)
-    {   //‘«‰¹
-        GameObj audio = obj->AddChildObject();
-        audio->SetName("footEmitter");
-        auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
-        au->SetEmitterPos(audio->transform_->GetWorldPosition());
-        au->AudioPlay();
+    std::string n = obj->GetName();
+    if (std::strcmp(obj->GetName(), "player") != 0) {
+        if (n.find(obj->GetName()) < 0) {
+            //‘«‰¹
+            GameObj audio = obj->AddChildObject();
+            audio->SetName("footEmitter");
+            auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+            au->AudioPlay();
+        }
     }
 
 
