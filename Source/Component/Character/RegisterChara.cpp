@@ -121,7 +121,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     //‰¹
     std::string n = obj->GetName();
     if (std::strcmp(obj->GetName(), "player") != 0) {
-        if (n.find(obj->GetName()) < 0) {
+        if (n.find("load") < 0) {
             //‘«‰¹
             GameObj audio = obj->AddChildObject();
             audio->SetName("footEmitter");
