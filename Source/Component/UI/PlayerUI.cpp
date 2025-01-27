@@ -156,6 +156,7 @@ void UI_PlayerHpUI::Update(float elapsedTime)
         }
     }
     else {
+        gauge->spc.color = { 0.000f, 1.000f, 0.184f, 1.000f };
     }
 }
 
@@ -200,7 +201,7 @@ void UI_HPEffect::Update(float elapsedTime)
             spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
         }
 
-        if (character.lock()->GetComponent<CharaStatusCom>()->IsDeathFrame()) {
+        if (character.lock()->GetComponent<CharaStatusCom>()->IsDeath()) {
             onceFLG = false;
         }
     }
