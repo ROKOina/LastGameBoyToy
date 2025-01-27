@@ -573,4 +573,5 @@ void Font::OnGUI()
     ImGui::DragFloat2("Position", &position.x);
     ImGui::DragFloat2("ParentOffset", &parentPosOffset.x);
     ImGui::DragFloat("Scale", &scale);
+    ImGui::ColorEdit4("Color", &color.x);
 }

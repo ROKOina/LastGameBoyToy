@@ -115,6 +115,32 @@ void SceneTraining::Update(float elapsedTime)
         PlayerUIManager::Instance().UIUpdate(elapsedTime);
     }
 
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+
+    //UIしょり
+    if (canvas) {
+
+        auto& backA = canvas->GetChildFind("allyBack");
+        auto& backE = canvas->GetChildFind("enemyBack");
+        if (backA)backA->SetEnabled(false);
+        if (backE)backE->SetEnabled(false);
+
+        if (TrainingManager::Instance().GetTutoriaFlag())
+        {
+            if (!TrainingManager::Instance().GetTutorilUIFlag())
+            {
+                canvas->SetEnabled(true);
+            }
+            else
+            {
+                canvas->SetEnabled(false);
+            }
+        }
+    }
+
+    //プレイヤー落下処理
+    PlayerRespawn();
+
     if (TrainingManager::Instance().GetTutoriaFlag())
     {
         if (!TrainingManager::Instance().GetTutorilUIFlag())
@@ -126,6 +152,7 @@ void SceneTraining::Update(float elapsedTime)
             GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
         }
     }
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
@@ -154,4 +181,17 @@ void SceneTraining::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
+}
+
+void SceneTraining::PlayerRespawn()
+{
+    auto& p = GameObjectManager::Instance().Find("player");
+    //BOSSのY座標
+    float posY = p->transform_->GetWorldPosition().y;
+
+    //一定距離落下したら中央に戻す
+    if (posY < -50.0f)
+    {
+        p->transform_->SetWorldPosition(SpawnPos);
+    }
 }

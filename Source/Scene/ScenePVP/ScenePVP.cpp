@@ -533,6 +533,12 @@ void ScenePVP::InitializePVP()
         col->SetJudgeTag(COLLIDER_TAG::Player);
         col->SetRadius(1.3f);
         obj->AddComponent<CrownCom>();
+
+        //王冠のエフェクト
+        std::shared_ptr<GameObject>crawneffect = obj->AddChildObject();
+        crawneffect->SetName("carwneffect");
+        crawneffect->transform_->SetLocalPosition({ 0.163f,5.945f,0.377f });
+        crawneffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crawn_pvp.gpuparticle", 4000);
     }
     break;
     }

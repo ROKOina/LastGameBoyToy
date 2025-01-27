@@ -66,9 +66,12 @@ void JankratBulletCom::UltUpdate(float elapsedTime)
 //爆発させる
 void JankratBulletCom::TriggerExplosion()
 {
+    //直撃よりダメージは下げる
+    damageValue *= 0.75f;
+
     // 当たり判定の半径を増やす
     const auto& sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
-    sphere->SetRadius(sphere->GetRadius() * 2.5f);
+    sphere->SetRadius(sphere->GetRadius() * 3.0f);
 
     // 剛体をキネマティックに変更
     const auto& rigid = GetGameObject()->GetComponent<RigidBodyCom>().get();

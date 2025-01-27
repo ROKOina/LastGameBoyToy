@@ -1620,23 +1620,21 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                             d.DcharaID = charaCom->GetNetCharaData().GetCharaID();
 
                             //使用UIを決める
-                            int uiID = 0;
+                            d.moveData.id = 0;
                             for (auto& log : saveCharaKilog)
                             {
                                 //後から追加される数を増やす
-                                log.second.moveData.underNum++;
-                                if (log.second.isEnemy != d.isEnemy)continue;   //同じチームが流れている場合は入る
+                                log.moveData.underNum++;
+                                if (log.isEnemy != d.isEnemy)continue;   //同じチームが流れている場合は入る
 
-                                if (log.second.moveData.id == 0)
-                                    uiID = 1;
+                                if (log.moveData.id == 0)
+                                    d.moveData.id = 1;
                             }
-                            if (uiID == 1)d.moveData.id = 0;
-                            else d.moveData.id = 1;
                         }
                     }
 
                     //キルが起きたので一旦保存
-                    saveCharaKilog[killPID] = d;
+                    saveCharaKilog.emplace_back(d);
                 }
             }
             killflg = false;
@@ -1645,9 +1643,6 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
     std::shared_ptr<GameObject> canvas = GameObjectManager::Instance().Find("killLogCanvas");
 
-    //削除用変数
-    std::vector<int> removeID;
-
     //演出用変数
     static const float stopY = 300; //停止位置
     static const float stopX = 3000; //停止位置
@@ -1655,9 +1650,9 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
     static const float removeTime = 5; //消去時間
 
     //敵味方、関係なく表示する
-    auto& kilogView = [&](std::string parentObjName, std::pair<const int, DeathData>& data)
+    auto& kilogView = [&](std::string parentObjName, DeathData& data)
         {
-            auto& moveData = data.second.moveData;
+            auto& moveData = data.moveData;
 
             auto& parant = canvas->GetChildFind((parentObjName + std::to_string(moveData.id)).c_str());
             auto& c01 = parant->GetChildFind("charaView01");
@@ -1683,14 +1678,14 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 Pspr->spc.color.w = 0;
                 c1spr->spc.color = { 1,1,1,0 };
                 c2spr->spc.color = { 1,1,1,0 };
-                if (data.second.myID == 0) //キルが自分
+                if (data.myID == 0) //キルが自分
                     c1spr->spc.color = { 1,0,0,0 };
-                if (data.second.myID == 1) //デスが自分
+                if (data.myID == 1) //デスが自分
                     c2spr->spc.color = { 1,0,0,0 };
 
                 //キャラIDを見て画像ずらす
-                c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.second.KcharaID;
-                c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.second.DcharaID;
+                c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.KcharaID;
+                c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.DcharaID;
             }
 
             //動き
@@ -1732,29 +1727,31 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
             if (moveData.timer > removeTime)
             {
                 parant->SetEnabled(false);
-                removeID.emplace_back(data.first);
+                return true;
             }
+            return false;
         };
 
+    std::vector<int> removeID;
+    int count = 0;
     for (auto& log : saveCharaKilog)
     {
-        if (log.second.isEnemy)  //チームが敵を倒した場合
-            kilogView("allyKillLog", log);
+        if (log.isEnemy)  //チームが敵を倒した場合
+        {
+            if (kilogView("allyKillLog", log))
+                removeID.emplace_back(count);
+        }
         else
-            kilogView("enemyKillLog", log);
+        {
+            if(kilogView("enemyKillLog", log))
+                removeID.emplace_back(count);
+        }
+        count++;
     }
 
-    for (auto& id : removeID)
+    for (int i = removeID.size() - 1; i >= 0; --i)
     {
-        GameObj parent;
-        if (saveCharaKilog[id].isEnemy)
-            parent = canvas->GetChildFind(("allyKillLog" + std::to_string(saveCharaKilog[id].moveData.id)).c_str());
-        else
-            parent = canvas->GetChildFind(("enemyKillLog" + std::to_string(saveCharaKilog[id].moveData.id)).c_str());
-
-        parent->SetEnabled(false);
-
-        saveCharaKilog.erase(id);
+        saveCharaKilog.erase(saveCharaKilog.begin() + removeID[i]);
     }
 }
 

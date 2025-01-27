@@ -14,16 +14,23 @@ void JankratMineCom::Update(float elapsedTime)
         //当たり判定の半径増やす
         SphereColliderCom* sphere = GetGameObject()->GetComponent<SphereColliderCom>().get();
         sphere->SetRadius(sphere->GetRadius() * 3.5f);
-        sphere->SetJudgeTag(COLLIDER_TAG::Enemy);
+
+        HitProcessCom* hitProcess = GetGameObject()->GetComponent<HitProcessCom>().get();
+        GameObject* parent = hitProcess->GetMyObj();
+
+        bool team = false;
+        if (parent->GetComponent<Collider>()->GetMyTag() == COLLIDER_TAG::Player)
+            team = true;
+        if (std::strcmp(parent->GetName(), "player") == 0 || team)
+            sphere->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
+        else
+            sphere->SetJudgeTag(COLLIDER_TAG::Player);
+        sphere->SetRadius(0.5f);
 
         //ノックバック判定をONにする
         SphereColliderCom* childCollder = GetGameObject()->GetChildren()[0].lock()->GetComponent<SphereColliderCom>().get();
         sphere->SetRadius(sphere->GetRadius() * 2.5f);
         childCollder->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::Enemy);
-
-        //直撃よりダメージ減らす
-        HitProcessCom* hit = GetGameObject()->GetComponent<HitProcessCom>().get();
-        hit->SetValue(hit->GetValue() * 0.8f);
 
         explosionFlag = true;
         explosionBegin = false;

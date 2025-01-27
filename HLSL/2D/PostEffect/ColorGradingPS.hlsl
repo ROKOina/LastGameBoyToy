@@ -249,7 +249,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     float4 sampled_color = texturemaps.Sample(sampler_states[POINT], pin.texcoord.xy);
 
     //レンズフレアとグローライトのエフェクト
-    float4 ndc_sun_position = mul(float4(-normalize(directionalLight.direction.xyz) * distance_to_sun, 1), viewProjection);
+    float4 ndc_sun_position = mul(float4(-normalize(sundirection) * distance_to_sun, 1), viewProjection);
     ndc_sun_position /= ndc_sun_position.w;
     if (saturate(ndc_sun_position.z) == ndc_sun_position.z)
     {
