@@ -46,6 +46,8 @@ public:
         return isHitNonChara;
     }
 
+    GameObject* GetMyObj() { return myObj.lock().get(); }
+
 private:
     void HitProcess(int myID, int hitID);
 
