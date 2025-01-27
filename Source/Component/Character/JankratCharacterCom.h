@@ -32,24 +32,40 @@ private:
     void ShotSecond();
 
 public:
-    GameObj GetHaveBullet() { return haveBullet; }
-    void SetHaveBullet(GameObj obj) { haveBullet = obj; }
+    std::weak_ptr<GameObject> GetHaveBullet() { return haveBullet; }
+    void SetHaveBullet(std::weak_ptr<GameObject> obj) { haveBullet = obj; }
     void ReleaseHaveBullet() { haveBullet.reset(); }
 
-    std::vector<GameObj> GetHaveMine() { return haveMine; }
-    void AddHaveMine(GameObj obj) { haveMine.emplace_back(obj); }
-    void ReleaseHaveMine(GameObj obj) { haveMine.erase(std::remove(haveMine.begin(), haveMine.end(), obj), haveMine.end()); }
+    std::vector<std::weak_ptr<GameObject>> GetHaveMine() { return haveMine; }
+    void AddHaveMine(std::weak_ptr<GameObject> obj) { haveMine.emplace_back(obj); }
+    void ReleaseHaveMine(std::weak_ptr<GameObject> obj)
+    {
+        haveMine.erase(
+            std::remove_if(
+                haveMine.begin(),
+                haveMine.end(),
+                [&obj](const std::weak_ptr<GameObject>& mine) {
+                    // ロックして比較
+                    return !mine.owner_before(obj) && !obj.owner_before(mine);
+                }
+            ),
+            haveMine.end()
+        );
+    }
     void AllReleaseHaveMine()
     {
         for (auto& mine : haveMine)
         {
-            mine.reset();
+            if (auto sharedMine = mine.lock())
+            {
+                sharedMine.reset(); // 共有所有権をリセット
+            }
         }
         haveMine.clear();
     }
 
 private:
 
-    GameObj haveBullet; //射撃待機中の弾丸
-    std::vector<GameObj> haveMine; //使用中の地雷
+    std::weak_ptr<GameObject> haveBullet; //射撃待機中の弾丸
+    std::vector<std::weak_ptr<GameObject>> haveMine; //使用中の地雷
 };
