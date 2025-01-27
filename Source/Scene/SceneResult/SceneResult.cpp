@@ -298,7 +298,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         f->position = { 154.0f, 365.0f + (160 * i) + uiOffset };
         f->str = stringconvert(resultDatas[i].playerName);
         f->scale = { 0.9f };
-        f->color = { 1,1,1,1.0f };
+        f->color = { 1,1,1,0.0f };
     }
 
     // 勝敗表示
@@ -490,7 +490,14 @@ void SceneResult::EventCamera(float elapsedTime)
     if (limittimer >= 2.3f)
     {
         // 経過時間に応じて alpha を増加
-        fontalpha += elapsedTime / 2;
+        fontalpha += elapsedTime / 9;
+
+        //フォント取得
+        for (int i = 0; i < 4; ++i)
+        {
+            std::string name = "charaname" + std::to_string(i + 1);
+            resultUI[i].lock()->GetChildFind(name.c_str())->GetComponent<Font>()->color = { 1,1,1 ,fontalpha };
+        }
 
         // alpha 値を最大 1.0 に制限
         fontalpha = (std::min)(fontalpha, 1.0f);
