@@ -349,7 +349,6 @@ void AudioSource3D::OnGUI()
         "Plate",
     };
 
-    //ブレンドモード設定
     static int num = 0;
     if (ImGui::Combo("reverbMode", &num, reverb, NUM_PRESETS, NUM_PRESETS))
     {
