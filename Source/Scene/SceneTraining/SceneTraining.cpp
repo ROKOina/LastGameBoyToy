@@ -115,17 +115,28 @@ void SceneTraining::Update(float elapsedTime)
         PlayerUIManager::Instance().UIUpdate(elapsedTime);
     }
 
-    if (TrainingManager::Instance().GetTutoriaFlag())
-    {
-        if (!TrainingManager::Instance().GetTutorilUIFlag())
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+
+    if (canvas) {
+
+        auto& backA = canvas->GetChildFind("allyBack");
+        auto& backE = canvas->GetChildFind("enemyBack");
+        if (backA)backA->SetEnabled(false);
+        if (backE)backE->SetEnabled(false);
+
+        if (TrainingManager::Instance().GetTutoriaFlag())
         {
-            GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
-        }
-        else
-        {
-            GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
+            if (!TrainingManager::Instance().GetTutorilUIFlag())
+            {
+                canvas->SetEnabled(true);
+            }
+            else
+            {
+                canvas->SetEnabled(false);
+            }
         }
     }
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
