@@ -211,18 +211,18 @@ void FarahCom::GroundBomber(float elapsedTime)
 {
     for (auto& bullet : bullets)
     {
-        if (!bullet.obj) continue;
+        if (!bullet.obj.lock()) continue;
 
         // 地面に接触
         auto& obj = bullet.obj;
-        auto& movecom = obj->GetComponent<MovementCom>();
+        auto& movecom = obj.lock()->GetComponent<MovementCom>();
         if (movecom->OnGround() || movecom->GetOnWall())
         {
             bullet.bomberflag = true;
             movecom->SetIsRaycast(false);
             movecom->ZeroVelocity();
             movecom->ZeroNonMaxSpeedVelocity();
-            obj->GetComponent<SphereColliderCom>()->SetRadius(2.1f);
+            obj.lock()->GetComponent<SphereColliderCom>()->SetRadius(2.1f);
         }
 
         // 爆発フラグ処理
@@ -249,20 +249,20 @@ void FarahCom::GroundBomber(float elapsedTime)
                     d->Add(movecom->GetWallHitPosition(), movecom->GetWallNormal(), 1.0f);
                 }
 
-                obj->GetComponent<GPUParticle>()->SetEnabled(true);
-                obj->GetComponent<GPUParticle>()->Play();
+                obj.lock()->GetComponent<GPUParticle>()->SetEnabled(true);
+                obj.lock()->GetComponent<GPUParticle>()->Play();
                 bullet.played = true; // フラグを設定
             }
 
             //回転させる
             bullet.rotation += elapsedTime * 900;
-            obj->GetComponent<GPUParticle>()->GetGameObject()->transform_->SetEulerRotation({ 0.0f,0.0f,bullet.rotation });
+            obj.lock()->GetComponent<GPUParticle>()->GetGameObject()->transform_->SetEulerRotation({ 0.0f,0.0f,bullet.rotation });
         }
 
         // 爆発後に削除
         if (bullet.bombertimer >= 0.1f)
         {
-            auto& viewBullet = obj->GetComponent<BulletCom>()->GetViewBullet().lock();
+            auto& viewBullet = obj.lock()->GetComponent<BulletCom>()->GetViewBullet().lock();
             if (viewBullet)
             {
                 GameObjectManager::Instance().Remove(viewBullet);
@@ -270,8 +270,8 @@ void FarahCom::GroundBomber(float elapsedTime)
 
             if (bullet.bombertimer > 0.5f)
             {
-                GameObjectManager::Instance().Remove(obj);
-                RemoveBullet(obj);
+                GameObjectManager::Instance().Remove(obj.lock());
+                RemoveBullet(obj.lock());
             }
         }
     }
@@ -282,7 +282,7 @@ void FarahCom::RemoveBullet(const std::shared_ptr<GameObject>& obj)
 {
     bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
         [&obj](const FarahBullet& bullet) {
-            return bullet.obj == obj;
+            return bullet.obj.lock() == obj;
         }),
         bullets.end());
 }

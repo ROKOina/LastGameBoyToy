@@ -121,7 +121,7 @@ void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
         return;
     }
 
-    if (const auto& bullet = charaComponent->GetHaveBullet())
+    if (const auto& bullet = charaComponent->GetHaveBullet().lock())
     {
         FireBullet(bullet);
         charaComponent->ReleaseHaveBullet();
@@ -174,7 +174,7 @@ void JankratCharacter_SubAttackState::Execute(const float& elapsedTime)
     for (auto& mine : charaCom.lock()->GetHaveMine())
     {
         //全ての設置中の地雷を起爆
-        mine->GetComponent<JankratMineCom>()->Fire();
+        mine.lock()->GetComponent<JankratMineCom>()->Fire();
     }
 
     //遷移
@@ -225,7 +225,7 @@ void JankratCharacter_UltState::Execute(const float& elapsedTime)
     //腕アニメーション再生
     charaCom.lock()->HandleArmAnimation();
 
-    if (const auto& bullet = charaComponent->GetHaveBullet())
+    if (const auto& bullet = charaComponent->GetHaveBullet().lock())
     {
         FireBullet(bullet);
 

@@ -90,8 +90,6 @@ void JankratCharacterCom::SubSkill()
     {
         //ínóãê›íu
         attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::MAIN_SKILL);
-        //SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 0.1f);
-        //ResetSkillCoolTimer(SkillCoolID::RightClick);
     }
 }
 
@@ -115,7 +113,7 @@ void JankratCharacterCom::EraseHaveObjects()
     std::vector<GameObj> eraseObjs;
     for (int i = 0; i < haveMine.size(); ++i)
     {
-        if (haveMine[i]->GetComponent<JankratMineCom>()->GetExplosionFlag())
+        if (haveMine[i].lock()->GetComponent<JankratMineCom>()->GetExplosionFlag())
         {
             eraseObjs.emplace_back(haveMine[i]);
         }
