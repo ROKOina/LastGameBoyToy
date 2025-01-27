@@ -12,6 +12,12 @@ JankratCharacterCom::~JankratCharacterCom()
     AllReleaseHaveMine();
 }
 
+inline GameObj MAKE_AUDIO_3D(GameObj obj, AUDIOID3D id) {
+    GameObj ultSeObj = obj->AddChildObject();
+    std::shared_ptr<AudioSource3D> ultSe = ultSeObj->AddComponent<AudioSource3D>(id);
+    return ultSeObj;
+}
+
 void JankratCharacterCom::Start()
 {
     //ÉXÉeÅ[Égìoò^
@@ -33,6 +39,8 @@ void JankratCharacterCom::Start()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 
     //SEìoò^
+    audioObjs["ULT"] = MAKE_AUDIO_3D(GetGameObject(), AUDIOID3D::JANKRA_ULT);
+    audioObjs["ULT2"] = MAKE_AUDIO_3D(GetGameObject(), AUDIOID3D::JANKRA_ULT2);
 }
 
 void JankratCharacterCom::Update(float elapsedTime)

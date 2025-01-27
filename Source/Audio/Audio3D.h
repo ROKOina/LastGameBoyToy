@@ -98,6 +98,8 @@ enum class AUDIOID2D
     PLAYER_CHARGE,
     PLAYER_DAMAGE,
     PLAYER_DASH,
+    PLAYER_CANON,
+    PLAYER_CANON2,
 
     //チュートリアルセリフ
     TUTOLINES_01,
@@ -314,6 +316,10 @@ enum AUDIOID3D
     SE,
     TEST,
     PLAYER_WAKL,
+    
+    //ジャンクラ
+    JANKRA_ULT,
+    JANKRA_ULT2,
 
     MAX_
 };
@@ -351,6 +357,8 @@ private:
         audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
         audio3DResources[AUDIOID3D::PLAYER_WAKL] = std::make_shared<AudioResource>("Data/AudioData/SE/player/player_walk.wav");
 
+        audio3DResources[AUDIOID3D::JANKRA_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/player/canon.wav");
+        audio3DResources[AUDIOID3D::JANKRA_ULT2] = std::make_shared<AudioResource>("Data/AudioData/SE/player/canon2.wav");
     }
 
 
@@ -374,7 +382,10 @@ public:
     void UpdateAudio3d(float elapsedTime);
 
     // 再生
+    void AudioPlay(bool loop);
     void AudioPlay();
+
+    void AudioStop();
 
     void SetVolume(float volume) { volume = this->volume; }
 
@@ -392,6 +403,8 @@ public:
     std::shared_ptr<AudioResource>	resource_;
 
 private:
+    AUDIOID3D myId = AUDIOID3D::MAX_;
+
     DirectX::XMFLOAT3 listenerPos;
     DirectX::XMFLOAT3 emitterPos;
 

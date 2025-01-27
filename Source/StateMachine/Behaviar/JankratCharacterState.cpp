@@ -5,6 +5,7 @@
 #include "Component\Bullet\BulletCom.h"
 #include "Component\SkillObj\JankratMineCom.h"
 #include "Component\Bullet\JankratBulletCom.h"
+#include "Audio\Audio3D.h"
 
 #include "Netwark/Photon/StaticSendDataManager.h"
 
@@ -208,6 +209,8 @@ void JankratCharacter_UltState::Enter()
         DIR = dir;
         POS = gunPos;
     }
+
+    charaCom.lock()->GetAudio("ULT")->AudioPlay(false);
 }
 void JankratCharacter_UltState::Execute(const float& elapsedTime)
 {

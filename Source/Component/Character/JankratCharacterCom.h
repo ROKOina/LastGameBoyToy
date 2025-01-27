@@ -1,5 +1,6 @@
 #pragma once
 #include "CharacterCom.h"
+#include "Audio\Audio3D.h"
 
 class JankratCharacterCom : public CharacterCom
 {
@@ -49,7 +50,11 @@ public:
     }
 
 private:
-
     GameObj haveBullet; //射撃待機中の弾丸
     std::vector<GameObj> haveMine; //使用中の地雷
+
+private:
+    std::map<std::string, GameObj> audioObjs;
+public:
+    AudioSource3D* GetAudio(std::string name) { return audioObjs[name]->GetComponent<AudioSource3D>().get(); }
 };

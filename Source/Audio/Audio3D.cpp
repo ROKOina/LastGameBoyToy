@@ -46,7 +46,7 @@ XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAMS02[NUM_PRESETS] =
 };
 
 
-AudioSource3D::AudioSource3D(AUDIOID3D id)
+AudioSource3D::AudioSource3D(AUDIOID3D id) : myId(id)
 {
     // Clear struct
     g_audioState = {};
@@ -439,15 +439,17 @@ void AudioSource3D::SetAudio(AUDIOID3D id)
     }
 }
 
-void AudioSource3D::AudioPlay()
+void AudioSource3D::AudioPlay(bool loop)
 {
+    AudioStop();
     // Submit the wave sample data using an XAUDIO2_BUFFER structure
     XAUDIO2_BUFFER buffer = {};
 
     buffer.pAudioData = resource_->GetAudioData();
     buffer.Flags = XAUDIO2_END_OF_STREAM;
     buffer.AudioBytes = resource_->GetAudioBytes();
-    buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+    
+    loop ? buffer.LoopCount = XAUDIO2_LOOP_INFINITE : buffer.LoopCount = 0;
 
     sourceVoice_->SubmitSourceBuffer(&buffer);
 
@@ -455,6 +457,19 @@ void AudioSource3D::AudioPlay()
     sourceVoice_->SetVolume(volume);
 
     g_audioState.nFrameToApply3DAudio = 0;
+}
+
+void AudioSource3D::AudioPlay()
+{
+    AudioPlay(true);
+}
+
+void AudioSource3D::AudioStop()
+{
+    if (!sourceVoice_)return;
+
+    sourceVoice_->FlushSourceBuffers();
+    sourceVoice_->Stop(0);
 }
 
 
