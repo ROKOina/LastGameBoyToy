@@ -17,7 +17,7 @@ public:
         bool bomberflag = false;           // 爆発フラグ
         bool played = false;
         float rotation = 0;
-        std::shared_ptr<GameObject> obj;   // 弾丸オブジェクトへのポインタ
+        std::weak_ptr<GameObject> obj;   // 弾丸オブジェクトへのポインタ
     };
 
 public:
