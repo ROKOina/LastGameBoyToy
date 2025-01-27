@@ -445,6 +445,26 @@ private:
     float  effectFLGTimer = 0;
 };
 
+class UI_Reload : public Component
+{
+public:
+    UI_Reload();
+    ~UI_Reload() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_Reload"; }
+
+    // 開始処理
+    void Start() override;
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //gui
+    void OnGUI()override {};
+
+private:
+};
 //PlayerUIのマネージャー
 class PlayerUIManager
 {

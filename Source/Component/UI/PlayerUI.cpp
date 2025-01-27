@@ -157,6 +157,7 @@ void UI_PlayerHpUI::Update(float elapsedTime)
     }
     else {
         gauge->spc.color = { 0.000f, 1.000f, 0.184f, 1.000f };
+        electro->spc.color = { 0.000f, 1.000f, 0.184f, 1.000f };
     }
 }
 
@@ -1242,6 +1243,11 @@ void PlayerUIManager::CreateReticleUI()
     reticle->SetName("reticle");
     auto& a = reticle->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Reticle.ui", Sprite::SpriteShader::DEFALT, false);
     a->LoadTexture(name);
+
+    std::shared_ptr<GameObject> reload = canvas->AddChildObject();
+    reload->SetName("reloadUI");
+    auto& b = reload->AddComponent<UI_Reload>();
+
 }
 
 void PlayerUIManager::CreateUltUI()
@@ -2157,3 +2163,37 @@ void UI_KillEffect::EffectUpdat(float elapsedTime)
     if (!skull->IsPlayEasing()) {
     }
 }
+
+UI_Reload::UI_Reload()
+{
+    std::shared_ptr<GameObject> reload = GameObjectManager::Instance().Create();
+    reload->SetName("reload");
+    reload->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/Reload.ui", Sprite::SpriteShader::DEFALT, false);
+    reload->SetEnabled(false);
+}
+
+void UI_Reload::Start()
+{
+    //eŽq•t‚¯
+    this->GetGameObject()->AddChildObject(GameObjectManager::Instance().Find("reload"));
+}
+
+void UI_Reload::Update(float elapsedTime)
+{
+    std::weak_ptr<GameObject> player = GameObjectManager::Instance().Find("player");
+    std::weak_ptr<GameObject> reload = GameObjectManager::Instance().Find("reload");
+    std::weak_ptr<GameObject> reticle = GameObjectManager::Instance().Find("reticle");
+
+    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() == CharacterCom::CHARACTER_ATTACK_ACTIONS::RELOAD)
+    {
+        reload.lock()->SetEnabled(true);
+        reticle.lock()->SetEnabled(false);
+        reload.lock()->GetComponent<UiSystem>()->spc.angle += 5.0f;
+        
+    }
+    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() != CharacterCom::CHARACTER_ATTACK_ACTIONS::RELOAD){
+        reload.lock()->SetEnabled(false);
+        reticle.lock()->SetEnabled(true);
+    }
+}
+
