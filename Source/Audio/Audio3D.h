@@ -381,6 +381,13 @@ public:
     void SetListenerPos(DirectX::XMFLOAT3 pos) { listenerPos = pos; }
     void SetEmitterPos(DirectX::XMFLOAT3 pos) { emitterPos = pos; }
 
+    //効果
+    void SetReverb(int nReverb);
+
+    //聞こえる範囲
+    void SetCurveDistanceScaler(float dis) { CurveDistanceScaler = dis; }
+
+
 private:
     // オーディオ登録関数
     void SetAudio(AUDIOID3D id);
@@ -396,6 +403,10 @@ private:
     DirectX::XMFLOAT3 emitterPos;
 
     float volume = 1;
+
+    float CurveDistanceScaler = 14.0f;
+
+    bool frameUpdate = false;
 
     AUDIO_STATE  g_audioState;
 };

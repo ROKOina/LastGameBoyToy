@@ -115,6 +115,30 @@ void SceneTraining::Update(float elapsedTime)
         PlayerUIManager::Instance().UIUpdate(elapsedTime);
     }
 
+    auto& canvas = GameObjectManager::Instance().Find("Canvas");
+
+    //UIしょり
+    if (canvas) {
+
+        auto& backA = canvas->GetChildFind("allyBack");
+        auto& backE = canvas->GetChildFind("enemyBack");
+        if (backA)backA->SetEnabled(false);
+        if (backE)backE->SetEnabled(false);
+
+        if (TrainingManager::Instance().GetTutoriaFlag())
+        {
+            if (!TrainingManager::Instance().GetTutorilUIFlag())
+            {
+                canvas->SetEnabled(true);
+            }
+            else
+            {
+                canvas->SetEnabled(false);
+            }
+        }
+    }
+
+    //プレイヤー落下処理
     PlayerRespawn();
 
     if (TrainingManager::Instance().GetTutoriaFlag())
@@ -128,6 +152,7 @@ void SceneTraining::Update(float elapsedTime)
             GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
         }
     }
+
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
@@ -160,12 +185,13 @@ void SceneTraining::Render(float elapsedTime)
 
 void SceneTraining::PlayerRespawn()
 {
+    auto& p = GameObjectManager::Instance().Find("player");
     //BOSSのY座標
-    float posY = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition().y;
+    float posY = p->transform_->GetWorldPosition().y;
 
     //一定距離落下したら中央に戻す
     if (posY < -50.0f)
     {
-        GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition(SpawnPos);
+        p->transform_->SetWorldPosition(SpawnPos);
     }
 }

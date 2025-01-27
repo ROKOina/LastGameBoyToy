@@ -547,5 +547,6 @@ private:
             int underNum = 0;   //’Ç‰Á‚Å‚«‚½”
         }moveData;
     };
-    std::map<int, DeathData> saveCharaKilog;
+    //std::map<int, DeathData> saveCharaKilog;
+    std::vector<DeathData> saveCharaKilog;
 };
