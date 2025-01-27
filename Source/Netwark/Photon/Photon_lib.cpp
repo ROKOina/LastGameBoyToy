@@ -271,7 +271,8 @@ void PhotonLib::update(float elapsedTime)
     if (StaticSendDataManager::Instance().GetMyDeath())
     {
         //€–S“ü‚é
-        saveInputPhoton[myPlayerID].deathCount++;
+        if (myPlayerID >= 0)
+            saveInputPhoton[myPlayerID].deathCount++;
     }
 
     //ƒNƒ‰ƒEƒ“
