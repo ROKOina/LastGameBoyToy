@@ -177,6 +177,10 @@ Sprite::Sprite(const char* filename, SpriteShader spriteshader, bool collsion)
         PSPath = { "Shader\\SpritePS.cso" };
         VSPath = { "Shader\\SpriteVS.cso" };
         break;
+    case SpriteShader::DEFALTUV:
+        PSPath = { "Shader\\SpriteDefaltUVPS.cso" };
+        VSPath = { "Shader\\SpriteVS.cso" };
+        break;
     case SpriteShader::BLUR:
         PSPath = { "Shader\\SpriteBlurPS.cso" };
         VSPath = { "Shader\\SpriteVS.cso" };
