@@ -15,4 +15,6 @@ cbuffer CbPostEffect : register(b3)
     float blurradius;
     float blurdecay;
     float distance_to_sun;
+    float3 sundirection;
+    float padding;
 };

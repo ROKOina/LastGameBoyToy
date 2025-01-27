@@ -132,7 +132,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         }
     }
 
-
     //煙のエフェクト
     {
         std::shared_ptr<GameObject> smoke = obj->AddChildObject();
@@ -634,6 +633,8 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 6.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
+    c->SetCurrentBulletNum(20);
+    c->SetMaxBulletNum(20);
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
