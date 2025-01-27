@@ -149,14 +149,6 @@ void SceneTitle::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    //{
-    //    GameObj audio = GameObjectManager::Instance().Create();
-    //    audio->SetName("Audio");
-    //    auto& a2d = audio->AddComponent<AudioSource2D>();
-    //    a2d->SetAudio2D(AUDIOID2D::BGM);
-    //    a2d->Audio2DPlay();
-    //}
-
     Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
 
     {

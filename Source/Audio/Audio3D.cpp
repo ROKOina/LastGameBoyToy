@@ -218,13 +218,17 @@ AudioSource3D::AudioSource3D(AUDIOID3D id)
     g_audioState.emitter.InnerRadius = 2.0f;
     g_audioState.emitter.InnerRadiusAngle = X3DAUDIO_PI / 4.0f;;
 
+    //static const X3DAUDIO_DISTANCE_CURVE_POINT X3DAudioDefault_LinearCurvePointsAA[3] = { { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f } };
+    //static const X3DAUDIO_DISTANCE_CURVE       X3DAudioDefault_LinearCurveAA = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&X3DAudioDefault_LinearCurvePointsAA[0], 3 };
+
+    //g_audioState.emitter.pVolumeCurve = (X3DAUDIO_DISTANCE_CURVE*)&X3DAudioDefault_LinearCurveAA;
     g_audioState.emitter.pVolumeCurve = (X3DAUDIO_DISTANCE_CURVE*)&X3DAudioDefault_LinearCurve;
     g_audioState.emitter.pLFECurve = (X3DAUDIO_DISTANCE_CURVE*)&Emitter_LFE_Curve;
     g_audioState.emitter.pLPFDirectCurve = nullptr; // use default curve
     g_audioState.emitter.pLPFReverbCurve = nullptr; // use default curve
     g_audioState.emitter.pReverbCurve = (X3DAUDIO_DISTANCE_CURVE*)&Emitter_Reverb_Curve;
     g_audioState.emitter.CurveDistanceScaler = 14.0f;
-    g_audioState.emitter.DopplerScaler = 1.0f;
+    g_audioState.emitter.DopplerScaler = 0.5f;
 
     g_audioState.dspSettings.SrcChannelCount = INPUTCHANNELS;
     g_audioState.dspSettings.DstChannelCount = g_audioState.nChannels;
@@ -308,10 +312,57 @@ void AudioSource3D::OnGUI()
 {
     if (ImGui::DragFloat("volume", &volume))
         sourceVoice_->SetVolume(volume);
+    ImGui::DragFloat("CurveDistanceScaler", &CurveDistanceScaler);
+
+    //りばーぶ
+    constexpr const char* reverb[NUM_PRESETS] =
+    {
+        "Forest",
+        "Default",
+        "Generic",
+        "Padded cell",
+        "Room",
+        "Bathroom",
+        "Living room",
+        "Stone room",
+        "Auditorium",
+        "Concert hall",
+        "Cave",
+        "Arena",
+        "Hangar",
+        "Carpeted hallway",
+        "Hallway",
+        "Stone Corridor",
+        "Alley",
+        "City",
+        "Mountains",
+        "Quarry",
+        "Plain",
+        "Parking lot",
+        "Sewer pipe",
+        "Underwater",
+        "Small room",
+        "Medium room",
+        "Large room",
+        "Medium hall",
+        "Large hall",
+        "Plate",
+    };
+
+    //ブレンドモード設定
+    static int num = 0;
+    if (ImGui::Combo("reverbMode", &num, reverb, NUM_PRESETS, NUM_PRESETS))
+    {
+        SetReverb(num);
+    }
+
 }
 
 void AudioSource3D::UpdateAudio3d(float elapsedTime)
 {
+    frameUpdate = !frameUpdate;
+    if (!frameUpdate)return;
+
     {
         //方向を指定
         DirectX::XMFLOAT3 front = { 0,0,1 };
@@ -376,6 +427,9 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
         }
     }
 
+    g_audioState.emitter.CurveDistanceScaler = CurveDistanceScaler;
+
+
     DWORD dwCalcFlags = X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER
         | X3DAUDIO_CALCULATE_LPF_DIRECT | X3DAUDIO_CALCULATE_LPF_REVERB
         | X3DAUDIO_CALCULATE_REVERB;
@@ -406,6 +460,15 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
     }
 }
 
+void AudioSource3D::SetReverb(int nReverb)
+{
+    if (g_audioState.pSubmixVoice)
+    {
+        XAUDIO2FX_REVERB_PARAMETERS native;
+        ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS02[nReverb], &native);
+        g_audioState.pSubmixVoice->SetEffectParameters(0, &native, sizeof(native));
+    }
+}
 void AudioSource3D::SetAudio(AUDIOID3D id)
 {
     resource_ = Audio3DResourceMagaer::Instance().GetAudio3DResouce(id);

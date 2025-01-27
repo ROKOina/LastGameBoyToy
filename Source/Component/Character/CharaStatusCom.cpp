@@ -58,7 +58,7 @@ void CharaStatusCom::AddDamagePoint(float value, int playerID)
             {
                 //攻撃してきた敵を保存
                 lastDamageID = playerID;
-                lastDamageTimer = 5;
+                lastDamageTimer = 20;
             }
             //死亡時にキルをした相手をネットに送る
             if (hitPoint <= 0)
@@ -80,6 +80,9 @@ void CharaStatusCom::ReSpawn(int HP)
 
     //デスフラグを撤回
     isDeath = false;
+
+    //攻撃相手保存をリセット
+    lastDamageID = -1;
 }
 
 //GUI
@@ -90,4 +93,5 @@ void CharaStatusCom::OnGUI()
     ImGui::Text("Current Invincible Time: %.2f", currentInvincibleTime);
     ImGui::Checkbox("isDeathFrame", &isDeathFrame);
     ImGui::InputInt("lastDamageID", &lastDamageID);
+    ImGui::InputFloat("lastDamageTimer", &lastDamageTimer);
 }

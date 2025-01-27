@@ -117,6 +117,7 @@ void SceneTraining::Update(float elapsedTime)
 
     auto& canvas = GameObjectManager::Instance().Find("Canvas");
 
+    //UI‚µ‚å‚è
     if (canvas) {
 
         auto& backA = canvas->GetChildFind("allyBack");
@@ -133,6 +134,18 @@ void SceneTraining::Update(float elapsedTime)
             else
             {
                 canvas->SetEnabled(false);
+            }
+        }
+    }
+
+    //ƒvƒŒƒCƒ„[—Ž‰ºˆ—
+    {
+        auto& p = GameObjectManager::Instance().Find("player");
+        if (p)
+        {
+            if (p->transform_->GetWorldPosition().y < -10)
+            {
+                p->transform_->SetWorldPosition({ 0, 10, 0 });
             }
         }
     }
