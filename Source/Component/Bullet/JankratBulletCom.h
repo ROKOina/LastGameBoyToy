@@ -51,10 +51,10 @@ private:
     float lifeTimer = 0.0f;
 
     float explosionTime = 1.5f;
-    float lifeTime = 5.0f;
+    float lifeTime = 2.5f;
 
     bool explosionFlag = false;
-    int damageValue = 30;
+    int damageValue = 50;
 
     float addGravity = 0.0f;
 
