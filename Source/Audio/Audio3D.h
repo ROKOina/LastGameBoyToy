@@ -375,6 +375,8 @@ public:
 
     // 再生
     void AudioPlay();
+    // 停止
+    void Audio3DStop();
 
     void SetVolume(float volume) { volume = this->volume; }
 
@@ -387,12 +389,9 @@ public:
     //聞こえる範囲
     void SetCurveDistanceScaler(float dis) { CurveDistanceScaler = dis; }
 
-
 private:
     // オーディオ登録関数
     void SetAudio(AUDIOID3D id);
-
-
 
 public:
     IXAudio2SourceVoice* sourceVoice_ = nullptr;
