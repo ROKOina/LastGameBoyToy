@@ -1407,8 +1407,6 @@ void PhotonLib::GameRecv(NetData recvData)
             {
                 //デスを確認
                 saveDeath[myD].onDeath = false;
-                //キルしたIDを保存
-                StaticSendDataManager::Instance().GetKillID(myD, myPlayerID) = true;
             }
         }
 
@@ -1751,6 +1749,12 @@ void PhotonLib::sendGameData(void)
     for (int d = 0; d < 4; ++d)
     {
         netD.gameData.deathID[d] = saveDeath[d].onDeath;
+        if (saveDeath[d].onDeath)
+        {
+            if (myPlayerID >= 0)
+                //自分のデスを送る
+                StaticSendDataManager::Instance().GetKillID(d, myPlayerID) = true;
+        }
     }
     //キル確認したら送る
     for (int d = 0; d < 4; ++d)
