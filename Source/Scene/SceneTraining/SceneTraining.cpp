@@ -115,6 +115,8 @@ void SceneTraining::Update(float elapsedTime)
         PlayerUIManager::Instance().UIUpdate(elapsedTime);
     }
 
+    PlayerRespawn();
+
     if (TrainingManager::Instance().GetTutoriaFlag())
     {
         if (!TrainingManager::Instance().GetTutorilUIFlag())
@@ -154,4 +156,16 @@ void SceneTraining::Render(float elapsedTime)
 
     //オブジェクト描画
     GameObjectManager::Instance().Render(sc->data.view, sc->data.projection, GameObjectManager::Instance().Find("directionallight")->GetComponent<Light>()->GetDirection());
+}
+
+void SceneTraining::PlayerRespawn()
+{
+    //BOSSのY座標
+    float posY = GameObjectManager::Instance().Find("player")->transform_->GetWorldPosition().y;
+
+    //一定距離落下したら中央に戻す
+    if (posY < -50.0f)
+    {
+        GameObjectManager::Instance().Find("player")->transform_->SetWorldPosition(SpawnPos);
+    }
 }
