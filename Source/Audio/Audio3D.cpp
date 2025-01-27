@@ -452,7 +452,7 @@ void AudioSource3D::AudioPlay()
     sourceVoice_->SubmitSourceBuffer(&buffer);
 
     sourceVoice_->Start(0);
-    //sourceVoice_->SetVolume(10);
+    sourceVoice_->SetVolume(volume);
 
     g_audioState.nFrameToApply3DAudio = 0;
 }

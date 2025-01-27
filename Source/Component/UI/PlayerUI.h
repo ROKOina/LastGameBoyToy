@@ -513,6 +513,7 @@ public:
     //勝敗表示UI
     void CreateGameJudgeUI(PVPGameSystem::TEAM_KIND victryTeam);
     bool GetIsEndFLG() { return isEndFLG; }
+    void ResetEndFLG() { isEndFLG = false; }
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
 
@@ -530,7 +531,8 @@ private:
     //要素がキルキャラID
     struct DeathData
     {
-        int charaID;
+        int KcharaID;
+        int DcharaID;
         bool isEnemy;   //ですしたキャラは敵か
         //自分がいる場合
         int myID = -1;  //-1:なし　0:キル　1:デス

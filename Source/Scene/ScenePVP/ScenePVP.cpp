@@ -160,6 +160,7 @@ void ScenePVP::Initialize()
 
     //UIèâä˙âª
     PlayerUIManager::Instance().ResetAllyHp();
+    PlayerUIManager::Instance().ResetEndFLG();
 }
 
 void ScenePVP::InitializeLobbySelect()
@@ -707,7 +708,7 @@ void ScenePVP::Update(float elapsedTime)
                     if (!netI.useFlg)continue;
                     DelivertResultData::ResultData data;
                     data.charaID = netI.charaID;
-                    data.playerName = netI.name + "_player";
+                    data.playerName = netI.name;
                     data.killNum = netI.killCount;
                     data.deathNum = netI.deathCount;
 

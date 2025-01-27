@@ -46,9 +46,10 @@ private:
 
     DelivertResultData::ResultData resultDatas[4];
     bool isMyWin = false;
-    GameObj resultUI[4];
-    GameObj resultModel[2];
+    std::weak_ptr<GameObject> resultUI[4];
+    std::weak_ptr<GameObject> resultModel[2];
 
     float timer = 1.0f;
     float limittimer = 0.0f;
+    float fontalpha = 0.0f;
 };

@@ -1579,7 +1579,6 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                     kilogTimer[deathPID] = 3;
 
                     //ここでキルログを出す
-                    int killChara = -1;
                     DeathData  d;
                     //チームを見る
                     for (auto& chara : GameObjectManager::Instance().GetCharaObject())
@@ -1592,7 +1591,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                         //キル側
                         if (charaCom->GetNetCharaData().GetNetPlayerID() == killPID)
                         {
-                            killChara = charaCom->GetNetCharaData().GetCharaID();
+                            d.KcharaID = charaCom->GetNetCharaData().GetCharaID();
 
                             //自分の場合
                             if (std::strcmp(chara.lock()->GetName(), "player") == 0)
@@ -1612,7 +1611,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                             int nT = charaCom->GetNetCharaData().GetTeamID();
                             d.isEnemy = (pT != nT);
 
-                            d.charaID = charaCom->GetNetCharaData().GetCharaID();
+                            d.DcharaID = charaCom->GetNetCharaData().GetCharaID();
 
                             //使用UIを決める
                             int uiID = 0;
@@ -1631,7 +1630,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                     }
 
                     //キルが起きたので一旦保存
-                    saveCharaKilog[killChara] = d;
+                    saveCharaKilog[killPID] = d;
                 }
             }
             killflg = false;
@@ -1676,16 +1675,16 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
                 //いーじんぐ初期か
                 Pspr->spc.color.w = 0;
-                c1spr->spc.color.w = 0;
-                c2spr->spc.color.w = 0;
+                c1spr->spc.color = { 1,1,1,0 };
+                c2spr->spc.color = { 1,1,1,0 };
                 if (data.second.myID == 0) //キルが自分
                     c1spr->spc.color = { 1,0,0,0 };
                 if (data.second.myID == 1) //デスが自分
                     c2spr->spc.color = { 1,0,0,0 };
 
                 //キャラIDを見て画像ずらす
-                c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.first;
-                c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.second.charaID;
+                c01->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.second.KcharaID;
+                c02->GetComponent<UiSystem>()->numUVScroll.x = 0.25f * data.second.DcharaID;
             }
 
             //動き
@@ -1755,6 +1754,8 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
 void PlayerUIManager::CreateKillLog()
 {
+    saveCharaKilog.clear();
+
     std::shared_ptr<GameObject> killLogCanvas = GameObjectManager::Instance().Create();
     killLogCanvas->SetName("killLogCanvas");
 

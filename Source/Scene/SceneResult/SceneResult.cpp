@@ -16,6 +16,41 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTitle\SceneTitle.h"
+#include <string>
+#include <windows.h>
+
+std::wstring stringconvert(const std::string& str)
+{
+    std::wstring result;
+    size_t i = 0;
+    while (i < str.size()) {
+        unsigned char c = str[i];
+        if (c <= 0x7F) {
+            result.push_back(c);
+            ++i;
+        }
+        else if ((c & 0xE0) == 0xC0) {
+            wchar_t wc = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+            result.push_back(wc);
+            i += 2;
+        }
+        else if ((c & 0xF0) == 0xE0) {
+            wchar_t wc = ((c & 0x0F) << 12) | ((str[i + 1] & 0x3F) << 6) | (str[i + 2] & 0x3F);
+            result.push_back(wc);
+            i += 3;
+        }
+        else if ((c & 0xF8) == 0xF0) {
+            wchar_t wc = ((c & 0x07) << 18) | ((str[i + 1] & 0x3F) << 12) | ((str[i + 2] & 0x3F) << 6) | (str[i + 3] & 0x3F);
+            result.push_back(wc);
+            i += 4;
+        }
+        else {
+            // 不正なUTF-8データを無視する
+            ++i;
+        }
+    }
+    return result;
+}
 
 //コンストラクタ
 void SceneResult::Initialize()
@@ -85,7 +120,7 @@ void SceneResult::Finalize()
 {
     for (int i = 0; i < std::size(resultUI); ++i)
     {
-        if (resultUI[i])
+        if (resultUI[i].lock())
         {
             resultUI[i].reset();
         }
@@ -93,7 +128,7 @@ void SceneResult::Finalize()
 
     for (int i = 0; i < std::size(resultModel); ++i)
     {
-        if (resultModel[i])
+        if (resultModel[i].lock())
         {
             resultModel[i].reset();
         }
@@ -113,13 +148,13 @@ void SceneResult::Update(float elapsedTime)
             for (int i = 0; i < 4; ++i)
             {
                 std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-                resultUI[i]->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
                 std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-                resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
                 std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-                resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
                 std::string icon = std::to_string(i) + "st_PlayerIcon";
-                resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
+                resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
             }
 
             //勝敗君
@@ -131,13 +166,13 @@ void SceneResult::Update(float elapsedTime)
             for (int i = 0; i < 4; ++i)
             {
                 std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-                resultUI[i]->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->StopEasing();
                 std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-                resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->StopEasing();
                 std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-                resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->StopEasing();
                 std::string icon = std::to_string(i) + "st_PlayerIcon";
-                resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->StopEasing();
+                resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->StopEasing();
             }
 
             //勝敗君
@@ -192,7 +227,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         if (i >= 2) uiOffset = 60;
 
         // 子オブジェクト (UI Canvas) を生成し名前を付ける
-        GameObj uiCanvas = canvas->AddChildObject();
+        std::shared_ptr<GameObject> uiCanvas = canvas->AddChildObject();
         std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
         uiCanvas->SetName(canvasName.c_str());
         uiCanvas->transform_->SetWorldPosition({ -400.0f, 395.0f + (160 * i) + uiOffset, 0.0f });
@@ -253,6 +288,17 @@ void SceneResult::MakeResultUI(GameObj canvas)
             IconSprite->LoadTexture("Data/Texture/PlayerUI/CharaIcon/SoldierCom.png");
             break;
         }
+
+        //キャラの名前
+        GameObj charaname = uiCanvas->AddChildObject();
+        deathNumObj->SetName(deathNumName.c_str());
+        std::string name = "charaname" + std::to_string(i + 1);
+        charaname->SetName(name.c_str());
+        std::shared_ptr<Font>f = charaname->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        f->position = { 154.0f, 365.0f + (160 * i) + uiOffset };
+        f->str = stringconvert(resultDatas[i].playerName);
+        f->scale = { 0.9f };
+        f->color = { 1,1,1,1.0f };
     }
 
     // 勝敗表示
@@ -352,10 +398,10 @@ void SceneResult::MakeResultModel()
     }
 
     //値を代入
-    if (resultModel[0] && resultModel[1])
+    if (resultModel[0].lock() && resultModel[1].lock())
     {
-        resultModel[0]->transform_->SetWorldPosition({ 31.532f, -6.528f, 43.868f });
-        resultModel[1]->transform_->SetWorldPosition({ -35.722f, -7.606f, -14.812f });
+        resultModel[0].lock()->transform_->SetWorldPosition({ 31.532f, -6.528f, 43.868f });
+        resultModel[1].lock()->transform_->SetWorldPosition({ -35.722f, -7.606f, -14.812f });
     }
 
     //王冠
@@ -427,17 +473,27 @@ void SceneResult::EventCamera(float elapsedTime)
         for (int i = 0; i < 4; ++i)
         {
             std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-            resultUI[i]->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
             std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-            resultUI[i]->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
             std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-            resultUI[i]->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
             std::string icon = std::to_string(i) + "st_PlayerIcon";
-            resultUI[i]->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
+            resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
         }
 
         //勝敗君
         canvas->GetChildFind("Judge")->GetComponent<Sprite>()->EasingPlay();
+    }
+
+    // フォントの alpha 値を徐々に上げる処理
+    if (limittimer >= 2.3f)
+    {
+        // 経過時間に応じて alpha を増加
+        fontalpha += elapsedTime / 2;
+
+        // alpha 値を最大 1.0 に制限
+        fontalpha = (std::min)(fontalpha, 1.0f);
     }
 
     //チェンジシーン
