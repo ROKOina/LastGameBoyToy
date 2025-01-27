@@ -168,10 +168,10 @@ void SceneTitle::Initialize()
     {
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Emitter1");
-        audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
         audio->transform_->SetWorldPosition({ 15,0,0 });
-        audio->GetComponent<AudioSource3D>()->SetEmitterPos(audio->transform_->GetWorldPosition());
-        audio->GetComponent<AudioSource3D>()->AudioPlay();
+        auto& au3D = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+        au3D->SetEmitterPos(audio->transform_->GetWorldPosition());
+        au3D->AudioPlay();
     }
 
     //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
