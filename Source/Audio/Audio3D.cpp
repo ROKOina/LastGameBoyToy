@@ -522,6 +522,9 @@ void AudioSource3D::AudioPlay(bool loop)
 void AudioSource3D::Audio3DStop()
 {
     if (!sourceVoice_) return;
+
+    sourceVoice_->FlushSourceBuffers();
+    sourceVoice_->Stop(0);
 }
 
 void AudioSource3D::AudioPlay()

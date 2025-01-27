@@ -210,6 +210,7 @@ void JankratCharacter_UltState::Enter()
         POS = gunPos;
     }
 
+    charaCom.lock()->GetAudio("ULT")->Audio3DStop();
     charaCom.lock()->GetAudio("ULT")->AudioPlay(false);
 }
 void JankratCharacter_UltState::Execute(const float& elapsedTime)

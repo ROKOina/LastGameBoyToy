@@ -387,8 +387,6 @@ public:
     // ’âŽ~
     void Audio3DStop();
 
-    void AudioStop();
-
     void SetVolume(float volume) { volume = this->volume; }
 
     void SetListenerPos(DirectX::XMFLOAT3 pos) { listenerPos = pos; }
