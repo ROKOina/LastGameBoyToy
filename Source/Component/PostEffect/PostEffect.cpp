@@ -67,6 +67,7 @@ void PostEffect::OnGUI()
         ImGui::SliderFloat("blurradius", &m_posteffect->data.blurradius, +0.0f, +1.0f);
         ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
         ImGui::DragFloat("DistanceSan", &m_posteffect->data.ditancesan);
+        ImGui::DragFloat3("SunDirection", &m_posteffect->data.sundirection.x, 0.01f);
     }
 
     if (ImGui::TreeNode("shadow"))

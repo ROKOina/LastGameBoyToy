@@ -90,7 +90,9 @@ private:
         float blurstrength = {};
         float blurradius = { 1.0f };
         float blurdecay = { 0.999f };
-        float ditancesan = { 1034.0f };
+        float ditancesan = { 986.0f };
+        DirectX::XMFLOAT3 sundirection = { -1.9f,-0.37f,-0.09f };
+        float padding = {};
     };
     std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
 

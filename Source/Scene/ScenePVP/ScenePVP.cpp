@@ -47,6 +47,8 @@
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
 
+#include "SystemStruct\TimeManager.h"
+
 // UTF-8 (std::string) Å® UTF-16 (std::wstring) ïœä∑
 std::wstring UTF8ToWString2(const std::string& str) {
     std::wstring result;
@@ -747,7 +749,6 @@ void ScenePVP::Update(float elapsedTime)
                         DelivertResultData::Instance().SetIsMyWin(data.isWin);
                 }
             }
-
             SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
         }
     }

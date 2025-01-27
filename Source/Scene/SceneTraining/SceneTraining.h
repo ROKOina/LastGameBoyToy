@@ -29,7 +29,12 @@ public:
     //–¼‘OŽæ“¾
     std::string GetName() const override { return "SceneTraining"; };
 
+    void PlayerRespawn();
+
     GameObj audioObj;
 private:
     std::unique_ptr<BasicsApplication> photonNet;
+
+    DirectX::XMFLOAT3 SpawnPos = { 0,8.0f,0 };
+
 };

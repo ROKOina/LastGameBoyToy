@@ -218,13 +218,17 @@ AudioSource3D::AudioSource3D(AUDIOID3D id) : myId(id)
     g_audioState.emitter.InnerRadius = 2.0f;
     g_audioState.emitter.InnerRadiusAngle = X3DAUDIO_PI / 4.0f;;
 
+    //static const X3DAUDIO_DISTANCE_CURVE_POINT X3DAudioDefault_LinearCurvePointsAA[3] = { { 0.0f, 1.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f } };
+    //static const X3DAUDIO_DISTANCE_CURVE       X3DAudioDefault_LinearCurveAA = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&X3DAudioDefault_LinearCurvePointsAA[0], 3 };
+
+    //g_audioState.emitter.pVolumeCurve = (X3DAUDIO_DISTANCE_CURVE*)&X3DAudioDefault_LinearCurveAA;
     g_audioState.emitter.pVolumeCurve = (X3DAUDIO_DISTANCE_CURVE*)&X3DAudioDefault_LinearCurve;
     g_audioState.emitter.pLFECurve = (X3DAUDIO_DISTANCE_CURVE*)&Emitter_LFE_Curve;
     g_audioState.emitter.pLPFDirectCurve = nullptr; // use default curve
     g_audioState.emitter.pLPFReverbCurve = nullptr; // use default curve
     g_audioState.emitter.pReverbCurve = (X3DAUDIO_DISTANCE_CURVE*)&Emitter_Reverb_Curve;
     g_audioState.emitter.CurveDistanceScaler = 14.0f;
-    g_audioState.emitter.DopplerScaler = 1.0f;
+    g_audioState.emitter.DopplerScaler = 0.5f;
 
     g_audioState.dspSettings.SrcChannelCount = INPUTCHANNELS;
     g_audioState.dspSettings.DstChannelCount = g_audioState.nChannels;
@@ -296,10 +300,6 @@ void AudioSource3D::Update(float elapsedTime)
     g_audioState.vListenerPos = pos;
 
     g_audioState.vEmitterPos = GetGameObject()->transform_->GetWorldPosition();
-    //g_audioState.vEmitterPos = GameObjectManager::Instance().Find("Emitter")->transform_->GetWorldPosition();
-
-    //g_audioState.vListenerPos = listenerPos;
-    //g_audioState.vEmitterPos = emitterPos;
 
     UpdateAudio3d(elapsedTime);
 }
@@ -308,10 +308,61 @@ void AudioSource3D::OnGUI()
 {
     if (ImGui::DragFloat("volume", &volume))
         sourceVoice_->SetVolume(volume);
+    ImGui::DragFloat("CurveDistanceScaler", &CurveDistanceScaler);
+
+    //りばーぶ
+    constexpr const char* reverb[NUM_PRESETS] =
+    {
+        "Forest",
+        "Default",
+        "Generic",
+        "Padded cell",
+        "Room",
+        "Bathroom",
+        "Living room",
+        "Stone room",
+        "Auditorium",
+        "Concert hall",
+        "Cave",
+        "Arena",
+        "Hangar",
+        "Carpeted hallway",
+        "Hallway",
+        "Stone Corridor",
+        "Alley",
+        "City",
+        "Mountains",
+        "Quarry",
+        "Plain",
+        "Parking lot",
+        "Sewer pipe",
+        "Underwater",
+        "Small room",
+        "Medium room",
+        "Large room",
+        "Medium hall",
+        "Large hall",
+        "Plate",
+    };
+
+    static int num = 0;
+    if (ImGui::Combo("reverbMode", &num, reverb, NUM_PRESETS, NUM_PRESETS))
+    {
+        SetReverb(num);
+    }
+
+    if (ImGui::Button("Play"))
+        AudioPlay();
+    ImGui::Separator();
+    if (ImGui::Button("Stop"))
+        Audio3DStop();
 }
 
 void AudioSource3D::UpdateAudio3d(float elapsedTime)
 {
+    frameUpdate = !frameUpdate;
+    if (!frameUpdate)return;
+
     {
         //方向を指定
         DirectX::XMFLOAT3 front = { 0,0,1 };
@@ -376,6 +427,9 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
         }
     }
 
+    g_audioState.emitter.CurveDistanceScaler = CurveDistanceScaler;
+
+
     DWORD dwCalcFlags = X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER
         | X3DAUDIO_CALCULATE_LPF_DIRECT | X3DAUDIO_CALCULATE_LPF_REVERB
         | X3DAUDIO_CALCULATE_REVERB;
@@ -406,6 +460,15 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
     }
 }
 
+void AudioSource3D::SetReverb(int nReverb)
+{
+    if (g_audioState.pSubmixVoice)
+    {
+        XAUDIO2FX_REVERB_PARAMETERS native;
+        ReverbConvertI3DL2ToNative(&g_PRESET_PARAMS02[nReverb], &native);
+        g_audioState.pSubmixVoice->SetEffectParameters(0, &native, sizeof(native));
+    }
+}
 void AudioSource3D::SetAudio(AUDIOID3D id)
 {
     resource_ = Audio3DResourceMagaer::Instance().GetAudio3DResouce(id);
@@ -441,22 +504,24 @@ void AudioSource3D::SetAudio(AUDIOID3D id)
 
 void AudioSource3D::AudioPlay(bool loop)
 {
-    AudioStop();
-    // Submit the wave sample data using an XAUDIO2_BUFFER structure
-    XAUDIO2_BUFFER buffer = {};
+    Audio3DStop();
 
-    buffer.pAudioData = resource_->GetAudioData();
-    buffer.Flags = XAUDIO2_END_OF_STREAM;
+    XAUDIO2_BUFFER buffer = {0};
     buffer.AudioBytes = resource_->GetAudioBytes();
-    
+    buffer.pAudioData = resource_->GetAudioData();
     loop ? buffer.LoopCount = XAUDIO2_LOOP_INFINITE : buffer.LoopCount = 0;
+    buffer.Flags = XAUDIO2_END_OF_STREAM;
 
     sourceVoice_->SubmitSourceBuffer(&buffer);
-
-    sourceVoice_->Start(0);
+    sourceVoice_->Start();
     sourceVoice_->SetVolume(volume);
 
     g_audioState.nFrameToApply3DAudio = 0;
+}
+
+void AudioSource3D::Audio3DStop()
+{
+    if (!sourceVoice_) return;
 }
 
 void AudioSource3D::AudioPlay()
@@ -464,111 +529,8 @@ void AudioSource3D::AudioPlay()
     AudioPlay(true);
 }
 
-void AudioSource3D::AudioStop()
-{
-    if (!sourceVoice_)return;
-
-    sourceVoice_->FlushSourceBuffers();
-    sourceVoice_->Stop(0);
-}
 
 
-
-//AudioSource2D::AudioSource2D()
-//{
-//    HRESULT hr;
-//    // COMの初期化
-//    hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-//
-//    UINT32 createFlags = 0;
-//#if defined(DEBUG) || defined(_DEBUG)
-//    //createFlags |= XAUDIO2_DEBUG_ENGINE;
-//#endif
-//    // XAudio初期化
-//    hr = XAudio2Create(&xaudio, createFlags);
-//    // マスタリングボイス生成
-//    hr = xaudio->CreateMasteringVoice(&masteringVoice);
-//}
-//
-//AudioSource2D::~AudioSource2D()
-//{
-//    //for (auto& pair : audioResources)
-//    //{
-//    //    pair.second.reset();
-//    //}
-//    //audioResources.clear();
-//
-//    // マスタリングボイス破棄
-//    if (masteringVoice != nullptr)
-//    {
-//        masteringVoice->DestroyVoice();
-//        masteringVoice = nullptr;
-//    }
-//
-//    //// XAudio終了化
-//    //if (xaudio != nullptr)
-//    //{
-//    //    xaudio->Release();
-//    //    xaudio = nullptr;
-//    //}
-//
-//    xaudio->StopEngine();
-//    xaudio.Reset();
-//
-//    // COM終了化
-//    CoUninitialize();
-//}
-//
-//void AudioSource2D::SetAudio2D(AUDIOID2D id)
-//{
-//    if (sourceVoice_)
-//    {
-//        sourceVoice_->Stop(0);
-//        sourceVoice_->DestroyVoice();
-//        sourceVoice_ = 0;
-//    }
-//
-//    const WAVEFORMATEX* pwfx = &resource_->GetWaveFormat();
-//    const uint8_t* sampleData = resource_->GetAudioData();
-//    uint32_t waveSize = resource_->GetAudioBytes();
-//
-//    // 2Dオーディオ
-//    HRESULT hr = xaudio->CreateSourceVoice(&sourceVoice_, &resource_->GetWaveFormat());
-//    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-//}
-//
-//void AudioSource2D::Audio2DPlay()
-//{
-//    XAUDIO2_BUFFER buffer = {};
-//    buffer.AudioBytes = resource_->GetAudioBytes();
-//    buffer.pAudioData = resource_->GetAudioData();
-//    buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
-//    buffer.Flags = XAUDIO2_END_OF_STREAM;
-//
-//    sourceVoice_->SubmitSourceBuffer(&buffer);
-//    sourceVoice_->Start(0);
-//}
-//
-//void AudioSource2D::Audio2DPlay(float volume, bool loop)
-//{
-//    XAUDIO2_BUFFER buffer = {};
-//    buffer.AudioBytes = resource_->GetAudioBytes();
-//    buffer.pAudioData = resource_->GetAudioData();
-//    buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
-//    buffer.Flags = XAUDIO2_END_OF_STREAM;
-//
-//    sourceVoice_->SubmitSourceBuffer(&buffer);
-//    sourceVoice_->Start();
-//    sourceVoice_->SetVolume(volume * 0.1f);
-//}
-//
-//void AudioSource2D::Audio2DStop()
-//{
-//    if (!sourceVoice_)return;
-//
-//    sourceVoice_->FlushSourceBuffers();
-//    sourceVoice_->Stop();
-//}
 
 void Audio2DMagaer::Audio2DPlay(AUDIOID2D id, float volume, bool loop)
 {
