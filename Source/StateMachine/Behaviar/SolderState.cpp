@@ -46,6 +46,9 @@ void Solder_MainAttackState::Enter()
     {
         charaCom.lock()->AddCurrentBulletNum(-1);
     }
+
+    charaCom.lock()->GetAudio("ATK")->Audio3DStop();
+    charaCom.lock()->GetAudio("ATK")->AudioPlay(false, 0.6f);
 }
 void Solder_MainAttackState::Execute(const float& elapsedTime)
 {
@@ -83,6 +86,9 @@ void Solder_MainAttackState::Execute(const float& elapsedTime)
         ray->SetStart(start);
         ray->SetEnd(end);
         ray->SetEnabled(true);
+
+        charaCom.lock()->GetAudio("ATK")->Audio3DStop();
+        charaCom.lock()->GetAudio("ATK")->AudioPlay(false, 0.3f);
 
         //弾減らさないとリロードしない
         if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
@@ -174,6 +180,7 @@ void Solder_ESkillState::Execute(const float& elapsedTime)
 
     //攻撃処理(スタンボール)
     BulletCreate::SoldierStanBall(owner->GetGameObject(), 50.0f, 10.0f, 2.0f);
+    charaCom.lock()->GetAudio("SKILL1")->AudioPlay(false, 0.1f);
 
     //ステート変更
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
@@ -185,6 +192,7 @@ void Solder_RightClickSkillState::Enter()
 {
     //エフェクト再生
     owner->GetGameObject()->GetChildFind("beem_fire")->GetComponent<GPUParticle>()->Play();
+    charaCom.lock()->GetAudio("SKILL2")->AudioPlay(false);
 }
 void Solder_RightClickSkillState::Execute(const float& elapsedTime)
 {

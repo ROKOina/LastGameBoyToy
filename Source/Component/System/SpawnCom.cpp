@@ -478,6 +478,10 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(parent.lock());
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
     hit->SetValue(10.0f);
+
+    GameObj parent = GetGameObject()->GetParent();
+    parent->GetComponent<CharacterCom>()->GetAudio("ULT")->Audio3DStop();
+    parent->GetComponent<CharacterCom>()->GetAudio("ULT")->AudioPlay(false, 1.0f);
 }
 
 //“–‚½‚è”»’è

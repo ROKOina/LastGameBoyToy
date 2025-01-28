@@ -18,6 +18,7 @@
 #include "KnockBackCom.h"
 #include "Component\System\SpawnCom.h"
 #include "OnGroundDeleteCom.h"
+#include "Audio\Audio3D.h"
 
 void BulletCom::Update(float elapsedTime)
 {
@@ -538,6 +539,10 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
 
     //地雷のコンポーネント作って付ける
     bullet->AddComponent<JankratMineCom>();
+
+    //音
+    AudioSource3D* audio = bullet->AddComponent<AudioSource3D>(AUDIOID3D::JANKRA_MINE_FIRE).get();
+    audio->SetCurveDistanceScaler(70.0f);
 
     //コライダー
     std::shared_ptr<SphereColliderCom> coll = bullet->AddComponent<SphereColliderCom>();

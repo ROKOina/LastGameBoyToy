@@ -1823,7 +1823,7 @@ void PlayerUIManager::CreateNetUseCharaUI()
     {
         std::shared_ptr<GameObject> allyBack = canvas->AddChildObject();
         allyBack->SetName("allyBack");
-        allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBack.ui", Sprite::SpriteShader::DEFALT, false);
+        allyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/allyBack.ui", Sprite::SpriteShader::DEFALT, false);
         //一人目
         {
             std::shared_ptr<GameObject> ally01 = allyBack->AddChildObject();
@@ -1856,7 +1856,7 @@ void PlayerUIManager::CreateNetUseCharaUI()
     {
         std::shared_ptr<GameObject> enemyBack = canvas->AddChildObject();
         enemyBack->SetName("enemyBack");
-        enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/CharaView/charaListBackEnemy.ui", Sprite::SpriteShader::DEFALT, false);
+        enemyBack->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/EnemyBack.ui", Sprite::SpriteShader::DEFALT, false);
         //一人目
         {
             std::shared_ptr<GameObject> enemy01 = enemyBack->AddChildObject();
@@ -1900,12 +1900,19 @@ void PlayerUIManager::NetUseCharaUIUpdate(int chara[4], int photonid[4])
             auto& sprite2 = c02->GetChildFind("DeathIcon")->GetComponent<Sprite>();
 
             //位置
-            c01->transform_->SetLocalPosition({ 122,0,0 });
-            c02->transform_->SetLocalPosition({ 341,0,0 });
-
+            if (of == 2)
+            {
+                c01->transform_->SetLocalPosition({ 26,0,0 });
+                c02->transform_->SetLocalPosition({ 145,0,0 });
+            }
+            else
+            {
+                c01->transform_->SetLocalPosition({ 76,0,0 });
+                c02->transform_->SetLocalPosition({ 195,0,0 });
+            }
             //位置を無理やり補正
-            deathicon1->transform_->SetLocalPosition({ -1573.559f,0,0 });
-            deathicon2->transform_->SetLocalPosition({ -1558.791f,0,0 });
+            deathicon1->transform_->SetLocalPosition({ -752,0,0 });
+            deathicon2->transform_->SetLocalPosition({ -752,0,0 });
 
             //キャラIDを見て画像ずらす
             if (chara[0 + of] >= 0)

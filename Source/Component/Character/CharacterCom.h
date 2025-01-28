@@ -140,6 +140,7 @@ public:
     //スペーススキル(上が単発押しで下のPushingが長押し)
     virtual void SpaceSkill() {}
     virtual void SpaceSkillPushing(float elapsedTime) {};
+    virtual void SpaceSkillUp() {};
 
     StateMachine<CharacterCom, CHARACTER_ATTACK_ACTIONS>& GetAttackStateMachine() { return attackStateMachine; }
     StateMachine<CharacterCom, CHARACTER_MOVE_ACTIONS>& GetMoveStateMachine() { return moveStateMachine; }
