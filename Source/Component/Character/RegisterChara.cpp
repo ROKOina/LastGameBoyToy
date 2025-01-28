@@ -695,6 +695,33 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         boost2->transform_->SetWorldPosition({ -0.105f, 10.505f, -1.080f });
     }
 
+    //ウルト時のスタンを纏うゲームオブジェクト
+    {
+        std::shared_ptr<GameObject>ultkun = obj->AddChildObject();
+        ultkun->SetName("UltStanObj");
+        std::shared_ptr<CapsuleColliderCom> collider = ultkun->AddComponent<CapsuleColliderCom>();
+
+        if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
+        {
+            collider->SetMyTag(COLLIDER_TAG::Player);
+            collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::UnderStand);
+        }
+        else
+        {
+            collider->SetMyTag(COLLIDER_TAG::Enemy);
+            collider->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
+        }
+
+        collider->SetRadius(0.53f);
+        collider->SetPosition1({ 0.0f,2.6f,0.0f });
+        ultkun->SetEnabled(true);
+
+        //スタン処理用
+        std::shared_ptr<HitProcessCom> hitstan = ultkun->AddComponent<HitProcessCom>(obj);
+        hitstan->SetHitType(HitProcessCom::HIT_TYPE::STAN);
+        hitstan->SetValue(2.0f);
+    }
+
     //ヒットスキャン
     {
         std::shared_ptr<GameObject> ultAttckChild = obj->AddChildObject();
