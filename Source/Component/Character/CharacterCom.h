@@ -247,6 +247,9 @@ public:
     //ゲーム開始前カウントダウン
     void SetStartCountDown(bool flg) { startCountDown = flg; }
 
+    //ダッシュの速度
+    float GetDashSpeed() const { return dashSpeed; }
+
 private:
     //入力ステート更新
     void InputStateUpdate(float elapsedTime);
@@ -367,9 +370,8 @@ private:
 
     bool startCountDown = false; //ゲーム開始前カウントダウン
 
-
 private://SE
-        std::map<std::string, GameObj> audioObjs;
+    std::map<std::string, GameObj> audioObjs;
 public:
     void SetAudio(std::string name, GameObj obj) { audioObjs[name] = obj; }
     AudioSource3D* GetAudio(std::string name) { return audioObjs[name]->GetComponent<AudioSource3D>().get(); }

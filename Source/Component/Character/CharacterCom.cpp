@@ -74,9 +74,11 @@ void CharacterCom::Update(float elapsedTime)
         //ダッシュ
         isDash = DashUpdateReIsDash(elapsedTime);
 
-        //カメラ制御            
+        //カメラ制御
         CameraControl(elapsedTime);
     }
+
+    auto& movecomkun = GetGameObject()->GetComponent<MovementCom>();
 
     //ダッシュ関係
     if (dashFlag)
@@ -107,6 +109,12 @@ void CharacterCom::Update(float elapsedTime)
     }
     else
         dashDraceTimer = dashDraceTime; //ダッシュ猶予時間
+
+    //初期化
+    if (movecomkun->OnGround())
+    {
+        movecomkun->SetMoveAcceleration(3.0f);
+    }
 
     //ウルト更新
     UltUpdate(elapsedTime);
@@ -276,12 +284,22 @@ void CharacterCom::DashFewSub(float elapsedTime)
     auto& moveCmp = GetGameObject()->GetComponent<MovementCom>();
     moveCmp->SetAddMoveMaxSpeed(dashSpeed);
 
+    if (!moveCmp->OnGround())
+    {
+        moveCmp->SetMoveAcceleration(9.0f);
+    }
+
     //初速減衰
     dashFirstTimer -= elapsedTime;
     if (dashFirstTimer < 0)
     {
         //速度を普通に
         dashSpeed = dashSpeedNormal;
+
+        if (!moveCmp->OnGround())
+        {
+            moveCmp->SetMoveAcceleration(6.0f);
+        }
     }
 }
 
