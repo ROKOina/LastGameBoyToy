@@ -201,26 +201,52 @@ void SceneResult::MakeResultUI(GameObj canvas)
         if (i >= 2)frameUiSprite->spc.easingcolor = { 1,45.0f / 255.0f,45.0f / 255.0f,1 };
 
         // キル数
-        GameObj killNumObj = uiCanvas->AddChildObject();
-        std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-        killNumObj->SetName(killNumName.c_str());
-        Sprite* killNumSpr = killNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Kill_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
-        killNumSpr->SetIsParentMove(true);
-        killNumSpr->SetEasingPosition({ 650.0f,395.0f + (160 * i) + uiOffset });
-        //キル数分スクロール
-        float kill = float(resultDatas[i].killNum) * 0.1f;
-        killNumSpr->numUVScroll.x = kill;
+        {   //一桁目   
+            GameObj killNumObj = uiCanvas->AddChildObject();
+            std::string killNumName = std::to_string(i) + "st_PlayerKillNum1";
+            killNumObj->SetName(killNumName.c_str());
+            Sprite* killNumSpr = killNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Kill_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
+            killNumSpr->SetIsParentMove(true);
+            killNumSpr->SetEasingPosition({ 650.0f,395.0f + (160 * i) + uiOffset });
+            //キル数分スクロール
+            float kill = float(resultDatas[i].killNum % 10) * 0.1f;
+            killNumSpr->numUVScroll.x = kill;
+        }
+        {   //二桁目
+            GameObj killNumObj = uiCanvas->AddChildObject();
+            std::string killNumName = std::to_string(i) + "st_PlayerKillNum2";
+            killNumObj->SetName(killNumName.c_str());
+            Sprite* killNumSpr = killNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Kill_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
+            killNumSpr->SetIsParentMove(true);
+            killNumSpr->SetEasingPosition({ 619.0f,395.0f + (160 * i) + uiOffset });
+            //キル数分スクロール
+            float kill = float(resultDatas[i].killNum / 10) * 0.1f;
+            killNumSpr->numUVScroll.x = kill;
+        }
 
         // デス数
-        GameObj deathNumObj = uiCanvas->AddChildObject();
-        std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-        deathNumObj->SetName(deathNumName.c_str());
-        Sprite* deathNumSpr = deathNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Death_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
-        deathNumSpr->SetIsParentMove(true);
-        deathNumSpr->SetEasingPosition({ 766.0f,395.0f + (160 * i) + uiOffset });
-        //デス数分スクロール
-        float death = float(resultDatas[i].deathNum) * 0.1f;
-        deathNumSpr->numUVScroll.x = death;
+        { //一桁目   
+            GameObj deathNumObj = uiCanvas->AddChildObject();
+            std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum1";
+            deathNumObj->SetName(deathNumName.c_str());
+            Sprite* deathNumSpr = deathNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Death_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
+            deathNumSpr->SetIsParentMove(true);
+            deathNumSpr->SetEasingPosition({ 747.0f,395.0f + (160 * i) + uiOffset });
+            //デス数分スクロール
+            float death = float(resultDatas[i].deathNum % 10) * 0.1f;
+            deathNumSpr->numUVScroll.x = death;
+        }
+        { //二桁目
+            GameObj deathNumObj = uiCanvas->AddChildObject();
+            std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum2";
+            deathNumObj->SetName(deathNumName.c_str());
+            Sprite* deathNumSpr = deathNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Death_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
+            deathNumSpr->SetIsParentMove(true);
+            deathNumSpr->SetEasingPosition({ 721.0f,395.0f + (160 * i) + uiOffset });
+            //デス数分スクロール
+            float death = float(resultDatas[i].deathNum / 10) * 0.1f;
+            deathNumSpr->numUVScroll.x = death;
+        }
 
         // キャラアイコン
         GameObj IconObj = uiCanvas->AddChildObject();
@@ -249,7 +275,6 @@ void SceneResult::MakeResultUI(GameObj canvas)
 
         //キャラの名前
         GameObj charaname = uiCanvas->AddChildObject();
-        deathNumObj->SetName(deathNumName.c_str());
         std::string name = "charaname" + std::to_string(i + 1);
         charaname->SetName(name.c_str());
         std::shared_ptr<Font>f = charaname->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
@@ -443,10 +468,14 @@ void SceneResult::EventCamera(float elapsedTime)
         {
             std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
             resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
-            std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
+            std::string killNumName = std::to_string(i) + "st_PlayerKillNum1";
             resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
-            std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
+            std::string killNumNam2 = std::to_string(i) + "st_PlayerKillNum2";
+            resultUI[i].lock()->GetChildFind(killNumNam2.c_str())->GetComponent<Sprite>()->EasingPlay();
+            std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum1";
             resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
+            std::string deathNumName2 = std::to_string(i) + "st_PlayerDeathNum2";
+            resultUI[i].lock()->GetChildFind(deathNumName2.c_str())->GetComponent<Sprite>()->EasingPlay();
             std::string icon = std::to_string(i) + "st_PlayerIcon";
             resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
         }
