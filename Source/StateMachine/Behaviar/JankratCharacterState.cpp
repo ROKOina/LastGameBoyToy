@@ -113,8 +113,8 @@ void JankratCharacter_MainAtkState::Enter()
         POS = gunPos;
     }
 
-    charaCom.lock()->GetAudio("ATK2")->Audio3DStop();
-    charaCom.lock()->GetAudio("ATK2")->AudioPlay(false, 0.4f);
+    charaCom.lock()->GetAudio("ATK1")->Audio3DStop();
+    charaCom.lock()->GetAudio("ATK1")->AudioPlay(false, 0.4f);
 }
 void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
 {
@@ -168,6 +168,9 @@ void JankratCharacter_MainSkillState::Execute(const float& elapsedTime)
         charaCom.lock()->AddHaveMine(BulletCreate::JankratMineFire(owner->GetGameObject(), gunPos, dir, 100.0f, 50, charaCom.lock()->GetNetCharaData().GetCharaID()));
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
     }
+
+    charaCom.lock()->GetAudio("MINE")->Audio3DStop();
+    charaCom.lock()->GetAudio("MINE")->AudioPlay(false);
 }
 #pragma endregion
 

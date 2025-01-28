@@ -39,6 +39,9 @@ public:
     // スペーススキル長押し
     void SpaceSkillPushing(float elapsedTime) override;
 
+    void SpaceSkill() override;
+    void SpaceSkillUp() override;
+
     // Eスキル
     void SubSkill() override;
 

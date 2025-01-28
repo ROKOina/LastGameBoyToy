@@ -317,11 +317,26 @@ enum AUDIOID3D
     TEST,
     PLAYER_WAKL,
     
+    //ファラ
+    FARAH_JET,
+    FARAH_ATK,
+    FARAH_SKILL1,
+    FARAH_SKILL2,
+    FARAH_ULT,
+
     //ジャンクラ
     JANKRA_ATK1,
     JANKRA_ATK2,
     JANKRA_ULT,
     JANKRA_ULT2,
+    JANKRA_MINE,
+    JANKRA_MINE_FIRE,
+
+    //ソルジャー
+    SOLDIER_ATK,
+    SOLDIER_SKILL1,
+    SOLDIER_SKILL2,
+    SOLDIER_ULT,
 
     MAX_
 };
@@ -359,10 +374,19 @@ private:
         audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
         audio3DResources[AUDIOID3D::PLAYER_WAKL] = std::make_shared<AudioResource>("Data/AudioData/SE/player/player_walk.wav");
 
+        audio3DResources[AUDIOID3D::FARAH_JET] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/jeat.wav");
+
         audio3DResources[AUDIOID3D::JANKRA_ATK1] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/se_small_bomb01.wav");
         audio3DResources[AUDIOID3D::JANKRA_ATK2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/se_small_bomb02.wav");
         audio3DResources[AUDIOID3D::JANKRA_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/canon.wav");
         audio3DResources[AUDIOID3D::JANKRA_ULT2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/canon2.wav");
+        audio3DResources[AUDIOID3D::JANKRA_MINE] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/mine.wav");
+        audio3DResources[AUDIOID3D::JANKRA_MINE_FIRE] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/mineBomb.wav");
+    
+        audio3DResources[AUDIOID3D::SOLDIER_ATK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/gun.wav");
+        audio3DResources[AUDIOID3D::SOLDIER_SKILL1] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/stunBullet.wav");
+        audio3DResources[AUDIOID3D::SOLDIER_SKILL2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/nockback.wav");
+        audio3DResources[AUDIOID3D::SOLDIER_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/stunUlt.wav");
     }
 
 
