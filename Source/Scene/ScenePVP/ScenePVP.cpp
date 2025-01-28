@@ -752,7 +752,7 @@ void ScenePVP::Update(float elapsedTime)
                         DelivertResultData::Instance().SetIsMyWin(data.isWin);
                 }
             }
-            //SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
+            SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
         }
     }
 

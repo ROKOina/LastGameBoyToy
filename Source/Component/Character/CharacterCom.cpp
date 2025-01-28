@@ -74,7 +74,7 @@ void CharacterCom::Update(float elapsedTime)
         //ダッシュ
         isDash = DashUpdateReIsDash(elapsedTime);
 
-        //カメラ制御
+        //カメラ制御            
         CameraControl(elapsedTime);
     }
 
