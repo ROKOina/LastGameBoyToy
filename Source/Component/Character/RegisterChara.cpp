@@ -714,12 +714,12 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
 
         collider->SetRadius(0.53f);
         collider->SetPosition1({ 0.0f,2.6f,0.0f });
-        ultkun->SetEnabled(true);
+        ultkun->SetEnabled(false);
 
         //スタン処理用
         std::shared_ptr<HitProcessCom> hitstan = ultkun->AddComponent<HitProcessCom>(obj);
         hitstan->SetHitType(HitProcessCom::HIT_TYPE::STAN);
-        hitstan->SetValue(2.0f);
+        hitstan->SetValue(1.0f);
     }
 
     //ヒットスキャン
