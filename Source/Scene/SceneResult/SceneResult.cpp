@@ -16,6 +16,7 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTitle\SceneTitle.h"
+#include "SystemStruct\TimeManager.h"
 #include <string>
 #include <windows.h>
 
@@ -95,6 +96,8 @@ void SceneResult::Initialize()
     //オブジェクト設定
     MakeResultUI(obj);
     MakeResultModel();
+
+    TimeManager::Instance().SetTimeEffect(1.0f,0.0f);
 
     //イベント用カメラ
     {
