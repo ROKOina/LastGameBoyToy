@@ -465,6 +465,26 @@ public:
 
 private:
 };
+
+class UI_PlayerFire :public Component
+{
+public:
+    UI_PlayerFire() {};
+    ~UI_PlayerFire() {};
+
+    // 名前取得
+    const char* GetName() const override { return "UI_PlayerFire"; }
+
+    // 開始処理
+    void Start() override {};
+
+    // 更新処理
+    void Update(float elapsedTime) override;
+
+    //gui
+    void OnGUI()override {};
+};
+
 //PlayerUIのマネージャー
 class PlayerUIManager
 {

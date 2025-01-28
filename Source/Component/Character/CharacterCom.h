@@ -186,6 +186,7 @@ public:
     void SetIsHitAttack(bool flg) { isHitAttack = flg; }
 
     bool UseUlt() { return isUseUlt; }
+    bool GetIsMaxUlt() { return isMaxUlt; }
     void FinishUlt() { isUseUlt = false; }
 
     //使用スキル登録

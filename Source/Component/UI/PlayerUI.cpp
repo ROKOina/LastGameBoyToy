@@ -1247,7 +1247,6 @@ void PlayerUIManager::CreateReticleUI()
     std::shared_ptr<GameObject> reload = canvas->AddChildObject();
     reload->SetName("reloadUI");
     auto& b = reload->AddComponent<UI_Reload>();
-
 }
 
 void PlayerUIManager::CreateUltUI()
@@ -1388,9 +1387,9 @@ void PlayerUIManager::CreatePlayerIcon()
     char_fire->SetName("char_fire");
     auto& fire = char_fire->AddComponent<Sprite>("Data/SerializeData/UIData/Player/chara_fire.ui", Sprite::SpriteShader::DEFALT, false);
     fire->SetColumns(5);
-    fire->SetRows(4);
-    fire->SetFrameRate(20.0f);
-    fire->SetEnabled(false);
+    fire->SetRows(1);
+    fire->SetFrameRate(14.0f);
+    char_fire->AddComponent<UI_PlayerFire>();
 
     std::shared_ptr<GameObject> charaicon = char_fire->AddChildObject();
     charaicon->SetName("CharaIcon");
@@ -1745,7 +1744,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
         }
         else
         {
-            if(kilogView("enemyKillLog", log))
+            if (kilogView("enemyKillLog", log))
                 removeID.emplace_back(count);
         }
         count++;
@@ -2186,11 +2185,18 @@ void UI_Reload::Update(float elapsedTime)
         reload.lock()->SetEnabled(true);
         reticle.lock()->SetEnabled(false);
         reload.lock()->GetComponent<UiSystem>()->spc.angle += 5.0f;
-        
     }
-    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() != CharacterCom::CHARACTER_ATTACK_ACTIONS::RELOAD){
+    if (player.lock()->GetComponent<CharacterCom>()->GetAttackStateMachine().GetCurrentState() != CharacterCom::CHARACTER_ATTACK_ACTIONS::RELOAD) {
         reload.lock()->SetEnabled(false);
         reticle.lock()->SetEnabled(true);
     }
 }
 
+//ƒvƒŒƒCƒ„[‚Ì‰Î‚ð‚Æ‚à‚·Žž‚Ìˆ—
+void UI_PlayerFire::Update(float elapsedTime)
+{
+    if (GameObjectManager::Instance().Find("player") != nullptr)
+    {
+        GetGameObject()->GetComponent<Sprite>()->SetEnabled(GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetIsMaxUlt());
+    }
+}
