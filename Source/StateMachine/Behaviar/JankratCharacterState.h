@@ -27,7 +27,7 @@ protected:
 
     float bulletLifeTimer = 3.0f;
     float addGravity = -0.4f;
-    float fireVecY = 0.0f;
+    float fireVecY = 0.1f;
     float explosiontime = 1.5f;
 
     DirectX::XMFLOAT3 DIR = {};

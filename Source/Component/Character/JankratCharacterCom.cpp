@@ -31,8 +31,6 @@ void JankratCharacterCom::Start()
 
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
-
-    //SE登録
 }
 
 void JankratCharacterCom::Update(float elapsedTime)
@@ -45,6 +43,13 @@ void JankratCharacterCom::Update(float elapsedTime)
 
     //後処理
     EraseHaveObjects();
+
+    //ウルト削除
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::DEATH)
+    {
+        FinishUlt();
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+    }
 
     //足にエフェクトを付与
     {

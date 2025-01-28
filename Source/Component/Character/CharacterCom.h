@@ -7,6 +7,7 @@
 #include "Component\Animation\AimIKCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Prop/NetCharaData.h"
+#include "Audio\Audio3D.h"
 #include <array>
 
 #define JUDGE_NONEBULLET() \
@@ -364,4 +365,11 @@ private:
     bool isHitAttack = false;   //攻撃が当たったフレーム時にtrue
 
     bool startCountDown = false; //ゲーム開始前カウントダウン
+
+
+private://SE
+        std::map<std::string, GameObj> audioObjs;
+public:
+    void SetAudio(std::string name, GameObj obj) { audioObjs[name] = obj; }
+    AudioSource3D* GetAudio(std::string name) { return audioObjs[name]->GetComponent<AudioSource3D>().get(); }
 };

@@ -954,7 +954,7 @@ void UI_GameJudge::Update(float elaspedTime)
         break;
     case 1:
         font->SetEnabled(true);
-        fontCom->spc.scale = { fontCom->spc.scale.x + 0.01f, fontCom->spc.scale.y + 0.01f, };
+        fontCom->spc.scale = { fontCom->spc.scale.x + 0.1f, fontCom->spc.scale.y + 0.1f, };
         if (fontCom->spc.scale.x >= 1.0f) {
             state++;
         }
@@ -1576,6 +1576,8 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
         //ƒfƒX‚µ‚½‘¤
         for (int deathPID = 0; deathPID < 4; deathPID++)
         {
+            if (killPID == deathPID)continue;
+
             auto& killflg = StaticSendDataManager::Instance().GetKillID(killPID, deathPID);
             if (killflg)  //ƒLƒ‹‚ª”­¶‚µ‚Ä‚¢‚é‚È‚ç
             {

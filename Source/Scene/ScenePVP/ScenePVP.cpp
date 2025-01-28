@@ -696,7 +696,7 @@ void ScenePVP::Update(float elapsedTime)
         //一回だけ通す
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
-            TimeManager::Instance().SetTimeEffect(0.35f,5.0f);
+            TimeManager::Instance().SetTimeEffect(0.35f,2.0f);
         }
 
         //仮遷移
@@ -752,7 +752,7 @@ void ScenePVP::Update(float elapsedTime)
                         DelivertResultData::Instance().SetIsMyWin(data.isWin);
                 }
             }
-            //SceneManager::Instance().ChangeSceneDelay(new SceneResult, 5);
+            SceneManager::Instance().ChangeSceneDelay(new SceneResult,0.8f );
         }
     }
 
@@ -821,6 +821,7 @@ void ScenePVP::Update(float elapsedTime)
         ss->SetViewSetting(false);
         charaPicks->SetViewCharaPicks(true);
     }
+
 
     // キャラピック更新処理
     charaPicks->CharaPicksUpdate(elapsedTime);

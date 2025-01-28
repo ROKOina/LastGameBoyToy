@@ -1,5 +1,6 @@
 #pragma once
 #include "CharacterCom.h"
+#include "Audio\Audio3D.h"
 
 class JankratCharacterCom : public CharacterCom
 {

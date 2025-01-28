@@ -124,6 +124,11 @@ void Solder_UltState::Enter()
     auto& ultobj = owner->GetGameObject()->GetChildFind("UltObject");
     ultobj->GetComponent<GPUParticle>()->SetLoop(true);
     ultobj->GetComponent<SpawnCom>()->SetOnTrigger(true);
+
+    if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+    {
+        owner->GetGameObject()->GetChildFind("UltStanObj")->SetEnabled(true);
+    }
 }
 void Solder_UltState::Execute(const float& elapsedTime)
 {
@@ -136,6 +141,11 @@ void Solder_UltState::Execute(const float& elapsedTime)
         auto& ultobj = owner->GetGameObject()->GetChildFind("UltObject");
         ultobj->GetComponent<GPUParticle>()->SetLoop(false);
         ultobj->GetComponent<SpawnCom>()->SetOnTrigger(false);
+
+        if (std::strcmp(owner->GetGameObject()->GetName(), "player") == 0)
+        {
+            owner->GetGameObject()->GetChildFind("UltStanObj")->SetEnabled(false);
+        }
 
         //ステート変更
         ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);

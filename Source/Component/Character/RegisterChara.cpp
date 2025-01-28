@@ -23,6 +23,13 @@
 #include "Component\Character\SoldierCom.h"
 #include "Audio/Audio3D.h"
 
+inline GameObj MAKE_AUDIO_3D(GameObj obj, AUDIOID3D id) {
+    GameObj ultSeObj = obj->AddChildObject();
+    std::shared_ptr<AudioSource3D> ultSe = ultSeObj->AddComponent<AudioSource3D>(id);
+    ultSe->SetCurveDistanceScaler(70.0f);
+    return ultSeObj;
+}
+
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     switch (list)
@@ -476,7 +483,9 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     std::shared_ptr<CharaStatusCom> status = obj->AddComponent<CharaStatusCom>();
     std::shared_ptr<JankratCharacterCom> charaCom = obj->AddComponent<JankratCharacterCom>();
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
-    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 5.0f);
+    charaCom->SetMaxBulletNum(15);
+    charaCom->SetCurrentBulletNum(15);
+    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 3.5f);
     charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 0.1f);
     charaCom->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
@@ -507,6 +516,12 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             au->AudioPlay();
         }
     }
+
+    //SE登録
+    charaCom->SetAudio("ATK1", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ATK1));
+    charaCom->SetAudio("ATK2", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ATK2));
+    charaCom->SetAudio("ULT1", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ULT));
+    charaCom->SetAudio("ULT2", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ULT2));
 
     //押し出し処理
     auto& pushBack = obj->AddComponent<PushBackCom>();
@@ -693,6 +708,33 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         boost2->SetName("Boost2");
         std::shared_ptr<GPUParticle>p = boost2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/matya_body.gpuparticle", 2000);
         boost2->transform_->SetWorldPosition({ -0.105f, 10.505f, -1.080f });
+    }
+
+    //ウルト時のスタンを纏うゲームオブジェクト
+    {
+        std::shared_ptr<GameObject>ultkun = obj->AddChildObject();
+        ultkun->SetName("UltStanObj");
+        std::shared_ptr<CapsuleColliderCom> collider = ultkun->AddComponent<CapsuleColliderCom>();
+
+        if (std::strcmp(obj->GetName(), "player") == 0 || myTeam)
+        {
+            collider->SetMyTag(COLLIDER_TAG::Player);
+            collider->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::UnderStand);
+        }
+        else
+        {
+            collider->SetMyTag(COLLIDER_TAG::Enemy);
+            collider->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::UnderStand);
+        }
+
+        collider->SetRadius(0.53f);
+        collider->SetPosition1({ 0.0f,2.6f,0.0f });
+        ultkun->SetEnabled(false);
+
+        //スタン処理用
+        std::shared_ptr<HitProcessCom> hitstan = ultkun->AddComponent<HitProcessCom>(obj);
+        hitstan->SetHitType(HitProcessCom::HIT_TYPE::STAN);
+        hitstan->SetValue(1.0f);
     }
 
     //ヒットスキャン
