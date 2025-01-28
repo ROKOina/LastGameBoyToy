@@ -46,6 +46,13 @@ void JankratCharacterCom::Update(float elapsedTime)
     //後処理
     EraseHaveObjects();
 
+    //ウルト削除
+    if (moveStateMachine.GetCurrentState() == CHARACTER_MOVE_ACTIONS::DEATH)
+    {
+        FinishUlt();
+        attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
+    }
+
     //足にエフェクトを付与
     {
         //ブーストエフェクト1、２
