@@ -23,6 +23,13 @@
 #include "Component\Character\SoldierCom.h"
 #include "Audio/Audio3D.h"
 
+inline GameObj MAKE_AUDIO_3D(GameObj obj, AUDIOID3D id) {
+    GameObj ultSeObj = obj->AddChildObject();
+    std::shared_ptr<AudioSource3D> ultSe = ultSeObj->AddComponent<AudioSource3D>(id);
+    ultSe->SetCurveDistanceScaler(70.0f);
+    return ultSeObj;
+}
+
 void RegisterChara::SetCharaComponet(CHARA_LIST list, std::shared_ptr<GameObject>& obj, bool myTeam)
 {
     switch (list)
@@ -507,6 +514,12 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             au->AudioPlay();
         }
     }
+
+    //SE“o˜^
+    charaCom->SetAudio("ATK1", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ATK1));
+    charaCom->SetAudio("ATK2", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ATK2));
+    charaCom->SetAudio("ULT1", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ULT));
+    charaCom->SetAudio("ULT2", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ULT2));
 
     //‰Ÿ‚µo‚µˆ—
     auto& pushBack = obj->AddComponent<PushBackCom>();

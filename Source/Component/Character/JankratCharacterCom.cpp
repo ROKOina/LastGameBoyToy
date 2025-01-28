@@ -31,8 +31,6 @@ void JankratCharacterCom::Start()
 
     moveStateMachine.ChangeState(CHARACTER_MOVE_ACTIONS::IDLE);
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
-
-    //SE“o˜^
 }
 
 void JankratCharacterCom::Update(float elapsedTime)
