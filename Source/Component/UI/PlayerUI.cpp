@@ -1757,8 +1757,6 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
 void PlayerUIManager::CreateKillLog()
 {
-    saveCharaKilog.clear();
-
     std::shared_ptr<GameObject> killLogCanvas = GameObjectManager::Instance().Create();
     killLogCanvas->SetName("killLogCanvas");
 

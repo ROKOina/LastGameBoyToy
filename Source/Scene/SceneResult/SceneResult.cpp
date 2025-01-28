@@ -16,6 +16,7 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTitle\SceneTitle.h"
+#include "SystemStruct\TimeManager.h"
 #include <string>
 #include <windows.h>
 
@@ -96,6 +97,8 @@ void SceneResult::Initialize()
     MakeResultUI(obj);
     MakeResultModel();
 
+    TimeManager::Instance().SetTimeEffect(1.0f, 2.0f);
+
     //イベント用カメラ
     {
         std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
@@ -138,48 +141,6 @@ void SceneResult::Finalize()
 //更新処理
 void SceneResult::Update(float elapsedTime)
 {
-    //スペースキーでリザルト開始（デバッグ用)
-    {
-        GamePad& gamepad = Input::Instance().GetGamePad();
-        auto& canvas = GameObjectManager::Instance().Find("Canvas");
-        if (GamePad::BTN_A & gamepad.GetButtonDown())
-        {
-            //リザルトのUI君
-            for (int i = 0; i < 4; ++i)
-            {
-                std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-                resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->EasingPlay();
-                std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-                resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
-                std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-                resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->EasingPlay();
-                std::string icon = std::to_string(i) + "st_PlayerIcon";
-                resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->EasingPlay();
-            }
-
-            //勝敗君
-            canvas->GetChildFind("Judge")->GetComponent<Sprite>()->EasingPlay();
-        }
-        if (GamePad::NAKA_BUTTON & gamepad.GetButtonDown())
-        {
-            //リザルトのUI君
-            for (int i = 0; i < 4; ++i)
-            {
-                std::string canvasName = "Player" + std::to_string(i) + "_UICanvas";
-                resultUI[i].lock()->GetChildFind((canvasName + "_Frame").c_str())->GetComponent<Sprite>()->StopEasing();
-                std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
-                resultUI[i].lock()->GetChildFind(killNumName.c_str())->GetComponent<Sprite>()->StopEasing();
-                std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
-                resultUI[i].lock()->GetChildFind(deathNumName.c_str())->GetComponent<Sprite>()->StopEasing();
-                std::string icon = std::to_string(i) + "st_PlayerIcon";
-                resultUI[i].lock()->GetChildFind(icon.c_str())->GetComponent<Sprite>()->StopEasing();
-            }
-
-            //勝敗君
-            canvas->GetChildFind("Judge")->GetComponent<Sprite>()->StopEasing();
-        }
-    }
-
     //イベントカメラ用
     EventCameraManager::Instance().EventUpdate(elapsedTime);
 
@@ -246,7 +207,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         GameObj killNumObj = uiCanvas->AddChildObject();
         std::string killNumName = std::to_string(i) + "st_PlayerKillNum";
         killNumObj->SetName(killNumName.c_str());
-        Sprite* killNumSpr = killNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Kill_number.ui", Sprite::SpriteShader::DEFALT, false).get();
+        Sprite* killNumSpr = killNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Kill_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
         killNumSpr->SetIsParentMove(true);
         killNumSpr->SetEasingPosition({ 650.0f,395.0f + (160 * i) + uiOffset });
         //キル数分スクロール
@@ -257,7 +218,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         GameObj deathNumObj = uiCanvas->AddChildObject();
         std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum";
         deathNumObj->SetName(deathNumName.c_str());
-        Sprite* deathNumSpr = deathNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Death_number.ui", Sprite::SpriteShader::DEFALT, false).get();
+        Sprite* deathNumSpr = deathNumObj->AddComponent<Sprite>("Data/SerializeData/UIData/resultScene/Result_Death_number.ui", Sprite::SpriteShader::DEFALTUV, false).get();
         deathNumSpr->SetIsParentMove(true);
         deathNumSpr->SetEasingPosition({ 766.0f,395.0f + (160 * i) + uiOffset });
         //デス数分スクロール
@@ -446,6 +407,17 @@ void SceneResult::MakeResultModel()
         crawneffect2->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/result_crawneffect.gpuparticle", 700);
         crawneffect2->SetEnabled(false);
     }
+
+    //skipフォント
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("skipfont");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::COOL);
+        font->position = { 687.0f,993.0f };
+        font->str = L"スペースキーでタイトルへ";
+        font->scale = 0.8f;
+        font->color.w = 1.0f;
+    }
 }
 
 //イベントカメラの更新更新処理
@@ -504,8 +476,8 @@ void SceneResult::EventCamera(float elapsedTime)
     }
 
     //チェンジシーン
-    GamePad& gamepad = Input::Instance().GetGamePad();
-    if (GamePad::BTN_P & gamepad.GetButtonDown())
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (GamePad::BTN_A & gamePad.GetButtonDown())
     {
         SceneManager::Instance().ChangeScene(new SceneTitle);
     }

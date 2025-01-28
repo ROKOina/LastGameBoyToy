@@ -163,6 +163,7 @@ void ScenePVP::Initialize()
     //UI初期化
     PlayerUIManager::Instance().ResetAllyHp();
     PlayerUIManager::Instance().ResetEndFLG();
+    PlayerUIManager::Instance().ResetKilog();
 }
 
 void ScenePVP::InitializeLobbySelect()
@@ -525,7 +526,7 @@ void ScenePVP::InitializePVP()
         r->LoadModel("Data/Model/Crawn/crawn.mdl");
         r->SetOutlineIntensity(10.0f);
         r->SetOutlineColor({ 0.899f, 1.000f, 0.000f });
-        obj->transform_->SetScale({ 0.3f, 0.3f, 0.3f });
+        obj->transform_->SetScale({ 0.25f, 0.25f, 0.25f });
         obj->transform_->SetWorldPosition({ 3.4f, 20, 8.1f });
         auto& move = obj->AddComponent<MovementCom>();
         auto& col = obj->AddComponent<SphereColliderCom>();
@@ -533,11 +534,12 @@ void ScenePVP::InitializePVP()
         col->SetJudgeTag(COLLIDER_TAG::Player);
         col->SetRadius(1.3f);
         obj->AddComponent<CrownCom>();
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crownUpLight.gpuparticle", 1000);
 
         //王冠のエフェクト
         std::shared_ptr<GameObject>crawneffect = obj->AddChildObject();
         crawneffect->SetName("carwneffect");
-        crawneffect->transform_->SetLocalPosition({ 0.163f,5.945f,0.377f });
+        crawneffect->transform_->SetLocalPosition({ 0.163f,-8.855f,0.377f });
         crawneffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crawn_pvp.gpuparticle", 4000);
     }
     break;
@@ -694,6 +696,7 @@ void ScenePVP::Update(float elapsedTime)
         //一回だけ通す
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
+            TimeManager::Instance().SetTimeEffect(0.35f,2.0f);
         }
 
         //仮遷移

@@ -519,6 +519,7 @@ public:
     //キルログ
     void KillLogUpdate(float elapsedTime);
     void CreateKillLog();   //オブジェ生成
+    void ResetKilog() { saveCharaKilog.clear(); }
 
     //全員の使用キャラUI
     void CreateNetUseCharaUI();

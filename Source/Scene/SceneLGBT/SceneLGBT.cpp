@@ -36,6 +36,15 @@ void SceneLGBT::Initialize()
         obj->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/lgbt.ui", Sprite::SpriteShader::DISSOLVE, false);
     }
 
+    //パス読み込み
+    std::array<const char*, static_cast<int>(RegisterChara::CHARA_LIST::MAX)> modelPaths =
+    {
+    "Data/Model/player_arm/player_arm.mdl",
+    "Data/Model/player_arm/player_arm_2.mdl",
+    "Data/Model/player_arm/player_arm_3.mdl",
+    "Data/Model/player_arm/player_arm_4.mdl"
+    };
+
     //キャラのシリアル情報登録
     for (int i = 0; i< int(RegisterChara::CHARA_LIST::MAX); ++i)
     {
@@ -43,12 +52,16 @@ void SceneLGBT::Initialize()
         obj->SetName(std::string("loadP" + std::to_string(i)).c_str());
         obj->transform_->SetWorldPosition({ 100,0,0 });
         RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(i), obj, true);
+
+        std::shared_ptr<GameObject> arm = GameObjectManager::Instance().Create();
+        arm->SetName("armChild");
+        arm->transform_->SetScale({ 0.5f,0.5f,0.5f });
+        std::shared_ptr<RendererCom> r = arm->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+
+        //モデル読み込み
+        if (i < modelPaths.size())
         {
-            std::shared_ptr<GameObject> arm = GameObjectManager::Instance().Create();
-            arm->SetName("armChild");
-            arm->transform_->SetScale({ 0.5f,0.5f,0.5f });
-            std::shared_ptr<RendererCom> r = arm->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            r->LoadModel(modelPaths[i]);
         }
     }
 

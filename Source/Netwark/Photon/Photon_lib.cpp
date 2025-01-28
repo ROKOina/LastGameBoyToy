@@ -271,13 +271,14 @@ void PhotonLib::update(float elapsedTime)
     if (StaticSendDataManager::Instance().GetMyDeath())
     {
         //Ž€–SŽž“ü‚é
-        saveInputPhoton[myPlayerID].deathCount++;
+        if (myPlayerID >= 0)
+            saveInputPhoton[myPlayerID].deathCount++;
     }
 
     //ƒNƒ‰ƒEƒ“
+    auto& crownObj = GameObjectManager::Instance().Find("crown");
     for (int c = 0; c < 4; ++c)
     {
-        auto& crownObj = GameObjectManager::Instance().Find("crown");
         saveCrown.fallTimer[c] -= elapsedTime;
         if (saveCrown.isCrownFall[c])   //’N‚©‚ªŽè•ú‚µ‚½Žž
         {

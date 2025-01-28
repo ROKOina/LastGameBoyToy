@@ -37,7 +37,4 @@ private:
 
     //画面エフェクト実装
     void ScreenEffect(float elapsedTime);
-
-    std::weak_ptr < AudioSource3D> audioSource3d;
-    std::weak_ptr < AudioSource3D> audioSource3d1;
 };

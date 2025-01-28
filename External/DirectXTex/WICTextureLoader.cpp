@@ -173,6 +173,14 @@ namespace
         static INIT_ONCE s_initOnce = INIT_ONCE_STATIC_INIT;
 
         IWICImagingFactory* factory = nullptr;
+
+        // COM‚Ì‰Šú‰»
+        HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+        if (FAILED(hr)) {
+            // COM ‰Šú‰»‚ÉŽ¸”s‚µ‚½ê‡
+            return nullptr;
+        }
+
         InitOnceExecuteOnce(&s_initOnce,
             [](PINIT_ONCE, PVOID, PVOID* factory) -> BOOL
             {
