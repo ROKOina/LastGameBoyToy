@@ -69,9 +69,4 @@ private:
 
     std::weak_ptr<GameObject> haveBullet; //射撃待機中の弾丸
     std::vector<std::weak_ptr<GameObject>> haveMine; //使用中の地雷
-
-private:
-    std::map<std::string, GameObj> audioObjs;
-public:
-    AudioSource3D* GetAudio(std::string name) { return audioObjs[name]->GetComponent<AudioSource3D>().get(); }
 };

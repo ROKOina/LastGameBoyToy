@@ -161,7 +161,7 @@ void SceneTitle::Initialize()
         GameObj audio = GameObjectManager::Instance().Create();
         audio->SetName("Emitter1");
         audio->transform_->SetWorldPosition({ 15,0,0 });
-        auto& au3D = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
+        auto& au3D = audio->AddComponent<AudioSource3D>(AUDIOID3D::JANKRA_ULT);
         au3D->SetEmitterPos(audio->transform_->GetWorldPosition());
         au3D->AudioPlay();
     }
