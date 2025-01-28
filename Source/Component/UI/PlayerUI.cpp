@@ -1576,6 +1576,8 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
         //ƒfƒX‚µ‚½‘¤
         for (int deathPID = 0; deathPID < 4; deathPID++)
         {
+            if (killPID == deathPID)continue;
+
             auto& killflg = StaticSendDataManager::Instance().GetKillID(killPID, deathPID);
             if (killflg)  //ƒLƒ‹‚ª”­¶‚µ‚Ä‚¢‚é‚È‚ç
             {
