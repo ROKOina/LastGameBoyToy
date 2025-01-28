@@ -276,9 +276,9 @@ void PhotonLib::update(float elapsedTime)
     }
 
     //ƒNƒ‰ƒEƒ“
+    auto& crownObj = GameObjectManager::Instance().Find("crown");
     for (int c = 0; c < 4; ++c)
     {
-        auto& crownObj = GameObjectManager::Instance().Find("crown");
         saveCrown.fallTimer[c] -= elapsedTime;
         if (saveCrown.isCrownFall[c])   //’N‚©‚ªŽè•ú‚µ‚½Žž
         {
