@@ -335,6 +335,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 6.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
+    c->SetAudio("JET", MAKE_AUDIO_3D(obj, AUDIOID3D::FARAH_JET));
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
@@ -522,6 +523,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     charaCom->SetAudio("ATK2", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ATK2));
     charaCom->SetAudio("ULT1", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ULT));
     charaCom->SetAudio("ULT2", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_ULT2));
+    charaCom->SetAudio("MINE", MAKE_AUDIO_3D(obj, AUDIOID3D::JANKRA_MINE));
 
     //押し出し処理
     auto& pushBack = obj->AddComponent<PushBackCom>();
@@ -650,6 +652,11 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
     c->SetCurrentBulletNum(20);
     c->SetMaxBulletNum(20);
+
+    c->SetAudio("ATK", MAKE_AUDIO_3D(obj, AUDIOID3D::SOLDIER_ATK));
+    c->SetAudio("SKILL1", MAKE_AUDIO_3D(obj, AUDIOID3D::SOLDIER_SKILL1));
+    c->SetAudio("SKILL2", MAKE_AUDIO_3D(obj, AUDIOID3D::SOLDIER_SKILL2));
+    c->SetAudio("ULT", MAKE_AUDIO_3D(obj, AUDIOID3D::SOLDIER_ULT));
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();

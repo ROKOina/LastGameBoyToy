@@ -3,6 +3,7 @@
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Renderer\DecalCom.h"
+#include "Audio\Audio3D.h"
 
 void JankratMineCom::Update(float elapsedTime)
 {
@@ -25,12 +26,14 @@ void JankratMineCom::Update(float elapsedTime)
             sphere->SetJudgeTag(COLLIDER_TAG::Enemy | COLLIDER_TAG::EnemyBullet);
         else
             sphere->SetJudgeTag(COLLIDER_TAG::Player);
-        sphere->SetRadius(0.5f);
 
         //ノックバック判定をONにする
         SphereColliderCom* childCollder = GetGameObject()->GetChildren()[0].lock()->GetComponent<SphereColliderCom>().get();
         sphere->SetRadius(sphere->GetRadius() * 2.5f);
         childCollder->SetJudgeTag(COLLIDER_TAG::Player | COLLIDER_TAG::Enemy);
+
+        GetGameObject()->GetComponent<AudioSource3D>()->Audio3DStop();
+        GetGameObject()->GetComponent<AudioSource3D>()->AudioPlay(false);
 
         explosionFlag = true;
         explosionBegin = false;

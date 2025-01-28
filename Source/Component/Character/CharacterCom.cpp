@@ -424,6 +424,11 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
         SpaceSkillPushing(elapsedTime);
     }
 
+    if (CharacterInput::JumpButton_SPACE & GetButtonUp())
+    {
+        SpaceSkillUp();
+    }
+
     //ウルトRキー
     if (CharacterInput::UltimetButton & GetButtonDown())
     {

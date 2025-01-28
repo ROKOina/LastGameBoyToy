@@ -114,6 +114,16 @@ void FarahCom::SpaceSkillPushing(float elapsedTime)
     }
 }
 
+void FarahCom::SpaceSkill()
+{
+    GetAudio("JET")->AudioPlay();
+}
+
+void FarahCom::SpaceSkillUp()
+{
+    GetAudio("JET")->Audio3DStop();
+}
+
 // EÉXÉLÉã
 void FarahCom::SubSkill()
 {
