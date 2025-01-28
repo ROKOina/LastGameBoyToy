@@ -168,7 +168,7 @@ UI_HPEffect::UI_HPEffect(const char* filename, SpriteShader spriteshader, bool c
     divideTexSize = gaugeTexSize / 10;
     character = obj;
     maxHp = character.lock()->GetComponent<CharaStatusCom>()->GetMaxHitpoint();
-    memoryId = num;
+    memoryId = num + 1;
     spc.color = { spc.color.x,spc.color.y,spc.color.z,0 };
 }
 
@@ -1344,7 +1344,7 @@ void PlayerUIManager::CreateHpUI()
     Hp->AddComponent<UI_PlayerHpUI>();
     //HPエフェクト
     {
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             std::shared_ptr<GameObject> hpgauge = GameObjectManager::Instance().Find("HpGauge");
             std::shared_ptr<GameObject> hpEffect = hpgauge->AddChildObject();
             std::string name = "HpEffect_" + std::to_string(i);
@@ -1757,8 +1757,6 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
 
 void PlayerUIManager::CreateKillLog()
 {
-    saveCharaKilog.clear();
-
     std::shared_ptr<GameObject> killLogCanvas = GameObjectManager::Instance().Create();
     killLogCanvas->SetName("killLogCanvas");
 

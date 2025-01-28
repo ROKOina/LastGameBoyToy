@@ -15,6 +15,7 @@ public:
     enum class SpriteShader
     {
         DEFALT,
+        DEFALTUV,
         BLUR,
         DISSOLVE,
         CHROMATICABERRATION,

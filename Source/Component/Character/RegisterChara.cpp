@@ -422,7 +422,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
-            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            r->LoadModel("Data/Model/player_arm/player_arm_2.mdl");
             armChild->AddComponent<AnimationCom>();
 
             //マゼルフラッシュ
@@ -570,7 +570,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
-            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            r->LoadModel("Data/Model/player_arm/player_arm_3.mdl");
             armChild->AddComponent<AnimationCom>();
 
             //マゼルフラッシュ
@@ -757,7 +757,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             armChild->transform_->SetScale({ 0.5f,0.5f,0.5f });
             armChild->transform_->SetLocalPosition({ 1.67f,-6.74f,0.95f });
             std::shared_ptr<RendererCom> r = armChild->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, false, false);
-            r->LoadModel("Data/Model/player_arm/player_arm.mdl");
+            r->LoadModel("Data/Model/player_arm/player_arm_4.mdl");
             armChild->AddComponent<AnimationCom>();
 
             //マゼルフラッシュ

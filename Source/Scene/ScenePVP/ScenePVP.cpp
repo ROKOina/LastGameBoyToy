@@ -163,6 +163,7 @@ void ScenePVP::Initialize()
     //UI‰Šú‰»
     PlayerUIManager::Instance().ResetAllyHp();
     PlayerUIManager::Instance().ResetEndFLG();
+    PlayerUIManager::Instance().ResetKilog();
 }
 
 void ScenePVP::InitializeLobbySelect()
@@ -695,6 +696,7 @@ void ScenePVP::Update(float elapsedTime)
         //ˆê‰ñ‚¾‚¯’Ê‚·
         if (!PlayerUIManager::Instance().GetIsEndFLG()) {
             PlayerUIManager::Instance().CreateGameJudgeUI(pvpGameSystem->GetVictoryTeam());
+            TimeManager::Instance().SetTimeEffect(0.35f,5.0f);
         }
 
         //‰¼‘JˆÚ

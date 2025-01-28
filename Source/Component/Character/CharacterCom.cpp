@@ -75,7 +75,7 @@ void CharacterCom::Update(float elapsedTime)
         isDash = DashUpdateReIsDash(elapsedTime);
 
         //カメラ制御
-        CameraControl();
+        CameraControl(elapsedTime);
     }
 
     //ダッシュ関係
@@ -445,7 +445,7 @@ void CharacterCom::InputStateUpdate(float elapsedTime)
     }
 }
 
-void CharacterCom::CameraControl()
+void CharacterCom::CameraControl(float elapsedTime)
 {
     if (!cameraObj)return;
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -474,8 +474,8 @@ void CharacterCom::CameraControl()
 
             //動かす速度(感度)
             auto& ss = SceneManager::Instance().GetSettingScreen();
-            float moveX = (newCursor.x - 500) * 0.0005f * ss->GetSensitivity();
-            float moveY = (newCursor.y - 500) * 0.0005f * ss->GetSensitivity();
+            float moveX = (newCursor.x - 500) * 0.02f * ss->GetSensitivity() * elapsedTime;
+            float moveY = (newCursor.y - 500) * 0.02f * ss->GetSensitivity() * elapsedTime;
 
             //Y軸回転(ここでオブジェクトの回転)
             DirectX::XMFLOAT3 euler = GetGameObject()->transform_->GetEulerRotation();
