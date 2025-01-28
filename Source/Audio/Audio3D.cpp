@@ -502,7 +502,7 @@ void AudioSource3D::SetAudio(AUDIOID3D id)
     }
 }
 
-void AudioSource3D::AudioPlay(bool loop)
+void AudioSource3D::AudioPlay(bool loop, float pitch)
 {
     Audio3DStop();
 
@@ -515,6 +515,8 @@ void AudioSource3D::AudioPlay(bool loop)
     sourceVoice_->SubmitSourceBuffer(&buffer);
     sourceVoice_->Start();
     sourceVoice_->SetVolume(volume);
+
+    sourceVoice_->SetFrequencyRatio(pitch);
 
     g_audioState.nFrameToApply3DAudio = 0;
 }

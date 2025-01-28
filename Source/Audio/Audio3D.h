@@ -318,6 +318,8 @@ enum AUDIOID3D
     PLAYER_WAKL,
     
     //ÉWÉÉÉìÉNÉâ
+    JANKRA_ATK1,
+    JANKRA_ATK2,
     JANKRA_ULT,
     JANKRA_ULT2,
 
@@ -357,8 +359,10 @@ private:
         audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
         audio3DResources[AUDIOID3D::PLAYER_WAKL] = std::make_shared<AudioResource>("Data/AudioData/SE/player/player_walk.wav");
 
-        audio3DResources[AUDIOID3D::JANKRA_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/player/canon.wav");
-        audio3DResources[AUDIOID3D::JANKRA_ULT2] = std::make_shared<AudioResource>("Data/AudioData/SE/player/canon2.wav");
+        audio3DResources[AUDIOID3D::JANKRA_ATK1] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/se_small_bomb01.wav");
+        audio3DResources[AUDIOID3D::JANKRA_ATK2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/se_small_bomb02.wav");
+        audio3DResources[AUDIOID3D::JANKRA_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/canon.wav");
+        audio3DResources[AUDIOID3D::JANKRA_ULT2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/canon2.wav");
     }
 
 
@@ -382,7 +386,7 @@ public:
     void UpdateAudio3d(float elapsedTime);
 
     // çƒê∂
-    void AudioPlay(bool loop);
+    void AudioPlay(bool loop, float pitch = 1.0f);
     void AudioPlay();
     // í‚é~
     void Audio3DStop();

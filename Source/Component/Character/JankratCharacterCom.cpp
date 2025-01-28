@@ -39,6 +39,8 @@ void JankratCharacterCom::Start()
     attackStateMachine.ChangeState(CHARACTER_ATTACK_ACTIONS::NONE);
 
     //SE“o˜^
+    audioObjs["ATK1"] = MAKE_AUDIO_3D(GetGameObject(), AUDIOID3D::JANKRA_ATK1);
+    audioObjs["ATK2"] = MAKE_AUDIO_3D(GetGameObject(), AUDIOID3D::JANKRA_ATK2);
     audioObjs["ULT"] = MAKE_AUDIO_3D(GetGameObject(), AUDIOID3D::JANKRA_ULT);
     audioObjs["ULT2"] = MAKE_AUDIO_3D(GetGameObject(), AUDIOID3D::JANKRA_ULT2);
 }

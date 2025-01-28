@@ -112,6 +112,9 @@ void JankratCharacter_MainAtkState::Enter()
         DIR = dir;
         POS = gunPos;
     }
+
+    charaCom.lock()->GetAudio("ATK2")->Audio3DStop();
+    charaCom.lock()->GetAudio("ATK2")->AudioPlay(false, 0.4f);
 }
 void JankratCharacter_MainAtkState::Execute(const float& elapsedTime)
 {
@@ -210,8 +213,8 @@ void JankratCharacter_UltState::Enter()
         POS = gunPos;
     }
 
-    charaCom.lock()->GetAudio("ULT")->Audio3DStop();
-    charaCom.lock()->GetAudio("ULT")->AudioPlay(false);
+    charaCom.lock()->GetAudio("ULT2")->Audio3DStop();
+    charaCom.lock()->GetAudio("ULT2")->AudioPlay(false);
 }
 void JankratCharacter_UltState::Execute(const float& elapsedTime)
 {
