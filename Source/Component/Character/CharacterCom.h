@@ -250,7 +250,7 @@ private:
     void InputStateUpdate(float elapsedTime);
 
     //カメラ操作
-    void CameraControl();
+    void CameraControl(float elapsedTime);
 
     //ダッシュ関係（ダッシュ中か返す）
     bool DashUpdateReIsDash(float elapsedTime);
