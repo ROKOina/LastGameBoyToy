@@ -5,6 +5,7 @@
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Sprite\Sprite.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
+#include "Phsix\Physxlib.h"
 
 void HitProcessCom::Update(float elapsedTime)
 {
@@ -21,6 +22,35 @@ void HitProcessCom::Update(float elapsedTime)
     if (!myObj.lock())return;
     std::shared_ptr<CharacterCom> chara = myObj.lock()->GetComponent<CharacterCom>();
     if (!chara)return;
+
+    //ƒŒƒC‚Ìê‡Œš•¨‚Æ‚Ì”»’è‚ð‚·‚é
+    auto& ray = GetGameObject()->GetComponent<RayColliderCom>();
+    if (ray)
+    {
+        float dist = 10000.0f;
+        //ˆê”Ô‹ß‚¢‹——£‚ð’T‚·
+        DirectX::XMFLOAT3 start = ray->GetStart();
+        DirectX::XMFLOAT3 end = ray->GetEnd();
+        for (auto& hit : col->OnHitGameObject())
+        {
+            float d = Mathf::Length(start - hit.hitPos);
+            if (dist > d)
+                dist = d;
+        }
+        //Œš•¨‚Æ‚Ì“–‚½‚è‚Æ”äŠr
+        PxRaycastBuffer buffer;
+        if (PhysXLib::Instance().RayCast_PhysX(start, Mathf::Normalize(end - start), Mathf::Length(end - start), buffer, PhysXLib::CollisionLayer::Stage))
+        {
+            DirectX::XMFLOAT3 hitPos;
+            hitPos.x = buffer.block.position.x;
+            hitPos.y = buffer.block.position.y;
+            hitPos.z = buffer.block.position.z;
+
+            //Œš•¨‚Ì•û‚ª‹ß‚¢ê‡‚Íƒ_ƒ[ƒWˆ—‚ð”ò‚Î‚·
+            float d = Mathf::Length(start - hitPos);
+            if (dist > d)return;
+        }
+    }
 
     for (auto& hit : col->OnHitGameObject())
     {
