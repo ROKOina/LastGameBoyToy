@@ -245,13 +245,6 @@ void ScenePVE::Initialize()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomberexplosion.gpuparticle", 6000);
         obj->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/energyspawn.spawn");
     }
-
-    //オーディオ
-    {
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME1, 0.0f, true);
-        Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME1, 0.6f, 0.01f);
-    }
-
 #pragma region グラフィック系の設定
 
     //コンスタントバッファの初期化
@@ -269,6 +262,7 @@ void ScenePVE::Finalize()
 {
     photonNet->close();
     PVEDirection::Instance().DirectionEnd();
+    Audio2DMagaer::Instance().Audio2DStopAll();
 }
 
 void ScenePVE::Update(float elapsedTime)
@@ -292,18 +286,22 @@ void ScenePVE::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
-    //ネット選択したら更新開始
-    if (flag)
+
+    ////ネット選択したら更新開始
+    //if (flag)
     {
         GameObj boss = GameObjectManager::Instance().Find("BOSS");
-        if (!battleClymax && boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 20.0f)
+        if (!battleClymax && boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 700.0f)
         {
-            Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME1, 0.0f, elapsedTime);
-
-            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_GAME2, 0.0f, true);
-            Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::SCENE_GAME2, 1.0f, elapsedTime / 2);
+            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_BOSS_START);
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_BOSS_CLYMAX, 1.5f, true);
 
             battleClymax = true;
+        }
+
+        if (battleClymax && boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 0.0f)
+        {
+            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_BOSS_CLYMAX);
         }
     }
 }
