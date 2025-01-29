@@ -3,6 +3,7 @@
 #include "Component/System/Component.h"
 #include "StateMachine\Behaviar\BossState.h"
 #include "StateMachine/StateMachine.h"
+#include "Audio\Audio3D.h"
 
 class BossCom :public Component
 {
@@ -88,4 +89,11 @@ public:
 private:
     StateMachine<BossCom, BossState> state;
     DirectX::XMFLOAT3 targetposition = {};
+
+    
+private://‰¹
+    std::map<AUDIOID3D, GameObj> audios;
+public:
+    void SetAudios(AUDIOID3D id, GameObj obj) { audios[id] = obj; }
+    GameObj GetAudios(AUDIOID3D id) { return audios[id]; }
 };

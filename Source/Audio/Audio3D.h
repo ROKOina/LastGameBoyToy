@@ -317,6 +317,13 @@ enum AUDIOID3D
     TEST,
     PLAYER_WAKL,
     
+    //ハンゾー
+    HANZO_ATK,
+    HANZO_SKILL1,
+    HANZO_SKILL2,
+    HANZO_ULT,
+    HANZO_ULT_FAILD,
+
     //ファラ
     FARAH_JET,
     FARAH_ATK,
@@ -337,6 +344,9 @@ enum AUDIOID3D
     SOLDIER_SKILL1,
     SOLDIER_SKILL2,
     SOLDIER_ULT,
+
+    //ボス
+    BOSS_,
 
     MAX_
 };
