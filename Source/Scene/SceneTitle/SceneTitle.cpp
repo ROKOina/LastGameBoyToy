@@ -75,8 +75,6 @@ void SceneTitle::Initialize()
         r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
         r->SetOutlineColor({ 0.000f, 0.282f, 1.000f });
         r->SetOutlineIntensity(10.0f);
-        StageEditorCom* stageEdit = obj->AddComponent<StageEditorCom>().get();
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
     }
 
     //ƒvƒŒƒCƒ„[
