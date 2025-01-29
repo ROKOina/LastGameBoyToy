@@ -67,18 +67,18 @@ void SceneLGBT::Initialize()
 
     //ステージのシリアル情報登録
     {
-        auto& stageObj = GameObjectManager::Instance().Create();
-        stageObj->SetName("stage");
-        stageObj->transform_->SetWorldPosition({ 0, 0, -1000 });
-        stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
-        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
-        //ステージ
-        StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
-        //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/", "StageJson/ColliderStage.mdl", "__", 0.005f);
-        //Jsonからオブジェクト配置
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
+        //auto& stageObj = GameObjectManager::Instance().Create();
+        //stageObj->SetName("stage");
+        //stageObj->transform_->SetWorldPosition({ 0, 0, -1000 });
+        //stageObj->transform_->SetScale({ 0.005f, 0.005f, 0.005f });
+        //std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        //r->LoadModel("Data/Model/MatuokaStage/StageJson/DrawStage.mdl");
+        ////ステージ
+        //StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        ////判定生成
+        //stageEdit->PlaceStageRigidCollider("Data/Model/MatuokaStage/", "StageJson/ColliderStage.mdl", "__", 0.005f);
+        ////Jsonからオブジェクト配置
+        //stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/GateGimic.json");
     }
 
     //skipフォント

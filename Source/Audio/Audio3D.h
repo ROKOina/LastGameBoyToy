@@ -71,10 +71,11 @@ struct AUDIO_STATE
 
 enum class AUDIOID2D
 {
-    SCENE_GAME1,
-    SCENE_GAME2,
     SCENE_TITLE,
     SCENE_LOBBY,
+    SCENE_BOSS_START,
+    SCENE_BOSS_CLYMAX,
+
     CURSOR,
     ENTER,
     BOSS_JUMPATTACK_START,
@@ -155,7 +156,6 @@ public:
 
         Register2DAudio(xaudio2D.Get());
     };
-
     ~Audio2DMagaer() {
         //ソースボイス削除
         for (auto& r2d : audio2DResources)
@@ -181,9 +181,6 @@ public:
         CoUninitialize();
     };
 
-    // インスタンス取得
-    //static Audio2DMagaer& Instance() { return *instance_; }
-
     void Audio2DPlay(AUDIOID2D id, float volume = 1, bool loop = false);
     void Audio2DStop(AUDIOID2D id);
     void Audio2DStopAll();
@@ -193,10 +190,10 @@ private:
     void Register2DAudio(IXAudio2* x2d)
     {
         //2Dオーディオ登録
-        audio2DResources[AUDIOID2D::SCENE_GAME1] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
-        audio2DResources[AUDIOID2D::SCENE_GAME2] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
         audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
         audio2DResources[AUDIOID2D::SCENE_LOBBY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/LobbyBGM.wav");
+        audio2DResources[AUDIOID2D::SCENE_BOSS_START] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
+        audio2DResources[AUDIOID2D::SCENE_BOSS_CLYMAX] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
         audio2DResources[AUDIOID2D::CURSOR] = AudioResource2DStr(x2d, "Data/AudioData/SE/cursorMove.wav");
         audio2DResources[AUDIOID2D::ENTER] = AudioResource2DStr(x2d, "Data/AudioData/SE/enter.wav");
         audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_START] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_start.wav");
@@ -246,17 +243,6 @@ private:
         audio2DResources[AUDIOID2D::TUTOLINES_30] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/030_L.wav");
         audio2DResources[AUDIOID2D::TUTOLINES_31] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/031_L.wav");
     }
-
-    ////リソース検索
-    //AudioResource2DStr& GetAudio2DResouce(AUDIOID2D audioENUM)
-    //{
-    //    auto& it = audio2DResources.find(audioENUM);
-    //    if (it != audio2DResources.end()) { // 見つかった
-    //        return it->second;
-    //    }
-    //    //見つからない
-    //    return nullptr;
-    //}
 
         //2D音源構造体
     struct AudioResource2DStr
@@ -441,36 +427,3 @@ private:
 
     AUDIO_STATE  g_audioState;
 };
-
-//class AudioSource2D : public Component
-//{
-//public:
-//    AudioSource2D();
-//    ~AudioSource2D() override;
-//
-//    void Start() override {};
-//    void Update(float elapsedTime) override {};
-//
-//    const char* GetName() const override { return "Audio2D"; }
-//    void OnGUI() override {}
-//
-//    // オーディオ呼び出し関数
-//    void SetAudio2D(AUDIOID2D id);
-//
-//    // 再生
-//    void Audio2DPlay();
-//    void Audio2DPlay(float volume, bool loop = false);
-//    void Audio2DStop();
-//
-//public:
-//    //IXAudio2SourceVoice* sourceVoice_ = nullptr;
-//
-//private:
-//    Microsoft::WRL::ComPtr<IXAudio2> xaudio;
-//    IXAudio2MasteringVoice* masteringVoice = nullptr;
-//
-//    bool audioChangeFlg = false;
-//};
-
-//// Global variables
-//extern AUDIO_STATE  g_audioState;

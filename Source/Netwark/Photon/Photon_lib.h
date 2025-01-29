@@ -80,6 +80,8 @@ public:
     int GetKillCount(int team);
     //クラウン所持時間取得
     float GetCrownTimerCount(int team);
+    //ボタン押した回数
+    int GetButtonCount(int team);
 
     int GetMyPhotonID();
     int GetMyPlayerID();
@@ -146,6 +148,9 @@ public:
     //クラウン所持時間取得
     void SetCrownTimer(int playerID, float timer);
 
+    //ボタンを押した回数をネットに多分送るんだと思う
+    void SetButtonPusu(int playerID, int count);
+
     //接続開始
     void StartConnect() { connectFlg = true; }
     bool GetConnectBegin() { return connectBegin; }
@@ -185,6 +190,9 @@ public:
         //クラウン
         //所持時間
         float crownTimer = 0;
+
+        //ボタンを押した回数by上野
+        int buttonCount = 0;
 
         //次の入力情報を格納
         struct NextInput
@@ -261,6 +269,7 @@ private:
     void sendGameModeData(void);
     void sendDeathMatchData(void);
     void sendCrownData(void);
+    void sendButtonData(void);
 
     // events, triggered by certain operations of all players in the same room
     //入室時に入る
@@ -273,6 +282,7 @@ private:
     void LobbyRecv(NetData recvData);    //ロビー受信
     void DeathMatchRecv(NetData recvData);    //デスマッチ受信
     void CrownRecv(NetData recvData);    //クラウン受信
+    void ButtonRecv(NetData recvData);   //ボタン受信
 
     // receive and print out debug out here
     virtual void debugReturn(int debugLevel, const ExitGames::Common::JString& string);

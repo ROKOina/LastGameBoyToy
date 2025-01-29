@@ -55,8 +55,15 @@ public:
     //ボタン勝敗必要情報
     struct ButtonData   //ゲーム
     {
+        float endTime = 300; //終了時間(秒)
+        float nowTime = 0;
+
+        //勝利カウント
+        int winbuttoncount = 5;
+
         struct ButtonTeamData   //チームごと
         {
+            int buttoncount = 0;
         };
         ButtonTeamData teamData[2];
     };

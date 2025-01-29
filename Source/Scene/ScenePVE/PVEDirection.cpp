@@ -302,6 +302,7 @@ void PVEDirection::DirectionFOne(float elapsedTime)
         GameObject* eventGate = GameObjectManager::Instance().Find("Gate0").get();
         eventGate->GetComponent<GateGimmick>()->GetStateMachine().ChangeState(GateGimmick::GimmickState::UP);
 
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_BOSS_START, 1.0f, true);
         flag = true;
     }
 

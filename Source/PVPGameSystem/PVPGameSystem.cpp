@@ -102,4 +102,33 @@ void PVPGameSystem::CrownUpdate()
 
 void PVPGameSystem::ButtonUpdate()
 {
+    for (int i = 0; i < 2; ++i)
+    {
+        //ボタンを押した回数
+        if (buttonData.teamData[i].buttoncount >= buttonData.winbuttoncount)
+        {
+            isEndGame = true;	//ゲーム終了
+            victoryTeam = TEAM_KIND(i);	//勝利チーム
+            return;
+        }
+    }
+
+    //タイムアップ
+    if (buttonData.nowTime >= buttonData.endTime)
+    {
+        isEndGame = true;	//ゲーム終了
+        //勝利チーム
+        if (buttonData.teamData[0].buttoncount == buttonData.teamData[1].buttoncount)
+        {
+            victoryTeam = TEAM_KIND::DRAW;
+        }
+        else if (buttonData.teamData[0].buttoncount > buttonData.teamData[1].buttoncount)
+        {
+            victoryTeam = TEAM_KIND::RED_GROUP;
+        }
+        else
+        {
+            victoryTeam = TEAM_KIND::BLUE_GROUP;
+        }
+    }
 }

@@ -153,6 +153,7 @@ struct NetData
         //ゲームモード
         DEATHMATCH,
         CROWN,
+        BUTTON,
     };
     int dataKind = {};
     bool isMasterClient = false;
@@ -231,6 +232,11 @@ struct NetData
         DirectX::XMFLOAT3 lastPos = {}; //王冠を落とした時の位置
         bool haveCrown = false; //所持しているか
     }crownData;
+    //ボタン
+    struct ButtonData
+    {
+        int buttoncount = 0;
+    }buttonData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {
@@ -296,6 +302,9 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         out << h.crownData.crownTimer << " ";
         out << h.crownData.lastPos << " ";
         out << h.crownData.haveCrown << " ";
+    }
+    if (h.dataKind == NetData::DATA_KIND::BUTTON)
+    {
     }
 
     return out;
@@ -365,6 +374,9 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
         in >> h.crownData.crownTimer;
         in >> h.crownData.lastPos;
         in >> h.crownData.haveCrown;
+    }
+    if (h.dataKind == NetData::DATA_KIND::BUTTON)
+    {
     }
 
     return in;
