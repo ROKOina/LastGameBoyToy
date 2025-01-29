@@ -367,6 +367,9 @@ private:
         audio3DResources[AUDIOID3D::HANZO_ULT_BOOM] = std::make_shared<AudioResource>("Data/AudioData/SE/player/mono/kanizo/player_Boom.wav");
 
         audio3DResources[AUDIOID3D::FARAH_JET] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/jeat.wav");
+        audio3DResources[AUDIOID3D::FARAH_ATK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/Fara_MainAttack.wav");
+        audio3DResources[AUDIOID3D::FARAH_SKILL1] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/FaraSkill_E.wav");
+        audio3DResources[AUDIOID3D::FARAH_SKILL2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/Fara_RightClick.wav");
 
         audio3DResources[AUDIOID3D::JANKRA_ATK1] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/se_small_bomb01.wav");
         audio3DResources[AUDIOID3D::JANKRA_ATK2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/se_small_bomb02.wav");

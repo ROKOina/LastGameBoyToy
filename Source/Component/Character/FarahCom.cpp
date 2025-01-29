@@ -72,6 +72,10 @@ void FarahCom::Update(float elapsedTime)
             GetGameObject()->GetChildFind("Boost2")->transform_->SetWorldPosition({ footpos->worldTransform._41,footpos->worldTransform._42,footpos->worldTransform._43 });
         }
     }
+   
+    if (dashGauge <= 0.1f) {
+        GetAudio("JET")->Audio3DStop();
+    }
 
     //ult‚Ìui‚ÌON,OFF
     auto& canvas = GameObjectManager::Instance().Find("Canvas");
@@ -96,7 +100,8 @@ void FarahCom::OnGUI()
 void FarahCom::SubAttackDown()
 {
     if (cooldownTimer > 0.0f) return;
-
+    GetAudio("SKILL2")->Audio3DStop();
+    GetAudio("SKILL2")->AudioPlay(false, 1.0f);
     ApplyJumpForce();
     SetCooldown(COOLDOWN_TIME);
     AddDashGauge(DASH_GAUGE_INCREMENT);
@@ -115,7 +120,7 @@ void FarahCom::SpaceSkillPushing(float elapsedTime)
 }
 
 void FarahCom::SpaceSkill()
-{
+{ 
     GetAudio("JET")->AudioPlay();
 }
 
