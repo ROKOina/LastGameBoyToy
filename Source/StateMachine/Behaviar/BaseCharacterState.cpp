@@ -180,7 +180,6 @@ void BaseCharacter_MoveState::Exit()
 #pragma endregion
 
 #pragma region Jump
-
 void BaseCharacter_JumpState::Enter()
 {
     //‰ŠúÝ’è
@@ -200,7 +199,6 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
     {
         Hovering(elapsedTime);
     }
-
     if (!animationCom.lock()->IsPlayLowerAnimation())
     {
         ChangeMoveState(CharacterCom::CHARACTER_MOVE_ACTIONS::JUMPLOOP);
