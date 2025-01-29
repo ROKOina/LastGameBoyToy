@@ -197,9 +197,8 @@ void ScenePVP::InitializeLobbySelect()
         }
 
         std::shared_ptr<GameObject> obj = FParent->AddChildObject();
-        //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName(("lobbySelectFont" + std::to_string(lf.id)).c_str());
-        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/HGS‘n‰pŠpÎß¯Ìß‘Ì.font", 1024);
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
         font->position = lf.pos;
         font->str = lf.str;  //L•t‚¯‚Ä‚Ë
         font->scale = lf.scale;
@@ -247,7 +246,7 @@ void ScenePVP::InitializeLobby()
             std::shared_ptr<GameObject> kariLOBBY = FParent->AddChildObject();
             //std::shared_ptr<GameObject> kariLOBBYSELECT = GameObjectManager::Instance().Create();
             kariLOBBY->SetName(("FontBack" + std::to_string(lf.id)).c_str());
-            kariLOBBY->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyStrBack.ui", Sprite::SpriteShader::DEFALT, true);
+            auto& ui=kariLOBBY->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyStrBack.ui", Sprite::SpriteShader::DEFALT, true);
             //íœ—\’èƒŠƒXƒg‚É’Ç‰Á
             tempRemoveObj.emplace_back(kariLOBBY);
         }
@@ -1186,6 +1185,7 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
             if (ui->GetHitSprite())
             {
                 ui->spc.color.x = 1;
+                font->color = { 255 / 255.0f,255 / 255.0f,255 / 255.0f,1 };
 
                 GamePad& gamePad = Input::Instance().GetGamePad();
                 if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
@@ -1253,7 +1253,11 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                 }
             }
             else
+            {
                 ui->spc.color.x = 0;
+                font->color = { 196 / 255.0f,196 / 255.0f,99 / 255.0f,1 };
+            }
+            ui->spc.color.w = 0;
         }
 
         //ƒƒr[–¼“ü—Í
@@ -1374,7 +1378,7 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
             //”»’è
             if (ui->GetHitSprite())
             {
-                ui->spc.color.x = 1;
+                ui->spc.color = { 0 / 255.0f,216 / 255.0f,1,1 };
 
                 GamePad& gamePad = Input::Instance().GetGamePad();
                 if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
@@ -1408,7 +1412,7 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
             }
             else
             {
-                ui->spc.color.x = 0;
+                ui->spc.color = { 12 / 255.0f,110 / 255.0f,128 / 255.0f,117 / 255.0f };
             }
         }
     }
