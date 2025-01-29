@@ -77,6 +77,7 @@ enum class AUDIOID2D
     SCENE_GAME1,
     SCENE_GAME2,
     SCENE_TITLE,
+    SCENE_LOBBY,
     CURSOR,
     ENTER,
     BOSS_JUMPATTACK_START,
@@ -193,6 +194,7 @@ public:
 
     void Audio2DPlay(AUDIOID2D id, float volume = 1, bool loop = false);
     void Audio2DStop(AUDIOID2D id);
+    void Audio2DStopAll();
     void Audio2DFeed(AUDIOID2D id, float start, float end) {}
 
 private:
@@ -203,7 +205,8 @@ private:
         audio2DResources[AUDIOID2D::SE] = AudioResource2DStr(x2d, "Data/AudioData/TestAudio/SE.wav");
         audio2DResources[AUDIOID2D::SCENE_GAME1] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
         audio2DResources[AUDIOID2D::SCENE_GAME2] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
-        audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/Indomitable.wav");
+        audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
+        audio2DResources[AUDIOID2D::SCENE_LOBBY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/LobbyBGM.wav");
         audio2DResources[AUDIOID2D::CURSOR] = AudioResource2DStr(x2d, "Data/AudioData/SE/cursorMove.wav");
         audio2DResources[AUDIOID2D::ENTER] = AudioResource2DStr(x2d, "Data/AudioData/SE/enter.wav");
         audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_START] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_start.wav");

@@ -551,3 +551,15 @@ void Audio2DMagaer::Audio2DStop(AUDIOID2D id)
     audio2DResources[id].sourceVoice_->FlushSourceBuffers();
     audio2DResources[id].sourceVoice_->Stop(0);
 }
+
+void Audio2DMagaer::Audio2DStopAll()
+{
+    for (auto& [id, resource] : audio2DResources)
+    {
+        if (resource.sourceVoice_)
+        {
+            resource.sourceVoice_->FlushSourceBuffers();
+            resource.sourceVoice_->Stop(0);
+        }
+    }
+}

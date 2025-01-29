@@ -421,12 +421,10 @@ void CharaPicks::SetViewCharaPicks(bool flg)
     if (flg)
     {
         charaPicksCanvas->SetEnabled(true);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_TITLE, true);
         GameObjectManager::Instance().Find("lobbyBackParent")->SetEnabled(false);
     }
     else
     {
         charaPicksCanvas->SetEnabled(false);
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_TITLE);
     }
 }

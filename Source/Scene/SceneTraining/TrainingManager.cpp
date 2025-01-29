@@ -252,6 +252,7 @@ void TrainingManager::CharaSelectUpdate(float elapsedTime)
         CharaSelectUnHindOBJ();
         charaPicks->SetViewCharaPicks(true);
         flag = true;
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, true);
     }
 
     charaPicks->CharaPicksUpdate(elapsedTime);
@@ -266,6 +267,7 @@ void TrainingManager::CharaSelectUpdate(float elapsedTime)
             GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
             flag1 = true;
             GameObjectManager::Instance().Find("player")->SetEnabled(false);
+            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_LOBBY);
         }
 
         GameObjectManager::Instance().Find("scarecrow1")->SetEnabled(true);

@@ -32,7 +32,7 @@ SceneTitle::~SceneTitle()
 {
 }
 
-AUDIOID2D titleAudioID = AUDIOID2D::BGM;
+AUDIOID2D titleAudioID = AUDIOID2D::SCENE_TITLE;
 
 void SceneTitle::Initialize()
 {
@@ -150,6 +150,7 @@ void SceneTitle::Initialize()
     ConstantBufferInitialize();
 
     Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
+    Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_LOBBY);
 
     {
         GameObj audio = GameObjectManager::Instance().Create();
