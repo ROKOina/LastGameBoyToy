@@ -287,6 +287,8 @@ void ScenePVE::Update(float elapsedTime)
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
+    // リザルトにBGM設定、PvEに必要なオーディオがないか確認
+
     ////ネット選択したら更新開始
     //if (flag)
     {
