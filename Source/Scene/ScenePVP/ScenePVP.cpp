@@ -198,7 +198,7 @@ void ScenePVP::InitializeLobbySelect()
         std::shared_ptr<GameObject> obj = FParent->AddChildObject();
         //std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName(("lobbySelectFont" + std::to_string(lf.id)).c_str());
-        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/HGS‘n‰pŠpÎß¯Ìß‘Ì.font", 1024);
         font->position = lf.pos;
         font->str = lf.str;  //L•t‚¯‚Ä‚Ë
         font->scale = lf.scale;

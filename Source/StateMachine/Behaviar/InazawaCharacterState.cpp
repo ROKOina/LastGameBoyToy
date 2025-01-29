@@ -32,7 +32,7 @@ void InazawaCharacter_AttackState::Enter()
         charge->GetComponent<GPUParticle>()->SetLoop(true);
 
         //音
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_CHARGE, 10.0f, false);
+        owner->GetAudio("CHARGE")->AudioPlay(false);
     }
 }
 
@@ -82,9 +82,8 @@ void InazawaCharacter_AttackState::Execute(const float& elapsedTime)
         BulletCreate::DamageFire(owner->GetGameObject(), arrowSpeed, attackPower / maxAttackPower, maxDamage * attackPower);
 
         //音
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_CHARGE);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, 10.0f, false);
-
+        owner->GetAudio("CHARGE")->Audio3DStop();
+        owner->GetAudio("ATK")->AudioPlay(false);
         //射撃間隔タイマー起動
         owner->GetGameObject()->GetComponent<InazawaCharacterCom>()->ResetShootTimer();
 
@@ -156,8 +155,8 @@ void InazawaCharacter_ESkillState::Execute(const float& elapsedTime)
         isShot = true;
 
         //音
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_SHOOT);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_SHOOT, 10.0f, false);
+        owner->GetAudio("ATK")->Audio3DStop();
+        owner->GetAudio("ATK")->AudioPlay(false);
     }
 }
 

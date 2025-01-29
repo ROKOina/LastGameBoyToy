@@ -440,8 +440,8 @@ void Ult_Attack_State::Enter()
     }
 
     //‰¹
-    Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_ATTACKULTSHOOT);
-    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_ATTACKULTSHOOT, 10.0f, false);
+    owner->GetAudio("ULT")->Audio3DStop();
+    owner->GetAudio("ULT")->AudioPlay(false);
 
     ray->SetStart(start);
     ray->SetEnd(end);

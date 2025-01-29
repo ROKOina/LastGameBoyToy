@@ -91,12 +91,7 @@ enum class AUDIOID2D
     BOSS_WALK,
 
     //プレイヤー
-    PLAYER_SHOOT,
-    PLAYER_ATTACKULTSHOOT,
-    PLAYER_ATTACKULTBOOM,
-    PLAYER_CHARGE,
     PLAYER_DAMAGE,
-    PLAYER_DASH,
     PLAYER_CANON,
     PLAYER_CANON2,
 
@@ -218,12 +213,7 @@ private:
         audio2DResources[AUDIOID2D::BOSS_WALK] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_ground2.wav");
 
         //プレイヤー
-        audio2DResources[AUDIOID2D::PLAYER_ATTACKULTBOOM] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_Boom.wav");
-        audio2DResources[AUDIOID2D::PLAYER_ATTACKULTSHOOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_attackUltShoot.wav");
-        audio2DResources[AUDIOID2D::PLAYER_CHARGE] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_charge.wav");
         audio2DResources[AUDIOID2D::PLAYER_DAMAGE] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_damage.wav");
-        audio2DResources[AUDIOID2D::PLAYER_DASH] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_dash2.wav");
-        audio2DResources[AUDIOID2D::PLAYER_SHOOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_shoot.wav");
 
         //チュートリアル
         audio2DResources[AUDIOID2D::TUTOLINES_01] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/001_L.wav");
@@ -313,10 +303,10 @@ enum AUDIOID3D
 
     //ハンゾー
     HANZO_ATK,
-    HANZO_SKILL1,
-    HANZO_SKILL2,
+    HANZO_DASH,
+    HANZO_CHARGE,
     HANZO_ULT,
-    HANZO_ULT_FAILD,
+    HANZO_ULT_BOOM,
 
     //ファラ
     FARAH_JET,
@@ -377,6 +367,12 @@ private:
         audio3DResources[AUDIOID3D::SE] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
         audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
         audio3DResources[AUDIOID3D::PLAYER_WAKL] = std::make_shared<AudioResource>("Data/AudioData/SE/player/player_walk.wav");
+
+        audio3DResources[AUDIOID3D::HANZO_ATK] = std::make_shared<AudioResource>("Data/AudioData/SE/player/mono/kanizo/player_shoot.wav");
+        audio3DResources[AUDIOID3D::HANZO_CHARGE] = std::make_shared<AudioResource>("Data/AudioData/SE/player/mono/kanizo/player_charge.wav");
+        audio3DResources[AUDIOID3D::HANZO_DASH] = std::make_shared<AudioResource>("Data/AudioData/SE/player/mono/kanizo/player_dash2.wav");
+        audio3DResources[AUDIOID3D::HANZO_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/player/mono/kanizo/player_attackUltShoot.wav");
+        audio3DResources[AUDIOID3D::HANZO_ULT_BOOM] = std::make_shared<AudioResource>("Data/AudioData/SE/player/mono/kanizo/player_Boom.wav");
 
         audio3DResources[AUDIOID3D::FARAH_JET] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/jeat.wav");
 

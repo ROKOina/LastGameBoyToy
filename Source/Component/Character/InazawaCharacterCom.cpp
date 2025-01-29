@@ -69,8 +69,8 @@ void InazawaCharacterCom::Update(float elapsedTime)
                     }
 
                     //‰¹
-                    Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::PLAYER_ATTACKULTBOOM);
-                    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::PLAYER_ATTACKULTBOOM, 10.0f, false);
+                    GetAudio("ULT_BOOM")->Audio3DStop();
+                    GetAudio("ULT_BOOM")->AudioPlay(false);
                 }
                 objHitFlag = true;
             }

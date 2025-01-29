@@ -110,6 +110,12 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 8.0f);
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 5.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
+    //音
+    c->SetAudio("ATK", MAKE_AUDIO_3D(obj, AUDIOID3D::HANZO_ATK));
+    c->SetAudio("DASH", MAKE_AUDIO_3D(obj, AUDIOID3D::HANZO_DASH));
+    c->SetAudio("CHARGE", MAKE_AUDIO_3D(obj, AUDIOID3D::HANZO_CHARGE));
+    c->SetAudio("ULT", MAKE_AUDIO_3D(obj, AUDIOID3D::HANZO_ULT));
+    c->SetAudio("ULT_BOOM", MAKE_AUDIO_3D(obj, AUDIOID3D::HANZO_ULT_BOOM));
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();
@@ -311,6 +317,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
 
         pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
+
 }
 
 //ファラ
