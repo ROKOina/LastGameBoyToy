@@ -82,7 +82,7 @@ private:
     std::vector<std::weak_ptr<GameObject>> tempRemoveObj;   //画面切り替え時に削除するオブジェクト
 
     //ゲームシステム
-    std::unique_ptr<PVPGameSystem> pvpGameSystem;
+    std::shared_ptr<PVPGameSystem> pvpGameSystem;
 
     struct LobbySelectFont
     {

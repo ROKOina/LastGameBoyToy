@@ -36,7 +36,7 @@
 #include "Component\GameSystem\RespawnCom.h"
 #include "Component\System\CrownCom.h"
 #include "Component\System\pingCom.h"
-
+#include "Component\System\ButtonCom.h"
 #include "Component/Renderer/InstanceRendererCom.h"
 
 #include "Netwark/Photon/Photon_lib.h"
@@ -158,7 +158,7 @@ void ScenePVP::Initialize()
     photonNet = std::make_unique<BasicsApplication>(l);
 
     //ゲームシステム
-    pvpGameSystem = std::make_unique<PVPGameSystem>();
+    pvpGameSystem = std::make_shared<PVPGameSystem>();
 
     //UI初期化
     PlayerUIManager::Instance().ResetAllyHp();
@@ -577,6 +577,10 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Button);
         sphere->SetJudgeTag(COLLIDER_TAG::Player);
+
+        //ボタンのコンポーネントを付与する
+        std::shared_ptr<ButtonCom>b = obj->AddComponent<ButtonCom>();
+        b->SetPVPGameSystem(pvpGameSystem);
     }
     break;
     }
