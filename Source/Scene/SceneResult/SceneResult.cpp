@@ -116,6 +116,14 @@ void SceneResult::Initialize()
     auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
     post->SetExposureZero();    //ˆÃ“]
     post->SetParameter(1.4f, 1.0f, parameters); //–¾“]
+
+    // BGM
+    {
+        if(isMyWin)
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
+        else
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER, 1.0f, false);
+    }
 }
 
 //I—¹ˆ—
@@ -136,6 +144,8 @@ void SceneResult::Finalize()
             resultModel[i].reset();
         }
     }
+
+    Audio2DMagaer::Instance().Audio2DStopAll();
 }
 
 //XVˆ—
