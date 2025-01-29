@@ -232,6 +232,11 @@ struct NetData
         DirectX::XMFLOAT3 lastPos = {}; //‰¤Š¥‚ğ—‚Æ‚µ‚½‚ÌˆÊ’u
         bool haveCrown = false; //Š‚µ‚Ä‚¢‚é‚©
     }crownData;
+    //ƒ{ƒ^ƒ“
+    struct ButtonData
+    {
+        int buttoncount = 0;
+    }buttonData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
 {

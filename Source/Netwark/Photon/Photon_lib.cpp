@@ -1025,6 +1025,13 @@ void PhotonLib::SetCrownTimer(int playerID, float timer)
     saveInputPhoton[playerID].crownTimer = timer;
 }
 
+void PhotonLib::SetButtonPusu(int playerID, int count)
+{
+    if (playerID < 0)return;
+
+    saveInputPhoton[playerID].buttonCount = count;
+}
+
 int PhotonLib::SendMs()
 {
     return GetServerTime() - oldMs;
@@ -1323,6 +1330,10 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             case NetData::DATA_KIND::CROWN:
                 if (isGamePlay)
                     CrownRecv(ne[0]);
+                break;
+            case NetData::DATA_KIND::BUTTON:
+                if (isGamePlay)
+                    ButtonRecv(ne[0]);
                 break;
             }
         }
@@ -1698,6 +1709,17 @@ void PhotonLib::CrownRecv(NetData recvData)
                 saveCrown.crownFallPos = recvData.crownData.lastPos;
             }
         }
+    }
+}
+
+//by上野
+void PhotonLib::ButtonRecv(NetData recvData)
+{
+
+    if (recvData.playerId >= 0)
+    {
+        //ボタンを押した回数を送る
+        saveInputPhoton[recvData.playerId].buttonCount = recvData.buttonData.buttoncount;
     }
 }
 
@@ -2113,6 +2135,10 @@ void PhotonLib::sendButtonData(void)
 
     //種別をボタンに
     netD.dataKind = NetData::DATA_KIND::BUTTON;
+
+    //クラウン所持時間送信
+    if (myPlayerID >= 0)
+        netD.buttonData.buttoncount = saveInputPhoton[myPlayerID].buttonCount;
 
     std::stringstream s = NetDataSendCast(n);
     auto ne = NetDataRecvCast(s.str());
