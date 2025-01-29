@@ -451,6 +451,16 @@ void PhotonLib::ImGui()
         ImGui::TreePop();
     }
 
+    //ボタン所持時間
+    if (ImGui::TreeNode("button"))
+    {
+        for (auto& s : saveInputPhoton)
+        {
+            ImGui::InputInt(std::string(s.name).c_str(), &s.buttonCount);
+        }
+        ImGui::TreePop();
+    }
+
     //マスタークライアントか
     bool isMaster = GetIsMasterPlayer();
     ImGui::Checkbox("master", &isMaster);
@@ -882,6 +892,17 @@ float PhotonLib::GetCrownTimerCount(int team)
     return count;
 }
 
+int PhotonLib::GetButtonCount(int team)
+{
+    int count = 0;
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.teamID == team)
+            count += s.buttonCount;
+    }
+    return count;
+}
+
 int PhotonLib::GetMyPhotonID()
 {
     int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
@@ -1002,6 +1023,13 @@ void PhotonLib::SetCrownTimer(int playerID, float timer)
     if (playerID < 0)return;
 
     saveInputPhoton[playerID].crownTimer = timer;
+}
+
+void PhotonLib::SetButtonPusu(int playerID, int count)
+{
+    if (playerID < 0)return;
+
+    saveInputPhoton[playerID].buttonCount = count;
 }
 
 int PhotonLib::SendMs()
@@ -1302,6 +1330,10 @@ void PhotonLib::customEventAction(int playerNr, nByte eventCode, const ExitGames
             case NetData::DATA_KIND::CROWN:
                 if (isGamePlay)
                     CrownRecv(ne[0]);
+                break;
+            case NetData::DATA_KIND::BUTTON:
+                if (isGamePlay)
+                    ButtonRecv(ne[0]);
                 break;
             }
         }
@@ -1680,6 +1712,17 @@ void PhotonLib::CrownRecv(NetData recvData)
     }
 }
 
+//by上野
+void PhotonLib::ButtonRecv(NetData recvData)
+{
+
+    if (recvData.playerId >= 0)
+    {
+        //ボタンを押した回数を送る
+        saveInputPhoton[recvData.playerId].buttonCount = recvData.buttonData.buttoncount;
+    }
+}
+
 //送信
 void PhotonLib::sendGameData(void)
 {
@@ -1967,6 +2010,7 @@ void PhotonLib::sendGameModeData(void)
                 sendCrownData();
                 break;
                 case int(PVPGameSystem::GAME_MODE::Button) :
+                    sendButtonData();
                     break;
     }
 }
@@ -2070,6 +2114,38 @@ void PhotonLib::sendCrownData(void)
     mLoadBalancingClient.opRaiseEvent(true, event, 0);
     //特定のナンバーに送信
     //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+}
+
+void PhotonLib::sendButtonData(void)
+{
+    ExitGames::Common::Hashtable event;
+    std::vector<NetData> n;
+    NetData& netD = n.emplace_back(NetData());
+    //ID
+    int myPhotonID = GetMyPhotonID();
+    netD.photonId = myPhotonID;
+    //ID
+    int myPlayerID = GetMyPlayerID();
+    netD.playerId = myPlayerID;
+    netD.isMasterClient = GetIsMasterPlayer();
+    ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
+
+    //gamemode
+    netD.gameMode = gameMode;
+
+    //種別をボタンに
+    netD.dataKind = NetData::DATA_KIND::BUTTON;
+
+    //クラウン所持時間送信
+    if (myPlayerID >= 0)
+        netD.buttonData.buttoncount = saveInputPhoton[myPlayerID].buttonCount;
+
+    std::stringstream s = NetDataSendCast(n);
+    auto ne = NetDataRecvCast(s.str());
+    event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
+    int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
+    //自分以外全員に送信
+    mLoadBalancingClient.opRaiseEvent(true, event, 0);
 }
 
 //プレイヤー追加

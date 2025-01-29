@@ -36,7 +36,7 @@
 #include "Component\GameSystem\RespawnCom.h"
 #include "Component\System\CrownCom.h"
 #include "Component\System\pingCom.h"
-
+#include "Component\System\ButtonCom.h"
 #include "Component/Renderer/InstanceRendererCom.h"
 
 #include "Netwark/Photon/Photon_lib.h"
@@ -158,7 +158,7 @@ void ScenePVP::Initialize()
     photonNet = std::make_unique<BasicsApplication>(l);
 
     //ゲームシステム
-    pvpGameSystem = std::make_unique<PVPGameSystem>();
+    pvpGameSystem = std::make_shared<PVPGameSystem>();
 
     //UI初期化
     PlayerUIManager::Instance().ResetAllyHp();
@@ -544,6 +544,46 @@ void ScenePVP::InitializePVP()
         crawneffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crawn_pvp.gpuparticle", 4000);
     }
     break;
+    case PVPGameSystem::GAME_MODE::Button:
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("time");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 900,0 };
+        font->scale = 1.5f;
+        font->color = { 1,1,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("ButtonAlly");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 1091,23 };
+        font->scale = 1.0f;
+        font->color = { 0,0,1,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = gameModeUI->AddChildObject();
+        obj->SetName("ButtonCountEnemy");
+        std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024);
+        font->position = { 829,23 };
+        font->scale = 1.0f;
+        font->color = { 1,0,0,1 };
+    }
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("ButtonArea");
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
+
+        //コライダーセット
+        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
+        sphere->SetMyTag(COLLIDER_TAG::Button);
+        sphere->SetJudgeTag(COLLIDER_TAG::Player);
+
+        //ボタンのコンポーネントを付与する
+        std::shared_ptr<ButtonCom>b = obj->AddComponent<ButtonCom>();
+        b->SetPVPGameSystem(pvpGameSystem);
+    }
+    break;
     }
 
     //キャラピックオブジェクトを消去
@@ -703,8 +743,6 @@ void ScenePVP::Update(float elapsedTime)
         //仮遷移
         if (!SceneManager::Instance().GetTransitionFlag())
         {
-            //SceneResult* result = new SceneResult;
-
             int Pid = net->GetMyPlayerID();
             if (Pid >= 0)
             {
@@ -728,7 +766,6 @@ void ScenePVP::Update(float elapsedTime)
                     data.myTeam = (myTeamID == netI.teamID);
                     data.playerID = i;
 
-                    //result->resultDatas[i] = data;
                     if (data.myTeam)
                     {
                         if (!teamMyJudge)
@@ -753,7 +790,7 @@ void ScenePVP::Update(float elapsedTime)
                         DelivertResultData::Instance().SetIsMyWin(data.isWin);
                 }
             }
-            SceneManager::Instance().ChangeSceneDelay(new SceneResult,0.8f );
+            SceneManager::Instance().ChangeSceneDelay(new SceneResult, 1.2f);
         }
     }
 
@@ -1046,6 +1083,12 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     break;
     case PVPGameSystem::GAME_MODE::Button:
 
+        //ゲームシステムに送信
+        auto& DM = pvpGameSystem->GetButtonData();
+        DM.teamData[PVPGameSystem::TEAM_KIND::RED_GROUP].buttoncount = net->GetButtonCount(PVPGameSystem::TEAM_KIND::RED_GROUP);
+        DM.teamData[PVPGameSystem::TEAM_KIND::BLUE_GROUP].buttoncount = net->GetButtonCount(PVPGameSystem::TEAM_KIND::BLUE_GROUP);
+        DM.nowTime = net->GetNowTime();
+
         break;
     }
 }
@@ -1228,6 +1271,17 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
 
                         break;
                     }
+                    else if (f.id == 13)    //入室
+                    {
+                        if (lobbyF->str.length() > 0)
+                        {
+                            auto net = photonNet->GetPhotonLib();
+                            net->SetRoomName(lobbyF->str);
+                            net->StartConnect();
+                        }
+
+                        break;
+                    }
                     else if (f.id == 14)    //名前決定
                     {
                         auto& nameStr = fP->GetChildFind(("lobbySelectFont" + std::to_string(16)).c_str());  //文字
@@ -1394,6 +1448,10 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                     if (f.id == 12) //王冠
                     {
                         net->SetGameMode(2);
+                    }
+                    if (f.id == 13) //エリアブレイク
+                    {
+                        net->SetGameMode(3);
                     }
 
                     //ヒット情報リセット
@@ -1654,6 +1712,28 @@ void ScenePVP::GameUpdate(float elapsedTime)
         {
             crownA->str = UTF8ToWString2(std::to_string(int(cro.teamData[1].crownTime)));
             crownE->str = UTF8ToWString2(std::to_string(int(cro.teamData[0].crownTime)));
+        }
+    }
+    break;
+    case PVPGameSystem::GAME_MODE::Button:
+    {
+        auto& gameModeUI = GameObjectManager::Instance().Find("gameModeUI");
+        auto& time = gameModeUI->GetChildFind("time")->GetComponent<Font>();
+        auto& buttonA = gameModeUI->GetChildFind("ButtonAlly")->GetComponent<Font>();
+        auto& buttonE = gameModeUI->GetChildFind("ButtonCountEnemy")->GetComponent<Font>();
+        auto& count = pvpGameSystem->GetButtonData();
+        time->str = UTF8ToWString2(std::to_string(int(count.endTime - count.nowTime)));
+
+        //チームによって変える
+        if (netData.GetTeamID() == 0)
+        {
+            buttonA->str = UTF8ToWString2(std::to_string(count.teamData[0].buttoncount));
+            buttonE->str = UTF8ToWString2(std::to_string(count.teamData[1].buttoncount));
+        }
+        else
+        {
+            buttonA->str = UTF8ToWString2(std::to_string(count.teamData[1].buttoncount));
+            buttonE->str = UTF8ToWString2(std::to_string(count.teamData[0].buttoncount));
         }
     }
     break;
