@@ -252,7 +252,7 @@ void TrainingManager::CharaSelectUpdate(float elapsedTime)
         CharaSelectUnHindOBJ();
         charaPicks->SetViewCharaPicks(true);
         flag = true;
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, true);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, 0.5f, true);
     }
 
     charaPicks->CharaPicksUpdate(elapsedTime);

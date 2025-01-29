@@ -170,7 +170,7 @@ void ScenePVP::InitializeLobbySelect()
 {
     //îwåi
     InitializeBack();
-    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, true);
+    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, 0.5f, true);
 
     //font
     std::shared_ptr<GameObject> FParent = GameObjectManager::Instance().Create();
