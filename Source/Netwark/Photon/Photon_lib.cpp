@@ -451,6 +451,16 @@ void PhotonLib::ImGui()
         ImGui::TreePop();
     }
 
+    //ボタン所持時間
+    if (ImGui::TreeNode("button"))
+    {
+        for (auto& s : saveInputPhoton)
+        {
+            ImGui::InputInt(std::string(s.name).c_str(), &s.buttonCount);
+        }
+        ImGui::TreePop();
+    }
+
     //マスタークライアントか
     bool isMaster = GetIsMasterPlayer();
     ImGui::Checkbox("master", &isMaster);
@@ -878,6 +888,17 @@ float PhotonLib::GetCrownTimerCount(int team)
     {
         if (s.teamID == team)
             count += s.crownTimer;
+    }
+    return count;
+}
+
+int PhotonLib::GetButtonCount(int team)
+{
+    int count = 0;
+    for (auto& s : saveInputPhoton)
+    {
+        if (s.teamID == team)
+            count += s.buttonCount;
     }
     return count;
 }

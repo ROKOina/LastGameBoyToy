@@ -80,6 +80,8 @@ public:
     int GetKillCount(int team);
     //クラウン所持時間取得
     float GetCrownTimerCount(int team);
+    //ボタン押した回数
+    int GetButtonCount(int team);
 
     int GetMyPhotonID();
     int GetMyPlayerID();
@@ -185,6 +187,9 @@ public:
         //クラウン
         //所持時間
         float crownTimer = 0;
+
+        //ボタンを押した回数by上野
+        int buttonCount = 0;
 
         //次の入力情報を格納
         struct NextInput
