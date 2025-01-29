@@ -445,7 +445,7 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
-    bulletCom->SetDamageValue(damage);
+    bulletCom->SetDamageValue(-damage);
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
     k->SetKnockBackForce({ 18,5,18 });
@@ -453,6 +453,8 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
     //判定用
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
+    auto& m = objPoint->GetComponent<MovementCom>();
+    hit->SetValue3({ m->GetNonMaxSpeedVelocity().x, m->GetVelocity().y, m->GetNonMaxSpeedVelocity().z });
 
     return colObj;
 }
@@ -513,7 +515,6 @@ GameObj BulletCreate::JankratMineFire(std::shared_ptr<GameObject> parent, Direct
 {
     //発射位置算出用変数定義
     DirectX::XMFLOAT3 fpsDir = dir;
-    //DirectX::XMFLOAT3 fpsDir = parent->GetComponent<CharacterCom>()->GetFpsCameraDir();
 
     //弾丸オブジェクト生成
     GameObj bullet = GameObjectManager::Instance().Create();
@@ -660,7 +661,7 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
         auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
         for (auto& b : saveB)
         {
-            if (CharacterInput::MainSkillButton_E & b.inputDown)
+            if (CharacterInput::SubAttackButton & b.inputDown)
             {
                 fpsDir = b.fpsDir;
                 firePos = b.gunPos;
@@ -743,6 +744,8 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
     hit->SetValue(damageValue);
+    auto& m = objPoint->GetComponent<MovementCom>();
+    hit->SetValue3({ m->GetNonMaxSpeedVelocity().x, m->GetVelocity().y, m->GetNonMaxSpeedVelocity().z });
 }
 
 //ソルジャースタン

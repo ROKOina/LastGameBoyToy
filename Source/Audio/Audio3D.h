@@ -71,12 +71,10 @@ struct AUDIO_STATE
 
 enum class AUDIOID2D
 {
-    BGM,
-    SE,
-
     SCENE_GAME1,
     SCENE_GAME2,
     SCENE_TITLE,
+    SCENE_LOBBY,
     CURSOR,
     ENTER,
     BOSS_JUMPATTACK_START,
@@ -188,17 +186,17 @@ public:
 
     void Audio2DPlay(AUDIOID2D id, float volume = 1, bool loop = false);
     void Audio2DStop(AUDIOID2D id);
+    void Audio2DStopAll();
     void Audio2DFeed(AUDIOID2D id, float start, float end) {}
 
 private:
     void Register2DAudio(IXAudio2* x2d)
     {
         //2Dオーディオ登録
-        audio2DResources[AUDIOID2D::BGM] = AudioResource2DStr(x2d, "Data/AudioData/TestAudio/BGM.wav");
-        audio2DResources[AUDIOID2D::SE] = AudioResource2DStr(x2d, "Data/AudioData/TestAudio/SE.wav");
         audio2DResources[AUDIOID2D::SCENE_GAME1] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
         audio2DResources[AUDIOID2D::SCENE_GAME2] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
-        audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/Indomitable.wav");
+        audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
+        audio2DResources[AUDIOID2D::SCENE_LOBBY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/LobbyBGM.wav");
         audio2DResources[AUDIOID2D::CURSOR] = AudioResource2DStr(x2d, "Data/AudioData/SE/cursorMove.wav");
         audio2DResources[AUDIOID2D::ENTER] = AudioResource2DStr(x2d, "Data/AudioData/SE/enter.wav");
         audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_START] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_start.wav");
@@ -296,9 +294,6 @@ private:
 
 enum AUDIOID3D
 {
-    BGM,
-    SE,
-    TEST,
     PLAYER_WAKL,
 
     //ハンゾー
@@ -363,9 +358,6 @@ private:
     void Register3DAudio()
     {
         //3Dオーディオ登録
-        audio3DResources[AUDIOID3D::BGM] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
-        audio3DResources[AUDIOID3D::SE] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
-        audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
         audio3DResources[AUDIOID3D::PLAYER_WAKL] = std::make_shared<AudioResource>("Data/AudioData/SE/player/player_walk.wav");
 
         audio3DResources[AUDIOID3D::HANZO_ATK] = std::make_shared<AudioResource>("Data/AudioData/SE/player/mono/kanizo/player_shoot.wav");

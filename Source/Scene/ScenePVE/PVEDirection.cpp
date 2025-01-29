@@ -84,6 +84,7 @@ void PVEDirection::CharaSlect(float elapsedTime)
 
         charaPicks->SetViewCharaPicks(true);
         flag = true;
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, true);
     }
 
     // キャラピック更新処理
@@ -99,6 +100,7 @@ void PVEDirection::CharaSlect(float elapsedTime)
             GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("CharaPicksCanvas"));
             deleyFlag = true;
             GameObjectManager::Instance().Find("player")->SetEnabled(false);
+            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_LOBBY);
         }
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);

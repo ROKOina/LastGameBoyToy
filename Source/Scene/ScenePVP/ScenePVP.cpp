@@ -170,6 +170,7 @@ void ScenePVP::InitializeLobbySelect()
 {
     //”wŒi
     InitializeBack();
+    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, true);
 
     //font
     std::shared_ptr<GameObject> FParent = GameObjectManager::Instance().Create();
@@ -1539,6 +1540,8 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
         post->SetParameter(1.4f, 1.0f, parameters); //–¾“]
 
         net->PlayGameStart();
+
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_LOBBY);
     }
 
     //ƒsƒbƒNŠm’è

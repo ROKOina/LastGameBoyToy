@@ -9,6 +9,7 @@
 #include "Component\Renderer\VideoCom.h"
 #include "SystemStruct\TimeManager.h"
 #include "Component\PostEffect\PostEffect.h"
+#include "Audio/Audio3D.h"
 
 CharaPicks::CharaPicks()
 {
@@ -201,6 +202,10 @@ void CharaPicks::CharaDetails(float elapsedTime)
             // キャラ選択処理
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && selected.sprite->GetHitSprite())
             {
+                Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
+                // セレクト音
+                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR);
+
                 selected.name->SetEnabled(true);
                 selected.charamodel->GetComponent<RendererCom>()->SetEnabled(true);
                 selected.name->GetComponent<Sprite>()->EasingPlay();
@@ -324,6 +329,10 @@ void CharaPicks::DecisionButton()
     // OKボタンが押され、かつキャラが選択されている場合のみ処理を実行
     if (selectedCharacterId != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && sprite->GetHitSprite())
     {
+        // 決定音
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
+
         decisionFlg = true;
         GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("charapickcamera"));
     }
@@ -415,5 +424,7 @@ void CharaPicks::SetViewCharaPicks(bool flg)
         GameObjectManager::Instance().Find("lobbyBackParent")->SetEnabled(false);
     }
     else
+    {
         charaPicksCanvas->SetEnabled(false);
+    }
 }
