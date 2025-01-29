@@ -310,6 +310,16 @@ enum AUDIOID3D
     SE,
     TEST,
     PLAYER_WAKL,
+<<<<<<< HEAD
+=======
+    
+    //ハンゾー
+    HANZO_ATK,
+    HANZO_SKILL1,
+    HANZO_SKILL2,
+    HANZO_ULT,
+    HANZO_ULT_FAILD,
+>>>>>>> Jankra
 
     //ファラ
     FARAH_JET,
@@ -331,6 +341,9 @@ enum AUDIOID3D
     SOLDIER_SKILL1,
     SOLDIER_SKILL2,
     SOLDIER_ULT,
+
+    //ボス
+    BOSS_,
 
     MAX_
 };
