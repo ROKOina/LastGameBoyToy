@@ -38,6 +38,7 @@ enum COLLIDER_TAG : uint64_t
 
     UnderStand = 1 << 21,   //’†—§
     Crown = 1 << 22,
+    Button=1<<23,
 
     //ƒsƒ“
     pin = 1 << 25,

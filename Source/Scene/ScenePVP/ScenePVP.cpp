@@ -568,6 +568,16 @@ void ScenePVP::InitializePVP()
         font->scale = 1.0f;
         font->color = { 1,0,0,1 };
     }
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("ButtonArea");
+        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
+
+        //コライダーセット
+        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
+        sphere->SetMyTag(COLLIDER_TAG::Button);
+        sphere->SetJudgeTag(COLLIDER_TAG::Player);
+    }
     break;
     }
 
