@@ -84,7 +84,7 @@ void PVEDirection::CharaSlect(float elapsedTime)
 
         charaPicks->SetViewCharaPicks(true);
         flag = true;
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, true);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, 0.5f, true);
     }
 
     // キャラピック更新処理
