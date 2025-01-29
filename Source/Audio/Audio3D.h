@@ -71,9 +71,6 @@ struct AUDIO_STATE
 
 enum class AUDIOID2D
 {
-    BGM,
-    SE,
-
     SCENE_GAME1,
     SCENE_GAME2,
     SCENE_TITLE,
@@ -201,8 +198,6 @@ private:
     void Register2DAudio(IXAudio2* x2d)
     {
         //2Dオーディオ登録
-        audio2DResources[AUDIOID2D::BGM] = AudioResource2DStr(x2d, "Data/AudioData/TestAudio/BGM.wav");
-        audio2DResources[AUDIOID2D::SE] = AudioResource2DStr(x2d, "Data/AudioData/TestAudio/SE.wav");
         audio2DResources[AUDIOID2D::SCENE_GAME1] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
         audio2DResources[AUDIOID2D::SCENE_GAME2] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
         audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
@@ -309,9 +304,6 @@ private:
 
 enum AUDIOID3D
 {
-    BGM,
-    SE,
-    TEST,
     PLAYER_WAKL,
 
     //ハンゾー
@@ -376,9 +368,6 @@ private:
     void Register3DAudio()
     {
         //3Dオーディオ登録
-        audio3DResources[AUDIOID3D::BGM] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/BGM.wav");
-        audio3DResources[AUDIOID3D::SE] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/heli.wav");
-        audio3DResources[AUDIOID3D::TEST] = std::make_shared<AudioResource>("Data/AudioData/TestAudio/SE.wav");
         audio3DResources[AUDIOID3D::PLAYER_WAKL] = std::make_shared<AudioResource>("Data/AudioData/SE/player/player_walk.wav");
 
         audio3DResources[AUDIOID3D::FARAH_JET] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/jeat.wav");
