@@ -1988,6 +1988,7 @@ void PhotonLib::sendGameModeData(void)
                 sendCrownData();
                 break;
                 case int(PVPGameSystem::GAME_MODE::Button) :
+                    sendButtonData();
                     break;
     }
 }
@@ -2091,6 +2092,34 @@ void PhotonLib::sendCrownData(void)
     mLoadBalancingClient.opRaiseEvent(true, event, 0);
     //特定のナンバーに送信
     //mLoadBalancingClient.opRaiseEvent(true, event, 0, ExitGames::LoadBalancing::RaiseEventOptions().setTargetPlayers(&myPlayerNumber, 1));
+}
+
+void PhotonLib::sendButtonData(void)
+{
+    ExitGames::Common::Hashtable event;
+    std::vector<NetData> n;
+    NetData& netD = n.emplace_back(NetData());
+    //ID
+    int myPhotonID = GetMyPhotonID();
+    netD.photonId = myPhotonID;
+    //ID
+    int myPlayerID = GetMyPlayerID();
+    netD.playerId = myPlayerID;
+    netD.isMasterClient = GetIsMasterPlayer();
+    ::strncpy_s(netD.name, sizeof(netD.name), netName.c_str(), sizeof(netD.name));
+
+    //gamemode
+    netD.gameMode = gameMode;
+
+    //種別をボタンに
+    netD.dataKind = NetData::DATA_KIND::BUTTON;
+
+    std::stringstream s = NetDataSendCast(n);
+    auto ne = NetDataRecvCast(s.str());
+    event.put(static_cast<nByte>(0), ExitGames::Common::JString(s.str().c_str()));
+    int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
+    //自分以外全員に送信
+    mLoadBalancingClient.opRaiseEvent(true, event, 0);
 }
 
 //プレイヤー追加

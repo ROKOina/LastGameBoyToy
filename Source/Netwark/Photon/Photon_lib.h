@@ -266,6 +266,7 @@ private:
     void sendGameModeData(void);
     void sendDeathMatchData(void);
     void sendCrownData(void);
+    void sendButtonData(void);
 
     // events, triggered by certain operations of all players in the same room
     //“üŽºŽž‚É“ü‚é
