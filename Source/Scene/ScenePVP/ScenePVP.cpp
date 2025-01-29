@@ -652,6 +652,7 @@ void ScenePVP::InitializeBack()
 void ScenePVP::Finalize()
 {
     photonNet->close();
+    Audio2DMagaer::Instance().Audio2DStopAll();
 }
 
 void TransitionRemove(std::vector<std::weak_ptr<GameObject>>& removeObjs)
@@ -1258,6 +1259,12 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                             net->StartConnect();
                         }
 
+                        // SE
+                        {
+                            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
+                            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER, 1.0f, false);
+                        }
+
                         break;
                     }
                     else if (f.id == 12)    //入室
@@ -1269,6 +1276,12 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                             net->StartConnect();
                         }
 
+                        // SE
+                        {
+                            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
+                            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER, 1.0f, false);
+                        }
+
                         break;
                     }
                     else if (f.id == 13)    //入室
@@ -1278,6 +1291,12 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                             auto net = photonNet->GetPhotonLib();
                             net->SetRoomName(lobbyF->str);
                             net->StartConnect();
+                        }
+
+                        // SE
+                        {
+                            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
+                            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER, 1.0f, false);
                         }
 
                         break;
@@ -1294,8 +1313,21 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                             fontState = 0;
                         }
 
+                        // SE
+                        {
+                            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
+                            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER, 1.0f, false);
+                        }
+
                         break;
                     }
+
+                    if (f.id != 3 || f.id != 12 || f.id != 13 || f.id != 14) // SE                    
+                    {
+                        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
+                        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
+                    }
+
                     //ヒット情報リセット
                     for (auto& f : lobbySelectFont)
                     {
@@ -1304,6 +1336,7 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                         auto& backUi = backf->GetComponent<UiSystem>();
                         backUi->SetHitSprite(false);
                     }
+
                 }
             }
             else
@@ -1366,6 +1399,12 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                     auto& lobbyF = lobbyStr->GetComponent<Font>();
                     lobbyF->str = room;
                     joinRoomCount = count;
+
+                    // SE
+                    {
+                        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
+                        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
+                    }
 
                     break;
                 }
@@ -1438,6 +1477,11 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                     if (f.id == 2)
                     {
                         net->SetIsCharaSelect();
+                        // SE
+                        {
+                            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
+                            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER, 1.0f, false);
+                        }
                     }
 
                     //ゲームモード
@@ -1452,6 +1496,12 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                     if (f.id == 13) //エリアブレイク
                     {
                         net->SetGameMode(3);
+                    }
+
+                    // SE
+                    {
+                        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
+                        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
                     }
 
                     //ヒット情報リセット
@@ -1551,6 +1601,12 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                             teamColorUI->spc.color = { 0,0,1,1 };
                         else
                             teamColorUI->spc.color = { 1,0,0,1 };
+
+                        // SE
+                        {
+                            Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
+                            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
+                        }
                     }
                 }
 
