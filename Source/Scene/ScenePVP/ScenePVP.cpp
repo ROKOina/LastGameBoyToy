@@ -580,7 +580,6 @@ void ScenePVP::InitializePVP()
 
         //ボタンのコンポーネントを付与する
         std::shared_ptr<ButtonCom>b = obj->AddComponent<ButtonCom>();
-        b->SetPVPGameSystem(pvpGameSystem);
     }
     break;
     }
@@ -1081,6 +1080,10 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     }
     break;
     case PVPGameSystem::GAME_MODE::Button:
+        //プッシュ回数をネットに送信
+        auto& button = GameObjectManager::Instance().Find("ButtonArea")->GetComponent<ButtonCom>();
+        if (net->GetMyPlayerID() >= 0)
+            net->SetButtonPusu(net->GetMyPlayerID(), button->GetPushCount());
 
         //ゲームシステムに送信
         auto& DM = pvpGameSystem->GetButtonData();

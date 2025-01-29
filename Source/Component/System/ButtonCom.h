@@ -24,16 +24,15 @@ public:
     // GUI描画
     void OnGUI() override;
 
-    //データを移動する
-    void SetPVPGameSystem(const std::weak_ptr<PVPGameSystem>& system) { pvpGameSystem = system; }
+    int GetPushCount() { return pushCount; }
 
 private:
 
     //ボタンに触れたら
-    void ButtonTouch();
+    void ButtonTouch(float elapsedTime);
 
 private:
 
-    //ゲームシステム
-    std::weak_ptr<PVPGameSystem> pvpGameSystem;
+    float nonPushTimer = 0; //押した後に押せなくする
+    int pushCount = 0;
 };

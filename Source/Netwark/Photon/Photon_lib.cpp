@@ -2136,7 +2136,7 @@ void PhotonLib::sendButtonData(void)
     //種別をボタンに
     netD.dataKind = NetData::DATA_KIND::BUTTON;
 
-    //クラウン所持時間送信
+    //ボタン回数送信
     if (myPlayerID >= 0)
         netD.buttonData.buttoncount = saveInputPhoton[myPlayerID].buttonCount;
 

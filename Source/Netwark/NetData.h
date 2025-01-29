@@ -305,6 +305,7 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     }
     if (h.dataKind == NetData::DATA_KIND::BUTTON)
     {
+        out << h.buttonData.buttoncount << " ";
     }
 
     return out;
@@ -377,6 +378,7 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     }
     if (h.dataKind == NetData::DATA_KIND::BUTTON)
     {
+        in >> h.buttonData.buttoncount;
     }
 
     return in;
