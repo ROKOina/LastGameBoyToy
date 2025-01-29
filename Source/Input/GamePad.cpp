@@ -156,6 +156,7 @@ void GamePad::Update()
         if (GetAsyncKeyState('P') & 0x8000)newButtonState |= BTN_P;
         if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)newButtonState |= ESC;
         if (GetAsyncKeyState(VK_MBUTTON) & 0x8000)newButtonState |= NAKA_BUTTON;
+        if (GetAsyncKeyState(VK_RETURN) & 0x8000)newButtonState |= ENTER;
 
         //if (GetAsyncKeyState(VK_UP) & 0x8000)		newButtonState |= BTN_UP;
         //if (GetAsyncKeyState(VK_RIGHT) & 0x8000)	newButtonState |= BTN_RIGHT;

@@ -30,6 +30,7 @@ public:
     static const GamePadButton BTN_P = (1 << 19);
     static const GamePadButton ESC = (1 << 20);
     static const GamePadButton NAKA_BUTTON = (1 << 21);
+    static const GamePadButton ENTER = (1 << 22);
 
 public:
     GamePad() {}
