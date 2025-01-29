@@ -232,7 +232,7 @@ void FarahCom::GroundBomber(float elapsedTime)
             movecom->SetIsRaycast(false);
             movecom->ZeroVelocity();
             movecom->ZeroNonMaxSpeedVelocity();
-            obj.lock()->GetComponent<SphereColliderCom>()->SetRadius(2.1f);
+            obj.lock()->GetComponent<SphereColliderCom>()->SetRadius(2.6f);
         }
 
         // ”š”­ƒtƒ‰ƒOˆ—

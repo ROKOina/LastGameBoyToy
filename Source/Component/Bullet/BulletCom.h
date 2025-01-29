@@ -63,8 +63,8 @@ public:
     static void DamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = 10);
 
     //ファラ通常弾
-    static GameObj FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1, int damageValue = 10);
-    static GameObj FarahKnockBack(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float power = 1);
+    static GameObj FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, int damageValue = 10);
+    static GameObj FarahKnockBack(std::shared_ptr<GameObject> objPoint, float bulletSpeed = 40, float damage = 1);
 
     //ジャンクラの弾
     static GameObj JankratBulletFire(std::shared_ptr<GameObject> parent, DirectX::XMFLOAT3 pos, int id);

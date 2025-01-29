@@ -17,7 +17,7 @@
 #include <array>
 
 CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 3)
-CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 3)
+CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 4)
 
 // シリアライズ
 namespace DirectX
@@ -121,10 +121,13 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
     );
 
     // バージョン1およびバージョン2には存在しないフィールドにはデフォルト値を与える
-    if (version == 1 || version == 2)
+    if (version == 1 || version == 2 || version == 3)
     {
         worldpos = 0;
-        iscurve = false; // バージョン3で追加されたフィールドにデフォルト値を設定
+        iscurve = false;
+        columns = 1;
+        rows = 1;
+        animationrate = 1.0f;
     }
     if (version >= 2)
     {
@@ -138,6 +141,15 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
         archive
         (
             CEREAL_NVP(iscurve) // バージョン3以降でシリアライズ
+        );
+    }
+    if (version >= 4)
+    {
+        archive
+        (
+            CEREAL_NVP(columns),
+            CEREAL_NVP(rows),
+            CEREAL_NVP(animationrate)
         );
     }
 }
@@ -779,6 +791,7 @@ void GPUParticle::ParameterGUI()
         ImGui::DragFloat(J(u8"パーティクルの寿命"), &m_GSC.lifeTime, 0.1f, 0.0f, 5.0f);
         ImGui::TreePop();
     }
+    AnimationGUI();
     EmitGUI();
     SpeedGUI();
     ScaleGUI();
@@ -887,6 +900,17 @@ void GPUParticle::EmitGUI()
         ImGui::SetNextItemWidth(90);
         ImGui::DragFloat(J(u8"スパイラル強度"), &m_GSC.spiralstrong, 0.1f, 0.0f, 20.0f);
 
+        ImGui::TreePop();
+    }
+}
+
+void GPUParticle::AnimationGUI()
+{
+    if (ImGui::TreeNode(J(u8"アニメーション関係")))
+    {
+        ImGui::InputInt((char*)u8"スプライトの列数", &m_GSC.columns);
+        ImGui::InputInt((char*)u8"スプライトの行数", &m_GSC.rows);
+        ImGui::DragFloat((char*)u8"アニメーション速度", &m_GSC.animationrate, 0.1f, 0.0f, 60.0f);
         ImGui::TreePop();
     }
 }

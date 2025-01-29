@@ -13,25 +13,25 @@
 #include "Component/System/Component.h"
 #include "SystemStruct/Misc.h"
 
-    // Global defines
+// Global defines
 #define INPUTCHANNELS 1  // number of source channels
 #define OUTPUTCHANNELS 8 // maximum number of destination channels supported in this sample
 
 #define NUM_PRESETS 30
 
 // Constants to define our world space
-    constexpr INT XMIN = -10;
-    constexpr INT XMAX = 10;
-    constexpr INT ZMIN = -10;
-    constexpr INT ZMAX = 10;
+constexpr INT XMIN = -10;
+constexpr INT XMAX = 10;
+constexpr INT ZMIN = -10;
+constexpr INT ZMAX = 10;
 
-    static const X3DAUDIO_CONE Listener_DirectionalCone = { X3DAUDIO_PI * 5.0f / 6.0f, X3DAUDIO_PI * 11.0f / 6.0f, 1.0f, 0.75f, 0.0f, 0.25f, 0.708f, 1.0f };
+static const X3DAUDIO_CONE Listener_DirectionalCone = { X3DAUDIO_PI * 5.0f / 6.0f, X3DAUDIO_PI * 11.0f / 6.0f, 1.0f, 0.75f, 0.0f, 0.25f, 0.708f, 1.0f };
 
-    static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_LFE_CurvePoints[3] = { 0.0f, 1.0f, 0.25f, 0.0f, 1.0f, 0.0f };
-    static const X3DAUDIO_DISTANCE_CURVE       Emitter_LFE_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_LFE_CurvePoints[0], 3 };
+static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_LFE_CurvePoints[3] = { 0.0f, 1.0f, 0.25f, 0.0f, 1.0f, 0.0f };
+static const X3DAUDIO_DISTANCE_CURVE       Emitter_LFE_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_LFE_CurvePoints[0], 3 };
 
-    static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_Reverb_CurvePoints[3] = { 0.0f, 0.5f, 0.75f, 1.0f, 1.0f, 0.0f };
-    static const X3DAUDIO_DISTANCE_CURVE       Emitter_Reverb_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_Reverb_CurvePoints[0], 3 };
+static const X3DAUDIO_DISTANCE_CURVE_POINT Emitter_Reverb_CurvePoints[3] = { 0.0f, 0.5f, 0.75f, 1.0f, 1.0f, 0.0f };
+static const X3DAUDIO_DISTANCE_CURVE       Emitter_Reverb_Curve = { (X3DAUDIO_DISTANCE_CURVE_POINT*)&Emitter_Reverb_CurvePoints[0], 3 };
 
 struct AUDIO_STATE
 {
@@ -67,7 +67,6 @@ struct AUDIO_STATE
     bool  fUseRedirectToLFE;
 
     FLOAT32 matrixCoefficients[INPUTCHANNELS * OUTPUTCHANNELS];
-
 };
 
 enum class AUDIOID2D
@@ -134,7 +133,6 @@ enum class AUDIOID2D
     TUTOLINES_30,
     TUTOLINES_31,
 
-
     MAX_
 };
 
@@ -147,7 +145,6 @@ public:
         static Audio2DMagaer instance;
         return instance;
     }
-
 
     Audio2DMagaer() {
         HRESULT hr;
@@ -202,65 +199,64 @@ private:
     void Register2DAudio(IXAudio2* x2d)
     {
         //2Dオーディオ登録
-        audio2DResources[AUDIOID2D::BGM] =                  AudioResource2DStr(x2d,"Data/AudioData/TestAudio/BGM.wav");
-        audio2DResources[AUDIOID2D::SE] =                   AudioResource2DStr(x2d,"Data/AudioData/TestAudio/SE.wav");
-        audio2DResources[AUDIOID2D::SCENE_GAME1] =          AudioResource2DStr(x2d,"Data/AudioData/BGM/BossBattle_start.wav");
-        audio2DResources[AUDIOID2D::SCENE_GAME2] =          AudioResource2DStr(x2d,"Data/AudioData/BGM/BossBattle_clymax.wav");
-        audio2DResources[AUDIOID2D::SCENE_TITLE] =          AudioResource2DStr(x2d,"Data/AudioData/BGM/Indomitable.wav");
-        audio2DResources[AUDIOID2D::CURSOR] =               AudioResource2DStr(x2d,"Data/AudioData/SE/cursorMove.wav");
-        audio2DResources[AUDIOID2D::ENTER] =                AudioResource2DStr(x2d,"Data/AudioData/SE/enter.wav");
-        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_START] =    AudioResource2DStr(x2d,"Data/AudioData/SE/boss_jumpAttack_start.wav");
-        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_END] =      AudioResource2DStr(x2d,"Data/AudioData/SE/boss_jumpAttack_end.wav");
-        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_GROUND] =   AudioResource2DStr(x2d,"Data/AudioData/SE/boss_jumpAttack_ground3.wav");
-        audio2DResources[AUDIOID2D::BOSS_SHOT] =                AudioResource2DStr(x2d,"Data/AudioData/SE/boss_shot.wav");
-        audio2DResources[AUDIOID2D::BOSS_POWERSHOT] =           AudioResource2DStr(x2d,"Data/AudioData/SE/boss_powerShot.wav");
-        audio2DResources[AUDIOID2D::BOSS_CHARGE] =              AudioResource2DStr(x2d,"Data/AudioData/SE/boss_charge.wav");
-        audio2DResources[AUDIOID2D::BOSS_BULLET] =              AudioResource2DStr(x2d,"Data/AudioData/SE/boss_fire.wav");
-        audio2DResources[AUDIOID2D::BOSS_PUNCH] =               AudioResource2DStr(x2d,"Data/AudioData/SE/boss_punch.wav");
-        audio2DResources[AUDIOID2D::BOSS_LARIAT] =              AudioResource2DStr(x2d,"Data/AudioData/SE/boss_lariat.wav");
-        audio2DResources[AUDIOID2D::BOSS_WALK] =                AudioResource2DStr(x2d,"Data/AudioData/SE/boss_jumpAttack_ground2.wav");
+        audio2DResources[AUDIOID2D::BGM] = AudioResource2DStr(x2d, "Data/AudioData/TestAudio/BGM.wav");
+        audio2DResources[AUDIOID2D::SE] = AudioResource2DStr(x2d, "Data/AudioData/TestAudio/SE.wav");
+        audio2DResources[AUDIOID2D::SCENE_GAME1] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
+        audio2DResources[AUDIOID2D::SCENE_GAME2] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
+        audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/Indomitable.wav");
+        audio2DResources[AUDIOID2D::CURSOR] = AudioResource2DStr(x2d, "Data/AudioData/SE/cursorMove.wav");
+        audio2DResources[AUDIOID2D::ENTER] = AudioResource2DStr(x2d, "Data/AudioData/SE/enter.wav");
+        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_START] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_start.wav");
+        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_END] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_end.wav");
+        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_GROUND] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_ground3.wav");
+        audio2DResources[AUDIOID2D::BOSS_SHOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_shot.wav");
+        audio2DResources[AUDIOID2D::BOSS_POWERSHOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_powerShot.wav");
+        audio2DResources[AUDIOID2D::BOSS_CHARGE] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_charge.wav");
+        audio2DResources[AUDIOID2D::BOSS_BULLET] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_fire.wav");
+        audio2DResources[AUDIOID2D::BOSS_PUNCH] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_punch.wav");
+        audio2DResources[AUDIOID2D::BOSS_LARIAT] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_lariat.wav");
+        audio2DResources[AUDIOID2D::BOSS_WALK] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_ground2.wav");
 
         //プレイヤー
-        audio2DResources[AUDIOID2D::PLAYER_ATTACKULTBOOM] =     AudioResource2DStr(x2d,"Data/AudioData/SE/player/player_Boom.wav");
-        audio2DResources[AUDIOID2D::PLAYER_ATTACKULTSHOOT] =    AudioResource2DStr(x2d,"Data/AudioData/SE/player/player_attackUltShoot.wav");
-        audio2DResources[AUDIOID2D::PLAYER_CHARGE] =            AudioResource2DStr(x2d,"Data/AudioData/SE/player/player_charge.wav");
-        audio2DResources[AUDIOID2D::PLAYER_DAMAGE] =            AudioResource2DStr(x2d,"Data/AudioData/SE/player/player_damage.wav");
-        audio2DResources[AUDIOID2D::PLAYER_DASH] =              AudioResource2DStr(x2d,"Data/AudioData/SE/player/player_dash2.wav");
-        audio2DResources[AUDIOID2D::PLAYER_SHOOT] =             AudioResource2DStr(x2d,"Data/AudioData/SE/player/player_shoot.wav");
+        audio2DResources[AUDIOID2D::PLAYER_ATTACKULTBOOM] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_Boom.wav");
+        audio2DResources[AUDIOID2D::PLAYER_ATTACKULTSHOOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_attackUltShoot.wav");
+        audio2DResources[AUDIOID2D::PLAYER_CHARGE] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_charge.wav");
+        audio2DResources[AUDIOID2D::PLAYER_DAMAGE] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_damage.wav");
+        audio2DResources[AUDIOID2D::PLAYER_DASH] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_dash2.wav");
+        audio2DResources[AUDIOID2D::PLAYER_SHOOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_shoot.wav");
 
         //チュートリアル
-        audio2DResources[AUDIOID2D::TUTOLINES_01] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/001_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_02] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/002_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_03] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/003_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_04] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/004_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_05] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/005_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_06] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/006_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_07] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/007_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_08] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/008_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_09] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/009_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_10] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/010_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_11] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/011_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_12] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/012_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_13] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/013_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_14] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/014_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_15] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/015_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_16] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/016_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_17] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/017_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_18] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/018_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_19] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/019_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_20] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/020_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_21] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/021_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_22] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/022_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_23] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/023_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_24] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/024_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_25] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/025_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_26] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/026_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_27] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/027_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_28] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/028_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_29] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/029_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_30] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/030_L.wav");
-        audio2DResources[AUDIOID2D::TUTOLINES_31] = AudioResource2DStr(x2d,"Data/AudioData/SE/Tutorial/TutorialLines/031_L.wav");
-
+        audio2DResources[AUDIOID2D::TUTOLINES_01] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/001_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_02] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/002_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_03] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/003_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_04] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/004_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_05] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/005_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_06] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/006_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_07] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/007_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_08] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/008_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_09] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/009_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_10] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/010_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_11] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/011_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_12] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/012_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_13] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/013_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_14] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/014_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_15] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/015_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_16] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/016_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_17] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/017_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_18] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/018_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_19] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/019_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_20] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/020_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_21] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/021_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_22] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/022_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_23] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/023_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_24] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/024_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_25] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/025_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_26] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/026_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_27] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/027_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_28] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/028_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_29] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/029_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_30] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/030_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_31] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/031_L.wav");
     }
 
     ////リソース検索
@@ -282,7 +278,7 @@ private:
         // デフォルトコンストラクタを明示的に定義
         AudioResource2DStr() : sourceVoice_(nullptr) {}
         //初期化
-        AudioResource2DStr(IXAudio2* x2d ,std::string filename)
+        AudioResource2DStr(IXAudio2* x2d, std::string filename)
         {
             resource2D = std::make_shared<AudioResource>(filename.c_str());
 
@@ -295,7 +291,6 @@ private:
 
             HRESULT hr = x2d->CreateSourceVoice(&sourceVoice_, &resource2D->GetWaveFormat());
             _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
         }
 
         std::shared_ptr<AudioResource> resource2D;
@@ -307,7 +302,6 @@ private:
 
     Microsoft::WRL::ComPtr<IXAudio2> xaudio2D;
     IXAudio2MasteringVoice* masteringVoice = nullptr;
-
 };
 
 enum AUDIOID3D
@@ -316,7 +310,7 @@ enum AUDIOID3D
     SE,
     TEST,
     PLAYER_WAKL,
-    
+
     //ファラ
     FARAH_JET,
     FARAH_ATK,
@@ -382,14 +376,12 @@ private:
         audio3DResources[AUDIOID3D::JANKRA_ULT2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/canon2.wav");
         audio3DResources[AUDIOID3D::JANKRA_MINE] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/mine.wav");
         audio3DResources[AUDIOID3D::JANKRA_MINE_FIRE] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/mineBomb.wav");
-    
+
         audio3DResources[AUDIOID3D::SOLDIER_ATK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/gun.wav");
         audio3DResources[AUDIOID3D::SOLDIER_SKILL1] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/stunBullet.wav");
         audio3DResources[AUDIOID3D::SOLDIER_SKILL2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/nockback.wav");
         audio3DResources[AUDIOID3D::SOLDIER_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/stunUlt.wav");
     }
-
-
 
     std::map<AUDIOID3D, std::shared_ptr<AudioResource>> audio3DResources;
 };
@@ -478,7 +470,6 @@ private:
 //
 //    bool audioChangeFlg = false;
 //};
-
 
 //// Global variables
 //extern AUDIO_STATE  g_audioState;

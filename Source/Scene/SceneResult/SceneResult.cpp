@@ -97,7 +97,7 @@ void SceneResult::Initialize()
     MakeResultUI(obj);
     MakeResultModel();
 
-    TimeManager::Instance().SetTimeEffect(1.0f,0.0f);
+    TimeManager::Instance().SetTimeEffect(1.0f, 0.0f);
 
     //イベント用カメラ
     {
@@ -204,7 +204,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         if (i >= 2)frameUiSprite->spc.easingcolor = { 1,45.0f / 255.0f,45.0f / 255.0f,1 };
 
         // キル数
-        {   //一桁目   
+        {   //一桁目
             GameObj killNumObj = uiCanvas->AddChildObject();
             std::string killNumName = std::to_string(i) + "st_PlayerKillNum1";
             killNumObj->SetName(killNumName.c_str());
@@ -228,7 +228,7 @@ void SceneResult::MakeResultUI(GameObj canvas)
         }
 
         // デス数
-        { //一桁目   
+        { //一桁目
             GameObj deathNumObj = uiCanvas->AddChildObject();
             std::string deathNumName = std::to_string(i) + "st_PlayerDeathNum1";
             deathNumObj->SetName(deathNumName.c_str());

@@ -742,6 +742,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         std::shared_ptr<HitProcessCom> hitstan = ultkun->AddComponent<HitProcessCom>(obj);
         hitstan->SetHitType(HitProcessCom::HIT_TYPE::STAN);
         hitstan->SetValue(1.0f);
+        hitstan->SetHitInterval(0.5f);
     }
 
     //ヒットスキャン
@@ -764,7 +765,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         //ダメージ処理用
         std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
         hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-        hitDamage->SetValue(10);
+        hitDamage->SetValue(15);
 
         //キャラクターに登録
         obj->GetComponent<SoldierCom>()->SetAttackRayObj(ultAttckChild);

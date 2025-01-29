@@ -72,6 +72,7 @@ private:
     void ScaleGUI();
     void SpeedGUI();
     void EmitGUI();
+    void AnimationGUI();
     void CurveGUI();
 
 public:
@@ -154,7 +155,9 @@ public:
         float strechscale = { 1.0f };    //ストレッチビルボードの強度(伸びる時の大きさ)
         DirectX::XMFLOAT3 padding = {};
         int iscurve = { false };
-        DirectX::XMFLOAT3 padding2 = {};
+        int columns = { 1 };
+        int rows = { 1 };
+        float animationrate = { 1.0f };
 
         template<class Archive>
         void serialize(Archive& archive, int version);

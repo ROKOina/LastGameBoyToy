@@ -102,13 +102,12 @@ public:
     }
 
     void SendMyDeath() { isMyDeath = true; }
-    bool GetMyDeath() { 
+    bool GetMyDeath() {
         //送信したらリセット
         bool d = isMyDeath;
         isMyDeath = false;
         return d;
     }
-
 
     void ResetData()
     {

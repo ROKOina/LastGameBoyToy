@@ -232,7 +232,7 @@ void BulletCreate::DamageFire(std::shared_ptr<GameObject> objPoint, float bullet
 }
 
 //ファラ通常弾
-GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power, int damageValue)
+GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, float bulletSpeed, int damageValue)
 {
     //発射位置算出用変数定義
     DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
@@ -343,7 +343,7 @@ GameObj BulletCreate::FarahDamageFire(std::shared_ptr<GameObject> objPoint, floa
 }
 
 //ファラのノックバック
-GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float power)
+GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float bulletSpeed, float damage)
 {
     //発射位置算出用変数定義
     DirectX::XMFLOAT3 fpsDir = objPoint->GetComponent<CharacterCom>()->GetFpsCameraDir();
@@ -445,7 +445,7 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
     int netID = objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
     std::shared_ptr<BulletCom> bulletCom = colObj->AddComponent<BulletCom>(netID);
     bulletCom->SetAliveTime(5.0f);
-    bulletCom->SetDamageValue(power);
+    bulletCom->SetDamageValue(damage);
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
     k->SetKnockBackForce({ 18,5,18 });
@@ -737,7 +737,7 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     bulletCom->SetDamageValue(-damageValue);
     bulletCom->SetViewBullet(viewObj);
     std::shared_ptr<KnockBackCom>k = colObj->AddComponent<KnockBackCom>();
-    k->SetKnockBackForce({ 10,3,10 });
+    k->SetKnockBackForce({ 17,6,17 });
 
     //判定用
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);

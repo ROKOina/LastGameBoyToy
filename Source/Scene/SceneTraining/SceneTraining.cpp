@@ -119,7 +119,6 @@ void SceneTraining::Update(float elapsedTime)
 
     //UI‚µ‚å‚è
     if (canvas) {
-
         auto& backA = canvas->GetChildFind("allyBack");
         auto& backE = canvas->GetChildFind("enemyBack");
         if (backA)backA->SetEnabled(false);

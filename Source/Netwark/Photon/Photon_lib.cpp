@@ -1489,7 +1489,6 @@ void PhotonLib::GameRecv(NetData recvData)
         }
     }
 
-
     if (recvData.playerId >= 0)
     {
         //ƒsƒ“ƒO

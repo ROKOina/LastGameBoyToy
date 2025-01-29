@@ -45,6 +45,12 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
     float4 worldviewpos = mul(mul(float4(p.position, 1.0f), world), view);
     float4 viewvelo = mul(float4(p.velocity.xyz, 0.0), view);
 
+    //アニメーション用のテクスチャオフセット計算
+    float2 frameSize = float2(1.0 / columns, 1.0 / rows); // フレームのサイズ
+    int totalFrames = rows * columns; // フレーム総数
+    int currentFrame = (int) (time * animationrate) % totalFrames; // 現在のフレーム番号
+    float2 frameOffset = float2(currentFrame % columns, currentFrame / columns) * frameSize;
+
     //回転
     p.rotation = rotation;
 
@@ -92,7 +98,7 @@ void main(point VS_OUT input[1], inout TriangleStream<GS_OUT> output)
         element.color.rgb = p.color.rgb * baseColor.rgb;
         element.color.a = p.color.a * baseColor.a;
         element.color.rgb *= colorScale;
-        element.texcoord = TEXCOORD[i];
+        element.texcoord = TEXCOORD[i] * frameSize + frameOffset;
         output.Append(element);
     }
 

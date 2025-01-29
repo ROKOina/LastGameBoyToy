@@ -86,5 +86,7 @@ cbuffer GPUparticleSaveConstants : register(b7)
     float strechscale; //ストレッチビルボードの強度(伸びる時の大きさ)
     float3 padding;
     int iscurve;
-    float3 padding2;
+    int columns;
+    int rows;
+    float animationrate;
 }

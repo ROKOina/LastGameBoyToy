@@ -36,5 +36,4 @@ private:
     std::unique_ptr<BasicsApplication> photonNet;
 
     DirectX::XMFLOAT3 SpawnPos = { 0,8.0f,0 };
-
 };

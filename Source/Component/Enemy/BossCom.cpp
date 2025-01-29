@@ -33,7 +33,6 @@ void BossCom::Start()
 
     //初期ステート登録
     state.ChangeState(BossState::IDLE);
-
 }
 
 //更新処理

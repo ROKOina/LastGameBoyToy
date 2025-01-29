@@ -45,7 +45,6 @@ XAUDIO2FX_REVERB_I3DL2_PARAMETERS g_PRESET_PARAMS02[NUM_PRESETS] =
     XAUDIO2FX_I3DL2_PRESET_PLATE,
 };
 
-
 AudioSource3D::AudioSource3D(AUDIOID3D id) : myId(id)
 {
     // Clear struct
@@ -56,7 +55,6 @@ AudioSource3D::AudioSource3D(AUDIOID3D id) : myId(id)
     if (FAILED(hr))
     {
     }
-
 
     UINT32 flags = 0;
 #if defined(USING_XAUDIO2_7_DIRECTX) && defined(_DEBUG)
@@ -71,8 +69,8 @@ AudioSource3D::AudioSource3D(AUDIOID3D id) : myId(id)
     // To see the trace output, you need to view ETW logs for this application:
     //    Go to Control Panel, Administrative Tools, Event Viewer.
     //    View->Show Analytic and Debug Logs.
-    //    Applications and Services Logs / Microsoft / Windows / XAudio2. 
-    //    Right click on Microsoft Windows XAudio2 debug logging, Properties, then Enable Logging, and hit OK 
+    //    Applications and Services Logs / Microsoft / Windows / XAudio2.
+    //    Right click on Microsoft Windows XAudio2 debug logging, Properties, then Enable Logging, and hit OK
     XAUDIO2_DEBUG_CONFIGURATION debug = {};
     debug.TraceMask = XAUDIO2_LOG_ERRORS | XAUDIO2_LOG_WARNINGS;
     debug.BreakMask = XAUDIO2_LOG_ERRORS;
@@ -270,7 +268,6 @@ AudioSource3D::~AudioSource3D()
     g_audioState.pVolumeLimiter.Reset();
     g_audioState.pReverbEffect.Reset();
 
-
 #ifdef USING_XAUDIO2_7_DIRECTX
     if (g_audioState.mXAudioDLL)
     {
@@ -281,7 +278,7 @@ AudioSource3D::~AudioSource3D()
 
     CoUninitialize();
 
-    g_audioState.bInitialized = false;    
+    g_audioState.bInitialized = false;
 }
 
 void AudioSource3D::Start()
@@ -429,7 +426,6 @@ void AudioSource3D::UpdateAudio3d(float elapsedTime)
 
     g_audioState.emitter.CurveDistanceScaler = CurveDistanceScaler;
 
-
     DWORD dwCalcFlags = X3DAUDIO_CALCULATE_MATRIX | X3DAUDIO_CALCULATE_DOPPLER
         | X3DAUDIO_CALCULATE_LPF_DIRECT | X3DAUDIO_CALCULATE_LPF_REVERB
         | X3DAUDIO_CALCULATE_REVERB;
@@ -506,7 +502,7 @@ void AudioSource3D::AudioPlay(bool loop, float pitch)
 {
     Audio3DStop();
 
-    XAUDIO2_BUFFER buffer = {0};
+    XAUDIO2_BUFFER buffer = { 0 };
     buffer.AudioBytes = resource_->GetAudioBytes();
     buffer.pAudioData = resource_->GetAudioData();
     loop ? buffer.LoopCount = XAUDIO2_LOOP_INFINITE : buffer.LoopCount = 0;
@@ -534,13 +530,10 @@ void AudioSource3D::AudioPlay()
     AudioPlay(true);
 }
 
-
-
-
 void Audio2DMagaer::Audio2DPlay(AUDIOID2D id, float volume, bool loop)
 {
     Audio2DStop(id);
-    XAUDIO2_BUFFER buffer = {0};
+    XAUDIO2_BUFFER buffer = { 0 };
     buffer.AudioBytes = audio2DResources[id].resource2D->GetAudioBytes();
     buffer.pAudioData = audio2DResources[id].resource2D->GetAudioData();
     buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;

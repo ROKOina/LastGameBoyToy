@@ -8,7 +8,6 @@
 #include "Component\Camera\CameraCom.h"
 #include "Audio/Audio3D.h"
 
-
 //基底コンストラクタ
 Boss_BaseState::Boss_BaseState(BossCom* owner) : State(owner)
 {

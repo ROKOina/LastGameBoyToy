@@ -431,7 +431,7 @@ void SpawnCom::CreateJyankratUlt(const std::shared_ptr<GameObject>& obj)
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(parent.lock());
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    hit->SetValue(10.0f);
+    hit->SetValue(50.0f);
 
     //”š”­•¨
     std::shared_ptr<GameObject>explosion = obj->AddChildObject();
@@ -477,7 +477,7 @@ void SpawnCom::CreateSoldierUlt(const std::shared_ptr<GameObject>& obj)
     //”»’è—p
     std::shared_ptr<HitProcessCom> hit = obj->AddComponent<HitProcessCom>(parent.lock());
     hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    hit->SetValue(10.0f);
+    hit->SetValue(20.0f);
 
     GameObj parent = GetGameObject()->GetParent();
     parent->GetComponent<CharacterCom>()->GetAudio("ULT")->Audio3DStop();
