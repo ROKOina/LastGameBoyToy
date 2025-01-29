@@ -8,7 +8,6 @@
 //更新処理
 void KnockBackCom::Update(float elapsedTime)
 {
-    // Colliderコンポーネントの取得
     const auto& collider = GetGameObject()->GetComponent<Collider>();
     if (!collider) return;
 
@@ -18,23 +17,28 @@ void KnockBackCom::Update(float elapsedTime)
         if (!gameObject) continue;
 
         auto movement = gameObject->GetComponent<MovementCom>();
-        if (!movement) continue; // MovementComが無ければ処理をスキップ
+        if (!movement) continue;
 
-        // 自分と衝突対象の位置を取得
         const DirectX::XMFLOAT3 pos = GetGameObject()->transform_->GetWorldPosition();
         const DirectX::XMFLOAT3 enemy = gameObject->transform_->GetWorldPosition();
 
-        // ノックバック力の分離
-        const DirectX::XMFLOAT3 forceXZ = { knockbackforce.x, 0, knockbackforce.z };
-        const DirectX::XMFLOAT3 forceY = { 0, knockbackforce.y, 0 };
+        const DirectX::XMVECTOR posVec = DirectX::XMLoadFloat3(&pos);
+        const DirectX::XMVECTOR enemyVec = DirectX::XMLoadFloat3(&enemy);
 
-        // XZ平面でのノックバック計算
-        const DirectX::XMFLOAT3 normalizedDir = (Mathf::Normalize(enemy - pos) * forceXZ);
+        DirectX::XMVECTOR direction = DirectX::XMVectorSubtract(enemyVec, posVec);
+        direction = DirectX::XMVector3Normalize(direction);
 
-        // MovementComの操作
+        DirectX::XMVECTOR forceXZVec = DirectX::XMVectorSet(knockbackforce.x, 0, knockbackforce.z, 0);
+        DirectX::XMVECTOR forceYVec = DirectX::XMVectorSet(0, knockbackforce.y, 0, 0);
+
+        DirectX::XMVECTOR resultXZ = DirectX::XMVectorMultiply(direction, forceXZVec);
+
+        DirectX::XMFLOAT3 normalizedDir;
+        DirectX::XMStoreFloat3(&normalizedDir, resultXZ);
+
         movement->ZeroVelocity();
         movement->AddNonMaxSpeedVelocity(normalizedDir);
-        movement->AddForce(forceY);
+        movement->AddForce({ 0.0f, knockbackforce.y, 0.0f });
         movement->SetOnGround(false);
         movement->SetAirForce(1.0f);
     }

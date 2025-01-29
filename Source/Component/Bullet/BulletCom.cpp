@@ -453,6 +453,7 @@ GameObj BulletCreate::FarahKnockBack(std::shared_ptr<GameObject> objPoint, float
     //判定用
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
+    hit->SetValue3({ 18,5,18 });
 
     return colObj;
 }
@@ -743,6 +744,7 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
     std::shared_ptr<HitProcessCom> hit = colObj->AddComponent<HitProcessCom>(objPoint);
     hit->SetHitType(HitProcessCom::HIT_TYPE::KNOCKBACK);
     hit->SetValue(damageValue);
+    hit->SetValue3({ 17,6,17 });
 }
 
 //ソルジャースタン
