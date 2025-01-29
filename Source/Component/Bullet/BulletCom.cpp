@@ -661,7 +661,7 @@ void BulletCreate::SoldierEskillBullet(std::shared_ptr<GameObject> objPoint, flo
         auto& saveB = StaticSendDataManager::Instance().GetSaveBuffer(objPoint->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID());
         for (auto& b : saveB)
         {
-            if (CharacterInput::MainSkillButton_E & b.inputDown)
+            if (CharacterInput::SubAttackButton & b.inputDown)
             {
                 fpsDir = b.fpsDir;
                 firePos = b.gunPos;
