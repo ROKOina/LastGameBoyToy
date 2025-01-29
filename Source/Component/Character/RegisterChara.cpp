@@ -1,3 +1,5 @@
+
+
 #include "RegisterChara.h"
 #include "Component\System\GameObject.h"
 #include "Component/System/TransformCom.h"
@@ -336,6 +338,9 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
     c->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 6.0f);
     c->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
     c->SetAudio("JET", MAKE_AUDIO_3D(obj, AUDIOID3D::FARAH_JET));
+    c->SetAudio("ATK", MAKE_AUDIO_3D(obj, AUDIOID3D::FARAH_ATK));
+    c->SetAudio("SKILL1", MAKE_AUDIO_3D(obj, AUDIOID3D::FARAH_SKILL1));
+    c->SetAudio("SKILL2", MAKE_AUDIO_3D(obj, AUDIOID3D::FARAH_SKILL2));
 
     //ボックスコライダー
     std::shared_ptr<BoxColliderCom> box = obj->AddComponent<BoxColliderCom>();

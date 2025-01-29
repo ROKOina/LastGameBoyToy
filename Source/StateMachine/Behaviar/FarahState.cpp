@@ -14,6 +14,11 @@ Farah_BaseState::Farah_BaseState(CharacterCom* owner) : State(owner)
 }
 
 #pragma region メイン攻撃
+void Farah_MainAttackState::Enter()
+{
+    charaCom.lock()->GetAudio("ATK")->Audio3DStop();
+    charaCom.lock()->GetAudio("ATK")->AudioPlay(false, 1.0f);
+}
 void Farah_MainAttackState::Execute(const float& elapsedTime)
 {
     //攻撃終了処理＆攻撃処理
@@ -27,6 +32,8 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
         {
             charaCom.lock()->AddCurrentBulletNum(-1);
         }
+
+
 
         //攻撃処理
         charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 50.0f, 15.0f));
@@ -86,6 +93,11 @@ void Farah_UltState::Exit()
 #pragma endregion
 
 #pragma region Eskill
+void Farah_ESkillState::Enter()
+{
+    charaCom.lock()->GetAudio("SKILL1")->Audio3DStop();
+    charaCom.lock()->GetAudio("SKILL1")->AudioPlay(false, 1.0f);
+}
 void Farah_ESkillState::Execute(const float& elapsedTime)
 {
     //腕アニメーション再生
@@ -97,4 +109,3 @@ void Farah_ESkillState::Execute(const float& elapsedTime)
     //ステート変更
     ChangeAttackState(CharacterCom::CHARACTER_ATTACK_ACTIONS::NONE);
 }
-#pragma endregion
