@@ -6,13 +6,16 @@
 #include "Math\Mathf.h"
 #include "Input\Input.h"
 #include "Component\System\HitProcessCom.h"
+#include <Component/Enemy/BossCom.h>
 
 class MissileCom : public Component
 {
 public:
     MissileCom() {};
     MissileCom(float soundTime) { soundLen = soundTime; };
-    ~MissileCom() override {};
+    ~MissileCom() override {
+        bossSE->GetAudios(BOSS_BULLET)->Audio3DStop();
+    };
 
     // –¼‘OŽæ“¾
     const char* GetName() const override { return "Missile"; }
@@ -29,4 +32,6 @@ public:
 private:
     float soundLen = 40.0f;
     bool playFlag = false;
+
+    std::shared_ptr<BossCom> bossSE;
 };

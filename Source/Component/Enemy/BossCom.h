@@ -92,8 +92,13 @@ private:
 
     
 private://‰¹
-    std::map<std::string, GameObj> audioObjs;
+    std::map<AUDIOID3D, GameObj> audios;
 public:
-    void SetAudio(std::string name, GameObj obj) { audioObjs[name] = obj; }
-    AudioSource3D* GetAudio(std::string name) { return audioObjs[name]->GetComponent<AudioSource3D>().get(); }
+    void SetAudios(AUDIOID3D id, GameObj obj) {
+        GameObj bossSeObj = obj->AddChildObject();
+        std::shared_ptr<AudioSource3D> bossSe = bossSeObj->AddComponent<AudioSource3D>(id);
+        bossSe->SetCurveDistanceScaler(70.0f);
+        audios[id] = bossSeObj;
+    }
+    AudioSource3D* GetAudios(AUDIOID3D id) { return audios[id]->GetComponent<AudioSource3D>().get();}
 };
