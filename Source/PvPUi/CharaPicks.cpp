@@ -176,17 +176,26 @@ void CharaPicks::StageSelect()
         kind = static_cast<SelectStageKind>(stagepick);
     }
 
-    // OKボタンの操作
-    if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
+    // OKキーの演出
+    if (stagepick != -1 && Buttonsprite->GetHitSpriteEnter())
     {
         Buttonsprite->EasingPlay();
-        GameObjectManager::Instance().Remove(canvas);
-        SetViewCharaPicks(true);
     }
     else if (!Buttonsprite->GetHitSprite())
     {
         Buttonsprite->StopEasing();
         Buttonsprite->spc.color = { 1,1,1,1 };
+    }
+
+    // OKボタンが押され、かつキャラが選択されている場合のみ処理を実行
+    if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
+    {
+        // 決定音
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
+
+        GameObjectManager::Instance().Remove(canvas);
+        SetViewCharaPicks(true);
     }
 }
 
