@@ -76,6 +76,14 @@ void CharaPicks::CreateCharaPicksUiObject()
         decision->SetName("decision");
         decision->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
     }
+    // 決定後待機ボタン
+    {
+        auto& waitButton = charaPicksCanvas->AddChildObject();
+        waitButton->SetName("waitSpr");
+        auto& spr= waitButton->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/wait.ui", Sprite::SpriteShader::DEFALT,false);
+        spr->SetOrderinLayer(10);
+        waitButton->SetEnabled(false);
+    }
 
     // キャラ選択UI
     {
@@ -426,6 +434,7 @@ void CharaPicks::DecisionButton()
 
     auto& canvas = GameObjectManager::Instance().Find("CharaPicksCanvas");
     auto& decisionButton = canvas->GetChildFind("decision");
+    auto& waitButton = canvas->GetChildFind("waitSpr");
     auto& sprite = decisionButton->GetComponent<Sprite>();
 
     // OKキーの演出
@@ -448,6 +457,8 @@ void CharaPicks::DecisionButton()
 
         decisionFlg = true;
         GameObjectManager::Instance().Remove(GameObjectManager::Instance().Find("charapickcamera"));
+        waitButton->SetEnabled(true);
+        sprite->SetEnabled(false);
     }
 }
 
