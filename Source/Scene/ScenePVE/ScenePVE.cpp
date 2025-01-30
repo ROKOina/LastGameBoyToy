@@ -119,7 +119,6 @@ void ScenePVE::Initialize()
         RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
     }
 
-
     //snowparticle
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -269,17 +268,14 @@ void ScenePVE::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("BossUI");
         obj->SetEnabled(false);
-       auto& bossHpFrame =  obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHPFrame.ui",Sprite::SpriteShader::DEFALT,false);
-  
+        auto& bossHpFrame = obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHPFrame.ui", Sprite::SpriteShader::DEFALT, false);
 
-       auto& hpGaugeObj = obj->AddChildObject();
-       hpGaugeObj->SetName("BossHpGauge");
-       hpGaugeObj->SetEnabled(false);
-       auto& hpGauge = hpGaugeObj->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);
-       hpGauge->SetVariableValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint());
-       hpGauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
-   
-
+        auto& hpGaugeObj = obj->AddChildObject();
+        hpGaugeObj->SetName("BossHpGauge");
+        hpGaugeObj->SetEnabled(false);
+        auto& hpGauge = hpGaugeObj->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);
+        hpGauge->SetVariableValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint());
+        hpGauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
     }
 #pragma region グラフィック系の設定
 
@@ -327,7 +323,6 @@ void ScenePVE::Update(float elapsedTime)
             flag = true;
         }
     }
-   
 
     PVEDirection::Instance().Update(elapsedTime);
 
