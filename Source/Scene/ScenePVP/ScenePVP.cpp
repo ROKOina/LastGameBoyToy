@@ -632,7 +632,7 @@ void ScenePVP::InitializePVP()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("ButtonArea0");
-        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
+        //obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
 
         //コライダーセット
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
@@ -650,7 +650,7 @@ void ScenePVP::InitializePVP()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("ButtonArea1");
-        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
+        //obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
 
         //コライダーセット
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
