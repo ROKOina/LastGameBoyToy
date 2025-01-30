@@ -26,6 +26,7 @@
 #include "Component\Collsion\FrustumCom.h"
 #include "Component\Stage\GateGimmickCom.h"
 #include "Component\Renderer\InstanceRendererCom.h"
+#include "Audio/Audio3D.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -481,7 +482,7 @@ void StageEditorCom::TowerGimic(GameObj& place)
     //”C‚³‚ê‚Ü‚µ‚½ƒˆƒCƒVƒ‡[
     place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/energy.gpuparticle", 6000);
     place->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/enemy.spawn");
-    place->AddComponent<StageGimmick>();
+   StageGimmick* gimmick =  place->AddComponent<StageGimmick>().get();
     place->AddComponent<FrustumCom>();
     place->GetComponent<RendererCom>()->SetOutlineColor({ 1.000f, 0.361f, 0.000f });
     place->GetComponent<RendererCom>()->SetOutlineIntensity(10.0f);
@@ -500,6 +501,12 @@ void StageEditorCom::TowerGimic(GameObj& place)
     accumulate->SetName("accumulateparticle");
     std::shared_ptr<GPUParticle>p = accumulate->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/enemyspawn.gpuparticle", 500);
     p->SetLoop(false);
+
+    // SE
+    GameObj SeObj = place->AddChildObject();
+    gimmick->SetAudios(AUDIOID3D::GIMMICKSTATE_ENEMYSPAWN, SeObj);
+    gimmick->SetAudios(AUDIOID3D::GIMMICKSTATE_BIGATTACK, SeObj);
+    gimmick->SetAudios(AUDIOID3D::GIMMICKSTATE_BREAK, SeObj);
 }
 
 void StageEditorCom::GateGimic(GameObj& place)
@@ -523,5 +530,5 @@ void StageEditorCom::PlaneGimic(GameObj& place)
 
 void StageEditorCom::JumpGimic(GameObj& place)
 {
-    
+
 }

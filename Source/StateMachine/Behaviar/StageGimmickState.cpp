@@ -14,7 +14,7 @@ StageGimmick_BaseState::StageGimmick_BaseState(StageGimmick* owner) : State(owne
 void StageGimmick_IdleState::Execute(const float& elapsedTime)
 {
     const auto& boss = GameObjectManager::Instance().Find("BOSS");
-
+    
     if (boss)
     {
         spawntime += elapsedTime;
@@ -54,6 +54,12 @@ void StageGimmick_IdleState::Exit()
 #pragma endregion
 
 #pragma region エネミー生成
+void StageGimmick_EnemySpawnState::Enter()
+{
+    owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->Audio3DStop();
+    owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->SetVolume(10.0f);
+    owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->AudioPlay();
+}
 void StageGimmick_EnemySpawnState::Execute(const float& elapsedTime)
 {
     const auto& boss = GameObjectManager::Instance().Find("BOSS");
@@ -90,6 +96,7 @@ void StageGimmick_EnemySpawnState::Exit()
 {
     owner->GetGameObject()->GetChildFind("accumulateparticle")->GetComponent<GPUParticle>()->SetLoop(false);
     spawn.lock()->SetOnTrigger(false);
+    owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->Audio3DStop();
 }
 #pragma endregion
 
@@ -100,6 +107,10 @@ void StageGimmick_BigAttackState::Enter()
     gpuparticle.lock()->SetLoop(true);
     bomber->GetComponent<GPUParticle>()->SetLoop(true);
     bomber->GetComponent<SpawnCom>()->SetOnTrigger(true);
+
+    owner->GetAudios(GIMMICKSTATE_BIGATTACK)->Audio3DStop();
+    owner->GetAudios(GIMMICKSTATE_BIGATTACK)->SetVolume(10.0f);
+    owner->GetAudios(GIMMICKSTATE_BIGATTACK)->AudioPlay(true);
 }
 void StageGimmick_BigAttackState::Execute(const float& elapsedTime)
 {
@@ -108,6 +119,7 @@ void StageGimmick_BigAttackState::Execute(const float& elapsedTime)
     if (*status.lock()->GetHitPoint() <= 0.0f || *boss->GetComponent<CharaStatusCom>()->GetHitPoint() <= 0.0f)
     {
         gpuparticle.lock()->SetLoop(false);
+        owner->GetAudios(GIMMICKSTATE_BIGATTACK)->Audio3DStop();
         owner->GetStateMachine().ChangeState(StageGimmick::GimmickState::BREAK);
         return;
     }
@@ -119,6 +131,10 @@ void StageGimmick_BreakState::Enter()
 {
     //潰れたら煙を出す演出をする
     cpuparticle.lock()->SetActive(true);
+
+    owner->GetAudios(GIMMICKSTATE_BREAK)->Audio3DStop();
+    owner->GetAudios(GIMMICKSTATE_BREAK)->SetVolume(10.0f);
+    owner->GetAudios(GIMMICKSTATE_BREAK)->AudioPlay();
 }
 void StageGimmick_BreakState::Execute(const float& elapsedTime)
 {
@@ -138,6 +154,7 @@ void StageGimmick_BreakState::Execute(const float& elapsedTime)
     {
         bomber->GetComponent<GPUParticle>()->SetLoop(false);
         bomber->GetComponent<SpawnCom>()->SetOnTrigger(false);
+        owner->GetAudios(GIMMICKSTATE_BREAK)->Audio3DStop();
     }
 }
 #pragma endregion
