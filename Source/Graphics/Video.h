@@ -37,4 +37,9 @@ struct VideoTexture
     bool hasFinished();
     Texture* getTexture();
     float getAspectRatio() const;
+
+    void SetRestart();
+    void SetTimeScale(float scale);
+    void SetisLoop(bool isloop);
+    void Loadfile(const char* filePath);
 };

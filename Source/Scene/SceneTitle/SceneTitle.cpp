@@ -27,6 +27,7 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTraining\SceneTraining.h"
+#include "Component\Renderer\VideoCom.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -129,6 +130,14 @@ void SceneTitle::Initialize()
             next->SetName("Training");
             next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::GLITCH, true);
         }
+
+        //クレジット
+        {
+            auto& next = obj->AddChildObject();
+            next->SetName("credit");
+            next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Credit.ui", Sprite::SpriteShader::GLITCH, true);
+        }
+
         //ゲーム終了
         {
             auto& next = obj->AddChildObject();
@@ -142,6 +151,19 @@ void SceneTitle::Initialize()
             next->SetName("selectBow");
             next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/selectBow.ui", Sprite::SpriteShader::DEFALT, false);
         }
+    }
+
+    //クレジット
+    {
+        auto& obj = GameObjectManager::Instance().Create();
+        obj->SetName("CreditVideo");
+        auto& video = obj->AddComponent<Video>("Data/Video/StarWars.mp4");
+
+        video->GetVidePram().pause();
+        video->GetVidePram().SetisLoop(false);
+        obj->transform_->SetWorldPosition({-3.294,0.344,-1.816});
+        obj->transform_->SetScale({1.820,1.398,1.00});
+        obj->SetEnabled(false);
     }
 
     //コンスタントバッファの初期化
@@ -186,6 +208,12 @@ void SceneTitle::Update(float elapsedTime)
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
+    if (creditFLG) {
+        CreditUpdate(elapsedTime);
+    }
+    else {
+    
+    }
 }
 
 void SceneTitle::Render(float elapsedTime)
@@ -237,6 +265,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
     names.emplace_back("PVE", new ScenePVE, 450);
     names.emplace_back("PVP", new ScenePVP, 570);
     names.emplace_back("Training", new SceneTraining, 690);
+    names.emplace_back("credit", nullptr, 830);
     names.emplace_back("endgame", new SceneTraining, 900);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -253,33 +282,50 @@ void SceneTitle::UIUpdate(float elapsedTime)
             //クリックで遷移＆演出
             if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
             {
-                //イージング
-                canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
-                canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
-                canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
-                canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
-                canvas->GetChildFind("endgame")->GetComponent<Sprite>()->EasingPlay();
-
+                if (s.scene != nullptr) {
+                    //イージング
+                    canvas->GetChildFind("title")->GetComponent<Sprite>()->EasingPlay();
+                    canvas->GetChildFind("PVE")->GetComponent<Sprite>()->EasingPlay();
+                    canvas->GetChildFind("PVP")->GetComponent<Sprite>()->EasingPlay();
+                    canvas->GetChildFind("Training")->GetComponent<Sprite>()->EasingPlay();
+                    canvas->GetChildFind("credit")->GetComponent<Sprite>()->EasingPlay();
+                    canvas->GetChildFind("endgame")->GetComponent<Sprite>()->EasingPlay();
+                }
                 //ゲーム終了
                 if (std::string(sprite->GetGameObject()->GetName()) == "endgame")
                 {
                     PostMessage(Graphics::Instance().GetHwnd(), WM_CLOSE, 0, 0);
                 }
 
-                if (!SceneManager::Instance().GetTransitionFlag())
-                {
-                    //BGM消す
-                    Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
-                    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
+                //クレジット再生
+                if (std::string(sprite->GetGameObject()->GetName()) == "credit" && creditFLG == false) {
+                    GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
+                    GameObjectManager::Instance().Find("stage")->SetEnabled(false);
 
-                    //audioSource->FeedStart(static_cast<int>(AUDIOID::SE), 0.0f, elapsedTime);
-                    //audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);
-                    //暗転
-                    std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
-                    GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
+                    auto& creditVideo = GameObjectManager::Instance().Find("CreditVideo");
+                    creditVideo->GetComponent<Video>()->GetVidePram().SetRestart();
+                    creditVideo->GetComponent<Video>()->GetVidePram().resume();
+                    creditVideo->SetEnabled(true);
+                    creditFLG = true;
+                }
 
-                    SceneManager::Instance().ChangeSceneDelay(s.scene, 2);
-                    deleteFlg = true;
+                if (s.scene != nullptr) {
+
+                    if (!SceneManager::Instance().GetTransitionFlag())
+                    {
+                        //BGM消す
+                        Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
+                        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
+
+                        //audioSource->FeedStart(static_cast<int>(AUDIOID::SE), 0.0f, elapsedTime);
+                        //audioSource->AudioPlay(static_cast<int>(AUDIOID::SE), false);
+                        //暗転
+                        std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
+                        GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);
+
+                        SceneManager::Instance().ChangeSceneDelay(s.scene, 2);
+                        deleteFlg = true;
+                    }
                 }
             }
             //セレクト棒壱変更
@@ -301,4 +347,39 @@ void SceneTitle::UIUpdate(float elapsedTime)
     }
     //棒消す
     if (SceneManager::Instance().GetTransitionFlag())selectB->SetEnabled(false);
+
+
+}
+
+void SceneTitle::CreditUpdate(float elapsedTime)
+{
+    auto& creditVideo = GameObjectManager::Instance().Find("CreditVideo");
+
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (GamePad::ENTER & gamePad.GetButton())
+    {
+        creditVideo->GetComponent<Video>()->GetVidePram().SetTimeScale(30.0f);
+
+    }
+    else {
+        creditVideo->GetComponent<Video>()->GetVidePram().SetTimeScale(1.0f);
+    }
+
+    //スペースキーを押したらスキップ
+    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    {
+        creditVideo->GetComponent<Video>()->GetVidePram().SetRestart();
+        creditFLG = false;
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
+        GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+        creditVideo->SetEnabled(false);
+    }
+    if (creditVideo->GetComponent<Video>()->GetVidePram().hasFinished()) {
+        creditVideo->GetComponent<Video>()->GetVidePram().SetRestart();
+        creditFLG = false;
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
+        GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+        creditVideo->SetEnabled(false);
+    }
+
 }

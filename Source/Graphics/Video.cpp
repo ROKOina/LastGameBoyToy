@@ -475,6 +475,7 @@ struct VideoTexture::InternalData
 
     float     clock_time = 0.0f;
     LONGLONG  video_time = 0;
+    float     timeScale = 1.0f;
     bool      finished = false;
     bool      paused = false;
     bool      autoloop = true;
@@ -593,7 +594,7 @@ public:
         if (finished)
             return;
 
-        clock_time += elapsed;
+        clock_time += elapsed * timeScale;
 
         LONGLONG uct = (LONGLONG)(clock_time * 10000000);
         if (uct < video_time)
@@ -719,6 +720,7 @@ void VideoTexture::destroyAPI()
 
 bool VideoTexture::create(const char* filename)
 {
+
     assert(!internal_data);
     internal_data = new InternalData();
     return internal_data->open(filename);
@@ -765,3 +767,33 @@ float VideoTexture::getAspectRatio() const
 {
     return (float)internal_data->width / (float)internal_data->height;
 }
+
+void VideoTexture::SetRestart()
+{
+    if (internal_data->pSourceReader)
+    {
+        PROPVARIANT var = { 0 };
+        var.vt = VT_I8;
+        var.hVal.QuadPart = 0;
+        HRESULT hr = internal_data->pSourceReader->SetCurrentPosition(GUID_NULL, var);
+        if (FAILED(hr))
+        {
+            dbg("Failed to reset source reader position.");
+        }
+        internal_data->clock_time = 0.0f;
+        internal_data->video_time = 0;
+        internal_data->finished = false;
+    }
+}
+
+void VideoTexture::SetTimeScale(float scale)
+{
+    internal_data->timeScale = scale;
+}
+
+void VideoTexture::SetisLoop(bool isloop)
+{
+    internal_data->autoloop = isloop;
+}
+
+
