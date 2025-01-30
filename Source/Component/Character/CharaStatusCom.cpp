@@ -58,27 +58,31 @@ void CharaStatusCom::AddDamagePoint(float value, int playerID)
 
             auto& player = GameObjectManager::Instance().Find("player");
             int myPlayerID = player->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
-            int damageID = GetGameObject()->GetComponent<CharacterCom>()->GetNetCharaData().GetNetPlayerID();
-            if (myPlayerID == damageID) {
-                //死亡時プレイヤーID保存
-                if (playerID >= 0)
-                {
-                    int attackID = StaticSendDataManager::Instance().GetTeamNum(playerID);
-                    int myID = GetGameObject()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
-
-                    if (attackID != myID) { //敵チーム場合は通る
-                        //攻撃してきた敵を保存
-                        lastDamageID = playerID;
-                        lastDamageTimer = 20;
-                    }
-                }
-                //死亡時にキルをした相手をネットに送る
-                if (hitPoint <= 0)
-                {
-                    if (lastDamageID >= 0)
+            auto& chara = GetGameObject()->GetComponent<CharacterCom>();
+            if (chara)
+            {
+                int damageID = chara->GetNetCharaData().GetNetPlayerID();
+                if (myPlayerID == damageID) {
+                    //死亡時プレイヤーID保存
+                    if (playerID >= 0)
                     {
-                        //キルした相手を保存
-                        StaticSendDataManager::Instance().GetDeathID(lastDamageID) = true;
+                        int attackID = StaticSendDataManager::Instance().GetTeamNum(playerID);
+                        int myID = GetGameObject()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+
+                        if (attackID != myID) { //敵チーム場合は通る
+                            //攻撃してきた敵を保存
+                            lastDamageID = playerID;
+                            lastDamageTimer = 20;
+                        }
+                    }
+                    //死亡時にキルをした相手をネットに送る
+                    if (hitPoint <= 0)
+                    {
+                        if (lastDamageID >= 0)
+                        {
+                            //キルした相手を保存
+                            StaticSendDataManager::Instance().GetDeathID(lastDamageID) = true;
+                        }
                     }
                 }
             }
