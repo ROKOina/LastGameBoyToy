@@ -269,7 +269,8 @@ void ScenePVP::InitializeCharaSelect()
     //”wŒi
     InitializeBack();    //ƒsƒbƒN‰æ–Ê‹N“®
 
-    charaPicks->SetViewStagePicks(true);
+    //charaPicks->SetViewStagePicks(true);
+    charaPicks->SetViewCharaPicks(true);
 }
 
 void ScenePVP::InitializePVP()
