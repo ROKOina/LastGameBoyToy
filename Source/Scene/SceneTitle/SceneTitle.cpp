@@ -172,21 +172,6 @@ void SceneTitle::Initialize()
     Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
     Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_LOBBY);
 
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Lisner");
-        audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
-    }
-
-    {
-        GameObj audio = GameObjectManager::Instance().Create();
-        audio->SetName("Emitter1");
-        audio->transform_->SetWorldPosition({ 15,0,0 });
-        auto& au3D = audio->AddComponent<AudioSource3D>(AUDIOID3D::JANKRA_ULT);
-        au3D->SetEmitterPos(audio->transform_->GetWorldPosition());
-        au3D->AudioPlay();
-    }
-
     //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
     auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
