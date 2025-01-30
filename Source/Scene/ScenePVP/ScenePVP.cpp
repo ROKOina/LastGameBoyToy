@@ -601,7 +601,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject>crawneffect = obj->AddChildObject();
         crawneffect->SetName("carwneffect");
         crawneffect->transform_->SetLocalPosition({ 0.163f,-8.855f,0.377f });
-        crawneffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crawn_pvp.gpuparticle", 4000);
+        crawneffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crawn_pvp.gpuparticle", 1000);
     }
     break;
     case PVPGameSystem::GAME_MODE::Button:
@@ -631,16 +631,39 @@ void ScenePVP::InitializePVP()
     }
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("ButtonArea");
-        obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
+        obj->SetName("ButtonArea0");
+        //obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
 
         //コライダーセット
         std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
         sphere->SetMyTag(COLLIDER_TAG::Button);
-        sphere->SetJudgeTag(COLLIDER_TAG::Player);
 
         //ボタンのコンポーネントを付与する
         std::shared_ptr<ButtonCom>b = obj->AddComponent<ButtonCom>();
+
+        {
+            auto& areaC = obj->AddChildObject();
+            areaC->SetName("ButtonChild");
+            areaC->AddComponent<GPUParticle>(nullptr, 1000);
+        }
+    }
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("ButtonArea1");
+        //obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/area.gpuparticle", 3000);
+
+        //コライダーセット
+        std::shared_ptr<SphereColliderCom> sphere = obj->AddComponent<SphereColliderCom>();
+        sphere->SetMyTag(COLLIDER_TAG::Button);
+
+        //ボタンのコンポーネントを付与する
+        std::shared_ptr<ButtonCom>b = obj->AddComponent<ButtonCom>();
+
+        {
+            auto& areaC = obj->AddChildObject();
+            areaC->SetName("ButtonChild");
+            areaC->AddComponent<GPUParticle>(nullptr, 1000);
+        }
     }
     break;
     }
@@ -1143,9 +1166,12 @@ void ScenePVP::GameSystemUpdate(float elapsedTime)
     break;
     case PVPGameSystem::GAME_MODE::Button:
         //プッシュ回数をネットに送信
-        auto& button = GameObjectManager::Instance().Find("ButtonArea")->GetComponent<ButtonCom>();
+        std::string name = "ButtonArea" + std::to_string(net->GetTeamID(net->GetMyPlayerID()));
+        auto& button = GameObjectManager::Instance().Find(name.c_str());
+
+        auto& buttonCom = button->GetComponent<ButtonCom>();
         if (net->GetMyPlayerID() >= 0)
-            net->SetButtonPusu(net->GetMyPlayerID(), button->GetPushCount());
+            net->SetButtonPusu(net->GetMyPlayerID(), buttonCom->GetPushCount());
 
         //ゲームシステムに送信
         auto& DM = pvpGameSystem->GetButtonData();

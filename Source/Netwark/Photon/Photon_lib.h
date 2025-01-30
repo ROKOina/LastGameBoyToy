@@ -253,6 +253,9 @@ public:
     PhotonState::States GetPhotonState() { return mState; }
 
 private:
+    //ボタン配置
+    void SetButtonPos(int teamID);
+
     //プレイヤー追加
     void AddPlayer(int photonID, int playerID);
 
@@ -378,6 +381,52 @@ private:
         int slowFrame = 0;  //何フレーム間送るか
         DirectX::XMFLOAT3 myCrownFallPos = {};
     }saveCrown;
+
+    //ボタン
+    struct SaveButton
+    {
+        DirectX::XMFLOAT3 buttonPosition = {};
+        bool isTeleport = false;    //移動完了フラグ
+        bool isPush = false;    //押されたか
+        int sendButtonDelay = 3;  //送り漏れ防止
+        int sendFrame = 0;
+    }saveButton[2];
+
+    const std::vector<DirectX::XMFLOAT3> buttonPosData[2][2] = {
+        //ステージ０
+        {
+            {
+                {5.4f,8.8f,-35.9f},
+                {4.7f,17.0f,-3.0f},
+                {31.7f,8.8f,-31.4f},
+                {-21.1f,8.8f,-31.4f},
+                {-34.1f,10.7f,-6.7f},
+                {44.3f,10.7f,-6.7f},
+            },
+            {
+                {5.4f,8.8f,59.4f},
+                {4.7f,17.0f,16.8f},
+                {31.7f,8.8f,47.4f},
+                {-21.1f,8.8f,47.4f},
+                {-34.1f,10.7f,20.6f},
+                {44.3f,10.7f,20.6f},
+            },
+        },
+        //ステージ１
+        {
+            {
+                {0,-10,0},
+                {10,0,0},
+            },
+            {
+                {110,-10,0},
+                {10,10,10},
+            },
+        },
+    };
+    int oldButtonPosID[2] = { 0 };
+
+    int stageID = 0;
 
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ

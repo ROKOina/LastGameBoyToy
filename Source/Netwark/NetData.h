@@ -236,6 +236,11 @@ struct NetData
     struct ButtonData
     {
         int buttoncount = 0;
+
+        //マスターだけが操作できる用にする
+        DirectX::XMFLOAT3 team1ButtonPos = {};
+        DirectX::XMFLOAT3 team2ButtonPos = {};
+        bool isPushButton = false;   //ボタンが押された
     }buttonData;
 };
 static std::stringstream& operator<<(std::stringstream& out, NetData& h)
@@ -306,6 +311,9 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::BUTTON)
     {
         out << h.buttonData.buttoncount << " ";
+        out << h.buttonData.isPushButton << " ";
+        out << h.buttonData.team1ButtonPos << " ";
+        out << h.buttonData.team2ButtonPos << " ";
     }
 
     return out;
@@ -379,6 +387,9 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
     if (h.dataKind == NetData::DATA_KIND::BUTTON)
     {
         in >> h.buttonData.buttoncount;
+        in >> h.buttonData.isPushButton;
+        in >> h.buttonData.team1ButtonPos;
+        in >> h.buttonData.team2ButtonPos;
     }
 
     return in;

@@ -109,6 +109,14 @@ public:
         return d;
     }
 
+    void SetButton() { isGetButton = true; }
+    bool GetButton()
+    {
+        bool temp = isGetButton;
+        isGetButton = false;
+        return temp;
+    }
+
     void ResetData()
     {
         for (auto& s : saveBuffer)
@@ -122,6 +130,7 @@ public:
             }
         }
         isMyDeath = false;
+        isGetButton = false;
     }
 private:
     std::vector<SaveBuffer> saveBuffer[5];
@@ -130,6 +139,9 @@ private:
     std::vector<DirectX::XMFLOAT3> damagePostPos = {};
     int teamNum[4] = { -1,-1,-1,-1 };    //[]playerID  0:赤 1:青 -1:なし
     bool isMyDeath = false;   //デスした時にtrueに
+
+    //ボタン
+    bool isGetButton = false;
 
     //ピン関係
     int pinNum = -1;
