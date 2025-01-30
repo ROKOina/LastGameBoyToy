@@ -379,8 +379,7 @@ void PhotonLib::update(float elapsedTime)
     {
         if (!s.useFlg)continue;
         auto& teamFlag = StaticSendDataManager::Instance().GetTeamNum(s.playerId);
-        teamFlag = false;
-        if (s.teamID == 0)teamFlag = true;
+        teamFlag = s.teamID;
     }
 
     DelayUpdate();
