@@ -72,6 +72,7 @@ struct AUDIO_STATE
 enum class AUDIOID2D
 {
     SCENE_TITLE,
+    CREDIT,
     SCENE_LOBBY,
     SCENE_BOSS_START,
     SCENE_BOSS_CLYMAX,
@@ -186,6 +187,7 @@ private:
     {
         //2Dオーディオ登録
         audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
+        audio2DResources[AUDIOID2D::CREDIT] = AudioResource2DStr(x2d, "Data/AudioData/BGM/CreditBGM.wav");
         audio2DResources[AUDIOID2D::SCENE_LOBBY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/LobbyBGM.wav");
         audio2DResources[AUDIOID2D::SCENE_BOSS_START] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
         audio2DResources[AUDIOID2D::SCENE_BOSS_CLYMAX] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
