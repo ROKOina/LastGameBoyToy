@@ -173,7 +173,6 @@ void PhotonLib::update(float elapsedTime)
                 break;
             }
 
-            static bool firstStartGame = false; //始めてゲーム開始に入った時
             if (isGamePlay) //ゲーム中か
             {
                 //ゲーム開始時に入る
@@ -1479,7 +1478,7 @@ void PhotonLib::GameRecv(NetData recvData)
         {
             if (saveDeath[myPlayerID].deathCountTimer <= 0)
             {
-                saveDeath[myPlayerID].deathCountTimer = 2;
+                saveDeath[myPlayerID].deathCountTimer = 3;
                 saveDeath[myPlayerID].killCon = true;
                 saveInputPhoton[myPlayerID].killCount++;
                 auto& myPlayer = GameObjectManager::Instance().Find("player");

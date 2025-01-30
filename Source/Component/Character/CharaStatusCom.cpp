@@ -43,6 +43,8 @@ void CharaStatusCom::Update(float elapsedTime)
 // HP‚ÌŒ¸­ˆ—i–³“GŽžŠÔ‚ðl—¶j
 void CharaStatusCom::AddDamagePoint(float value, int playerID)
 {
+    if (isDeath)return;
+
     if (!IsInvincible())
     {
         if (hitPoint > 0)

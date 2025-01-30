@@ -560,6 +560,8 @@ public:
 
     void BookingRegistrationUI(std::shared_ptr<GameObject> obj);
 
+    bool GetKillFrame() { return killFrame; }
+
 private:
     bool bookingRegister = false;
 
@@ -592,4 +594,5 @@ private:
     };
     //std::map<int, DeathData> saveCharaKilog;
     std::vector<DeathData> saveCharaKilog;
+    bool killFrame = false; //©•ª‚ªƒLƒ‹‚µ‚½ƒtƒŒ[ƒ€‚Ìtrue
 };

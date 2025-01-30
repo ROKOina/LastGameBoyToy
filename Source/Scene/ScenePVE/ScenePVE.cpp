@@ -288,6 +288,7 @@ void ScenePVE::Initialize()
     //ƒlƒbƒg‘åŽ–
     StdIO_UIListener* l = new StdIO_UIListener();
     photonNet = std::make_unique<BasicsApplication>(l);
+    PlayerUIManager::Instance().ResetKilog();
 }
 
 void ScenePVE::Finalize()

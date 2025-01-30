@@ -437,6 +437,8 @@ private:
     int stageID = 0;
     bool endStagePick = false;  //マスターが送る
 
+    bool firstStartGame = false; //始めてゲーム開始に入った時
+
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ
     std::string chat = {};   //チャット

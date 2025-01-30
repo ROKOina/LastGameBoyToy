@@ -1579,11 +1579,13 @@ void PlayerUIManager::FarahSkillAndUltUI()
 //キルログ
 void PlayerUIManager::KillLogUpdate(float elapsedTime)
 {
+    killFrame = false;
     //タイマー更新
     for (int deathPID = 0; deathPID < 4; deathPID++)
     {
         kilogTimer[deathPID] -= elapsedTime;
     }
+    auto& pObj = GameObjectManager::Instance().Find("player");
 
     //キルした側
     for (int killPID = 0; killPID < 4; killPID++)
@@ -1599,6 +1601,13 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                 //一回だけ通るように
                 if (kilogTimer[deathPID] < 0)
                 {
+                    //自分のキルなら保存
+                    if (pObj) {
+                        auto& player = pObj->GetComponent<CharacterCom>();
+                        if (player->GetNetCharaData().GetNetPlayerID() == killPID)
+                            killFrame = true;
+                    }
+
                     kilogTimer[deathPID] = 3;
 
                     //ここでキルログを出す
@@ -2154,17 +2163,9 @@ void UI_KillEffect::Start()
 
 void UI_KillEffect::Update(float elapsedTime)
 {
-   
+    if (PlayerUIManager::Instance().GetKillFrame())
+        effectFLG = true;
 
-    auto& player = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>();
-    for (int i = 0; i < 4; i++)
-    {
-        auto& killflg = StaticSendDataManager::Instance().GetKillID(player->GetNetCharaData().GetNetPlayerID(), i);
-        if (killflg)
-        {          
-             effectFLG = true;         
-        }
-    }
     EffectUpdat(elapsedTime);
 }
 
