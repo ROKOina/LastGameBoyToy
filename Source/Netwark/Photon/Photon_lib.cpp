@@ -1732,6 +1732,13 @@ void PhotonLib::LobbyRecv(NetData recvData)
         //チームを保存
         for (int pID = 0; pID < 4; ++pID)
             saveInputPhoton[pID].teamID = recvData.lobbyData.teamID[pID];
+
+        //ステージピック完了
+        if (recvData.lobbyData.endStagePick)
+        {
+            stageID = recvData.lobbyData.stageID;
+            endStagePick = true;
+        }
     }
 
     //チャットに文字が入っているなら
@@ -2052,6 +2059,16 @@ void PhotonLib::sendLobbyData(void)
         //チームIDを送る
         for (int i = 0; i < 4; ++i)
             netD.lobbyData.teamID[i] = saveInputPhoton[i].teamID;
+
+        //ステージ選択終了
+        if (endStagePick) {
+            netD.lobbyData.endStagePick = true;
+            netD.lobbyData.stageID = stageID;
+        }
+        else {
+            netD.lobbyData.endStagePick = false;
+            netD.lobbyData.stageID = -1;
+        }
     }
 
     if (myPlayerID >= 0)

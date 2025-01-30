@@ -1720,6 +1720,21 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
     //キャラ被りを無くす
     auto& netSaveInput = net->GetSaveInput();
 
+    //ステージ選択完了
+    if (net->GetIsMasterPlayer())
+    {
+        charaPicks->SetMasterPlayer();
+        if (charaPicks->EndStagePick())
+            net->SetIsStageSelect(charaPicks->getStagePick());
+    }
+    else
+    {
+        if (net->GetIsStageSelect()) //マスターからセレクト完了が送られた
+        {
+            charaPicks->SetClientStagePick(net->GetStageNum());
+        }
+    }
+
     //全員ピック確認
     bool pickTransition = true;
     for (auto& s : netSaveInput)

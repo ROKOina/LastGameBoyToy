@@ -162,31 +162,46 @@ void CharaPicks::StageSelect()
     UpdateSprite(stage1sprite.get(), defaultStageScale);
     UpdateSprite(stage2sprite.get(), defaultStageScale);
 
-    //１なら
-    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage1sprite->GetHitSprite())
+    if (isMasterPlayer)
     {
-        stagepick = static_cast<int>(SelectStageKind::FIRST);
-        kind = static_cast<SelectStageKind>(stagepick);
-    }
+        //１なら
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage1sprite->GetHitSprite())
+        {
+            stagepick = static_cast<int>(SelectStageKind::FIRST);
+            kind = static_cast<SelectStageKind>(stagepick);
+        }
 
-    //2なら
-    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage2sprite->GetHitSprite())
-    {
-        stagepick = static_cast<int>(SelectStageKind::SECOND);
-        kind = static_cast<SelectStageKind>(stagepick);
-    }
+        //2なら
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage2sprite->GetHitSprite())
+        {
+            stagepick = static_cast<int>(SelectStageKind::SECOND);
+            kind = static_cast<SelectStageKind>(stagepick);
+        }
 
-    // OKボタンの操作
-    if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
-    {
-        Buttonsprite->EasingPlay();
-        GameObjectManager::Instance().Remove(canvas);
-        SetViewCharaPicks(true);
+        // OKボタンの操作
+        if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
+        {
+            Buttonsprite->EasingPlay();
+            GameObjectManager::Instance().Remove(canvas);
+            SetViewCharaPicks(true);
+            isStagePick = true;
+        }
+        else if (!Buttonsprite->GetHitSprite())
+        {
+            Buttonsprite->StopEasing();
+            Buttonsprite->spc.color = { 1,1,1,1 };
+        }
     }
-    else if (!Buttonsprite->GetHitSprite())
+    else
     {
-        Buttonsprite->StopEasing();
-        Buttonsprite->spc.color = { 1,1,1,1 };
+        //マスター以外は遷移待機
+        if (endStagePickClient)
+        {
+            Buttonsprite->EasingPlay();
+            GameObjectManager::Instance().Remove(canvas);
+            SetViewCharaPicks(true);
+            isStagePick = true;
+        }
     }
 }
 

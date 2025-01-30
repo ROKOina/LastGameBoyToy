@@ -218,6 +218,10 @@ struct NetData
         int pickSelect = {}; //1:ピック開始、2:ピック確定
         int charaID = {};    //キャラのID
         char chat[500];
+
+        //ステージ
+        int stageID = -1;
+        bool  endStagePick = false;
     }lobbyData;
 
     int gameMode = {};   //ゲームモード(ホストが決定)
@@ -296,6 +300,9 @@ static std::stringstream& operator<<(std::stringstream& out, NetData& h)
         out << h.lobbyData.teamID << " ";
         out << h.lobbyData.charaID << " ";
         out << h.lobbyData.pickSelect << " ";
+
+        out << h.lobbyData.stageID << " ";
+        out << h.lobbyData.endStagePick << " ";
     }
 
     out << h.gameMode << " ";
@@ -372,6 +379,9 @@ static std::stringstream& operator>>(std::stringstream& in, NetData& h)
         in >> h.lobbyData.teamID;
         in >> h.lobbyData.charaID;
         in >> h.lobbyData.pickSelect;
+
+        in >> h.lobbyData.stageID;
+        in >> h.lobbyData.endStagePick;
     }
 
     in >> h.gameMode;

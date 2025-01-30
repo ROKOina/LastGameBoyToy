@@ -108,6 +108,14 @@ public:
         }
     }
 
+    //ステージセレクトが終わったか
+    bool GetIsStageSelect() { return endStagePick; }
+    int GetStageNum() { return stageID; }
+    void SetIsStageSelect(int id) {
+        endStagePick = true;
+        stageID = id;
+    }
+
     //ゲームモード登録
     int GetGameMode() { return gameMode; }
     void SetGameMode(int mode) { gameMode = mode; }
@@ -427,6 +435,7 @@ private:
     int oldButtonPosID[2] = { 0 };
 
     int stageID = 0;
+    bool endStagePick = false;  //マスターが送る
 
     //仮機能
     bool isSendChat = false;    //チャット送信フラグ
