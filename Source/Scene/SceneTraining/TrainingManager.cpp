@@ -1334,6 +1334,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
         {
             GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
 
+
             if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
             {
                 GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
@@ -1369,6 +1370,9 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
         if (downFlag)
         {
             GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
+
+            GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->SetCurrentBulletNum(5);
+
 
             if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
             {
@@ -1463,10 +1467,12 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
     {
         if (downFlag)
         {
+
             GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w += elapsedTime;
 
             if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
             {
+                GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->ResetSkillCoolTimer(GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->E);
                 GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
                 downFlag = false;
                 upFlag = true;
@@ -1563,6 +1569,8 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
 
             if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w > 1.0f)
             {
+                GameObjectManager::Instance().Find("player")->GetComponent<InazawaCharacterCom>()->SetUltGauge(100);
+
                 GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w = 1.0f;
                 downFlag = false;
                 upFlag = true;
