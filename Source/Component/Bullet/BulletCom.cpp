@@ -491,9 +491,9 @@ GameObj BulletCreate::JankratBulletFire(std::shared_ptr<GameObject> parent, Dire
     bulletCom->SetCharaGameObj(parent);
 
     //判定用
-    std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
-    hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-    hit->SetValue(1);
+    //std::shared_ptr<HitProcessCom> hit = bullet->AddComponent<HitProcessCom>(parent);
+    //hit->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
+    //hit->SetValue(0);
 
     //爆発エフェクト付属
     std::shared_ptr<GameObject> bomber = bullet->AddChildObject();
