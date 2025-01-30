@@ -72,6 +72,7 @@ struct AUDIO_STATE
 enum class AUDIOID2D
 {
     SCENE_TITLE,
+    CREDIT,
     SCENE_LOBBY,
     SCENE_BOSS_START,
     SCENE_BOSS_CLYMAX,
@@ -82,16 +83,6 @@ enum class AUDIOID2D
 
     CURSOR,
     ENTER,
-    BOSS_JUMPATTACK_START,
-    BOSS_JUMPATTACK_END,
-    BOSS_JUMPATTACK_GROUND,
-    BOSS_SHOT,
-    BOSS_POWERSHOT,
-    BOSS_CHARGE,
-    BOSS_BULLET,
-    BOSS_PUNCH,
-    BOSS_LARIAT,
-    BOSS_WALK,
 
     //プレイヤー
     PLAYER_DAMAGE,
@@ -196,6 +187,7 @@ private:
     {
         //2Dオーディオ登録
         audio2DResources[AUDIOID2D::SCENE_TITLE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
+        audio2DResources[AUDIOID2D::CREDIT] = AudioResource2DStr(x2d, "Data/AudioData/BGM/CreditBGM.wav");
         audio2DResources[AUDIOID2D::SCENE_LOBBY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/LobbyBGM.wav");
         audio2DResources[AUDIOID2D::SCENE_BOSS_START] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
         audio2DResources[AUDIOID2D::SCENE_BOSS_CLYMAX] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
@@ -205,17 +197,6 @@ private:
         audio2DResources[AUDIOID2D::SCENE_RESULT_DEFEAT_SE] = AudioResource2DStr(x2d, "Data/AudioData/SE/result/defeatSE.wav");
         audio2DResources[AUDIOID2D::CURSOR] = AudioResource2DStr(x2d, "Data/AudioData/SE/cursorMove.wav");
         audio2DResources[AUDIOID2D::ENTER] = AudioResource2DStr(x2d, "Data/AudioData/SE/enter.wav");
-
-        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_START] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_start.wav");
-        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_END] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_end.wav");
-        audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_GROUND] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_ground3.wav");
-        audio2DResources[AUDIOID2D::BOSS_SHOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_shot.wav");
-        audio2DResources[AUDIOID2D::BOSS_POWERSHOT] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_powerShot.wav");
-        audio2DResources[AUDIOID2D::BOSS_CHARGE] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_charge.wav");
-        audio2DResources[AUDIOID2D::BOSS_BULLET] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_fire.wav");
-        audio2DResources[AUDIOID2D::BOSS_PUNCH] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_punch.wav");
-        audio2DResources[AUDIOID2D::BOSS_LARIAT] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_lariat.wav");
-        audio2DResources[AUDIOID2D::BOSS_WALK] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_ground2.wav");
 
         //プレイヤー
         audio2DResources[AUDIOID2D::PLAYER_DAMAGE] = AudioResource2DStr(x2d, "Data/AudioData/SE/player/player_damage.wav");
@@ -389,16 +370,16 @@ private:
         audio3DResources[AUDIOID3D::SOLDIER_SKILL2] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/nockback.wav");
         audio3DResources[AUDIOID3D::SOLDIER_ULT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/stunUlt.wav");
 
-        audio3DResources[AUDIOID3D::BOSS_JUMPATTACK_START] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_jumpAttack_start.wav");
-        audio3DResources[AUDIOID3D::BOSS_JUMPATTACK_END] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_jumpAttack_end.wav");
-        audio3DResources[AUDIOID3D::BOSS_JUMPATTACK_GROUND] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_jumpAttack_ground3.wav");
-        audio3DResources[AUDIOID3D::BOSS_SHOT] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_shot.wav");
-        audio3DResources[AUDIOID3D::BOSS_POWERSHOT] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_powerShot.wav");
-        audio3DResources[AUDIOID3D::BOSS_CHARGE] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_charge.wav");
-        audio3DResources[AUDIOID3D::BOSS_BULLET] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_fire.wav");
-        audio3DResources[AUDIOID3D::BOSS_PUNCH] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_punch.wav");
-        audio3DResources[AUDIOID3D::BOSS_LARIAT] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_lariat.wav");
-        audio3DResources[AUDIOID3D::BOSS_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::BOSS_JUMPATTACK_START] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_start.wav");
+        audio3DResources[AUDIOID3D::BOSS_JUMPATTACK_END] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_end.wav");
+        audio3DResources[AUDIOID3D::BOSS_JUMPATTACK_GROUND] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground3.wav");
+        audio3DResources[AUDIOID3D::BOSS_SHOT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_shot.wav");
+        audio3DResources[AUDIOID3D::BOSS_POWERSHOT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_powerShot.wav");
+        audio3DResources[AUDIOID3D::BOSS_CHARGE] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_charge.wav");
+        audio3DResources[AUDIOID3D::BOSS_BULLET] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_fire.wav");
+        audio3DResources[AUDIOID3D::BOSS_PUNCH] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_punch.wav");
+        audio3DResources[AUDIOID3D::BOSS_LARIAT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_lariat.wav");
+        audio3DResources[AUDIOID3D::BOSS_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
 
     }
 

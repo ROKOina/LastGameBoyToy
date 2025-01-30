@@ -302,10 +302,14 @@ void SceneTitle::UIUpdate(float elapsedTime)
                     GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
                     GameObjectManager::Instance().Find("stage")->SetEnabled(false);
 
+                    Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
+                    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CREDIT, 1.0f, false);
+
                     auto& creditVideo = GameObjectManager::Instance().Find("CreditVideo");
                     creditVideo->GetComponent<Video>()->GetVidePram().SetRestart();
                     creditVideo->GetComponent<Video>()->GetVidePram().resume();
                     creditVideo->SetEnabled(true);
+
                     creditFLG = true;
                 }
 
@@ -372,6 +376,8 @@ void SceneTitle::CreditUpdate(float elapsedTime)
         creditFLG = false;
         GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
         GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CREDIT);
+        Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
         creditVideo->SetEnabled(false);
     }
     if (creditVideo->GetComponent<Video>()->GetVidePram().hasFinished()) {
@@ -379,6 +385,8 @@ void SceneTitle::CreditUpdate(float elapsedTime)
         creditFLG = false;
         GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
         GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CREDIT);
+        Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
         creditVideo->SetEnabled(false);
     }
 

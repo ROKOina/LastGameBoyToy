@@ -125,6 +125,7 @@
     <ClInclude Include="Source\Audio\Audio3D.h" />
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
+    <ClInclude Include="Source\Component\Stage\JumpGimicCom.h" />
     <ClInclude Include="Source\Component\System\ButtonCom.h" />
     <ClInclude Include="Source\Component\System\CrownCom.h" />
     <ClInclude Include="Source\Component\System\pingCom.h" />
@@ -293,6 +294,7 @@
     <ClCompile Include="Source\Audio\Audio3D.cpp" />
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
+    <ClCompile Include="Source\Component\Stage\JumpGimicCom.cpp" />
     <ClCompile Include="Source\Component\System\ButtonCom.cpp" />
     <ClCompile Include="Source\Component\System\CrownCom.cpp" />
     <ClCompile Include="Source\Component\UI\UiMove.cpp" />

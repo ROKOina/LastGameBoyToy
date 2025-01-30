@@ -1,11 +1,11 @@
 #include "BossState.h"
-#include "Component/Enemy/BossCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Component\System\SpawnCom.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Camera\CameraCom.h"
+#include "Component/Enemy/BossCom.h"
 #include "Audio/Audio3D.h"
 
 //基底コンストラクタ
@@ -251,8 +251,9 @@ void Boss_MoveState::Execute(const float& elapsedTime)
     //足音
     if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
     {
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::BOSS_WALK);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_WALK, 7.0f, false);
+        owner->GetAudios(BOSS_WALK)->Audio3DStop();
+        owner->GetAudios(BOSS_WALK)->SetVolume(7.0f);
+        owner->GetAudios(BOSS_WALK)->AudioPlay();
     }
 
     //距離判定
@@ -273,6 +274,7 @@ void Boss_MoveState::Exit()
     //エフェクトを切る
     GameObjectManager::Instance().Find("rightfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
     GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    owner->GetAudios(BOSS_WALK)->Audio3DStop();
 }
 #pragma endregion
 
@@ -286,7 +288,9 @@ void Boss_SA1::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
     {
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_PUNCH, 10.0f, false);
+        owner->GetAudios(BOSS_PUNCH)->Audio3DStop();
+        owner->GetAudios(BOSS_PUNCH)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_PUNCH)->AudioPlay();
     }
 
     //アニメーションが終われば
@@ -303,6 +307,10 @@ void Boss_SA1::Execute(const float& elapsedTime)
         return;
     }
 }
+void Boss_SA1::Exit()
+{
+    owner->GetAudios(BOSS_PUNCH)->Audio3DStop();
+}
 #pragma endregion
 
 #pragma region 近距離攻撃2
@@ -315,7 +323,9 @@ void Boss_SA2::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
     {
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_PUNCH, 10.0f, false);
+        owner->GetAudios(BOSS_PUNCH)->Audio3DStop();
+        owner->GetAudios(BOSS_PUNCH)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_PUNCH)->AudioPlay();
     }
 
     //アニメーションが終われば
@@ -331,6 +341,10 @@ void Boss_SA2::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
+}
+void Boss_SA2::Exit()
+{
+    owner->GetAudios(BOSS_PUNCH)->Audio3DStop();
 }
 #pragma endregion
 
@@ -377,10 +391,10 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
     AnimtionEventControl("COLLSION", "Boss_R_hand", "righthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
     AnimtionEventControl("COLLSION", "Boss_L_hand", "lefthand", EnableGPUParticle | EnableCPUParticle | EnableCollision);
 
-    if (animationCom.lock()->IsEventCalling("SOUND"))
+    if (animationCom.lock()->IsEventCalling("COLLSION"))
     {
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::BOSS_LARIAT);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_LARIAT, 10.0f, false);
+        owner->GetAudios(BOSS_LARIAT)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_LARIAT)->AudioPlay();
     }
 
     //ラリアット持続時間
@@ -411,6 +425,7 @@ void Boss_LARIATLOOP::Exit()
     lefthand->GetComponent<GPUParticle>()->SetLoop(false);
     GameObjectManager::Instance().Find("rightfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
     GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
+    owner->GetAudios(BOSS_LARIAT)->Audio3DStop();
 }
 #pragma endregion
 
@@ -463,7 +478,9 @@ void Boss_UpShotStart::Execute(const float& elapsedTime)
 #pragma region 打ち上げチャージ
 void Boss_UpShotCharge::Enter()
 {
-    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_CHARGE, 10.0f, false);
+    owner->GetAudios(BOSS_CHARGE)->Audio3DStop();
+    owner->GetAudios(BOSS_CHARGE)->SetVolume(10.0f);
+    owner->GetAudios(BOSS_CHARGE)->AudioPlay();
 
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_up_shot_charge"), true, false, 0.1f);
 }
@@ -491,6 +508,7 @@ void Boss_UpShotCharge::Exit()
     //エフェクトを切る
     const auto& spaen = GameObjectManager::Instance().Find("spawn");
     spaen->GetComponent<GPUParticle>()->SetLoop(false);
+    owner->GetAudios(BOSS_CHARGE)->Audio3DStop();
 }
 #pragma endregion
 
@@ -508,7 +526,11 @@ void Boss_UpShotLoop::Execute(const float& elapsedTime)
     }
 
     //モーションに合わせてSE再生
-    if (animationCom.lock()->IsEventCalling("SHOT")) { Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_SHOT, 10.0f, false); }
+    if (animationCom.lock()->IsEventCalling("SHOT")) { 
+        owner->GetAudios(BOSS_SHOT)->Audio3DStop();
+        owner->GetAudios(BOSS_SHOT)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_SHOT)->AudioPlay();
+    }
 
     time += elapsedTime;
     if (time > 4.0f)
@@ -532,6 +554,7 @@ void Boss_UpShotLoop::Exit()
     spawn->GetComponent<SpawnCom>()->SetOnTrigger(false);
     spawn->GetComponent<CPUParticle>()->SetActive(false);
     muzzleflash->GetComponent<CPUParticle>()->SetActive(false);
+    owner->GetAudios(BOSS_SHOT)->Audio3DStop();
 }
 #pragma endregion
 
@@ -584,7 +607,10 @@ void Boss_ShotStart::Execute(const float& elapsedTime)
 #pragma region チャージ
 void Boss_ShotCharge::Enter()
 {
-    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_CHARGE, 10.0f, false);
+    owner->GetAudios(BOSS_CHARGE)->Audio3DStop();
+    owner->GetAudios(BOSS_CHARGE)->SetVolume(10.0f);
+    owner->GetAudios(BOSS_CHARGE)->AudioPlay();
+
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_shot_charge_loop"), true, false, 0.1f);
 }
 void Boss_ShotCharge::Execute(const float& elapsedTime)
@@ -611,6 +637,7 @@ void Boss_ShotCharge::Exit()
     const auto& charge = GameObjectManager::Instance().Find("charge");
     charge->GetComponent<GPUParticle>()->SetLoop(false);
     charge->GetComponent<CPUParticle>()->SetActive(false);
+    owner->GetAudios(BOSS_CHARGE)->Audio3DStop();
 }
 #pragma endregion
 
@@ -628,7 +655,9 @@ void Boss_Shot::Execute(const float& elapsedTime)
 
     if (animationCom.lock()->IsEventCalling("SHOT"))
     {
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_POWERSHOT, 10.0f, false);
+        owner->GetAudios(BOSS_POWERSHOT)->Audio3DStop();
+        owner->GetAudios(BOSS_POWERSHOT)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_POWERSHOT)->AudioPlay();
     }
 
     //アニメーションが終われば
@@ -644,6 +673,10 @@ void Boss_Shot::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
+}
+void Boss_Shot::Exit()
+{
+    owner->GetAudios(BOSS_POWERSHOT)->Audio3DStop();
 }
 #pragma endregion
 
@@ -661,7 +694,9 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     //飛ぶ
     if (animationCom.lock()->IsEventCalling("JUMPINIT"))
     {
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_JUMPATTACK_START, 5.0f, false);
+        owner->GetAudios(BOSS_JUMPATTACK_START)->Audio3DStop();
+        owner->GetAudios(BOSS_JUMPATTACK_START)->SetVolume(5.0f);
+        owner->GetAudios(BOSS_JUMPATTACK_START)->AudioPlay();
     }
     if (animationCom.lock()->IsEventCalling("JUMPTIME"))
     {
@@ -698,13 +733,17 @@ void Boss_JumpAttackStart::Exit()
 {
     //重力を元に戻す
     moveCom.lock()->SetGravity(GRAVITY_NORMAL);
+
+    owner->GetAudios(BOSS_JUMPATTACK_START)->Audio3DStop();
 }
 #pragma endregion
 
 #pragma region ジャンプ攻撃終わり
 void Boss_JumpAttackEnd::Enter()
 {
-    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_JUMPATTACK_END, 10.0f, false);
+    owner->GetAudios(BOSS_JUMPATTACK_END)->Audio3DStop();
+    owner->GetAudios(BOSS_JUMPATTACK_END)->SetVolume(10.0f);
+    owner->GetAudios(BOSS_JUMPATTACK_END)->AudioPlay();
 
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_jump_attack_end"), false, false, 0.1f);
 
@@ -728,7 +767,9 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     if (moveCom.lock()->JustLanded())
     {
         //カメラシェイク
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_JUMPATTACK_GROUND, 10.0f, false);
+        owner->GetAudios(BOSS_JUMPATTACK_GROUND)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_JUMPATTACK_GROUND)->AudioPlay();
+
         GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.5f);
     }
 
@@ -744,6 +785,11 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
         bossCom.lock()->GetStateMachine().ChangeState(BossCom::BossState::EVENT_DEATH);
         return;
     }
+}
+void Boss_JumpAttackEnd::Exit()
+{
+    owner->GetAudios(BOSS_JUMPATTACK_END)->Audio3DStop();
+    owner->GetAudios(BOSS_JUMPATTACK_GROUND)->Audio3DStop();
 }
 #pragma endregion
 
@@ -761,7 +807,9 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
 
     if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
     {
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_WALK, 10.0f, false);
+        owner->GetAudios(BOSS_WALK)->Audio3DStop();
+        owner->GetAudios(BOSS_WALK)->SetVolume(7.0f);
+        owner->GetAudios(BOSS_WALK)->AudioPlay();
     }
 
     //左右の煙
@@ -776,6 +824,7 @@ void Boss_EventWalk::Exit()
     GameObjectManager::Instance().Find("leftfootsmokeeffect")->GetComponent<CPUParticle>()->SetActive(false);
 
     owner->GetGameObject()->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animationCom.lock()->FindAnimation("Boss_walk_front")].animationspeed = 1.0f;
+    owner->GetAudios(BOSS_WALK)->Audio3DStop();
 }
 
 void Boss_EventPunch::Enter()
