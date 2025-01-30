@@ -199,7 +199,7 @@ private:
         audio2DResources[AUDIOID2D::SCENE_BOSS_START] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
         audio2DResources[AUDIOID2D::SCENE_BOSS_CLYMAX] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
         audio2DResources[AUDIOID2D::SCENE_RESULT_VICTORY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
-        audio2DResources[AUDIOID2D::SCENE_RESULT_DEFEAT] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
+        audio2DResources[AUDIOID2D::SCENE_RESULT_DEFEAT] = AudioResource2DStr(x2d, "Data/AudioData/BGM/Result_defeatBGM.wav");
         audio2DResources[AUDIOID2D::SCENE_RESULT_VICTORY_SE] = AudioResource2DStr(x2d, "Data/AudioData/SE/result/victorySE.wav");
         audio2DResources[AUDIOID2D::SCENE_RESULT_DEFEAT_SE] = AudioResource2DStr(x2d, "Data/AudioData/SE/result/defeatSE.wav");
         audio2DResources[AUDIOID2D::CURSOR] = AudioResource2DStr(x2d, "Data/AudioData/SE/cursorMove.wav");

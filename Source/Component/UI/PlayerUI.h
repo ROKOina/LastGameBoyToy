@@ -280,8 +280,7 @@ class UI_GameJudge : public Component
 public:
     UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam);
     ~UI_GameJudge() {
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_RESULT_VICTORY_SE);
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_RESULT_DEFEAT_SE);
+        Audio2DMagaer::Instance().Audio2DStopAll();
     }
 
     // –¼‘OŽæ“¾
