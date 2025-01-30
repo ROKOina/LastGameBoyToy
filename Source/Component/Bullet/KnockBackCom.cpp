@@ -41,6 +41,7 @@ void KnockBackCom::Update(float elapsedTime)
         movement->AddForce({ 0.0f, knockbackforce.y, 0.0f });
         movement->SetOnGround(false);
         movement->SetAirForce(1.0f);
+        movement->SetMoveAcceleration(3.0f);
     }
 }
 
