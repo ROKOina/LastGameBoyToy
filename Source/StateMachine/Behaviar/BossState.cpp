@@ -252,7 +252,7 @@ void Boss_MoveState::Execute(const float& elapsedTime)
     if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
     {
         owner->GetAudios(BOSS_WALK)->Audio3DStop();
-        owner->GetAudios(BOSS_WALK)->SetVolume(7.0f);
+        owner->GetAudios(BOSS_WALK)->SetVolume(0.7f);
         owner->GetAudios(BOSS_WALK)->AudioPlay();
     }
 
@@ -289,7 +289,7 @@ void Boss_SA1::Execute(const float& elapsedTime)
     if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
     {
         owner->GetAudios(BOSS_PUNCH)->Audio3DStop();
-        owner->GetAudios(BOSS_PUNCH)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_PUNCH)->SetVolume(0.7f);
         owner->GetAudios(BOSS_PUNCH)->AudioPlay();
     }
 
@@ -324,7 +324,7 @@ void Boss_SA2::Execute(const float& elapsedTime)
     if (animationCom.lock()->IsEventCalling("ATTACK_INIT"))
     {
         owner->GetAudios(BOSS_PUNCH)->Audio3DStop();
-        owner->GetAudios(BOSS_PUNCH)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_PUNCH)->SetVolume(0.7f);
         owner->GetAudios(BOSS_PUNCH)->AudioPlay();
     }
 
@@ -393,7 +393,7 @@ void Boss_LARIATLOOP::Execute(const float& elapsedTime)
 
     if (animationCom.lock()->IsEventCalling("COLLSION"))
     {
-        owner->GetAudios(BOSS_LARIAT)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_LARIAT)->SetVolume(0.7f);
         owner->GetAudios(BOSS_LARIAT)->AudioPlay();
     }
 
@@ -479,7 +479,7 @@ void Boss_UpShotStart::Execute(const float& elapsedTime)
 void Boss_UpShotCharge::Enter()
 {
     owner->GetAudios(BOSS_CHARGE)->Audio3DStop();
-    owner->GetAudios(BOSS_CHARGE)->SetVolume(10.0f);
+    owner->GetAudios(BOSS_CHARGE)->SetVolume(0.7f);
     owner->GetAudios(BOSS_CHARGE)->AudioPlay();
 
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_up_shot_charge"), true, false, 0.1f);
@@ -528,7 +528,7 @@ void Boss_UpShotLoop::Execute(const float& elapsedTime)
     //モーションに合わせてSE再生
     if (animationCom.lock()->IsEventCalling("SHOT")) { 
         owner->GetAudios(BOSS_SHOT)->Audio3DStop();
-        owner->GetAudios(BOSS_SHOT)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_SHOT)->SetVolume(0.7f);
         owner->GetAudios(BOSS_SHOT)->AudioPlay();
     }
 
@@ -608,7 +608,7 @@ void Boss_ShotStart::Execute(const float& elapsedTime)
 void Boss_ShotCharge::Enter()
 {
     owner->GetAudios(BOSS_CHARGE)->Audio3DStop();
-    owner->GetAudios(BOSS_CHARGE)->SetVolume(10.0f);
+    owner->GetAudios(BOSS_CHARGE)->SetVolume(0.7f);
     owner->GetAudios(BOSS_CHARGE)->AudioPlay();
 
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_shot_charge_loop"), true, false, 0.1f);
@@ -656,7 +656,7 @@ void Boss_Shot::Execute(const float& elapsedTime)
     if (animationCom.lock()->IsEventCalling("SHOT"))
     {
         owner->GetAudios(BOSS_POWERSHOT)->Audio3DStop();
-        owner->GetAudios(BOSS_POWERSHOT)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_POWERSHOT)->SetVolume(0.7f);
         owner->GetAudios(BOSS_POWERSHOT)->AudioPlay();
     }
 
@@ -695,7 +695,7 @@ void Boss_JumpAttackStart::Execute(const float& elapsedTime)
     if (animationCom.lock()->IsEventCalling("JUMPINIT"))
     {
         owner->GetAudios(BOSS_JUMPATTACK_START)->Audio3DStop();
-        owner->GetAudios(BOSS_JUMPATTACK_START)->SetVolume(5.0f);
+        owner->GetAudios(BOSS_JUMPATTACK_START)->SetVolume(0.7f);
         owner->GetAudios(BOSS_JUMPATTACK_START)->AudioPlay();
     }
     if (animationCom.lock()->IsEventCalling("JUMPTIME"))
@@ -742,7 +742,7 @@ void Boss_JumpAttackStart::Exit()
 void Boss_JumpAttackEnd::Enter()
 {
     owner->GetAudios(BOSS_JUMPATTACK_END)->Audio3DStop();
-    owner->GetAudios(BOSS_JUMPATTACK_END)->SetVolume(10.0f);
+    owner->GetAudios(BOSS_JUMPATTACK_END)->SetVolume(0.7f);
     owner->GetAudios(BOSS_JUMPATTACK_END)->AudioPlay();
 
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Boss_jump_attack_end"), false, false, 0.1f);
@@ -767,7 +767,7 @@ void Boss_JumpAttackEnd::Execute(const float& elapsedTime)
     if (moveCom.lock()->JustLanded())
     {
         //カメラシェイク
-        owner->GetAudios(BOSS_JUMPATTACK_GROUND)->SetVolume(10.0f);
+        owner->GetAudios(BOSS_JUMPATTACK_GROUND)->SetVolume(0.7f);
         owner->GetAudios(BOSS_JUMPATTACK_GROUND)->AudioPlay();
 
         GameObjectManager::Instance().Find("cameraPostPlayer")->GetComponent<CameraCom>()->CameraShake(0.04f, 0.5f);
@@ -808,7 +808,7 @@ void Boss_EventWalk::Execute(const float& elapsedTime)
     if (animationCom.lock()->IsEventCalling("STEP_LEFT") || animationCom.lock()->IsEventCalling("STEP_RIGHT"))
     {
         owner->GetAudios(BOSS_WALK)->Audio3DStop();
-        owner->GetAudios(BOSS_WALK)->SetVolume(7.0f);
+        owner->GetAudios(BOSS_WALK)->SetVolume(0.7f);
         owner->GetAudios(BOSS_WALK)->AudioPlay();
     }
 
