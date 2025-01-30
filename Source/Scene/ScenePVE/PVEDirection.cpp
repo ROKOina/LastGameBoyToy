@@ -386,6 +386,8 @@ void PVEDirection::DirectionFEnd(float elapsedTime)
     if (eventBoss->GetComponent<CharaStatusCom>()->IsDeath())
     {
         GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
+        GameObjectManager::Instance().Find("armChild")->SetEnabled(false);
+
         //ˆÃ“]
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
         GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>()->SetParameter(0.0f, 4.0f, parameters);

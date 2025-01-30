@@ -1,5 +1,3 @@
-
-
 #include "RegisterChara.h"
 #include "Component\System\GameObject.h"
 #include "Component/System/TransformCom.h"
@@ -181,7 +179,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
         //ダメージ処理用
         std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
         hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-        hitDamage->SetValue(100);
+        hitDamage->SetValue(80.0f);
 
         //キャラクターに登録
         obj->GetComponent<InazawaCharacterCom>()->SetAttackUltRayObj(ultAttckChild);
@@ -319,7 +317,6 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
 
         pin->AddComponent<NodeCollsionCom>("Data/SerializeData/NodeCollsionData/pinChara.nodecollsion");
     }
-
 }
 
 //ファラ
@@ -777,7 +774,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
         //ダメージ処理用
         std::shared_ptr<HitProcessCom> hitDamage = ultAttckChild->AddComponent<HitProcessCom>(obj);
         hitDamage->SetHitType(HitProcessCom::HIT_TYPE::DAMAGE);
-        hitDamage->SetValue(15);
+        hitDamage->SetValue(20.0f);
 
         //キャラクターに登録
         obj->GetComponent<SoldierCom>()->SetAttackRayObj(ultAttckChild);

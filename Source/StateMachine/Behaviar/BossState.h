@@ -98,7 +98,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit()override {};
+    void Exit()override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "SA1"; }
 };
@@ -111,7 +111,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit()override {};
+    void Exit()override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "SA2"; }
 };
@@ -253,7 +253,7 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit()override {};
+    void Exit()override;
     void ImGui() override {};
     virtual const char* GetName() const override { return "Shot"; }
 };
@@ -279,8 +279,8 @@ public:
 
     void Enter() override;
     void Execute(const float& elapsedTime) override;
-    void Exit()override {};
-    void ImGui() override {};
+    void Exit()override;
+    void ImGui() override { };
     virtual const char* GetName() const override { return "JumpAttackEnd"; }
 };
 

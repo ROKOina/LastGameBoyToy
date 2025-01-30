@@ -90,6 +90,36 @@ void CharaPicks::CreateCharaPicksUiObject()
         timeLimit->SetName("TimeLimit");
     }
 
+    //ステージセレクトのキャンバス
+    {
+        auto& stagecanvas = GameObjectManager::Instance().Create();
+        stagecanvas->SetName("StagePickCanvas");
+
+        auto& stage1 = stagecanvas->AddChildObject();
+        stage1->SetName("stage1picture");
+        stage1->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stage1.ui", Sprite::SpriteShader::DEFALT, true);
+
+        auto& stage2 = stagecanvas->AddChildObject();
+        stage2->SetName("stage2picture");
+        stage2->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stage2.ui", Sprite::SpriteShader::DEFALT, true);
+
+        auto& decision = stagecanvas->AddChildObject();
+        decision->SetName("decision");
+        decision->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
+
+        auto& stagevide1 = stagecanvas->AddChildObject();
+        stagevide1->SetName("stagevide1");
+        stagevide1->transform_->SetWorldPosition({ -2.342f,1.404f,1.765f });
+        stagevide1->transform_->SetScale({ 1.6f,1.6f,1.0f });
+        stagevide1->AddComponent<Video>("Data/Video/stage1.mp4");
+
+        auto& stagevide2 = stagecanvas->AddChildObject();
+        stagevide2->SetName("stagevide2");
+        stagevide2->transform_->SetWorldPosition({ 0.083f,1.404f,1.765f });
+        stagevide2->transform_->SetScale({ 1.6f,1.6f,1.0f });
+        stagevide2->AddComponent<Video>("Data/Video/stage2.mp4");
+    }
+
     //暗転からはじまるように
     std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
     auto& post = GameObjectManager::Instance().Find("posteffect")->GetComponent<PostEffect>();
@@ -107,6 +137,56 @@ void CharaPicks::CharaPicksUpdate(float elapsedTime)
     if (GameObjectManager::Instance().Find("CharaPicksCanvas") != nullptr)
     {
         DecisionButton();
+    }
+
+    //ステージセレクト更新処理
+    StageSelect();
+}
+
+//ステージセレクト
+void CharaPicks::StageSelect()
+{
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    auto& canvas = GameObjectManager::Instance().Find("StagePickCanvas");
+    if (canvas == nullptr)return;
+    auto& decisionButton = canvas->GetChildFind("decision");
+    auto& stage1 = canvas->GetChildFind("stage1picture");
+    auto& stage2 = canvas->GetChildFind("stage2picture");
+    auto& Buttonsprite = decisionButton->GetComponent<Sprite>();
+    auto& stage1sprite = stage1->GetComponent<Sprite>();
+    auto& stage2sprite = stage2->GetComponent<Sprite>();
+
+    // ステージの操作
+    const DirectX::XMFLOAT2 defaultStageScale = { 0.3f, 0.4f };
+    UpdateSprite(stage1sprite.get(), defaultStageScale);
+    UpdateSprite(stage2sprite.get(), defaultStageScale);
+
+    //１なら
+    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage1sprite->GetHitSprite())
+    {
+        stagepick = static_cast<int>(SelectStageKind::FIRST);
+        kind = static_cast<SelectStageKind>(stagepick);
+    }
+
+    //2なら
+    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage2sprite->GetHitSprite())
+    {
+        stagepick = static_cast<int>(SelectStageKind::SECOND);
+        kind = static_cast<SelectStageKind>(stagepick);
+    }
+
+    // OKボタンの操作
+    if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
+    {
+        Buttonsprite->EasingPlay();
+        GameObjectManager::Instance().Remove(canvas);
+        SetViewCharaPicks(true);
+    }
+    else if (!Buttonsprite->GetHitSprite())
+    {
+        Buttonsprite->StopEasing();
+        Buttonsprite->spc.color = { 1,1,1,1 };
     }
 }
 
@@ -306,6 +386,19 @@ void CharaPicks::CharaDetails(float elapsedTime)
     }
 }
 
+void CharaPicks::UpdateSprite(Sprite* sprite, const DirectX::XMFLOAT2& defaultScale)
+{
+    if (sprite->GetHitSpriteEnter())
+    {
+        sprite->EasingPlay();
+    }
+    else if (!sprite->GetHitSprite())
+    {
+        sprite->StopEasing();
+        sprite->spc.scale = defaultScale;
+    }
+}
+
 // 決定処理
 void CharaPicks::DecisionButton()
 {
@@ -426,5 +519,26 @@ void CharaPicks::SetViewCharaPicks(bool flg)
     else
     {
         charaPicksCanvas->SetEnabled(false);
+    }
+}
+
+//ステージピック表示設定
+void CharaPicks::SetViewStagePicks(bool flg)
+{
+    auto& stagepicks = GameObjectManager::Instance().Find("StagePickCanvas");
+    if (!stagepicks) return;
+
+    if (flg)
+    {
+        stagepicks->SetEnabled(true);
+        stagepicks->GetChildFind("stagevide1")->SetEnabled(true);
+        stagepicks->GetChildFind("stagevide2")->SetEnabled(true);
+        GameObjectManager::Instance().Find("lobbyBackParent")->SetEnabled(false);
+    }
+    else
+    {
+        stagepicks->SetEnabled(false);
+        stagepicks->GetChildFind("stagevide1")->SetEnabled(false);
+        stagepicks->GetChildFind("stagevide2")->SetEnabled(false);
     }
 }

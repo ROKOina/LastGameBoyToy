@@ -4,21 +4,15 @@
 
 void MissileCom::Start()
 {
+    bossSE = std::make_shared<BossCom>();
 }
 
 void MissileCom::Update(float elapsedTime)
 {
-    GameObj player = GameObjectManager::Instance().Find("player");
+    GameObj boss = GameObjectManager::Instance().Find("BOSS");
+    bossSE = boss->GetComponent<BossCom>();
 
-    if (!playFlag)
-    {
-        //ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚É‰ž‚¶‚Ä‰¹‚ð‘å‚«‚­
-        float len = Mathf::Length(player->transform_->GetWorldPosition() - GetGameObject()->transform_->GetWorldPosition());
-        if (len < soundLen)
-        {
-            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::BOSS_BULLET, 3.0f, false);
-            Audio2DMagaer::Instance().Audio2DFeed(AUDIOID2D::BOSS_BULLET, 10.0f, 0.2f);
-            playFlag = true;
-        }
-    }
+    bossSE->GetAudios(BOSS_BULLET)->Audio3DStop();
+    bossSE->GetAudios(BOSS_BULLET)->SetVolume(10.0f);
+    bossSE->GetAudios(BOSS_BULLET)->AudioPlay();
 }

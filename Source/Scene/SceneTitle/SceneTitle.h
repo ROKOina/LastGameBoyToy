@@ -35,6 +35,11 @@ private:
     //uiの更新
     void UIUpdate(float elapsedTime);
 
+    //クレジットの更新
+    void CreditUpdate(float elapsedTime);
+
     //画面エフェクト実装
     void ScreenEffect(float elapsedTime);
+
+    bool creditFLG = false;
 };

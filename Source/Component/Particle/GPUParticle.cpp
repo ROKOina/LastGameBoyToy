@@ -17,7 +17,7 @@
 #include <array>
 
 CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 3)
-CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 4)
+CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 3)
 
 // シリアライズ
 namespace DirectX
@@ -121,13 +121,13 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
     );
 
     // バージョン1およびバージョン2には存在しないフィールドにはデフォルト値を与える
-    if (version == 1 || version == 2 || version == 3)
+    if (version == 1 || version == 2 /*|| version == 3*/)
     {
         worldpos = 0;
         iscurve = false;
-        columns = 1;
-        rows = 1;
-        animationrate = 1.0f;
+        //columns = 1;
+        //rows = 1;
+        //animationrate = 1.0f;
     }
     if (version >= 2)
     {
@@ -143,15 +143,15 @@ void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int vers
             CEREAL_NVP(iscurve) // バージョン3以降でシリアライズ
         );
     }
-    if (version >= 4)
-    {
-        archive
-        (
-            CEREAL_NVP(columns),
-            CEREAL_NVP(rows),
-            CEREAL_NVP(animationrate)
-        );
-    }
+    //if (version >= 4)
+    //{
+    //    archive
+    //    (
+    //        CEREAL_NVP(columns),
+    //        CEREAL_NVP(rows),
+    //        CEREAL_NVP(animationrate)
+    //    );
+    //}
 }
 
 template<class Archive>

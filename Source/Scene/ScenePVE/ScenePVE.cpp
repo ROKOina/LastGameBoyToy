@@ -31,6 +31,7 @@
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component\GameSystem\RespawnCom.h"
+#include "Component/Character/RegisterChara.h"
 #include "Audio/Audio3D.h"
 
 ScenePVE::~ScenePVE()
@@ -235,6 +236,22 @@ void ScenePVE::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 300);
             smoke->SetActive(false);
         }
+
+        // SE
+        {
+            auto& se = boss->GetComponent<BossCom>();
+
+            se->SetAudios(AUDIOID3D::BOSS_JUMPATTACK_START, boss);
+            se->SetAudios(AUDIOID3D::BOSS_JUMPATTACK_END, boss);
+            se->SetAudios(AUDIOID3D::BOSS_JUMPATTACK_GROUND, boss);
+            se->SetAudios(AUDIOID3D::BOSS_SHOT, boss);
+            se->SetAudios(AUDIOID3D::BOSS_POWERSHOT, boss);
+            se->SetAudios(AUDIOID3D::BOSS_CHARGE, boss);
+            se->SetAudios(AUDIOID3D::BOSS_BULLET, boss);
+            se->SetAudios(AUDIOID3D::BOSS_PUNCH, boss);
+            se->SetAudios(AUDIOID3D::BOSS_LARIAT, boss);
+            se->SetAudios(AUDIOID3D::BOSS_WALK, boss);
+        }
     }
 
     //大技的なやつ
@@ -244,6 +261,21 @@ void ScenePVE::Initialize()
         obj->transform_->SetWorldPosition({ -1.917f,23.375f,-32.530f });
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomberexplosion.gpuparticle", 6000);
         obj->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/energyspawn.spawn");
+    }
+
+    //ボスの体力UI
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("BossUI");
+        obj->SetEnabled(false);
+        auto& bossHpFrame = obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHPFrame.ui", Sprite::SpriteShader::DEFALT, false);
+
+        auto& hpGaugeObj = obj->AddChildObject();
+        hpGaugeObj->SetName("BossHpGauge");
+        hpGaugeObj->SetEnabled(false);
+        auto& hpGauge = hpGaugeObj->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);
+        hpGauge->SetVariableValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint());
+        hpGauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
     }
 #pragma region グラフィック系の設定
 
@@ -281,13 +313,23 @@ void ScenePVE::Update(float elapsedTime)
     {
         //UI生成
         PlayerUIManager::Instance().UIUpdate(elapsedTime);
+        if (!flag) {
+            auto& frame = GameObjectManager::Instance().Find("BossUI");
+            auto& gauge = GameObjectManager::Instance().Find("BossHpGauge");
+            frame->SetEnabled(true);
+            gauge->SetEnabled(true);
+            GameObjectManager::Instance().Find("Canvas")->AddChildObject(frame);
+            GameObjectManager::Instance().Find("BossUI")->AddChildObject(gauge);
+            flag = true;
+        }
     }
+
     PVEDirection::Instance().Update(elapsedTime);
 
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
-    // リザルトにBGM設定、PvEに必要なオーディオがないか確認
+    // TODO PvEに必要なオーディオがないか確認
 
     ////ネット選択したら更新開始
     //if (flag)

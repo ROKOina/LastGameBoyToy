@@ -149,6 +149,7 @@ void ScenePVP::Initialize()
     // キャラピックUI生成
     charaPicks->CreateCharaPicksUiObject();
     charaPicks->SetViewCharaPicks(false);
+    charaPicks->SetViewStagePicks(false);
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -246,7 +247,7 @@ void ScenePVP::InitializeLobby()
             std::shared_ptr<GameObject> kariLOBBY = FParent->AddChildObject();
             //std::shared_ptr<GameObject> kariLOBBYSELECT = GameObjectManager::Instance().Create();
             kariLOBBY->SetName(("FontBack" + std::to_string(lf.id)).c_str());
-            auto& ui=kariLOBBY->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyStrBack.ui", Sprite::SpriteShader::DEFALT, true);
+            auto& ui = kariLOBBY->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyStrBack.ui", Sprite::SpriteShader::DEFALT, true);
             //削除予定リストに追加
             tempRemoveObj.emplace_back(kariLOBBY);
         }
@@ -268,7 +269,7 @@ void ScenePVP::InitializeCharaSelect()
     //背景
     InitializeBack();    //ピック画面起動
 
-    charaPicks->SetViewCharaPicks(true);
+    charaPicks->SetViewStagePicks(true);
 }
 
 void ScenePVP::InitializePVP()
@@ -286,7 +287,10 @@ void ScenePVP::InitializePVP()
     GameObjectManager::Instance().Find("freecamera")->GetComponent<CameraCom>()->ActiveCameraChange();
 #endif
 
-    //ステージ
+    switch (charaPicks->kind)
+    {
+    case CharaPicks::SelectStageKind::FIRST:
+        //ステージ
     {
         auto& stageObj = GameObjectManager::Instance().Create();
         stageObj->SetName("stage");
@@ -339,14 +343,6 @@ void ScenePVP::InitializePVP()
         obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[GetPlayerTeamIndex(myPlayerID)]);
     }
 
-    //イベント用カメラ
-    {
-        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
-        eventCamera->SetName("eventcamera");
-        eventCamera->AddComponent<EventCameraCom>();
-        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
-    }
-
     //ステージのエフェクト関係
     {
         std::shared_ptr<GameObject> stageEffect = GameObjectManager::Instance().Create();
@@ -383,6 +379,71 @@ void ScenePVP::InitializePVP()
             jeteffect4->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/stgae_jet_1.gpuparticle", 1000);
             jeteffect4->transform_->SetWorldPosition({ -4.663f,9.966f,17.040f });
         }
+    }
+
+    break;
+
+    case CharaPicks::SelectStageKind::SECOND:
+
+        //ステージ
+    {
+        auto& stageObj = GameObjectManager::Instance().Create();
+        stageObj->SetName("stage");
+        stageObj->transform_->SetWorldPosition({ 0.00f, 0.00f, 0.000f });
+
+        float size = 0.05f;
+        stageObj->transform_->SetScale({ size, size, size });
+        std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
+        r->LoadModel("Data/Model/AbeStage/stage2_4.mdl");
+
+        //ステージ
+        StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
+        //判定生成
+        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "stage2_4.mdl", "__", size);
+        //Jsonからオブジェクト配置
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage2_Spawn.json");
+
+        //リスポーン用
+        GameObj respawnObj = GameObjectManager::Instance().Create();
+        respawnObj->SetName("respawn");
+        RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
+        spawnCom->SetGameMode(PVPGameSystem::GAME_MODE::Deathmatch);
+
+        StageEditorCom::PlaceObject spawnObj = stageEdit->GetPlaceObject("Spawn");
+        for (auto& obj : spawnObj.objList)
+        {
+            spawnCom->AddRespawnPoses(obj->transform_->GetWorldPosition());
+        }
+
+        //プレイヤー
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("player");
+        RegisterChara::Instance().SetCharaComponet(RegisterChara::CHARA_LIST(charaPicks->GetSelectedCharacterId()), obj, true);
+
+        //ネットIDによって位置分け
+        //自分のID
+        int myPlayerID = 0;
+        myPlayerID = photonNet->GetPhotonLib()->GetMyPlayerID();
+
+        //自分のチーム
+        int teamIndex = -1;
+        teamIndex = photonNet->GetPhotonLib()->GetTeamID(myPlayerID);
+
+        //どの出現位置なのか
+        int spawnIndex = 0;
+
+        obj->transform_->SetWorldPosition(spawnCom->GetRespawnPoses()[GetPlayerTeamIndex(myPlayerID)]);
+    }
+
+    break;
+    }
+
+    //イベント用カメラ
+    {
+        std::shared_ptr<GameObject> eventCamera = GameObjectManager::Instance().Create();
+        eventCamera->SetName("eventcamera");
+        eventCamera->AddComponent<EventCameraCom>();
+        eventCamera->transform_->SetWorldPosition({ 0, 5, -10 });
     }
 
     //snowparticle
@@ -1339,7 +1400,7 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                         break;
                     }
 
-                    if (f.id != 3 || f.id != 12 || f.id != 13 || f.id != 14) // SE                    
+                    if (f.id != 3 || f.id != 12 || f.id != 13 || f.id != 14) // SE
                     {
                         Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
                         Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
@@ -1353,7 +1414,6 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                         auto& backUi = backf->GetComponent<UiSystem>();
                         backUi->SetHitSprite(false);
                     }
-
                 }
             }
             else
