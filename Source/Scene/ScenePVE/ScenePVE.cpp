@@ -235,6 +235,11 @@ void ScenePVE::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 300);
             smoke->SetActive(false);
         }
+
+        // SE
+        {
+
+        }
     }
 
     //‘å‹Z“I‚È‚â‚Â

@@ -92,8 +92,8 @@ private:
 
     
 private://‰¹
-    std::map<AUDIOID3D, GameObj> audios;
+    std::map<std::string, GameObj> audioObjs;
 public:
-    void SetAudios(AUDIOID3D id, GameObj obj) { audios[id] = obj; }
-    GameObj GetAudios(AUDIOID3D id) { return audios[id]; }
+    void SetAudio(std::string name, GameObj obj) { audioObjs[name] = obj; }
+    AudioSource3D* GetAudio(std::string name) { return audioObjs[name]->GetComponent<AudioSource3D>().get(); }
 };
