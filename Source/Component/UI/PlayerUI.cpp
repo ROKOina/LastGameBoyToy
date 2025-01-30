@@ -1654,11 +1654,7 @@ void PlayerUIManager::KillLogUpdate(float elapsedTime)
                     saveCharaKilog.emplace_back(d);
                 }
             }
-            ki
-                
-                
-                
-                llflg = false;
+            killflg = false;
         }
     }
 
