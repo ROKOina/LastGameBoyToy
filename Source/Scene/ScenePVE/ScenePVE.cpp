@@ -235,6 +235,11 @@ void ScenePVE::Initialize()
             std::shared_ptr<CPUParticle>smoke = groundobject->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/groundsmoke.cpuparticle", 300);
             smoke->SetActive(false);
         }
+
+        // SE
+        {
+
+        }
     }
 
     //大技的なやつ
@@ -287,7 +292,7 @@ void ScenePVE::Update(float elapsedTime)
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
-    // リザルトにBGM設定、PvEに必要なオーディオがないか確認
+    // TODO PvEに必要なオーディオがないか確認
 
     ////ネット選択したら更新開始
     //if (flag)
