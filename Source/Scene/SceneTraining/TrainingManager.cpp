@@ -69,6 +69,7 @@ void TrainingManager::TrainingManagerStart()
     // キャラピックUI生成
     charaPicks->CreateCharaPicksUiObject();
     charaPicks->SetViewCharaPicks(false);
+    charaPicks->SetViewStagePicks(false);
 
     // ポーズ画面設定
     {
@@ -141,12 +142,13 @@ void TrainingManager::ChangeTutorialFlag()
     TrainingSystem::Instance().TrainingObjUnhide();
     TrainingSystem::Instance().ShootingIni();
     tutorialFlag = true;
-    tutorialUIFlag = true;
+    tutorialUIFlag = true; 
 }
 
 void TrainingManager::ChangeTrainigFlag()
 {
     TutorialSystem::Instance().TutorialFlagClear();
+    GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
     tutorialFlag = false;
 }
 
@@ -1496,6 +1498,7 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 
     if (skillInspectionFlag)
     {
+        GameObjectManager::Instance().Find("Canvas")->SetEnabled(false);
         NextTutorial(TutorialID::ULT);
     }
 
@@ -1591,6 +1594,7 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
 
     if (ultInspectionFlag)
     {
+        
         NextTutorial(TutorialID::ENDBLACK);
     }
 
@@ -1602,6 +1606,7 @@ void TutorialSystem::EndBlackTutorialManager(float elapsedTime)
 {
     if (!flag)
     {
+        TrainingManager::Instance().SetTutorilUIFlag(true);
         TrainingManager::Instance().Changeblackout();
         flag = true;
     }
@@ -1613,8 +1618,10 @@ void TutorialSystem::EndBlackTutorialManager(float elapsedTime)
 
     if (blackTime < blackTimer)
     {
+
         TrainingSystem::Instance().TrainingObjDisplay();
         blackTimer = 0.0f;
+        TutorialRightFlag = true;
         flag = false;
         NextTutorial(TutorialID::END);
     }
@@ -1624,13 +1631,15 @@ void TutorialSystem::EndTutorialManager(float elapsedTime)
 {
     if (!flag)
     {
+        
         TrainingManager::Instance().Changelightchange();
-
+        
         flag = true;
     }
 
     if (flag)
     {
+        TutorialRightFlag = false;
         TrainingManager::Instance().ChangeTrainigFlag();
     }
 }

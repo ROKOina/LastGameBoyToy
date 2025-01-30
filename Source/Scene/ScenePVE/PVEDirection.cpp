@@ -83,6 +83,8 @@ void PVEDirection::CharaSlect(float elapsedTime)
         //GameObjectManager::Instance().Find("armChild")->SetEnabled(false);
 
         charaPicks->SetViewCharaPicks(true);
+        charaPicks->SetViewStagePicks(false);
+
         flag = true;
         Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_LOBBY, 0.5f, true);
     }
