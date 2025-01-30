@@ -43,10 +43,20 @@ public:
         SECOND,
         MAX
     };
-    SelectStageKind kind = SelectStageKind::FIRST;
 
     //ステージをのenumを中に格納する
     int getStagePick() const { return stagepick; }
+    bool EndStagePick() const { return isStagePick; }
+    void SetClientStagePick(int id) {   //マスターからの送信が来たら次に行く
+        if (endStagePickClient)return;
+
+        endStagePickClient = true;
+        kind = SelectStageKind(id);
+        stagepick = id;
+    }
+    SelectStageKind kind = SelectStageKind::FIRST;
+
+    void SetMasterPlayer() { isMasterPlayer = true; }
 
 private:
 
@@ -90,6 +100,10 @@ private:
 
     //ステージが選ばれていたら
     int stagepick = -1;
+    bool isStagePick = false;
+
+    bool endStagePickClient = false;
+    bool isMasterPlayer = false;
 
     //経過時間
     float plustime = 0.0f;

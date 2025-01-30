@@ -401,7 +401,7 @@ void ScenePVP::InitializePVP()
         //判定生成
         stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "stage2_4.mdl", "__", size);
         //Jsonからオブジェクト配置
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage2_Spawn.json");
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage2_Gate.json");
 
         //リスポーン用
         GameObj respawnObj = GameObjectManager::Instance().Create();
@@ -1588,7 +1588,7 @@ void ScenePVP::LobbyFontUpdate(float elapsedTime)
                     }
                     if (f.id == 13) //エリアブレイク
                     {
-                        net->SetGameMode(3);
+                        //net->SetGameMode(3);
                     }
 
                     // SE
@@ -1719,6 +1719,21 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
 
     //キャラ被りを無くす
     auto& netSaveInput = net->GetSaveInput();
+
+    //ステージ選択完了
+    if (net->GetIsMasterPlayer())
+    {
+        charaPicks->SetMasterPlayer();
+        if (charaPicks->EndStagePick())
+            net->SetIsStageSelect(charaPicks->getStagePick());
+    }
+    else
+    {
+        if (net->GetIsStageSelect()) //マスターからセレクト完了が送られた
+        {
+            charaPicks->SetClientStagePick(net->GetStageNum());
+        }
+    }
 
     //全員ピック確認
     bool pickTransition = true;

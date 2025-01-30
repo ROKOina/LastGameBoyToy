@@ -140,7 +140,7 @@ void RegisterChara::InazawaChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             GameObj audio = obj->AddChildObject();
             audio->SetName("footEmitter");
             auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
-            au->SetVolume(10);
+            au->SetVolume(0.7f);
             au->AudioPlay();
         }
     }
@@ -364,7 +364,7 @@ void RegisterChara::FarahCharacter(std::shared_ptr<GameObject>& obj, bool myTeam
             GameObj audio = obj->AddChildObject();
             audio->SetName("footEmitter");
             auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
-            au->SetVolume(10);
+            au->SetVolume(0.7f);
             au->AudioPlay();
         }
     }
@@ -522,7 +522,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
             GameObj audio = obj->AddChildObject();
             audio->SetName("footEmitter");
             auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
-            au->SetVolume(10);
+            au->SetVolume(0.7f);
             au->AudioPlay();
         }
     }
@@ -685,7 +685,7 @@ void RegisterChara::SoldireChar(std::shared_ptr<GameObject>& obj, bool myTeam)
             GameObj audio = obj->AddChildObject();
             audio->SetName("footEmitter");
             auto& au = audio->AddComponent<AudioSource3D>(AUDIOID3D::PLAYER_WAKL);
-            au->SetVolume(10);
+            au->SetVolume(0.7f);
             au->AudioPlay();
         }
     }

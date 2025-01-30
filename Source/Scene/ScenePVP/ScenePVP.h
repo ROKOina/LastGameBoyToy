@@ -138,7 +138,8 @@ private:
         LobbySelectFont(10,L"ゲームモード",{1260,52},1.5f,false,0),
         LobbySelectFont(11,L"チームデスマッチ",{1435,201},1,true,0),
         LobbySelectFont(12,L"クラウンスティール",{1435,281},1,true,0),
-        LobbySelectFont(13,L"エリアブレイク",{1435,361},1,true,0),
+        LobbySelectFont(13,L"coming soon",{1435,361},1,false,0),
+        //LobbySelectFont(13,L"エリアブレイク",{1435,361},1,true,0),
 
         //ネット名用
         LobbySelectFont(20,L"",{536,218},1.0f,true,2),

@@ -162,40 +162,46 @@ void CharaPicks::StageSelect()
     UpdateSprite(stage1sprite.get(), defaultStageScale);
     UpdateSprite(stage2sprite.get(), defaultStageScale);
 
-    //１なら
-    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage1sprite->GetHitSprite())
+    if (isMasterPlayer)
     {
-        stagepick = static_cast<int>(SelectStageKind::FIRST);
-        kind = static_cast<SelectStageKind>(stagepick);
-    }
+        //１なら
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage1sprite->GetHitSprite())
+        {
+            stagepick = static_cast<int>(SelectStageKind::FIRST);
+            kind = static_cast<SelectStageKind>(stagepick);
+        }
 
-    //2なら
-    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage2sprite->GetHitSprite())
-    {
-        stagepick = static_cast<int>(SelectStageKind::SECOND);
-        kind = static_cast<SelectStageKind>(stagepick);
-    }
+        //2なら
+        if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage2sprite->GetHitSprite())
+        {
+            stagepick = static_cast<int>(SelectStageKind::SECOND);
+            kind = static_cast<SelectStageKind>(stagepick);
+        }
 
-    // OKキーの演出
-    if (stagepick != -1 && Buttonsprite->GetHitSpriteEnter())
-    {
-        Buttonsprite->EasingPlay();
+        // OKボタンの操作
+        if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
+        {
+            Buttonsprite->EasingPlay();
+            GameObjectManager::Instance().Remove(canvas);
+            SetViewCharaPicks(true);
+            isStagePick = true;
+        }
+        else if (!Buttonsprite->GetHitSprite())
+        {
+            Buttonsprite->StopEasing();
+            Buttonsprite->spc.color = { 1,1,1,1 };
+        }
     }
-    else if (!Buttonsprite->GetHitSprite())
+    else
     {
-        Buttonsprite->StopEasing();
-        Buttonsprite->spc.color = { 1,1,1,1 };
-    }
-
-    // OKボタンが押され、かつキャラが選択されている場合のみ処理を実行
-    if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
-    {
-        // 決定音
-        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::ENTER);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER);
-
-        GameObjectManager::Instance().Remove(canvas);
-        SetViewCharaPicks(true);
+        //マスター以外は遷移待機
+        if (endStagePickClient)
+        {
+            Buttonsprite->EasingPlay();
+            GameObjectManager::Instance().Remove(canvas);
+            SetViewCharaPicks(true);
+            isStagePick = true;
+        }
     }
 }
 
@@ -399,10 +405,14 @@ void CharaPicks::UpdateSprite(Sprite* sprite, const DirectX::XMFLOAT2& defaultSc
 {
     if (sprite->GetHitSpriteEnter())
     {
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 5.f);
+
         sprite->EasingPlay();
     }
     else if (!sprite->GetHitSprite())
     {
+
         sprite->StopEasing();
         sprite->spc.scale = defaultScale;
     }
