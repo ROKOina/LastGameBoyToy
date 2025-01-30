@@ -17,6 +17,8 @@ NoobEnemyCom::NoobEnemyCom()
 //デストラクタ
 NoobEnemyCom::~NoobEnemyCom()
 {
+    GetAudios(NoobEnemy_WALK)->Audio3DStop();
+    GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
 }
 
 //GUI描画
@@ -117,7 +119,8 @@ void NoobEnemyCom::TransitionPursuit()
 {
     state = State::Purstuit;
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_run"), true);
-    
+    boss = GameObjectManager::Instance().Find("BOSS");
+
     // SE
     GetAudios(NoobEnemy_WALK)->Audio3DStop();
     GetAudios(NoobEnemy_WALK)->SetVolume(0.3f);
@@ -139,6 +142,10 @@ void NoobEnemyCom::TransitionExplosion()
     bomber->GetComponent<GPUParticle>()->SetLoop(true);
     bomber->GetComponent<CPUParticle>()->SetActive(true);
 
+    GameObj boss = GameObjectManager::Instance().Find("BOSS");
+    if (boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 0.0f)
+        return;
+
     // SE
     GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
     GetAudios(NoobEnemy_EXPLOSION)->SetVolume(0.5f);
@@ -150,6 +157,10 @@ void NoobEnemyCom::TransiotnDeath()
 {
     state = State::Death;
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_dead"), false);
+
+    GameObj boss = GameObjectManager::Instance().Find("BOSS");
+    if (boss != nullptr && *(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 0.0f)
+        return;
 
     // SE
     GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
@@ -211,6 +222,10 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
         GetAudios(NoobEnemy_WALK)->Audio3DStop();
         TransiotnDeath();
     }
+
+    if (*(boss->GetComponent<CharaStatusCom>()->GetHitPoint()) < 0.0f)
+        GetAudios(NoobEnemy_WALK)->Audio3DStop();
+
 }
 
 //爆発ステート更新処理
