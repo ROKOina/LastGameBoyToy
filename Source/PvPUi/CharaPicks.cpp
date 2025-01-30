@@ -399,10 +399,14 @@ void CharaPicks::UpdateSprite(Sprite* sprite, const DirectX::XMFLOAT2& defaultSc
 {
     if (sprite->GetHitSpriteEnter())
     {
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 5.f);
+
         sprite->EasingPlay();
     }
     else if (!sprite->GetHitSprite())
     {
+
         sprite->StopEasing();
         sprite->spc.scale = defaultScale;
     }

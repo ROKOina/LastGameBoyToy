@@ -120,7 +120,7 @@ void NoobEnemyCom::TransitionPursuit()
     
     // SE
     GetAudios(NoobEnemy_WALK)->Audio3DStop();
-    GetAudios(NoobEnemy_WALK)->SetVolume(10.0f);
+    GetAudios(NoobEnemy_WALK)->SetVolume(0.3f);
     GetAudios(NoobEnemy_WALK)->AudioPlay(true);
 }
 
@@ -141,7 +141,7 @@ void NoobEnemyCom::TransitionExplosion()
 
     // SE
     GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
-    GetAudios(NoobEnemy_EXPLOSION)->SetVolume(10.0f);
+    GetAudios(NoobEnemy_EXPLOSION)->SetVolume(0.5f);
     GetAudios(NoobEnemy_EXPLOSION)->AudioPlay(true);
 }
 
@@ -153,7 +153,7 @@ void NoobEnemyCom::TransiotnDeath()
 
     // SE
     GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
-    GetAudios(NoobEnemy_EXPLOSION)->SetVolume(10.0f);
+    GetAudios(NoobEnemy_EXPLOSION)->SetVolume(0.5f);
     GetAudios(NoobEnemy_EXPLOSION)->AudioPlay(true);
 }
 

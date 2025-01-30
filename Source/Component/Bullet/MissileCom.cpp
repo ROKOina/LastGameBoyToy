@@ -13,6 +13,6 @@ void MissileCom::Update(float elapsedTime)
     bossSE = boss->GetComponent<BossCom>();
 
     bossSE->GetAudios(BOSS_BULLET)->Audio3DStop();
-    bossSE->GetAudios(BOSS_BULLET)->SetVolume(10.0f);
+    bossSE->GetAudios(BOSS_BULLET)->SetVolume(0.7f);
     bossSE->GetAudios(BOSS_BULLET)->AudioPlay();
 }

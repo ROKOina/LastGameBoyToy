@@ -57,7 +57,7 @@ void StageGimmick_IdleState::Exit()
 void StageGimmick_EnemySpawnState::Enter()
 {
     owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->Audio3DStop();
-    owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->SetVolume(10.0f);
+    owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->SetVolume(1.0f);
     owner->GetAudios(GIMMICKSTATE_ENEMYSPAWN)->AudioPlay();
 }
 void StageGimmick_EnemySpawnState::Execute(const float& elapsedTime)
@@ -109,7 +109,7 @@ void StageGimmick_BigAttackState::Enter()
     bomber->GetComponent<SpawnCom>()->SetOnTrigger(true);
 
     owner->GetAudios(GIMMICKSTATE_BIGATTACK)->Audio3DStop();
-    owner->GetAudios(GIMMICKSTATE_BIGATTACK)->SetVolume(10.0f);
+    owner->GetAudios(GIMMICKSTATE_BIGATTACK)->SetVolume(0.5f);
     owner->GetAudios(GIMMICKSTATE_BIGATTACK)->AudioPlay(true);
 }
 void StageGimmick_BigAttackState::Execute(const float& elapsedTime)
@@ -133,7 +133,7 @@ void StageGimmick_BreakState::Enter()
     cpuparticle.lock()->SetActive(true);
 
     owner->GetAudios(GIMMICKSTATE_BREAK)->Audio3DStop();
-    owner->GetAudios(GIMMICKSTATE_BREAK)->SetVolume(10.0f);
+    owner->GetAudios(GIMMICKSTATE_BREAK)->SetVolume(0.7f);
     owner->GetAudios(GIMMICKSTATE_BREAK)->AudioPlay();
 }
 void StageGimmick_BreakState::Execute(const float& elapsedTime)
