@@ -61,6 +61,7 @@ private:
         GateGimic,
         SpawnGimic,
         Plan,
+        JumpBorad,
         Max,
     };
 
@@ -70,6 +71,7 @@ private:
     static void GateGimic(GameObj& place);
     static void SpawnGimic(GameObj& place);
     static void PlaneGimic(GameObj& place);
+    static void JumpGimic(GameObj& place);
 
     GenerateFunc generateFunc[(int)GenerateFuncName::Max] =
     {
@@ -80,6 +82,7 @@ private:
         GateGimic,
         SpawnGimic,
         PlaneGimic,
+        JumpGimic,
     };
 
 public:
