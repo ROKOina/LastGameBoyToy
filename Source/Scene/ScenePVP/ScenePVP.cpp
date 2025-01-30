@@ -394,12 +394,12 @@ void ScenePVP::InitializePVP()
         float size = 0.05f;
         stageObj->transform_->SetScale({ size, size, size });
         std::shared_ptr<RendererCom> r = stageObj->AddComponent<RendererCom>(SHADER_ID_MODEL::DEFERRED, BLENDSTATE::MULTIPLERENDERTARGETS, DEPTHSTATE::ZT_ON_ZW_ON, RASTERIZERSTATE::SOLID_CULL_BACK, true, false);
-        r->LoadModel("Data/Model/AbeStage/stage2_4.mdl");
+        r->LoadModel("Data/Model/AbeStage/stage2_6.mdl");
 
         //ステージ
         StageEditorCom* stageEdit = stageObj->AddComponent<StageEditorCom>().get();
         //判定生成
-        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "stage2_4.mdl", "__", size);
+        stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "stage2_6.mdl", "__", size);
         //Jsonからオブジェクト配置
         stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage2_Gate.json");
 
