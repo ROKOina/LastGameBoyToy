@@ -443,8 +443,8 @@ public:
     void OnGUI()override {};
 
 private:
-    bool  effectFLG;
-    float  effectFLGTimer = 0;
+    bool  effectFLG = false;
+    float  effectFLGTimer = 3.0;
 };
 
 class UI_Reload : public Component
