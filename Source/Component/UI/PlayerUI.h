@@ -279,7 +279,10 @@ class UI_GameJudge : public Component
     //コンポーネントオーバーライド
 public:
     UI_GameJudge(PVPGameSystem::TEAM_KIND victryTeam);
-    ~UI_GameJudge() {}
+    ~UI_GameJudge() {
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_RESULT_VICTORY_SE);
+        Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_RESULT_DEFEAT_SE);
+    }
 
     // 名前取得
     const char* GetName() const override { return "UI_GameJudge"; }

@@ -120,9 +120,9 @@ void SceneResult::Initialize()
     // BGM
     {
         if(isMyWin)
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_VICTORY, 1.0f, true);
         else
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::ENTER, 1.0f, false);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_DEFEAT, 1.0f, true);
     }
 }
 

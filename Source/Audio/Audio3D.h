@@ -77,6 +77,8 @@ enum class AUDIOID2D
     SCENE_BOSS_CLYMAX,
     SCENE_RESULT_VICTORY,
     SCENE_RESULT_DEFEAT,
+    SCENE_RESULT_VICTORY_SE,
+    SCENE_RESULT_DEFEAT_SE,
 
     CURSOR,
     ENTER,
@@ -196,8 +198,10 @@ private:
         audio2DResources[AUDIOID2D::SCENE_LOBBY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/LobbyBGM.wav");
         audio2DResources[AUDIOID2D::SCENE_BOSS_START] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_start.wav");
         audio2DResources[AUDIOID2D::SCENE_BOSS_CLYMAX] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
-        audio2DResources[AUDIOID2D::SCENE_RESULT_VICTORY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
-        audio2DResources[AUDIOID2D::SCENE_RESULT_DEFEAT] = AudioResource2DStr(x2d, "Data/AudioData/BGM/BossBattle_clymax.wav");
+        audio2DResources[AUDIOID2D::SCENE_RESULT_VICTORY] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
+        audio2DResources[AUDIOID2D::SCENE_RESULT_DEFEAT] = AudioResource2DStr(x2d, "Data/AudioData/BGM/TitleBGM.wav");
+        audio2DResources[AUDIOID2D::SCENE_RESULT_VICTORY_SE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/victorySE.wav");
+        audio2DResources[AUDIOID2D::SCENE_RESULT_DEFEAT_SE] = AudioResource2DStr(x2d, "Data/AudioData/BGM/defeatSE.wav");
         audio2DResources[AUDIOID2D::CURSOR] = AudioResource2DStr(x2d, "Data/AudioData/SE/cursorMove.wav");
         audio2DResources[AUDIOID2D::ENTER] = AudioResource2DStr(x2d, "Data/AudioData/SE/enter.wav");
         audio2DResources[AUDIOID2D::BOSS_JUMPATTACK_START] = AudioResource2DStr(x2d, "Data/AudioData/SE/boss_jumpAttack_start.wav");
