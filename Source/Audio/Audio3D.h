@@ -391,9 +391,9 @@ private:
         audio3DResources[AUDIOID3D::BOSS_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
 
         audio3DResources[AUDIOID3D::NoobEnemy_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
-        audio3DResources[AUDIOID3D::NoobEnemy_EXPLOSION] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::NoobEnemy_EXPLOSION] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/enemy_explosion.wav");
 
-        audio3DResources[AUDIOID3D::GIMMICKSTATE_ENEMYSPAWN] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::GIMMICKSTATE_ENEMYSPAWN] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/enemy_explosion.wav");
         audio3DResources[AUDIOID3D::GIMMICKSTATE_BIGATTACK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
         audio3DResources[AUDIOID3D::GIMMICKSTATE_BREAK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
     }
