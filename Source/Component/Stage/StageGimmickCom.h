@@ -2,6 +2,7 @@
 
 #include "Component\System\Component.h"
 #include "StateMachine/StateMachine.h"
+#include "Audio\Audio3D.h"
 
 class StageGimmick : public Component
 {
@@ -39,4 +40,16 @@ public:
 private:
 
     StateMachine<StageGimmick, GimmickState> state;
+
+private://‰¹
+    std::map<AUDIOID3D, GameObj> audios;
+public:
+    void SetAudios(AUDIOID3D id, GameObj obj) {
+        GameObj SeObj = obj->AddChildObject();
+        std::shared_ptr<AudioSource3D> Se = SeObj->AddComponent<AudioSource3D>(id);
+        Se->SetCurveDistanceScaler(70.0f);
+        audios[id] = SeObj;
+    }
+    AudioSource3D* GetAudios(AUDIOID3D id) { return audios[id]->GetComponent<AudioSource3D>().get(); }
+
 };

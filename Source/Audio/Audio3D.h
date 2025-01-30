@@ -314,6 +314,15 @@ enum AUDIOID3D
     BOSS_LARIAT,
     BOSS_WALK,
 
+    // 雑魚敵
+    NoobEnemy_WALK,
+    NoobEnemy_EXPLOSION,
+
+    // ステージギミック
+    GIMMICKSTATE_ENEMYSPAWN,
+    GIMMICKSTATE_BIGATTACK,
+    GIMMICKSTATE_BREAK,
+
     MAX_
 };
 class Audio3DResourceMagaer
@@ -381,6 +390,12 @@ private:
         audio3DResources[AUDIOID3D::BOSS_LARIAT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_lariat.wav");
         audio3DResources[AUDIOID3D::BOSS_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
 
+        audio3DResources[AUDIOID3D::NoobEnemy_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::NoobEnemy_EXPLOSION] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+
+        audio3DResources[AUDIOID3D::GIMMICKSTATE_ENEMYSPAWN] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::GIMMICKSTATE_BIGATTACK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::GIMMICKSTATE_BREAK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
     }
 
     std::map<AUDIOID3D, std::shared_ptr<AudioResource>> audio3DResources;
