@@ -4,6 +4,7 @@
 #include "Graphics\Video.h"
 #include "Graphics/ConstantBuffer.h"
 
+
 class Video :public Component
 {
 public:
@@ -24,6 +25,8 @@ public:
 
     //–¼‘Oİ’è
     const char* GetName() const override { return "Video"; }
+
+    VideoTexture GetVidePram() { return video; }
 
 private:
 
