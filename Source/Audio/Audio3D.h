@@ -390,14 +390,14 @@ private:
         audio3DResources[AUDIOID3D::BOSS_LARIAT] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_lariat.wav");
         audio3DResources[AUDIOID3D::BOSS_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
 
-        audio3DResources[AUDIOID3D::NoobEnemy_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::NoobEnemy_WALK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/NoobEnemy_WALK.wav");
         audio3DResources[AUDIOID3D::NoobEnemy_EXPLOSION] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/enemy_explosion.wav");
 
         audio3DResources[AUDIOID3D::GIMMICKSTATE_ENEMYSPAWN] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/enemy_explosion.wav");
-        audio3DResources[AUDIOID3D::GIMMICKSTATE_BIGATTACK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
-        audio3DResources[AUDIOID3D::GIMMICKSTATE_BREAK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/boss_jumpAttack_ground2.wav");
+        audio3DResources[AUDIOID3D::GIMMICKSTATE_BIGATTACK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/gimmickstate_bigattack.wav");
+        audio3DResources[AUDIOID3D::GIMMICKSTATE_BREAK] = std::make_shared<AudioResource>("Data/AudioData/SE/mono/gimmickstate_break.wav");
     }
-
+    
     std::map<AUDIOID3D, std::shared_ptr<AudioResource>> audio3DResources;
 };
 
@@ -422,7 +422,7 @@ public:
     // ’âŽ~
     void Audio3DStop();
 
-    void SetVolume(float volume) { volume = this->volume; }
+    void SetVolume(float volume) { this->volume = volume; }
 
     void SetListenerPos(DirectX::XMFLOAT3 pos) { listenerPos = pos; }
     void SetEmitterPos(DirectX::XMFLOAT3 pos) { emitterPos = pos; }
@@ -447,7 +447,7 @@ private:
     DirectX::XMFLOAT3 listenerPos;
     DirectX::XMFLOAT3 emitterPos;
 
-    float volume = 1;
+    float volume = 0.6f;
 
     float CurveDistanceScaler = 14.0f;
 
