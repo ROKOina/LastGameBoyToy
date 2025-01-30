@@ -103,6 +103,7 @@ void SceneTraining::Finalize()
     TrainingManager::Instance().TrainingManagerClear();
     GameObjectManager::Instance().AllRemove();
     GameObjectManager::Instance().RemoveGameObjects();
+    Audio2DMagaer::Instance().Audio2DStopAll();
 }
 
 void SceneTraining::Update(float elapsedTime)
