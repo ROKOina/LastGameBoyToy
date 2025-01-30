@@ -601,7 +601,7 @@ void ScenePVP::InitializePVP()
         std::shared_ptr<GameObject>crawneffect = obj->AddChildObject();
         crawneffect->SetName("carwneffect");
         crawneffect->transform_->SetLocalPosition({ 0.163f,-8.855f,0.377f });
-        crawneffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crawn_pvp.gpuparticle", 4000);
+        crawneffect->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/crawn_pvp.gpuparticle", 1000);
     }
     break;
     case PVPGameSystem::GAME_MODE::Button:
@@ -640,6 +640,12 @@ void ScenePVP::InitializePVP()
 
         //ボタンのコンポーネントを付与する
         std::shared_ptr<ButtonCom>b = obj->AddComponent<ButtonCom>();
+
+        {
+            auto& areaC = obj->AddChildObject();
+            areaC->SetName("ButtonChild");
+            areaC->AddComponent<GPUParticle>(nullptr, 1000);
+        }
     }
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -652,6 +658,12 @@ void ScenePVP::InitializePVP()
 
         //ボタンのコンポーネントを付与する
         std::shared_ptr<ButtonCom>b = obj->AddComponent<ButtonCom>();
+
+        {
+            auto& areaC = obj->AddChildObject();
+            areaC->SetName("ButtonChild");
+            areaC->AddComponent<GPUParticle>(nullptr, 1000);
+        }
     }
     break;
     }
