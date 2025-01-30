@@ -208,7 +208,8 @@ void StageEditorCom::OnGUI()
                 "TowerGimic",
                 "GateGimic",
                 "SpawnGimic",
-                "Plane"
+                "Plane",
+                "JumpGimic"
             };
             int funcIndex = (int)objName.second.func;
             ImGui::Combo((char*)u8"¶¬ŠÖ”", &funcIndex, FuncName, (int)GenerateFuncName::Max);
@@ -535,6 +536,8 @@ void StageEditorCom::JumpGimic(GameObj& place)
     SphereColliderCom* sphere = place->AddComponent<SphereColliderCom>().get();
     sphere->SetMyTag(COLLIDER_TAG::JUMPGIMMICK);
     sphere->SetJudgeTag(COLLIDER_TAG::Player);
+    sphere->SetRadius(5.0f);
     auto& knockback = place->AddComponent<KnockBackCom>();
-    knockback->SetKnockBackForce({ 0,10,20 });
+    knockback->SetKnockBackForce({ 0,15,0 });
+    place->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/jump.gpuparticle", 1000);
 }

@@ -116,7 +116,8 @@ void SceneNakanisi::Initialize()
         //判定生成
         stageEdit->PlaceStageRigidCollider("Data/Model/AbeStage/", "stage2_4.mdl", "__", size);
         //Jsonからオブジェクト配置
-        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage2_Spawn.json");
+        //stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage2_Spawn.json");
+        stageEdit->PlaceJsonData("Data/SerializeData/StageGimic/AbeStage2_Gate.json");
 
         //リスポーン用
         GameObj respawnObj = GameObjectManager::Instance().Create();

@@ -2154,19 +2154,15 @@ void UI_KillEffect::Start()
 
 void UI_KillEffect::Update(float elapsedTime)
 {
-    effectFLGTimer -= elapsedTime;
+   
 
     auto& player = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>();
     for (int i = 0; i < 4; i++)
     {
         auto& killflg = StaticSendDataManager::Instance().GetKillID(player->GetNetCharaData().GetNetPlayerID(), i);
         if (killflg)
-        {
-            if (effectFLGTimer < 0)
-            {
-                effectFLG = true;
-                effectFLGTimer = 3;
-            }
+        {          
+             effectFLG = true;         
         }
     }
     EffectUpdat(elapsedTime);

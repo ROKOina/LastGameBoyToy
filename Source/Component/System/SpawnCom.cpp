@@ -285,7 +285,10 @@ void SpawnCom::SetupEnemy(const std::shared_ptr<GameObject>& obj)
     Gbomber->SetLoop(false);
     std::shared_ptr<CPUParticle>Cbomber = bomber->AddComponent<CPUParticle>("Data/SerializeData/CPUEffect/bomber.cpuparticle", 500);
     Cbomber->SetActive(false);
-    obj->AddComponent<NoobEnemyCom>();
+    
+    auto& se = obj->AddComponent<NoobEnemyCom>();
+    se->SetAudios(NoobEnemy_WALK, obj);
+    se->SetAudios(NoobEnemy_EXPLOSION, obj);
 }
 
 //ƒ~ƒTƒCƒ‹¶¬ŠÖ”

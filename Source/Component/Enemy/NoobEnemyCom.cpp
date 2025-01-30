@@ -117,6 +117,11 @@ void NoobEnemyCom::TransitionPursuit()
 {
     state = State::Purstuit;
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_run"), true);
+    
+    // SE
+    GetAudios(NoobEnemy_WALK)->Audio3DStop();
+    GetAudios(NoobEnemy_WALK)->SetVolume(10.0f);
+    GetAudios(NoobEnemy_WALK)->AudioPlay(true);
 }
 
 //爆発ステート
@@ -133,6 +138,11 @@ void NoobEnemyCom::TransitionExplosion()
     const auto& bomber = GetGameObject()->GetChildFind("bomber");
     bomber->GetComponent<GPUParticle>()->SetLoop(true);
     bomber->GetComponent<CPUParticle>()->SetActive(true);
+
+    // SE
+    GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
+    GetAudios(NoobEnemy_EXPLOSION)->SetVolume(10.0f);
+    GetAudios(NoobEnemy_EXPLOSION)->AudioPlay(true);
 }
 
 //死亡ステート
@@ -140,6 +150,11 @@ void NoobEnemyCom::TransiotnDeath()
 {
     state = State::Death;
     animationCom.lock()->PlayAnimation(animationCom.lock()->FindAnimation("Enemy_dead"), false);
+
+    // SE
+    GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
+    GetAudios(NoobEnemy_EXPLOSION)->SetVolume(10.0f);
+    GetAudios(NoobEnemy_EXPLOSION)->AudioPlay(true);
 }
 
 //待機ステート更新処理
@@ -186,12 +201,14 @@ void NoobEnemyCom::UpdatePursuit(float elapedTime)
     //爆発ステートに遷移
     if (explosionDist > GetPlayerDist())
     {
+        GetAudios(NoobEnemy_WALK)->Audio3DStop();
         TransitionExplosion();
     }
 
     //死亡フラグが立てば
     if (GetGameObject()->GetComponent<CharaStatusCom>()->IsDeath())
     {
+        GetAudios(NoobEnemy_WALK)->Audio3DStop();
         TransiotnDeath();
     }
 }
@@ -210,6 +227,8 @@ void NoobEnemyCom::UpdateExplosion(float elapsedTime)
         bomber->GetComponent<GPUParticle>()->SetLoop(false);
         bomber->GetComponent<CPUParticle>()->SetActive(false);
 
+        GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
+
         if (time > 1.0f)
         {
             //一定時間その場に止まってから爆発
@@ -226,6 +245,8 @@ void NoobEnemyCom::UpdateDeath(float elapsedTime)
     {
         time += elapsedTime;
         GetGameObject()->GetComponent<RendererCom>()->SetDissolveThreshold(time);
+        // SE
+        GetAudios(NoobEnemy_EXPLOSION)->Audio3DStop();
 
         if (time > 1.0f)
         {

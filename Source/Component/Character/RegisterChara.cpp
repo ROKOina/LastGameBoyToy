@@ -495,7 +495,7 @@ void RegisterChara::JankratChara(std::shared_ptr<GameObject>& obj, bool myTeam)
     charaCom->GetNetCharaData().SetCharaID(int(CHARA_LIST::JANKRAT));
     charaCom->SetMaxBulletNum(15);
     charaCom->SetCurrentBulletNum(15);
-    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 3.5f);
+    charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::E, 2.5f);
     charaCom->SetSkillCoolTime(CharacterCom::SkillCoolID::RightClick, 0.1f);
     charaCom->SetUseSkill(USE_SKILL::E | USE_SKILL::RIGHT_CLICK);
 
