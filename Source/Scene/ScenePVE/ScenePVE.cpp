@@ -118,6 +118,7 @@ void ScenePVE::Initialize()
         RespawnCom* spawnCom = respawnObj->AddComponent<RespawnCom>().get();
     }
 
+
     //snowparticle
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
@@ -250,6 +251,24 @@ void ScenePVE::Initialize()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/bomberexplosion.gpuparticle", 6000);
         obj->AddComponent<SpawnCom>("Data/SerializeData/SpawnData/energyspawn.spawn");
     }
+
+    //ボスの体力UI
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("BossUI");
+        obj->SetEnabled(false);
+       auto& bossHpFrame =  obj->AddComponent<UiSystem>("Data/SerializeData/UIData/Player/BossHPFrame.ui",Sprite::SpriteShader::DEFALT,false);
+  
+
+       auto& hpGaugeObj = obj->AddChildObject();
+       hpGaugeObj->SetName("BossHpGauge");
+       hpGaugeObj->SetEnabled(false);
+       auto& hpGauge = hpGaugeObj->AddComponent<UiGauge>("Data/SerializeData/UIData/Player/BossHpGauge.ui", Sprite::SpriteShader::DEFALT, false, UiSystem::ChangeValue::X_ONLY_ADD);
+       hpGauge->SetVariableValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetHitPoint());
+       hpGauge->SetMaxValue(GameObjectManager::Instance().Find("BOSS")->GetComponent<CharaStatusCom>()->GetMaxHitpoint());
+   
+
+    }
 #pragma region グラフィック系の設定
 
     //コンスタントバッファの初期化
@@ -286,7 +305,18 @@ void ScenePVE::Update(float elapsedTime)
     {
         //UI生成
         PlayerUIManager::Instance().UIUpdate(elapsedTime);
+        if (!flag) {
+            auto& frame = GameObjectManager::Instance().Find("BossUI");
+            auto& gauge = GameObjectManager::Instance().Find("BossHpGauge");
+            frame->SetEnabled(true);
+            gauge->SetEnabled(true);
+            GameObjectManager::Instance().Find("Canvas")->AddChildObject(frame);
+            GameObjectManager::Instance().Find("BossUI")->AddChildObject(gauge);
+            flag = true;
+        }
     }
+   
+
     PVEDirection::Instance().Update(elapsedTime);
 
     GameObjectManager::Instance().UpdateTransform();
