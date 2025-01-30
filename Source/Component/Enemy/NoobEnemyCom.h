@@ -7,6 +7,7 @@
 #include "Component/Animation/AnimationCom.h"
 #include <array>
 #include "Component\MoveSystem\MovementCom.h"
+#include "Audio\Audio3D.h"
 
 #define GetComp(Component) owner->GetGameObject()->GetComponent<Component>();
 
@@ -98,4 +99,15 @@ private:
     float firstIdleTimer = 0.0f;
     //íœŠÔ
     float time = {};
+
+private://‰¹
+    std::map<AUDIOID3D, GameObj> audios;
+public:
+    void SetAudios(AUDIOID3D id, GameObj obj) {
+        GameObj SeObj = obj->AddChildObject();
+        std::shared_ptr<AudioSource3D> Se = SeObj->AddComponent<AudioSource3D>(id);
+        Se->SetCurveDistanceScaler(70.0f);
+        audios[id] = SeObj;
+    }
+    AudioSource3D* GetAudios(AUDIOID3D id) { return audios[id]->GetComponent<AudioSource3D>().get(); }
 };
