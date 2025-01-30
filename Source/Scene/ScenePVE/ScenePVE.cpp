@@ -31,6 +31,7 @@
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component\GameSystem\RespawnCom.h"
+#include "Component/Character/RegisterChara.h"
 #include "Audio/Audio3D.h"
 
 ScenePVE::~ScenePVE()
@@ -239,7 +240,18 @@ void ScenePVE::Initialize()
 
         // SE
         {
+            auto& se = boss->GetComponent<BossCom>();
 
+            se->SetAudios(AUDIOID3D::BOSS_JUMPATTACK_START, boss);
+            se->SetAudios(AUDIOID3D::BOSS_JUMPATTACK_END, boss);
+            se->SetAudios(AUDIOID3D::BOSS_JUMPATTACK_GROUND, boss);
+            se->SetAudios(AUDIOID3D::BOSS_SHOT, boss);
+            se->SetAudios(AUDIOID3D::BOSS_POWERSHOT, boss);
+            se->SetAudios(AUDIOID3D::BOSS_CHARGE, boss);
+            se->SetAudios(AUDIOID3D::BOSS_BULLET, boss);
+            se->SetAudios(AUDIOID3D::BOSS_PUNCH, boss);
+            se->SetAudios(AUDIOID3D::BOSS_LARIAT, boss);
+            se->SetAudios(AUDIOID3D::BOSS_WALK, boss);
         }
     }
 
