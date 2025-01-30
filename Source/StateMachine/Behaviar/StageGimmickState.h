@@ -42,7 +42,7 @@ class StageGimmick_EnemySpawnState : public StageGimmick_BaseState
 public:
     StageGimmick_EnemySpawnState(StageGimmick* owner) :StageGimmick_BaseState(owner) {}
 
-    void Enter() override {};
+    void Enter() override;
     void Execute(const float& elapsedTime) override;
     virtual void Exit();
     void ImGui() override {};

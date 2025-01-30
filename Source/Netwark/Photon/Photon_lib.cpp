@@ -188,6 +188,23 @@ void PhotonLib::update(float elapsedTime)
                     //スタート時間保存
                     startTime = GetServerTime();
                     countTime = GetServerTime();
+
+                    //ステージIDでボタン位置決定
+                    int myT = GetTeamID(GetMyPlayerID());
+                    for (int i = 0; i < 2; ++i) {
+                        std::string name = "ButtonArea" + std::to_string(i);
+                        auto& button = GameObjectManager::Instance().Find(name.c_str());
+                        if (button)
+                        {
+                            if (myT == i)
+                                button->GetComponent<Collider>()->SetJudgeTag(COLLIDER_TAG::Player);
+                            else
+                                button->GetComponent<Collider>()->SetJudgeTag(COLLIDER_TAG::Enemy);
+                        }
+
+                        auto& buttonVector = buttonPosData[stageID][i];
+                        saveButton[i].buttonPosition = buttonVector[0];
+                    }
                 }
                 firstStartGame = true;
                 //ゲーム中情報送信
@@ -310,6 +327,53 @@ void PhotonLib::update(float elapsedTime)
             }
         }
     }
+
+
+    //ボタン
+    if (myPlayerID >= 0) {
+        int teamID = GetTeamID(myPlayerID);
+        auto& sB = saveButton[teamID];
+        //送り漏れ防止
+        if (sB.isPush)
+        {
+            if (sB.sendFrame <= 0)
+            {
+                sB.isPush = false;
+                sB.isTeleport = false;
+            }
+        }
+        //ボタンプッシュを送る
+        if (StaticSendDataManager::Instance().GetButton())
+        {
+            sB.isPush = true;
+            sB.sendFrame = sB.sendButtonDelay;
+        }
+
+        //ボタン位置変更
+        if (GetIsMasterPlayer())
+        {
+            for (int i = 0; i < 2; ++i)
+            {
+                if (!saveButton[i].isPush)continue;
+                if (saveButton[i].isTeleport)continue;
+
+                SetButtonPos(i);
+
+                //位置変更フラグを起動
+                saveButton[i].isTeleport = true;
+            }
+        }
+        //ボタン位置更新
+        for (int i = 0; i < 2; ++i)
+        {
+            std::string name = "ButtonArea" + std::to_string(i);
+            auto& button = GameObjectManager::Instance().Find(name.c_str());
+            if (button)
+                button->transform_->SetWorldPosition(saveButton[i].buttonPosition);
+        }
+    }
+
+
 
     //チーム保存
     for (auto& s : saveInputPhoton)
@@ -1720,6 +1784,19 @@ void PhotonLib::ButtonRecv(NetData recvData)
     {
         //ボタンを押した回数を送る
         saveInputPhoton[recvData.playerId].buttonCount = recvData.buttonData.buttoncount;
+
+        if (!GetIsMasterPlayer())   //マスター以外
+        {
+            //ボタンポジションを保存
+            saveButton[0].buttonPosition = recvData.buttonData.team1ButtonPos;
+            saveButton[1].buttonPosition = recvData.buttonData.team2ButtonPos;
+        }
+        else
+        {
+            //マスターの場合は押されたフラグを確認
+            if (recvData.buttonData.isPushButton)
+                saveButton[saveInputPhoton[recvData.playerId].teamID].isPush = recvData.buttonData.isPushButton;
+        }
     }
 }
 
@@ -2138,7 +2215,26 @@ void PhotonLib::sendButtonData(void)
 
     //ボタン回数送信
     if (myPlayerID >= 0)
+    {
         netD.buttonData.buttoncount = saveInputPhoton[myPlayerID].buttonCount;
+
+        //ボタン位置
+        if (GetIsMasterPlayer())   //マスターのみ
+        {
+            netD.buttonData.team1ButtonPos = saveButton[0].buttonPosition;
+            netD.buttonData.team2ButtonPos = saveButton[1].buttonPosition;
+        }
+
+        //ボタン獲得
+        int teamID = GetTeamID(myPlayerID);
+        saveButton[teamID].sendFrame--;
+        if (saveButton[teamID].isPush)
+        {
+            netD.buttonData.isPushButton = true;
+        }
+        else
+            netD.buttonData.isPushButton = false;
+    }
 
     std::stringstream s = NetDataSendCast(n);
     auto ne = NetDataRecvCast(s.str());
@@ -2146,6 +2242,21 @@ void PhotonLib::sendButtonData(void)
     int myPlayerNumber = mLoadBalancingClient.getLocalPlayer().getNumber();
     //自分以外全員に送信
     mLoadBalancingClient.opRaiseEvent(true, event, 0);
+}
+
+void PhotonLib::SetButtonPos(int teamID)
+{
+    auto& buttonVector = buttonPosData[stageID][teamID];
+    int nextPosID = -1;
+    //前回と違うIDが出来るまで繰り返す
+    while (1) {
+        nextPosID = rand() % buttonVector.size();
+        if (oldButtonPosID[teamID] != nextPosID)break;
+    }
+    oldButtonPosID[teamID] = nextPosID; //今回のIDを保存
+
+    //位置を保存
+    saveButton[teamID].buttonPosition = buttonVector[nextPosID];
 }
 
 //プレイヤー追加
