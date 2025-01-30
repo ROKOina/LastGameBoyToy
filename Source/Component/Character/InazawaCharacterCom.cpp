@@ -166,17 +166,6 @@ void InazawaCharacterCom::SubSkill()
 
 void InazawaCharacterCom::UltSkill()
 {
-    //int counter = *GetRCounter();
-    //if (counter >= 0 && counter <= 4)
-    //{
-    //    std::string coreName = "core" + std::to_string(4 - counter);
-    //    const auto& sprite = GameObjectManager::Instance().Find(coreName.c_str())->GetComponent<Sprite>();
-    //    if (sprite)
-    //    {
-    //        sprite->EasingPlay();
-    //    }
-    //}
-
     attackUltCounter = 0;
 
     if (std::string(GetGameObject()->GetName()) == "player")

@@ -33,10 +33,8 @@ void Farah_MainAttackState::Execute(const float& elapsedTime)
             charaCom.lock()->AddCurrentBulletNum(-1);
         }
 
-
-
         //UŒ‚ˆ—
-        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 50.0f, 15.0f));
+        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 50.0f, 20.0f));
 
         //ŽËŒ‚ŠÔŠuƒ^ƒCƒ}[‹N“®
         charaCom.lock()->ResetShootTimer();
@@ -67,7 +65,7 @@ void Farah_UltState::Execute(const float& elapsedTime)
         charaCom.lock()->HandleArmAnimation();
 
         //UŒ‚ˆ—
-        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 50.0f, 15.0f));
+        charaCom.lock()->AddBullet(BulletCreate::FarahDamageFire(owner->GetGameObject(), 50.0f, 20.0f));
     }
 
     if (owner->GetUltTimer() > owner->GetMaxUltTime())

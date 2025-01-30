@@ -25,7 +25,9 @@
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\FrustumCom.h"
 #include "Component\Stage\GateGimmickCom.h"
+#include "Component\Stage\JumpGimicCom.h"
 #include "Component\Renderer\InstanceRendererCom.h"
+#include "Component\Bullet\KnockBackCom.h"
 
 void StageEditorCom::Update(float elapsedTime)
 {
@@ -523,5 +525,9 @@ void StageEditorCom::PlaneGimic(GameObj& place)
 
 void StageEditorCom::JumpGimic(GameObj& place)
 {
-    
+    SphereColliderCom* sphere = place->AddComponent<SphereColliderCom>().get();
+    sphere->SetMyTag(COLLIDER_TAG::JUMPGIMMICK);
+    sphere->SetJudgeTag(COLLIDER_TAG::Player);
+    auto& knockback = place->AddComponent<KnockBackCom>();
+    knockback->SetKnockBackForce({ 0,10,20 });
 }

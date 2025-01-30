@@ -45,6 +45,9 @@ public:
     };
     SelectStageKind kind = SelectStageKind::FIRST;
 
+    //ステージをのenumを中に格納する
+    int getStagePick() const { return stagepick; }
+
 private:
 
     // キャラ詳細（スキル表示、キャラ名、選択キャラ表示）
@@ -84,6 +87,9 @@ private:
 
     //チームがピックしているキャラ
     int teamPick = -1;
+
+    //ステージが選ばれていたら
+    int stagepick = -1;
 
     //経過時間
     float plustime = 0.0f;

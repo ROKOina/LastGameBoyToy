@@ -106,6 +106,18 @@ void CharaPicks::CreateCharaPicksUiObject()
         auto& decision = stagecanvas->AddChildObject();
         decision->SetName("decision");
         decision->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/decision.ui", Sprite::SpriteShader::DEFALT, true);
+
+        auto& stagevide1 = stagecanvas->AddChildObject();
+        stagevide1->SetName("stagevide1");
+        stagevide1->transform_->SetWorldPosition({ -2.342f,1.404f,1.765f });
+        stagevide1->transform_->SetScale({ 1.6f,1.6f,1.0f });
+        stagevide1->AddComponent<Video>("Data/Video/stage1.mp4");
+
+        auto& stagevide2 = stagecanvas->AddChildObject();
+        stagevide2->SetName("stagevide2");
+        stagevide2->transform_->SetWorldPosition({ 0.083f,1.404f,1.765f });
+        stagevide2->transform_->SetScale({ 1.6f,1.6f,1.0f });
+        stagevide2->AddComponent<Video>("Data/Video/stage2.mp4");
     }
 
     //ˆÃ“]‚©‚ç‚Í‚¶‚Ü‚é‚æ‚¤‚É
@@ -137,6 +149,7 @@ void CharaPicks::StageSelect()
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     auto& canvas = GameObjectManager::Instance().Find("StagePickCanvas");
+    if (canvas == nullptr)return;
     auto& decisionButton = canvas->GetChildFind("decision");
     auto& stage1 = canvas->GetChildFind("stage1picture");
     auto& stage2 = canvas->GetChildFind("stage2picture");
@@ -149,10 +162,26 @@ void CharaPicks::StageSelect()
     UpdateSprite(stage1sprite.get(), defaultStageScale);
     UpdateSprite(stage2sprite.get(), defaultStageScale);
 
+    //‚P‚È‚ç
+    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage1sprite->GetHitSprite())
+    {
+        stagepick = static_cast<int>(SelectStageKind::FIRST);
+        kind = static_cast<SelectStageKind>(stagepick);
+    }
+
+    //2‚È‚ç
+    if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && stage2sprite->GetHitSprite())
+    {
+        stagepick = static_cast<int>(SelectStageKind::SECOND);
+        kind = static_cast<SelectStageKind>(stagepick);
+    }
+
     // OKƒ{ƒ^ƒ“‚Ì‘€ì
-    if (Buttonsprite->GetHitSpriteEnter())
+    if (stagepick != -1 && GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown() && Buttonsprite->GetHitSprite())
     {
         Buttonsprite->EasingPlay();
+        GameObjectManager::Instance().Remove(canvas);
+        SetViewCharaPicks(true);
     }
     else if (!Buttonsprite->GetHitSprite())
     {
@@ -502,10 +531,14 @@ void CharaPicks::SetViewStagePicks(bool flg)
     if (flg)
     {
         stagepicks->SetEnabled(true);
+        stagepicks->GetChildFind("stagevide1")->SetEnabled(true);
+        stagepicks->GetChildFind("stagevide2")->SetEnabled(true);
         GameObjectManager::Instance().Find("lobbyBackParent")->SetEnabled(false);
     }
     else
     {
         stagepicks->SetEnabled(false);
+        stagepicks->GetChildFind("stagevide1")->SetEnabled(false);
+        stagepicks->GetChildFind("stagevide2")->SetEnabled(false);
     }
 }
