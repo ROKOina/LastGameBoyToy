@@ -805,106 +805,111 @@ void TutorialSystem::TutorialSystemStart()
     moveSubTitle[1].pos = { 553.0f,80.0f };
     moveSubTitle[1].UIID = 1;
 
-    moveSubTitle[2].str = L"まずは、移動からなのだ";
+    moveSubTitle[2].str = L"僕の言う通りに操作してほしいのだ";
     moveSubTitle[2].Lines = AUDIOID2D::TUTOLINES_03;
-    moveSubTitle[2].pos = { 701.0f,80.0f };
+    moveSubTitle[2].pos = { 553.0f,80.0f };
     moveSubTitle[2].UIID = 2;
 
-    moveSubTitle[3].str = L"キーボードのADキーで左右移動なのだ";
+    moveSubTitle[3].str = L"まずは、移動からなのだ";
     moveSubTitle[3].Lines = AUDIOID2D::TUTOLINES_04;
-    moveSubTitle[3].pos = { 539.0f,80.0f };
+    moveSubTitle[3].pos = { 701.0f,80.0f };
     moveSubTitle[3].UIID = 3;
 
-    moveSubTitle[4].str = L"よくできたのだ";
+    moveSubTitle[4].str = L"キーボードのADキーで左右移動なのだ";
     moveSubTitle[4].Lines = AUDIOID2D::TUTOLINES_05;
-    moveSubTitle[4].pos = { 806.0f,80.0f };
+    moveSubTitle[4].pos = { 539.0f,80.0f };
     moveSubTitle[4].UIID = 4;
 
-    moveSubTitle[5].str = L"次は縦移動なのだ";
+    moveSubTitle[5].str = L"よくできたのだ";
     moveSubTitle[5].Lines = AUDIOID2D::TUTOLINES_06;
-    moveSubTitle[5].pos = { 777.0f,80.0f };
+    moveSubTitle[5].pos = { 806.0f,80.0f };
     moveSubTitle[5].UIID = 5;
 
-    moveSubTitle[6].str = L"キーボードのWSキーで縦移動なのだ";
+    moveSubTitle[6].str = L"次は縦移動なのだ";
     moveSubTitle[6].Lines = AUDIOID2D::TUTOLINES_07;
-    moveSubTitle[6].pos = { 556.0f,80.0f };
+    moveSubTitle[6].pos = { 777.0f,80.0f };
     moveSubTitle[6].UIID = 6;
 
-    moveSubTitle[7].str = L"素晴らしいのだ";
+    moveSubTitle[7].str = L"キーボードのWSキーで縦移動なのだ";
     moveSubTitle[7].Lines = AUDIOID2D::TUTOLINES_08;
-    moveSubTitle[7].pos = { 809.0f,80.0f };
+    moveSubTitle[7].pos = { 556.0f,80.0f };
     moveSubTitle[7].UIID = 7;
 
-    moveSubTitle[8].str = L"次はジャンプなのだ";
+    moveSubTitle[8].str = L"素晴らしいのだ";
     moveSubTitle[8].Lines = AUDIOID2D::TUTOLINES_09;
-    moveSubTitle[8].pos = { 740.0f,80.0f };
+    moveSubTitle[8].pos = { 809.0f,80.0f };
     moveSubTitle[8].UIID = 8;
 
-    moveSubTitle[9].str = L"キーボードのスペースキーでジャンプなのだ";
+    moveSubTitle[9].str = L"次はジャンプなのだ";
     moveSubTitle[9].Lines = AUDIOID2D::TUTOLINES_10;
-    moveSubTitle[9].pos = { 493.0f,80.0f };
+    moveSubTitle[9].pos = { 740.0f,80.0f };
     moveSubTitle[9].UIID = 9;
 
-    moveSubTitle[10].str = L"天才なのだ";
+    moveSubTitle[10].str = L"キーボードのスペースキーでジャンプなのだ";
     moveSubTitle[10].Lines = AUDIOID2D::TUTOLINES_11;
-    moveSubTitle[10].pos = { 834.0f,80.0f };
-    moveSubTitle[10].UIID = 10;
+    moveSubTitle[10].pos = { 493.0f,80.0f };
+    moveSubTitle[10].UIID =10;
 
-    moveSubTitle[11].str = L"次はダッシュなのだ";
+    moveSubTitle[11].str = L"天才なのだ";
     moveSubTitle[11].Lines = AUDIOID2D::TUTOLINES_12;
-    moveSubTitle[11].pos = { 715.0f,80.0f };
+    moveSubTitle[11].pos = { 834.0f,80.0f };
     moveSubTitle[11].UIID = 11;
 
-    moveSubTitle[12].str = L"移動しながらShiftキーでダッシュなのだ";
+    moveSubTitle[12].str = L"次はダッシュなのだ";
     moveSubTitle[12].Lines = AUDIOID2D::TUTOLINES_13;
-    moveSubTitle[12].pos = { 539.0f,80.0f };
+    moveSubTitle[12].pos = { 715.0f,80.0f };
     moveSubTitle[12].UIID = 12;
 
-    moveSubTitle[13].str = L"よくできたのだ";
+    moveSubTitle[13].str = L"移動しながらShiftキーでダッシュなのだ";
     moveSubTitle[13].Lines = AUDIOID2D::TUTOLINES_14;
-    moveSubTitle[13].pos = { 806.0f,80.0f };
+    moveSubTitle[13].pos = { 539.0f,80.0f };
     moveSubTitle[13].UIID = 13;
 
-    moveSubTitle[14].str = L"次は銃の説明なのだ";
+    moveSubTitle[14].str = L"よくできたのだ";
     moveSubTitle[14].Lines = AUDIOID2D::TUTOLINES_15;
-    moveSubTitle[14].pos = { 715.0f,80.0f };
+    moveSubTitle[14].pos = { 806.0f,80.0f };
     moveSubTitle[14].UIID = 14;
+
+    moveSubTitle[15].str = L"次は銃の説明なのだ";
+    moveSubTitle[15].Lines = AUDIOID2D::TUTOLINES_16;
+    moveSubTitle[15].pos = { 715.0f,80.0f };
+    moveSubTitle[15].UIID = 15;
 
 #pragma endregion
 #pragma region 銃セリフ
 
     gunSubTitle[0].str = L"銃の基本説明を教えるのだ";
-    gunSubTitle[0].Lines = AUDIOID2D::TUTOLINES_16;
+    gunSubTitle[0].Lines = AUDIOID2D::TUTOLINES_17;
     gunSubTitle[0].pos = { 674.0f,80.0f };
     gunSubTitle[0].UIID = 0;
 
     gunSubTitle[1].str = L"マウスの左クリックで、発射なのだ";
-    gunSubTitle[1].Lines = AUDIOID2D::TUTOLINES_17;
+    gunSubTitle[1].Lines = AUDIOID2D::TUTOLINES_18;
     gunSubTitle[1].pos = { 571.0f,80.0f };
     gunSubTitle[1].UIID = 1;
 
     gunSubTitle[2].str = L"よくできたのだ";
-    gunSubTitle[2].Lines = AUDIOID2D::TUTOLINES_18;
+    gunSubTitle[2].Lines = AUDIOID2D::TUTOLINES_19;
     gunSubTitle[2].pos = { 765.0f,80.0f };
     gunSubTitle[2].UIID = 2;
 
     gunSubTitle[3].str = L"次はリロードなのだ";
-    gunSubTitle[3].Lines = AUDIOID2D::TUTOLINES_19;
+    gunSubTitle[3].Lines = AUDIOID2D::TUTOLINES_20;
     gunSubTitle[3].pos = { 715.0f,80.0f };
     gunSubTitle[3].UIID = 3;
 
     gunSubTitle[4].str = L"キーボードのRキーで、リロードなのだ";
-    gunSubTitle[4].Lines = AUDIOID2D::TUTOLINES_20;
+    gunSubTitle[4].Lines = AUDIOID2D::TUTOLINES_21;
     gunSubTitle[4].pos = { 539.0f,80.0f };
     gunSubTitle[4].UIID = 4;
 
     gunSubTitle[5].str = L"すばらしいのだ";
-    gunSubTitle[5].Lines = AUDIOID2D::TUTOLINES_21;
+    gunSubTitle[5].Lines = AUDIOID2D::TUTOLINES_22;
     gunSubTitle[5].pos = { 809.0f,80.0f };
     gunSubTitle[5].UIID = 5;
 
     gunSubTitle[6].str = L"次はスキルの説明なのだ";
-    gunSubTitle[6].Lines = AUDIOID2D::TUTOLINES_22;
+    gunSubTitle[6].Lines = AUDIOID2D::TUTOLINES_23;
     gunSubTitle[6].pos = { 693.0f,80.0f };
     gunSubTitle[6].UIID = 6;
 
@@ -912,22 +917,22 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region スキルセリフ
 
     skillSubTitle[0].str = L"スキルの基本操作を教えるのだ";
-    skillSubTitle[0].Lines = AUDIOID2D::TUTOLINES_23;
+    skillSubTitle[0].Lines = AUDIOID2D::TUTOLINES_24;
     skillSubTitle[0].pos = { 624.0f,80.0f };
     skillSubTitle[0].UIID = 0;
 
     skillSubTitle[1].str = L"キーボードのEキーで発動なのだ";
-    skillSubTitle[1].Lines = AUDIOID2D::TUTOLINES_24;
+    skillSubTitle[1].Lines = AUDIOID2D::TUTOLINES_25;
     skillSubTitle[1].pos = { 621.0f,80.0f };
     skillSubTitle[1].UIID = 1;
 
     skillSubTitle[2].str = L"素晴らしいのだ";
-    skillSubTitle[2].Lines = AUDIOID2D::TUTOLINES_25;
+    skillSubTitle[2].Lines = AUDIOID2D::TUTOLINES_26;
     skillSubTitle[2].pos = { 780.0f,80.0f };
     skillSubTitle[2].UIID = 2;
 
     skillSubTitle[3].str = L"次はウルトの説明なのだ";
-    skillSubTitle[3].Lines = AUDIOID2D::TUTOLINES_26;
+    skillSubTitle[3].Lines = AUDIOID2D::TUTOLINES_27;
     skillSubTitle[3].pos = { 714.0f,80.0f };
     skillSubTitle[3].UIID = 3;
 
@@ -935,27 +940,27 @@ void TutorialSystem::TutorialSystemStart()
 #pragma region ウルトセリフ
 
     ultSubTitle[0].str = L"ウルトの基本操作を教えるのだ";
-    ultSubTitle[0].Lines = AUDIOID2D::TUTOLINES_27;
+    ultSubTitle[0].Lines = AUDIOID2D::TUTOLINES_28;
     ultSubTitle[0].pos = { 628.0f,80.0f };
     ultSubTitle[0].UIID = 0;
 
     ultSubTitle[1].str = L"キーボードのQキーで発動なのだ";
-    ultSubTitle[1].Lines = AUDIOID2D::TUTOLINES_28;
+    ultSubTitle[1].Lines = AUDIOID2D::TUTOLINES_29;
     ultSubTitle[1].pos = { 628.0f,80.0f };
     ultSubTitle[1].UIID = 1;
 
     ultSubTitle[2].str = L"天才なのだ";
-    ultSubTitle[2].Lines = AUDIOID2D::TUTOLINES_29;
+    ultSubTitle[2].Lines = AUDIOID2D::TUTOLINES_30;
     ultSubTitle[2].pos = { 827.0f,80.0f };
     ultSubTitle[2].UIID = 2;
 
     ultSubTitle[3].str = L"これでチュートリアルは終わりなのだ";
-    ultSubTitle[3].Lines = AUDIOID2D::TUTOLINES_30;
+    ultSubTitle[3].Lines = AUDIOID2D::TUTOLINES_31;
     ultSubTitle[3].pos = { 543.0f,80.0f };
     ultSubTitle[3].UIID = 3;
 
     ultSubTitle[4].str = L"Les’t enjoyなのだ";
-    ultSubTitle[4].Lines = AUDIOID2D::TUTOLINES_31;
+    ultSubTitle[4].Lines = AUDIOID2D::TUTOLINES_32;
     ultSubTitle[4].pos = { 742.0f,80.0f };
     ultSubTitle[4].UIID = 5;
 
@@ -1068,7 +1073,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
     InputVec = GameObjectManager::Instance().Find("player")->GetComponent<CharacterCom>()->GetLeftStick();
 
-    if (moveSubTitleIndex != 3 && moveSubTitleIndex != 6 && moveSubTitleIndex != 9 && moveSubTitleIndex != 12)
+    if (moveSubTitleIndex != 4 && moveSubTitleIndex != 7 && moveSubTitleIndex != 10 && moveSubTitleIndex != 13)
     {
         if (upFlag)
         {
@@ -1080,7 +1085,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 
                 if (GameObjectManager::Instance().Find("testFont")->GetComponent<Font>()->color.w < 0.0)
                 {
-                    if (moveSubTitleIndex == 14)
+                    if (moveSubTitleIndex == 15)
                     {
                         moveInspectionFlag = true;
                         upFlag = false;
@@ -1110,7 +1115,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
         }
     }
     //横移動
-    else if (moveSubTitleIndex == 3)
+    else if (moveSubTitleIndex == 4)
     {
         if (InputVec.x == 1.0f)
         {
@@ -1151,7 +1156,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
         }
     }
     //縦移動
-    else if (moveSubTitleIndex == 6)
+    else if (moveSubTitleIndex == 7)
     {
         if (downFlag)
         {
@@ -1192,7 +1197,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
         }
     }
     //ジャンプ
-    else if (moveSubTitleIndex == 9)
+    else if (moveSubTitleIndex == 10)
     {
         if (downFlag)
         {
@@ -1227,7 +1232,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
             }
         }
     }
-    else if (moveSubTitleIndex == 12)
+    else if (moveSubTitleIndex == 13)
     {
         if (downFlag)
         {

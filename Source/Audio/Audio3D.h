@@ -126,6 +126,7 @@ enum class AUDIOID2D
     TUTOLINES_29,
     TUTOLINES_30,
     TUTOLINES_31,
+    TUTOLINES_32,
 
     MAX_
 };
@@ -242,6 +243,7 @@ private:
         audio2DResources[AUDIOID2D::TUTOLINES_29] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/029_L.wav");
         audio2DResources[AUDIOID2D::TUTOLINES_30] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/030_L.wav");
         audio2DResources[AUDIOID2D::TUTOLINES_31] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/031_L.wav");
+        audio2DResources[AUDIOID2D::TUTOLINES_32] = AudioResource2DStr(x2d, "Data/AudioData/SE/Tutorial/TutorialLines/032_L.wav");
     }
 
         //2Dâπåπç\ë¢ëÃ

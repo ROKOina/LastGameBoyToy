@@ -243,7 +243,7 @@ private:
         //const char* Lines;
     };
 
-    SubTitle moveSubTitle[15];
+    SubTitle moveSubTitle[16];
     SubTitle gunSubTitle[7];
     SubTitle skillSubTitle[4];
     SubTitle ultSubTitle[5];
