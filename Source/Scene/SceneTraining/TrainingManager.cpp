@@ -1065,7 +1065,7 @@ void TutorialSystem::MoveTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        Audio2DMagaer::Instance().Audio2DPlay(moveSubTitle[moveSubTitleIndex].Lines, 1.0f, false);
+        Audio2DMagaer::Instance().Audio2DPlay(moveSubTitle[moveSubTitleIndex].Lines, 7.0f, false);
 
         linesFlag = true;
         TrainingManager::Instance().SetTutorilUIFlag(false);
@@ -1281,7 +1281,7 @@ void TutorialSystem::GunTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        Audio2DMagaer::Instance().Audio2DPlay(gunSubTitle[gunSubTitleIndex].Lines, 1.0f, false);
+        Audio2DMagaer::Instance().Audio2DPlay(gunSubTitle[gunSubTitleIndex].Lines, 7.0f, false);
         linesFlag = true;
     }
 
@@ -1412,7 +1412,7 @@ void TutorialSystem::SkillTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        Audio2DMagaer::Instance().Audio2DPlay(skillSubTitle[skillSubTitleIndex].Lines, 1.0f, false);
+        Audio2DMagaer::Instance().Audio2DPlay(skillSubTitle[skillSubTitleIndex].Lines, 7.0f, false);
         linesFlag = true;
     }
 
@@ -1507,7 +1507,7 @@ void TutorialSystem::UltTutorialManager(float elapsedTime)
 {
     if (!linesFlag)
     {
-        Audio2DMagaer::Instance().Audio2DPlay(ultSubTitle[ultSubTitleIndex].Lines, 1.0f, false);
+        Audio2DMagaer::Instance().Audio2DPlay(ultSubTitle[ultSubTitleIndex].Lines, 7.0f, false);
         linesFlag = true;
     }
 
