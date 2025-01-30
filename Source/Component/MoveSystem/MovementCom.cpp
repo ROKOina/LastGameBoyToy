@@ -173,6 +173,7 @@ void MovementCom::VelocityApplyPositionVertical(float elapsedTime, const float& 
         {
             position.y += moveVec * elapsedTime;
             onGround_ = false;
+            airForce = friction_;
         }
     }
 

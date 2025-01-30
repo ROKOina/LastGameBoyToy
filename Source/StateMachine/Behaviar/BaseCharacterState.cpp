@@ -209,6 +209,9 @@ void BaseCharacter_JumpState::Execute(const float& elapsedTime)
 #pragma region JumpLoop
 void BaseCharacter_JumpLoop::Enter()
 {
+    //初期設定
+    moveCom.lock()->SetAirForce(12.620);
+
     //アニメーション検索
     int animaIndex = animationCom.lock()->FindAnimation("Jump_middle");
 
