@@ -149,6 +149,7 @@ void ScenePVP::Initialize()
     // キャラピックUI生成
     charaPicks->CreateCharaPicksUiObject();
     charaPicks->SetViewCharaPicks(false);
+    charaPicks->SetViewStagePicks(false);
 
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
@@ -246,7 +247,7 @@ void ScenePVP::InitializeLobby()
             std::shared_ptr<GameObject> kariLOBBY = FParent->AddChildObject();
             //std::shared_ptr<GameObject> kariLOBBYSELECT = GameObjectManager::Instance().Create();
             kariLOBBY->SetName(("FontBack" + std::to_string(lf.id)).c_str());
-            auto& ui=kariLOBBY->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyStrBack.ui", Sprite::SpriteShader::DEFALT, true);
+            auto& ui = kariLOBBY->AddComponent<UiSystem>("Data/SerializeData/UIData/PVPScene/lobbyStrBack.ui", Sprite::SpriteShader::DEFALT, true);
             //削除予定リストに追加
             tempRemoveObj.emplace_back(kariLOBBY);
         }
@@ -268,7 +269,7 @@ void ScenePVP::InitializeCharaSelect()
     //背景
     InitializeBack();    //ピック画面起動
 
-    charaPicks->SetViewCharaPicks(true);
+    charaPicks->SetViewStagePicks(true);
 }
 
 void ScenePVP::InitializePVP()
@@ -1325,7 +1326,7 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                         break;
                     }
 
-                    if (f.id != 3 || f.id != 12 || f.id != 13 || f.id != 14) // SE                    
+                    if (f.id != 3 || f.id != 12 || f.id != 13 || f.id != 14) // SE
                     {
                         Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
                         Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 1.0f, false);
@@ -1339,7 +1340,6 @@ void ScenePVP::LobbySelectFontUpdate(float elapsedTime)
                         auto& backUi = backf->GetComponent<UiSystem>();
                         backUi->SetHitSprite(false);
                     }
-
                 }
             }
             else
@@ -1653,6 +1653,7 @@ void ScenePVP::CharaSelectUpdate(float elapsedTime)
     {
         //ゲームスタート
         charaPicks->SetViewCharaPicks(false);
+        charaPicks->SetViewStagePicks(false);
 
         //暗転からはじまるように
         std::vector<PostEffect::PostEffectParameter> parameters = { PostEffect::PostEffectParameter::Exposure };
