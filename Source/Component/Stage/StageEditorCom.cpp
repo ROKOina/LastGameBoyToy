@@ -520,3 +520,8 @@ void StageEditorCom::PlaneGimic(GameObj& place)
     RigidBodyCom* rigid = place->AddComponent<RigidBodyCom>(true, PhysXLib::ShapeType::Triangle).get();
     rigid->SetRigidScale(1);
 }
+
+void StageEditorCom::JumpGimic(GameObj& place)
+{
+    
+}
