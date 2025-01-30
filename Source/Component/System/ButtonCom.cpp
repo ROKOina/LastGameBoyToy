@@ -2,6 +2,7 @@
 #include "Component/Collsion/ColliderCom.h"
 #include "Component/Character/CharacterCom.h"
 #include "Component\GameSystem\RespawnCom.h"
+#include "Netwark/Photon/StaticSendDataManager.h"
 
 //‰Šú‰»
 ButtonCom::ButtonCom()
@@ -38,6 +39,7 @@ void ButtonCom::ButtonTouch(float elapsedTime)
         //Ž©•ª‚¾‚¯‚ªG‚ê‚é—l‚É
         if (std::strcmp(c.gameObject.lock()->GetName(), "player") == 0)
         {
+            StaticSendDataManager::Instance().SetButton();
             pushCount += 1;
             nonPushTimer = 3;
             RespawnCom* respawn = GameObjectManager::Instance().Find("respawn")->GetComponent<RespawnCom>().get();
