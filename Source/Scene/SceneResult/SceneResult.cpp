@@ -119,10 +119,10 @@ void SceneResult::Initialize()
 
     // BGM
     {
-        if(isMyWin)
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_VICTORY, 1.0f, true);
+        if (isMyWin)
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_VICTORY, 1.0f, true);
         else
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_DEFEAT, 1.0f, true);
+            Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_DEFEAT, 1.0f, true);
     }
 }
 
@@ -448,8 +448,8 @@ void SceneResult::MakeResultModel()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("skipfont");
         std::shared_ptr<Font> font = obj->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::COOL);
-        font->position = { 687.0f,993.0f };
-        font->str = L"スペースキーでタイトルへ";
+        font->position = { 768.0f,993.0f };
+        font->str = L"Enterでタイトルへ";
         font->scale = 0.8f;
         font->color.w = 1.0f;
     }
@@ -516,7 +516,7 @@ void SceneResult::EventCamera(float elapsedTime)
 
     //チェンジシーン
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (GamePad::BTN_A & gamePad.GetButtonDown())
+    if (GamePad::ENTER & gamePad.GetButtonDown())
     {
         SceneManager::Instance().ChangeScene(new SceneTitle);
     }
