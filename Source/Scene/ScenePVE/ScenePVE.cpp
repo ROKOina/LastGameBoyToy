@@ -329,8 +329,6 @@ void ScenePVE::Update(float elapsedTime)
     GameObjectManager::Instance().UpdateTransform();
     GameObjectManager::Instance().Update(elapsedTime);
 
-    // TODO PvEに必要なオーディオがないか確認
-
     ////ネット選択したら更新開始
     //if (flag)
     {

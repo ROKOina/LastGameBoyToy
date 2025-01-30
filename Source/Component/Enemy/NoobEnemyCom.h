@@ -102,6 +102,7 @@ private:
 
 private://‰¹
     std::map<AUDIOID3D, GameObj> audios;
+    GameObj boss;
 public:
     void SetAudios(AUDIOID3D id, GameObj obj) {
         GameObj SeObj = obj->AddChildObject();

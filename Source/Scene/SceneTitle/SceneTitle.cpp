@@ -288,7 +288,7 @@ void SceneTitle::UIUpdate(float elapsedTime)
                     GameObjectManager::Instance().Find("stage")->SetEnabled(false);
 
                     Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
-                    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CREDIT, 1.0f, false);
+                    Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CREDIT, 5.0f, false);
 
                     auto& creditVideo = GameObjectManager::Instance().Find("CreditVideo");
                     creditVideo->GetComponent<Video>()->GetVidePram().SetRestart();
