@@ -1,4 +1,5 @@
 #include "CharaStatusCom.h"
+#include "CharacterCom.h"
 #include "Netwark/Photon/StaticSendDataManager.h"
 
 // 更新処理
@@ -58,9 +59,15 @@ void CharaStatusCom::AddDamagePoint(float value, int playerID)
             //死亡時プレイヤーID保存
             if (playerID >= 0)
             {
-                //攻撃してきた敵を保存
-                lastDamageID = playerID;
-                lastDamageTimer = 20;
+
+                int attackID = StaticSendDataManager::Instance().GetTeamNum(playerID);
+                int myID = GetGameObject()->GetComponent<CharacterCom>()->GetNetCharaData().GetTeamID();
+
+                if (attackID != myID) { //敵チーム場合は通る
+                    //攻撃してきた敵を保存
+                    lastDamageID = playerID;
+                    lastDamageTimer = 20;
+                }
             }
             //死亡時にキルをした相手をネットに送る
             if (hitPoint <= 0)
