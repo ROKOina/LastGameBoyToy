@@ -95,13 +95,6 @@ void CharaPicks::CreateCharaPicksUiObject()
         auto& stagecanvas = GameObjectManager::Instance().Create();
         stagecanvas->SetName("StagePickCanvas");
 
-        auto& stage1 = stagecanvas->AddChildObject();
-        stage1->SetName("stage1picture");
-        stage1->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stage1.ui", Sprite::SpriteShader::DEFALT, true);
-
-        auto& stage2 = stagecanvas->AddChildObject();
-        stage2->SetName("stage2picture");
-        stage2->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stage2.ui", Sprite::SpriteShader::DEFALT, true);
 
         auto& decision = stagecanvas->AddChildObject();
         decision->SetName("decision");
@@ -109,15 +102,21 @@ void CharaPicks::CreateCharaPicksUiObject()
 
         auto& stagevide1 = stagecanvas->AddChildObject();
         stagevide1->SetName("stagevide1");
-        stagevide1->transform_->SetWorldPosition({ -2.342f,1.404f,1.765f });
-        stagevide1->transform_->SetScale({ 1.6f,1.6f,1.0f });
-        stagevide1->AddComponent<Video>("Data/Video/stage1.mp4");
+        stagevide1->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stageSelect1.ui", Sprite::SpriteShader::DEFALT, true);
 
         auto& stagevide2 = stagecanvas->AddChildObject();
         stagevide2->SetName("stagevide2");
-        stagevide2->transform_->SetWorldPosition({ 0.083f,1.404f,1.765f });
-        stagevide2->transform_->SetScale({ 1.6f,1.6f,1.0f });
-        stagevide2->AddComponent<Video>("Data/Video/stage2.mp4");
+        stagevide2->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stageSelect2.ui",Sprite::SpriteShader::DEFALT,true);
+
+        auto& stage1 = stagecanvas->AddChildObject();
+        stage1->SetName("stage1picture");
+        auto& hit1 =  stage1->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stage1.ui", Sprite::SpriteShader::DEFALT, false);
+        hit1->spc.objectname = "stagevide1";
+
+        auto& stage2 = stagecanvas->AddChildObject();
+        stage2->SetName("stage2picture");
+        auto& hit2 = stage2->AddComponent<Sprite>("Data/SerializeData/UIData/CharaPick/stage2.ui", Sprite::SpriteShader::DEFALT, false);
+        hit2->spc.objectname = "stagevide2";
     }
 
     //暗転からはじまるように
@@ -151,14 +150,14 @@ void CharaPicks::StageSelect()
     auto& canvas = GameObjectManager::Instance().Find("StagePickCanvas");
     if (canvas == nullptr)return;
     auto& decisionButton = canvas->GetChildFind("decision");
-    auto& stage1 = canvas->GetChildFind("stage1picture");
-    auto& stage2 = canvas->GetChildFind("stage2picture");
+    auto& stage1 = canvas->GetChildFind("stagevide1");
+    auto& stage2 = canvas->GetChildFind("stagevide2");
     auto& Buttonsprite = decisionButton->GetComponent<Sprite>();
     auto& stage1sprite = stage1->GetComponent<Sprite>();
     auto& stage2sprite = stage2->GetComponent<Sprite>();
 
     // ステージの操作
-    const DirectX::XMFLOAT2 defaultStageScale = { 0.3f, 0.4f };
+    const DirectX::XMFLOAT2 defaultStageScale = { 1.19f, 0.81f };
     UpdateSprite(stage1sprite.get(), defaultStageScale);
     UpdateSprite(stage2sprite.get(), defaultStageScale);
 
@@ -169,6 +168,8 @@ void CharaPicks::StageSelect()
         {
             stagepick = static_cast<int>(SelectStageKind::FIRST);
             kind = static_cast<SelectStageKind>(stagepick);
+            stage1sprite->spc.color = {1,0,0,1};
+            stage2sprite->spc.color = {1,1,1,1};
         }
 
         //2なら
@@ -176,6 +177,8 @@ void CharaPicks::StageSelect()
         {
             stagepick = static_cast<int>(SelectStageKind::SECOND);
             kind = static_cast<SelectStageKind>(stagepick);
+            stage2sprite->spc.color = { 1,0,0,1 };
+            stage1sprite->spc.color = { 1,1,1,1 };
         }
 
         // OKボタンの操作
@@ -406,15 +409,13 @@ void CharaPicks::UpdateSprite(Sprite* sprite, const DirectX::XMFLOAT2& defaultSc
     if (sprite->GetHitSpriteEnter())
     {
         Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CURSOR);
-        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 5.f);
+        Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CURSOR, 5.0f);
+        sprite->spc.scale = { defaultScale.x + 0.02f,defaultScale.y + 0.02f };
 
-        sprite->EasingPlay();
     }
     else if (!sprite->GetHitSprite())
     {
-
-        sprite->StopEasing();
-        sprite->spc.scale = defaultScale;
+        sprite->spc.scale = {defaultScale.x,defaultScale.y };
     }
 }
 

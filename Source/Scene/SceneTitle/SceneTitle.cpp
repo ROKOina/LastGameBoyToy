@@ -28,6 +28,7 @@
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTraining\SceneTraining.h"
 #include "Component\Renderer\VideoCom.h"
+#include "Component\UI\Font.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -166,6 +167,32 @@ void SceneTitle::Initialize()
         obj->SetEnabled(false);
     }
 
+    //spcaseでスキップ
+    {
+        auto& space = GameObjectManager::Instance().Create();
+        space->SetName("Space");
+        space->SetEnabled(false);
+        auto& spaceFont = space->AddComponent<Font>("Data/Texture/Font/BitmapFont.font",1024,Font::FontShader::DEFALT);
+        spaceFont->position = { 1093.0f,940.0f };
+        spaceFont->str = L"Space:スキップ";
+        spaceFont->scale = 1.0f;
+        spaceFont->color.w = 1.0f;
+        
+    }
+
+
+    //Enterで早送り
+    {
+        auto& emter = GameObjectManager::Instance().Create();
+        emter->SetName("Enter");
+        emter->SetEnabled(false);
+        auto& emterFont = emter->AddComponent<Font>("Data/Texture/Font/BitmapFont.font", 1024, Font::FontShader::DEFALT);
+        emterFont->position = { 687.0f,940.0f };
+        emterFont->str = L"Enter:早送り";
+        emterFont->scale = 1.0f;
+        emterFont->color.w = 1.0f;;
+    }
+
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
@@ -289,6 +316,8 @@ void SceneTitle::UIUpdate(float elapsedTime)
 
                     Audio2DMagaer::Instance().Audio2DStop(titleAudioID);
                     Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::CREDIT, 1.0f, false);
+                    GameObjectManager::Instance().Find("Space")->SetEnabled(true);
+                    GameObjectManager::Instance().Find("Enter")->SetEnabled(true);
 
                     auto& creditVideo = GameObjectManager::Instance().Find("CreditVideo");
                     creditVideo->GetComponent<Video>()->GetVidePram().SetRestart();
@@ -361,6 +390,10 @@ void SceneTitle::CreditUpdate(float elapsedTime)
         creditFLG = false;
         GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
         GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+
+        GameObjectManager::Instance().Find("Space")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Enter")->SetEnabled(false);
+
         Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CREDIT);
         Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
         creditVideo->SetEnabled(false);
@@ -370,6 +403,10 @@ void SceneTitle::CreditUpdate(float elapsedTime)
         creditFLG = false;
         GameObjectManager::Instance().Find("Canvas")->SetEnabled(true);
         GameObjectManager::Instance().Find("stage")->SetEnabled(true);
+
+        GameObjectManager::Instance().Find("Space")->SetEnabled(false);
+        GameObjectManager::Instance().Find("Enter")->SetEnabled(false);
+
         Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::CREDIT);
         Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
         creditVideo->SetEnabled(false);
