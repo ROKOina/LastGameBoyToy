@@ -965,12 +965,12 @@ void UI_GameJudge::Update(float elaspedTime)
             if (DelivertResultData::Instance().GetIsMyWin())
             {
                 Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_RESULT_VICTORY_SE);
-                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_VICTORY_SE, 1.5f);
+                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_VICTORY_SE, 2.5f);
             }
             else
             {
                 Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_RESULT_DEFEAT_SE);
-                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_DEFEAT_SE, 1.5f);
+                Audio2DMagaer::Instance().Audio2DPlay(AUDIOID2D::SCENE_RESULT_DEFEAT_SE, 2.5f);
             }
         }
 

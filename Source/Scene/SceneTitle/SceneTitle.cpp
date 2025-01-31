@@ -196,7 +196,7 @@ void SceneTitle::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    Audio2DMagaer::Instance().Audio2DPlay(titleAudioID);
+    Audio2DMagaer::Instance().Audio2DPlay(titleAudioID, true);
     Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_LOBBY);
 
     //暗転からはじまるように
