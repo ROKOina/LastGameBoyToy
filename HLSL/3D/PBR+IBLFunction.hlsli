@@ -119,7 +119,8 @@ float4 BRDF(float4 albedo, float metallic, float perceptualRoughness, float3 nor
     float diffuseTerm = Fd_Burley(ndotv, ndotl, ldoth, perceptualRoughness) * ndotl;
     float3 diffuse = albedo.rgb * (1 - reflectivity) * lightColor * diffuseTerm;
     // Indirect Diffuse
-    diffuse += albedo.rgb * (1 - reflectivity) * indirectDiffuse.rgb;
+    float3 clampIndirect = clamp(indirectDiffuse.rgb * 4, 2, 5);
+    diffuse += albedo.rgb * (1 - reflectivity) * clampIndirect;
     float alpha = perceptualRoughness * perceptualRoughness;
     float V = V_SmithGGXCorrelated(ndotl, ndotv, alpha);
     float D = D_GGX(perceptualRoughness, ndotv, normal, halfDir);

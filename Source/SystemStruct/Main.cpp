@@ -50,7 +50,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
     wcex.hInstance = instance;
     wcex.hIcon = 0;
     wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);	//ウィンドウ背景色
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 3);	//ウィンドウ背景色
     wcex.lpszMenuName = NULL;
     wcex.lpszClassName = _T("Game");
     wcex.hIconSm = 0;
