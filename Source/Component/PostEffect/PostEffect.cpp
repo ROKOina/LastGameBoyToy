@@ -68,6 +68,13 @@ void PostEffect::OnGUI()
         ImGui::SliderFloat("blurdecay", &m_posteffect->data.blurdecay, +0.0f, +1.0f);
         ImGui::DragFloat("DistanceSan", &m_posteffect->data.ditancesan);
         ImGui::DragFloat3("SunDirection", &m_posteffect->data.sundirection.x, 0.01f);
+        ImGui::ColorEdit3("FogColor", &m_posteffect->data.FogColor.x);
+        ImGui::DragFloat("FogScale", &m_posteffect->data.FogScale);
+        ImGui::DragFloat("FogAttenuationRate", &m_posteffect->data.FogAttenuationRate);
+        ImGui::DragFloat("FogHeightOffset", &m_posteffect->data.FogHeightOffset);
+        ImGui::DragFloat("HeightFogScale", &m_posteffect->data.HeightFogScale);
+        ImGui::DragFloat("HeightFogAttenuationRate", &m_posteffect->data.HeightFogAttenuationRate);
+        ImGui::DragFloat("HeightFogWeightRate", &m_posteffect->data.HeightFogWeightRate);
     }
 
     if (ImGui::TreeNode("shadow"))
@@ -164,7 +171,7 @@ void PostEffect::PostEffectRender()
     dc->OMSetDepthStencilState(Graphics.GetDepthStencilState(DEPTHSTATE::ZT_OFF_ZW_OFF), 1);
     dc->RSSetState(Graphics.GetRasterizerState(RASTERIZERSTATE::SOLID_CULL_NONE));
     ID3D11ShaderResourceView* posteffect[]
-    { m_offScreenBuffer[static_cast<size_t>(offscreen::cascadeshadow)]->m_shaderresourceviews[0].Get(),*m_gBuffer->GetDepthStencilSRV() ,m_gBuffer->GetShaderResources()[5] };
+    { m_offScreenBuffer[static_cast<size_t>(offscreen::cascadeshadow)]->m_shaderresourceviews[0].Get(),*m_gBuffer->GetDepthStencilSRV() ,m_gBuffer->GetShaderResources()[5],m_gBuffer->GetShaderResources()[2] };
     FullScreenQuad::Instance().Blit(dc, posteffect, 0, _countof(posteffect), m_pixelshaders[static_cast<int>(pixelshader::colorGrading)].Get());
     m_offScreenBuffer[static_cast<int>(offscreen::posteffect)]->Deactivate(dc);
 

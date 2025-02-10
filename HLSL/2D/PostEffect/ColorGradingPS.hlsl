@@ -8,6 +8,7 @@
 Texture2D texturemaps : register(t0);
 Texture2D depth_map : register(t1);
 Texture2D outlinecolor : register(t2);
+Texture2D positionmap : register(t3);
 
 //明るさ(画面全体の)とコントラスト(画像の明暗)
 float3 brightness_contrast(float3 fragment_color, float brightness, float contrast)
@@ -221,6 +222,29 @@ float3 cc(float3 color, float factor, float factor2) // color modifier
     return lerp(color, w * factor, w * factor2);
 }
 
+//fogの計算
+float CalculateConstantFog(float3 position)
+{
+    float3 delta = position - cameraposition;
+    float dist = length(delta);
+    return FogScale * max(0.0f, 1.0f - exp(-FogAttenuationRate * dist));
+}
+
+//fogの計算
+float CalculateHeightFog(float3 position)
+{
+    float3 heightFogCameraPosition =  cameraposition- float3(0.0, FogHeightOffset, 0.0);
+    float3 deltaVec = position - heightFogCameraPosition;
+    float H = deltaVec.y;
+    float D = length(deltaVec.xz);
+    float K = H / D;
+    float a0 = HeightFogAttenuationRate;
+    float b = HeightFogWeightRate;
+    float Y0 = heightFogCameraPosition.y;
+    float bgLightWeight = exp(a0 * exp(-b * Y0) * (exp(-b * H) - 1.0) / (b * K));
+    return HeightFogScale * max(0.0, 1.0 - bgLightWeight);
+}
+
 float4 main(VS_OUT pin) : SV_TARGET
 {
     // 指定されたミップマップレベルのテクスチャマップの次元情報を取得し、アスペクト比を計算
@@ -283,6 +307,13 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     // ビネット効果の適用
     sampled_color.rgb = lerp(sampled_color.rgb * vignettecolor.rgb, sampled_color.rgb, vignette(pin.texcoord.xy));
+
+    // Fog 計算の組み込み
+    float fogWeight = 0.0f;
+    float3 worldpostion = positionmap.SampleLevel(sampler_states[POINT], pin.texcoord.xy, 0.0f);
+    fogWeight += CalculateConstantFog(worldpostion);
+    fogWeight += CalculateHeightFog(worldpostion);
+    sampled_color.rgb = lerp(sampled_color.rgb, FogColor.rgb, saturate(fogWeight));
 
     // 最終的な色を返す
     return sampled_color;

@@ -16,5 +16,11 @@ cbuffer CbPostEffect : register(b3)
     float blurdecay;
     float distance_to_sun;
     float3 sundirection;
-    float padding;
+    float FogScale;
+    float FogAttenuationRate;
+    float3 FogColor;
+    float FogHeightOffset;
+    float HeightFogScale;
+    float HeightFogAttenuationRate;
+    float HeightFogWeightRate;
 };
