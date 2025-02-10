@@ -1,7 +1,5 @@
 #include "Shader.h"
 #include "SystemStruct\Misc.h"
-#include <cstdio>
-#include <memory>
 
 //頂点シェーダー読み込み
 HRESULT CreateVsFromCso(ID3D11Device* device, const char* cso_name, ID3D11VertexShader** vertex_shader, ID3D11InputLayout** input_layout, D3D11_INPUT_ELEMENT_DESC* input_element_desc, UINT num_elements)

@@ -1,5 +1,4 @@
 #include "VariousShaderConstants.h"
-#include "imgui.h"
 #include "Graphics/Graphics.h"
 
 EffectConstants::EffectConstants()
@@ -7,7 +6,7 @@ EffectConstants::EffectConstants()
     Graphics& graphics = Graphics::Instance();
 
     if (m_effectconstants == nullptr) {
-        m_effectconstants = std::make_unique<ConstantBuffer<Buffer>>(graphics.GetDevice());
+        m_effectconstants = std::make_unique<constantBufferH::ConstantBuffer<Buffer>>(graphics.GetDevice());
     }
 }
 
@@ -46,7 +45,7 @@ SciFiGateConstants::SciFiGateConstants()
     Graphics& graphics = Graphics::Instance();
 
     if (m_constants == nullptr) {
-        m_constants = std::make_unique<ConstantBuffer<Buffer>>(graphics.GetDevice());
+        m_constants = std::make_unique<constantBufferH::ConstantBuffer<Buffer>>(graphics.GetDevice());
     }
 }
 

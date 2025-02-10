@@ -1,4 +1,3 @@
-#include <imgui.h>
 #include "../../Graphics/Graphics.h"
 #include "Component.h"
 #include "GameObject.h"

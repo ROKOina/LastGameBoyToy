@@ -2,8 +2,6 @@
 
 #include "LoadBalancing-cpp/inc/Client.h"
 #include "UIListener.h"
-#include <vector>
-#include <string>
 
 #include "../NetData.h"
 #include "../RingBuffer.h"

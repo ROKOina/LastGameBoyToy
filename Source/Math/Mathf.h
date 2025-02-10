@@ -1,10 +1,5 @@
 #pragma once
 
-#include <cmath>
-#include <limits>
-#include <numbers>
-#include <DirectXMath.h>
-
 // •‚“®¬”Zp
 class Mathf
 {

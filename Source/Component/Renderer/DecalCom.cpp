@@ -148,7 +148,7 @@ Decal::Decal(const char* filename)
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
     //ConstantBuffer
-    DCB = std::make_unique<ConstantBuffer<DecalConstantBuffer>>(graphics.GetDevice());
+    DCB = std::make_unique<constantBufferH::ConstantBuffer<DecalConstantBuffer>>(graphics.GetDevice());
 
     //頂点シェーダー
     //入力レイアウト

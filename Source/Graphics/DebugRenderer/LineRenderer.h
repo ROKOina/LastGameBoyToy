@@ -1,9 +1,4 @@
 #pragma once
-
-#include <vector>
-#include <wrl.h>
-#include <d3d11.h>
-#include <DirectXMath.h>
 #include "Graphics/ConstantBuffer.h"
 
 class LineRenderer
@@ -25,7 +20,7 @@ private:
         DirectX::XMFLOAT4X4	wvp;
         DirectX::XMFLOAT4	color = { 1,1,1,1 };
     };
-    std::unique_ptr<ConstantBuffer<CB>>cb;
+    std::unique_ptr<constantBufferH::ConstantBuffer<CB>>cb;
 
     struct Vertex
     {

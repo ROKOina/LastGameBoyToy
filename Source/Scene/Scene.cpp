@@ -7,7 +7,7 @@
 //シーンのコンスタントバッファの初期化
 void Scene::ConstantBufferInitialize()
 {
-    sc = std::make_unique<ConstantBuffer<SceneConstants>>(Graphics::Instance().GetDevice());
+    sc = std::make_unique<constantBufferH::ConstantBuffer<SceneConstants>>(Graphics::Instance().GetDevice());
 }
 
 //シーンのコンスタントバッファの更新

@@ -84,7 +84,7 @@ private:
         DirectX::XMFLOAT3 intensity = { 1,1,1 };
         float dissolveThreshold = 0.0f;
     };
-    std::unique_ptr<ConstantBuffer<CPUParticleConstant>>m_cc;
+    std::unique_ptr<constantBufferH::ConstantBuffer<CPUParticleConstant>>m_cc;
 
 public:
 

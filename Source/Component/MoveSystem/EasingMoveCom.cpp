@@ -1,12 +1,4 @@
 #include "EasingMoveCom.h"
-#include <imgui.h>
-#include <fstream>
-#include <filesystem>
-#include <shlwapi.h>
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal\types\vector.hpp>
 #include "SystemStruct\Dialog.h"
 #include "SystemStruct\Logger.h"
 #include "Graphics/Graphics.h"

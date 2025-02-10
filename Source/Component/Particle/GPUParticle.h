@@ -52,10 +52,10 @@ private:
     void SystemGUI();
 
     // カーブデータ用1Dテクスチャを作成する関数
-    ID3D11ShaderResourceView* GenerateCurveTexture(Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution);
+    ID3D11ShaderResourceView* GenerateCurveTexture( Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution);
 
     //更新
-    void UpdateCurveTexture(Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture);
+    void UpdateCurveTexture(  Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture);
 
     //カーブデータ読み込み
     void CurveDataLoding();
@@ -103,7 +103,7 @@ public:
 
         DirectX::XMFLOAT4X4 world = {};
     };
-    std::unique_ptr<ConstantBuffer<GPUParticleConstants>>m_gpu;
+    std::unique_ptr<constantBufferH::ConstantBuffer<GPUParticleConstants>>m_gpu;
 
     //保存するコンスタントバッファ
     struct GPUparticleSaveConstants
@@ -190,13 +190,13 @@ public:
 private:
 
     //カーブで使いたいパラメータの定義
-    std::unique_ptr<Curve> scale_curve;
-    std::unique_ptr<Curve> speed_curve;
-    std::unique_ptr<Curve> color_curve_r;
-    std::unique_ptr<Curve> color_curve_g;
-    std::unique_ptr<Curve> color_curve_b;
-    std::unique_ptr<Curve> color_curve_a;
-    std::unique_ptr<Curve> gravity_curve;
+    std::unique_ptr< Curve> scale_curve;
+    std::unique_ptr< Curve> speed_curve;
+    std::unique_ptr< Curve> color_curve_r;
+    std::unique_ptr< Curve> color_curve_g;
+    std::unique_ptr< Curve> color_curve_b;
+    std::unique_ptr< Curve> color_curve_a;
+    std::unique_ptr< Curve> gravity_curve;
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> SSG_srv;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> color_srv;

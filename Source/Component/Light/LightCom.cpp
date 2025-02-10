@@ -2,14 +2,8 @@
 #include "Graphics/Graphics.h"
 #include "Component\System\TransformCom.h"
 #include "Math\Mathf.h"
-#include <cereal/cereal.hpp>
-#include <cereal\types\vector.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
 #include <SystemStruct\Dialog.h>
 #include <SystemStruct\Logger.h>
-#include <fstream>
-#include <filesystem>
 
 CEREAL_CLASS_VERSION(Light::LightParameter, 1)
 

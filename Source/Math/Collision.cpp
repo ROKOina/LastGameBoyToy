@@ -1,6 +1,5 @@
 #include "Collision.h"
 #include "Graphics/Graphics.h"
-#include <cmath>
 #include "QuaternionStruct.h"
 
 //‹…‚Æ‹…‚ÌŒğ·”»’è

@@ -1,8 +1,3 @@
-#include <windows.h>
-#include <memory>
-#include <assert.h>
-#include <tchar.h>
-
 #include "Framework.h"
 #include "ImGuiRender.h"
 

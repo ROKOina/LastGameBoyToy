@@ -4,16 +4,9 @@
 #include "CameraCom.h"
 #include "Component/System/TransformCom.h"
 #include "Math/Mathf.h"
-#include "imgui.h"
 
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/unordered_map.hpp>
 #include "Graphics/Graphics.h"
 #include "SystemStruct\Dialog.h"
-#include <fstream>
 #include "SystemStruct\Logger.h"
 
 CEREAL_CLASS_VERSION(EventCameraManager::ECTransform, 1)

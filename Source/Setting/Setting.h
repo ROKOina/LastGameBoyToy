@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-
 class GameObject;
 
 class SettingScreen

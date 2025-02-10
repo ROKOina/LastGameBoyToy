@@ -2,7 +2,6 @@
 #include "Input\Input.h"
 #include "SystemStruct\Dialog.h"
 #include "Graphics/Graphics.h"
-#include "imgui.h"
 #include "Component\System\GameObject.h"
 #include "Component/System/TransformCom.h"
 #include "Component\Camera\CameraCom.h"
@@ -10,12 +9,7 @@
 #include "Graphics/Model/ResourceManager.h"
 #include "SystemStruct\Framework.h"
 #include "Scene/SceneManager.h"
-#include <cstring>
 #include "Component/Collsion/RayCollisionCom.h"
-#include <nlohmann/json.hpp>
-#include <fstream>
-#include <iostream>
-#include <filesystem>
 #include "Phsix\Physxlib.h"
 #include "Component\Collsion\NodeCollsionCom.h"
 #include "Component\System\SpawnCom.h"

@@ -1,11 +1,9 @@
 #include "MovementCom.h"
-#include <imgui.h>
 
 #include "Component/System/TransformCom.h"
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
 #include "Phsix\Physxlib.h"
-#include <random>
 #include "SystemStruct\TimeManager.h"
 
 // XVˆ—

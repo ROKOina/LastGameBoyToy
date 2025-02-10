@@ -4,15 +4,8 @@
 #include "Graphics\Texture.h"
 #include "Component\System\TransformCom.h"
 #include "Math\Mathf.h"
-#include <fstream>
-#include <filesystem>
-#include <shlwapi.h>
 #include <SystemStruct\Dialog.h>
 #include "SystemStruct\Logger.h"
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
-#include <random>
 #include "Component\Camera\CameraCom.h"
 
 CEREAL_CLASS_VERSION(Trail::TrailParameter, 1)
@@ -193,9 +186,9 @@ void Trail::Update(float elapsedTime)
     for (int i = 0; i < MAX_POLYGON; ++i)
     {
         int p1index = i;
-        int p2index = min(i + 1, MAX_POLYGON - 1);
-        int p3index = min(i + 2, MAX_POLYGON - 1);
-        int p0index = max(i - 1, 0);
+        int p2index = std::min(i + 1, MAX_POLYGON - 1);
+        int p3index = std::min(i + 2, MAX_POLYGON - 1);
+        int p0index = std::max(i - 1, 0);
 
         // ã•”‚Ì’¸“_
         DirectX::XMVECTOR upperpolygon0 = XMLoadFloat3(&m_trailpositions[0][p0index]);

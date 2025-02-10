@@ -4,12 +4,6 @@
 #include "Math/Mathf.h"
 #include "SystemStruct\Logger.h"
 #include "Component/System/TransformCom.h"
-#include <fstream>
-#include <filesystem>
-#include <shlwapi.h>
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
 
 CEREAL_CLASS_VERSION(CPUParticle::SerializeCPUParticle, 2)
 
@@ -180,7 +174,7 @@ CPUParticle::CPUParticle(const char* filename, int num)
     assert(SUCCEEDED(hr));
 
     //コンスタントバッファ設定
-    m_cc = std::make_unique<ConstantBuffer<CPUParticleConstant>>(graphics.GetDevice());
+    m_cc = std::make_unique<constantBufferH::ConstantBuffer<CPUParticleConstant>>(graphics.GetDevice());
 
     //ファイル読み込み処理
     if (filename)

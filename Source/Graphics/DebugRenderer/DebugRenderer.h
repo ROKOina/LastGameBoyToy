@@ -1,13 +1,6 @@
 #pragma once
-
-#include <vector>
-#include <string>
-#include <wrl.h>
-#include <d3d11.h>
-#include <DirectXMath.h>
 #include "Graphics/ConstantBuffer.h"
 #include "Math\QuaternionStruct.h"
-#include "PxPhysicsAPI.h"
 
 class DebugRenderer
 {
@@ -44,7 +37,7 @@ private:
         DirectX::XMFLOAT4X4	wvp;
         DirectX::XMFLOAT4	color;
     };
-    std::unique_ptr<ConstantBuffer<CbMesh>>cbmesh;
+    std::unique_ptr<constantBufferH::ConstantBuffer<CbMesh>>cbmesh;
 
     struct Sphere
     {

@@ -16,9 +16,6 @@
     <Filter Include="External\imgui">
       <UniqueIdentifier>{c85446c9-90d2-4441-add5-5aac511d95ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\DirectXTex">
-      <UniqueIdentifier>{8dd0c8ba-1f1c-4648-8a04-c28bb5a1c75a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Input">
       <UniqueIdentifier>{1922815d-5a70-4f38-9fbd-fb6e72c44df0}</UniqueIdentifier>
     </Filter>
@@ -75,9 +72,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="External\DirectXTex\WICTextureLoader.h">
-      <Filter>External\DirectXTex</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Input\GamePad.h">
       <Filter>Source\Input</Filter>
     </ClInclude>
@@ -216,12 +210,6 @@
     <ClInclude Include="Source\Components\MovementCom.h" />
     <ClInclude Include="Source\Components\AnimatorCom.h" />
     <ClInclude Include="Source\Graphics\Shaders\3D\UnityChanToonShader.h" />
-    <ClInclude Include="External\DirectXTex\DDSTextureLoader.h" />
-    <ClInclude Include="External\DirectXTex\DDS.h" />
-    <ClInclude Include="External\DirectXTex\LoaderHelpers.h" />
-    <ClInclude Include="External\DirectXTex\pch.h" />
-    <ClInclude Include="External\DirectXTex\PlatformHelpers.h" />
-    <ClInclude Include="External\DirectXTex\DirectXHelpers.h" />
     <ClInclude Include="Source\ThreadPool\ThreadPool.h" />
     <ClInclude Include="Source\GameSource\Math\easing.h" />
     <ClInclude Include="Source\Components\ParticleSystemCom.h" />
@@ -231,9 +219,6 @@
     <ClInclude Include="Source\Graphics\Shaders\3D\ShadowMapCasterShader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="External\DirectXTex\WICTextureLoader.cpp">
-      <Filter>External\DirectXTex</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Input\GamePad.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
@@ -376,15 +361,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Shaders\3D\UnityChanToonShader.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="External\DirectXTex\DirectXHelpers.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="External\DirectXTex\pch.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameSource\Math\easing.cpp">

@@ -1,6 +1,5 @@
 #include "Graphics/Graphics.h"
 #include "Scene/SceneManager.h"
-#include "imgui.h"
 #include "Component\System\GameObject.h"
 #include "Component/System/TransformCom.h"
 #include "SceneLGBT.h"

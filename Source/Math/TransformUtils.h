@@ -1,6 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
 
 class TransformUtils
 {

@@ -7,14 +7,6 @@
 #include "SystemStruct\Dialog.h"
 #include "SystemStruct\Logger.h"
 #include "Component/System/TransformCom.h"
-#include <fstream>
-#include <filesystem>
-#include <shlwapi.h>
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
-#include<cereal\types\vector.hpp>
-#include <array>
 
 CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 3)
 CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 3)
@@ -242,7 +234,7 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     CreateCsFromCso(device, "Shader\\GPUParticleInitializeCS.cso", m_initialzecomputeshader.ReleaseAndGetAddressOf());
 
     //コンスタントバッファの定義と更新
-    m_gpu = std::make_unique<ConstantBuffer<GPUParticleConstants>>(device);
+    m_gpu = std::make_unique<constantBufferH::ConstantBuffer<GPUParticleConstants>>(device);
 
     //コンスタントバッファのバッファ作成、更新
     buffer_desc.ByteWidth = sizeof(GPUparticleSaveConstants);
@@ -396,8 +388,8 @@ void GPUParticle::Update(float elapsedTime)
     // 曲線の更新（毎フレームや必要に応じて）
     if (m_GSC.iscurve == 1)
     {
-        Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
-        Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
+         Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
+         Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
         UpdateCurveTexture(SSG, 2, 128, SSG_texture);
         UpdateCurveTexture(color, 3, 128, color_texture);
     }
@@ -603,7 +595,7 @@ void GPUParticle::SystemGUI()
     ImGui::Combo("DepthState", &m_p.m_depthS, dsName, static_cast<int>(DEPTHSTATE::MAX), ARRAYSIZE(dsName));
 }
 
-ID3D11ShaderResourceView* GPUParticle::GenerateCurveTexture(Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution)
+ID3D11ShaderResourceView* GPUParticle::GenerateCurveTexture( Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution)
 {
     Graphics& graphics = Graphics::Instance();
     ID3D11Device* device = graphics.GetDevice();
@@ -663,7 +655,7 @@ ID3D11ShaderResourceView* GPUParticle::GenerateCurveTexture(Curve** curve, int e
     return SUCCEEDED(hr) ? srv.Get() : nullptr;
 }
 
-void GPUParticle::UpdateCurveTexture(Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture)
+void GPUParticle::UpdateCurveTexture( Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture)
 {
     if (!texture) return; // まだテクスチャが生成されていない場合
 
@@ -713,20 +705,20 @@ void GPUParticle::UpdateCurveTexture(Curve** curve, int elementalcount, int reso
 void GPUParticle::CurveDataLoding()
 {
     //カーブデータ作成
-    scale_curve = std::make_unique<Curve>(8);
-    speed_curve = std::make_unique<Curve>(8);
-    color_curve_r = std::make_unique<Curve>(8);
-    color_curve_g = std::make_unique<Curve>(8);
-    color_curve_b = std::make_unique<Curve>(8);
-    color_curve_a = std::make_unique<Curve>(8);
-    gravity_curve = std::make_unique<Curve>(8);
+    scale_curve = std::make_unique< Curve>(8);
+    speed_curve = std::make_unique< Curve>(8);
+    color_curve_r = std::make_unique< Curve>(8);
+    color_curve_g = std::make_unique< Curve>(8);
+    color_curve_b = std::make_unique< Curve>(8);
+    color_curve_a = std::make_unique< Curve>(8);
+    gravity_curve = std::make_unique< Curve>(8);
 
     //カーブデータのファイルパス読み込み
     CurveFilePathDataLoading();
 
     // 各曲線に対応するテクスチャとSRVを生成
-    Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
-    Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
+     Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
+     Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
     GenerateCurveTexture(SSG, 2, SSG_texture, SSG_srv, 128);
     GenerateCurveTexture(color, 3, color_texture, color_srv, 128);
 }

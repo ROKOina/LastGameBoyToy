@@ -1,9 +1,5 @@
 #pragma once
 #include "State.h"
-#include <vector>
-#include <memory>
-#include <map>
-#include <imgui.h>
 
 template <class Owner, typename Enum>
 class StateMachine

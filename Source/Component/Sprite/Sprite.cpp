@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <WICTextureLoader.h>
 #include "Sprite.h"
 #include "SystemStruct\Misc.h"
 #include "Graphics/Graphics.h"
@@ -8,13 +6,6 @@
 #include "SystemStruct\Dialog.h"
 #include "SystemStruct\Logger.h"
 #include "Math/Mathf.h"
-#include <imgui.h>
-#include <fstream>
-#include <filesystem>
-#include <shlwapi.h>
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
 #include "Math/easing.h"
 #include "Component/System/TransformCom.h"
 #include <Input/Input.h>

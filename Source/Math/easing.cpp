@@ -1,5 +1,4 @@
 #pragma warning (disable : 4244)
-#include <DirectXMath.h>
 #include "Easing.h"
 
 //------------------------------------------------------------------------------

@@ -4,8 +4,6 @@
 #include "Graphics/Graphics.h"
 #include "Math/Mathf.h"
 #include "Scene/SceneManager.h"
-#include <imgui.h>
-#include <cmath>
 
 //コンストラクタで値を代入
 CameraCom::CameraCom(float fovY, float aspect, float nearZ, float farZ)

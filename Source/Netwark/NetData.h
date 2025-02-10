@@ -1,10 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
-#include <sstream>
-#include <vector>
-#include <array>
-
 #define MAX_BUFFER_NET 65536
 
 //XMFLOAT4

@@ -1,9 +1,6 @@
 #pragma once
 
 #include "Graphics/ConstantBuffer.h"
-#include <DirectXMath.h>
-#include <memory>
-#include <string>
 
 //‘O•ûéŒ¾
 class CameraCom;
@@ -66,7 +63,7 @@ protected:
         DirectX::XMFLOAT2 cameraScope = {};
         DirectX::XMFLOAT2 screenResolution = {};
     };
-    std::unique_ptr<ConstantBuffer<SceneConstants>>sc;
+    std::unique_ptr<constantBufferH::ConstantBuffer<SceneConstants>>sc;
 
 private:
     bool isReady_ = false;

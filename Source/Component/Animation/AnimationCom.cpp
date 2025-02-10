@@ -5,8 +5,6 @@
 #include "Component\Character/CharacterCom.h"
 #include "AimIKCom.h"
 #include "Math/AnimationCalculation.h"
-#include <imgui.h>
-#include <cassert>
 
 //シーケンサーエディタ
 #include "SystemStruct/MySequence.h"

@@ -1,13 +1,6 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <d3d11.h>
-#include <DirectXMath.h>
 #include "ModelResource.h"
-#include <imgui.h>
-#include <ImGuizmo.h>
-#include <unordered_map>
 
 class Model
 {

@@ -44,7 +44,7 @@ private:
     {
         DirectX::XMFLOAT4X4 world = {};
     };
-    std::unique_ptr<ConstantBuffer<VideoConstants>>VC;
+    std::unique_ptr<constantBufferH::ConstantBuffer<VideoConstants>>VC;
 
 private:
     VideoTexture video;

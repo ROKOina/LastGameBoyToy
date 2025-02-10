@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <memory>
+
 #include "SystemStruct\Misc.h"
 #include "DebugRenderer.h"
 #include "Graphics/Graphics.h"
@@ -25,7 +24,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 
     // 定数バッファ
     {
-        cbmesh = std::make_unique<ConstantBuffer<CbMesh>>(device);
+        cbmesh = std::make_unique<constantBufferH::ConstantBuffer<CbMesh>>(device);
     }
 
     // 球メッシュ作成

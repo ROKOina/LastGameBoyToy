@@ -2,7 +2,6 @@
 #include "BasicsApplication.h"
 #include "UIListener.h"
 #include "Photon_lib.h"
-#include "imgui.h"
 
 using namespace ExitGames::Common;
 

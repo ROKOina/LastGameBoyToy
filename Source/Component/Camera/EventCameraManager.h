@@ -1,10 +1,4 @@
 #pragma once
-
-#include <string>
-#include <vector>
-#include <memory>
-#include <DirectXMath.h>
-
 class GameObject;
 
 // イベントカメラの動きを保存

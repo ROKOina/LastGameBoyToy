@@ -1,15 +1,10 @@
 #pragma once
 
-#include <xaudio2.h>
 #include <xaudio2fx.h>
 #include <x3daudio.h>
 #include <xapofx.h>
 
-#include <wrl/client.h>
-
 #include "AudioResource.h"
-#include <memory>
-#include <map>
 #include "Component/System/Component.h"
 #include "SystemStruct/Misc.h"
 

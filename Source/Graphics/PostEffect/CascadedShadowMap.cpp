@@ -1,7 +1,6 @@
 #include "CascadedShadowMap.h"
 #include "SystemStruct\Misc.h"
 #include "Graphics/Graphics.h"
-#include <array>
 
 using namespace DirectX;
 
@@ -73,7 +72,7 @@ CascadedShadowMap::CascadedShadowMap(ID3D11Device* device, uint32_t width, uint3
     m_viewport.TopLeftX = 0.0f;
     m_viewport.TopLeftY = 0.0f;
 
-    m_constants = std::make_unique<ConstantBuffer<constants>>(device);
+    m_constants = std::make_unique<constantBufferH::ConstantBuffer<constants>>(device);
 }
 
 //é¿çs

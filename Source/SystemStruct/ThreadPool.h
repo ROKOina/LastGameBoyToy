@@ -1,12 +1,5 @@
 #pragma once
 
-#include <thread>
-#include <mutex>
-#include <queue>
-#include <memory>
-#include <functional>
-#include <future>
-
 class ThreadPool
 {
     using ui32 = std::uint_fast32_t;

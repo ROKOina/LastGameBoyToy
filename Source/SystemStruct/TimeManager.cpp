@@ -1,5 +1,4 @@
 #include "TimeManager.h"
-#include <imgui.h>
 
 //XVˆ—
 void TimeManager::Update(const float& elapsedTime)

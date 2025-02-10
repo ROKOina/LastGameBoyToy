@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <memory>
 #include "SystemStruct\Misc.h"
 #include "LineRenderer.h"
 #include "Graphics/Graphics.h"
@@ -26,7 +24,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 
     // 定数バッファ
     {
-        cb = std::make_unique<ConstantBuffer<CB>>(device);
+        cb = std::make_unique<constantBufferH::ConstantBuffer<CB>>(device);
     }
 
     // 頂点バッファ

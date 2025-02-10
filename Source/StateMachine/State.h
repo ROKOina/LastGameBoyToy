@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 //UŒ‚‚Ìí—Ş
 enum class AttackType
 {

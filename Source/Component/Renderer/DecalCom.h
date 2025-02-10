@@ -63,7 +63,7 @@ private:
         DirectX::XMFLOAT3 colorscale = { 1,1,1 };
         float padding;
     };
-    std::unique_ptr<ConstantBuffer<DecalConstantBuffer>>DCB;
+    std::unique_ptr<constantBufferH::ConstantBuffer<DecalConstantBuffer>>DCB;
 
 private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>decalmap;

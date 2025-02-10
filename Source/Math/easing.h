@@ -8,7 +8,6 @@
 
 #include <math.h>
 #include <stdio.h>
-#include "imgui.h"
 
 enum class EaseType
 {

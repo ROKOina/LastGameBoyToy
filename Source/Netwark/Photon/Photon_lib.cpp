@@ -22,9 +22,6 @@
 #include "StaticSendDataManager.h"
 #include "Component\System\pingCom.h"
 
-#include "imgui.h"
-
-#include <fstream>
 
 static const ExitGames::Common::JString appID = L"0d572336-477d-43ad-895e-59f4eeebbca9"; // set your app id here
 static const ExitGames::Common::JString appVersion = L"1.0";

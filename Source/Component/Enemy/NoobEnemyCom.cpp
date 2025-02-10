@@ -7,7 +7,6 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\ColliderCom.h"
-#include <cmath>
 
 //コンストラクタ
 NoobEnemyCom::NoobEnemyCom()

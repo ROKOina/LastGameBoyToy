@@ -1,11 +1,6 @@
 #pragma once
 #include "ImGuiRender.h"
-#include <imgui.h>
-#include <ImGuizmo.h>
 #include "ImCurveEdit.h"
-#include <vector>
-#include <string>
-#include <map>
 
 struct MySequence : public ImSequencer::SequenceInterface
 {

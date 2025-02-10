@@ -1,14 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <set>
-#include <string>
-#include <DirectXMath.h>
-#include <future>
-#include <imgui.h>
-#include <ImGuizmo.h>
-
 // ‘O•ûéŒ¾
 class Component;
 class TransformCom;

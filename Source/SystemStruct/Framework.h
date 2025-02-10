@@ -1,6 +1,4 @@
 #pragma once
-#define _WINSOCKAPI_  // windows.hを定義した際に、winsock.hを自動的にインクルードしない
-#include <windows.h>
 #include "HighResolutionTimer.h"
 #include "Graphics/Graphics.h"
 #include "Input/input.h"

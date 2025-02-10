@@ -1,14 +1,3 @@
-#include <stdlib.h>
-#include <fstream>
-#include <functional>
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
-#include <WICTextureLoader.h>
-#include <DDSTextureLoader.h>
-#include <filesystem>
-#include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

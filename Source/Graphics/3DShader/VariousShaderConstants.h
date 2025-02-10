@@ -2,7 +2,6 @@
 
 #include "Math/Mathf.h"
 #include "Graphics/ConstantBuffer.h"
-#include <memory>
 
 class BaseConstants {
 public:
@@ -47,7 +46,7 @@ public:
     float waveEffectIntensity = 1.0f;
 
 private:
-    inline static std::unique_ptr<ConstantBuffer<Buffer>> m_effectconstants;
+    inline static std::unique_ptr<constantBufferH::ConstantBuffer<Buffer>> m_effectconstants;
 };
 
 class SciFiGateConstants :public BaseConstants
@@ -101,5 +100,5 @@ public:
     float contourSensitive = 500.0;
 
 private:
-    inline static std::unique_ptr<ConstantBuffer<Buffer>> m_constants;
+    inline static std::unique_ptr<constantBufferH::ConstantBuffer<Buffer>> m_constants;
 };

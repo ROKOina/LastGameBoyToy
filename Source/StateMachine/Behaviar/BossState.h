@@ -5,7 +5,6 @@
 #include "Component/Animation/AnimationCom.h"
 #include "Component/Character/CharaStatusCom.h"
 #include "Component\Particle\CPUParticle.h"
-#include <random>
 
 class BossCom;
 
