@@ -1,5 +1,7 @@
 #include "EventMoveBase.h"
 #include <SystemStruct\TimeManager.h>
+#include <Input\Input.h>
+#include <Graphics\Graphics.h>
 
 void EventMoveParameterBehaviorBase::TimerUpdate()
 {
@@ -65,22 +67,3 @@ void EventMoveDefaultValueBase::OnGUI()
     ImGui::DragFloat("End Value", &m_endValue);
 }
 
-EventMoveBase::EventMoveBase()
-{
-    m_eventMoveParameter->SetOwner(shared_from_this());
-}
-
-void EventMoveBase::Update(float elapsedTime)
-{
-    m_eventMoveParameter->Update();
-}
-
-void EventMoveBase::Start()
-{
-    m_eventMoveParameter->Start();
-}
-
-void EventMoveBase::OnGUI()
-{
-    m_eventMoveParameter->OnGUI();
-}

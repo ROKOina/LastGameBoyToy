@@ -129,6 +129,7 @@
     <ClInclude Include="Source\Audio\Audio3D.h" />
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Event\2DEvent\EventSpriteMoveBehavior.h" />
+    <ClInclude Include="Source\Component\Event\EventMove.h" />
     <ClInclude Include="Source\Component\Event\EventMoveBase.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
     <ClInclude Include="Source\Component\Sprite\SpriteCollisionCom.h" />
@@ -291,6 +292,7 @@
     <ClInclude Include="Source\SystemStruct\Targa.h" />
     <ClInclude Include="Source\SystemStruct\ThreadPool.h" />
     <ClInclude Include="Source\SystemStruct\TimeManager.h" />
+    <ClInclude Include="Source\Utility\Utility_.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
@@ -298,6 +300,7 @@
     <ClCompile Include="Source\Audio\Audio3D.cpp" />
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Event\2DEvent\EventSpriteMoveBehavior.cpp" />
+    <ClCompile Include="Source\Component\Event\EventMove.cpp" />
     <ClCompile Include="Source\Component\Event\EventMoveBase.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\SpriteCollisionCom.cpp" />
@@ -442,6 +445,7 @@
     <ClCompile Include="Source\SystemStruct\Logger.cpp" />
     <ClCompile Include="Source\SystemStruct\Main.cpp" />
     <ClCompile Include="Source\SystemStruct\TimeManager.cpp" />
+    <ClCompile Include="Source\Utility\Utility_.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

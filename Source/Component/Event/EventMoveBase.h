@@ -1,12 +1,22 @@
 #pragma once
 #include "SystemStruct\Curve.h"
 
+// イベントのクラスの名前を登録する関数と自身をマネージャーに登録させる関数を追加するマクロ
+#define EDITABLE_ON_GUI(CLASS)\
+    static inline AddEventRegistry::AutoRegister<CLASS>addEventItem{ std::make_shared<CLASS>(), GET_CLASS_NAME(CLASS)};\
+    std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>>& eventMoveParameters)override\
+    {\
+        auto eventMoveParam= eventMoveParameters.emplace_back(std::make_shared<CLASS>());\
+        return eventMoveParam;\
+}
+
 enum class Shaft
 {
     X, Y, Z,
 };
 
-class EventMoveParameterBehaviorBase
+// イベントのパラメータを更新させるクラスのベース
+class EventMoveParameterBehaviorBase: public std::enable_shared_from_this<EventMoveParameterBehaviorBase>
 {
 public:
     EventMoveParameterBehaviorBase() {};
@@ -37,8 +47,11 @@ public:
 
     bool GetFinishEnable() { return m_decisionEnable; }
 
+    // イベント登録の際に必要な関数
+    virtual std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>>& m_eventMoveParameters) = 0;
+
 protected:
-    friend class EventMoveBase;
+    friend class EventMove;
     // GUI描画
     virtual void OnGUI();
 
@@ -86,6 +99,13 @@ public:
     EventMoveDefaultValueBase() {};
     ~EventMoveDefaultValueBase() {};
 
+    virtual void RegisterEvent(std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>> eventMoveParameters) = 0;
+
+protected:
+    std::shared_ptr<EventMoveDefaultValueBase> shared_from_this() {
+        return std::static_pointer_cast<EventMoveDefaultValueBase>(EventMoveParameterBehaviorBase::shared_from_this());
+    }
+
 protected:
     virtual void SetStartValue() = 0;
     virtual void SetEndValue() = 0;
@@ -117,25 +137,42 @@ private:
 CEREAL_REGISTER_TYPE(EventMoveDefaultValueBase)
 CEREAL_CLASS_VERSION(EventMoveDefaultValueBase, 0)
 
-// イベントのパラメータにアクセスするためのコンポーネント
-class EventMoveBase : public Component, public std::enable_shared_from_this<EventMoveBase>
-{
+// イベントのクラスの名前を登録するクラス
+class AddEventRegistry {
 public:
-    // TODO:シリアライズの処理を追加
-    EventMoveBase();
-    ~EventMoveBase() {};
+    //! @brief  コンストラクタは削除する
+    AddEventRegistry() = delete;
 
-    //名前設定
-    const char* GetName() const override { return "EventMoveBase"; }
+    static void RegisterName(const char* name)
+    {
+        GetClassName_().emplace_back(name);
+    }
+
+    static std::vector<const char*>& GetClassName_()
+    {
+        static  std::vector<const char*> name;
+        return name;
+    }
+
+    //! @brief  関数の登録
+    static void RegisterClass_(std::shared_ptr<EventMoveParameterBehaviorBase> c)
+    {
+        GetEventMoveParameter().emplace_back(c);
+    }
+
+    //! @brief  追加可能イベントを入手できる関数の配列を取得できる
+    static std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>>& GetEventMoveParameter()
+    {
+        static std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>> eventMoveParameter;
+        return eventMoveParameter;
+    }
 
 public:
-    virtual void Start() override;
-    virtual void Update(float elapsedTime);
-
-protected:
-    // GUI描画
-    virtual void OnGUI();
-
-protected:
-    std::shared_ptr<EventMoveParameterBehaviorBase> m_eventMoveParameter;
+    template<typename Class>
+    struct AutoRegister {
+        AutoRegister(std::shared_ptr <Class> c, const char* name) {
+            RegisterClass_(c);
+            RegisterName(name);
+        }
+    };
 };

@@ -26,6 +26,7 @@
 #include "Scene\SceneTraining\SceneTraining.h"
 #include "Component\Renderer\VideoCom.h"
 #include "Component\UI\Font.h"
+#include <Component\Event\EventMove.h>
 
 SceneTitle::~SceneTitle()
 {
@@ -62,6 +63,13 @@ void SceneTitle::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("directionallight");
         obj->AddComponent<Light>("Data/SerializeData/LightData/title.light");
+    }
+
+    // イベント（テスト）
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("eventMove");
+        obj->AddComponent<EventMove>();
     }
 
     //ステージ

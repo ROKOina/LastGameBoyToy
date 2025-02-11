@@ -233,6 +233,7 @@ using namespace std::string_literals;
 // ゲーム関連で使うインクルード
 #include "Math/Define.h"
 #include "Math/Vector2.h"
+#include "Utility/Utility_.h"
 #include "Component/System/Component.h"
 #include "Component/System/GameObject.h"
 #include "Component/System/TransformCom.h"
