@@ -90,7 +90,13 @@ private:
         float blurdecay = { 0.999f };
         float ditancesan = { 986.0f };
         DirectX::XMFLOAT3 sundirection = { -1.9f,-0.37f,-0.09f };
-        float padding = {};
+        float FogScale = { 0.7f };
+        float FogAttenuationRate = { 0.009f };
+        DirectX::XMFLOAT3 FogColor = { 0.200f, 0.200f, 0.200f };
+        float FogHeightOffset = { 0.0f };
+        float HeightFogScale = { 0.0f };
+        float HeightFogAttenuationRate = { 0.0f };
+        float HeightFogWeightRate = { 0.0f };
     };
     std::unique_ptr<constantBufferH::ConstantBuffer<POSTEFFECT>>m_posteffect;
 
