@@ -1,5 +1,4 @@
 #include "FrustumCom.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Renderer/RendererCom.h"
 #include "Scene/SceneManager.h"
 #include "Component/Camera/CameraCom.h"

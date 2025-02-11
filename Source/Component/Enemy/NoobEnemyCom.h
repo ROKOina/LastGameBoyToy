@@ -1,5 +1,4 @@
 #pragma once
-#include "Component/System/Component.h"
 #include "StateMachine\StateMachine.h"
 #include "Scene\SceneManager.h"
 #include "Math\Mathf.h"

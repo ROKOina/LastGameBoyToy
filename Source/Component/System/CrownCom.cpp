@@ -1,6 +1,5 @@
 #include "CrownCom.h"
 
-#include "Component/System/TransformCom.h"
 #include "Component/Collsion/ColliderCom.h"
 #include "Component/Character/CharaStatusCom.h"
 

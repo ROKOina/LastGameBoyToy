@@ -7,8 +7,6 @@
 #include "Input\GamePad.h"
 
 #include "../NetData.h"
-#include "Component/System/GameObject.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Renderer/RendererCom.h"
 #include "Component/MoveSystem/MovementCom.h"
 #include "Component/Collsion/ColliderCom.h"

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Component/System/Component.h"
-
 //押し返しするコンポーネント
 
 //PushBackCom

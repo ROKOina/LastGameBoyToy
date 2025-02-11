@@ -1,6 +1,5 @@
 #include "Audio3D.h"
 #include "Component\System\GameObject.h"
-#include "Component/System/TransformCom.h"
 
 //Audio2DMagaer* Audio2DMagaer::instance_ = nullptr;
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "Component/System/Component.h"
 
 class UltSkillMaxItem :public Component
 {

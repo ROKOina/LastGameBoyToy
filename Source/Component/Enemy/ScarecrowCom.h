@@ -1,5 +1,4 @@
 #pragma once
-#include "Component/System/Component.h"
 #include "StateMachine\Behaviar\TrainingScarecrowState.h"
 #include "StateMachine/StateMachine.h"
 

@@ -2,8 +2,6 @@
 #include "Input\Input.h"
 #include "SystemStruct\Dialog.h"
 #include "Graphics/Graphics.h"
-#include "Component\System\GameObject.h"
-#include "Component/System/TransformCom.h"
 #include "Component\Camera\CameraCom.h"
 #include "Component/Collsion/ColliderCom.h"
 #include "Graphics/Model/ResourceManager.h"

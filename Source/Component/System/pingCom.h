@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Component/System/Component.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Particle/GPUParticle.h"
 #include "Component/Collsion/ColliderCom.h"
 #include "Component/UI/UiSystem.h"

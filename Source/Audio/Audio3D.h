@@ -5,7 +5,6 @@
 #include <xapofx.h>
 
 #include "AudioResource.h"
-#include "Component/System/Component.h"
 #include "SystemStruct/Misc.h"
 
 // Global defines

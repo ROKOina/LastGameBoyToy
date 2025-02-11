@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Component/System/Component.h"
-
 class GameObject;
 
 //ゲームモード王冠のオブジェクト

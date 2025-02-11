@@ -1,8 +1,6 @@
 #include "Setting.h"
 
-#include "Component\System\GameObject.h"
 #include "Component/Sprite/Sprite.h"
-#include "Component/System/TransformCom.h"
 #include "Math/Mathf.h"
 #include "Input\Input.h"
 

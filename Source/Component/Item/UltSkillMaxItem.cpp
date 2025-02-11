@@ -2,7 +2,6 @@
 #include "Component/Collsion/ColliderCom.h"
 #include "Component/Character/CharacterCom.h"
 #include "Scene/SceneTraining/TrainingManager.h"
-#include "Component/System/TransformCom.h"
 void UltSkillMaxItem::Start()
 {
 }

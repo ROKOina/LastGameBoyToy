@@ -1,5 +1,4 @@
 #include "PushBackCom.h"
-#include "Component/System/TransformCom.h"
 #include "Graphics/Graphics.h"
 
 PushBackCom::PushBackCom()

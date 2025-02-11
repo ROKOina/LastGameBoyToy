@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Component/System/Component.h"
-
 class EasingMoveCom :public Component
 {
 public:

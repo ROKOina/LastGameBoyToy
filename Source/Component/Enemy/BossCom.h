@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component/System/Component.h"
 #include "StateMachine\Behaviar\BossState.h"
 #include "StateMachine/StateMachine.h"
 #include "Audio\Audio3D.h"

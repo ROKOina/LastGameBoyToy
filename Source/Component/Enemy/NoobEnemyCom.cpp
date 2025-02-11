@@ -1,5 +1,4 @@
 #include "NoobEnemyCom.h"
-#include "Component/System/TransformCom.h"
 #include"Component/Character/CharacterCom.h"
 #include"Component/Character/CharaStatusCom.h"
 #include "Graphics/Graphics.h"

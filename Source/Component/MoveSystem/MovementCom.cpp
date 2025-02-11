@@ -1,6 +1,5 @@
 #include "MovementCom.h"
 
-#include "Component/System/TransformCom.h"
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
 #include "Phsix\Physxlib.h"

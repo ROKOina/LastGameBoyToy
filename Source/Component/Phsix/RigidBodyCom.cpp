@@ -1,7 +1,6 @@
 #include "RigidBodyCom.h"
 #include "Phsix\Physxlib.h"
 #include "Graphics\Model\ResourceManager.h"
-#include "Component/System/TransformCom.h"
 
 RigidBodyCom::RigidBodyCom(bool isStatic, PhysXLib::ShapeType type)
 {

@@ -1,7 +1,6 @@
 #include "SetNodeWorldPosCom.h"
 
 #include "Component/Renderer/RendererCom.h"
-#include "Component/System/TransformCom.h"
 
 void SetNodeWorldPosCom::Start()
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component/System/Component.h"
 #include <PVPGameSystem\PVPGameSystem.h>
 
 class GameObject;

@@ -1,7 +1,5 @@
 #include "Graphics/Graphics.h"
 #include "Scene/SceneManager.h"
-#include "Component\System\GameObject.h"
-#include "Component/System/TransformCom.h"
 #include "SceneLGBT.h"
 #include "Component\Light\LightCom.h"
 #include "Scene\SceneTitle\SceneTitle.h"

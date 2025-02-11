@@ -3,7 +3,6 @@
 #include "Graphics/ConstantBuffer.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
-#include "Component/System/Component.h"
 
 class CPUParticle :public Component
 {

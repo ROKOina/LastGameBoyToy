@@ -231,15 +231,10 @@ using namespace std::string_literals;
 #pragma warning(pop) // 外部ライブラリの警告抑制
 
 // ゲーム関連で使うインクルード
-//#include "core/framework.h"
-//#include "render/rendering_pipeline.h"
-//#include "scene/scene.h"
-//#include "game/game_object.h"
-//#include "game/component.h"
-//#include "game/behavior_component.h"
-//#include "game/transform/transform_component.h"
-//#include "game/transform/rect_transform.h"
-//
-//#include "game/game_object.inl"
+#include "Math/Define.h"
+#include "Math/Vector2.h"
+#include "Component/System/Component.h"
+#include "Component/System/GameObject.h"
+#include "Component/System/TransformCom.h"
 
 #endif //PCH_H

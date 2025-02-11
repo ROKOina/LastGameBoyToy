@@ -1,5 +1,4 @@
 #pragma once
-#include "Component/System/Component.h"
 #include <PvPUi/CharaPicks.h>
 #include "Audio/Audio3D.h"
 

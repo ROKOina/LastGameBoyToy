@@ -1,5 +1,4 @@
 #include "InstanceModelShader.h"
-#include "Component/System/TransformCom.h"
 
 #define MAX_STATIC_BATCH (300) // ƒoƒbƒ`•`‰æ‚·‚éÅ‘å” by™
 
