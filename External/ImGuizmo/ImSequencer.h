@@ -18,6 +18,15 @@ namespace ImSequencer
         SEQUENCER_EDIT_ALL = SEQUENCER_EDIT_STARTEND | SEQUENCER_CHANGE_FRAME
     };
 
+    enum SEQUENCER_RET_TYPE
+    {
+        RET_NONE,
+        RET_ADD,
+        RET_EDIT,
+        RET_DELETE,
+        RET_DUPLICATE,
+    };
+
     struct SequenceInterface
     {
         bool focused = false;
@@ -49,4 +58,40 @@ namespace ImSequencer
     // return true if selection is made
     bool Sequencer(SequenceInterface* sequence, int* currentFrame, bool* expanded, int* selectedEntry, int* firstFrame, int sequenceOptions
         , bool& MovingCurrentFrame, int& delID, int& addID);
+
+
+    struct MySequenceInterface
+    {
+        bool focused = false;
+        virtual int GetFrameMin() const = 0;
+        virtual int GetFrameMax() const = 0;
+        virtual int GetItemCount() const = 0;
+
+        virtual void BeginEdit(int /*index*/) {}
+        virtual void EndEdit() {}
+        virtual int GetItemTypeCount() const { return 0; }
+        virtual const char* GetItemTypeName(int /*typeIndex*/) const { return ""; }
+        virtual const char* GetItemLabel(int /*index*/) const { return ""; }
+
+        virtual void Get(int index, int** start, int** end, unsigned int* color) = 0;
+        virtual void Add(int /*type*/) {}
+        virtual void Del(int /*index*/) {}
+        virtual void Duplicate(int /*index*/) {}
+
+        virtual void Copy() {}
+        virtual void Paste() {}
+
+        virtual size_t GetCustomHeight(int /*index*/) { return 0; }
+        virtual void DoubleClick(int /*index*/) {}
+        virtual void CustomDraw(int /*index*/, ImDrawList* /*draw_list*/, const ImRect& /*rc*/, const ImRect& /*legendRect*/, const ImRect& /*clippingRect*/, const ImRect& /*legendClippingRect*/) {}
+        virtual void CustomDrawCompact(int /*index*/, ImDrawList* /*draw_list*/, const ImRect& /*rc*/, const ImRect& /*clippingRect*/) {}
+    };
+    bool Sequencer(std::shared_ptr<MySequenceInterface> sequence,
+        int* currentFrame,
+        bool* expanded,
+        int* selectedEntry,
+        int* firstFrame,
+        bool& MovingCurrentFrame,
+        int sequenceOptions,
+        SEQUENCER_RET_TYPE& retType);
 }
