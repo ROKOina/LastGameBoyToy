@@ -1,8 +1,5 @@
 #pragma once
 
-#include <deque>
-#include <vector>
-
 // リングバッファクラス
 template<class T>
 class RingBuffer {

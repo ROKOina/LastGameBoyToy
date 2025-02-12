@@ -42,7 +42,7 @@ Video::Video(const char* filename)
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
     //定数バッファの作成
-    VC = std::make_unique<ConstantBuffer<VideoConstants>>(device);
+    VC = std::make_unique<constantBufferH::ConstantBuffer<VideoConstants>>(device);
 
     VideoTexture::createAPI();
     video.create(filename);

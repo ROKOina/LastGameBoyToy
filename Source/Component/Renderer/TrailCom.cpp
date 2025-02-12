@@ -4,75 +4,14 @@
 #include "Graphics\Texture.h"
 #include "Component\System\TransformCom.h"
 #include "Math\Mathf.h"
-#include <fstream>
-#include <filesystem>
-#include <shlwapi.h>
 #include <SystemStruct\Dialog.h>
 #include "SystemStruct\Logger.h"
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
-#include <random>
 #include "Component\Camera\CameraCom.h"
 
 CEREAL_CLASS_VERSION(Trail::TrailParameter, 1)
 CEREAL_CLASS_VERSION(Trail::TrailConstants, 1)
 
 // シリアライズ
-namespace DirectX
-{
-    template<class Archive>
-    void serialize(Archive& archive, XMUINT4& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y),
-            cereal::make_nvp("z", v.z),
-            cereal::make_nvp("w", v.w)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT2& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT3& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y),
-            cereal::make_nvp("z", v.z)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT4& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y),
-            cereal::make_nvp("z", v.z),
-            cereal::make_nvp("w", v.w)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT4X4& m)
-    {
-        archive(
-            cereal::make_nvp("_11", m._11), cereal::make_nvp("_12", m._12), cereal::make_nvp("_13", m._13), cereal::make_nvp("_14", m._14),
-            cereal::make_nvp("_21", m._21), cereal::make_nvp("_22", m._22), cereal::make_nvp("_23", m._23), cereal::make_nvp("_24", m._24),
-            cereal::make_nvp("_31", m._31), cereal::make_nvp("_32", m._32), cereal::make_nvp("_33", m._33), cereal::make_nvp("_34", m._34),
-            cereal::make_nvp("_41", m._41), cereal::make_nvp("_42", m._42), cereal::make_nvp("_43", m._43), cereal::make_nvp("_44", m._44)
-        );
-    }
-}
 
 template<class Archive>
 void Trail::TrailParameter::serialize(Archive& archive, int version)
@@ -193,9 +132,9 @@ void Trail::Update(float elapsedTime)
     for (int i = 0; i < MAX_POLYGON; ++i)
     {
         int p1index = i;
-        int p2index = min(i + 1, MAX_POLYGON - 1);
-        int p3index = min(i + 2, MAX_POLYGON - 1);
-        int p0index = max(i - 1, 0);
+        int p2index = std::min(i + 1, MAX_POLYGON - 1);
+        int p3index = std::min(i + 2, MAX_POLYGON - 1);
+        int p0index = std::max(i - 1, 0);
 
         // 上部の頂点
         DirectX::XMVECTOR upperpolygon0 = XMLoadFloat3(&m_trailpositions[0][p0index]);

@@ -2,7 +2,6 @@
 #include "Graphics\Graphics.h"
 #include "Component\Renderer\RendererCom.h"
 #include "NodeCollsionCom.h"
-#include <imgui.h>
 
 //“–‚½‚è”»’è
 #pragma region Collider

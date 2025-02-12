@@ -1,10 +1,7 @@
 #include "RayCastManager.h"
 #include "Math/Mathf.h"
 #include "Component\Collsion\RayCollisionCom.h"
-#include "Component/System/TransformCom.h"
 #include "Graphics/Graphics.h"
-#include <queue>
-#include <assert.h>
 
 // レイキャストの判定するポリゴンを表示するフラグ ( コメントアウト = 無効化 )
 //#define DRAW_POLYGON_GROUP
@@ -308,8 +305,8 @@ bool RayCastManager::RayVsBox(const DirectX::XMFLOAT3& start, const DirectX::XMF
                 t2 = tmp;
             }
 
-            t_min = max(t_min, t1);
-            t_max = min(t_max, t2);
+            t_min = std::max(t_min, t1);
+            t_max = std::min(t_max, t2);
 
             if (t_min > t_max)
                 return false; // 交差していない

@@ -1,10 +1,5 @@
 #pragma once
 
-#include <d3d11.h>
-#include <stdint.h>
-#include <wrl.h>
-#include <memory>
-
 //テクスチャ
 struct Texture
 {

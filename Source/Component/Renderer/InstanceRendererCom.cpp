@@ -1,8 +1,6 @@
 #include "InstanceRendererCom.h"
-#include "Component/System/TransformCom.h"
 #include <Graphics/Model/ResourceManager.h>
 #include "Math/Mathf.h"
-#include <random>
 
 //コンストラクタ
 InstanceRenderer::InstanceRenderer(SHADER_ID_MODEL id, int maxinstance, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode, bool shadowrender)

@@ -1,6 +1,5 @@
 #include "RegisterChara.h"
 #include "Component\System\GameObject.h"
-#include "Component/System/TransformCom.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Animation\AnimationCom.h"
 #include "Component/Animation/AimIKCom.h"

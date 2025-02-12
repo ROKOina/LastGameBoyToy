@@ -1,0 +1,225 @@
+#include "SpriteCollisionCom.h"
+#include "SystemStruct\Misc.h"
+#include "Graphics/Graphics.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
+#include "SystemStruct\Dialog.h"
+#include "SystemStruct\Logger.h"
+#include "Math/Mathf.h"
+#include "Math/easing.h"
+#include <Input/Input.h>
+
+SpriteCollisionCom::SpriteCollisionCom(std::shared_ptr<SpriteCom> spr)
+{
+    ID3D11Device* device = Graphics::Instance().GetDevice();
+    this->spr = spr;
+    LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &collisionTexture2ddesc_);
+}
+
+void SpriteCollisionCom::Start()
+{
+}
+
+void SpriteCollisionCom::Update(float elapsedTime)
+{
+    //当たり判定
+    if (!ontriiger)return;
+
+    if (cursorVsCollsionBox())
+    {
+        //当たった瞬間を記録
+        (hit == false) ? hitEnter = true : hitEnter = false;
+
+        hit = true;
+    }
+    else
+    {
+        hit = false;
+    }
+}
+
+void SpriteCollisionCom::Render(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+#ifdef DEBUG
+    // 当たり判定の可視化
+    if (!drawcollsion || !ontriiger)return;
+
+    DrawCollsionBox();
+#endif // DEBUG
+}
+
+void SpriteCollisionCom::OnGUI()
+{
+    //ImGui::DragFloat2((char*)u8"位置オフセット値", &spc.collsionpositionoffset.x);
+    //ImGui::DragFloat2((char*)u8"スケールオフセット値", &spc.collsionscaleoffset.x);
+    ImGui::Checkbox((char*)u8"当たり判定描画", &drawcollsion);
+}
+
+void SpriteCollisionCom::DrawCollsionBox()
+{
+    Graphics& graphics = Graphics::Instance();
+    ID3D11Device* device = graphics.GetDevice();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+    auto spriteCom = spr.lock();
+
+    // スプライトと同じビューポートの設定
+    D3D11_VIEWPORT viewport{};
+    UINT num_viewports{ 1 };
+    dc->RSGetViewports(&num_viewports, &viewport);
+
+    Vector2        position = { GetGameObject()->transform_->GetWorldPosition().x, GetGameObject()->transform_->GetWorldPosition().y };
+    Vector2        scale = { GetGameObject()->transform_->GetScale().x   , GetGameObject()->transform_->GetScale().y };
+    float          angle = GetGameObject()->transform_->GetEulerRotation().z;
+    const Vector2& texSize = spriteCom->spc.texSize;
+    const Vector2& texPos = spriteCom->spc.texPos;
+    const Vector2& pivot = spriteCom->spc.pivot;
+
+    // ピボットの処理
+    Vector2 drawPivot = ((texSize * scale) / texSize) * pivot;
+
+    position -= drawPivot;
+
+    // 描画範囲
+    Vector2 extent = texSize * scale;
+
+    // アフィン変換
+    // スプライトを構成する４頂点のスクリーン座標を計算する
+    Vector2 positions[] = {
+        Vector2(position.x            , position.y),			    // 左上
+        Vector2(position.x + extent.x , position.y),			    // 右上
+        Vector2(position.x            , position.y + extent.y),	// 左下
+        Vector2(position.x + extent.x , position.y + extent.y),	// 右下
+    };
+
+    // スプライトを構成する４頂点のテクスチャ座標を計算する
+    Vector2 texcoords[] = {
+        Vector2(texPos.x            , texPos.y),			        // 左上
+        Vector2(texPos.x + texSize.x, texPos.y),			        // 右上
+        Vector2(texPos.x            , texPos.y + texSize.y),	    // 左下
+        Vector2(texPos.x + texSize.x, texPos.y + texSize.y),	    // 右下
+    };
+
+    // スプライトの中心で回転させるために４頂点の中心位置が
+    // 原点(0, 0)になるように一旦頂点を移動させる。
+    Vector2 offset = position + extent * (pivot / texSize);
+    for (auto& p : positions)
+    {
+        p -= offset;
+    }
+
+    // 頂点を回転させる
+    float theta = angle /** (DirectX::XM_PI / 180.0f)*/;	// 角度をラジアン(θ)に変換
+    float c = cosf(theta);
+    float s = sinf(theta);
+    for (auto& p : positions)
+    {
+        DirectX::XMFLOAT2 r = p;
+        p.x = c * r.x + -s * r.y;
+        p.y = s * r.x + c * r.y;
+    }
+
+    // 回転のために移動させた頂点を元の位置に戻す
+    for (auto& p : positions)
+    {
+        p += offset;
+    }
+
+    // スクリーン座標系からNDC座標系へ変換する。
+    for (auto& p : positions)
+    {
+        p.x = 2.0f * p.x / viewport.Width - 1.0f;
+        p.y = 1.0f - 2.0f * p.y / viewport.Height;
+    }
+
+    float texWidth = (float)spriteCom->texture2ddesc_.Width;
+    float texHeight = (float)spriteCom->texture2ddesc_.Height;
+
+    // 頂点バッファのデータを作成
+    for (int i = 0; i < 4; ++i)
+    {
+        texcoords[i].x /= texWidth;
+        texcoords[i].y /= texHeight;
+    }
+
+
+    // 当たり判定用の矩形を描画するための頂点
+    SpriteCom::Vertex collisionVertices[]
+    {
+        { { positions[0].x, positions[0].y, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 0.0f, 0.0f } }, // 赤色で表示
+        { { positions[1].x, positions[1].y, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 1.0f, 0.0f } },
+        { { positions[2].x, positions[2].y, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 0.0f, 1.0f } },
+        { { positions[3].x, positions[3].y, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.3f }, { 1.0f, 1.0f } },
+    };
+
+    // 当たり判定用の矩形を描画するための頂点バッファの作成
+    D3D11_BUFFER_DESC buffer_desc{};
+    buffer_desc.ByteWidth = sizeof(collisionVertices);
+    buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+    buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    D3D11_SUBRESOURCE_DATA subresource_data{};
+    subresource_data.pSysMem = collisionVertices;
+    ID3D11Buffer* collisionVertexBuffer = nullptr;
+    HRESULT hr = device->CreateBuffer(&buffer_desc, &subresource_data, &collisionVertexBuffer);
+    if (FAILED(hr)) {
+        LOG("当たり判定用頂点バッファの作成に失敗しました。HRESULT: 0x%X", hr);
+        return; // エラー処理
+    }
+
+    // 描画設定
+    UINT stride{ sizeof(SpriteCom::Vertex) };
+    UINT pOffset{ 0 };
+    dc->IASetVertexBuffers(0, 1, &collisionVertexBuffer, &stride, &pOffset);
+    dc->PSSetShaderResources(0, 1, collsionshaderResourceView_.GetAddressOf());
+
+    // スプライトの矩形を描画
+    dc->Draw(4, 0);
+
+    // メモリの解放
+    if (collisionVertexBuffer) {
+        collisionVertexBuffer->Release();
+        collisionVertexBuffer = nullptr;
+    }
+}
+
+bool SpriteCollisionCom::cursorVsCollsionBox()
+{
+    //マウスの位置
+    Mouse& mouse = Input::Instance().GetMouse();
+    float mousePosx = mouse.GetPositionX();
+    float mousePosy = mouse.GetPositionY();
+
+    //法線ベクトル作成
+    float x{ sinf(DirectX::XMConvertToRadians(GetGameObject()->transform_->GetEulerRotation().z)) };
+    float y{ cosf(DirectX::XMConvertToRadians(GetGameObject()->transform_->GetEulerRotation().z)) };
+    DirectX::XMFLOAT2 normalUp = Mathf::Normalize({ x,y });
+    DirectX::XMFLOAT3 normalCross = Mathf::Cross({ normalUp.x,normalUp.y,0 }, { 0,0,1 });
+    DirectX::XMFLOAT2 normalRight = Mathf::Normalize({ normalCross.x,normalCross.y });
+    auto spriteCom = spr.lock();
+
+    // スケール倍したテクスチャサイズ
+    Vector2        scale = { GetGameObject()->transform_->GetScale().x   , GetGameObject()->transform_->GetScale().y };
+    float texSizeX = spriteCom->spc.texSize.x * scale.x;
+    float texSizeY = spriteCom->spc.texSize.y * scale.y;
+
+    // 座標とピボットの処理
+    float pivotX = (spriteCom->spc.pivot.x / spriteCom->spc.texSize.x);
+    float pivotY = (spriteCom->spc.pivot.y / spriteCom->spc.texSize.y);
+
+    //カーソル位置からコリジョンボックスのベクトル
+    DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
+    DirectX::XMFLOAT2 pos = { collisionPivot.x /*+ spc.collsionpositionoffset.x*/, collisionPivot.y /*+ spc.collsionpositionoffset.y*/ };
+    DirectX::XMFLOAT2 curVecPos = cur - pos;
+    curVecPos.y *= -1;
+
+    //長さを測る
+    float upLen = Mathf::Dot(normalUp, curVecPos);
+    float rightLen = Mathf::Dot(normalRight, curVecPos);
+
+    //判定
+    scale = { (texSizeX / 2 /*+ spc.collsionscaleoffset.x*/),(texSizeY / 2 /*+ spc.collsionscaleoffset.y*/) };
+    if (upLen * upLen > scale.y * scale.y)return false;
+    if (rightLen * rightLen > scale.x * scale.x)return false;
+
+    return true;
+}

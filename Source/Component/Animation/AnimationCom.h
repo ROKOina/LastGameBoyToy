@@ -1,7 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
-
 #include "Component\System\Component.h"
 #include "Graphics/Model/Model.h"
 #include "Graphics\Model\Model.h"

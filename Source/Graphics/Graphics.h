@@ -1,15 +1,10 @@
 #pragma once
 
-#include <memory>
-#include <d3d11.h>
-#include <wrl.h>
 #include "Graphics/Shader.h"
 #include "Graphics/DebugRenderer/DebugRenderer.h"
 #include "Graphics/DebugRenderer/LineRenderer.h"
 
 #include "SystemStruct\ThreadPool.h"
-
-#include <mutex>
 
 #define DEBUG_GUI_ true
 

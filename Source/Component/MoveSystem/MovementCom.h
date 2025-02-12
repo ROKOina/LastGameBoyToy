@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component/System/Component.h"
 #include "Math/Mathf.h"
 
 #define GRAVITY_NORMAL 0.98

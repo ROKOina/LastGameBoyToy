@@ -65,8 +65,8 @@ private:
     };
 
 private:
-    std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
-    std::unique_ptr<ConstantBuffer<m_general>>       m_generalconstants;
+    std::unique_ptr<constantBufferH::ConstantBuffer<subsetconstants>> m_subsetconstants;
+    std::unique_ptr<constantBufferH::ConstantBuffer<m_general>>       m_generalconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;

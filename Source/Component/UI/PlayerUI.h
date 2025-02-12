@@ -4,7 +4,6 @@
 #include "Component\Character\RegisterChara.h"
 #include "Component\Character\CharacterCom.h"
 #include "PVPGameSystem\PVPGameSystem.h"
-#include <map>
 
 class UI_Skill : public UiSystem
 {

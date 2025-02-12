@@ -1,9 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <DirectXMath.h>
-
 class GameObject;
 class RayCollisionCom;
 

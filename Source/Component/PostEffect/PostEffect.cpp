@@ -2,7 +2,6 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include "Graphics/Texture.h"
-#include <imgui.h>
 #include "Graphics/Shader.h"
 #include <Math\Mathf.h>
 
@@ -36,8 +35,8 @@ PostEffect::PostEffect()
     m_cascadedshadowmap = std::make_unique<CascadedShadowMap>(Graphics.GetDevice(), 1024 * 4, 1024 * 4);
 
     //コンスタントバッファ
-    m_posteffect = std::make_unique<ConstantBuffer<POSTEFFECT>>(Graphics.GetDevice());
-    m_shadowparameter = std::make_unique<ConstantBuffer<SHADOWPARAMETER>>(Graphics.GetDevice());
+    m_posteffect = std::make_unique<constantBufferH::ConstantBuffer<POSTEFFECT>>(Graphics.GetDevice());
+    m_shadowparameter = std::make_unique<constantBufferH::ConstantBuffer<SHADOWPARAMETER>>(Graphics.GetDevice());
 }
 
 //更新処理

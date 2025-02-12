@@ -1,11 +1,5 @@
 #pragma once
 
-#include <d3d11.h>
-#include <wrl.h>
-#include <directxmath.h>
-#include <vector>
-#include <functional>
-#include <memory>
 #include "Graphics/ConstantBuffer.h"
 
 // https://learnopengl.com/Guest-Articles/2021/CSM
@@ -42,7 +36,7 @@ public:
         DirectX::XMFLOAT4X4 viewprojectionmatrices[4];
         float cascadeplanedistances[4];
     };
-    std::unique_ptr<ConstantBuffer<constants>> m_constants;
+    std::unique_ptr<constantBufferH::ConstantBuffer<constants>> m_constants;
 
 public:
     const size_t m_cascadecount;

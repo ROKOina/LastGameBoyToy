@@ -1,7 +1,4 @@
 #pragma once
-#include <memory>
-#include <DirectXMath.h>
-#include <string>
 
 // ‘O•ûéŒ¾
 class GameObject;

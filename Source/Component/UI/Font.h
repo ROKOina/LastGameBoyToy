@@ -1,16 +1,4 @@
 #pragma once
-#include "Component/System/Component.h"
-#include <vector>
-#include <memory>
-#include <wrl.h>
-#include <d3d11.h>
-#include <DirectXMath.h>
-
-#include <vector>
-#include <memory>
-#include <wrl.h>
-#include <d3d11.h>
-#include <DirectXMath.h>
 
 class Font : public Component
 {

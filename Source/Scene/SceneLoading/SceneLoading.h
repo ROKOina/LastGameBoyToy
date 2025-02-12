@@ -2,7 +2,6 @@
 
 #include "Component\Sprite/Sprite.h"
 #include "Scene/Scene.h"
-#include <thread>
 
 //ローディングシーン
 class SceneLoading :public Scene

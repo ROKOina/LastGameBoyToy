@@ -1,33 +1,10 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <string>
-#include <cassert>
 #include "Video.h"
 #include "Graphics.h"
 #include "SystemStruct\TimeManager.h"
 
-// ----------------------------------
-// MF API usage copied from mediafoundationsamples\MFMP4ToYUVWithoutMFT
-#include <mfapi.h>
-#include <mfplay.h>
-#include <mfreadwrite.h>
-#include <mferror.h>
-#include <wmcodecdsp.h>
 
-#pragma comment(lib, "mf.lib")
-#pragma comment(lib, "mfplat.lib")
-#pragma comment(lib, "mfplay.lib")
-#pragma comment(lib, "mfreadwrite.lib")
-#pragma comment(lib, "mfuuid.lib")
-#pragma comment(lib, "wmcodecdspuuid.lib")
-
-#define CHECK_HR(x, msg) hr = x; if( hr != S_OK ) { dbg(msg); return false; }
+#define CHECK_HR(x, msg) hr = x; if( hr != S_OK ) { return false; }
 #define SAFE_RELEASE(x) if(x) { (x)->Release(); x = nullptr; }
-
-//#define SHOW_DEBUG        1
-#if SHOW_DEBUG
-#else
-#define dbg(...)
-#endif
 
 bool Texture::create(uint32_t new_xres, uint32_t new_yres, DXGI_FORMAT new_format, bool is_dynamic)
 {
@@ -275,181 +252,6 @@ LPCSTR GetGUIDNameConst(const GUID& guid)
 
 #define CHECKHR_GOTO(x,y) if(x != S_OK) goto y;
 
-// Returns all attributes from the stream in string format
-std::string GetMediaTypeDescription(IMFMediaType* pMediaType)
-{
-    HRESULT hr = S_OK;
-    GUID MajorType;
-    UINT32 cAttrCount;
-    LPCSTR pszGuidStr;
-    std::string description;
-    WCHAR TempBuf[200];
-
-    if (pMediaType == NULL)
-    {
-        description = "<NULL>";
-        goto done;
-    }
-
-    hr = pMediaType->GetMajorType(&MajorType);
-    CHECKHR_GOTO(hr, done);
-
-    //pszGuidStr = STRING_FROM_GUID(MajorType);
-    pszGuidStr = GetGUIDNameConst(MajorType);
-    if (pszGuidStr != NULL)
-    {
-        description += pszGuidStr;
-        description += ": ";
-    }
-    else
-    {
-        description += "Other: ";
-    }
-
-    hr = pMediaType->GetCount(&cAttrCount);
-    CHECKHR_GOTO(hr, done);
-
-    for (UINT32 i = 0; i < cAttrCount; i++)
-    {
-        GUID guidId;
-        MF_ATTRIBUTE_TYPE attrType;
-
-        hr = pMediaType->GetItemByIndex(i, &guidId, NULL);
-        CHECKHR_GOTO(hr, done);
-
-        hr = pMediaType->GetItemType(guidId, &attrType);
-        CHECKHR_GOTO(hr, done);
-
-        pszGuidStr = GetGUIDNameConst(guidId);
-        if (pszGuidStr != NULL)
-        {
-            description += pszGuidStr;
-        }
-        else
-        {
-            LPOLESTR guidStr = NULL;
-            // GUID's won't have wide chars.
-            CHECKHR_GOTO(StringFromCLSID(guidId, &guidStr), done);
-            char str[128];
-            wcstombs(str, guidStr, sizeof(str));
-            description += std::string(str);
-
-            CoTaskMemFree(guidStr);
-        }
-
-        description += "=";
-
-        switch (attrType)
-        {
-        case MF_ATTRIBUTE_UINT32:
-        {
-            UINT32 Val;
-            hr = pMediaType->GetUINT32(guidId, &Val);
-            CHECKHR_GOTO(hr, done);
-
-            description += std::to_string(Val);
-            break;
-        }
-        case MF_ATTRIBUTE_UINT64:
-        {
-            UINT64 Val;
-            hr = pMediaType->GetUINT64(guidId, &Val);
-            CHECKHR_GOTO(hr, done);
-
-            if (guidId == MF_MT_FRAME_SIZE)
-            {
-                description += "W:" + std::to_string(HI32(Val)) + " H: " + std::to_string(LO32(Val));
-            }
-            else if (guidId == MF_MT_FRAME_RATE)
-            {
-                // Frame rate is numerator/denominator.
-                description += std::to_string(HI32(Val)) + "/" + std::to_string(LO32(Val));
-            }
-            else if (guidId == MF_MT_PIXEL_ASPECT_RATIO)
-            {
-                description += std::to_string(HI32(Val)) + ":" + std::to_string(LO32(Val));
-            }
-            else
-            {
-                //tempStr.Format("%ld", Val);
-                description += std::to_string(Val);
-            }
-
-            //description += tempStr;
-
-            break;
-        }
-        case MF_ATTRIBUTE_DOUBLE:
-        {
-            DOUBLE Val;
-            hr = pMediaType->GetDouble(guidId, &Val);
-            CHECKHR_GOTO(hr, done);
-
-            //tempStr.Format("%f", Val);
-            description += std::to_string(Val);
-            break;
-        }
-        case MF_ATTRIBUTE_GUID:
-        {
-            GUID Val;
-            const char* pValStr;
-
-            hr = pMediaType->GetGUID(guidId, &Val);
-            CHECKHR_GOTO(hr, done);
-
-            pValStr = GetGUIDNameConst(Val);
-            if (pValStr != NULL)
-            {
-                description += pValStr;
-            }
-            else
-            {
-                LPOLESTR guidStr = NULL;
-                CHECKHR_GOTO(StringFromCLSID(Val, &guidStr), done);
-                char str[128];
-                wcstombs(str, guidStr, sizeof(str));
-                description += std::string(str);
-
-                CoTaskMemFree(guidStr);
-            }
-
-            break;
-        }
-        case MF_ATTRIBUTE_STRING:
-        {
-            hr = pMediaType->GetString(guidId, TempBuf, sizeof(TempBuf) / sizeof(TempBuf[0]), NULL);
-            if (hr == HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER))
-            {
-                description += "<Too Long>";
-                break;
-            }
-            CHECKHR_GOTO(hr, done);
-            char str[200];
-            wcstombs(str, TempBuf, sizeof(str));
-            description += std::string(str);
-
-            break;
-        }
-        case MF_ATTRIBUTE_BLOB:
-        {
-            description += "<BLOB>";
-            break;
-        }
-        case MF_ATTRIBUTE_IUNKNOWN:
-        {
-            description += "<UNK>";
-            break;
-        }
-        }
-
-        description += ", ";
-    }
-
-done:
-
-    return description;
-}
-
 // -------------------------------------------------------------------
 struct VideoTexture::InternalData
 {
@@ -502,7 +304,6 @@ struct VideoTexture::InternalData
 
         SAFE_RELEASE(pNativeType);
 
-        dbg("Source reader output media type: %dx%d %s (@ %f fps)\n", width, height, GetMediaTypeDescription(pFirstOutputType).c_str(), fps);
         return true;
     }
 
@@ -528,7 +329,8 @@ public:
         finished = false;
 
         wchar_t wfilename[256];
-        mbstowcs(wfilename, filename, sizeof(wfilename) / sizeof(wchar_t));
+        mbstowcs_s(NULL, wfilename, sizeof(wfilename) / sizeof(wchar_t), filename, _TRUNCATE);
+
         HRESULT hr = S_OK;
 
         // Set up the reader for the file.
@@ -621,19 +423,13 @@ public:
 
         video_time = llVideoTimeStamp;
 
-        if (flags & MF_SOURCE_READERF_STREAMTICK)
-        {
-            dbg("\tStream tick.\n");
-        }
         if (flags & MF_SOURCE_READERF_ENDOFSTREAM)
         {
-            dbg("\tEnd of stream.\n");
             if (autoloop)
             {
                 PROPVARIANT var = { 0 };
                 var.vt = VT_I8;
                 hr = pSourceReader->SetCurrentPosition(GUID_NULL, var);
-                if (hr != S_OK) { dbg("Failed to set source reader position."); }
                 clock_time = 0.0f;
             }
             else
@@ -641,17 +437,14 @@ public:
         }
         if (flags & MF_SOURCE_READERF_NEWSTREAM)
         {
-            dbg("\tNew stream.\n");
             finished = true;
         }
         if (flags & MF_SOURCE_READERF_NATIVEMEDIATYPECHANGED)
         {
-            dbg("\tNative type changed.\n");
             finished = true;
         }
         if (flags & MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED)
         {
-            dbg("\tCurrent type changed: from %dx%d %s (@ %f fps)\n", width, height, GetMediaTypeDescription(pFirstOutputType).c_str(), fps);
             if (!readOutputMediaFormat())
             {
                 finished = true;
@@ -693,8 +486,6 @@ public:
 
             target_texture->updateFromIYUV(byteBuffer, buffCurrLen);
             float elapsed = TimeManager::Instance().GetElapsedTime();
-
-            dbg("Sample count %d, Sample flags %d, sample duration %I64d, sample time %I64d. CT:%I64d. Buffer: %ld/%ld. Elapsed:%f\n", sampleCount, sampleFlags, llSampleDuration, llVideoTimeStamp, uct, buffCurrLen, buffMaxLen, elapsed);
 
             hr = buf->Unlock();
             assert(SUCCEEDED(hr));
@@ -778,7 +569,6 @@ void VideoTexture::SetRestart()
         HRESULT hr = internal_data->pSourceReader->SetCurrentPosition(GUID_NULL, var);
         if (FAILED(hr))
         {
-            dbg("Failed to reset source reader position.");
         }
         internal_data->clock_time = 0.0f;
         internal_data->video_time = 0;

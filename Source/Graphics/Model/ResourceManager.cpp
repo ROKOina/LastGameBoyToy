@@ -1,6 +1,5 @@
 #include "Graphics\Graphics.h"
 #include "ResourceManager.h"
-#include <map>
 
 //モデルリソース読み込み
 std::shared_ptr<ModelResource> ResourceManager::LoadModelResource(const char* filename)

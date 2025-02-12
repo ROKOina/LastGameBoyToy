@@ -1,6 +1,5 @@
 #include "EventCameraCom.h"
 #include "Graphics/Graphics.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Character/CharacterCom.h"
 #include "Component/MoveSystem/MovementCom.h"
 #include <Scene\SceneManager.h>

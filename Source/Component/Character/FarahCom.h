@@ -1,9 +1,6 @@
 #pragma once
 
 #include "CharacterCom.h"
-#include <algorithm>
-#include <vector>
-#include <memory>
 #include "Component\Renderer\DecalCom.h"
 
 class FarahCom : public CharacterCom

@@ -1,6 +1,4 @@
 #pragma once
-
-#include <memory>
 #include "Common-cpp/inc/Common.h"
 
 class UIListener

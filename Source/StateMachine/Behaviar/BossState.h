@@ -1,11 +1,9 @@
 #pragma once
 #include "Component/MoveSystem/MovementCom.h"
 #include "StateMachine\State.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Animation/AnimationCom.h"
 #include "Component/Character/CharaStatusCom.h"
 #include "Component\Particle\CPUParticle.h"
-#include <random>
 
 class BossCom;
 

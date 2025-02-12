@@ -2,7 +2,6 @@
 
 #include "FrameBuffer.h"
 #include "FullScreenQuad.h"
-#include <memory>
 
 //ƒuƒ‹[ƒ€
 class Bloom

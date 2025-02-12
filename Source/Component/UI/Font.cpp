@@ -1,13 +1,10 @@
 #include "Font.h"
-#include <WICTextureLoader.h>
 #include "SystemStruct\Targa.h"
 #include "SystemStruct\Misc.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
-#include <string>
 #include <codecvt>
-#include<windows.h>
 #include "Math\Mathf.h"
 #include "Component\System\TransformCom.h"
 

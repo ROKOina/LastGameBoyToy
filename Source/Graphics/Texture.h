@@ -1,16 +1,10 @@
 #pragma once
 
-#include <wrl.h>
-#include <d3d11.h>
-#include <stdlib.h>
-#include <filesystem>
-#include <WICTextureLoader.h>
-#include <DDSTextureLoader.h>
-#include <map>
 #include "Graphics/Graphics.h"
 #include "SystemStruct\Misc.h"
 #include "SystemStruct\Logger.h"
 #include <stb_image.h>
+
 
 // テクスチャ
 //DDSTextureを読み込むための処理

@@ -2,7 +2,6 @@
 #include "Component/System/TransformCom.h"
 #include "Component/Phsix/RigidBodyCom.h"
 #include "Graphics\Model\ResourceManager.h"
-#include <list>
 
 void PhysXLib::Initialize()
 {

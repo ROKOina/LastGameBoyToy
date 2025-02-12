@@ -6,9 +6,7 @@
 #include "Graphics/PostEffect/Bloom.h"
 #include "Graphics/PostEffect/MultiRenderTarget.h"
 #include "Graphics/PostEffect/CascadedShadowMap.h"
-#include <DirectXMath.h>
 #include "Component\System\Component.h"
-#include <map>
 
 //ポストエフェクト
 class PostEffect :public Component
@@ -100,7 +98,7 @@ private:
         float HeightFogAttenuationRate = { 0.0f };
         float HeightFogWeightRate = { 0.0f };
     };
-    std::unique_ptr<ConstantBuffer<POSTEFFECT>>m_posteffect;
+    std::unique_ptr<constantBufferH::ConstantBuffer<POSTEFFECT>>m_posteffect;
 
     //影のパラメータのコンスタントバッファ
     struct SHADOWPARAMETER
@@ -110,7 +108,7 @@ private:
         float shadowfilterradius = 14.222f;
         int shadowsamplecount = 32;
     };
-    std::unique_ptr<ConstantBuffer<SHADOWPARAMETER>>m_shadowparameter;
+    std::unique_ptr<constantBufferH::ConstantBuffer<SHADOWPARAMETER>>m_shadowparameter;
 
 public:
 

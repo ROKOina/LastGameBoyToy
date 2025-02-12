@@ -1,7 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
-
 #include "CameraCom.h"
 
 //ƒtƒŠ[ƒJƒƒ‰

@@ -1,9 +1,6 @@
 #pragma once
 #include "Component\System/Component.h"
-#include <List>
-#include <map>
 #include <Math\Collision.h>
-#include <functional>
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Phsix\RigidBodyCom.h"
 

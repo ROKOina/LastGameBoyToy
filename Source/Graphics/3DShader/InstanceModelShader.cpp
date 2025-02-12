@@ -1,5 +1,4 @@
 #include "InstanceModelShader.h"
-#include "Component/System/TransformCom.h"
 
 #define MAX_STATIC_BATCH (300) // バッチ描画する最大数 by杉
 
@@ -98,8 +97,8 @@ InstanceModelShader::InstanceModelShader(SHADER_ID_MODEL shader, int count)
     // 定数バッファ
     {
         // オブジェクト用のコンスタントバッファ,サブセット用
-        m_subsetconstants = std::make_unique<ConstantBuffer<subsetconstants>>(Graphics.GetDevice());
-        m_generalconstants = std::make_unique<ConstantBuffer<m_general>>(Graphics.GetDevice());
+        m_subsetconstants = std::make_unique<constantBufferH::ConstantBuffer<subsetconstants>>(Graphics.GetDevice());
+        m_generalconstants = std::make_unique<constantBufferH::ConstantBuffer<m_general>>(Graphics.GetDevice());
     }
 
     // インスタンシングのデータをバッファに格納

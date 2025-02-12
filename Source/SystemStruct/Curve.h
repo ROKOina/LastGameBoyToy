@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include <vector>
 
 //============================================================================
 // グラフ
@@ -25,7 +23,7 @@ public:
     //ファイルパス取得
     const std::string& GetFilePath() const { return filepath; }
 
-private:
+protected:
 
     std::vector<float> frames;
     std::vector<float> values;
@@ -45,4 +43,18 @@ private:
 
     // デシリアライズ
     bool Deserialize(const char* filename);
+};
+
+class EventCurve : public Curve
+{
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive& archive)
+    {
+        archive(
+            CEREAL_NVP(frames),
+            CEREAL_NVP(values)
+        );
+    }
 };

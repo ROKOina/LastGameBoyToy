@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component/Animation/AnimationCom.h"
-#include "Component/System/Component.h"
 #include "PvPUi/CharaPicks.h"
 //PVE‚Ì‰‰o“Š‡
 class PVEDirection

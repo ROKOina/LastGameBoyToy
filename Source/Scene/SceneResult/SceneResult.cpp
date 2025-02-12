@@ -17,8 +17,6 @@
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTitle\SceneTitle.h"
 #include "SystemStruct\TimeManager.h"
-#include <string>
-#include <windows.h>
 
 std::wstring stringconvert(const std::string& str)
 {

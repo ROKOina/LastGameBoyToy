@@ -1,5 +1,4 @@
 #include "NoobEnemyCom.h"
-#include "Component/System/TransformCom.h"
 #include"Component/Character/CharacterCom.h"
 #include"Component/Character/CharaStatusCom.h"
 #include "Graphics/Graphics.h"
@@ -7,7 +6,6 @@
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Collsion\ColliderCom.h"
-#include <cmath>
 
 //コンストラクタ
 NoobEnemyCom::NoobEnemyCom()

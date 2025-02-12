@@ -1,6 +1,4 @@
-#include <imgui.h>
 #include "TransformCom.h"
-#include <cmath>
 #include "Graphics\Model\Model.h"
 
 // ŠJnˆ—

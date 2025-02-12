@@ -6,74 +6,11 @@
 #include "Math/Mathf.h"
 #include "SystemStruct\Dialog.h"
 #include "SystemStruct\Logger.h"
-#include "Component/System/TransformCom.h"
-#include <fstream>
-#include <filesystem>
-#include <shlwapi.h>
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
-#include<cereal\types\vector.hpp>
-#include <array>
 
 CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 3)
 CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 3)
 
 // シリアライズ
-namespace DirectX
-{
-    template<class Archive>
-    void serialize(Archive& archive, XMUINT4& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y),
-            cereal::make_nvp("z", v.z),
-            cereal::make_nvp("w", v.w)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT2& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT3& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y),
-            cereal::make_nvp("z", v.z)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT4& v)
-    {
-        archive(
-            cereal::make_nvp("x", v.x),
-            cereal::make_nvp("y", v.y),
-            cereal::make_nvp("z", v.z),
-            cereal::make_nvp("w", v.w)
-        );
-    }
-
-    template<class Archive>
-    void serialize(Archive& archive, XMFLOAT4X4& m)
-    {
-        archive(
-            cereal::make_nvp("_11", m._11), cereal::make_nvp("_12", m._12), cereal::make_nvp("_13", m._13), cereal::make_nvp("_14", m._14),
-            cereal::make_nvp("_21", m._21), cereal::make_nvp("_22", m._22), cereal::make_nvp("_23", m._23), cereal::make_nvp("_24", m._24),
-            cereal::make_nvp("_31", m._31), cereal::make_nvp("_32", m._32), cereal::make_nvp("_33", m._33), cereal::make_nvp("_34", m._34),
-            cereal::make_nvp("_41", m._41), cereal::make_nvp("_42", m._42), cereal::make_nvp("_43", m._43), cereal::make_nvp("_44", m._44)
-        );
-    }
-}
 
 template<class Archive>
 void GPUParticle::GPUparticleSaveConstants::serialize(Archive& archive, int version)
@@ -242,7 +179,7 @@ GPUParticle::GPUParticle(const char* filename, size_t maxparticle) :m_maxparticl
     CreateCsFromCso(device, "Shader\\GPUParticleInitializeCS.cso", m_initialzecomputeshader.ReleaseAndGetAddressOf());
 
     //コンスタントバッファの定義と更新
-    m_gpu = std::make_unique<ConstantBuffer<GPUParticleConstants>>(device);
+    m_gpu = std::make_unique<constantBufferH::ConstantBuffer<GPUParticleConstants>>(device);
 
     //コンスタントバッファのバッファ作成、更新
     buffer_desc.ByteWidth = sizeof(GPUparticleSaveConstants);
@@ -396,8 +333,8 @@ void GPUParticle::Update(float elapsedTime)
     // 曲線の更新（毎フレームや必要に応じて）
     if (m_GSC.iscurve == 1)
     {
-        Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
-        Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
+         Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
+         Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
         UpdateCurveTexture(SSG, 2, 128, SSG_texture);
         UpdateCurveTexture(color, 3, 128, color_texture);
     }
@@ -603,7 +540,7 @@ void GPUParticle::SystemGUI()
     ImGui::Combo("DepthState", &m_p.m_depthS, dsName, static_cast<int>(DEPTHSTATE::MAX), ARRAYSIZE(dsName));
 }
 
-ID3D11ShaderResourceView* GPUParticle::GenerateCurveTexture(Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution)
+ID3D11ShaderResourceView* GPUParticle::GenerateCurveTexture( Curve** curve, int elementalcount, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int resolution)
 {
     Graphics& graphics = Graphics::Instance();
     ID3D11Device* device = graphics.GetDevice();
@@ -663,7 +600,7 @@ ID3D11ShaderResourceView* GPUParticle::GenerateCurveTexture(Curve** curve, int e
     return SUCCEEDED(hr) ? srv.Get() : nullptr;
 }
 
-void GPUParticle::UpdateCurveTexture(Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture)
+void GPUParticle::UpdateCurveTexture( Curve** curve, int elementalcount, int resolution, Microsoft::WRL::ComPtr<ID3D11Texture1D>& texture)
 {
     if (!texture) return; // まだテクスチャが生成されていない場合
 
@@ -713,20 +650,20 @@ void GPUParticle::UpdateCurveTexture(Curve** curve, int elementalcount, int reso
 void GPUParticle::CurveDataLoding()
 {
     //カーブデータ作成
-    scale_curve = std::make_unique<Curve>(8);
-    speed_curve = std::make_unique<Curve>(8);
-    color_curve_r = std::make_unique<Curve>(8);
-    color_curve_g = std::make_unique<Curve>(8);
-    color_curve_b = std::make_unique<Curve>(8);
-    color_curve_a = std::make_unique<Curve>(8);
-    gravity_curve = std::make_unique<Curve>(8);
+    scale_curve = std::make_unique< Curve>(8);
+    speed_curve = std::make_unique< Curve>(8);
+    color_curve_r = std::make_unique< Curve>(8);
+    color_curve_g = std::make_unique< Curve>(8);
+    color_curve_b = std::make_unique< Curve>(8);
+    color_curve_a = std::make_unique< Curve>(8);
+    gravity_curve = std::make_unique< Curve>(8);
 
     //カーブデータのファイルパス読み込み
     CurveFilePathDataLoading();
 
     // 各曲線に対応するテクスチャとSRVを生成
-    Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
-    Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
+     Curve* SSG[3] = { scale_curve.get(),speed_curve.get(),gravity_curve.get() };
+     Curve* color[4] = { color_curve_r.get(),color_curve_g.get(),color_curve_b.get(),color_curve_a.get() };
     GenerateCurveTexture(SSG, 2, SSG_texture, SSG_srv, 128);
     GenerateCurveTexture(color, 3, color_texture, color_srv, 128);
 }

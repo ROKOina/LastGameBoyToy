@@ -33,20 +33,27 @@ HRESULT LoadTextureFromFile(ID3D11Device* device, const char* filename, ID3D11Sh
         else
         {
             // HDRファイルの存在を確認
-            std::filesystem::path hdr_filepath = filepath;
-            hdr_filepath.replace_extension("hdr");
-
-            if (std::filesystem::exists(hdr_filepath))
+            std::filesystem::path path = filepath;
+            if (std::filesystem::exists(path.replace_extension("hdr")))
             {
                 // HDRテクスチャの読み込み
-                hr = LoadHDRTexture(device, hdr_filepath.c_str(), resource, shader_resource_view);
+                hr = LoadHDRTexture(device, path.c_str(), resource, shader_resource_view);
                 _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
             }
-            else
+            else if (
+                std::filesystem::exists(path.replace_extension(".bmp")) ||
+                std::filesystem::exists(path.replace_extension(".jpg")) ||
+                std::filesystem::exists(path.replace_extension(".png")) ||
+                std::filesystem::exists(path.replace_extension(".tif")) ||
+                std::filesystem::exists(path.replace_extension(".gif")))
             {
                 // その他のWIC対応フォーマットの読み込み
                 hr = DirectX::CreateWICTextureFromFile(device, filepath.c_str(), resource.GetAddressOf(), shader_resource_view);
                 _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+                if (FAILED(hr))
+                {
+                    throw std::runtime_error("DirectX::CreateWICTextureFromFile() failed.");
+                }
             }
         }
 

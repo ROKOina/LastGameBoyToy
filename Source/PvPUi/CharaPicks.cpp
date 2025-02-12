@@ -1,8 +1,6 @@
 #include "CharaPicks.h"
 #include "Input/Input.h"
 #include "Component/Sprite/Sprite.h"
-#include "Component/System/GameObject.h"
-#include "Component/System/TransformCom.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Animation\AnimationCom.h"
 #include <Component\Camera\FreeCameraCom.h>

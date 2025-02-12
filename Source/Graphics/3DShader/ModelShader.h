@@ -35,7 +35,7 @@ public:
         DirectX::XMFLOAT2 scroll = { 1.0f,1.0f };
         DirectX::XMFLOAT2 meshdummy = {};
     };
-    std::unique_ptr<ConstantBuffer<objectconstants>> m_objectconstants;
+    std::unique_ptr<constantBufferH::ConstantBuffer<objectconstants>> m_objectconstants;
 
     //サブセットのコンスタントバッファ
     struct subsetconstants
@@ -59,8 +59,8 @@ public:
     };
 
 private:
-    std::unique_ptr<ConstantBuffer<subsetconstants>> m_subsetconstants;
-    std::unique_ptr<ConstantBuffer<m_general>> m_generalconstants;
+    std::unique_ptr<constantBufferH::ConstantBuffer<subsetconstants>> m_subsetconstants;
+    std::unique_ptr<constantBufferH::ConstantBuffer<m_general>> m_generalconstants;
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>       m_vertexshader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>        m_pixelshader;

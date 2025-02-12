@@ -1,9 +1,5 @@
 #pragma once
 
-#include <wrl.h>
-#include <d3d11.h>
-#include <DirectXMath.h>
-#include "Component/System/Component.h"
 #include "Component/Camera/CameraCom.h"
 
 // スプライト

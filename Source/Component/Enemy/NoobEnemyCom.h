@@ -1,11 +1,9 @@
 #pragma once
-#include "Component/System/Component.h"
 #include "StateMachine\StateMachine.h"
 #include "Scene\SceneManager.h"
 #include "Math\Mathf.h"
 #include "Input\Input.h"
 #include "Component/Animation/AnimationCom.h"
-#include <array>
 #include "Component\MoveSystem\MovementCom.h"
 #include "Audio\Audio3D.h"
 

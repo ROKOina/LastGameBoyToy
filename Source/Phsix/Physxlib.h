@@ -1,10 +1,6 @@
 #pragma once
-#include "PxPhysicsAPI.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Collsion\NodeCollsionCom.h"
-#include <memory>
-#include <map>
-#include <vector>
 
 using namespace physx;
 

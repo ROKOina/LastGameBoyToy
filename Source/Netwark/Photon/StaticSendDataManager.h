@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../RingBuffer.h"
-#include <DirectXMath.h>
-#include <vector>
 #include "../NetData.h"
 
 //クライアントに送信する情報を管理する

@@ -8,7 +8,6 @@
 #include "Component\MoveSystem\MovementCom.h"
 #include "Prop/NetCharaData.h"
 #include "Audio\Audio3D.h"
-#include <array>
 
 #define JUDGE_NONEBULLET() \
     (std::strcmp(GetGameObject()->GetName(), "player") == 0 \

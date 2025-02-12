@@ -1,9 +1,7 @@
 #include "FreeCameraCom.h"
 
-#include "Component/System/TransformCom.h"
 #include "Math\QuaternionStruct.h"
 #include "Graphics/Graphics.h"
-#include <windows.h>
 #include "Input/Input.h"
 
 //コンストラクタ

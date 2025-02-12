@@ -1,7 +1,5 @@
 #pragma once
 
-#include <DirectXMath.h>
-
 using GamePadButton = unsigned int;
 
 // ゲームパッド

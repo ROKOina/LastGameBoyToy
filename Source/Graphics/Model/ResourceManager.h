@@ -1,11 +1,6 @@
 #pragma once
 
-#include <memory>
-#include <string>
-#include <map>
-
 #include "ModelResource.h"
-#include <mutex>
 
 //リソースマネジャー
 class ResourceManager

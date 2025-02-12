@@ -1,7 +1,4 @@
 #include "RendererCom.h"
-#include "Component/System/TransformCom.h"
-#include <imgui.h>
-#include <string>
 #include "Graphics/Model/ResourceManager.h"
 
 //コンストラクタ

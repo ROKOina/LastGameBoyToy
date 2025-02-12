@@ -4,7 +4,6 @@
 #include "Graphics\3DShader\ModelShader.h"
 
 #include "Component/Camera/CameraCom.h"
-#include <iostream>
 
 Graphics* Graphics::instance_ = nullptr;
 

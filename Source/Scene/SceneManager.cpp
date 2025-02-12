@@ -1,6 +1,4 @@
 #include "SceneManager.h"
-#include "Component/System/GameObject.h"
-#include "Component/System/TransformCom.h"
 #include "Component\Camera\CameraCom.h"
 #include "Component\Character\CharacterCom.h"
 #include "Graphics/Graphics.h"

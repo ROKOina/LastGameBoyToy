@@ -1,5 +1,4 @@
 #pragma once
-#include <DirectXMath.h>
 #include "Graphics\Model\Model.h"
 #include "Graphics/Model/ModelResource.h"
 

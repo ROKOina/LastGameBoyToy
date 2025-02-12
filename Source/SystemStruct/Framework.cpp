@@ -1,6 +1,3 @@
-#include <memory>
-#include <sstream>
-#include <tchar.h>
 
 #include "Graphics/Graphics.h"
 #include "Input/Input.h"
@@ -10,8 +7,6 @@
 #include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
-#include <imgui.h>
-#include <ImGuizmo.h>
 #include "Phsix\Physxlib.h"
 #include "TimeManager.h"
 
