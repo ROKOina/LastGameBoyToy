@@ -690,8 +690,6 @@ namespace ImSequencer
 
         bool popupOpened = false;
         int sequenceCount = sequence->GetItemCount();
-        //if (!sequenceCount)
-        //    return false;
         ImGui::BeginGroup();
 
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -1031,12 +1029,9 @@ namespace ImSequencer
                 customHeight += localCustomHeight;
             }
 
-
             // moving
-            if (/*backgroundRect.Contains(io.MousePos) && */movingEntry >= 0)
+            if (movingEntry >= 0)
             {
-                // TODO: タイムラインエディターの挙動が変わるかもしれない
-                //ImGui::CaptureMouseFromApp();
                 ImGui::SetNextFrameWantCaptureMouse(true);
                 int diffFrame = int((cx - movingPos) / framePixelWidth);
                 if (std::abs(diffFrame) > 0)
@@ -1256,35 +1251,6 @@ namespace ImSequencer
                 {
                     overCustomDraw = true;
                 }
-            }
-            if (overCustomDraw)
-            {
-            }
-            else
-            {
-#if 0
-                frameOverCursor = *firstFrame + (int)(visibleFrameCount * ((io.MousePos.x - (float)legendWidth - canvas_pos.x) / (canvas_size.x - legendWidth)));
-                //frameOverCursor = max(min(*firstFrame - visibleFrameCount / 2, frameCount - visibleFrameCount), 0);
-
-                /**firstFrame -= frameOverCursor;
-                *firstFrame *= framePixelWidthTarget / framePixelWidth;
-                *firstFrame += frameOverCursor;*/
-                if (io.MouseWheel < -FLT_EPSILON)
-                {
-                    *firstFrame -= frameOverCursor;
-                    *firstFrame = int(*firstFrame * 1.1f);
-                    framePixelWidthTarget *= 0.9f;
-                    *firstFrame += frameOverCursor;
-                }
-
-                if (io.MouseWheel > FLT_EPSILON)
-                {
-                    *firstFrame -= frameOverCursor;
-                    *firstFrame = int(*firstFrame * 0.9f);
-                    framePixelWidthTarget *= 1.1f;
-                    *firstFrame += frameOverCursor;
-                }
-#endif
             }
         }
 

@@ -129,6 +129,8 @@
     <ClInclude Include="Source\Audio\Audio3D.h" />
     <ClInclude Include="Source\Component\Bullet\OnGroundDeleteCom.h" />
     <ClInclude Include="Source\Component\Event\2DEvent\EventSpriteMoveBehavior.h" />
+    <ClInclude Include="Source\Component\Event\EventDirect.h" />
+    <ClInclude Include="Source\Component\Event\EventDirectCom.h" />
     <ClInclude Include="Source\Component\Event\EventMove.h" />
     <ClInclude Include="Source\Component\Event\EventMoveBase.h" />
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
@@ -300,6 +302,8 @@
     <ClCompile Include="Source\Audio\Audio3D.cpp" />
     <ClCompile Include="Source\Component\Bullet\OnGroundDeleteCom.cpp" />
     <ClCompile Include="Source\Component\Event\2DEvent\EventSpriteMoveBehavior.cpp" />
+    <ClCompile Include="Source\Component\Event\EventDirect.cpp" />
+    <ClCompile Include="Source\Component\Event\EventDirectCom.cpp" />
     <ClCompile Include="Source\Component\Event\EventMove.cpp" />
     <ClCompile Include="Source\Component\Event\EventMoveBase.cpp" />
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />

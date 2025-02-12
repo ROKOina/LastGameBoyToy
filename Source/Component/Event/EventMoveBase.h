@@ -19,6 +19,8 @@ enum class Shaft
 // イベントのパラメータを更新させるクラスのベース
 class EventMoveParameterBehaviorBase: public std::enable_shared_from_this<EventMoveParameterBehaviorBase>
 {
+    friend class EventDirect;
+    friend class EventMove;
 public:
     EventMoveParameterBehaviorBase() {};
     ~EventMoveParameterBehaviorBase() {};
@@ -52,7 +54,6 @@ public:
     virtual std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::list<std::shared_ptr<EventMoveParameterBehaviorBase>>& m_eventMoveParameters) = 0;
     virtual std::string GetClassName_() = 0;
 protected:
-    friend class EventMove;
     // GUI描画
     virtual void OnGUI();
 
