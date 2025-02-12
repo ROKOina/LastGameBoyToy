@@ -1,6 +1,5 @@
 #include "StageEditorCom.h"
 #include "Input\Input.h"
-#include "SystemStruct\Dialog.h"
 #include "Graphics/Graphics.h"
 #include "Component\Camera\CameraCom.h"
 #include "Component/Collsion/ColliderCom.h"

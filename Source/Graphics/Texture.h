@@ -2,7 +2,6 @@
 
 #include "Graphics/Graphics.h"
 #include "SystemStruct\Misc.h"
-#include "SystemStruct\Logger.h"
 #include <stb_image.h>
 
 

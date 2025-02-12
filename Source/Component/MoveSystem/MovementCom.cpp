@@ -3,7 +3,6 @@
 #include "Component/System/RayCastManager.h"
 #include "Graphics/Graphics.h"
 #include "Phsix\Physxlib.h"
-#include "SystemStruct\TimeManager.h"
 
 // XVˆ—
 void MovementCom::Update(float elapsedTime)

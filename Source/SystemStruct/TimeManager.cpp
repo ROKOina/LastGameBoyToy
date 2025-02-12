@@ -1,4 +1,3 @@
-#include "TimeManager.h"
 
 //XVˆ—
 void TimeManager::Update(const float& elapsedTime)

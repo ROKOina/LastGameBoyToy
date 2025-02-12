@@ -5,7 +5,6 @@
 #include "Component\Animation\AnimationCom.h"
 #include <Component\Camera\FreeCameraCom.h>
 #include "Component\Renderer\VideoCom.h"
-#include "SystemStruct\TimeManager.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Audio/Audio3D.h"
 

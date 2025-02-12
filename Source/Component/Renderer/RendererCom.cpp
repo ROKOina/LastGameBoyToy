@@ -304,7 +304,6 @@ void RendererCom::ChangeMaterialParameter()
 #include "SystemStruct\Framework.h"
 #include <shlwapi.h>
 #include "Graphics/Texture.h"
-#include "SystemStruct\Dialog.h"
 
 void RendererCom::ModelInitialize(const char* filename)
 {

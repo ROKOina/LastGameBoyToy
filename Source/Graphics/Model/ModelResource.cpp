@@ -3,7 +3,6 @@
 #include <stb_image.h>
 
 #include "SystemStruct\Misc.h"
-#include "SystemStruct\Logger.h"
 #include "ModelResource.h"
 
 #include "Graphics/Graphics.h"

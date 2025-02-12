@@ -3,8 +3,6 @@
 #include "Component/Renderer/InstanceRendererCom.h"
 #include <Math\Mathf.h>
 #include "Component\System\TransformCom.h"
-#include <SystemStruct\Dialog.h>
-#include <SystemStruct\Logger.h>
 
 CEREAL_CLASS_VERSION(NodeCollsionCom::StaticCollsionParameter, 1)
 

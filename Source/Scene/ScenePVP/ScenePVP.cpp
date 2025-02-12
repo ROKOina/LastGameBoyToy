@@ -47,8 +47,6 @@
 #include "PvPUi/CharaPicks.h"
 #include "Setting/Setting.h"
 
-#include "SystemStruct\TimeManager.h"
-
 // UTF-8 (std::string) ¨ UTF-16 (std::wstring) •ÏŠ·
 std::wstring UTF8ToWString2(const std::string& str) {
     std::wstring result;

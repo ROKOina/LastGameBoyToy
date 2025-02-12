@@ -1,6 +1,5 @@
 #include "RayCollisionCom.h"
 #include "Component/System/RayCastManager.h"
-#include "SystemStruct\Logger.h"
 
 #pragma region シリアライズ
 

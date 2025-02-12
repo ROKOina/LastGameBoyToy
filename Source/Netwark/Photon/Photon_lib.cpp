@@ -1,8 +1,6 @@
 #include "Photon_lib.h"
 #include "limits.h"
 
-#include "SystemStruct\Logger.h"
-
 #include "Input\Input.h"
 #include "Input\GamePad.h"
 

@@ -8,7 +8,6 @@
 #include "Scene\\SceneTitle\SceneTitle.h"
 #include "ImGuiRender.h"
 #include "Phsix\Physxlib.h"
-#include "TimeManager.h"
 
 // ‚’¼“¯ŠúŠÔŠuİ’è
 static const int syncInterval = 1;
@@ -46,7 +45,6 @@ Framework::~Framework()
 #endif
 }
 
-#include "Logger.h"
 clock_t startTime1 = 0, endTime1 = 0;
 
 // XVˆ—

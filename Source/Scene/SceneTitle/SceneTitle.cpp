@@ -69,7 +69,7 @@ void SceneTitle::Initialize()
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("eventMove");
-        obj->AddComponent<EventMove>();
+        obj->AddComponent<EventMove>("Data/Event/MoveParam/test.evm");
     }
 
     //ステージ

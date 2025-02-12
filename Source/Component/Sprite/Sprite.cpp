@@ -3,8 +3,6 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
-#include "SystemStruct\Dialog.h"
-#include "SystemStruct\Logger.h"
 #include "Math/Mathf.h"
 #include "Math/easing.h"
 #include <Input/Input.h>

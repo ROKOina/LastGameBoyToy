@@ -6,8 +6,6 @@
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Component\Character\CharaStatusCom.h"
 #include "Component\MoveSystem\EasingMoveCom.h"
-#include "SystemStruct\Dialog.h"
-#include "SystemStruct\Logger.h"
 #include "Component/Collsion/PushBackCom.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"
@@ -15,7 +13,6 @@
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Bullet\MissileCom.h"
 #include "Component\Character\CharacterCom.h"
-#include "SystemStruct\TimeManager.h"
 #include "Component\SkillObj\JankratUltCom.h"
 #include <Component\Bullet\OnGroundDeleteCom.h>
 #include "Component\System\HitProcessCom.h"

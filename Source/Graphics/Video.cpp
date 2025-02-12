@@ -1,6 +1,5 @@
 #include "Video.h"
 #include "Graphics.h"
-#include "SystemStruct\TimeManager.h"
 
 
 #define CHECK_HR(x, msg) hr = x; if( hr != S_OK ) { return false; }

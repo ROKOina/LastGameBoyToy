@@ -4,8 +4,6 @@
 #include "Graphics\Texture.h"
 #include "Component\System\TransformCom.h"
 #include "Math\Mathf.h"
-#include <SystemStruct\Dialog.h>
-#include "SystemStruct\Logger.h"
 #include "Component\Camera\CameraCom.h"
 
 CEREAL_CLASS_VERSION(Trail::TrailParameter, 1)

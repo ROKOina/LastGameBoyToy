@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#include "Logger.h"
-
 // ƒƒOo—Í
 void Logger::Print(const char* format, ...)
 {

@@ -1,8 +1,6 @@
-#include "SystemStruct\Logger.h"
 #include "SystemStruct\Misc.h"
 #include "Model.h"
 #include "Graphics/Graphics.h"
-#include "SystemStruct\Dialog.h"
 #include <Math/TransformUtils.h>
 
 CEREAL_CLASS_VERSION(Model::CollsionParameter, 1)

@@ -1,4 +1,3 @@
-#include "Dialog.h"
 
 static char pathBuffer[MAX_PATH];
 

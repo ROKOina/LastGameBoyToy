@@ -2,25 +2,33 @@
 #include <Graphics\Graphics.h>
 #include <Input\Input.h>
 
-EventMove::EventMove()
+EventMove::EventMove(const char* filename)
 {
-#ifdef DEBUG
-
-#endif // DEBUG
-    for (auto eventMoveParameter : m_eventMoveParameters)
+    if (filename)
     {
-        eventMoveParameter->SetOwner(shared_from_this());
+        this->filename = filename;
+        std::ifstream istream(filename, std::ios::binary);
+        if (istream.is_open())
+        {
+            cereal::BinaryInputArchive archive(istream);
+            try
+            {
+                archive
+                (
+                    CEREAL_NVP(m_eventMoveParameters)
+                );
+            }
+            catch (...)
+            {
+                LOG("event move deserialize failed.\n%s\n", filename);
+                return;
+            }
+        }
     }
 }
 
 EventMove::~EventMove()
 {
-#ifdef DEBUG
-    //for (char* str : addableItemNames)
-    //{
-    //    delete[] str;
-    //}
-#endif // DEBUG
 }
 
 void EventMove::Update(float elapsedTime)
@@ -35,15 +43,68 @@ void EventMove::Start()
 {
     for (auto eventMoveParameter : m_eventMoveParameters)
     {
+        eventMoveParameter->SetOwner(shared_from_this());
         eventMoveParameter->Start();
     }
 }
 
 void EventMove::OnGUI()
 {
+    if (ImGui::Button((char*)u8"保存"))
+    {
+        Serialize();
+    }
+    if (filename != "")
+    {
+        ImGui::SameLine();
+        TimeManager& timeManager = TimeManager::Instance();
+        m_timeSinceCopyFilename += timeManager.GetElapsedTime();
+        if (ImGui::Button((char*)u8"ファイルパスのコピー"))
+        {
+            // クリップボードにコピーさせる
+            size_t pos = filename.find("Data");
+            std::string newPath = filename.substr(pos);
+            for (char& c : newPath) { if (c == '\\')  c = '/'; }
+
+            CopyOnClipboard(newPath.c_str());
+            m_timeSinceCopyFilename = 0;
+        }
+        if (m_timeSinceCopyFilename < DISPLAY_SUCCESS_COPY_TIME)
+        {
+            float colorAlpha = (m_timeSinceCopyFilename / DISPLAY_SUCCESS_COPY_TIME);
+            colorAlpha = std::powf(colorAlpha, 5.0f) * -1.0f + 1.0f;
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, colorAlpha));
+            ImGui::SameLine();
+            ImGui::Text("Copied!");
+            ImGui::PopStyleColor();
+        }
+    }
+
+    std::shared_ptr<EventMoveParameterBehaviorBase> deleteMoveParameter = nullptr;
     for (auto eventMoveParameter : m_eventMoveParameters)
     {
-        eventMoveParameter->OnGUI();
+        ImGui::PushID(eventMoveParameter.get());
+        if (ImGui::CollapsingHeader(eventMoveParameter->GetClassName_().c_str(), ImGuiTreeNodeFlags_DefaultOpen /*| ImGuiTreeNodeFlags_SpanFullWidth*/))
+        {
+            if (ImGui::BeginDragDropSource())
+            {
+                ImGui::SetDragDropPayload("EventMoveParameter", &(*eventMoveParameter), sizeof(std::shared_ptr<EventMoveParameterBehaviorBase>));
+                ImGui::Text((*eventMoveParameter).GetClassName_().c_str());
+                ImGui::EndDragDropSource();
+            }
+            eventMoveParameter->OnGUI();
+            ImGui::Spacing();
+            if (ImGui::SmallButton("Delete"))
+            {
+                deleteMoveParameter = eventMoveParameter;
+            }
+        }
+        ImGui::PopID();
+    }
+
+    if (deleteMoveParameter)
+    {
+        m_eventMoveParameters.remove(deleteMoveParameter);
     }
 
     ImGui::Spacing();
@@ -135,5 +196,58 @@ void EventMove::OnGUI()
     else if (!isHovered && ImGui::IsMouseClicked(0))
     {
         showEventMoveParameters = false;
+    }
+}
+
+// シリアライズ処理
+void EventMove::Serialize()
+{
+    if (this->filename != "")
+    {
+        std::ofstream ostream(filename, std::ios::binary);
+        if (ostream.is_open())
+        {
+            cereal::BinaryOutputArchive archive(ostream);
+            try
+            {
+                archive
+                (
+                    CEREAL_NVP(m_eventMoveParameters)
+                );
+            }
+            catch (...)
+            {
+                LOG("event move deserialize failed.\n%s\n", filename);
+                return;
+            }
+        }
+        return;
+    }
+
+    static const char* filter = "EventMoveFiles(*.evm)\0*.evm;\0All Files(*.*)\0*.*;\0\0";
+
+    char filename[256] = { 0 };
+    DialogResult result = Dialog::SaveFileName(filename, sizeof(filename), filter, nullptr, "evm", Graphics::Instance().GetHwnd());
+    if (result == DialogResult::OK)
+    {
+        std::ofstream ostream(filename, std::ios::binary);
+        if (ostream.is_open())
+        {
+            cereal::BinaryOutputArchive archive(ostream);
+
+            try
+            {
+                this->filename = filename;
+                archive
+                (
+                    CEREAL_NVP(m_eventMoveParameters)
+                );
+            }
+            catch (...)
+            {
+                LOG("event move deserialize failed.\n%s\n", filename);
+                return;
+            }
+        }
     }
 }

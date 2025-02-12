@@ -1,6 +1,4 @@
 #include "EasingMoveCom.h"
-#include "SystemStruct\Dialog.h"
-#include "SystemStruct\Logger.h"
 #include "Graphics/Graphics.h"
 #include "Math/easing.h"
 #include "Math/Mathf.h"

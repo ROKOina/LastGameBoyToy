@@ -1,5 +1,4 @@
 #include "EventMoveBase.h"
-#include <SystemStruct\TimeManager.h>
 #include <Input\Input.h>
 #include <Graphics\Graphics.h>
 
@@ -40,8 +39,11 @@ void EventMoveParameterBehaviorBase::Start()
 
 void EventMoveParameterBehaviorBase::OnGUI()
 {
-    ImGui::Text((char*)u8"EventUpdateEnableFGUIã‚Å‚ ‚Ü‚è•ÏX‚µ‚È‚¢‚Å‰º‚³‚¢");
-    ImGui::Checkbox("EventUpdateEnable", &m_eventUpdateEnable);
+    if (ImGui::TreeNode((char*)u8"è“®‰ğœ¦‚ ‚Ü‚èG‚ç‚È‚­‚Ä‚¢‚¢‚Å‚·"))
+    {
+        ImGui::Checkbox("EventUpdateEnable", &m_eventUpdateEnable);
+        ImGui::TreePop();
+    }
     ImGui::Checkbox("StartInitializeEnable", &m_startInitializeEnable);
     ImGui::Checkbox("Is Auto Initialize", &m_autoInitializeEnable);
     if (!m_eventUpdateEnable)

@@ -1,8 +1,6 @@
 #include "CPUParticle.h"
 #include "Graphics/Graphics.h"
-#include "SystemStruct\Dialog.h"
 #include "Math/Mathf.h"
-#include "SystemStruct\Logger.h"
 
 CEREAL_CLASS_VERSION(CPUParticle::SerializeCPUParticle, 2)
 

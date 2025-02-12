@@ -3,8 +3,9 @@
 
 // イベントのクラスの名前を登録する関数と自身をマネージャーに登録させる関数を追加するマクロ
 #define EDITABLE_ON_GUI(CLASS)\
+    std::string GetClassName_()override {return GET_CLASS_NAME(CLASS);}\
     static inline AddEventRegistry::AutoRegister<CLASS>addEventItem{ std::make_shared<CLASS>(), GET_CLASS_NAME(CLASS)};\
-    std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>>& eventMoveParameters)override\
+    std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::list<std::shared_ptr<EventMoveParameterBehaviorBase>>& eventMoveParameters)override\
     {\
         auto eventMoveParam= eventMoveParameters.emplace_back(std::make_shared<CLASS>());\
         return eventMoveParam;\
@@ -48,8 +49,8 @@ public:
     bool GetFinishEnable() { return m_decisionEnable; }
 
     // イベント登録の際に必要な関数
-    virtual std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>>& m_eventMoveParameters) = 0;
-
+    virtual std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::list<std::shared_ptr<EventMoveParameterBehaviorBase>>& m_eventMoveParameters) = 0;
+    virtual std::string GetClassName_() = 0;
 protected:
     friend class EventMove;
     // GUI描画
@@ -101,6 +102,7 @@ public:
 
     virtual void RegisterEvent(std::vector<std::shared_ptr<EventMoveParameterBehaviorBase>> eventMoveParameters) = 0;
 
+    virtual std::string GetClassName_() = 0;
 protected:
     std::shared_ptr<EventMoveDefaultValueBase> shared_from_this() {
         return std::static_pointer_cast<EventMoveDefaultValueBase>(EventMoveParameterBehaviorBase::shared_from_this());

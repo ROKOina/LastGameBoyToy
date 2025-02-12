@@ -1,6 +1,4 @@
 #include "Curve.h"
-#include "Dialog.h"
-#include "Logger.h"
 #include <imgui_curve.hpp>
 
     Curve::Curve()

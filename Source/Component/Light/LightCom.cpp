@@ -2,8 +2,6 @@
 #include "Graphics/Graphics.h"
 #include "Component\System\TransformCom.h"
 #include "Math\Mathf.h"
-#include <SystemStruct\Dialog.h>
-#include <SystemStruct\Logger.h>
 
 CEREAL_CLASS_VERSION(Light::LightParameter, 1)
 

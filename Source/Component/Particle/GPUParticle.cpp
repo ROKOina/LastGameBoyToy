@@ -4,8 +4,6 @@
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
 #include "Math/Mathf.h"
-#include "SystemStruct\Dialog.h"
-#include "SystemStruct\Logger.h"
 
 CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 3)
 CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 3)
