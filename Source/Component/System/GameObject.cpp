@@ -161,6 +161,13 @@ void GameObject::AudioRelease()
 //ゲームオブジェクトマネージャー
 #pragma region GameObjectManager
 
+GameObjectManager::GameObjectManager()
+{
+#ifdef DEBUG
+    eventDirectEditor = std::make_unique<EventDirectEditor>();
+#endif // DEBUG
+}
+
 // 作成
 std::shared_ptr<GameObject> GameObjectManager::Create()
 {
@@ -417,6 +424,11 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
         // リスターと詳細の描画
         DrawLister();
         DrawDetail();
+
+        std::weak_ptr<GameObject> selectionGameObject = GameObjectManager::Instance().GetSelectionGameObject_().empty() ?
+            nullptr : *GameObjectManager::Instance().GetSelectionGameObject_().rbegin();
+        // イベントエディターの描画
+        eventDirectEditor->OnDraw(selectionGameObject);
     }
 
     // ギズモの描画

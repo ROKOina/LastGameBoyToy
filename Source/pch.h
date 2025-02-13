@@ -237,6 +237,7 @@ using namespace std::string_literals;
 #include "Input/Input.h"
 #include "SystemStruct/Logger.h"
 #include "Utility/Utility_.h"
+#include "Utility/GuiHelper.h"
 #include "SystemStruct/Dialog.h"
 #include "SystemStruct/TimeManager.h"
 #include "Graphics/Graphics.h"

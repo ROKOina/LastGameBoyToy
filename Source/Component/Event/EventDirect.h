@@ -1,7 +1,8 @@
 ﻿#pragma once
 
 #include "EventMoveBase.h"
-#include <ImSequencer.h>
+#include "ImGuiRender.h"
+#include "ImCurveEdit.h"
 
 // イベントのベース（派生させてゲームオブジェクトなどのイベント制御アイテムを作成する）
 class EventItemBase

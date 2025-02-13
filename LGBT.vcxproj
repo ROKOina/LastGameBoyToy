@@ -142,6 +142,7 @@
     <ClInclude Include="Source\Component\System\pingCom.h" />
     <ClInclude Include="Source\Component\UI\UiEasingEnabledRemove.h" />
     <ClInclude Include="Source\Component\UI\UiMove.h" />
+    <ClInclude Include="Source\Editor\EventDirectEditor.h" />
     <ClInclude Include="Source\Graphics\Video.h" />
     <ClInclude Include="Source\Math\Define.h" />
     <ClInclude Include="Source\Math\Vector2.h" />
@@ -294,6 +295,7 @@
     <ClInclude Include="Source\SystemStruct\Targa.h" />
     <ClInclude Include="Source\SystemStruct\ThreadPool.h" />
     <ClInclude Include="Source\SystemStruct\TimeManager.h" />
+    <ClInclude Include="Source\Utility\GuiHelper.h" />
     <ClInclude Include="Source\Utility\Utility_.h" />
   </ItemGroup>
   <ItemGroup>
@@ -313,6 +315,7 @@
     <ClCompile Include="Source\Component\System\ButtonCom.cpp" />
     <ClCompile Include="Source\Component\System\CrownCom.cpp" />
     <ClCompile Include="Source\Component\UI\UiMove.cpp" />
+    <ClCompile Include="Source\Editor\EventDirectEditor.cpp" />
     <ClCompile Include="Source\Graphics\Video.cpp" />
     <ClCompile Include="Source\Math\Define.cpp" />
     <ClCompile Include="Source\Math\Vector2.cpp" />
@@ -449,6 +452,7 @@
     <ClCompile Include="Source\SystemStruct\Logger.cpp" />
     <ClCompile Include="Source\SystemStruct\Main.cpp" />
     <ClCompile Include="Source\SystemStruct\TimeManager.cpp" />
+    <ClCompile Include="Source\Utility\GuiHelper.cpp" />
     <ClCompile Include="Source\Utility\Utility_.cpp" />
   </ItemGroup>
   <ItemGroup>

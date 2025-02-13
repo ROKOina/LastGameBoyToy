@@ -1,4 +1,9 @@
 #pragma once
+#ifdef DEBUG
+#include "Editor\EventDirectEditor.h"
+#include "Component/Event/EventDirectCom.h"
+#include <Component\Event\EventDirect.h>
+#endif // DEBUG
 
 // 前方宣言
 class Component;
@@ -50,13 +55,14 @@ public:
     std::shared_ptr<T> AddComponent(Args... args)
     {
         std::shared_ptr<T> component = std::make_shared<T>(args...);
-        component->SetGameObject(shared_from_this());
+        component->gameObject_ = shared_from_this();
 
         //transformの場合は保持する
         if (std::strcmp(component->GetName(), "Transform") == 0)
             transform_ = std::dynamic_pointer_cast<TransformCom>(component);
 
         components_.emplace_back(component);
+        component->registerId = components_.size();
         return component;
     }
 
@@ -124,12 +130,15 @@ private:
 };
 using GameObj = std::shared_ptr<GameObject>;
 
+#ifdef DEBUG
+class EventDirectEditor;
+#endif
 // ゲームオブジェクトマネージャー
 class GameObjectManager
 {
     friend class GameObject;
 private:
-    GameObjectManager() {}
+    GameObjectManager();
     ~GameObjectManager() {}
 
 public:
@@ -175,6 +184,8 @@ public:
     void DrawGuizmo(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     void RemoveGameObjects();
+
+    std::set<std::shared_ptr<GameObject>> GetSelectionGameObject_() { return selectionGameObject_; }
 private:
     void StartUpObjects();
     //保存コンポーネントを追加
@@ -294,4 +305,8 @@ private:
     bool isSceneGameStart_ = false;
 
     std::mutex mutex_;
+
+#ifdef DEBUG
+    std::unique_ptr<EventDirectEditor> eventDirectEditor;
+#endif // DEBUG
 };

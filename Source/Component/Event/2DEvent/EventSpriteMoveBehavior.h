@@ -8,10 +8,7 @@ public:
 
     EventSpriteMoveBehavior() {};
     ~EventSpriteMoveBehavior() {};
-//protected:
-//    std::shared_ptr<EventSpriteMoveBehavior> shared_from_this() {
-//        return std::static_pointer_cast<EventSpriteMoveBehavior>(EventMoveParameterBehaviorBase::shared_from_this());
-//    }
+
 private:
     // 初期化処理
     virtual void EventMoveInitialize() override;

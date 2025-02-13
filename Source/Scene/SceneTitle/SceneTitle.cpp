@@ -25,6 +25,7 @@
 #include "Component\Renderer\VideoCom.h"
 #include "Component\UI\Font.h"
 #include <Component\Event\EventMove.h>
+#include "Component\Event\EventDirectCom.h"
 
 SceneTitle::~SceneTitle()
 {
@@ -68,6 +69,7 @@ void SceneTitle::Initialize()
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("eventMove");
         obj->AddComponent<EventMove>("Data/Event/MoveParam/test.evm");
+        obj->AddComponent<EventDirectCom>("");
     }
 
     //ステージ

@@ -67,7 +67,7 @@ void EventMove::OnGUI()
         {
             if (ImGui::BeginDragDropSource())
             {
-                ImGui::SetDragDropPayload("EventMoveParameter", &(*eventMoveParameter), sizeof(std::shared_ptr<EventMoveParameterBehaviorBase>));
+                ImGui::SetDragDropPayload("EventMoveParameter", &(eventMoveParameter), sizeof(std::shared_ptr<EventMoveParameterBehaviorBase>));
                 ImGui::Text((*eventMoveParameter).GetClassName_().c_str());
                 ImGui::EndDragDropSource();
             }

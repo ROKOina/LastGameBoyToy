@@ -4,6 +4,7 @@ class GameObject;
 //コンポーネント
 class Component
 {
+    friend class GameObject;
 public:
     Component() {}
     virtual ~Component() {}
@@ -26,9 +27,6 @@ public:
     //音解放
     virtual void AudioRelease() {}
 
-    // ゲームオブジェクト設定
-    void SetGameObject(std::shared_ptr<GameObject> obj) { this->gameObject_ = obj; }
-
     // ゲームオブジェクト取得
     std::shared_ptr<GameObject> GetGameObject() { return gameObject_.lock(); }
 
@@ -38,9 +36,12 @@ public:
     const float GetLoadTime() const { return loadTime; }
     void SetLoadTime(float time) { loadTime = time; }
 
+    const int GetRegisterId() const { return registerId; }
+
 private:
     std::weak_ptr<GameObject>	gameObject_;
     float loadTime = 0;
+    int registerId = -1;
 
 protected:
     //有効か

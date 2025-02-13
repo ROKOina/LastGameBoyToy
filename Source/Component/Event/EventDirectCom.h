@@ -8,11 +8,14 @@ public:
     EventDirectCom(const char* filename);
     ~EventDirectCom() {};
 
+    const char* GetName() const override { return "EventDirectCom"; }
 public:
     virtual void Start() override;
     virtual void Update(float elapsedTime) override;
 
 private:
+    friend class EventDirectEditor;
+
     // イベント内の値を更新する処理
     void EventUpdate();
 

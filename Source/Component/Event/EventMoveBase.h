@@ -7,7 +7,8 @@
     static inline AddEventRegistry::AutoRegister<CLASS>addEventItem{ std::make_shared<CLASS>(), GET_CLASS_NAME(CLASS)};\
     std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::list<std::shared_ptr<EventMoveParameterBehaviorBase>>& eventMoveParameters)override\
     {\
-        auto eventMoveParam= eventMoveParameters.emplace_back(std::make_shared<CLASS>());\
+        auto eventMoveParam = eventMoveParameters.emplace_back(std::make_shared<CLASS>());\
+        eventMoveParam->m_registerId = static_cast<int>(eventMoveParameters.size());\
         return eventMoveParam;\
 }
 
@@ -19,6 +20,7 @@ enum class Shaft
 // イベントのパラメータを更新させるクラスのベース
 class EventMoveParameterBehaviorBase: public std::enable_shared_from_this<EventMoveParameterBehaviorBase>
 {
+    friend class EventDirectEditor;
     friend class EventDirect;
     friend class EventMove;
 public:
@@ -50,6 +52,9 @@ public:
 
     bool GetFinishEnable() { return m_decisionEnable; }
 
+    // 自身の登録番号の取得
+    int GetRegisterId() { return m_registerId; }
+
     // イベント登録の際に必要な関数
     virtual std::shared_ptr<EventMoveParameterBehaviorBase> RegisterEvent(std::list<std::shared_ptr<EventMoveParameterBehaviorBase>>& m_eventMoveParameters) = 0;
     virtual std::string GetClassName_() = 0;
@@ -70,6 +75,10 @@ protected:
     bool  m_decisionEnable          = false;
     bool  m_startInitializeEnable   = true;
     bool  m_eventUpdateEnable       = false;
+public:
+    // 登録番号※外部から書き換えないでください
+    float m_registerId = -1;
+
 private:
     friend class cereal::access;
     template <class Archive>
