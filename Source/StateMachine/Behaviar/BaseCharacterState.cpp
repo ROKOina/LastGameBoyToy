@@ -567,8 +567,7 @@ void BaseCharacter_NoneAttack::PlayStateAnimation(bool isPlayer, CharacterCom::C
             animeSpeed = owner->GetGameObject()->GetComponent<MovementCom>()->GetMoveMaxSpeed() - owner->GetGameObject()->GetComponent<MovementCom>()->GetFisrtMoveMaxSpeed();
             if (animeSpeed < 0)animeSpeed = 0;
 
-            arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animCom->FindAnimation("FPS_walk")].animationspeed
-                = 1 + animeSpeed * 0.1f;
+            arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[animCom->FindAnimation("FPS_walk")].animationspeed = 1 + animeSpeed * 0.1f;
         }
         else
         {

@@ -54,7 +54,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
         float3 orbY = cross(normVec, float3(0, 0, 1));
         float3 orbVelo = orbZ * orbitalVelocity.z + orbX * orbitalVelocity.x + orbY * orbitalVelocity.y;
 
-         // ランダム成分の強化
+        // ランダム成分の強化
         float3 randomVel = float3(
             ((random(p.position.x * time + id) * 2) - 1) * veloRandScale * random(lerprate * 2.0f),
             ((random(p.position.y * time + id) * 2) - 1) * veloRandScale * random(lerprate * 3.0f),
@@ -90,7 +90,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
     p.age += deltatime;
     if (p.age > lifeTime && isEmitFlg == 1)
     {
-         //寿命時間から割合を計算
+        //寿命時間から割合を計算
         float lerprate = saturate(1 - (p.lifetime / lifeTime));
 
         // 各カーブをサンプリング

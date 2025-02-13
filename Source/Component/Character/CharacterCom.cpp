@@ -181,6 +181,7 @@ void CharacterCom::OnGUI()
 
     if (ImGui::TreeNode("dash"))
     {
+        ImGui::Checkbox("dashFlag", &dashFlag);
         ImGui::DragFloat("dashRecast", &dashRecast, 0.1f);
         ImGui::DragFloat("dashGauge", &dashGauge, 0.1f);
         ImGui::DragFloat("dashGaugeMax", &dashGaugeMax, 0.1f);
@@ -538,6 +539,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
 
     //途切れたら入らないように
     if (!isNowPush && !dashFlag)return false;
+    auto& arm = GameObjectManager::Instance().Find("armChild");
 
     //ダッシュスキル
     SetSkillCoolTime(SkillCoolID::LeftShift, dashRecast);
@@ -559,6 +561,9 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
                 dashFlag = true;
                 dashGauge -= 5; //最初は一気に減らす
 
+                //アニメーション速度変更
+                arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[arm->GetComponent<AnimationCom>()->FindAnimation("FPS_walk")].animationspeed = 1.5f;
+
                 //音
                 //GetGameObject()->GetComponent<AudioCom>()->Play("P_DASH", false, 10);
             }
@@ -573,6 +578,7 @@ bool CharacterCom::DashUpdateReIsDash(float elapsedTime)
                 skillCools[SkillCoolID::LeftShift].timer = 0;
                 skillCools[SkillCoolID::LeftShift].useskill = true;
                 posteffect->GetComponent<PostEffect>()->SetParameter(0.0f, 1.0f, parameters);
+                arm->GetComponent<RendererCom>()->GetModel()->GetResource()->GetAnimationsEdit()[arm->GetComponent<AnimationCom>()->FindAnimation("FPS_walk")].animationspeed = 1.0f;
             }
         }
 
