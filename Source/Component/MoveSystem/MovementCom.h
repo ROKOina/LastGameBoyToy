@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Math/Mathf.h"
-
 #define GRAVITY_NORMAL 0.98
 
 //MovementƒNƒ‰ƒX

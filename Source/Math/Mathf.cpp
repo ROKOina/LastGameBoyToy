@@ -1,4 +1,3 @@
-#include "Mathf.h"
 
 float Mathf::Lerp(const float& start, const float& end, const float& time)
 {

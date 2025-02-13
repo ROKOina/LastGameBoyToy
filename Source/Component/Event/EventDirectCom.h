@@ -16,6 +16,9 @@ private:
     // イベント内の値を更新する処理
     void EventUpdate();
 
+    // イベントのシリアライズ処理
+    void Serialize();
+
 #ifdef DEBUG
     void DebugEventUpdate();
 
@@ -110,8 +113,6 @@ private:
 
     // デバッグ時に使用
     std::string filename = "";
-    // コピーなどの成功表示に関する変数
-    inline static constexpr float DISPLAY_SUCCESS_COPY_TIME = 2.0f;
-    float m_timeSinceCopyFilename = DISPLAY_SUCCESS_COPY_TIME;
+    COPY_VARIABLE()
 };
 

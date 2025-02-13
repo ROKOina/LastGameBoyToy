@@ -1,5 +1,4 @@
 #include "SkyBoxManager.h"
-#include "Graphics/Graphics.h"
 #include "Graphics/Texture.h"
 #include "Graphics/PostEffect/FullScreenQuad.h"
 

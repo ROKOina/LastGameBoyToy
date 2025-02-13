@@ -1,5 +1,4 @@
 #include "EventMove.h"
-#include <Graphics\Graphics.h>
 #include <Input\Input.h>
 
 EventMove::EventMove(const char* filename)
@@ -57,27 +56,7 @@ void EventMove::OnGUI()
     if (filename != "")
     {
         ImGui::SameLine();
-        TimeManager& timeManager = TimeManager::Instance();
-        m_timeSinceCopyFilename += timeManager.GetElapsedTime();
-        if (ImGui::Button((char*)u8"ファイルパスのコピー"))
-        {
-            // クリップボードにコピーさせる
-            size_t pos = filename.find("Data");
-            std::string newPath = filename.substr(pos);
-            for (char& c : newPath) { if (c == '\\')  c = '/'; }
-
-            CopyOnClipboard(newPath.c_str());
-            m_timeSinceCopyFilename = 0;
-        }
-        if (m_timeSinceCopyFilename < DISPLAY_SUCCESS_COPY_TIME)
-        {
-            float colorAlpha = (m_timeSinceCopyFilename / DISPLAY_SUCCESS_COPY_TIME);
-            colorAlpha = std::powf(colorAlpha, 5.0f) * -1.0f + 1.0f;
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, colorAlpha));
-            ImGui::SameLine();
-            ImGui::Text("Copied!");
-            ImGui::PopStyleColor();
-        }
+        COPY_GUI(filename)
     }
 
     std::shared_ptr<EventMoveParameterBehaviorBase> deleteMoveParameter = nullptr;

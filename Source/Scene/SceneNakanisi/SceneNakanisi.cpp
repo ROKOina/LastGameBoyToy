@@ -1,5 +1,4 @@
 #include "SceneNakanisi.h"
-#include <Graphics\Graphics.h>
 #include <Component\Camera\FreeCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Character\RegisterChara.h>
@@ -29,7 +28,6 @@
 #include "Component\Stage\GateGimmickCom.h"
 #include <StateMachine\Behaviar\InazawaCharacterState.h>
 #include "Component\Sprite\Sprite.h"
-#include "Component\System\GameObject.h"
 #include "Component\GameSystem\RespawnCom.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 

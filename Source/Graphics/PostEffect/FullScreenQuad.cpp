@@ -1,5 +1,4 @@
 #include "FullScreenQuad.h"
-#include "Graphics/Graphics.h"
 #include "Graphics/Shader.h"
 #include "SystemStruct\Misc.h"
 #include "Graphics/Texture.h"

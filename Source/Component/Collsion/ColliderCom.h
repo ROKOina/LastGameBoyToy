@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Component\System\Component.h"
-#include "Component\System\TransformCom.h"
 #include "Math/Collision.h"
 //当たり判定をするコンポーネントまとめてここに書く
 

@@ -1,6 +1,5 @@
 #include"Scene/SceneTraining/TrainingManager.h"
 
-#include <Graphics\Graphics.h>
 #include <Component\Camera\FreeCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Character\RegisterChara.h>

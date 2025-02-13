@@ -1,8 +1,5 @@
 #include "CameraCom.h"
 
-#include "Component\System\TransformCom.h"
-#include "Graphics/Graphics.h"
-#include "Math/Mathf.h"
 #include "Scene/SceneManager.h"
 
 //コンストラクタで値を代入

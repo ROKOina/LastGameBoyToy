@@ -1,12 +1,9 @@
 #include "Font.h"
 #include "SystemStruct\Targa.h"
 #include "SystemStruct\Misc.h"
-#include "Graphics/Graphics.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
 #include <codecvt>
-#include "Math\Mathf.h"
-#include "Component\System\TransformCom.h"
 
 // UTF-16 (std::wstring) Å® UTF-8 (std::string) ïœä∑
 std::string WStringToUTF8(const std::wstring& wstr) {

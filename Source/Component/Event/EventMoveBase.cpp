@@ -1,6 +1,5 @@
 #include "EventMoveBase.h"
 #include <Input\Input.h>
-#include <Graphics\Graphics.h>
 
 void EventMoveParameterBehaviorBase::TimerUpdate()
 {

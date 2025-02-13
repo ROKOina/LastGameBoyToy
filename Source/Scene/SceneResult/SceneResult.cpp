@@ -1,8 +1,6 @@
 #include "SceneResult.h"
-#include "Graphics\Graphics.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Camera\FreeCameraCom.h"
-#include "Component\System\TransformCom.h"
 #include "Component\Sprite\Sprite.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\UI\Font.h"

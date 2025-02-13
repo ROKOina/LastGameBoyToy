@@ -1,6 +1,5 @@
 #pragma once
 #include "HighResolutionTimer.h"
-#include "Graphics/Graphics.h"
 #include "Input/input.h"
 
 #include "dxgidebug.h"

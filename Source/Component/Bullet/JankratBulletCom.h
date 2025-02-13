@@ -1,10 +1,7 @@
 #pragma once
 
-#include "../System\Component.h"
 #include "StateMachine\StateMachine.h"
 #include "Scene\SceneManager.h"
-#include "Math\Mathf.h"
-#include "Input\Input.h"
 #include "Component\System\HitProcessCom.h"
 
 class JankratBulletCom : public Component

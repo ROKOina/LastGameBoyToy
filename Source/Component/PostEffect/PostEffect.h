@@ -6,7 +6,6 @@
 #include "Graphics/PostEffect/Bloom.h"
 #include "Graphics/PostEffect/MultiRenderTarget.h"
 #include "Graphics/PostEffect/CascadedShadowMap.h"
-#include "Component\System\Component.h"
 
 //ポストエフェクト
 class PostEffect :public Component

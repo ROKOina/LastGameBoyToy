@@ -1,6 +1,4 @@
 #include "UiMove.h"
-#include "Math\Mathf.h"
-#include "Component\System\TransformCom.h"
 
 void UiMove::Update(float elapsedTime)
 {

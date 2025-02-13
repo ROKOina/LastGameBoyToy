@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component.h"
 #include "Math\QuaternionStruct.h"
 
 class TransformCom : public Component

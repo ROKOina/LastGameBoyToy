@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component\System\Component.h"
 #include "Graphics/Model/Model.h"
 #include "Graphics\Model\Model.h"
 #include "Graphics/Model/ModelResource.h"

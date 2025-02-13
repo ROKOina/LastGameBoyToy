@@ -3,8 +3,6 @@
 #include "Component/Camera/CameraCom.h"
 #include "Component/Collsion/ColliderCom.h"
 #include "Component/Particle/GPUParticle.h"
-#include "Input\Input.h"
-#include "Math/Mathf.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "RemoveTimerCom.h"
 #include "Setting/Setting.h"

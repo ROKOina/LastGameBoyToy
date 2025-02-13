@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Graphics/Graphics.h"
 #include "SystemStruct\Misc.h"
 #include <stb_image.h>
 

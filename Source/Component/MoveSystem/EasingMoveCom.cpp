@@ -1,7 +1,5 @@
 #include "EasingMoveCom.h"
-#include "Graphics/Graphics.h"
 #include "Math/easing.h"
-#include "Math/Mathf.h"
 
 CEREAL_CLASS_VERSION(EasingMoveCom::EasingMoveParameter, 1)
 

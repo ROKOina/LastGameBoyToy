@@ -1,7 +1,6 @@
 #include "NoobEnemyCom.h"
 #include"Component/Character/CharacterCom.h"
 #include"Component/Character/CharaStatusCom.h"
-#include "Graphics/Graphics.h"
 #include "Component/Renderer/RendererCom.h"
 #include "Component\Particle\GPUParticle.h"
 #include "Component\Particle\CPUParticle.h"

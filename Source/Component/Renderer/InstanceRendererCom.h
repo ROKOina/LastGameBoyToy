@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Component\System\Component.h"
 #include "Graphics\Model\Model.h"
-#include "Graphics\Graphics.h"
 #include <Graphics\3DShader\InstanceModelShader.h>
 
 class InstanceRenderer :public Component

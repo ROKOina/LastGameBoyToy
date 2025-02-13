@@ -1,5 +1,4 @@
 #include "MissileCom.h"
-#include "Component\System\TransformCom.h"
 #include "Audio/Audio3D.h"
 
 void MissileCom::Start()

@@ -55,9 +55,6 @@ public:
     // デシリアライズ
     void Deserialize(const char* filename);
 
-    // デシリアライズの読み込み
-    void LoadDeserialize();
-
 private:
     //頂点構造体
     struct Vertex
@@ -96,4 +93,6 @@ private:
 
     std::vector <std::function<void()>> drawEnd;
     std::vector <std::function<void()>>	drawStart;
+    std::string filename = "";
+    COPY_VARIABLE()
 };

@@ -1,7 +1,6 @@
 #include "SceneManager.h"
 #include "Component\Camera\CameraCom.h"
 #include "Component\Character\CharacterCom.h"
-#include "Graphics/Graphics.h"
 #include "Input\Input.h"
 #include "ScenePVE/ScenePVE.h"
 #include "ScenePVP/ScenePVP.h"

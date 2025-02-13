@@ -1,9 +1,6 @@
 #include "EventCameraManager.h"
 
 #include "CameraCom.h"
-#include "Math/Mathf.h"
-
-#include "Graphics/Graphics.h"
 
 CEREAL_CLASS_VERSION(EventCameraManager::ECTransform, 1)
 CEREAL_CLASS_VERSION(EventCameraManager::SaveEventCameraBuff, 2)

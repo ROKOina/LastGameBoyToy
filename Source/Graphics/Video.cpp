@@ -1,6 +1,4 @@
 #include "Video.h"
-#include "Graphics.h"
-
 
 #define CHECK_HR(x, msg) hr = x; if( hr != S_OK ) { return false; }
 #define SAFE_RELEASE(x) if(x) { (x)->Release(); x = nullptr; }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../System\Component.h"
-
 class OnGroundDeleteCom : public Component
 {
 public:

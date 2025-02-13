@@ -1,5 +1,4 @@
 #include "DecalCom.h"
-#include "Graphics\Graphics.h"
 #include "SystemStruct\Misc.h"
 #include "Graphics/Texture.h"
 

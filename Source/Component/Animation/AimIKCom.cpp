@@ -1,7 +1,6 @@
 #include "AimIKCom.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Camera\CameraCom.h"
-#include "Component\System\TransformCom.h"
 #include "Component\Character\CharacterCom.h"
 
 //コンストラクタ

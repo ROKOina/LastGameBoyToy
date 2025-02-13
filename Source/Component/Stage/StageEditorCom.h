@@ -1,5 +1,4 @@
 #pragma once
-#include "Component\System/Component.h"
 #include <Math\Collision.h>
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Phsix\RigidBodyCom.h"

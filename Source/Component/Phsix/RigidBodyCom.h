@@ -1,7 +1,5 @@
 #pragma once
 #include "Phsix\Physxlib.h"
-#include "Component\System\GameObject.h"
-#include "Component\System\Component.h"
 #include "Component\Collsion\NodeCollsionCom.h"
 #include "Graphics\Model\ModelResource.h"
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component\System\Component.h"
 #include <wrl.h>
 #include <d3d11.h>
 #include "Graphics/ConstantBuffer.h"

@@ -1,6 +1,4 @@
 #pragma once
-#include "Component\System\Component.h"
-#include "Component\System\GameObject.h"
 
 class JumpBoardCom : public Component
 {

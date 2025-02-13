@@ -2,7 +2,6 @@
 #include "Component/Renderer/RendererCom.h"
 #include "Scene/SceneManager.h"
 #include "Component/Camera/CameraCom.h"
-#include "Graphics/Graphics.h"
 
 // XVˆ—
 void FrustumCom::Update(float elapsedTime)

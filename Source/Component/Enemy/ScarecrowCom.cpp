@@ -1,8 +1,5 @@
 #include "ScarecrowCom.h"
-#include "Math/Mathf.h"
-#include "Graphics/Graphics.h"
 #include "Component/Renderer/RendererCom.h"
-#include "Component\System\TransformCom.h"
 #include <Component\MoveSystem\MovementCom.h>
 #include "Component\Sprite\Sprite.h"
 

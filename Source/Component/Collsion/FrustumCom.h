@@ -1,6 +1,5 @@
 #pragma once
 #include "Component/Camera/CameraCom.h"
-#include "Graphics/Graphics.h"
 
 class FrustumCom :public Component
 {

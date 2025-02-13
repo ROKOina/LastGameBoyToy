@@ -1,5 +1,4 @@
 #include "Physxlib.h"
-#include "Component/System/TransformCom.h"
 #include "Component/Phsix/RigidBodyCom.h"
 #include "Graphics\Model\ResourceManager.h"
 

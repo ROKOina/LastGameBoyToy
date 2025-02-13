@@ -1,5 +1,4 @@
 #include "ColliderCom.h"
-#include "Graphics\Graphics.h"
 #include "Component\Renderer\RendererCom.h"
 #include "NodeCollsionCom.h"
 

@@ -1,8 +1,6 @@
 #include "Scene.h"
-#include "Graphics/Graphics.h"
 #include "Component/Camera/CameraCom.h"
 #include "Scene/SceneManager.h"
-#include "Component\System\TransformCom.h"
 
 //シーンのコンスタントバッファの初期化
 void Scene::ConstantBufferInitialize()

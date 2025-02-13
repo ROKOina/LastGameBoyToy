@@ -1,6 +1,5 @@
 #include "Graphics/Shader.h"
 #include "Bloom.h"
-#include "Graphics/Graphics.h"
 
 //コンストラクタ
 Bloom::Bloom(ID3D11Device* device, uint32_t width, uint32_t height)

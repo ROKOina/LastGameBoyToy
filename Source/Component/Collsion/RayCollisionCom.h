@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component\System\Component.h"
 #include <intsafe.h>
 
 class RayCollisionCom : public Component, public std::enable_shared_from_this<RayCollisionCom>

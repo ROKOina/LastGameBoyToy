@@ -2,7 +2,6 @@
 #include "Scene\ScenePVE\PVEDirection.h"
 #include "StateMachine\Behaviar\GateGimmickState.h"
 #include "Component\Phsix\RigidBodyCom.h"
-#include "Component\System\TransformCom.h"
 
 void GateGimmick::Start()
 {

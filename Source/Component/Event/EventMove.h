@@ -29,7 +29,5 @@ private:
     bool showEventMoveParameters = false;
     char searchName[256] = {};
     std::string filename = "";
-    // コピーなどの成功表示に関する変数
-    inline static constexpr float DISPLAY_SUCCESS_COPY_TIME = 2.0f;
-    float m_timeSinceCopyFilename = DISPLAY_SUCCESS_COPY_TIME;
+    COPY_VARIABLE()
 };

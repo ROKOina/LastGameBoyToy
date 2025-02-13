@@ -1,9 +1,6 @@
 #pragma once
-#include "../System\Component.h"
 #include "StateMachine\StateMachine.h"
 #include "Scene\SceneManager.h"
-#include "Math\Mathf.h"
-#include "Input\Input.h"
 #include "Component\Animation\AimIKCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Prop/NetCharaData.h"

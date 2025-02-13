@@ -1,9 +1,6 @@
 #include "TrailCom.h"
 #include "Graphics\Shader.h"
-#include "Graphics\Graphics.h"
 #include "Graphics\Texture.h"
-#include "Component\System\TransformCom.h"
-#include "Math\Mathf.h"
 #include "Component\Camera\CameraCom.h"
 
 CEREAL_CLASS_VERSION(Trail::TrailParameter, 1)

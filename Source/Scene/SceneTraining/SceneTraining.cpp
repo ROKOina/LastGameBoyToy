@@ -1,8 +1,6 @@
 #include "SceneTraining.h"
 #include  "Scene/SceneTraining/TrainingManager.h"
-#include "Graphics/Graphics.h"
 #include "Input\Input.h"
-#include "Input\GamePad.h"
 #include "Scene/SceneManager.h"
 #include "Scene/SceneLoading/SceneLoading.h"
 #include "Component\Renderer\RendererCom.h"

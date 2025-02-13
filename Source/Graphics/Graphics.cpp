@@ -1,5 +1,4 @@
 #include "SystemStruct\Misc.h"
-#include "Graphics/Graphics.h"
 
 #include "Graphics\3DShader\ModelShader.h"
 

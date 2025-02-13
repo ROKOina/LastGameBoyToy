@@ -1,9 +1,7 @@
 #include "GPUParticle.h"
-#include "Graphics/Graphics.h"
 #include "SystemStruct\Misc.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
-#include "Math/Mathf.h"
 
 CEREAL_CLASS_VERSION(GPUParticle::SaveParameter, 3)
 CEREAL_CLASS_VERSION(GPUParticle::GPUparticleSaveConstants, 3)

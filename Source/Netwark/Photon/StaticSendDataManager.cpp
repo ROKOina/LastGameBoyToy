@@ -1,4 +1,3 @@
-#include "Component\System\GameObject.h"
 #include <Component\Character\CharacterCom.h>
 
 #include "StaticSendDataManager.h"  //インクルード一番下に

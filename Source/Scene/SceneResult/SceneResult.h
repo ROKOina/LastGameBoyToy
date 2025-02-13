@@ -1,6 +1,5 @@
 #pragma once
 #include "Scene\Scene.h"
-#include "Component\System\GameObject.h"
 #include "DeliveryResultData.h"
 
 class SceneResult : public Scene

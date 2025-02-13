@@ -1,5 +1,4 @@
 
-#include "Graphics/Graphics.h"
 #include "Input/Input.h"
 #include "Framework.h"
 #include "Scene\SceneManager.h"

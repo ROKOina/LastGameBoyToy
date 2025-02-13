@@ -1,7 +1,5 @@
 #include "AnimationCom.h"
 #include "Component\Renderer\RendererCom.h"
-#include "Component\System\TransformCom.h"
-#include "Math\Mathf.h"
 #include "Component\Character/CharacterCom.h"
 #include "AimIKCom.h"
 #include "Math/AnimationCalculation.h"

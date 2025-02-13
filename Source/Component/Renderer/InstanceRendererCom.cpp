@@ -1,6 +1,5 @@
 #include "InstanceRendererCom.h"
 #include <Graphics/Model/ResourceManager.h>
-#include "Math/Mathf.h"
 
 //コンストラクタ
 InstanceRenderer::InstanceRenderer(SHADER_ID_MODEL id, int maxinstance, BLENDSTATE blendmode, DEPTHSTATE depthmode, RASTERIZERSTATE rasterizermode, bool shadowrender)

@@ -1,6 +1,5 @@
 #include "CascadedShadowMap.h"
 #include "SystemStruct\Misc.h"
-#include "Graphics/Graphics.h"
 
 using namespace DirectX;
 

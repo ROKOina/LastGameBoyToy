@@ -1,11 +1,8 @@
 #include "Sprite.h"
 #include "SystemStruct\Misc.h"
-#include "Graphics/Graphics.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
-#include "Math/Mathf.h"
 #include "Math/easing.h"
-#include <Input/Input.h>
 
 CEREAL_CLASS_VERSION(Sprite::SaveParameterCPU, 3)
 

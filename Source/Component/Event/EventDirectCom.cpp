@@ -278,6 +278,58 @@ const Any* EventDirectCom::GetEventAdditionValue(const std::string& eventKey) co
         return nullptr;
     }
 
+void EventDirectCom::Serialize()
+{
+    if (this->filename != "")
+    {
+        std::ofstream ostream(filename, std::ios::binary);
+        if (ostream.is_open())
+        {
+            cereal::BinaryOutputArchive archive(ostream);
+            try
+            {
+                archive
+                (
+                    CEREAL_NVP(spc)
+                );
+            }
+            catch (...)
+            {
+                LOG("event move deserialize failed.\n%s\n", filename);
+                return;
+            }
+        }
+        return;
+    }
+
+    static const char* filter = "EventMoveFiles(*.edm)\0*.edm;\0All Files(*.*)\0*.*;\0\0";
+
+    char filename[256] = { 0 };
+    DialogResult result = Dialog::SaveFileName(filename, sizeof(filename), filter, nullptr, "edm", Graphics::Instance().GetHwnd());
+    if (result == DialogResult::OK)
+    {
+        std::ofstream ostream(filename, std::ios::binary);
+        if (ostream.is_open())
+        {
+            cereal::BinaryOutputArchive archive(ostream);
+
+            try
+            {
+                this->filename = filename;
+                archive
+                (
+                    CEREAL_NVP(spc)
+                );
+            }
+            catch (...)
+            {
+                LOG("event direct deserialize failed.\n%s\n", filename);
+                return;
+            }
+        }
+    }
+}
+
 void EventDirectCom::OnGUI()
 {
     if (ImGui::Button((char*)u8"保存"))
@@ -287,27 +339,7 @@ void EventDirectCom::OnGUI()
     if (filename != "")
     {
         ImGui::SameLine();
-        TimeManager& timeManager = TimeManager::Instance();
-        m_timeSinceCopyFilename += timeManager.GetElapsedTime();
-        if (ImGui::Button((char*)u8"ファイルパスのコピー"))
-        {
-            // クリップボードにコピーさせる
-            size_t pos = filename.find("Data");
-            std::string newPath = filename.substr(pos);
-            for (char& c : newPath) { if (c == '\\')  c = '/'; }
-
-            CopyOnClipboard(newPath.c_str());
-            m_timeSinceCopyFilename = 0;
-        }
-        if (m_timeSinceCopyFilename < DISPLAY_SUCCESS_COPY_TIME)
-        {
-            float colorAlpha = (m_timeSinceCopyFilename / DISPLAY_SUCCESS_COPY_TIME);
-            colorAlpha = std::powf(colorAlpha, 5.0f) * -1.0f + 1.0f;
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, colorAlpha));
-            ImGui::SameLine();
-            ImGui::Text("Copied!");
-            ImGui::PopStyleColor();
-        }
+        COPY_GUI(filename)
     }
 
     ImGui::Checkbox(U("生成と同時に再生"), &spc.initialPlaybackEbanle);

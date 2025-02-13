@@ -1,5 +1,4 @@
 #include "VariousShaderConstants.h"
-#include "Graphics/Graphics.h"
 
 EffectConstants::EffectConstants()
 {

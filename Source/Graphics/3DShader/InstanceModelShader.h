@@ -2,7 +2,6 @@
 
 #include "Graphics/Shader.h"
 #include "Graphics/ConstantBuffer.h"
-#include "Graphics/Graphics.h"
 #include "Graphics/Model/Model.h"
 
 class TransformCom;

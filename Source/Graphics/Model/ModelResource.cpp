@@ -5,8 +5,6 @@
 #include "SystemStruct\Misc.h"
 #include "ModelResource.h"
 
-#include "Graphics/Graphics.h"
-
 // CEREALバージョン定義
 CEREAL_CLASS_VERSION(ModelResource::Node, 1)
 CEREAL_CLASS_VERSION(ModelResource::Material, 1)

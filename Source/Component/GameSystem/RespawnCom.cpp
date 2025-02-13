@@ -1,6 +1,5 @@
 #include "RespawnCom.h"
 #include "Scene\ScenePVP\ScenePVP.h"
-#include "Component\System\TransformCom.h"
 #include "Component\Character\CharacterCom.h"
 #include "Component\MoveSystem\MovementCom.h"
 #include "Scene\SceneTitle\SceneTitle.h"

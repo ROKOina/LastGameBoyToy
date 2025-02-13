@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Component\System\Component.h"
-
 //ƒJƒƒ‰
 class CameraCom : public Component
 {

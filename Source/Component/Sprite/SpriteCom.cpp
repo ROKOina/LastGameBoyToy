@@ -1,11 +1,8 @@
 #include "SpriteCom.h"
 #include "SystemStruct\Misc.h"
-#include "Graphics/Graphics.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
-#include "Math/Mathf.h"
 #include "Math/easing.h"
-#include <Input/Input.h>
 
 SpriteCom::SpriteCom(const char* filename, SpriteShader spriteshader)
 {
@@ -97,6 +94,7 @@ SpriteCom::SpriteCom(const char* filename, SpriteShader spriteshader)
     //ファイル読み込み処理
     if (filename)
     {
+        this->filename = filename;
         Deserialize(filename);
         LoadTextureFromFile(device, spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
     }
@@ -274,20 +272,14 @@ void SpriteCom::DrawEnd()
 
 void SpriteCom::OnGUI()
 {
-    // ファイルの保存と読み込み
-    ImGui::Text("File Operations");
-    ImGui::SameLine();
-    if (ImGui::Button("Save"))
+    if (ImGui::Button((char*)u8"保存"))
     {
         Serialize();
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Load"))
+    if (filename != "")
     {
-        LoadDeserialize();
-        LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
-        spc.texSize.x = texture2ddesc_.Width;
-        spc.texSize.y = texture2ddesc_.Height;
+        ImGui::SameLine();
+        COPY_GUI(filename)
     }
 
     // テクスチャの選択
@@ -360,10 +352,10 @@ void SpriteCom::LoadTexture(std::string filename)
 
 void SpriteCom::Serialize()
 {
-    static const char* filter = "UI Files(*.ui)\0*.ui;\0All Files(*.*)\0*.*;\0\0";
+    static const char* filter = "spc Files(*.spc)\0*.spc;\0All Files(*.*)\0*.*;\0\0";
 
     char filename[256] = { 0 };
-    DialogResult result = Dialog::SaveFileName(filename, sizeof(filename), filter, nullptr, "ui", Graphics::Instance().GetHwnd());
+    DialogResult result = Dialog::SaveFileName(filename, sizeof(filename), filter, nullptr, "spc", Graphics::Instance().GetHwnd());
     if (result == DialogResult::OK)
     {
         std::ofstream ostream(filename, std::ios::binary);
@@ -380,7 +372,7 @@ void SpriteCom::Serialize()
             }
             catch (...)
             {
-                LOG("ui deserialize failed.\n%s\n", filename);
+                LOG("spc deserialize failed.\n%s\n", filename);
                 return;
             }
         }
@@ -403,21 +395,9 @@ void SpriteCom::Deserialize(const char* filename)
         }
         catch (...)
         {
-            LOG("ui deserialize failed.\n%s\n", filename);
+            LOG("spc deserialize failed.\n%s\n", filename);
             return;
         }
-    }
-}
-
-void SpriteCom::LoadDeserialize()
-{
-    static const char* filter = "UI Files(*.ui)\0*.ui;\0All Files(*.*)\0*.*;\0\0";
-
-    char filename[256] = { 0 };
-    DialogResult result = Dialog::OpenFileName(filename, sizeof(filename), filter, nullptr, Graphics::Instance().GetHwnd());
-    if (result == DialogResult::OK)
-    {
-        Deserialize(filename);
     }
 }
 

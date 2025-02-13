@@ -1,5 +1,4 @@
 #include "UiGauge.h"
-#include "Math\Mathf.h"
 
 UiGauge::UiGauge(const char* filename, SpriteShader spriteshader, bool collsion, int changeValue) :UiSystem(filename, spriteshader, collsion)
 {

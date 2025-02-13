@@ -2,7 +2,6 @@
 
 #include "Scene/Scene.h"
 #include "Netwark/Photon/BasicsApplication.h"
-#include "Component\System\GameObject.h"
 
 #include "PVPGameSystem/PVPGameSystem.h"
 // ‘O•ûéŒ¾

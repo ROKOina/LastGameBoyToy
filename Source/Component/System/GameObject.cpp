@@ -1,8 +1,4 @@
-#include "../../Graphics/Graphics.h"
-#include "Component.h"
-#include "GameObject.h"
 #include "Component/Renderer/RendererCom.h"
-#include "TransformCom.h"
 #include "Component/Camera/CameraCom.h"
 #include "Component/Collsion/ColliderCom.h"
 #include "Component/Collsion/PushBackCom.h"

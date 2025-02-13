@@ -1,9 +1,7 @@
 #include "PostEffect.h"
-#include "Graphics/Graphics.h"
 #include "Graphics/SkyBoxManager/SkyBoxManager.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Shader.h"
-#include <Math\Mathf.h>
 
 //コンストラクタ
 PostEffect::PostEffect()

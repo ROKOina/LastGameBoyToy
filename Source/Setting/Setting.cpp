@@ -1,8 +1,6 @@
 #include "Setting.h"
 
 #include "Component/Sprite/Sprite.h"
-#include "Math/Mathf.h"
-#include "Input\Input.h"
 
 void SettingScreen::CreateSettingUiObject()
 {

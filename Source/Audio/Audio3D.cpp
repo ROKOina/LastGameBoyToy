@@ -1,6 +1,4 @@
 #include "Audio3D.h"
-#include "Component\System\GameObject.h"
-
 //Audio2DMagaer* Audio2DMagaer::instance_ = nullptr;
 
 // Uncomment to enable the volume limiter on the master voice.

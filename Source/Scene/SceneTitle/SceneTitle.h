@@ -3,7 +3,6 @@
 #include "Scene/Scene.h"
 #include "Component\Sprite\Sprite.h"
 
-#include "Component\System\GameObject.h"
 #include "Component/Collsion/NodeCollsionCom.h"
 #include "Netwark/Photon/BasicsApplication.h"
 #include "Audio/Audio3D.h"

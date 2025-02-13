@@ -1,4 +1,3 @@
-#include "Graphics/Graphics.h"
 #include "Scene/SceneManager.h"
 #include "SceneLGBT.h"
 #include "Component\Light\LightCom.h"

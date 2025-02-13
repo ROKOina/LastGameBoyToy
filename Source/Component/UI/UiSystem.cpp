@@ -1,5 +1,4 @@
 #include "Uisystem.h"
-#include "Math\Mathf.h"
 UiSystem::UiSystem(const char* filename, SpriteShader spriteshader, bool collsion) :Sprite(filename, spriteshader, collsion)
 {
     fadeInFlag = false;

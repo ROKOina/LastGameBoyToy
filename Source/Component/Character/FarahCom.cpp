@@ -1,7 +1,6 @@
 #include "FarahCom.h"
 #include "StateMachine\Behaviar\BaseCharacterState.h"
 #include "Component\Renderer\RendererCom.h"
-#include "Math\Mathf.h"
 #include "StateMachine\Behaviar\FarahState.h"
 #include "Component\Particle\CPUParticle.h"
 #include "Component\Particle\GPUParticle.h"

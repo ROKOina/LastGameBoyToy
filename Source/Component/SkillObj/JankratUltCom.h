@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../System\Component.h"
-#include "Math\Mathf.h"
 #include "Component\System\HitProcessCom.h"
 
 class JankratUltCom : public Component

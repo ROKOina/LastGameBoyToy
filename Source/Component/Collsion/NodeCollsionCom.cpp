@@ -1,8 +1,6 @@
 #include "NodeCollsionCom.h"
 #include "Component/Renderer/RendererCom.h"
 #include "Component/Renderer/InstanceRendererCom.h"
-#include <Math\Mathf.h>
-#include "Component\System\TransformCom.h"
 
 CEREAL_CLASS_VERSION(NodeCollsionCom::StaticCollsionParameter, 1)
 

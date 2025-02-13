@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Math/Mathf.h"
 #include "Graphics/ConstantBuffer.h"
 
 class BaseConstants {

@@ -1,7 +1,4 @@
 #include "VideoCom.h"
-#include "Graphics\Graphics.h"
-#include "Component\System\TransformCom.h"
-#include "Math\Mathf.h"
 
 //コンストラクタ
 Video::Video(const char* filename)

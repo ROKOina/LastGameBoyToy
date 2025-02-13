@@ -1,4 +1,3 @@
-#include "TransformCom.h"
 #include "Graphics\Model\Model.h"
 
 // ŠJnˆ—

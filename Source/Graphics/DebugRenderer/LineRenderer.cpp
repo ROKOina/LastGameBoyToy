@@ -1,6 +1,5 @@
 #include "SystemStruct\Misc.h"
 #include "LineRenderer.h"
-#include "Graphics/Graphics.h"
 
 LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
     : capacity_(vertexCount)

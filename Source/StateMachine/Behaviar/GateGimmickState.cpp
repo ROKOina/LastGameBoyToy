@@ -1,6 +1,4 @@
 #include "GateGimmickState.h"
-#include "Math\Mathf.h"
-#include "Component\System\TransformCom.h"
 
 GateGimmick_BaseState::GateGimmick_BaseState(GateGimmick* owner) : State(owner)
 {

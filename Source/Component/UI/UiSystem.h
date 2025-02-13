@@ -1,6 +1,5 @@
 #pragma once
 #include "Component\Sprite\Sprite.h"
-#include "Component\System\TransformCom.h"
 #include "math.h"
 class UiSystem : public Sprite
 {

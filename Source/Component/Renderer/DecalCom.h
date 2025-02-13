@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Component\System\Component.h"
 #include "Graphics/ConstantBuffer.h"
 
 class Decal :public Component

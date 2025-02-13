@@ -1,9 +1,7 @@
 #include "KnockBackCom.h"
 #include "Component\Collsion\ColliderCom.h"
 #include "Component\System\HitProcessCom.h"
-#include "Component\System\TransformCom.h"
 #include "Component\MoveSystem\MovementCom.h"
-#include "Math\Mathf.h"
 
 //XVˆ—
 void KnockBackCom::Update(float elapsedTime)

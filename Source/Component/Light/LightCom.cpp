@@ -1,7 +1,4 @@
 #include "LightCom.h"
-#include "Graphics/Graphics.h"
-#include "Component\System\TransformCom.h"
-#include "Math\Mathf.h"
 
 CEREAL_CLASS_VERSION(Light::LightParameter, 1)
 
