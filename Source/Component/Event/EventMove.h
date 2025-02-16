@@ -15,6 +15,23 @@ public:
     virtual void Start() override;
     virtual void Update(float elapsedTime);
 
+    // ƒCƒxƒ“ƒgID‚©‚çŽæ“¾
+    std::shared_ptr<EventMoveParameterBehaviorBase> GetEventToRegisterId(int id)
+    {
+        int index = 0;
+        std::shared_ptr<EventMoveParameterBehaviorBase> p;
+        for (auto& eventMoveParameter : m_eventMoveParameters)
+        {
+            if (index == id)
+            {
+                p = eventMoveParameter;
+                break;
+            }
+            index++;
+        }
+        return p;
+    }
+
 private:
     // GUI•`‰æ
     virtual void OnGUI();

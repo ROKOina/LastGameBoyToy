@@ -358,15 +358,19 @@ void EventDirectEditor::DropUpdate(std::shared_ptr<EventDirect>eventDirect)
                     // 動きのイベント登録
                     if (!_event->m_eventUpdateEnable)
                     {
-                        auto eventComponent = std::make_shared<EventMoveParameterBase>();
-                        eventComponent->expanded = false;
-                        eventComponent->_Start = 0;
-                        eventComponent->_End = moveParam->m_duration;
-                        eventComponent->_event = moveParam;
+                        auto eventMoveParam = std::make_shared<EventMoveParameterBase>();
+                        eventMoveParam->expanded = false;
+                        eventMoveParam->_Start = 0;
+                        eventMoveParam->_End = moveParam->m_duration;
+                        eventMoveParam->_event = moveParam;
+                        // 後からイベントを検索できるように
+                        eventMoveParam->_gameObjName = moveParam->m_owner.lock()->GetGameObject()->GetName();
+                        eventMoveParam->_componentRegisterId = moveParam->m_owner.lock()->GetRegisterId();
+                        eventMoveParam->_eventRegisterId = moveParam->m_registerId;
                         // イベントで制御するように通知
                         moveParam->m_eventUpdateEnable = true;
 
-                        eventDirect->AddEventMoveParameterBehaviorBaseEvent(std::move(eventComponent));
+                        eventDirect->AddEventMoveParameterBehaviorBaseEvent(std::move(eventMoveParam));
                         singularEnable = true;
                     }
                 }

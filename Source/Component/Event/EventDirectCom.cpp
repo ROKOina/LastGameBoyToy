@@ -1,4 +1,5 @@
 ﻿#include "EventDirectCom.h"
+#include "EventMove.h"
 
 EventDirectCom::EventDirectCom(const char* filename)
 {
@@ -33,7 +34,17 @@ EventDirectCom::EventDirectCom(const char* filename)
 void EventDirectCom::Start()
 {
     // ゲームオブジェクトマネージャーからイベントに関するパラメータをリンクさせる
-
+    for (auto& eventItem : spc.eventData->_EventItems)
+    {
+        if (auto& eventMoveParameter = std::dynamic_pointer_cast<EventMoveParameterBase>(eventItem.second))
+        {
+            auto eventObj = GameObjectManager::Instance().Find(eventMoveParameter->_gameObjName.c_str());
+            auto eventMove = eventObj->GetComponentToRegisterId<EventMove>(eventMoveParameter->_componentRegisterId - 1);
+            // パラメータリンク
+            eventMoveParameter->_event = eventMove->GetEventToRegisterId(eventMoveParameter->_eventRegisterId -1);
+        }
+    }
+    
     if (spc.initialPlaybackEbanle)
     {
         EventPlay();
@@ -334,7 +345,7 @@ void EventDirectCom::OnGUI()
 {
     if (ImGui::Button((char*)u8"保存"))
     {
-        //Serialize();
+        Serialize();
     }
     if (filename != "")
     {

@@ -59,8 +59,10 @@ public:
 public:
 	std::weak_ptr<EventMoveParameterBehaviorBase> _event;
 
+	std::string _gameObjName = "";
+	int _componentRegisterId = -1;
+	int _eventRegisterId = -1;
 public:
-	//TODO: ポインターでの保存をしないように
 	friend class cereal::access;
 	template <class Archive>
 	void serialize(Archive& archive, const uint32_t version)
@@ -72,10 +74,20 @@ public:
 				_event
 			);
 		}
+		// 名前などの情報からイベントを検索する
+		if (version == 1)
+		{
+			archive(
+				cereal::base_class<EventItemBase>(this),
+				_gameObjName,
+				_componentRegisterId,
+				_eventRegisterId
+			);
+		}
 	}
 };
 CEREAL_REGISTER_TYPE(EventMoveParameterBase)
-CEREAL_CLASS_VERSION(EventMoveParameterBase, 0)
+CEREAL_CLASS_VERSION(EventMoveParameterBase, 1)
 
 struct EventDirect : public ImSequencer::MySequenceInterface
 {

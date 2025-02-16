@@ -79,6 +79,15 @@ public:
         return nullptr;
     }
 
+    // コンポーネントIDから取得
+    template<class T>
+    std::shared_ptr<T> GetComponentToRegisterId(int id)
+    {
+        std::shared_ptr<T> p = std::dynamic_pointer_cast<T>(components_.at(id));
+        if (p == nullptr) return nullptr;
+        return p;
+    }
+
     //親子
     //追加
     std::shared_ptr<GameObject> AddChildObject();
