@@ -50,7 +50,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 directioncolor = BRDF(-L, directionalLight.color.rgb, V, N, diffuseReflectance, MRAO.r, MRAO.y, F0);
 
     // --- ŠÂ‹«Œõ‚É‚æ‚éŠgU”½Ë{‹¾–Ê”½Ë ---
-    float3 envcolor = IBL(lutGGX, diffuseIem, specularPmrem, sampler_states[BLACK_BORDER_ANISOTROPIC], diffuseReflectance, F0, MRAO.y, N, V);;
+    float3 envcolor = IBL(lutGGX, diffuseIem, specularPmrem, sampler_states[BLACK_BORDER_ANISOTROPIC], diffuseReflectance, F0, MRAO.y, N, V);
 
     //ÅI‚ÌFî•ñ
     float3 color = albedoColor.rgb + directioncolor + envcolor;
