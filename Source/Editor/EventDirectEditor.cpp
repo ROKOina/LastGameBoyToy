@@ -9,6 +9,7 @@ EventDirectEditor::EventDirectEditor()
 
 void EventDirectEditor::OnDraw(std::weak_ptr<GameObject> selectionGameObject)
 {
+#ifdef DEBUG
     if (selectionGameObject.lock() == nullptr)return;
 
     auto setEvent = selectionGameObject.lock()->GetComponent<EventDirectCom>();
@@ -339,10 +340,12 @@ void EventDirectEditor::OnDraw(std::weak_ptr<GameObject> selectionGameObject)
     DropUpdate(eventDirect);
 
     ImGui::End();
+#endif // DEBUG
 }
 
 void EventDirectEditor::DropUpdate(std::shared_ptr<EventDirect>eventDirect)
 {
+#ifdef DEBUG
     if (ImGui::BeginDragDropTarget())
     {
         // イベントの登録
@@ -378,4 +381,5 @@ void EventDirectEditor::DropUpdate(std::shared_ptr<EventDirect>eventDirect)
         }
         ImGui::EndDragDropTarget();
     }
+#endif // DEBUG
 }
