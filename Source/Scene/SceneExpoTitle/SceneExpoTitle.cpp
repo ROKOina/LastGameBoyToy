@@ -64,13 +64,13 @@ void SceneExpoTitle::Initialize()
         obj->AddComponent<Light>("Data/SerializeData/LightData/title.light");
     }
 
-    // イベント（テスト）
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("eventMove");
-        obj->AddComponent<EventMove>("Data/Event/MoveParam/test.evm");
-        obj->AddComponent<EventDirectCom>("Data/Event/testDirect.edm");
-    }
+    //// イベント（テスト）
+    //{
+    //    std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+    //    obj->SetName("eventMove");
+    //    obj->AddComponent<EventMove>("Data/Event/MoveParam/test.evm");
+    //    obj->AddComponent<EventDirectCom>("Data/Event/testDirect.edm");
+    //}
 
     //ステージ
     {
@@ -138,6 +138,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 570.000, 0 });
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titilepvpUI.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("");
     }
     //トレーニング
     {
@@ -146,6 +147,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 670.000, 0 });
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titileTraining.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("");
     }
     
     //クレジット
@@ -155,6 +157,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 815.000, 0 });
         next->transform_->SetScale(0.590);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlecredit.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("");
     }
     
     //ゲーム終了
@@ -164,6 +167,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 896.000, 0 });
         next->transform_->SetScale(0.590);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleendgameUI.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("");
     }
     
     //セレクト棒
@@ -171,6 +175,13 @@ void SceneExpoTitle::Initialize()
         std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
         next->SetName("selectBow");
         next->AddComponent<SpriteCom>("", SpriteCom::SpriteShader::DEFALT);
+    }
+
+    // 開始イベント
+    {
+        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
+        obj->SetName("IntroUI");
+        obj->AddComponent<EventDirectCom>("");
     }
 
     //クレジット

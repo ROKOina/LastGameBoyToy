@@ -2,6 +2,7 @@
 #include "Component/Event/EventDirectCom.h"
 #include <ImSequencer.h>
 #include <Component\Event\EventDirect.h>
+#include <Component\Event\EventMove.h>
 
 EventDirectEditor::EventDirectEditor()
 {
@@ -34,6 +35,22 @@ void EventDirectEditor::OnDraw(std::weak_ptr<GameObject> selectionGameObject)
     {
         eventDirectBehavior.lock()->DebugEventUpdate();
     }
+    if (ImGui::Button((char*)u8"保存"))
+    {
+        // 登録されているイベントアイテムを全てシリアライズさせる
+        eventDirectBehavior.lock()->Serialize();
+        for (auto item : eventDirect->_EventItems)
+        {
+            if (auto inflexionEvent = std::dynamic_pointer_cast<EventMoveParameterBase>(item.second))
+            {
+                if (auto eventMove = std::dynamic_pointer_cast<EventMove>(inflexionEvent->_event.lock()->m_owner.lock()))
+                {
+                    eventMove->Serialize();
+                }
+            }
+        }
+    }
+    ImGui::SameLine();
 
     ImGui::Checkbox("Lock", &selectLockEnable);
 

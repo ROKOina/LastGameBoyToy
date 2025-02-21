@@ -1,61 +1,54 @@
-﻿#include "scale_up_down_behavior.h"
+﻿#include "EventSpriteScaleBehavior.h"
 
-namespace chimera
+void EventSpriteScaleBehavior::EventMoveInitialize()
 {
-    void ScaleUpDownBehavior::MoveInitialize()
+    m_timer = 0;
+    m_owner.lock()->GetGameObject()->transform_->SetScale(start);
+    m_decisionEnable = false;
+}
+
+void EventSpriteScaleBehavior::Update()
+{
+    if (m_decisionEnable) return;// 動作が完了したら更新させない
+
+    EventMoveParameterBehaviorBase::TimerUpdate();
+
+    if (m_timer <= 0)return;
+
+    if (m_eventUpdateEnable)
     {
-        timer = 0;
-        transform.lock()->SetScale(start);
-        isDecision = false;
+        if (m_timer > m_duration)return;
     }
 
-    void ScaleUpDownBehavior::Update()
+    float easePos = m_curve.Evaluate(std::min(m_timer / m_duration, 0.999f));
+    float moveScale = (m_reverseEnable) ? Mathf::Lerp(end, start, easePos) : Mathf::Lerp(start, end, easePos);
+
+    m_owner.lock()->GetGameObject()->transform_->SetScale(moveScale);
+
+    EventMoveParameterBehaviorBase::FinishJudge();
+}
+
+void EventSpriteScaleBehavior::SetStartValue()
+{
+    m_owner.lock()->GetGameObject()->transform_->SetScale(start);
+}
+
+void EventSpriteScaleBehavior::SetEndValue()
+{
+    m_owner.lock()->GetGameObject()->transform_->SetScale(end);
+}
+
+void EventSpriteScaleBehavior::OnGUI()
+{
+    EventMoveParameterBehaviorBase::OnGUI();
+    ImGui::DragFloat("Start Value", &start);
+    if (ImGui::Button("Set Valu To Transform##1"))
     {
-        if (isDecision) return;// 動作が完了したら更新させない
-
-        SpriteMoveBaseBehavior::TimerUpdate();
-
-        if (timer <= 0)return;
-
-        if (eventUpdateEnable)
-        {
-            if (timer > wateTime)return;
-        }
-
-        float easePos = curve.Evaluate(std::min(timer / wateTime, 0.999f));
-        float moveScale = (isReverse) ? Lerp(end, start, easePos) : Lerp(start, end, easePos);
-
-        transform.lock()->SetScale(moveScale);
-
-        SpriteMoveBaseBehavior::FinishJudge();
+        m_owner.lock()->GetGameObject()->transform_->SetScale(start);
     }
-
-    void ScaleUpDownBehavior::SetStartValue()
+    ImGui::DragFloat("End Value", &end);
+    if (ImGui::Button("Set Valu To Transform##2"))
     {
-        transform.lock()->SetScale(start);
+        m_owner.lock()->GetGameObject()->transform_->SetScale(end);
     }
-
-    void ScaleUpDownBehavior::SetEndValue()
-    {
-        transform.lock()->SetScale(end);
-    }
-
-#ifdef DEBUG
-    void ScaleUpDownBehavior::Editor()
-    {
-        SpriteMoveBaseBehavior::Editor();
-        ImGui::DragFloat("Start Value", &start);
-        if (ImGui::Button("Set Valu To Transform##1"))
-        {
-            auto rectTrans = GetOwner()->GetComponent<RectTransform>();
-            rectTrans->SetScale(start);
-        }
-        ImGui::DragFloat("End Value", &end);
-        if (ImGui::Button("Set Valu To Transform##2"))
-        {
-            auto rectTrans = GetOwner()->GetComponent<RectTransform>();
-            rectTrans->SetScale(end);
-        }
-    }
-#endif
 }

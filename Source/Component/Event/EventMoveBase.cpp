@@ -43,6 +43,11 @@ void EventMoveParameterBehaviorBase::OnGUI()
         ImGui::Checkbox("EventUpdateEnable", &m_eventUpdateEnable);
         ImGui::TreePop();
     }
+
+    if (ImGui::SliderFloat("##Timeline", &m_timer, 0, m_duration, "current frame = %.3f"))
+    {
+        m_decisionEnable = false;
+    }
     ImGui::Checkbox("StartInitializeEnable", &m_startInitializeEnable);
     ImGui::Checkbox("Is Auto Initialize", &m_autoInitializeEnable);
     if (!m_eventUpdateEnable)
@@ -53,7 +58,10 @@ void EventMoveParameterBehaviorBase::OnGUI()
         }
         ImGui::Checkbox("UnscaledEnable", &m_useUnscaledEnable);
         ImGui::Checkbox("ReverseEnable", &m_reverseEnable);
-        ImGui::DragFloat("Change Duration", &m_duration);
+        if (ImGui::DragFloat("Change Duration", &m_duration))
+        {
+            if (m_duration < 0)m_duration = 0;
+        }
         ImGui::Checkbox("Loop", &m_loopEnable);
     }
 

@@ -1,74 +1,47 @@
 ﻿#pragma once
 
-#include "sprite_move_base.h"
+#include "..//EventMoveBase.h"
 
-namespace chimera
+class EventSpriteShaftAngleBehavior : public EventMoveParameterBehaviorBase
 {
-    class DesignationAngleBehavior : public SpriteMoveBaseBehavior
+public:
+    EDITABLE_ON_GUI(EventSpriteShaftAngleBehavior)
+
+        EventSpriteShaftAngleBehavior() {};
+    ~EventSpriteShaftAngleBehavior() {};
+private:
+    // 初期化処理
+    virtual void EventMoveInitialize() override;
+
+public:
+    virtual void Update() override;
+
+    virtual void SetStartValue() override;
+    virtual void SetEndValue() override;
+private:
+    float start = {};
+    float end = {};
+
+private:
+    virtual void OnGUI()override;
+
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(
+    Archive& archive, const uint32_t version)
     {
-    public:
-#ifdef DEBUG
-        CLASS_NAME(DesignationAngleBehavior)
-        EDITABLE_ON_GUI(DesignationAngleBehavior)
-#endif
-            using SpriteMoveBaseBehavior::SpriteMoveBaseBehavior;
-
-    protected:
-        std::shared_ptr<DesignationAngleBehavior> shared_from_this() {
-            return std::static_pointer_cast<DesignationAngleBehavior>(SpriteMoveBaseBehavior::shared_from_this());
-        }
-
-    protected:
-        // 初期化処理
-        virtual void MoveInitialize() override;
-
-    public:
-        virtual void Update() override;
-
-        virtual void SetStartValue() override;
-        virtual void SetEndValue() override;
-    private:
-        float start = {};
-        float end = {};
-
-#ifdef DEBUG
-    private:
-        friend class ImGuiManager;
-        virtual void Editor();
-#endif
-
-    private:
-        friend class cereal::access;
-        template <class Archive>
-        void serialize(
-        Archive& archive, const uint32_t version)
+        if (version == 0)
         {
-            if (version == 0)
-            {
-                archive(
-                    cereal::base_class<BehaviorComponent>(this),
-                    timer,
-                    start,
-                    end,
-                    wateTime,
-                    loop,
-                    isReverse,
-                    isUseUnscale,
-                    isDecision
-                );
-            }
-            if (version == 1)
-            {
-                archive(
-                    cereal::base_class<SpriteMoveBaseBehavior>(this),
-                    start,
-                    end
-                );
-            }
+            archive(
+                cereal::base_class<EventMoveParameterBehaviorBase>(this),
+                start,
+                end
+            );
         }
-    };
-}
+    }
+};
 
-CEREAL_REGISTER_TYPE(chimera::DesignationAngleBehavior)
-CEREAL_CLASS_VERSION(chimera::DesignationAngleBehavior, 1)
+CEREAL_REGISTER_TYPE(EventSpriteShaftAngleBehavior)
+CEREAL_CLASS_VERSION(EventSpriteShaftAngleBehavior, 0)
 

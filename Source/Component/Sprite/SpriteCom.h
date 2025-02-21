@@ -4,6 +4,7 @@
 class SpriteCom :public Component
 {
     friend class SpriteCollisionCom;
+    friend class EventSpriteFadeBehavior;
 public:
     //シェーダーコードを変更する
     enum class SpriteShader

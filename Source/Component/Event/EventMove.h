@@ -36,6 +36,7 @@ private:
     // GUI描画
     virtual void OnGUI();
 
+    friend class EventDirectEditor;
     //シリアライズ
     void Serialize();
 

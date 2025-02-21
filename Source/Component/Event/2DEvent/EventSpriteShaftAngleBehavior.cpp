@@ -1,75 +1,65 @@
-﻿#include "designation_angle_behavior.h"
+﻿#include "EventSpriteShaftAngleBehavior.h"
 
-namespace chimera
+void EventSpriteShaftAngleBehavior::EventMoveInitialize()
 {
-    void DesignationAngleBehavior::MoveInitialize()
+    m_timer = 0;
+    m_owner.lock()->GetGameObject()->transform_->SetEulerRotation({ 0, 0, DirectX::XMConvertToRadians(start) });
+    m_decisionEnable = false;
+}
+
+void EventSpriteShaftAngleBehavior::Update()
+{
+    if (m_decisionEnable) return;// 動作が完了したら更新させない
+
+    EventMoveParameterBehaviorBase::TimerUpdate();
+
+    if (m_timer <= 0)return;
+
+    if (m_eventUpdateEnable)
     {
-        timer = 0;
-        if(transform.lock())
-        transform.lock()->SetRotationEuler({ 0, 0, DirectX::XMConvertToRadians(start) });
-        isDecision = false;
+        if (m_timer > m_duration)return;
     }
 
-    void DesignationAngleBehavior::Update()
+    float easePos = m_curve.Evaluate(std::min(m_timer / m_duration, 0.999f));
+    float moveAngle = (m_reverseEnable) ? Mathf::Lerp(end, start, easePos) : Mathf::Lerp(start, end, easePos);
+
+    m_owner.lock()->GetGameObject()->transform_->SetEulerRotation({ 0, 0, DirectX::XMConvertToRadians(moveAngle) });
+
+    EventMoveParameterBehaviorBase::FinishJudge();
+}
+
+void EventSpriteShaftAngleBehavior::SetStartValue()
+{
+    m_owner.lock()->GetGameObject()->transform_->SetEulerRotation({ 0, 0, DirectX::XMConvertToRadians(start) });
+}
+
+void EventSpriteShaftAngleBehavior::SetEndValue()
+{
+    m_owner.lock()->GetGameObject()->transform_->SetEulerRotation({ 0, 0, DirectX::XMConvertToRadians(end) });
+}
+
+void EventSpriteShaftAngleBehavior::OnGUI()
+{
+    EventMoveParameterBehaviorBase::OnGUI();
+    ImGui::DragFloat("Start Value", &start);
+    if (ImGui::Button("Set Current Angle##1"))
     {
-        if (isDecision) return;// 動作が完了したら更新させない
-
-        SpriteMoveBaseBehavior::TimerUpdate();
-
-        if (timer <= 0)return;
-
-        if (eventUpdateEnable)
-        {
-            if (timer > wateTime)return;
-        }
-
-        float easePos = curve.Evaluate(std::min(timer / wateTime, 0.999f));
-        float moveAngle = (isReverse) ? Lerp(end, start, easePos) : Lerp(start, end, easePos);
-
-        transform.lock()->SetRotationEuler({ 0, 0, DirectX::XMConvertToRadians(moveAngle) });
-
-        SpriteMoveBaseBehavior::FinishJudge();
+        start = m_owner.lock()->GetGameObject()->transform_->GetEulerRotation().z;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Set Valu To Angle##1"))
+    {
+        m_owner.lock()->GetGameObject()->transform_->SetEulerRotation({ 0, 0, DirectX::XMConvertToRadians(start) });
     }
 
-    void DesignationAngleBehavior::SetStartValue()
+    ImGui::DragFloat("End Value", &end);
+    if (ImGui::Button("Set Current Angle##2"))
     {
-        transform.lock()->SetRotationEuler({ 0, 0, DirectX::XMConvertToRadians(start) });
+        end = m_owner.lock()->GetGameObject()->transform_->GetEulerRotation().z;
     }
-
-    void DesignationAngleBehavior::SetEndValue()
+    ImGui::SameLine();
+    if (ImGui::Button("Set Valu To Angle##2"))
     {
-        transform.lock()->SetRotationEuler({ 0, 0, DirectX::XMConvertToRadians(end) });
+        m_owner.lock()->GetGameObject()->transform_->SetEulerRotation({ 0, 0, DirectX::XMConvertToRadians(end) });
     }
-
-#ifdef DEBUG
-    void DesignationAngleBehavior::Editor()
-    {
-        SpriteMoveBaseBehavior::Editor();
-        ImGui::DragFloat("Start Value", &start);
-        if (ImGui::Button("Set Current Pos##1"))
-        {
-            auto rectTrans = GetOwner()->GetComponent<RectTransform>();
-            start = rectTrans->GetRotationEuler().z;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Set Valu To Transform##1"))
-        {
-            auto rectTrans = GetOwner()->GetComponent<RectTransform>();
-            rectTrans->SetRotationEuler(Vector3(0, 0, DirectX::XMConvertToRadians(start)));
-        }
-
-        ImGui::DragFloat("End Value", &end);
-        if (ImGui::Button("Set Current Pos##2"))
-        {
-            auto rectTrans = GetOwner()->GetComponent<RectTransform>();
-            end = rectTrans->GetRotationEuler().z;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Set Valu To Transform##2"))
-        {
-            auto rectTrans = GetOwner()->GetComponent<RectTransform>();
-            rectTrans->SetRotationEuler(Vector3(0, 0, DirectX::XMConvertToRadians(end)));
-        }
-    }
-#endif
 }
