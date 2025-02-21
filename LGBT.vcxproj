@@ -133,6 +133,7 @@
     <ClInclude Include="Source\Component\Event\2DEvent\EventSpriteScaleBehavior.h" />
     <ClInclude Include="Source\Component\Event\2DEvent\EventSpriteShaftAngleBehavior.h" />
     <ClInclude Include="Source\Component\Event\2DEvent\EventSpriteShaftScaleBehavior.h" />
+    <ClInclude Include="Source\Component\Event\2DEvent\EventSpriteToMoveBehavior.h" />
     <ClInclude Include="Source\Component\Event\EventDirect.h" />
     <ClInclude Include="Source\Component\Event\EventDirectCom.h" />
     <ClInclude Include="Source\Component\Event\EventMove.h" />
@@ -314,6 +315,7 @@
     <ClCompile Include="Source\Component\Event\2DEvent\EventSpriteScaleBehavior.cpp" />
     <ClCompile Include="Source\Component\Event\2DEvent\EventSpriteShaftAngleBehavior.cpp" />
     <ClCompile Include="Source\Component\Event\2DEvent\EventSpriteShaftScaleBehavior.cpp" />
+    <ClCompile Include="Source\Component\Event\2DEvent\EventSpriteToMoveBehavior.cpp" />
     <ClCompile Include="Source\Component\Event\EventDirect.cpp" />
     <ClCompile Include="Source\Component\Event\EventDirectCom.cpp" />
     <ClCompile Include="Source\Component\Event\EventMove.cpp" />

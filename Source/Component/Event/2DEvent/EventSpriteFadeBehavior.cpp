@@ -18,6 +18,9 @@ void EventSpriteFadeBehavior::SetAlpha(float alpha)
 
 void EventSpriteFadeBehavior::Update()
 {
+#ifdef DEBUG
+    if (!m_debugEnable)return;
+#endif // DEBUG
     if (m_decisionEnable) return;// 動作が完了したら更新させない
 
     EventMoveParameterBehaviorBase::TimerUpdate();
@@ -29,7 +32,7 @@ void EventSpriteFadeBehavior::Update()
         if (m_timer > m_duration)return;
     }
 
-    float easePos = m_curve.Evaluate(std::min(m_timer / m_duration, 0.99f));
+    float easePos = m_curve.Evaluate(std::min(m_timer / m_duration, 0.9999f));
     float moveAlpha = (fadeType == FadeType::In) ?
         (m_reverseEnable) ? Mathf::Lerp(0.0f, maxAlpha, easePos) : Mathf::Lerp(maxAlpha, 0.0f, easePos)
         : (m_reverseEnable) ? Mathf::Lerp(maxAlpha, 0.0f, easePos) : Mathf::Lerp(0.0f, maxAlpha, easePos);

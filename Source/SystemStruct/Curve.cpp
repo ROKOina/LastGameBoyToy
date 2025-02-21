@@ -174,8 +174,12 @@
             points[i].x = frames[i];
             points[i].y = values[i];
         }
-
-        return smooth ? ImGui::CurveValueSmooth(time, frames.size(), points) : ImGui::CurveValue(time, frames.size(), points);
+        float ret = smooth ? ImGui::CurveValueSmooth(time, frames.size(), points) : ImGui::CurveValue(time, frames.size(), points);
+        if (!isfinite(ret))
+        {
+            ret = 1;
+        }
+        return ret;
     }
 
         // シリアライズ
@@ -265,3 +269,144 @@
 
 // CEREALバージョン定義
 CEREAL_CLASS_VERSION(Curve, 1)
+
+EventCurve::EventCurve()
+{
+    frames.resize(5);
+    values.resize(5);
+    for (int i = 0; i < 5; i++)
+    {
+        frames[i] = (float)i / 4;
+        values[i] = (float)i / 4;
+    }
+
+    curvePoint = 0.0f;
+    selectedPoint = -1;
+    fitCurveInEditor = false;
+    isSelectable = false;
+    isHovered = false;
+}
+
+EventCurve::EventCurve(int count)
+{
+    frames.resize(count);
+    values.resize(count);
+    for (int i = 0; i < count; i++)
+    {
+        float px = (float)i / float(count - 1);
+        frames[i] = px;
+        values[i] = px;
+    }
+
+    curvePoint = 0.0f;
+    selectedPoint = -1;
+    fitCurveInEditor = false;
+    isSelectable = false;
+    isHovered = false;
+}
+
+bool EventCurve::ShowGraph(std::string guiname)
+{
+    bool out = false;
+    int changed_idx = -1;
+
+    //ImGui::Label(guiname.c_str());
+    void* unique_id = reinterpret_cast<void*>(&guiname);
+    ImGui::PushID(unique_id);
+    if (ImGui::TreeNode(guiname.c_str()))
+    {
+        ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - 20);
+        static ImVec2 size(-1, 200);
+
+        ImVec2 points[15];
+        assert(frames.size() < _countof(points));
+        for (int i = 0; i < frames.size(); ++i)
+        {
+            points[i].x = frames[i];
+            points[i].y = values[i];
+        }
+        int new_count;
+        float last_frame = frames.back();
+        int flags = (int)ImGui::CurveEditorFlags::NO_TANGENTS | (int)ImGui::CurveEditorFlags::SHOW_GRID;
+        if (fitCurveInEditor)
+        {
+            flags |= (int)ImGui::CurveEditorFlags::RESET;
+            fitCurveInEditor = false;
+        }
+
+        isHovered = false;
+        changed_idx = ImGui::CurveEditor("curve", (float*)points, (int)frames.size(), _countof(points), size, flags, &new_count, &selectedPoint, curvePoint, &isSelectable, &isHovered);
+        if (changed_idx >= 0)
+        {
+            frames[changed_idx] = points[changed_idx].x;
+            values[changed_idx] = points[changed_idx].y;
+            frames.back() = last_frame;
+            frames[0] = 0;
+        }
+        if (new_count != frames.size())
+        {
+            frames.resize(new_count);
+            values.resize(new_count);
+            for (int i = 0; i < new_count; ++i)
+            {
+                frames[i] = points[i].x;
+                values[i] = points[i].y;
+            }
+        }
+        if (isSelectable)
+        {
+            for (int i = 0; i < new_count; ++i)
+            {
+                frames[i] = points[i].x;
+                values[i] = points[i].y;
+            }
+            isSelectable = false;
+            out = true;
+        }
+
+        ImGui::PopItemWidth();
+
+        if (ImGui::BeginPopupContextItem("curve"))
+        {
+            if (ImGui::Selectable("Fit data")) fitCurveInEditor = true;
+
+            ImGui::EndPopup();
+        }
+
+        bool changed = false;
+        if (selectedPoint >= 0 && selectedPoint < frames.size())
+        {
+            ImGui::Label("Frame");
+            ImGui::DragFloat("##frame", &curvePoint, 0.005f, 0.0f);
+            ImVec2 value_you_care_about;
+            value_you_care_about.x = ImGui::CurveValue(curvePoint, static_cast<int>(frames.size()), points);
+            value_you_care_about.y = ImGui::CurveValueSmooth(curvePoint, static_cast<int>(frames.size()), points);
+            ImGui::Label("FrameValue:(normal,smooth)");
+            ImGui::InputFloat2("##frameval", &value_you_care_about.x);
+        }
+
+        ImGui::HSplitter("sizer", &size);
+        auto f = ImGui::GetCurrentWindow()->Flags;
+
+        if (isHovered)ImGui::GetCurrentWindow()->Flags = f | ImGuiWindowFlags_NoScrollWithMouse;
+        else ImGui::GetCurrentWindow()->Flags &= ~ImGuiWindowFlags_NoScrollWithMouse;
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+
+
+    return out || (changed_idx >= 0);
+}
+
+float EventCurve::Evaluate(float time, bool smooth)
+{
+    ImVec2 points[15];
+    assert(frames.size() < _countof(points));
+    for (int i = 0; i < frames.size(); ++i)
+    {
+        points[i].x = frames[i];
+        points[i].y = values[i];
+    }
+
+    return smooth ? ImGui::CurveValueSmooth(time, static_cast<int>(frames.size()), points) : ImGui::CurveValue(time, static_cast<int>(frames.size()), points);
+}

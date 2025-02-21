@@ -9,6 +9,9 @@ void EventSpriteShaftScaleBehavior::EventMoveInitialize()
 
 void EventSpriteShaftScaleBehavior::Update()
 {
+#ifdef DEBUG
+    if (!m_debugEnable)return;
+#endif // DEBUG
     if (m_decisionEnable) return;// 動作が完了したら更新させない
 
     EventMoveParameterBehaviorBase::TimerUpdate();

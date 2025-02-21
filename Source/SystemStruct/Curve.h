@@ -12,13 +12,13 @@ public:
     ~Curve() = default;
 
     // ComponentのOnPropertyGUI内等で呼ぶ
-    bool ShowGraph(std::string guiname);
+    virtual bool ShowGraph(std::string guiname);
 
     // ファイルの名前(***.curve)
     void LoadCurve(std::string filename);
 
     // 指定された時間のカーブの値
-    float Evaluate(float time, bool smooth = true);
+    virtual float Evaluate(float time, bool smooth = true);
 
     //ファイルパス取得
     const std::string& GetFilePath() const { return filepath; }
@@ -47,6 +47,16 @@ private:
 
 class EventCurve : public Curve
 {
+public:
+    EventCurve();
+    EventCurve(int count);
+    ~EventCurve() = default;
+
+    // ComponentのOnPropertyGUI内等で呼ぶ
+    bool ShowGraph(std::string guiname)override;
+
+    // 指定された時間のカーブの値
+    float Evaluate(float time, bool smooth = true);
 private:
     friend class cereal::access;
     template <class Archive>

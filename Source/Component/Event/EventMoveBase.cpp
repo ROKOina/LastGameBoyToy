@@ -38,16 +38,22 @@ void EventMoveParameterBehaviorBase::Start()
 
 void EventMoveParameterBehaviorBase::OnGUI()
 {
+#ifdef DEBUG
     if (ImGui::TreeNode((char*)u8"éËìÆâèúÅ¶Ç†Ç‹ÇËêGÇÁÇ»Ç≠ÇƒÇ¢Ç¢Ç≈Ç∑"))
     {
         ImGui::Checkbox("EventUpdateEnable", &m_eventUpdateEnable);
         ImGui::TreePop();
     }
 
-    if (ImGui::SliderFloat("##Timeline", &m_timer, 0, m_duration, "current frame = %.3f"))
+    if (!m_eventUpdateEnable)
     {
-        m_decisionEnable = false;
+        ImGui::Checkbox("DebugUpdate", &m_debugEnable);
+        if (ImGui::SliderFloat("##Timeline", &m_timer, 0, m_duration, "current frame = %.3f"))
+        {
+            m_decisionEnable = false;
+        }
     }
+
     ImGui::Checkbox("StartInitializeEnable", &m_startInitializeEnable);
     ImGui::Checkbox("Is Auto Initialize", &m_autoInitializeEnable);
     if (!m_eventUpdateEnable)
@@ -66,6 +72,7 @@ void EventMoveParameterBehaviorBase::OnGUI()
     }
 
     m_curve.ShowGraph("Ease Curve");
+#endif // DEBUG
 }
 
 void EventMoveDefaultValueBase::OnGUI()

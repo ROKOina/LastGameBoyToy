@@ -34,6 +34,13 @@ void EventDirectEditor::OnDraw(std::weak_ptr<GameObject> selectionGameObject)
     if (debugUpdateEnable)
     {
         eventDirectBehavior.lock()->DebugEventUpdate();
+        for (auto item : eventDirect->_EventItems)
+        {
+            if (auto inflexionEvent = std::dynamic_pointer_cast<EventMoveParameterBase>(item.second))
+            {
+                inflexionEvent->_event.lock()->m_debugEnable = debugUpdateEnable;
+            }
+        }
     }
     if (ImGui::Button((char*)u8"保存"))
     {
@@ -233,6 +240,13 @@ void EventDirectEditor::OnDraw(std::weak_ptr<GameObject> selectionGameObject)
     if (ImGui::Button(setPlayButtonName.c_str()))
     {
         playEnable = !playEnable;
+        for (auto item : eventDirect->_EventItems)
+        {
+            if (auto inflexionEvent = std::dynamic_pointer_cast<EventMoveParameterBase>(item.second))
+            {
+                inflexionEvent->_event.lock()->m_decisionEnable = false;
+            }
+        }
     }
     ImGui::SameLine();
     if (playEnable)
@@ -292,7 +306,13 @@ void EventDirectEditor::OnDraw(std::weak_ptr<GameObject> selectionGameObject)
         ImSequencer::SEQUENCER_EDIT_ALL, retType))
     {
         changeEnable = true;
-
+        for (auto item : eventDirect->_EventItems)
+        {
+            if (auto inflexionEvent = std::dynamic_pointer_cast<EventMoveParameterBase>(item.second))
+            {
+                inflexionEvent->_event.lock()->m_decisionEnable = false;
+            }
+        }
         if (selectedEntry != -1)
         {
             auto currentEventIt = eventDirect->_EventItems.find(eventDirect->EventNames_[selectedEntry]);

@@ -9,6 +9,9 @@ void EventSpriteShaftAngleBehavior::EventMoveInitialize()
 
 void EventSpriteShaftAngleBehavior::Update()
 {
+#ifdef DEBUG
+    if (!m_debugEnable)return;
+#endif // DEBUG
     if (m_decisionEnable) return;// 動作が完了したら更新させない
 
     EventMoveParameterBehaviorBase::TimerUpdate();

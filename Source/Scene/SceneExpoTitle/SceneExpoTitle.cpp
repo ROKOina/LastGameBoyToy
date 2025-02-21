@@ -112,7 +112,7 @@ void SceneExpoTitle::Initialize()
         title->transform_->SetWorldPosition({ -1, 0, 0 });
         title->transform_->SetScale(2.740f);
         title->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlebackUI.spc", SpriteCom::SpriteShader::DEFALT);
-        title->AddComponent<EventMove>("");
+        title->AddComponent<EventMove>("Data/Event/MoveParam/titleBack.evm");
     }
     {
         std::shared_ptr<GameObject> title = GameObjectManager::Instance().Create();
@@ -120,7 +120,7 @@ void SceneExpoTitle::Initialize()
         title->transform_->SetWorldPosition({ 700.000, 247.000, 0 });
         title->transform_->SetScale(0.620);
         title->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleUI.spc", SpriteCom::SpriteShader::DEFALT);
-        title->AddComponent<EventMove>("");
+        title->AddComponent<EventMove>("Data/Event/MoveParam/titleRogo.evm");
     }
     //PVE
     {
@@ -129,7 +129,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 470.000, 0 });
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlepveUI.spc", SpriteCom::SpriteShader::DEFALT);
-        next->AddComponent<EventMove>("");
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titlePve.evm");
     }
     //PVP
     {
@@ -138,7 +138,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 570.000, 0 });
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titilepvpUI.spc", SpriteCom::SpriteShader::DEFALT);
-        next->AddComponent<EventMove>("");
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titlePvp.evm");
     }
     //トレーニング
     {
@@ -147,7 +147,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 670.000, 0 });
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titileTraining.spc", SpriteCom::SpriteShader::DEFALT);
-        next->AddComponent<EventMove>("");
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleTraining.evm");
     }
     
     //クレジット
@@ -157,7 +157,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 815.000, 0 });
         next->transform_->SetScale(0.590);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlecredit.spc", SpriteCom::SpriteShader::DEFALT);
-        next->AddComponent<EventMove>("");
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleCredit.evm");
     }
     
     //ゲーム終了
@@ -167,7 +167,7 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetWorldPosition({ 214.000, 896.000, 0 });
         next->transform_->SetScale(0.590);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleendgameUI.spc", SpriteCom::SpriteShader::DEFALT);
-        next->AddComponent<EventMove>("");
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleEndGame.evm");
     }
     
     //セレクト棒
@@ -180,8 +180,8 @@ void SceneExpoTitle::Initialize()
     // 開始イベント
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("IntroUI");
-        obj->AddComponent<EventDirectCom>("");
+        obj->SetName("IntroUIEvent");
+        obj->AddComponent<EventDirectCom>("Data/Event/TitleIntroUI.edm");
     }
 
     //クレジット

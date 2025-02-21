@@ -75,6 +75,10 @@ protected:
     bool  m_decisionEnable          = false;
     bool  m_startInitializeEnable   = true;
     bool  m_eventUpdateEnable       = false;
+
+#ifdef DEBUG
+    bool  m_debugEnable = false;
+#endif // DEBUG
 public:
     // “o˜^”Ô†¦ŠO•”‚©‚ç‘‚«Š·‚¦‚È‚¢‚Å‚­‚¾‚³‚¢
     float m_registerId = -1;
