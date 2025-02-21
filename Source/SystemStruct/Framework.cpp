@@ -220,6 +220,9 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
     //imgui‚Ìƒnƒ“ƒhƒ‹
     IMGUI_CTRL_WND_PRC_HANDLER(hWnd, msg, wParam, lParam);
 
+    //Input::Instance().GetMouse().SetDoubleClick(msg);
+    input_.GetMouse().SetDoubleClick(msg);
+
     switch (msg)
     {
     case WM_PAINT:

@@ -16,6 +16,7 @@ void TimeManager::Update(const float& elapsedTime)
 //imgui
 void TimeManager::ImGui()
 {
+#ifdef DEBUG
     if (!Framework::GetInstance()->isImgui)return;
     ImGui::Begin("TimeManager");
     ImGui::DragFloat("TimeScale", &m_timescale, 0.1f, 0.1f, 10.0f);
@@ -23,4 +24,5 @@ void TimeManager::ImGui()
 
     ImGui::Text("ElapsedTime: %.3f", m_elapsedtime); // Œ»İ‚ÌŒo‰ßŠÔ‚ğ•\¦
     ImGui::End();
+#endif // DEBUG
 }

@@ -15,6 +15,7 @@ class InstanceRenderer;
 class Collider;
 class PushBackCom;
 class Sprite;
+class SpriteCom;
 class Decal;
 class PostEffect;
 class Trail;
@@ -297,6 +298,7 @@ private:
 
     //スプライト描画
     std::vector<std::weak_ptr<Sprite>>spriteobject;
+    std::vector<std::weak_ptr<SpriteCom>>spriteComobject;
 
     //Font描画
     std::vector<std::weak_ptr<Font>>fontobject;

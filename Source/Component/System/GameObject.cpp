@@ -9,6 +9,7 @@
 #include "Component/Particle/GPUParticle.h"
 #include "Component/Camera/FreeCameraCom.h"
 #include "Component/Sprite/Sprite.h"
+#include "Component/Sprite/SpriteCom.h"
 #include "Component/Renderer/InstanceRendererCom.h"
 #include "Component\Renderer\DecalCom.h"
 #include "Component\PostEffect\PostEffect.h"
@@ -465,21 +466,6 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
     if (selectObject.find(obj) != selectObject.end())
     {
         nodeFlags |= ImGuiTreeNodeFlags_Selected;
-
-        if (ImGui::IsMouseDoubleClicked(0))
-        {
-            ImGuiIO& io = ImGui::GetIO();
-
-            // ImGui上にマウスカーソルがある場合は処理しない
-            if (!io.WantCaptureMouse) return;
-
-            auto& f = GameObjectManager::Instance().Find("freecamera");
-            if (f)
-            {
-                f->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
-                f->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
-            }
-        }
     }
 
     //子がいないなら、▼付けない
@@ -496,6 +482,17 @@ void CycleDrawLister(std::shared_ptr<GameObject> obj, std::set<std::shared_ptr<G
         // 単一選択だけ対応しておく
         selectObject.clear();
         selectObject.insert(obj);
+
+        // ダブルクリックでカメラの注視点を選択したオブジェクトの位置と同じにする
+        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+        {
+            auto& f = GameObjectManager::Instance().Find("freecamera");
+            if (f)
+            {
+                f->GetComponent<FreeCameraCom>()->SetFocusPos(obj->transform_->GetWorldPosition());
+                f->GetComponent<FreeCameraCom>()->SetDistance(5.0f);
+            }
+        }
     }
 
     if (!openNode)return;
@@ -632,6 +629,17 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
     //レイヤー順にソートする
     std::sort(spriteobject.begin(), spriteobject.end(),
         [&](std::weak_ptr<Sprite>& left, std::weak_ptr<Sprite>& right) {
+            return left.lock()->GetOrderinLayer() < right.lock()->GetOrderinLayer();
+        });
+    //スプライトオブジェクトがあれば入る
+    std::shared_ptr<SpriteCom>spriteCom = obj->GetComponent<SpriteCom>();
+    if (spriteCom)
+    {
+        spriteComobject.emplace_back(spriteCom);
+    }
+    //レイヤー順にソートする
+    std::sort(spriteComobject.begin(), spriteComobject.end(),
+        [&](std::weak_ptr<SpriteCom>& left, std::weak_ptr<SpriteCom>& right) {
             return left.lock()->GetOrderinLayer() < right.lock()->GetOrderinLayer();
         });
 
@@ -1125,15 +1133,27 @@ void GameObjectManager::TrailRender()
 //スプライト描画
 void GameObjectManager::SpriteRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
-    if (spriteobject.size() <= 0)return;
-
-    for (std::weak_ptr<Sprite>& sp : spriteobject)
+    if (spriteobject.size() > 0)
     {
-        if (!sp.lock()->GetGameObject()->GetEnabled())continue;
-        if (!sp.lock()->GetEnabled())continue;
+        for (std::weak_ptr<Sprite>& sp : spriteobject)
+        {
+            if (!sp.lock()->GetGameObject()->GetEnabled())continue;
+            if (!sp.lock()->GetEnabled())continue;
 
-        if (IsParentEnable(sp.lock()->GetGameObject()))
-            sp.lock()->Render(view, projection);
+            if (IsParentEnable(sp.lock()->GetGameObject()))
+                sp.lock()->Render(view, projection);
+        }
+    }
+    if (spriteComobject.size() > 0)
+    {
+        for (std::weak_ptr<SpriteCom>& sp : spriteComobject)
+        {
+            if (!sp.lock()->GetGameObject()->GetEnabled())continue;
+            if (!sp.lock()->GetEnabled())continue;
+
+            if (IsParentEnable(sp.lock()->GetGameObject()))
+                sp.lock()->Render(view, projection);
+        }
     }
 }
 

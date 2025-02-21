@@ -92,7 +92,7 @@ SpriteCom::SpriteCom(const char* filename, SpriteShader spriteshader)
     }
 
     //ファイル読み込み処理
-    if (filename)
+    if (filename != "")
     {
         this->filename = filename;
         Deserialize(filename);
@@ -236,7 +236,7 @@ void SpriteCom::Draw(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4&
     Vertex* vertices = reinterpret_cast<Vertex*>(mapped_subresource.pData);
     if (vertices != nullptr)
     {
-        for (int i = 0; i++; i < 4)
+        for (int i = 0; i < 4; i++)
         {
             vertices[i].position = DirectX::XMFLOAT3(positions[i].x, positions[i].y, 0);
             vertices[i].texcoord = texcoords[i];
@@ -272,6 +272,25 @@ void SpriteCom::DrawEnd()
 
 void SpriteCom::OnGUI()
 {
+#ifdef DEBUG
+    if (ImGui::IsKeyDown(ImGuiKey_LeftShift))
+    {
+        const Mouse& mouse = Input::Instance().GetMouse();
+        Vector2 mousePos = { (float)(mouse.GetPositionX()) ,(float)(mouse.GetPositionY()) };
+        if (Mouse::BTN_LEFT & mouse.GetButtonDown())
+        {
+            Vector2 rectPos = { GetGameObject()->transform_->GetWorldPosition().x,GetGameObject()->transform_->GetWorldPosition().y };
+            offsetPos = (rectPos - mousePos);
+        }
+
+        if (Mouse::BTN_LEFT & mouse.GetButton())
+        {
+            Vector2 setPos = (offsetPos + mousePos);
+            GetGameObject()->transform_->SetWorldPosition({ setPos.x, setPos.y, 0 });
+        }
+    }
+#endif // DEBUG
+
     if (ImGui::Button((char*)u8"保存"))
     {
         Serialize();
@@ -324,6 +343,59 @@ void SpriteCom::OnGUI()
     ImGui::Text("Resource Preview");
     ImGui::Image(shaderResourceView_.Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
+    ImGui::Separator();
+    if (ImGui::Button("Right Up      "))
+    {
+        spc.pivot = { 0,0 };
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Center Up     "))
+    {
+        
+        spc.pivot = { static_cast<float>(texture2ddesc_.Width) * 0.5f,0 };
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Left Up      "))
+    {
+        spc.pivot = { static_cast<float>(texture2ddesc_.Width) ,0 };
+    }
+    if (ImGui::Button("Right Center"))
+    {
+        spc.pivot = { 0,static_cast<float>(texture2ddesc_.Height) * 0.5f };
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Center          "))
+    {
+        spc.pivot = { static_cast<float>(texture2ddesc_.Width) * 0.5f,static_cast<float>(texture2ddesc_.Height) * 0.5f };
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Left Center"))
+    {
+        spc.pivot = { static_cast<float>(texture2ddesc_.Width) ,static_cast<float>(texture2ddesc_.Height) * 0.5f };
+    }
+    if (ImGui::Button("Right Down  "))
+    {
+        spc.pivot = { 0,static_cast<float>(texture2ddesc_.Height) };
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Center Down"))
+    {
+        spc.pivot = { static_cast<float>(texture2ddesc_.Width) * 0.5f,static_cast<float>(texture2ddesc_.Height) };
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Left Down "))
+    {
+        spc.pivot = { static_cast<float>(texture2ddesc_.Width) ,static_cast<float>(texture2ddesc_.Height) };
+    }
+    ImGui::DragFloat2("Pivot", &spc.pivot.x);
+    ImGui::Separator();
+    
+    ImGui::DragFloat2("TexSize", &spc.texSize.x);
+
+    ImGui::DragFloat2("TexPos", &spc.texPos.x);
+    
+    ImGui::ColorEdit4("Sprite Color", &spc.color.x);
+
     // ブレンドモード設定
     constexpr const char* BlendName[] =
     {
@@ -344,6 +416,7 @@ void SpriteCom::OnGUI()
 
 void SpriteCom::LoadTexture(std::string filename)
 {
+    spc.filename = filename;
     shaderResourceView_ = nullptr;
     LoadTextureFromFile(Graphics::Instance().GetDevice(), spc.filename.c_str(), shaderResourceView_.GetAddressOf(), &texture2ddesc_);
     spc.texSize.x = texture2ddesc_.Width;
@@ -358,6 +431,7 @@ void SpriteCom::Serialize()
     DialogResult result = Dialog::SaveFileName(filename, sizeof(filename), filter, nullptr, "spc", Graphics::Instance().GetHwnd());
     if (result == DialogResult::OK)
     {
+        this->filename = filename;
         std::ofstream ostream(filename, std::ios::binary);
         if (ostream.is_open())
         {

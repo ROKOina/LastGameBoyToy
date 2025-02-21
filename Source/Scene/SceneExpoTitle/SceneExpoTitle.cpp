@@ -27,6 +27,7 @@
 #include "Component\UI\Font.h"
 #include <Component\Event\EventMove.h>
 #include "Component\Event\EventDirectCom.h"
+#include <Component\Sprite\SpriteCom.h>
 
 SceneExpoTitle::~SceneExpoTitle()
 {
@@ -105,58 +106,72 @@ void SceneExpoTitle::Initialize()
         obj->AddComponent<GPUParticle>("Data/SerializeData/GPUEffect/snow.gpuparticle", 10000);
     }
 
-    ////キャンバス
-    //{
-    //    auto& obj = GameObjectManager::Instance().Create();
-    //    obj->SetName("Canvas");
-
-    //    //タイトル
-    //    {
-    //        auto& title = obj->AddChildObject();
-    //        title->SetName("title");
-    //        title->AddComponent<Sprite>("Data/SerializeData/UIData/titleScene/title.ui", Sprite::SpriteShader::CHROMATICABERRATION, false);
-    //    }
-
-    //    //PVE
-    //    {
-    //        auto& next = obj->AddChildObject();
-    //        next->SetName("PVE");
-    //        next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVE.ui", Sprite::SpriteShader::GLITCH, true);
-    //    }
-    //    //PVP
-    //    {
-    //        auto& next = obj->AddChildObject();
-    //        next->SetName("PVP");
-    //        next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/PVP.ui", Sprite::SpriteShader::GLITCH, true);
-    //    }
-    //    //トレーニング
-    //    {
-    //        auto& next = obj->AddChildObject();
-    //        next->SetName("Training");
-    //        next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Training.ui", Sprite::SpriteShader::GLITCH, true);
-    //    }
-
-    //    //クレジット
-    //    {
-    //        auto& next = obj->AddChildObject();
-    //        next->SetName("credit");
-    //        next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/Credit.ui", Sprite::SpriteShader::GLITCH, true);
-    //    }
-
-    //    //ゲーム終了
-    //    {
-    //        auto& next = obj->AddChildObject();
-    //        next->SetName("endgame");
-    //        next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/endgame.ui", Sprite::SpriteShader::GLITCH, true);
-    //    }
-
-    //    //セレクト棒
-    //    {
-    //        auto& next = obj->AddChildObject();
-    //        next->SetName("selectBow");
-    //        next->AddComponent<Sprite>("Data/SerializeData/UIData/selectScene/selectBow.ui", Sprite::SpriteShader::DEFALT, false);
-    //    }
-    //}
+    {
+        std::shared_ptr<GameObject> title = GameObjectManager::Instance().Create();
+        title->SetName("TitleBack");
+        title->transform_->SetWorldPosition({ -1, 0, 0 });
+        title->transform_->SetScale(2.740f);
+        title->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlebackUI.spc", SpriteCom::SpriteShader::DEFALT);
+        title->AddComponent<EventMove>("");
+    }
+    {
+        std::shared_ptr<GameObject> title = GameObjectManager::Instance().Create();
+        title->SetName("Title");
+        title->transform_->SetWorldPosition({ 700.000, 247.000, 0 });
+        title->transform_->SetScale(0.620);
+        title->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleUI.spc", SpriteCom::SpriteShader::DEFALT);
+        title->AddComponent<EventMove>("");
+    }
+    //PVE
+    {
+    std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("PVE");
+        next->transform_->SetWorldPosition({ 214.000, 470.000, 0 });
+        next->transform_->SetScale(0.730);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlepveUI.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("");
+    }
+    //PVP
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("PVP");
+        next->transform_->SetWorldPosition({ 214.000, 570.000, 0 });
+        next->transform_->SetScale(0.730);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titilepvpUI.spc", SpriteCom::SpriteShader::DEFALT);
+    }
+    //トレーニング
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("Training");
+        next->transform_->SetWorldPosition({ 214.000, 670.000, 0 });
+        next->transform_->SetScale(0.730);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titileTraining.spc", SpriteCom::SpriteShader::DEFALT);
+    }
+    
+    //クレジット
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("credit");
+        next->transform_->SetWorldPosition({ 214.000, 815.000, 0 });
+        next->transform_->SetScale(0.590);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlecredit.spc", SpriteCom::SpriteShader::DEFALT);
+    }
+    
+    //ゲーム終了
+    {
+        auto& next = GameObjectManager::Instance().Create();
+        next->SetName("endgame");
+        next->transform_->SetWorldPosition({ 214.000, 896.000, 0 });
+        next->transform_->SetScale(0.590);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleendgameUI.spc", SpriteCom::SpriteShader::DEFALT);
+    }
+    
+    //セレクト棒
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("selectBow");
+        next->AddComponent<SpriteCom>("", SpriteCom::SpriteShader::DEFALT);
+    }
 
     //クレジット
     {

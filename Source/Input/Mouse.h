@@ -56,6 +56,8 @@ public:
     // ƒXƒNƒŠ[ƒ“‚‚³æ“¾
     int GetScreenHeight() const { return screenHeight_; }
 
+    bool GetDoubleClick() { return (leftDable == WM_LBUTTONDBLCLK); }
+    void SetDoubleClick(UINT msg) { leftDable = msg; }
 private:
     MouseButton		buttonState_[2] = { 0 };
     MouseButton		buttonDown_ = 0;
@@ -66,4 +68,5 @@ private:
     int				screenWidth_ = 0;
     int				screenHeight_ = 0;
     HWND			hWnd_ = nullptr;
+    UINT 		leftDable = {};
 };

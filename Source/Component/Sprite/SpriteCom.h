@@ -95,4 +95,9 @@ private:
     std::vector <std::function<void()>>	drawStart;
     std::string filename = "";
     COPY_VARIABLE()
+
+#ifdef DEBUG
+    Vector2 offsetPos{};
+#endif // DEBUG
+
 };

@@ -13,6 +13,7 @@ void TransformCom::Update(float elapsedTime)
 // GUI描画
 void TransformCom::OnGUI()
 {
+#ifdef DEBUG
     //ローカルポジション
     ImGui::DragFloat3("Position", &localPosition_.x, 0.1f);
 
@@ -32,7 +33,21 @@ void TransformCom::OnGUI()
         SetEulerRotation(euler);
     }
 
-    ImGui::DragFloat3("Scale", &scale_.x, 0.001f);
+    if (!m_MatchScale)
+    {
+       ImGui::DragFloat3("Scale", &scale_.x, 0.01f);
+    }
+    else
+    {
+        if (ImGui::DragFloat("Scale", &scale_.x, 0.01f))
+        {
+            scale_.y = scale_.z = scale_.x;
+        }
+    }
+
+    ImGui::SameLine();
+    ImGui::Checkbox("##m_MatchScale", &m_MatchScale);
+#endif // DEBUG
 }
 
 //行列更新

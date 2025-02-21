@@ -69,6 +69,7 @@ public:
 
     // スケール
     void SetScale(const DirectX::XMFLOAT3& scale) { this->scale_ = scale; }
+    void SetScale(float scale) { this->scale_.x = this->scale_.y = this->scale_.z = scale; }
     const DirectX::XMFLOAT3& GetScale() const { return scale_; }
 
     //親行列
@@ -116,4 +117,9 @@ private:
     DirectX::XMFLOAT4X4	worldTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     DirectX::XMFLOAT4X4	localTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     DirectX::XMFLOAT4X4 parentTransform_ = DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+#ifdef DEBUG
+    bool m_MatchScale = false;
+#endif // DEBUG
+
 };
