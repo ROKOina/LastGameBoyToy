@@ -1,12 +1,12 @@
 #pragma once
 #include "SpriteCom.h"
 
-// スプライト描画用コンポーネント
+// スプライト当たり判定用コンポーネント
 class SpriteCollisionCom :public Component
 {
+    friend class SpriteCom;
 public:
-
-    SpriteCollisionCom(std::shared_ptr<SpriteCom> spr);
+    SpriteCollisionCom();
     ~SpriteCollisionCom() {}
 
     //初期設定
@@ -32,15 +32,20 @@ private:
     //マウスカーソルとコリジョンボックスの当たり判定
     bool cursorVsCollsionBox();
 
+    void SetHitSprite(bool h) { hit = h; }
 public:
 
     //カーソルがスプライトに当たっているか
-    bool GetHitSpriteCollisionCom() { return hit; }
-    void SetHitSpriteCollisionCom(bool h) { hit = h; }
+    bool GetHitSprite() { return hit; }
 
     //カーソルがスプライトに当たった瞬間
-    bool GetHitSpriteCollisionComEnter() { return hitEnter; }
+    void SetHitSpriteEnter(std::function<void()> callBack) { hitEnter.emplace_back() = callBack; }
 
+    // カーソルがスプライトから離れた瞬間
+    void SetHitSpriteExit(std::function<void()> callBack) { hitExit.emplace_back() = callBack; }
+
+    void SetOffsetScale(Vector2 scale) { offsetScale = scale; }
+    void SetOffsetScale(float scale) { offsetScale.x = offsetScale.y = scale; }
 private:
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	collsionshaderResourceView_;
@@ -49,8 +54,11 @@ private:
     std::weak_ptr<SpriteCom> spr;
     bool drawcollsion = false;
     bool hit = false;
-    bool hitEnter = false;
-    bool ontriiger = false;
 
-    DirectX::XMFLOAT2 collisionPivot;
+    bool ontriiger = true;
+
+    std::vector <std::function<void()>> hitEnter;
+    std::vector <std::function<void()>>	hitExit;
+
+    Vector2 offsetScale = { 0,0 };
 };

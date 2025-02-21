@@ -14,6 +14,7 @@
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
 #include "Scene\SceneTitle\SceneTitle.h"
+#include "Scene\SceneExpoTitle\SceneExpoTitle.h"
 
 std::wstring stringconvert(const std::string& str)
 {
@@ -513,6 +514,7 @@ void SceneResult::EventCamera(float elapsedTime)
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (GamePad::ENTER & gamePad.GetButtonDown())
     {
-        SceneManager::Instance().ChangeScene(new SceneTitle);
+        //SceneManager::Instance().ChangeScene(new SceneTitle);   
+        SceneManager::Instance().ChangeScene(new SceneExpoTitle);
     }
 }

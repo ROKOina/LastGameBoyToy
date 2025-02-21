@@ -162,6 +162,7 @@ void EventDirectCom::EventReversePlay()
     {
         spc.reversePlayEnable = true;
         playEnable = true;
+        decisionEnable = false;
         for (auto eventItem : spc.eventData->_EventItems)
         {
             eventItem.second->_FunctionDecisionEnable = false;
@@ -184,6 +185,7 @@ void EventDirectCom::EventStop()
 void EventDirectCom::EventResume()
     {
         playEnable = true;
+        decisionEnable = false;
         for (auto eventItem : spc.eventData->_EventItems)
         {
             eventItem.second->_FunctionDecisionEnable = false;

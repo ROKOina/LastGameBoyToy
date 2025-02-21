@@ -15,6 +15,7 @@
 #include "Component\UI\Font.h"
 #include "Setting/Setting.h"
 #include "Scene\SceneTitle\SceneTitle.h"
+#include "Scene\SceneExpoTitle\SceneExpoTitle.h"
 #include <Component/UI/UiSystem.h>
 #include <Component/Character/RegisterChara.h>
 
@@ -56,7 +57,8 @@ void PVEDirection::Setting()
 
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
         {
-            SceneManager::Instance().ChangeScene(new SceneTitle);
+            //SceneManager::Instance().ChangeScene(new SceneTitle);
+            SceneManager::Instance().ChangeScene(new SceneExpoTitle);
         }
     }
     else

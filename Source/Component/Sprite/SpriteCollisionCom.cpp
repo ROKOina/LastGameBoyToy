@@ -4,15 +4,15 @@
 #include "Graphics/Texture.h"
 #include "Math/easing.h"
 
-SpriteCollisionCom::SpriteCollisionCom(std::shared_ptr<SpriteCom> spr)
+SpriteCollisionCom::SpriteCollisionCom()
 {
     ID3D11Device* device = Graphics::Instance().GetDevice();
-    this->spr = spr;
     LoadTextureFromFile(device, "Data\\Texture\\collsionbox.png", collsionshaderResourceView_.GetAddressOf(), &collisionTexture2ddesc_);
 }
 
 void SpriteCollisionCom::Start()
 {
+    spr = GetGameObject()->GetComponent<SpriteCom>();
 }
 
 void SpriteCollisionCom::Update(float elapsedTime)
@@ -23,12 +23,34 @@ void SpriteCollisionCom::Update(float elapsedTime)
     if (cursorVsCollsionBox())
     {
         //当たった瞬間を記録
-        (hit == false) ? hitEnter = true : hitEnter = false;
+        if (hit == false)
+        {
+            for (auto& enter : hitEnter)
+            {
+                if (enter != nullptr)
+                {
+                    // 登録された関数を実行
+                    enter();
+                }
+            }
+        }
 
         hit = true;
     }
     else
     {
+        // 離れた瞬間を記録
+        if (hit == true)
+        {
+            for (auto& exit : hitExit)
+            {
+                if (exit != nullptr)
+                {
+                    // 登録された関数を実行
+                    exit();
+                }
+            }
+        }
         hit = false;
     }
 }
@@ -63,7 +85,7 @@ void SpriteCollisionCom::DrawCollsionBox()
     dc->RSGetViewports(&num_viewports, &viewport);
 
     Vector2        position = { GetGameObject()->transform_->GetWorldPosition().x, GetGameObject()->transform_->GetWorldPosition().y };
-    Vector2        scale = { GetGameObject()->transform_->GetScale().x   , GetGameObject()->transform_->GetScale().y };
+    Vector2 scale = { GetGameObject()->transform_->GetScale().x + offsetScale.x, GetGameObject()->transform_->GetScale().y + offsetScale.y };
     float          angle = GetGameObject()->transform_->GetEulerRotation().z;
     const Vector2& texSize = spriteCom->spc.texSize;
     const Vector2& texPos = spriteCom->spc.texPos;
@@ -181,40 +203,25 @@ bool SpriteCollisionCom::cursorVsCollsionBox()
 {
     //マウスの位置
     Mouse& mouse = Input::Instance().GetMouse();
-    float mousePosx = mouse.GetPositionX();
-    float mousePosy = mouse.GetPositionY();
-
-    //法線ベクトル作成
-    float x{ sinf(DirectX::XMConvertToRadians(GetGameObject()->transform_->GetEulerRotation().z)) };
-    float y{ cosf(DirectX::XMConvertToRadians(GetGameObject()->transform_->GetEulerRotation().z)) };
-    DirectX::XMFLOAT2 normalUp = Mathf::Normalize({ x,y });
-    DirectX::XMFLOAT3 normalCross = Mathf::Cross({ normalUp.x,normalUp.y,0 }, { 0,0,1 });
-    DirectX::XMFLOAT2 normalRight = Mathf::Normalize({ normalCross.x,normalCross.y });
+    Vector2 mousePos = { static_cast<float>(mouse.GetPositionX()),static_cast<float>(mouse.GetPositionY())};
     auto spriteCom = spr.lock();
+    Vector2 center = { spriteCom->spc.texSize.x / 2 ,spriteCom->spc.texSize.y / 2 };
+    Vector2 pivot = { spriteCom->spc.pivot.x ,spriteCom->spc.pivot.y };
+    Vector2 pivotToCenterVec = center - pivot;
+    Vector2 pos = { GetGameObject()->transform_->GetWorldPosition().x ,GetGameObject()->transform_->GetWorldPosition().y };
+    Vector2 centerPos = pos + Normalize(pivotToCenterVec) * pivotToCenterVec.Length();
+    Vector2 scale = { GetGameObject()->transform_->GetScale().x , GetGameObject()->transform_->GetScale().y };
 
-    // スケール倍したテクスチャサイズ
-    Vector2        scale = { GetGameObject()->transform_->GetScale().x   , GetGameObject()->transform_->GetScale().y };
-    float texSizeX = spriteCom->spc.texSize.x * scale.x;
-    float texSizeY = spriteCom->spc.texSize.y * scale.y;
-
-    // 座標とピボットの処理
-    float pivotX = (spriteCom->spc.pivot.x / spriteCom->spc.texSize.x);
-    float pivotY = (spriteCom->spc.pivot.y / spriteCom->spc.texSize.y);
-
-    //カーソル位置からコリジョンボックスのベクトル
-    DirectX::XMFLOAT2 cur = { mousePosx ,mousePosy };
-    DirectX::XMFLOAT2 pos = { collisionPivot.x /*+ spc.collsionpositionoffset.x*/, collisionPivot.y /*+ spc.collsionpositionoffset.y*/ };
-    DirectX::XMFLOAT2 curVecPos = cur - pos;
-    curVecPos.y *= -1;
-
-    //長さを測る
-    float upLen = Mathf::Dot(normalUp, curVecPos);
-    float rightLen = Mathf::Dot(normalRight, curVecPos);
+    float left  = centerPos.x - (center.x * scale.x);
+    float Right = centerPos.x + (center.x * scale.x);
+    float Down  = centerPos.y - (center.y * scale.y);
+    float Up    = centerPos.y + (center.y * scale.y);
 
     //判定
-    scale = { (texSizeX / 2 /*+ spc.collsionscaleoffset.x*/),(texSizeY / 2 /*+ spc.collsionscaleoffset.y*/) };
-    if (upLen * upLen > scale.y * scale.y)return false;
-    if (rightLen * rightLen > scale.x * scale.x)return false;
+    if (left > mousePos.x)return false;
+    if (Right < mousePos.x)return false;
+    if (Down > mousePos.y)return false;
+    if (Up < mousePos.y)return false;
 
     return true;
 }

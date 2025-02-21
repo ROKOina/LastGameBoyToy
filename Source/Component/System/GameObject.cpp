@@ -643,6 +643,11 @@ void GameObjectManager::StartUpSaveComponent(std::shared_ptr<GameObject> obj)
             return left.lock()->GetOrderinLayer() < right.lock()->GetOrderinLayer();
         });
 
+    if (auto spriteCom = obj->GetComponent<SpriteCollisionCom>())
+    {
+        spriteCollision.emplace_back(spriteCom);
+    }
+
     //フォントオブジェクトがあれば入る
     std::shared_ptr<Font>fontcomp = obj->GetComponent<Font>();
     if (fontcomp)
@@ -1155,6 +1160,17 @@ void GameObjectManager::SpriteRender(const DirectX::XMFLOAT4X4& view, const Dire
                 sp.lock()->Render(view, projection);
         }
     }
+    if (spriteCollision.size() > 0)
+    {
+        for (std::weak_ptr<SpriteCollisionCom>& sp : spriteCollision)
+        {
+            if (!sp.lock()->GetGameObject()->GetEnabled())continue;
+            if (!sp.lock()->GetEnabled())continue;
+
+            if (IsParentEnable(sp.lock()->GetGameObject()))
+                sp.lock()->Render(view, projection);
+        }
+    }
 }
 
 void GameObjectManager::FontRender(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
@@ -1270,6 +1286,22 @@ void GameObjectManager::EraseComponet()
         if (spriteobject[spr].expired())
         {
             spriteobject.erase(spriteobject.begin() + spr);
+            --spr;
+        }
+    }
+    for (int spr = 0; spr < spriteComobject.size(); ++spr)
+    {
+        if (spriteComobject[spr].expired())
+        {
+            spriteComobject.erase(spriteComobject.begin() + spr);
+            --spr;
+        }
+    }
+    for (int spr = 0; spr < spriteCollision.size(); ++spr)
+    {
+        if (spriteCollision[spr].expired())
+        {
+            spriteCollision.erase(spriteCollision.begin() + spr);
             --spr;
         }
     }

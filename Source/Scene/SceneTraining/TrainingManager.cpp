@@ -32,6 +32,7 @@
 #include "Component\UI\Font.h"
 #include "Setting/Setting.h"
 #include "Scene\SceneTitle\SceneTitle.h"
+#include "Scene\SceneExpoTitle\SceneExpoTitle.h"
 
 TrainingManager::TrainingManager()
 {
@@ -219,7 +220,8 @@ void TrainingManager::Setting()
 
         if (GamePad::BTN_RIGHT_TRIGGER & gamePad.GetButtonDown())
         {
-            SceneManager::Instance().ChangeScene(new SceneTitle);
+            //SceneManager::Instance().ChangeScene(new SceneTitle);
+            SceneManager::Instance().ChangeScene(new SceneExpoTitle);
             TrainingManager::Instance().ChangeTrainigFlag();
         }
     }

@@ -1,8 +1,6 @@
 #include "SceneExpoTitle.h"
 
 #include "Input\Input.h"
-#include "Scene/SceneManager.h"
-#include "Scene/SceneLoading/SceneLoading.h"
 #include "Component\Renderer\RendererCom.h"
 #include "Component\Camera\CameraCom.h"
 #include "Component\Animation\AnimationCom.h"
@@ -11,8 +9,6 @@
 #include "Component\Character\InazawaCharacterCom.h"
 #include "Component\Collsion\RayCollisionCom.h"
 #include "Component/Camera/FreeCameraCom.h"
-#include "Scene/ScenePVE/ScenePVE.h"
-#include "Scene\ScenePVP\ScenePVP.h"
 #include "Component\PostEffect\PostEffect.h"
 #include "Component\Light\LightCom.h"
 #include "Component\Character\RegisterChara.h"
@@ -22,12 +18,13 @@
 #include <Component\Camera\FPSCameraCom.h>
 #include <Component\Camera\EventCameraCom.h>
 #include <Component\Camera\EventCameraManager.h>
-#include "Scene\SceneTraining\SceneTraining.h"
 #include "Component\Renderer\VideoCom.h"
 #include "Component\UI\Font.h"
 #include <Component\Event\EventMove.h>
 #include "Component\Event\EventDirectCom.h"
 #include <Component\Sprite\SpriteCom.h>
+#include <Component\Sprite\SpriteShaderControllerCom.h>
+#include "Component\TitleController\ExpoTitleControllerCom.h"
 
 SceneExpoTitle::~SceneExpoTitle()
 {
@@ -35,11 +32,13 @@ SceneExpoTitle::~SceneExpoTitle()
 
 void SceneExpoTitle::Initialize()
 {
+    std::shared_ptr<ExpoTitleControllerCom> titleController = nullptr;
     //ポストエフェクト
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("posteffect");
         std::shared_ptr<PostEffect>posteffect = obj->AddComponent<PostEffect>();
+        titleController = obj->AddComponent<ExpoTitleControllerCom>();
     }
 
     //フリーカメラ
@@ -113,6 +112,7 @@ void SceneExpoTitle::Initialize()
         title->transform_->SetScale(2.740f);
         title->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlebackUI.spc", SpriteCom::SpriteShader::DEFALT);
         title->AddComponent<EventMove>("Data/Event/MoveParam/titleBack.evm");
+        titleController->RegisterUIObj(title);
     }
     {
         std::shared_ptr<GameObject> title = GameObjectManager::Instance().Create();
@@ -121,15 +121,20 @@ void SceneExpoTitle::Initialize()
         title->transform_->SetScale(0.620);
         title->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleUI.spc", SpriteCom::SpriteShader::DEFALT);
         title->AddComponent<EventMove>("Data/Event/MoveParam/titleRogo.evm");
+        titleController->RegisterUIObj(title);
     }
+    float colliderOffsetScale = 0.2f;
     //PVE
     {
-    std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
         next->SetName("PVE");
         next->transform_->SetWorldPosition({ 214.000, 470.000, 0 });
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlepveUI.spc", SpriteCom::SpriteShader::DEFALT);
         next->AddComponent<EventMove>("Data/Event/MoveParam/titlePve.evm");
+        auto col= next->AddComponent<SpriteCollisionCom>();
+        col->SetOffsetScale(colliderOffsetScale);
+        titleController->RegisterUIObj(next);
     }
     //PVP
     {
@@ -139,6 +144,9 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titilepvpUI.spc", SpriteCom::SpriteShader::DEFALT);
         next->AddComponent<EventMove>("Data/Event/MoveParam/titlePvp.evm");
+        auto col = next->AddComponent<SpriteCollisionCom>();
+        col->SetOffsetScale(colliderOffsetScale);
+        titleController->RegisterUIObj(next);
     }
     //トレーニング
     {
@@ -148,6 +156,9 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetScale(0.730);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titileTraining.spc", SpriteCom::SpriteShader::DEFALT);
         next->AddComponent<EventMove>("Data/Event/MoveParam/titleTraining.evm");
+        auto col = next->AddComponent<SpriteCollisionCom>();
+        col->SetOffsetScale(colliderOffsetScale);
+        titleController->RegisterUIObj(next);
     }
     
     //クレジット
@@ -158,6 +169,9 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetScale(0.590);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titlecredit.spc", SpriteCom::SpriteShader::DEFALT);
         next->AddComponent<EventMove>("Data/Event/MoveParam/titleCredit.evm");
+        auto col = next->AddComponent<SpriteCollisionCom>();
+        col->SetOffsetScale(colliderOffsetScale);
+        titleController->RegisterUIObj(next);
     }
     
     //ゲーム終了
@@ -168,20 +182,69 @@ void SceneExpoTitle::Initialize()
         next->transform_->SetScale(0.590);
         next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleendgameUI.spc", SpriteCom::SpriteShader::DEFALT);
         next->AddComponent<EventMove>("Data/Event/MoveParam/titleEndGame.evm");
+        auto col = next->AddComponent<SpriteCollisionCom>();
+        col->SetOffsetScale(colliderOffsetScale);
+        titleController->RegisterUIObj(next);
     }
     
     //セレクト棒
     {
         std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
-        next->SetName("selectBow");
-        next->AddComponent<SpriteCom>("", SpriteCom::SpriteShader::DEFALT);
+        next->SetName("selectPVE");
+        next->transform_->SetWorldPosition({ 226.000, 504.000, 0 });
+        next->transform_->SetScale(0.750);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleSelectBand.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleSelectPVE.evm");
+        auto selectEvent = next->AddComponent<EventDirectCom>("Data/Event/titleSelectPVE.edm");
+        titleController->RegisterSelectEvent(selectEvent);
+    }
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("selectPVP");
+        next->transform_->SetWorldPosition({ 226.000, 604.000, 0 });
+        next->transform_->SetScale(0.750);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleSelectBand.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleSelectPVP.evm");
+        auto selectEvent = next->AddComponent<EventDirectCom>("Data/Event/titleSelectPVP.edm");
+        titleController->RegisterSelectEvent(selectEvent);
+    }
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("selectTraining");
+        next->transform_->SetWorldPosition({ 226.000, 704.000, 0 });
+        next->transform_->SetScale(0.750);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleSelectBand.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleSelectTraining.evm");
+        auto selectEvent = next->AddComponent<EventDirectCom>("Data/Event/titleSelectTraining.edm");
+        titleController->RegisterSelectEvent(selectEvent);
+    }
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("selectCredit");
+        next->transform_->SetWorldPosition({ 134.000, 845.000, 0 });
+        next->transform_->SetScale(0.750);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleSelectBand.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleSelectCredit.evm");
+        auto selectEvent = next->AddComponent<EventDirectCom>("Data/Event/titleSelectCredit.edm");
+        titleController->RegisterSelectEvent(selectEvent);
+    }
+    {
+        std::shared_ptr<GameObject> next = GameObjectManager::Instance().Create();
+        next->SetName("selectEndGame");
+        next->transform_->SetWorldPosition({ 134.000, 926.000, 0 });
+        next->transform_->SetScale(0.750);
+        next->AddComponent<SpriteCom>("Data/SerializeData/SpriteData/titleSelectBand.spc", SpriteCom::SpriteShader::DEFALT);
+        next->AddComponent<EventMove>("Data/Event/MoveParam/titleSelectEndGame.evm");
+        auto selectEvent = next->AddComponent<EventDirectCom>("Data/Event/titleSelectEndGame.edm");
+        titleController->RegisterSelectEvent(selectEvent);
     }
 
     // 開始イベント
     {
         std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
         obj->SetName("IntroUIEvent");
-        obj->AddComponent<EventDirectCom>("Data/Event/TitleIntroUI.edm");
+        auto introEvent = obj->AddComponent<EventDirectCom>("Data/Event/TitleIntroUI.edm");
+        titleController->SetIntroUIEvent(introEvent);
     }
 
     //クレジット
@@ -225,7 +288,7 @@ void SceneExpoTitle::Initialize()
     //コンスタントバッファの初期化
     ConstantBufferInitialize();
 
-    Audio2DMagaer::Instance().Audio2DPlay(titleAudioID, true);
+    Audio2DMagaer::Instance().Audio2DPlay(titleAudioID, 1.0f, true);
     Audio2DMagaer::Instance().Audio2DStop(AUDIOID2D::SCENE_LOBBY);
 
     //暗転からはじまるように

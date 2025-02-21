@@ -24,8 +24,8 @@ Framework::Framework(HWND hWnd)
     PhysXLib::Instance().Initialize();
 
     //指定したシーンを選択
-    SceneManager::Instance().ChangeScene(new SceneExpoTitle);
-    //SceneManager::Instance().ChangeScene(new SceneLGBT);
+    //SceneManager::Instance().ChangeScene(new SceneExpoTitle);
+    SceneManager::Instance().ChangeScene(new SceneLGBT);
 
 #ifdef _DEBUG
     //IMGUI初期化

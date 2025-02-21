@@ -141,6 +141,7 @@
     <ClInclude Include="Source\Component\Renderer\VideoCom.h" />
     <ClInclude Include="Source\Component\Sprite\SpriteCollisionCom.h" />
     <ClInclude Include="Source\Component\Sprite\SpriteCom.h" />
+    <ClInclude Include="Source\Component\Sprite\SpriteShaderControllerCom.h" />
     <ClInclude Include="Source\Component\Stage\JumpGimicCom.h" />
     <ClInclude Include="Source\Component\System\ButtonCom.h" />
     <ClInclude Include="Source\Component\System\CrownCom.h" />
@@ -323,6 +324,7 @@
     <ClCompile Include="Source\Component\Renderer\VideoCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\SpriteCollisionCom.cpp" />
     <ClCompile Include="Source\Component\Sprite\SpriteCom.cpp" />
+    <ClCompile Include="Source\Component\Sprite\SpriteShaderControllerCom.cpp" />
     <ClCompile Include="Source\Component\Stage\JumpGimicCom.cpp" />
     <ClCompile Include="Source\Component\System\ButtonCom.cpp" />
     <ClCompile Include="Source\Component\System\CrownCom.cpp" />

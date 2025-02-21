@@ -4,6 +4,7 @@
 #include "Component/Event/EventDirectCom.h"
 #include <Component\Event\EventDirect.h>
 #endif // DEBUG
+#include <Component\Sprite\SpriteCollisionCom.h>
 
 // 前方宣言
 class Component;
@@ -299,6 +300,7 @@ private:
     //スプライト描画
     std::vector<std::weak_ptr<Sprite>>spriteobject;
     std::vector<std::weak_ptr<SpriteCom>>spriteComobject;
+    std::vector<std::weak_ptr<SpriteCollisionCom>>spriteCollision;
 
     //Font描画
     std::vector<std::weak_ptr<Font>>fontobject;
