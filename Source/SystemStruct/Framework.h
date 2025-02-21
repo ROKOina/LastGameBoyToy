@@ -45,4 +45,10 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Debug>				debugID_;
 
     static Framework* instance;
+
+#ifdef DEBUG
+public:
+    bool isImgui = true;
+#endif // DEBUG
+
 };

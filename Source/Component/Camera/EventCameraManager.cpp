@@ -1,6 +1,7 @@
 #include "EventCameraManager.h"
 
 #include "CameraCom.h"
+#include <SystemStruct\Framework.h>
 
 CEREAL_CLASS_VERSION(EventCameraManager::ECTransform, 1)
 CEREAL_CLASS_VERSION(EventCameraManager::SaveEventCameraBuff, 2)
@@ -104,6 +105,7 @@ void EventCameraManager::LoadDesirialize()
 void EventCameraManager::EventCameraImGui()
 {
 #ifdef _DEBUG
+    if (!Framework::GetInstance()->isImgui)return;
     ImGui::SetNextWindowPos(ImVec2(30, 50), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 

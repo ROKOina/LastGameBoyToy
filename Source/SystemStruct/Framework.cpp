@@ -5,6 +5,7 @@
 #include "Scene/ScenePVE/ScenePVE.h"
 #include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\\SceneTitle\SceneTitle.h"
+#include "Scene\\SceneExpoTitle\SceneExpoTitle.h"
 #include "ImGuiRender.h"
 #include "Phsix\Physxlib.h"
 
@@ -23,7 +24,8 @@ Framework::Framework(HWND hWnd)
     PhysXLib::Instance().Initialize();
 
     //指定したシーンを選択
-    SceneManager::Instance().ChangeScene(new SceneLGBT);
+    SceneManager::Instance().ChangeScene(new SceneExpoTitle);
+    //SceneManager::Instance().ChangeScene(new SceneLGBT);
 
 #ifdef _DEBUG
     //IMGUI初期化
@@ -64,6 +66,10 @@ void Framework::Update(float elapsedTime/*Elapsed seconds from last frame*/, flo
     SceneManager::Instance().Update(managedTime);
 
 #ifdef _DEBUG
+    if ((ImGui::IsKeyPressed(ImGuiKey_Backspace) &&
+        (ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift))))
+        isImgui = (isImgui) ? false : true;
+
     //IMGUI更新
     IMGUI_CTRL_CLEAR_FRAME();
 #endif

@@ -17,6 +17,7 @@
 #include "Component\UI\Font.h"
 #include "Component\Renderer\VideoCom.h"
 #include "Component\Character\CharaStatusCom.h"
+#include <SystemStruct\Framework.h>
 
 //ゲームオブジェクト
 #pragma region GameObject
@@ -394,6 +395,8 @@ void GameObjectManager::Render(const DirectX::XMFLOAT4X4& view, const DirectX::X
     FontRender(view, projection);
 
 #ifdef _DEBUG
+    if (!Framework::GetInstance()->isImgui)return;
+
     // デバッグ情報の描画
     if (graphics.IsDebugGUI())
     {

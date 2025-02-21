@@ -64,14 +64,6 @@ void SceneTitle::Initialize()
         obj->AddComponent<Light>("Data/SerializeData/LightData/title.light");
     }
 
-    // イベント（テスト）
-    {
-        std::shared_ptr<GameObject> obj = GameObjectManager::Instance().Create();
-        obj->SetName("eventMove");
-        obj->AddComponent<EventMove>("Data/Event/MoveParam/test.evm");
-        obj->AddComponent<EventDirectCom>("Data/Event/testDirect.edm");
-    }
-
     //ステージ
     {
         auto& obj = GameObjectManager::Instance().Create();

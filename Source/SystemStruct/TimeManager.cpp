@@ -1,3 +1,4 @@
+#include "Framework.h"
 
 //XVˆ—
 void TimeManager::Update(const float& elapsedTime)
@@ -15,6 +16,7 @@ void TimeManager::Update(const float& elapsedTime)
 //imgui
 void TimeManager::ImGui()
 {
+    if (!Framework::GetInstance()->isImgui)return;
     ImGui::Begin("TimeManager");
     ImGui::DragFloat("TimeScale", &m_timescale, 0.1f, 0.1f, 10.0f);
     ImGui::DragFloat("EffectTime", &m_effecttime, 0.1f, 0.0f, 10.0f);

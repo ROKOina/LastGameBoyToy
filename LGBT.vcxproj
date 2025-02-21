@@ -140,6 +140,7 @@
     <ClInclude Include="Source\Component\System\ButtonCom.h" />
     <ClInclude Include="Source\Component\System\CrownCom.h" />
     <ClInclude Include="Source\Component\System\pingCom.h" />
+    <ClInclude Include="Source\Component\TitleController\ExpoTitleControllerCom.h" />
     <ClInclude Include="Source\Component\UI\UiEasingEnabledRemove.h" />
     <ClInclude Include="Source\Component\UI\UiMove.h" />
     <ClInclude Include="Source\Editor\EventDirectEditor.h" />
@@ -261,6 +262,7 @@
     <ClInclude Include="Source\Phsix\Physxlib.h" />
     <ClInclude Include="Source\PVPGameSystem\PVPGameSystem.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
+    <ClInclude Include="Source\Scene\SceneExpoTitle\SceneExpoTitle.h" />
     <ClInclude Include="Source\Scene\SceneLGBT\SceneLGBT.h" />
     <ClInclude Include="Source\Scene\SceneLoading\SceneLoading.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
@@ -314,6 +316,7 @@
     <ClCompile Include="Source\Component\Stage\JumpGimicCom.cpp" />
     <ClCompile Include="Source\Component\System\ButtonCom.cpp" />
     <ClCompile Include="Source\Component\System\CrownCom.cpp" />
+    <ClCompile Include="Source\Component\TitleController\ExpoTitleControllerCom.cpp" />
     <ClCompile Include="Source\Component\UI\UiMove.cpp" />
     <ClCompile Include="Source\Editor\EventDirectEditor.cpp" />
     <ClCompile Include="Source\Graphics\Video.cpp" />
@@ -425,6 +428,7 @@
     <ClCompile Include="Source\Phsix\Physxlib.cpp" />
     <ClCompile Include="Source\PVPGameSystem\PVPGameSystem.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Scene\SceneExpoTitle\SceneExpoTitle.cpp" />
     <ClCompile Include="Source\Scene\SceneLGBT\SceneLGBT.cpp" />
     <ClCompile Include="Source\Scene\SceneLoading\SceneLoading.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />

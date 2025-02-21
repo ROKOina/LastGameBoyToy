@@ -2,6 +2,7 @@
 #include "SceneLGBT.h"
 #include "Component\Light\LightCom.h"
 #include "Scene\SceneTitle\SceneTitle.h"
+#include "Scene\SceneExpoTitle\SceneExpoTitle.h"
 #include "Component/Character/RegisterChara.h"
 #include "Component/Renderer/RendererCom.h"
 #include <Component\Camera\FreeCameraCom.h>
@@ -151,7 +152,8 @@ void SceneLGBT::SceneTransition(float elapsedTime)
 
         if (lgbt->GetClipTime() > 1.0f)
         {
-            SceneManager::Instance().ChangeScene(new SceneTitle);
+            //SceneManager::Instance().ChangeScene(new SceneTitle);
+            SceneManager::Instance().ChangeScene(new SceneExpoTitle);
         }
     }
 
@@ -159,6 +161,7 @@ void SceneLGBT::SceneTransition(float elapsedTime)
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (GamePad::BTN_A & gamePad.GetButtonDown())
     {
-        SceneManager::Instance().ChangeScene(new SceneTitle);
+        //SceneManager::Instance().ChangeScene(new SceneTitle);
+        SceneManager::Instance().ChangeScene(new SceneExpoTitle);
     }
 }

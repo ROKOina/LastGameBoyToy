@@ -5,6 +5,7 @@
 #include "ScenePVE/ScenePVE.h"
 #include "ScenePVP/ScenePVP.h"
 #include "SceneTitle/SceneTitle.h"
+#include "SceneExpoTitle/SceneExpoTitle.h"
 #include "SceneTraining/SceneTraining.h"
 #include "Scene\SceneLGBT\SceneLGBT.h"
 #include "Scene\SceneNakanisi\SceneNakanisi.h"
@@ -12,6 +13,7 @@
 
 #include "Setting/Setting.h"
 #include "Audio/Audio3D.h"
+#include <SystemStruct\Framework.h>
 
 SceneManager::SceneManager()
 {
@@ -117,6 +119,7 @@ void SceneManager::ChangeSceneDelay(Scene* scene, float time)
 void SceneManager::ImGui()
 {
 #ifdef _DEBUG
+    if (!Framework::GetInstance()->isImgui)return;
     const Scene* scene = GetScene();
     if (scene != nullptr)
     {
@@ -127,6 +130,7 @@ void SceneManager::ImGui()
             {
                 "SceneLGBT",
                 "SceneTitle",
+                "SceneExpoTitle",
                 "ScenePVE",
                 "ScenePVP",
                 "SceneTraining",
@@ -146,6 +150,7 @@ void SceneManager::ImGui()
                     // Game scenes
                     new SceneLGBT,
                     new SceneTitle,
+                    new SceneExpoTitle,
                     new ScenePVE,
                     new ScenePVP,
                     new SceneTraining,
